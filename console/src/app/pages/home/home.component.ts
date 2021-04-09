@@ -15,8 +15,8 @@ export class HomeComponent {
         const theme = localStorage.getItem('theme');
         this.dark = theme === 'dark-theme' ? true : theme === 'light-theme' ? false : true;
 
-        this.firstStepsDismissed = localStorage.getItem('firstStartDismissed') == 'true' ? true : false;
-        this.quickstartsDismissed = localStorage.getItem('quickstartsDismissed') == 'true' ? true : false;
+        this.firstStepsDismissed = localStorage.getItem('firstStartDismissed') === 'true' ? true : false;
+        this.quickstartsDismissed = localStorage.getItem('quickstartsDismissed') === 'true' ? true : false;
     }
 
     dismissFirstSteps(event: Event): void {

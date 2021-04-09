@@ -22,14 +22,14 @@ export class PaginatorComponent {
     @Output() public page: EventEmitter<PageEvent> = new EventEmitter();
     constructor() { }
 
-    previous() {
+    public previous(): void {
         if (this.previousPossible) {
             this.pageIndex = this.pageIndex - 1;
             this.emitChange();
         }
     }
 
-    next() {
+    public next(): void {
         if (this.nextPossible) {
             this.pageIndex = this.pageIndex + 1;
             this.emitChange();
@@ -46,7 +46,7 @@ export class PaginatorComponent {
         return (temp <= (this.length / this.pageSize));
     }
 
-    emitChange() {
+    public emitChange(): void {
         this.page.emit({
             length: this.length,
             pageSize: this.pageSize,

@@ -20,7 +20,7 @@ export class EditDialogComponent {
     constructor(public dialogRef: MatDialogRef<EditDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) {
         this.valueControl.setValue(data.value);
-        if (data.type == EditDialogType.PHONE) {
+        if (data.type === EditDialogType.PHONE) {
             this.isPhone = true;
         }
 
@@ -31,7 +31,7 @@ export class EditDialogComponent {
         });
     }
 
-    changeValue(changedValue: string) {
+    private changeValue(changedValue: string): void {
         if (this.isPhone && changedValue) {
             try {
                 const phoneNumber = parsePhoneNumber(changedValue ?? '', 'CH');

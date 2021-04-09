@@ -268,7 +268,10 @@ export class AppComponent implements OnDestroy {
                 const cropped = navigator.language.split('-')[0] ?? 'en';
                 const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
 
-                const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ? userprofile.human.profile?.preferredLanguage : fallbackLang;
+                const lang =
+                    userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ?
+                        userprofile.human.profile?.preferredLanguage :
+                        fallbackLang;
                 this.translate.use(lang);
                 this.language = lang;
                 this.document.documentElement.lang = lang;

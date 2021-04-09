@@ -167,7 +167,12 @@ export function getPartialConfigFromAuthMethod(authMethod: string): {
     }
 }
 
-export function getAuthMethodFromPartialConfig(config: { oidc?: Partial<OIDCConfig.AsObject>, api?: Partial<APIConfig.AsObject>; }): string {
+export function getAuthMethodFromPartialConfig(
+    config: {
+        oidc?: Partial<OIDCConfig.AsObject>,
+        api?: Partial<APIConfig.AsObject>,
+    },
+): string {
     if (config?.oidc) {
         const toCheck = [config.oidc.responseTypesList, config.oidc.grantTypesList, config.oidc.authMethodType];
         const code = JSON.stringify(
@@ -194,7 +199,7 @@ export function getAuthMethodFromPartialConfig(config: { oidc?: Partial<OIDCConf
             ],
         );
 
-        const pk_jwt = JSON.stringify(
+        const pkjwt = JSON.stringify(
             [
                 [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
                 [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
@@ -214,7 +219,7 @@ export function getAuthMethodFromPartialConfig(config: { oidc?: Partial<OIDCConf
             case code: return CODE_METHOD.key;
             case pkce: return PKCE_METHOD.key;
             case post: return POST_METHOD.key;
-            case pk_jwt: return PK_JWT_METHOD.key;
+            case pkjwt: return PK_JWT_METHOD.key;
             case implicit: return IMPLICIT_METHOD.key;
             default:
                 return CUSTOM_METHOD.key;

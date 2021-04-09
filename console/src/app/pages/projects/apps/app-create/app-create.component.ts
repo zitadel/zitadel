@@ -78,11 +78,17 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     ];
 
     // set to oidc first
-    public authMethodTypes: { type: OIDCAuthMethodType | APIAuthMethodType, checked: boolean, disabled: boolean; api?: boolean; oidc?: boolean; }[] = [
-        { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC, checked: false, disabled: false, oidc: true },
-        { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE, checked: false, disabled: false, oidc: true },
-        { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST, checked: false, disabled: false, oidc: true },
-    ];
+    public authMethodTypes: {
+        type: OIDCAuthMethodType | APIAuthMethodType,
+        checked: boolean,
+        disabled: boolean;
+        api?: boolean;
+        oidc?: boolean;
+    }[] = [
+            { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC, checked: false, disabled: false, oidc: true },
+            { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE, checked: false, disabled: false, oidc: true },
+            { type: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST, checked: false, disabled: false, oidc: true },
+        ];
 
     // stepper
     firstFormGroup!: FormGroup;
@@ -196,11 +202,18 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
 
             if (this.isStepperOIDC && partialConfig && partialConfig.oidc) {
-                this.oidcAppRequest.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
-                this.oidcAppRequest.grantTypesList = partialConfig.oidc?.grantTypesList ?? [];
-                this.oidcAppRequest.authMethodType = partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+                this.oidcAppRequest.responseTypesList = partialConfig.oidc?.responseTypesList
+                    ?? [];
+
+                this.oidcAppRequest.grantTypesList = partialConfig.oidc?.grantTypesList
+                    ?? [];
+
+                this.oidcAppRequest.authMethodType = partialConfig.oidc?.authMethodType
+                    ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+
             } else if (this.isStepperAPI && partialConfig && partialConfig.api) {
-                this.apiAppRequest.authMethodType = partialConfig.api?.authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
+                this.apiAppRequest.authMethodType = partialConfig.api?.authMethodType
+                    ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
             }
         });
     }
@@ -265,7 +278,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.form.updateValueAndValidity();
     }
 
-    public changeStep(event: StepperSelectionEvent) {
+    public changeStep(event: StepperSelectionEvent): void {
         if (event.selectedIndex >= 2) {
             this.requestRedirectValuesSubject$.next();
         }
@@ -382,19 +395,19 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
 
     get isDevOIDC(): boolean {
-        return (this.formappType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
+        return (this.formappType?.value as RadioItemAppType).createType === AppCreateType.OIDC;
     }
 
     get isStepperOIDC(): boolean {
-        return (this.appType?.value as RadioItemAppType).createType == AppCreateType.OIDC;
+        return (this.appType?.value as RadioItemAppType).createType === AppCreateType.OIDC;
     }
 
     get isDevAPI(): boolean {
-        return (this.formappType?.value as RadioItemAppType).createType == AppCreateType.API;
+        return (this.formappType?.value as RadioItemAppType).createType === AppCreateType.API;
     }
 
     get isStepperAPI(): boolean {
-        return (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
+        return (this.appType?.value as RadioItemAppType).createType === AppCreateType.API;
     }
 }
 

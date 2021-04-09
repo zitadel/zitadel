@@ -36,7 +36,7 @@ export class IdpTableComponent implements OnInit {
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public IDPOwnerType: any = IDPOwnerType;
     public IDPState: any = IDPState;
-    public IdpStylingType: any = IDPStylingType;
+    public IDPSTYLINGTYPE: any = IDPStylingType;
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'dates', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<IDP.AsObject>>

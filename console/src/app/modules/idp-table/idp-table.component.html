@@ -31,7 +31,7 @@
                         [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.owner == IDPOwnerType.IDP_OWNER_TYPE_SYSTEM"
                         (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
                         <img src="../../../assets/images/google.png"
-                            *ngIf="idp.stylingType == IdpStylingType.IDPSTYLINGTYPE_GOOGLE" alt="google" />
+                            *ngIf="idp.stylingType == IDPSTYLINGTYPE.IDPSTYLINGTYPE_GOOGLE" alt="google" />
                     </mat-checkbox>
                 </td>
             </ng-container>

@@ -126,11 +126,13 @@ export class AdminService {
         return this.grpcService.admin.listLoginPolicyMultiFactors(req, null).then(resp => resp.toObject());
     }
 
-    public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest): Promise<AddMultiFactorToLoginPolicyResponse.AsObject> {
+    public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest):
+        Promise<AddMultiFactorToLoginPolicyResponse.AsObject> {
         return this.grpcService.admin.addMultiFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest): Promise<RemoveMultiFactorFromLoginPolicyResponse.AsObject> {
+    public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest):
+        Promise<RemoveMultiFactorFromLoginPolicyResponse.AsObject> {
         return this.grpcService.admin.removeMultiFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
@@ -139,11 +141,13 @@ export class AdminService {
         return this.grpcService.admin.listLoginPolicySecondFactors(req, null).then(resp => resp.toObject());
     }
 
-    public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest): Promise<AddSecondFactorToLoginPolicyResponse.AsObject> {
+    public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest):
+        Promise<AddSecondFactorToLoginPolicyResponse.AsObject> {
         return this.grpcService.admin.addSecondFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest): Promise<RemoveSecondFactorFromLoginPolicyResponse.AsObject> {
+    public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest):
+        Promise<RemoveSecondFactorFromLoginPolicyResponse.AsObject> {
         return this.grpcService.admin.removeSecondFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 

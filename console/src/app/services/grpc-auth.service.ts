@@ -330,7 +330,8 @@ export class GrpcAuthService {
         return this.grpcService.auth.listMyUserSessions(req, null).then(resp => resp.toObject());
     }
 
-    public listMyUserGrants(limit?: number, offset?: number, queryList?: ListQuery[]): Promise<ListMyUserGrantsResponse.AsObject> {
+    public listMyUserGrants(limit?: number, offset?: number, queryList?: ListQuery[]):
+        Promise<ListMyUserGrantsResponse.AsObject> {
         const req = new ListMyUserGrantsRequest();
         const query = new ListQuery();
         if (limit) {

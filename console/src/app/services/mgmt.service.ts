@@ -352,11 +352,13 @@ export class ManagementService {
         return this.grpcService.mgmt.listLoginPolicyMultiFactors(req, null).then(resp => resp.toObject());
     }
 
-    public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest): Promise<AddMultiFactorToLoginPolicyResponse.AsObject> {
+    public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest):
+        Promise<AddMultiFactorToLoginPolicyResponse.AsObject> {
         return this.grpcService.mgmt.addMultiFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest): Promise<RemoveMultiFactorFromLoginPolicyResponse.AsObject> {
+    public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest):
+        Promise<RemoveMultiFactorFromLoginPolicyResponse.AsObject> {
         return this.grpcService.mgmt.removeMultiFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
@@ -365,11 +367,13 @@ export class ManagementService {
         return this.grpcService.mgmt.listLoginPolicySecondFactors(req, null).then(resp => resp.toObject());
     }
 
-    public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest): Promise<AddSecondFactorToLoginPolicyResponse.AsObject> {
+    public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest):
+        Promise<AddSecondFactorToLoginPolicyResponse.AsObject> {
         return this.grpcService.mgmt.addSecondFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest): Promise<RemoveSecondFactorFromLoginPolicyResponse.AsObject> {
+    public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest):
+        Promise<RemoveSecondFactorFromLoginPolicyResponse.AsObject> {
         return this.grpcService.mgmt.removeSecondFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
@@ -378,7 +382,8 @@ export class ManagementService {
         return this.grpcService.mgmt.getLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
-    public updateCustomLoginPolicy(req: UpdateCustomLoginPolicyRequest): Promise<UpdateCustomLoginPolicyResponse.AsObject> {
+    public updateCustomLoginPolicy(req: UpdateCustomLoginPolicyRequest):
+        Promise<UpdateCustomLoginPolicyResponse.AsObject> {
         return this.grpcService.mgmt.updateCustomLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
@@ -1009,7 +1014,8 @@ export class ManagementService {
         return this.grpcService.mgmt.reactivateUser(req, null).then(resp => resp.toObject());
     }
 
-    public addProjectRole(projectId: string, roleKey: string, displayName: string, group: string): Promise<AddProjectRoleResponse.AsObject> {
+    public addProjectRole(projectId: string, roleKey: string, displayName: string, group: string):
+        Promise<AddProjectRoleResponse.AsObject> {
         const req = new AddProjectRoleRequest();
         req.setProjectId(projectId);
         req.setRoleKey(roleKey);
@@ -1026,7 +1032,8 @@ export class ManagementService {
         return this.grpcService.mgmt.resendHumanEmailVerification(req, null).then(resp => resp.toObject());
     }
 
-    public resendHumanInitialization(userId: string, newemail: string): Promise<ResendHumanInitializationResponse.AsObject> {
+    public resendHumanInitialization(userId: string, newemail: string):
+        Promise<ResendHumanInitializationResponse.AsObject> {
         const req = new ResendHumanInitializationRequest();
         if (newemail) {
             req.setEmail(newemail);
@@ -1049,14 +1056,16 @@ export class ManagementService {
         return this.grpcService.mgmt.setHumanInitialPassword(req, null).then(resp => resp.toObject());
     }
 
-    public sendHumanResetPasswordNotification(id: string, type: SendHumanResetPasswordNotificationRequest.Type): Promise<any> {
+    public sendHumanResetPasswordNotification(id: string, type: SendHumanResetPasswordNotificationRequest.Type):
+        Promise<any> {
         const req = new SendHumanResetPasswordNotificationRequest();
         req.setUserId(id);
         req.setType(type);
         return this.grpcService.mgmt.sendHumanResetPasswordNotification(req, null).then(resp => resp.toObject());
     }
 
-    public listUsers(limit: number, offset: number, queriesList?: UserSearchQuery[], sortingColumn?: UserFieldName): Promise<ListUsersResponse.AsObject> {
+    public listUsers(limit: number, offset: number, queriesList?: UserSearchQuery[], sortingColumn?: UserFieldName):
+        Promise<ListUsersResponse.AsObject> {
         const req = new ListUsersRequest();
         const query = new ListQuery();
         if (limit) {
@@ -1149,7 +1158,8 @@ export class ManagementService {
         return this.grpcService.mgmt.bulkRemoveUserGrant(req, null).then(resp => resp.toObject());
     }
 
-    public listAppChanges(appId: string, projectId: string, limit: number, sequence: number): Promise<ListAppChangesResponse.AsObject> {
+    public listAppChanges(appId: string, projectId: string, limit: number, sequence: number):
+        Promise<ListAppChangesResponse.AsObject> {
         const req = new ListAppChangesRequest();
         const query = new ChangeQuery();
         req.setAppId(appId);
@@ -1180,7 +1190,8 @@ export class ManagementService {
         return this.grpcService.mgmt.listOrgChanges(req, null).then(resp => resp.toObject());
     }
 
-    public listProjectChanges(projectId: string, limit: number, sequence: number): Promise<ListProjectChangesResponse.AsObject> {
+    public listProjectChanges(projectId: string, limit: number, sequence: number):
+        Promise<ListProjectChangesResponse.AsObject> {
         const req = new ListProjectChangesRequest();
         req.setProjectId(projectId);
         const query = new ChangeQuery();
@@ -1196,7 +1207,8 @@ export class ManagementService {
         return this.grpcService.mgmt.listProjectChanges(req, null).then(resp => resp.toObject());
     }
 
-    public listUserChanges(userId: string, limit: number, sequence: number): Promise<ListUserChangesResponse.AsObject> {
+    public listUserChanges(userId: string, limit: number, sequence: number):
+        Promise<ListUserChangesResponse.AsObject> {
         const req = new ListUserChangesRequest();
         req.setUserId(userId);
         const query = new ChangeQuery();
@@ -1297,7 +1309,8 @@ export class ManagementService {
         return this.grpcService.mgmt.updateProject(req, null).then(resp => resp.toObject());
     }
 
-    public updateProjectGrant(grantId: string, projectId: string, rolesList: string[]): Promise<UpdateProjectGrantResponse.AsObject> {
+    public updateProjectGrant(grantId: string, projectId: string, rolesList: string[]):
+        Promise<UpdateProjectGrantResponse.AsObject> {
         const req = new UpdateProjectGrantRequest();
         req.setRoleKeysList(rolesList);
         req.setGrantId(grantId);
@@ -1324,7 +1337,8 @@ export class ManagementService {
         return this.grpcService.mgmt.reactivateProject(req, null).then(resp => resp.toObject());
     }
 
-    public listProjectGrants(projectId: string, limit: number, offset: number): Promise<ListProjectGrantsResponse.AsObject> {
+    public listProjectGrants(projectId: string, limit: number, offset: number):
+        Promise<ListProjectGrantsResponse.AsObject> {
         const req = new ListProjectGrantsRequest();
         req.setProjectId(projectId);
         const query = new ListQuery();
@@ -1345,7 +1359,8 @@ export class ManagementService {
         return this.grpcService.mgmt.listProjectGrantMemberRoles(req, null).then(resp => resp.toObject());
     }
 
-    public addProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<AddProjectMemberResponse.AsObject> {
+    public addProjectMember(projectId: string, userId: string, rolesList: string[]):
+        Promise<AddProjectMemberResponse.AsObject> {
         const req = new AddProjectMemberRequest();
         req.setProjectId(projectId);
         req.setUserId(userId);
@@ -1353,7 +1368,8 @@ export class ManagementService {
         return this.grpcService.mgmt.addProjectMember(req, null).then(resp => resp.toObject());
     }
 
-    public updateProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<UpdateProjectMemberResponse.AsObject> {
+    public updateProjectMember(projectId: string, userId: string, rolesList: string[]):
+        Promise<UpdateProjectMemberResponse.AsObject> {
         const req = new UpdateProjectMemberRequest();
         req.setProjectId(projectId);
         req.setUserId(userId);
@@ -1444,7 +1460,8 @@ export class ManagementService {
         return this.grpcService.mgmt.deactivateApp(req, null).then(resp => resp.toObject());
     }
 
-    public regenerateOIDCClientSecret(appId: string, projectId: string): Promise<RegenerateOIDCClientSecretResponse.AsObject> {
+    public regenerateOIDCClientSecret(appId: string, projectId: string):
+        Promise<RegenerateOIDCClientSecretResponse.AsObject> {
         const req = new RegenerateOIDCClientSecretRequest();
         req.setAppId(appId);
         req.setProjectId(projectId);

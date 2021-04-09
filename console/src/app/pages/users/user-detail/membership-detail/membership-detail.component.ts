@@ -207,7 +207,11 @@ export class MembershipDetailComponent implements AfterViewInit {
         let prom;
 
         if (membership.projectId && membership.projectGrantId && membership.userId) {
-            prom = this.mgmtService.removeProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId);
+            prom = this.mgmtService.removeProjectGrantMember(
+                membership.projectId,
+                membership.projectGrantId,
+                membership.userId,
+            );
         } else if (membership.projectId && membership.userId) {
             prom = this.mgmtService.removeProjectMember(membership.projectId, membership.userId);
         } else if (membership.orgId && membership.userId) {

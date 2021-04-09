@@ -53,7 +53,7 @@ export class OrgListComponent implements AfterViewInit {
         this.loadingSubject.next(true);
         let query;
         if (filter) {
-            const query = new OrgQuery();
+            query = new OrgQuery();
             const orgNameQuery = new OrgNameQuery();
             orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
             orgNameQuery.setName(filter);

@@ -96,7 +96,12 @@ export class ClientKeysComponent implements OnInit {
                 }
 
                 if (type) {
-                    return this.mgmtService.addAppKey(this.projectId, this.appId, type, date ? date : undefined).then((response) => {
+                    return this.mgmtService.addAppKey(
+                        this.projectId,
+                        this.appId,
+                        type,
+                        date ? date : undefined,
+                    ).then((response) => {
                         if (response) {
                             setTimeout(() => {
                                 this.refreshPage();
