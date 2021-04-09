@@ -18,7 +18,7 @@
         <i *ngIf="!devMode && !(uri | redirect : isNative)" class="las la-exclamation red" [matTooltip]="isNative ? ('APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate) : ('APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate)"></i>
 
         <button matTooltip="{{'ACTIONS.DELETE' | translate}}" mat-icon-button (click)="remove(uri)" class="icon-button">
-            <mat-icon>cancel</mat-icon>
+            <mat-icon class="icon">cancel</mat-icon>
         </button>
     </div>
 </div>

@@ -12,8 +12,8 @@
   right: 0;
 
   .org-button {
-      font-weight: bold;
-      padding-right: .5rem;
+    font-weight: bold;
+    padding-right: .5rem;
   }
 
   .logo {
@@ -168,41 +168,18 @@
         margin: 2rem 2rem;
 
         .toc {
-            font-size: 12px;
-            color: var(--grey);
-            text-decoration: none;
+          font-size: 12px;
+          color: var(--grey);
+          text-decoration: none;
 
-            &:hover {
-                text-decoration: underline;
-            }
+          &:hover {
+            text-decoration: underline;
+          }
         }
 
         .slash {
-            margin: 0 .5rem;
-            color: var(--grey);
-        }
-
-        .sp-status {
-            font-size: 12px;
-            color: var(--grey);
-            text-decoration: none;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-
-        .sp-status .sp-status-badge.sp-status-ok { 
-            background: darkgreen; 
-        }
-        .sp-status .sp-status-badge.sp-status-scheduled { 
-            background: darkblue; 
-        }
-        .sp-status .sp-status-badge.sp-status-minor { 
-            background: darkorange; 
-        }
-        .sp-status .sp-status-badge.sp-status-major { 
-            background: darkred; 
+          margin: 0 .5rem;
+          color: var(--grey);
         }
       }
 

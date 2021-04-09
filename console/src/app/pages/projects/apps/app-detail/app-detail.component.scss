@@ -13,14 +13,14 @@
     margin-right: 1rem;
 
     h1 {
-        font-size: 1.2rem;
-        margin: 0 0 0 0;
-        font-weight: normal;
+      font-size: 1.2rem;
+      margin: 0 0 0 0;
+      font-weight: normal;
     }
 
     span {
-        font-size: 12px;
-        color: var(--grey);
+      font-size: 12px;
+      color: var(--grey);
     }
   }
 
@@ -42,7 +42,7 @@
   }
 
   .state-button {
-      margin-left: .5rem;
+    margin-left: .5rem;
   }
 }
 
@@ -52,43 +52,44 @@
 }
 
 .environment-wrapper {
-    padding: 1rem 0;
-    display: flex;
-    flex-wrap: wrap;
+  padding: 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
 
-    .environment {
-        min-width: 300px;
-        
-        .key {
-            font-size: 12px;
-            color: var(--grey);
-        }
-        .environment-row {
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            height: 30px;
-        
-            button {
-                transition: opacity .15s ease-in-out;
-                visibility: hidden;
-                opacity: 0;
-            
-                &[disabled] {
-                    visibility: visible;
-                    color: white;
-                    opacity: 1;
-                }
-            }
-        
-            &:hover {
-            button {
-                visibility: visible;
-                opacity: 1;
-            }
-            }
-        }
+  .environment {
+    min-width: 300px;
+
+    .key {
+      font-size: 12px;
+      color: var(--grey);
     }
+
+    .environment-row {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      height: 30px;
+
+      button {
+        transition: opacity .15s ease-in-out;
+        visibility: hidden;
+        opacity: 0;
+
+        &[disabled] {
+          visibility: visible;
+          color: white;
+          opacity: 1;
+        }
+      }
+
+      &:hover {
+        button {
+          visibility: visible;
+          opacity: 1;
+        }
+      }
+    }
+  }
 }
 
 .compliance .problem {
@@ -150,8 +151,8 @@
   }
 
   .redirect-section {
-      flex: 1;
-      margin: 0 .5rem;
+    flex: 1;
+    margin: 0 .5rem;
   }
 
   .formfield {
@@ -162,9 +163,9 @@
       flex-basis: 100%;
     }
   }
-  
+
   .section-title {
-      margin: 1.5rem 0 0 0;
+    margin: 1.5rem 0 0 0;
   }
 
   .full-width {
