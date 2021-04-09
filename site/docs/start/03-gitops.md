@@ -10,7 +10,7 @@ Now open a unix terminal.
 
 ```bash
 # Download the zitadelctl binary
-curl -s https://api.github.com/repos/caos/zitadel/releases/tags/v0.118.2 | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
+curl -s https://api.github.com/repos/caos/zitadel/releases/tags/v1.0.0 | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 sudo chmod +x /usr/local/bin/zitadelctl
 sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 

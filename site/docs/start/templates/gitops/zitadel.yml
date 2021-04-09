@@ -18,9 +18,6 @@ iam:
         shortMaxAge: 5m
         shortSharedMaxAge: 15m
       secrets:
-        existingKeys:
-          key: keys
-          name: zitadel
         userVerificationID: userverificationkey_1
         otpVerificationID: otpverificationkey_1
         oidcKeysID: oidckey_1
