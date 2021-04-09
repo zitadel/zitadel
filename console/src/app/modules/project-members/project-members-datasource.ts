@@ -7,8 +7,8 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum ProjectType {
-    PROJECTTYPE_OWNED = "OWNED",
-    PROJECTTYPE_GRANTED = "GRANTED"
+    PROJECTTYPE_OWNED = 'OWNED',
+    PROJECTTYPE_GRANTED = 'GRANTED',
 }
 
 /**

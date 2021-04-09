@@ -11,7 +11,7 @@ export interface PageEvent {
 @Component({
     selector: 'cnsl-paginator',
     templateUrl: './paginator.component.html',
-    styleUrls: ['./paginator.component.scss']
+    styleUrls: ['./paginator.component.scss'],
 })
 export class PaginatorComponent {
     @Input() public timestamp!: Timestamp.AsObject;

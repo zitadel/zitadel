@@ -192,7 +192,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }, {
                 i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
                 i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
-                href: 'https://docs.zitadel.ch'
+                href: 'https://docs.zitadel.ch',
             },
         ];
     }

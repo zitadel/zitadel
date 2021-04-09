@@ -11,7 +11,7 @@ import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 enum OrgListSearchKey {
-    NAME = "NAME",
+    NAME = 'NAME',
 }
 
 @Component({

@@ -26,6 +26,6 @@ import { PaginatorComponent } from './paginator.component';
     ],
     exports: [
         PaginatorComponent,
-    ]
+    ],
 })
 export class PaginatorModule { }

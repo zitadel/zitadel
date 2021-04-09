@@ -921,7 +921,7 @@ export class ManagementService {
         nickName?: string,
         displayName?: string,
         preferredLanguage?: string,
-        gender?: Gender
+        gender?: Gender,
     ): Promise<UpdateHumanProfileResponse.AsObject> {
         const req = new UpdateHumanProfileRequest();
         req.setUserId(userId);

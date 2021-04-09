@@ -123,15 +123,15 @@ export class AdminService {
 
     public listLoginPolicyMultiFactors(): Promise<ListLoginPolicyMultiFactorsResponse.AsObject> {
         const req = new ListLoginPolicyMultiFactorsRequest();
-        return this.grpcService.admin.listLoginPolicyMultiFactors(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listLoginPolicyMultiFactors(req, null).then(resp => resp.toObject());
     }
 
     public addMultiFactorToLoginPolicy(req: AddMultiFactorToLoginPolicyRequest): Promise<AddMultiFactorToLoginPolicyResponse.AsObject> {
-        return this.grpcService.admin.addMultiFactorToLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.addMultiFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public removeMultiFactorFromLoginPolicy(req: RemoveMultiFactorFromLoginPolicyRequest): Promise<RemoveMultiFactorFromLoginPolicyResponse.AsObject> {
-        return this.grpcService.admin.removeMultiFactorFromLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.removeMultiFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public listLoginPolicySecondFactors(): Promise<ListLoginPolicySecondFactorsResponse.AsObject> {
@@ -140,33 +140,33 @@ export class AdminService {
     }
 
     public addSecondFactorToLoginPolicy(req: AddSecondFactorToLoginPolicyRequest): Promise<AddSecondFactorToLoginPolicyResponse.AsObject> {
-        return this.grpcService.admin.addSecondFactorToLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.addSecondFactorToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public removeSecondFactorFromLoginPolicy(req: RemoveSecondFactorFromLoginPolicyRequest): Promise<RemoveSecondFactorFromLoginPolicyResponse.AsObject> {
-        return this.grpcService.admin.removeSecondFactorFromLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.removeSecondFactorFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public listIAMMemberRoles(): Promise<ListIAMMemberRolesResponse.AsObject> {
         const req = new ListIAMMemberRolesRequest();
-        return this.grpcService.admin.listIAMMemberRoles(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listIAMMemberRoles(req, null).then(resp => resp.toObject());
     }
 
     public listViews(): Promise<ListViewsResponse.AsObject> {
         const req = new ListViewsRequest();
-        return this.grpcService.admin.listViews(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listViews(req, null).then(resp => resp.toObject());
     }
 
     public listFailedEvents(): Promise<ListFailedEventsResponse.AsObject> {
         const req = new ListFailedEventsRequest();
-        return this.grpcService.admin.listFailedEvents(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listFailedEvents(req, null).then(resp => resp.toObject());
     }
 
     public clearView(viewname: string, db: string): Promise<ClearViewResponse.AsObject> {
         const req = new ClearViewRequest();
         req.setDatabase(db);
         req.setViewName(viewname);
-        return this.grpcService.admin.clearView(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.clearView(req, null).then(resp => resp.toObject());
     }
 
     public removeFailedEvent(viewname: string, db: string, sequence: number): Promise<RemoveFailedEventResponse.AsObject> {
@@ -174,7 +174,7 @@ export class AdminService {
         req.setDatabase(db);
         req.setViewName(viewname);
         req.setFailedSequence(sequence);
-        return this.grpcService.admin.removeFailedEvent(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.removeFailedEvent(req, null).then(resp => resp.toObject());
     }
 
     // Features
@@ -210,7 +210,7 @@ export class AdminService {
 
     public getPasswordComplexityPolicy(): Promise<GetPasswordComplexityPolicyResponse.AsObject> {
         const req = new GetPasswordComplexityPolicyRequest();
-        return this.grpcService.admin.getPasswordComplexityPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
     }
 
     public updatePasswordComplexityPolicy(
@@ -226,7 +226,7 @@ export class AdminService {
         req.setHasNumber(hasNumber);
         req.setHasSymbol(hasSymbol);
         req.setMinLength(minLength);
-        return this.grpcService.admin.updatePasswordComplexityPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updatePasswordComplexityPolicy(req, null).then(resp => resp.toObject());
     }
 
     /* age */
@@ -234,7 +234,7 @@ export class AdminService {
     public getPasswordAgePolicy(): Promise<GetPasswordAgePolicyResponse.AsObject> {
         const req = new GetPasswordAgePolicyRequest();
 
-        return this.grpcService.admin.getPasswordAgePolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getPasswordAgePolicy(req, null).then(resp => resp.toObject());
     }
 
     public updatePasswordAgePolicy(
@@ -245,14 +245,14 @@ export class AdminService {
         req.setMaxAgeDays(maxAgeDays);
         req.setExpireWarnDays(expireWarnDays);
 
-        return this.grpcService.admin.updatePasswordAgePolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updatePasswordAgePolicy(req, null).then(resp => resp.toObject());
     }
 
     /* lockout */
 
     public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse.AsObject> {
         const req = new GetPasswordLockoutPolicyRequest();
-        return this.grpcService.admin.getPasswordLockoutPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
     }
 
     public updatePasswordLockoutPolicy(
@@ -263,7 +263,7 @@ export class AdminService {
         req.setMaxAttempts(maxAttempts);
         req.setShowLockoutFailure(showLockoutFailures);
 
-        return this.grpcService.admin.updatePasswordLockoutPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updatePasswordLockoutPolicy(req, null).then(resp => resp.toObject());
     }
 
     /* label */
@@ -274,7 +274,7 @@ export class AdminService {
     }
 
     public updateLabelPolicy(req: UpdateLabelPolicyRequest): Promise<UpdateLabelPolicyResponse.AsObject> {
-        return this.grpcService.admin.updateLabelPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateLabelPolicy(req, null).then(resp => resp.toObject());
     }
 
     /* login */
@@ -282,11 +282,11 @@ export class AdminService {
     public getLoginPolicy(
     ): Promise<GetLoginPolicyResponse.AsObject> {
         const req = new GetLoginPolicyRequest();
-        return this.grpcService.admin.getLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public updateLoginPolicy(req: UpdateLoginPolicyRequest): Promise<UpdateLoginPolicyResponse.AsObject> {
-        return this.grpcService.admin.updateLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     /* org iam */
@@ -294,7 +294,7 @@ export class AdminService {
     public getCustomOrgIAMPolicy(orgId: string): Promise<GetCustomOrgIAMPolicyResponse.AsObject> {
         const req = new GetCustomOrgIAMPolicyRequest();
         req.setOrgId(orgId);
-        return this.grpcService.admin.getCustomOrgIAMPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getCustomOrgIAMPolicy(req, null).then(resp => resp.toObject());
     }
 
     public addCustomOrgIAMPolicy(
@@ -304,7 +304,7 @@ export class AdminService {
         req.setOrgId(orgId);
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
 
-        return this.grpcService.admin.addCustomOrgIAMPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.addCustomOrgIAMPolicy(req, null).then(resp => resp.toObject());
     }
 
     public updateCustomOrgIAMPolicy(
@@ -313,7 +313,7 @@ export class AdminService {
         const req = new UpdateCustomOrgIAMPolicyRequest();
         req.setOrgId(orgId);
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-        return this.grpcService.admin.updateCustomOrgIAMPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateCustomOrgIAMPolicy(req, null).then(resp => resp.toObject());
     }
 
     public resetCustomOrgIAMPolicyToDefault(
@@ -321,20 +321,20 @@ export class AdminService {
     ): Promise<ResetCustomOrgIAMPolicyToDefaultResponse.AsObject> {
         const req = new ResetCustomOrgIAMPolicyToDefaultRequest();
         req.setOrgId(orgId);
-        return this.grpcService.admin.resetCustomOrgIAMPolicyToDefault(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.resetCustomOrgIAMPolicyToDefault(req, null).then(resp => resp.toObject());
     }
 
     /* admin iam */
 
     public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
         const req = new GetOrgIAMPolicyRequest();
-        return this.grpcService.admin.getOrgIAMPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getOrgIAMPolicy(req, null).then(resp => resp.toObject());
     }
 
     public updateOrgIAMPolicy(userLoginMustBeDomain: boolean): Promise<UpdateOrgIAMPolicyResponse.AsObject> {
         const req = new UpdateOrgIAMPolicyRequest();
         req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-        return this.grpcService.admin.updateOrgIAMPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateOrgIAMPolicy(req, null).then(resp => resp.toObject());
     }
 
     /* policies end */
@@ -342,13 +342,13 @@ export class AdminService {
     public addIDPToLoginPolicy(idpId: string): Promise<AddIDPToLoginPolicyResponse.AsObject> {
         const req = new AddIDPToLoginPolicyRequest();
         req.setIdpId(idpId);
-        return this.grpcService.admin.addIDPToLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.addIDPToLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public removeIDPFromLoginPolicy(idpId: string): Promise<RemoveIDPFromLoginPolicyResponse.AsObject> {
         const req = new RemoveIDPFromLoginPolicyRequest();
         req.setIdpId(idpId);
-        return this.grpcService.admin.removeIDPFromLoginPolicy(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.removeIDPFromLoginPolicy(req, null).then(resp => resp.toObject());
     }
 
     public listLoginPolicyIDPs(limit?: number, offset?: number): Promise<ListLoginPolicyIDPsResponse.AsObject> {
@@ -361,7 +361,7 @@ export class AdminService {
             query.setOffset(offset);
         }
         req.setQuery(query);
-        return this.grpcService.admin.listLoginPolicyIDPs(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listLoginPolicyIDPs(req, null).then(resp => resp.toObject());
     }
 
     public listIDPs(
@@ -382,7 +382,7 @@ export class AdminService {
             req.setQueriesList(queriesList);
         }
         req.setQuery(query);
-        return this.grpcService.admin.listIDPs(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listIDPs(req, null).then(resp => resp.toObject());
     }
 
     public getIDPByID(
@@ -390,25 +390,25 @@ export class AdminService {
     ): Promise<GetIDPByIDResponse.AsObject> {
         const req = new GetIDPByIDRequest();
         req.setId(id);
-        return this.grpcService.admin.getIDPByID(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.getIDPByID(req, null).then(resp => resp.toObject());
     }
 
     public updateIDP(
         req: UpdateIDPRequest,
     ): Promise<UpdateIDPResponse.AsObject> {
-        return this.grpcService.admin.updateIDP(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateIDP(req, null).then(resp => resp.toObject());
     }
 
     public addOIDCIDP(
         req: AddOIDCIDPRequest,
     ): Promise<AddOIDCIDPResponse.AsObject> {
-        return this.grpcService.admin.addOIDCIDP(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.addOIDCIDP(req, null).then(resp => resp.toObject());
     }
 
     public updateIDPOIDCConfig(
         req: UpdateIDPOIDCConfigRequest,
     ): Promise<UpdateIDPOIDCConfigResponse.AsObject> {
-        return this.grpcService.admin.updateIDPOIDCConfig(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateIDPOIDCConfig(req, null).then(resp => resp.toObject());
     }
 
     public removeIDP(
@@ -416,7 +416,7 @@ export class AdminService {
     ): Promise<RemoveIDPResponse.AsObject> {
         const req = new RemoveIDPRequest;
         req.setIdpId(id);
-        return this.grpcService.admin.removeIDP(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.removeIDP(req, null).then(resp => resp.toObject());
     }
 
     public deactivateIDP(
@@ -424,7 +424,7 @@ export class AdminService {
     ): Promise<DeactivateIDPResponse.AsObject> {
         const req = new DeactivateIDPRequest;
         req.setIdpId(id);
-        return this.grpcService.admin.deactivateIDP(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.deactivateIDP(req, null).then(resp => resp.toObject());
     }
 
     public reactivateIDP(
@@ -432,7 +432,7 @@ export class AdminService {
     ): Promise<ReactivateIDPResponse.AsObject> {
         const req = new ReactivateIDPRequest;
         req.setIdpId(id);
-        return this.grpcService.admin.reactivateIDP(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.reactivateIDP(req, null).then(resp => resp.toObject());
     }
 
     public listIAMMembers(
@@ -453,7 +453,7 @@ export class AdminService {
         }
         req.setQuery(metadata);
 
-        return this.grpcService.admin.listIAMMembers(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.listIAMMembers(req, null).then(resp => resp.toObject());
     }
 
     public removeIAMMember(
@@ -461,7 +461,7 @@ export class AdminService {
     ): Promise<RemoveIAMMemberResponse.AsObject> {
         const req = new RemoveIAMMemberRequest();
         req.setUserId(userId);
-        return this.grpcService.admin.removeIAMMember(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.removeIAMMember(req, null).then(resp => resp.toObject());
     }
 
     public addIAMMember(
@@ -472,7 +472,7 @@ export class AdminService {
         req.setUserId(userId);
         req.setRolesList(rolesList);
 
-        return this.grpcService.admin.addIAMMember(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.addIAMMember(req, null).then(resp => resp.toObject());
     }
 
     public updateIAMMember(
@@ -483,6 +483,6 @@ export class AdminService {
         req.setUserId(userId);
         req.setRolesList(rolesList);
 
-        return this.grpcService.admin.updateIAMMember(req, null).then(resp => resp.toObject());;
+        return this.grpcService.admin.updateIAMMember(req, null).then(resp => resp.toObject());
     }
 }

@@ -268,7 +268,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public changeStep(event: StepperSelectionEvent) {
         if (event.selectedIndex >= 2) {
             this.requestRedirectValuesSubject$.next();
-        };
+        }
     }
 
     private async getData({ projectid }: Params): Promise<void> {
@@ -335,8 +335,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(AppSecretDialogComponent, {
             data: {
                 clientSecret: clientSecret,
-                clientId: clientId
-            }
+                clientId: clientId,
+            },
         });
 
         dialogRef.afterClosed().subscribe(() => {
@@ -396,5 +396,5 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     get isStepperAPI(): boolean {
         return (this.appType?.value as RadioItemAppType).createType == AppCreateType.API;
     }
-};
+}
 

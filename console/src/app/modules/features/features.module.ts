@@ -20,7 +20,7 @@ import { FeaturesComponent } from './features.component';
 
 @NgModule({
     declarations: [
-        FeaturesComponent
+        FeaturesComponent,
     ],
     imports: [
         FeaturesRoutingModule,
@@ -41,6 +41,6 @@ import { FeaturesComponent } from './features.component';
     ],
     exports: [
         FeaturesComponent,
-    ]
+    ],
 })
 export class FeaturesModule { }

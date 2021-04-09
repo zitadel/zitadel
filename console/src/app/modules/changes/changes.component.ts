@@ -23,7 +23,7 @@ export enum ChangeType {
 }
 
 export interface MappedChange {
-    key: string,
+    key: string;
     values: Array<{
         data: any[];
         dates: Timestamp.AsObject[];
@@ -175,7 +175,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
         const splitted: { [editorId: string]: any[]; } = {};
         changes.forEach((change) => {
             if (change.changeDate) {
-                const index = `${this.getDateString(change.changeDate)}`;//`${this.getDateString(change.changeDate)}:${change.editorId}`;
+                const index = `${this.getDateString(change.changeDate)}`; // `${this.getDateString(change.changeDate)}:${change.editorId}`;
 
                 if (index) {
                     if (splitted[index]) {
@@ -209,7 +209,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
                                 // data: [change.data],
                                 eventTypes: [change.eventType],
                                 sequences: [change.sequence],
-                            }
+                            },
                         ];
                     }
                 }
@@ -243,10 +243,10 @@ export class ChangesComponent implements OnInit, OnDestroy {
     // Order by ascending property value
     valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
         return a.value.localeCompare(b.value);
-    };
+    }
 
     // Order by descending property key
     keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
         return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
-    };
+    }
 }

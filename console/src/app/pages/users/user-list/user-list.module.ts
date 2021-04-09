@@ -47,7 +47,7 @@ import { UserTableComponent } from './user-table/user-table.component';
         SharedModule,
         RefreshTableModule,
         InputModule,
-        PaginatorModule
+        PaginatorModule,
     ],
     exports: [
         UserListComponent,

@@ -104,7 +104,7 @@ export class MachineKeysComponent implements OnInit {
                             this.dialog.open(ShowKeyDialogComponent, {
                                 data: {
                                     key: response,
-                                    type: AddKeyDialogType.MACHINE
+                                    type: AddKeyDialogType.MACHINE,
                                 },
                                 width: '400px',
                             });

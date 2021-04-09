@@ -31,7 +31,7 @@ import { ChangesComponent } from './changes.component';
         LocalizedDatePipeModule,
         TimestampToDatePipeModule,
         MatTooltipModule,
-        AvatarModule
+        AvatarModule,
     ],
     exports: [
         ChangesComponent,

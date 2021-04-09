@@ -105,7 +105,7 @@ export class ClientKeysComponent implements OnInit {
                             this.dialog.open(ShowKeyDialogComponent, {
                                 data: {
                                     key: response,
-                                    type: AddKeyDialogType.AUTHNKEY
+                                    type: AddKeyDialogType.AUTHNKEY,
                                 },
                                 width: '400px',
                             });
