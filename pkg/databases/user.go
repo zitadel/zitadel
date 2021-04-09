@@ -5,7 +5,6 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api"
 	"github.com/caos/zitadel/operator/api/database"
 	coredb "github.com/caos/zitadel/operator/database/kinds/databases/core"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
@@ -29,7 +28,7 @@ func GitOpsListUsers(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) ([]string, error) {
-	desired, err := api.ReadDatabaseYml(gitClient)
+	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
 		return nil, err
@@ -94,7 +93,7 @@ func GitOpsAddUser(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) error {
-	desired, err := api.ReadDatabaseYml(gitClient)
+	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
 		return err
@@ -142,7 +141,7 @@ func GitOpsDeleteUser(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) error {
-	desired, err := api.ReadDatabaseYml(gitClient)
+	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
 		return err
