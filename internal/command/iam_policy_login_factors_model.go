@@ -93,3 +93,48 @@ func (wm *IAMMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 			iam.LoginPolicyMultiFactorAddedEventType,
 			iam.LoginPolicyMultiFactorRemovedEventType)
 }
+
+type IAMAuthFactorsWriteModel struct {
+	AuthFactorsWriteModel
+}
+
+func NewIAMAuthFactorsWriteModel() *IAMAuthFactorsWriteModel {
+	return &IAMAuthFactorsWriteModel{
+		AuthFactorsWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
+			},
+		},
+	}
+}
+
+func (wm *IAMAuthFactorsWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *iam.LoginPolicySecondFactorAddedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+		case *iam.LoginPolicySecondFactorRemovedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+		case *iam.LoginPolicyMultiFactorAddedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+		case *iam.LoginPolicyMultiFactorRemovedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+		}
+	}
+}
+
+func (wm *IAMAuthFactorsWriteModel) Reduce() error {
+	return wm.AuthFactorsWriteModel.Reduce()
+}
+
+func (wm *IAMAuthFactorsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.LoginPolicySecondFactorAddedEventType,
+			iam.LoginPolicySecondFactorRemovedEventType,
+			iam.LoginPolicyMultiFactorAddedEventType,
+			iam.LoginPolicyMultiFactorRemovedEventType)
+}

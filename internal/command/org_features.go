@@ -125,25 +125,34 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 		return nil, err
 	}
 	policy := *existingPolicy
-	if !features.LoginPolicyFactors && defaultPolicy.ForceMFA != existingPolicy.ForceMFA {
-		policy.ForceMFA = defaultPolicy.ForceMFA
+	if !features.LoginPolicyFactors {
+		if defaultPolicy.ForceMFA != existingPolicy.ForceMFA {
+			policy.ForceMFA = defaultPolicy.ForceMFA
+		}
+		iamAuthFactors, err := c.defaultLoginPolicyAuthFactorsWriteModel(ctx)
+		if err != nil {
+			return nil, err
+		}
+		orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		for iamFactor, iamState := range iamAuthFactors.SecondFactors {
+			orgState, ok := orgAuthFactors.SecondFactors[iamFactor]
+			if iamState == domain.FactorStateActive {
+				if ok && orgState == domain.FactorStateActive {
+					continue
+				}
+				c.AddSecondFactorToLoginPolicy(ctx, iamFactor, orgID)
+			}
+		}
+
 	}
 	if !features.LoginPolicyIDP {
 		if defaultPolicy.AllowExternalIDP != existingPolicy.AllowExternalIDP {
 			policy.AllowExternalIDP = defaultPolicy.AllowExternalIDP
-			c.org.SearchIDPConfigs
-			for _, idp := range existingPolicy.ex {
-				var externalIdpIDs []*domain.ExternalIDP
-				e, err := c.removeIDPConfig(ctx, idp, true, externalIdpIDs...)
-				if err != nil {
-					return nil, err
-				}
-				events = append(events, e...)
-			}
 		}
-		//for i, i := range existingPolicy.SecondFactorWriteModel.MFAType {
-		//
-		//} !reflect.DeepEqual(defaultPolicy.IDPProviders, existingPolicy.IDPProviders)
+		//TODO: handle idps
 	}
 	if !features.LoginPolicyRegistration && defaultPolicy.AllowRegister != existingPolicy.AllowRegister {
 		policy.AllowRegister = defaultPolicy.AllowRegister

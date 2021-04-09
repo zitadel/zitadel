@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -92,4 +93,49 @@ func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.LoginPolicyMultiFactorAddedEventType,
 			org.LoginPolicyMultiFactorRemovedEventType)
+}
+
+type OrgAuthFactorsWriteModel struct {
+	AuthFactorsWriteModel
+}
+
+func NewOrgAuthFactorsWriteModel(orgID string) *OrgAuthFactorsWriteModel {
+	return &OrgAuthFactorsWriteModel{
+		AuthFactorsWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+		},
+	}
+}
+
+func (wm *OrgAuthFactorsWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *iam.LoginPolicySecondFactorAddedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+		case *iam.LoginPolicySecondFactorRemovedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+		case *iam.LoginPolicyMultiFactorAddedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+		case *iam.LoginPolicyMultiFactorRemovedEvent:
+			wm.AuthFactorsWriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+		}
+	}
+}
+
+func (wm *OrgAuthFactorsWriteModel) Reduce() error {
+	return wm.AuthFactorsWriteModel.Reduce()
+}
+
+func (wm *OrgAuthFactorsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			iam.LoginPolicySecondFactorAddedEventType,
+			iam.LoginPolicySecondFactorRemovedEventType,
+			iam.LoginPolicyMultiFactorAddedEventType,
+			iam.LoginPolicyMultiFactorRemovedEventType)
 }
