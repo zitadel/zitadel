@@ -1,8 +1,6 @@
 package database
 
 import (
-	"errors"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -20,11 +18,6 @@ func Takeoff(monitor mntr.Monitor, gitClient *git.Client, adapt operator.AdaptFu
 			return
 		}
 		treeCurrent := &tree.Tree{}
-
-		if !k8sClient.Available() {
-			internalMonitor.Error(errors.New("kubeclient is not available"))
-			return
-		}
 
 		query, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 		if err != nil {
