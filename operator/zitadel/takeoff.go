@@ -1,8 +1,6 @@
 package zitadel
 
 import (
-	"errors"
-
 	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
@@ -26,11 +24,6 @@ func Takeoff(
 			return err
 		}
 		treeCurrent := &tree.Tree{}
-
-		if !k8sClient.Available() {
-			internalMonitor.Error(errors.New("kubeclient is not available"))
-			return err
-		}
 
 		query, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 		if err != nil {

@@ -5,7 +5,6 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api"
 	"github.com/caos/zitadel/operator/api/database"
 	coredb "github.com/caos/zitadel/operator/database/kinds/databases/core"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
@@ -28,7 +27,7 @@ func GitOpsGetConnectionInfo(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) (string, string, error) {
-	desired, err := api.ReadDatabaseYml(gitClient)
+	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
 		return "", "", err

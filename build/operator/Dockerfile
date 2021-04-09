@@ -33,7 +33,9 @@ FROM go-test as prod-go-build
 ARG ARCH=amd64
 ARG OS=linux
 ARG VERSION=none
-RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -a -installsuffix cgo -ldflags "-extldflags '-static' -X main.Version=${VERSION}" -o zitadelctl cmd/zitadelctl/main.go
+ARG GITHUBOAUTHCLIENTID=none
+ARG GITHUBOAUTHCLIENTSECRET=none
+RUN GOOS=${OS} GOARCH=${ARCH} ./scripts/build.sh ${VERSION}
 
 ## Go dev build
 FROM go-base as dev-go-build
