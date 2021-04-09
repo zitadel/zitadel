@@ -1,0 +1,30 @@
+kind: databases.caos.ch/Orb
+version: v0
+spec:
+  verbose: false
+  version: 1.0.0
+  selfReconciling: true
+database:
+  kind: databases.caos.ch/CockroachDB
+  version: v0
+  spec:
+    resources:
+      limits:
+        memory: 8Gi
+      requests:
+        cpu: 1
+        memory: 6Gi
+    verbose: false
+    replicaCount: 1
+    storageCapacity: 368Gi
+    storageClass: fast
+    clusterDNS: cluster.local
+    backups: {}
+      # bucket:
+      #  kind: databases.caos.ch/BucketBackup
+      # version: v0
+      #spec:
+      #  verbose: true
+      #  cron: 0 * * * *
+      #  bucket: dummy
+    #  serviceAccountJSON: {}
