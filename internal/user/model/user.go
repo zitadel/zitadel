@@ -32,7 +32,7 @@ const (
 
 func (u *User) CheckOrgIAMPolicy(policy *iam_model.OrgIAMPolicyView) error {
 	if policy == nil {
-		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH73", "Errors.Users.OrgIamPolicyNil")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
 		u.UserName = u.EmailAddress
