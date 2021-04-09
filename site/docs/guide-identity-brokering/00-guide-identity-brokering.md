@@ -136,10 +136,9 @@ Your user will now be able to choose Google for login instead of username/passwo
 
 ### Summary
 
-* With service users you can secure machine-to-machine communication
-* Because there is no interactive logon, you need to use a JWT signed with your private key to authorize the user
-* After successful authorization you can use an access token like for human users
+* You can federate identities of all oAuth 2.0 compliant external identity providers
+* Configure the provider in your custom login policy
 
 Where to go from here: 
-* Management API
-* Securing backend API
+* ZITADEL Projects
+* Service users
