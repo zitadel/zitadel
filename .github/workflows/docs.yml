@@ -3,7 +3,8 @@ on:
   push:
     paths:
       - 'site/**'
-
+    tags-ignore:
+      - '**'
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
