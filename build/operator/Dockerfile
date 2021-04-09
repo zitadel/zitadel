@@ -35,7 +35,7 @@ ARG OS=linux
 ARG VERSION=none
 ARG GITHUBOAUTHCLIENTID=none
 ARG GITHUBOAUTHCLIENTSECRET=none
-RUN GOOS=${OS} GOARCH=${ARCH} ./scripts/build.sh ${VERSION}
+RUN GOOS=${OS} GOARCH=${ARCH} ./build/operator/build.sh ${VERSION}
 
 ## Go dev build
 FROM go-base as dev-go-build
