@@ -11,11 +11,25 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type AdaptFunc func(monitor mntr.Monitor, desired *tree.Tree, current *tree.Tree) (QueryFunc, DestroyFunc, map[string]*secret.Secret, map[string]*secret.Existing, bool, error)
+type AdaptFunc func(
+	monitor mntr.Monitor,
+	desired *tree.Tree,
+	current *tree.Tree,
+) (
+	QueryFunc,
+	DestroyFunc,
+	ConfigureFunc,
+	map[string]*secret.Secret,
+	map[string]*secret.Existing,
+	bool,
+	error,
+)
 
 type EnsureFunc func(k8sClient kubernetes.ClientInt) error
 
 type DestroyFunc func(k8sClient kubernetes.ClientInt) error
+
+type ConfigureFunc func(k8sClient kubernetes.ClientInt, gitops bool) error
 
 type QueryFunc func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (EnsureFunc, error)
 

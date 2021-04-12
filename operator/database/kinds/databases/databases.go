@@ -20,7 +20,7 @@ func ComponentSelector() *labels.Selector {
 	return labels.OpenComponentSelector("ZITADEL", component)
 }
 
-func GetQueryAndDestroyFuncs(
+func Adapt(
 	monitor mntr.Monitor,
 	desiredTree *tree.Tree,
 	currentTree *tree.Tree,
@@ -34,6 +34,7 @@ func GetQueryAndDestroyFuncs(
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
+	configure operator.ConfigureFunc,
 	secrets map[string]*secret.Secret,
 	existing map[string]*secret.Existing,
 	migrate bool,
@@ -44,11 +45,11 @@ func GetQueryAndDestroyFuncs(
 
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
-		return managed.AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(internalMonitor, desiredTree, currentTree)
+		return managed.Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(internalMonitor, desiredTree, currentTree)
 	case "databases.caos.ch/ProvidedDatabase":
-		return provided.AdaptFunc()(internalMonitor, desiredTree, currentTree)
+		return provided.Adapter()(internalMonitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
 	}
 }
 

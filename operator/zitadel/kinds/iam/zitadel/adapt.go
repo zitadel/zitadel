@@ -3,6 +3,10 @@ package zitadel
 import (
 	"strconv"
 
+	"github.com/caos/orbos/pkg/helper"
+
+	"gopkg.in/yaml.v3"
+
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
@@ -39,6 +43,7 @@ func AdaptFunc(
 	) (
 		operator.QueryFunc,
 		operator.DestroyFunc,
+		operator.ConfigureFunc,
 		map[string]*secret.Secret,
 		map[string]*secret.Existing,
 		bool,
@@ -49,7 +54,7 @@ func AdaptFunc(
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -92,7 +97,7 @@ func AdaptFunc(
 			uiServiceName,
 			uint16(uiPort))
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		getQueryC, destroyC, getConfigurationHashes, err := configuration.AdaptFunc(
@@ -111,7 +116,7 @@ func AdaptFunc(
 			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryDB, err := database.AdaptFunc(
@@ -119,7 +124,7 @@ func AdaptFunc(
 			dbClient,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryM, destroyM, err := migration.AdaptFunc(
@@ -134,7 +139,7 @@ func AdaptFunc(
 			tolerations,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		getQuerySetup, destroySetup, err := setup.AdaptFunc(
@@ -155,7 +160,7 @@ func AdaptFunc(
 			secretPasswordName,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryD, destroyD, err := deployment.AdaptFunc(
@@ -182,7 +187,7 @@ func AdaptFunc(
 			setup.GetDoneFunc(monitor, namespace, action),
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryAmbassador, destroyAmbassador, err := ambassador.AdaptFunc(
@@ -195,7 +200,7 @@ func AdaptFunc(
 			desiredKind.Spec.Configuration.DNS,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -289,6 +294,70 @@ func AdaptFunc(
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
+			func(k8sClient kubernetes.ClientInt, gitops bool) error {
+				if desiredKind.Spec == nil {
+					desiredKind.Spec = &Spec{}
+				}
+				if desiredKind.Spec.Configuration == nil {
+					desiredKind.Spec.Configuration = &configuration.Configuration{}
+				}
+				if desiredKind.Spec.Configuration.Secrets == nil {
+					desiredKind.Spec.Configuration.Secrets = &configuration.Secrets{}
+				}
+				if desiredKind.Spec.Configuration.Secrets.CookieID == "" {
+					desiredKind.Spec.Configuration.Secrets.CookieID = "cookiekey_1"
+				}
+				if desiredKind.Spec.Configuration.Secrets.OTPVerificationID == "" {
+					desiredKind.Spec.Configuration.Secrets.OTPVerificationID = "otpverificationkey_1"
+				}
+				if desiredKind.Spec.Configuration.Secrets.DomainVerificationID == "" {
+					desiredKind.Spec.Configuration.Secrets.DomainVerificationID = "domainverificationkey_1"
+				}
+				if desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID == "" {
+					desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID = "idpconfigverificationkey_1"
+				}
+				if desiredKind.Spec.Configuration.Secrets.OIDCKeysID == "" {
+					desiredKind.Spec.Configuration.Secrets.OIDCKeysID = "oidckey_1"
+				}
+				if desiredKind.Spec.Configuration.Secrets.UserVerificationID == "" {
+					desiredKind.Spec.Configuration.Secrets.UserVerificationID = "userverificationkey_1"
+				}
+				if gitops && desiredKind.Spec.Configuration.Secrets.Keys == nil {
+					desiredKind.Spec.Configuration.Secrets.Keys = &secret.Secret{}
+				}
+				if !gitops && desiredKind.Spec.Configuration.Secrets.ExistingKeys == nil {
+					desiredKind.Spec.Configuration.Secrets.ExistingKeys = &secret.Existing{}
+				}
+
+				keys := make(map[string]string)
+				if gitops {
+					if err := yaml.Unmarshal([]byte(desiredKind.Spec.Configuration.Secrets.Keys.Value), keys); err != nil {
+						return nil
+					}
+				} else {
+					return errors.New("configure is not yet implemented for CRD mode")
+				}
+
+				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.CookieID]; !ok {
+					keys[desiredKind.Spec.Configuration.Secrets.CookieID] = helper.RandStringBytes(32)
+				}
+				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.OTPVerificationID]; !ok {
+					keys[desiredKind.Spec.Configuration.Secrets.OTPVerificationID] = helper.RandStringBytes(32)
+				}
+				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.DomainVerificationID]; !ok {
+					keys[desiredKind.Spec.Configuration.Secrets.DomainVerificationID] = helper.RandStringBytes(32)
+				}
+				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID]; !ok {
+					keys[desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID] = helper.RandStringBytes(32)
+				}
+				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.OIDCKeysID]; !ok {
+					keys[desiredKind.Spec.Configuration.Secrets.OIDCKeysID] = helper.RandStringBytes(32)
+				}
+				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID]; !ok {
+					keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID] = helper.RandStringBytes(32)
+				}
+				return nil
+			},
 			allSecrets,
 			allExisting,
 			false,

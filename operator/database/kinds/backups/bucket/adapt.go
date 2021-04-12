@@ -40,6 +40,7 @@ func AdaptFunc(
 	) (
 		operator.QueryFunc,
 		operator.DestroyFunc,
+		operator.ConfigureFunc,
 		map[string]*secretpkg.Secret,
 		map[string]*secretpkg.Existing,
 		bool,
@@ -50,7 +51,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -62,7 +63,7 @@ func AdaptFunc(
 
 		destroyS, err := secret.AdaptFuncToDestroy(namespace, secretName)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		_, destroyB, err := backup.AdaptFunc(
@@ -83,7 +84,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		_, destroyR, err := restore.AdaptFunc(
@@ -102,7 +103,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		_, destroyC, err := clean.AdaptFunc(
@@ -119,7 +120,7 @@ func AdaptFunc(
 			version,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -269,6 +270,7 @@ func AdaptFunc(
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
+			func(kubernetes.ClientInt, bool) error { return nil },
 			secrets,
 			existing,
 			false,
