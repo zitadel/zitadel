@@ -20,7 +20,7 @@
       <mj-section>
         <mj-group>
           <mj-column>
-            <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="160px" padding="50px 0 50px 0px" />
+            <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="160px" border-radius="8px" padding="50px 0 50px 0" />
           </mj-column>
         </mj-group>
       </mj-section>
