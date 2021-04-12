@@ -26,8 +26,8 @@
     min-width: 150px;
 
     .chip {
-        border-radius: .5rem;
-        height: 40px;
+      border-radius: .5rem;
+      height: 40px;
     }
 
     &.fullwidth {
@@ -40,21 +40,21 @@
   }
 
   .line {
-      display: flex;
-      align-items: flex-end;
-      width: 100%;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
 
-      .formfield {
-          flex: 1;
+    .formfield {
+      flex: 1;
 
-          input {
-              margin: 0;
-          }
+      input {
+        margin: 0;
       }
+    }
 
-      button {
-          margin-bottom: 12px;
-      }
+    button {
+      margin-bottom: 12px;
+    }
   }
 }
 

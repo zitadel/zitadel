@@ -18,17 +18,16 @@ Then go to your [Console Projects](https://console.zitadel.ch/projects) view and
     </figure>
 </div>
 
-Now you can proceed adding [users](administrate#What_are_users) to your organization as well as integrating your applications. We refer to our administration [documentation](administrate#What_are_clients) as well as our [quickstarts](quickstarts) to do so.
+Now you can proceed adding users to your organization as well as integrating your applications. We refer to our guides as well as our [quickstarts](quickstarts) to do so.
 
 #### Verify your domain name (optional)
 
-If you verify a domain you get the benefit that your organisations users can use this domain as the **preferred logonname**. You find a more detailed explanation on [how ZITADEL handles usernames](administrate#How_ZITADEL_handles_usernames) here.
-The verification process is documented [here](administrate#Verify_a_domain_name)
+If you verify a domain you get the benefit that your organisations users can use this domain as the **preferred logonname**.
 
 #### Elect Managers
 
 ZITADEL allows you to give other users control over ZITADEL Console itself. This can be restricted to some kind of write and/or read. This can be especially useful for directing administration over several users. You can have managers able to edit project settings and others able to create/add users only.
-Read the [administration](administrate#ZITADEL_Roles) guide for more information.
+Read the [guides](guides) for more information.
 
 > Note: ZITADEL Managers are always located on the right sidepanel of console.
 

@@ -1,0 +1,62 @@
+.paginator {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: .5rem;
+  padding-bottom: 1rem;
+
+  @media only screen and (min-width: 500px) {
+    flex-direction: row;
+  }
+
+  .col {
+    p {
+      margin: 0;
+    }
+
+    .length {
+      font-size: 14px;
+    }
+
+    .ts {
+      font-size: 12px;
+      color: var(--grey);
+    }
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .pos {
+    font-size: 12px;
+    margin: .5rem 1rem .5rem 1rem;
+    color: var(--grey);
+  }
+
+  .size {
+    transform: translateY(1px);
+    margin-right: .5rem;
+  }
+
+  button {
+    margin: 0 .5rem;
+  }
+
+  :last-child {
+    margin-right: 0;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* stylelint-disable */
+::ng-deep .mat-select {
+  min-width: 60px;
+  height: 36px !important;
+  padding-top: 8px !important;
+}
+/* stylelint-enable */

@@ -82,7 +82,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     }
 
     public addIdp(): void {
-        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
             const req = new AddOrgOIDCIDPRequest();
 
             req.setName(this.name?.value);

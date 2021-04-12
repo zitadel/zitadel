@@ -43,16 +43,15 @@
 }
 
 tr {
-    outline: none;
-  
+  outline: none;
+
+  button {
+    visibility: hidden;
+  }
+
+  &:hover {
     button {
-      visibility: hidden;
-    }
-  
-    &:hover {
-      button {
-        visibility: visible;
-      }
+      visibility: visible;
     }
   }
-  
+}

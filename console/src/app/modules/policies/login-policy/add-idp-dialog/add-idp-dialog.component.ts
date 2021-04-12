@@ -24,7 +24,6 @@ export class AddIdpDialogComponent {
 
     public idp: IDP.AsObject | undefined = undefined;
     public availableIdps: Array<IDP.AsObject[] | IDP.AsObject> | string[] = [];
-    public IdpProviderType: any = IDPOwnerType;
 
     constructor(
         private mgmtService: ManagementService,

@@ -6,7 +6,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -18,6 +17,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesComponent } from './project-roles.component';
@@ -30,7 +30,7 @@ import { ProjectRolesComponent } from './project-roles.component';
         MatButtonModule,
         HasRoleModule,
         MatTableModule,
-        MatPaginatorModule,
+        PaginatorModule,
         MatDialogModule,
         InputModule,
         FormsModule,
