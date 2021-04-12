@@ -2,7 +2,7 @@
   <mj-head>
     <mj-attributes>
       <mj-font name="Lato" href="http://fonts.googleapis.com/css?family=Lato:200,300,400,600" />
-      <mj-text align="center" color="#22292f" font-family="Lato, Arial, Helvetica, sans-serif" />
+      <mj-text align="center" color="#22292f" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Lato, Arial, Helvetica, sans-serif" />
       <mj-section padding="0" full-width="full-width" />
       <mj-body width="800px" border-radius="16px"/>
       <mj-image padding="0" />
@@ -20,13 +20,13 @@
       <mj-section>
         <mj-group>
           <mj-column>
-            <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="160px" border-radius="8px" padding="50px 0 50px 0" />
+            <mj-image src="https://static.zitadel.ch/zitadel-logo-dark.png" align="center" width="180px" border-radius="8px" padding="50px 0 30px 0" />
           </mj-column>
         </mj-group>
       </mj-section>
       <mj-section>
         <mj-column width="60%">
-          <mj-text font-size="24px" font-weight="200">{{.Greeting}}</mj-text>
+          <mj-text font-size="24px" font-weight="500">{{.Greeting}}</mj-text>
           <mj-text font-size="16px" line-height="1.5" font-weight="light">{{.Text}}</mj-text>
           <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" background-color="#5282C1" font-size="14px" font-weight="500" >{{.ButtonText}}</mj-button>
        <mj-divider
