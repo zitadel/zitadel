@@ -8,19 +8,125 @@ title: User Manual
 
 ### Self Register User
 
+Zitadel allows users to register a organization and/or user with just a few steps.
+
+1. Register a organization
+2. Verify your email
+3. Login to Zitadel and manage the organization
+
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/register.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/register.gif" itemprop="thumbnail" alt="Self Register" />
+        </a>
+        <figcaption itemprop="caption description">Self Register</figcaption>
+    </figure>
+</div>
+
+
 ### Verify EMail
+
+To verify our email address just klick the "Finish Initialization" link in the email your received after registration. You could copy and paste the received code as well and enter it at the initial login.
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/email-verify.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/email-verify.gif" itemprop="thumbnail" alt="Verify EMail" />
+        </a>
+        <figcaption itemprop="caption description">Verify EMail</figcaption>
+    </figure>
+</div>
 
 ### Verify Phone
 
+tbd
+
 ### Change Password
+
+To change your password you can hit the link right at the overview page. Alternatively  you can set it in the "Personal Information" page.
+
+
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/change-password.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/change-password.gif" itemprop="thumbnail" alt="Change Password" />
+        </a>
+        <figcaption itemprop="caption description">Change Password</figcaption>
+    </figure>
+</div>
 
 ### Manage Multi Factor
 
+To enable multifactor authentication visit the "Personal Information" page of your account and scroll to the "multifactor authentication". 
+You can either:
+
+1. Configure OTP
+2. AddU2F
+
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/enable-mfa-handling.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/enable-mfa-handling.gif" itemprop="thumbnail" alt="Enable Multi Factor" />
+        </a>
+        <figcaption itemprop="caption description">Encale Multi Factor</figcaption>
+    </figure>
+   <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/login-mfa.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/login-mfa.gif" itemprop="thumbnail" alt="Login Multi Factor" />
+        </a>
+        <figcaption itemprop="caption description">Login Multi Factor</figcaption>
+    </figure>
+</div>
+
+
 ### Identity Linking
+
+To link an external Identity Provider with a Zitadel Account you have to:
+
+1. choose your IDP
+2. Login to your IDP
+
+you can then either
+
+1. link the Identity to an existin ZITADEL useraccount
+2. auto register a new ZITADEL useraccount 
+
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/linking-accounts.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/linking-accounts.gif" itemprop="thumbnail" alt="Linking Accounts" />
+        </a>
+        <figcaption itemprop="caption description">Linking Accounts</figcaption>
+    </figure>
+</div>
+
 
 #### Auto Register
 
+see Identity Linking above
+
+
 #### Manage Account Linking
+
+You can manage the linked external IDP Providers within the "Personal Information" Page.
+
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/manage-external-idp.png" itemprop="contentUrl" data-size="1710x747">
+            <img src="img/manage-external-idp.png" itemprop="thumbnail" alt="Linking Accounts" />
+        </a>
+        <figcaption itemprop="caption description">Linking Accounts</figcaption>
+    </figure>
+</div>
+
+
+
+
 
 ### Login User
 
