@@ -358,7 +358,11 @@
     padding: 0.3rem 0.8rem 0.3rem;
     margin: 0 0.2rem;
     top: -0.1rem;
-    background: var(--back-api);
+    background: #2a2f45;
+  }
+
+  .content :global(p) :global(code) {
+    border: 1px solid #ffffff20;
   }
 
   .content :global(pre) :global(code) {
@@ -408,6 +412,7 @@
 
   section :global(p) {
     margin: 1em 0;
+    text-align: justify;
   }
 
   small {

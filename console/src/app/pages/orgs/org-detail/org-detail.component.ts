@@ -113,12 +113,14 @@ export class OrgDetailComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                this.mgmtService.addOrgDomain(resp).then(resp => {
-                    const newDomain = resp;
-
-                    // TODO send domainname only 
-                    // this.verifyDomain(newDomainView.toObject());
+                this.mgmtService.addOrgDomain(resp).then(() => {
                     this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
+
+                    setTimeout(() => {
+                        this.loadDomains();
+                    }, 1000);
+                }).catch(error => {
+                    this.toast.showError(error);
                 });
             }
         });

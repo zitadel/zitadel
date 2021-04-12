@@ -13,4 +13,4 @@ It demonstrates how to add a user login to your application and fetch some data 
 
 At the end of the guide you should have an application able to login a user and read the user profile.
 
-> Note that our **ZITADEL Console** is also written in Angular and can therefore be used as a reference.
+> This documentation refers to our [Template](https://github.com/caos/zitadel-angular-template) in Github. Note that our **ZITADEL Console** is also written in Angular and can therefore be used as a reference.

@@ -5,7 +5,7 @@ import { Observable, Subscription } from 'rxjs';
 @Component({
     selector: 'cnsl-redirect-uris',
     templateUrl: './redirect-uris.component.html',
-    styleUrls: ['./redirect-uris.component.scss']
+    styleUrls: ['./redirect-uris.component.scss'],
 })
 export class RedirectUrisComponent implements OnInit, OnDestroy {
     @Input() title: string = '';

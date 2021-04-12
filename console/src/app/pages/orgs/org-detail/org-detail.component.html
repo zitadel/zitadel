@@ -6,6 +6,8 @@
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
+                <button (click)="loadDomains()" card-actions mat-icon-button><mat-icon>refresh</mat-icon></button>
+
                 <div *ngFor="let domain of domains" class="domain">
                     <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain)"
                         class="title">{{domain.domainName}}</span>
@@ -31,7 +33,7 @@
         <h2>{{'FEATURES.TITLE' | translate}}</h2>
         <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
         <div *ngIf="features" class="tier">
-            <mat-icon>stars</mat-icon>
+            <mat-icon class="icon">stars</mat-icon>
             <div class="text" *ngIf="features.tier">
                 <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
                 <p>{{features.tier?.description}}</p>

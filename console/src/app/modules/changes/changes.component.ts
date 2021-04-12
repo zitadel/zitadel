@@ -23,7 +23,7 @@ export enum ChangeType {
 }
 
 export interface MappedChange {
-    key: string,
+    key: string;
     values: Array<{
         data: any[];
         dates: Timestamp.AsObject[];
@@ -34,7 +34,11 @@ export interface MappedChange {
     }>;
 }
 
-type ListChanges = ListMyUserChangesResponse.AsObject | ListUserChangesResponse.AsObject | ListProjectChangesResponse.AsObject | ListOrgChangesResponse.AsObject | ListAppChangesResponse.AsObject;
+type ListChanges = ListMyUserChangesResponse.AsObject |
+    ListUserChangesResponse.AsObject |
+    ListProjectChangesResponse.AsObject |
+    ListOrgChangesResponse.AsObject |
+    ListAppChangesResponse.AsObject;
 
 @Component({
     selector: 'app-changes',
@@ -171,11 +175,14 @@ export class ChangesComponent implements OnInit, OnDestroy {
         }
     }
 
-    mapChanges(changes: Change.AsObject[]) {
+    private mapChanges(changes: Change.AsObject[]): {
+        key: string; values: any[];
+    }[] {
         const splitted: { [editorId: string]: any[]; } = {};
         changes.forEach((change) => {
             if (change.changeDate) {
-                const index = `${this.getDateString(change.changeDate)}`;//`${this.getDateString(change.changeDate)}:${change.editorId}`;
+                const index = `${this.getDateString(change.changeDate)}`;
+                // `${this.getDateString(change.changeDate)}:${change.editorId}`;
 
                 if (index) {
                     if (splitted[index]) {
@@ -209,7 +216,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
                                 // data: [change.data],
                                 eventTypes: [change.eventType],
                                 sequences: [change.sequence],
-                            }
+                            },
                         ];
                     }
                 }
@@ -226,7 +233,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
         return arr;
     }
 
-    getDateString(ts: Timestamp.AsObject) {
+    getDateString(ts: Timestamp.AsObject): string {
         const date = new Date(ts.seconds * 1000 + ts.nanos / 1000 / 1000);
         return date.getUTCFullYear() + this.pad(date.getUTCMonth() + 1) + this.pad(date.getUTCDate());
     }
@@ -243,10 +250,10 @@ export class ChangesComponent implements OnInit, OnDestroy {
     // Order by ascending property value
     valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
         return a.value.localeCompare(b.value);
-    };
+    }
 
     // Order by descending property key
     keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
         return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
-    };
+    }
 }

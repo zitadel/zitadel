@@ -19,8 +19,7 @@
 <Nav title="Zitadel docs" {segment} {page} logo="logos/zitadel-logo-light.svg">
     <NavItem segment="start" prefetch>Get started</NavItem>
     <NavItem segment="quickstarts">Quickstarts</NavItem>
-    <!-- <NavItem segment="guides">Guides</NavItem> -->
-    <NavItem segment="administrate" prefetch>Administrate</NavItem>
+    <NavItem segment="guides" prefetch>Guides</NavItem>
     <NavItem segment="apis" prefetch>APIs</NavItem>
     <NavItem segment="architecture" prefetch>Architecture</NavItem>
     <NavItem segment="use" prefetch>Manual</NavItem>

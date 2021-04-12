@@ -1,0 +1,20 @@
+<div class="paginator">
+    <div class="col">
+        <p class="length"><span>{{length}} </span>{{'PAGINATOR.COUNT' | translate}}</p>
+        <p class="ts" *ngIf="timestamp">{{timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM YYYY, HH:mm'}}</p>
+    </div>
+    <span class="fill-space"></span>
+    <span class="pos">{{pageIndex * pageSize}} - {{pageIndex * pageSize + pageSize}} </span>
+    <div class="row">
+        <cnsl-form-field class="size" appearance="outline">
+            <mat-select [(ngModel)]="pageSize" (selectionChange)="emitChange()">
+                <mat-option *ngFor="let sizeOption of pageSizeOptions" [value]="sizeOption">
+                    {{sizeOption}}
+                </mat-option>
+            </mat-select>
+        </cnsl-form-field>
+        <button (click)="previous()" [disabled]="!previousPossible" mat-button>{{'PAGINATOR.PREVIOUS' |
+            translate}}</button>
+        <button (click)="next()" [disabled]="!nextPossible" mat-button>{{'PAGINATOR.NEXT' | translate}}</button>
+    </div>
+</div>

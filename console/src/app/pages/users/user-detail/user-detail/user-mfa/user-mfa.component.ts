@@ -20,7 +20,7 @@ export interface MFAItem {
     styleUrls: ['./user-mfa.component.scss'],
 })
 export class UserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
+    public displayedColumns: string[] = ['type', 'name', 'state', 'actions'];
     @Input() private user!: User.AsObject;
     public mfaSubject: BehaviorSubject<AuthFactor.AsObject[]> = new BehaviorSubject<AuthFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
