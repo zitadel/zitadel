@@ -49,7 +49,7 @@
     "@angular-devkit/build-angular": "~0.1102.7",
     "@angular/compiler-cli": "~11.0.0",
     "@types/jasmine": "~3.6.3",
-    "@angular/language-service": "~11.2.8",
+    "@angular/language-service": "~11.2.9",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.14.37",
     "codelyzer": "^6.0.0",
