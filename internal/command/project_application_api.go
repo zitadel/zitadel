@@ -69,7 +69,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 }
 
 func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
-	if !apiApp.IsValid() || apiApp.AppID == "" || apiApp.AggregateID == "" {
+	if apiApp.AppID == "" || apiApp.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
 	}
 
