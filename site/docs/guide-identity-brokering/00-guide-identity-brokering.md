@@ -96,7 +96,8 @@ Google Example:
 2. Fill out the form 
    - Use the issuer, clientid and client secret provided by your provider
    - The scopes will be prefilled with openid, profile and email, because this information is relevant for ZITADEL
-   - You can choose what fields you like to map as the display name and as username 
+   - You can choose what fields you like to map as the display name and as username. The fields you can choose are preferred_username and email
+     (Example: For Google you should choose email for both fields)
 3. Save your configuration
 4. Link your new configuration to your login policy. By searching in the organisation category you will get you own configuration. If you choose system you can link all predefined providers.
 
