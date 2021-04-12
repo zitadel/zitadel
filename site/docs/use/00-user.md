@@ -38,6 +38,7 @@ To verify our email address just klick the "Finish Initialization" link in the e
     </figure>
 </div>
 
+
 ### Verify Phone
 
 tbd
