@@ -24,7 +24,12 @@ func OperatorSelector() *labels.Selector {
 	return labels.OpenOperatorSelector("ZITADEL", "database.caos.ch")
 }
 
-func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ...string) operator.AdaptFunc {
+func AdaptFunc(
+	timestamp string,
+	binaryVersion *string,
+	gitops bool,
+	features ...string,
+) operator.AdaptFunc {
 
 	return func(
 		monitor mntr.Monitor,
@@ -33,6 +38,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 	) (
 		queryFunc operator.QueryFunc,
 		destroyFunc operator.DestroyFunc,
+		configureFunc operator.ConfigureFunc,
 		secrets map[string]*secret.Secret,
 		existing map[string]*secret.Existing,
 		migrate bool,
@@ -46,7 +52,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		desiredKind, err := ParseDesiredV0(orbDesiredTree)
 		if err != nil {
-			return nil, nil, nil, nil, migrate, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, migrate, errors.Wrap(err, "parsing desired state failed")
 		}
 		orbDesiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -57,7 +63,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		queryNS, err := namespace.AdaptFuncToEnsure(NamespaceStr)
 		if err != nil {
-			return nil, nil, nil, nil, migrate, err
+			return nil, nil, nil, nil, nil, migrate, err
 		}
 		/*destroyNS, err := namespace.AdaptFuncToDestroy(NamespaceStr)
 		if err != nil {
@@ -68,7 +74,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 
 		operatorLabels := mustDatabaseOperator(binaryVersion)
 
-		queryDB, destroyDB, secrets, existing, migrate, err := databases.GetQueryAndDestroyFuncs(
+		queryDB, destroyDB, configureDB, secrets, existing, migrate, err := databases.Adapt(
 			orbMonitor,
 			desiredKind.Database,
 			databaseCurrent,
@@ -81,7 +87,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 			features,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, migrate, err
+			return nil, nil, nil, nil, nil, migrate, err
 		}
 
 		destroyers := make([]operator.DestroyFunc, 0)
@@ -123,6 +129,7 @@ func AdaptFunc(timestamp string, binaryVersion *string, gitops bool, features ..
 				monitor.WithField("destroyers", len(queriers)).Info("Destroy")
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},
+			func(k8sClient kubernetes.ClientInt, gitops bool) error { return configureDB(k8sClient, gitops) },
 			secrets,
 			existing,
 			migrate,
