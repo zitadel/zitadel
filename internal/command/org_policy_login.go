@@ -239,18 +239,12 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 		return domain.SecondFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	secondFactorModel := NewOrgSecondFactorWriteModel(orgID, secondFactor)
-	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	addedEvent, err := c.addSecondFactorToLoginPolicy(ctx, secondFactorModel, secondFactor)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
 
-	if secondFactorModel.State == domain.FactorStateActive {
-		return domain.SecondFactorTypeUnspecified, nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
-	}
-
-	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
-
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLoginPolicySecondFactorAddedEvent(ctx, orgAgg, secondFactor))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, addedEvent)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
@@ -262,6 +256,20 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 	return secondFactorModel.MFAType, writeModelToObjectDetails(&secondFactorModel.WriteModel), nil
 }
 
+func (c *Commands) addSecondFactorToLoginPolicy(ctx context.Context, secondFactorModel *OrgSecondFactorWriteModel, secondFactor domain.SecondFactorType) (*org.LoginPolicySecondFactorAddedEvent, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	if err != nil {
+		return nil, err
+	}
+
+	if secondFactorModel.State == domain.FactorStateActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+	return org.NewLoginPolicySecondFactorAddedEvent(ctx, orgAgg, secondFactor), nil
+}
+
 func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-fM0gs", "Errors.ResourceOwnerMissing")
@@ -270,16 +278,12 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-55n8s", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	secondFactorModel := NewOrgSecondFactorWriteModel(orgID, secondFactor)
-	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	removedEvent, err := c.removeSecondFactorFromLoginPolicy(ctx, secondFactorModel, secondFactor)
 	if err != nil {
 		return nil, err
 	}
-	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.NotExisting")
-	}
-	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLoginPolicySecondFactorRemovedEvent(ctx, orgAgg, secondFactor))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -290,6 +294,19 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 	return writeModelToObjectDetails(&secondFactorModel.WriteModel), nil
 }
 
+func (c *Commands) removeSecondFactorFromLoginPolicy(ctx context.Context, secondFactorModel *OrgSecondFactorWriteModel, secondFactor domain.SecondFactorType) (*org.LoginPolicySecondFactorRemovedEvent, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	if err != nil {
+		return nil, err
+	}
+	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.NotExisting")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+
+	return org.NewLoginPolicySecondFactorRemovedEvent(ctx, orgAgg, secondFactor), nil
+}
+
 func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (domain.MultiFactorType, *domain.ObjectDetails, error) {
 	if orgID == "" {
 		return domain.MultiFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
@@ -298,17 +315,12 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 		return domain.MultiFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	multiFactorModel := NewOrgMultiFactorWriteModel(orgID, multiFactor)
-	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	addedEvent, err := c.addMultiFactorToLoginPolicy(ctx, multiFactorModel, multiFactor)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
-	if multiFactorModel.State == domain.FactorStateActive {
-		return domain.MultiFactorTypeUnspecified, nil, caos_errs.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
-	}
 
-	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.WriteModel)
-
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, multiFactor))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, addedEvent)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
@@ -319,6 +331,20 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 	return multiFactorModel.MultiFactorWriteModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
+func (c *Commands) addMultiFactorToLoginPolicy(ctx context.Context, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) (*org.LoginPolicyMultiFactorAddedEvent, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	if err != nil {
+		return nil, err
+	}
+	if multiFactorModel.State == domain.FactorStateActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.WriteModel)
+
+	return org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, multiFactor), nil
+}
+
 func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
@@ -327,16 +353,12 @@ func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	multiFactorModel := NewOrgMultiFactorWriteModel(orgID, multiFactor)
-	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	removedEvent, err := c.removeMultiFactorFromLoginPolicy(ctx, multiFactorModel, multiFactor)
 	if err != nil {
 		return nil, err
 	}
-	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LoginPolicy.MFA.NotExisting")
-	}
-	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLoginPolicyMultiFactorRemovedEvent(ctx, orgAgg, multiFactor))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -347,11 +369,24 @@ func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 	return writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
-func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgID string) (_ *IAMAuthFactorsWriteModel, err error) {
+func (c *Commands) removeMultiFactorFromLoginPolicy(ctx context.Context, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) (*org.LoginPolicyMultiFactorRemovedEvent, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	if err != nil {
+		return nil, err
+	}
+	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LoginPolicy.MFA.NotExisting")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
+
+	return org.NewLoginPolicyMultiFactorRemovedEvent(ctx, orgAgg, multiFactor), nil
+}
+
+func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgID string) (_ *OrgAuthFactorsAllowedWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMAuthFactorsWriteModel()
+	writeModel := NewOrgAuthFactorsAllowedWriteModel(orgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

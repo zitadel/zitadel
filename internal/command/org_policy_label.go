@@ -102,14 +102,15 @@ func (c *Commands) removeLabelPolicy(ctx context.Context, existingPolicy *OrgLab
 }
 
 func (c *Commands) removeLabelPolicyIfExists(ctx context.Context, orgID string) (*org.LabelPolicyRemovedEvent, error) {
-	policy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	if policy.State != domain.PolicyStateActive {
+	if existingPolicy.State != domain.PolicyStateActive {
 		return nil, nil
 	}
-	return c.removeLabelPolicy(ctx, policy)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
+	return org.NewLabelPolicyRemovedEvent(ctx, orgAgg), nil
 }
 
 func (c *Commands) orgLabelPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLabelPolicyWriteModel, error) {

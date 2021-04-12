@@ -132,12 +132,13 @@ func (c *Commands) removePasswordComplexityPolicy(ctx context.Context, existingP
 }
 
 func (c *Commands) removePasswordComplexityPolicyIfExists(ctx context.Context, orgID string) (*org.PasswordComplexityPolicyRemovedEvent, error) {
-	policy, err := c.orgPasswordComplexityPolicyWriteModelByID(ctx, orgID)
+	existingPolicy, err := c.orgPasswordComplexityPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	if policy.State != domain.PolicyStateActive {
+	if existingPolicy.State != domain.PolicyStateActive {
 		return nil, nil
 	}
-	return c.removePasswordComplexityPolicy(ctx, policy)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
+	return org.NewPasswordComplexityPolicyRemovedEvent(ctx, orgAgg), nil
 }

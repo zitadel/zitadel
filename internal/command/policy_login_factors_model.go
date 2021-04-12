@@ -45,25 +45,3 @@ func (wm *MultiFactorWriteModel) Reduce() error {
 	}
 	return wm.WriteModel.Reduce()
 }
-
-type AuthFactorsWriteModel struct {
-	eventstore.WriteModel
-	SecondFactors map[domain.SecondFactorType]domain.FactorState
-	MultiFactors  map[domain.MultiFactorType]domain.FactorState
-}
-
-func (wm *AuthFactorsWriteModel) Reduce() error {
-	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *policy.SecondFactorAddedEvent:
-			wm.SecondFactors[e.MFAType] = domain.FactorStateActive
-		case *policy.SecondFactorRemovedEvent:
-			wm.SecondFactors[e.MFAType] = domain.FactorStateRemoved
-		case *policy.MultiFactorAddedEvent:
-			wm.MultiFactors[e.MFAType] = domain.FactorStateActive
-		case *policy.MultiFactorRemovedEvent:
-			wm.MultiFactors[e.MFAType] = domain.FactorStateRemoved
-		}
-	}
-	return wm.WriteModel.Reduce()
-}

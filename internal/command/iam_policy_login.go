@@ -285,14 +285,15 @@ func (c *Commands) defaultLoginPolicyWriteModelByID(ctx context.Context, writeMo
 	return nil
 }
 
-func (c *Commands) defaultLoginPolicyAuthFactorsWriteModel(ctx context.Context) (_ *IAMAuthFactorsWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewIAMAuthFactorsWriteModel()
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
-}
+//
+//func (c *Commands) defaultLoginPolicyAuthFactorsWriteModel(ctx context.Context) (_ *IAMAuthFactorsWriteModel, err error) {
+//	ctx, span := tracing.NewSpan(ctx)
+//	defer func() { span.EndWithError(err) }()
+//
+//	writeModel := NewIAMAuthFactorsWriteModel()
+//	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return writeModel, nil
+//}

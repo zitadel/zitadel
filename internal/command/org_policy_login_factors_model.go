@@ -95,47 +95,104 @@ func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LoginPolicyMultiFactorRemovedEventType)
 }
 
-type OrgAuthFactorsWriteModel struct {
-	AuthFactorsWriteModel
-}
-
-func NewOrgAuthFactorsWriteModel(orgID string) *OrgAuthFactorsWriteModel {
-	return &OrgAuthFactorsWriteModel{
-		AuthFactorsWriteModel{
-			WriteModel: eventstore.WriteModel{
-				AggregateID:   orgID,
-				ResourceOwner: orgID,
-			},
+func NewOrgAuthFactorsAllowedWriteModel(orgID string) *OrgAuthFactorsAllowedWriteModel {
+	return &OrgAuthFactorsAllowedWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   orgID,
+			ResourceOwner: orgID,
 		},
+		SecondFactors: map[domain.SecondFactorType]*factorState{},
+		MultiFactors:  map[domain.MultiFactorType]*factorState{},
 	}
 }
 
-func (wm *OrgAuthFactorsWriteModel) AppendEvents(events ...eventstore.EventReader) {
-	for _, event := range events {
+type OrgAuthFactorsAllowedWriteModel struct {
+	eventstore.WriteModel
+	SecondFactors map[domain.SecondFactorType]*factorState
+	MultiFactors  map[domain.MultiFactorType]*factorState
+}
+
+type factorState struct {
+	IAM domain.FactorState
+	Org domain.FactorState
+}
+
+func (wm *OrgAuthFactorsAllowedWriteModel) Reduce() error {
+	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *iam.LoginPolicySecondFactorAddedEvent:
-			wm.AuthFactorsWriteModel.AppendEvents(&e.SecondFactorAddedEvent)
+			wm.ensureSecondFactor(e.MFAType)
+			wm.SecondFactors[e.MFAType].IAM = domain.FactorStateActive
 		case *iam.LoginPolicySecondFactorRemovedEvent:
-			wm.AuthFactorsWriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
+			wm.ensureSecondFactor(e.MFAType)
+			wm.SecondFactors[e.MFAType].IAM = domain.FactorStateRemoved
+		case *org.LoginPolicySecondFactorAddedEvent:
+			wm.ensureSecondFactor(e.MFAType)
+			wm.SecondFactors[e.MFAType].Org = domain.FactorStateActive
+		case *org.LoginPolicySecondFactorRemovedEvent:
+			wm.ensureSecondFactor(e.MFAType)
+			wm.SecondFactors[e.MFAType].Org = domain.FactorStateRemoved
 		case *iam.LoginPolicyMultiFactorAddedEvent:
-			wm.AuthFactorsWriteModel.AppendEvents(&e.MultiFactorAddedEvent)
+			wm.ensureMultiFactor(e.MFAType)
+			wm.MultiFactors[e.MFAType].IAM = domain.FactorStateActive
 		case *iam.LoginPolicyMultiFactorRemovedEvent:
-			wm.AuthFactorsWriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
+			wm.ensureMultiFactor(e.MFAType)
+			wm.MultiFactors[e.MFAType].IAM = domain.FactorStateRemoved
+		case *org.LoginPolicyMultiFactorAddedEvent:
+			wm.ensureMultiFactor(e.MFAType)
+			wm.MultiFactors[e.MFAType].Org = domain.FactorStateActive
+		case *org.LoginPolicyMultiFactorRemovedEvent:
+			wm.ensureMultiFactor(e.MFAType)
+			wm.MultiFactors[e.MFAType].Org = domain.FactorStateRemoved
 		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OrgAuthFactorsAllowedWriteModel) ensureSecondFactor(secondFactor domain.SecondFactorType) {
+	_, ok := wm.SecondFactors[secondFactor]
+	if !ok {
+		wm.SecondFactors[secondFactor] = &factorState{}
 	}
 }
 
-func (wm *OrgAuthFactorsWriteModel) Reduce() error {
-	return wm.AuthFactorsWriteModel.Reduce()
+func (wm *OrgAuthFactorsAllowedWriteModel) ensureMultiFactor(multiFactor domain.MultiFactorType) {
+	_, ok := wm.MultiFactors[multiFactor]
+	if !ok {
+		wm.MultiFactors[multiFactor] = &factorState{}
+	}
 }
 
-func (wm *OrgAuthFactorsWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID).
-		ResourceOwner(wm.ResourceOwner).
+func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType, org.AggregateType).
+		AggregateIDs(domain.IAMID, wm.WriteModel.AggregateID).
 		EventTypes(
 			iam.LoginPolicySecondFactorAddedEventType,
 			iam.LoginPolicySecondFactorRemovedEventType,
 			iam.LoginPolicyMultiFactorAddedEventType,
-			iam.LoginPolicyMultiFactorRemovedEventType)
+			iam.LoginPolicyMultiFactorRemovedEventType,
+			org.LoginPolicySecondFactorAddedEventType,
+			org.LoginPolicySecondFactorRemovedEventType,
+			org.LoginPolicyMultiFactorAddedEventType,
+			org.LoginPolicyMultiFactorRemovedEventType)
+}
+
+func (wm *OrgAuthFactorsAllowedWriteModel) ToSecondFactorWriteModel(factor domain.SecondFactorType) (*OrgSecondFactorWriteModel, error) {
+	orgSecondFactorWriteModel := NewOrgSecondFactorWriteModel(wm.AggregateID, factor)
+	orgSecondFactorWriteModel.AppendEvents(wm.Events...)
+	err := orgSecondFactorWriteModel.Reduce()
+	if err != nil {
+		return nil, err
+	}
+	return orgSecondFactorWriteModel, nil
+}
+
+func (wm *OrgAuthFactorsAllowedWriteModel) ToMultiFactorWriteModel(factor domain.MultiFactorType) (*OrgMultiFactorWriteModel, error) {
+	orgMultiFactorWriteModel := NewOrgMultiFactorWriteModel(wm.AggregateID, factor)
+	orgMultiFactorWriteModel.AppendEvents(wm.Events...)
+	err := orgMultiFactorWriteModel.Reduce()
+	if err != nil {
+		return nil, err
+	}
+	return orgMultiFactorWriteModel, nil
 }
