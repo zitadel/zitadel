@@ -177,22 +177,16 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 			org.LoginPolicyMultiFactorRemovedEventType)
 }
 
-func (wm *OrgAuthFactorsAllowedWriteModel) ToSecondFactorWriteModel(factor domain.SecondFactorType) (*OrgSecondFactorWriteModel, error) {
+func (wm *OrgAuthFactorsAllowedWriteModel) ToSecondFactorWriteModel(factor domain.SecondFactorType) *OrgSecondFactorWriteModel {
 	orgSecondFactorWriteModel := NewOrgSecondFactorWriteModel(wm.AggregateID, factor)
-	orgSecondFactorWriteModel.AppendEvents(wm.Events...)
-	err := orgSecondFactorWriteModel.Reduce()
-	if err != nil {
-		return nil, err
-	}
-	return orgSecondFactorWriteModel, nil
+	orgSecondFactorWriteModel.ProcessedSequence = wm.ProcessedSequence
+	orgSecondFactorWriteModel.State = wm.SecondFactors[factor].Org
+	return orgSecondFactorWriteModel
 }
 
-func (wm *OrgAuthFactorsAllowedWriteModel) ToMultiFactorWriteModel(factor domain.MultiFactorType) (*OrgMultiFactorWriteModel, error) {
+func (wm *OrgAuthFactorsAllowedWriteModel) ToMultiFactorWriteModel(factor domain.MultiFactorType) *OrgMultiFactorWriteModel {
 	orgMultiFactorWriteModel := NewOrgMultiFactorWriteModel(wm.AggregateID, factor)
-	orgMultiFactorWriteModel.AppendEvents(wm.Events...)
-	err := orgMultiFactorWriteModel.Reduce()
-	if err != nil {
-		return nil, err
-	}
-	return orgMultiFactorWriteModel, nil
+	orgMultiFactorWriteModel.ProcessedSequence = wm.ProcessedSequence
+	orgMultiFactorWriteModel.State = wm.MultiFactors[factor].Org
+	return orgMultiFactorWriteModel
 }

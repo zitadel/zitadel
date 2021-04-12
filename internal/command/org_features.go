@@ -10,6 +10,9 @@ import (
 )
 
 func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, features *domain.Features) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
+	}
 	existingFeatures := NewOrgFeaturesWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
@@ -53,6 +56,9 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 }
 
 func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
+	}
 	existingFeatures := NewOrgFeaturesWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
@@ -128,62 +134,11 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 		if defaultPolicy.ForceMFA != existingPolicy.ForceMFA {
 			policy.ForceMFA = defaultPolicy.ForceMFA
 		}
-		orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
+		authFactorsEvents, err := c.setDefaultAuthFactorsInCustomLoginPolicy(ctx, orgID)
 		if err != nil {
 			return nil, err
 		}
-		for factor, state := range orgAuthFactors.SecondFactors {
-			if state.IAM == state.Org {
-				continue
-			}
-			secondFactorWriteModel, err := orgAuthFactors.ToSecondFactorWriteModel(factor)
-			if err != nil {
-				return nil, err
-			}
-			if state.IAM == domain.FactorStateActive {
-				event, err := c.addSecondFactorToLoginPolicy(ctx, secondFactorWriteModel, factor)
-				if err != nil {
-					return nil, err
-				}
-				if event != nil {
-					events = append(events, event)
-				}
-				continue
-			}
-			event, err := c.removeSecondFactorFromLoginPolicy(ctx, secondFactorWriteModel, factor)
-			if err != nil {
-				return nil, err
-			}
-			if event != nil {
-				events = append(events, event)
-			}
-		}
-		for factor, state := range orgAuthFactors.MultiFactors {
-			if state.IAM == state.Org {
-				continue
-			}
-			multiFactorWriteModel, err := orgAuthFactors.ToMultiFactorWriteModel(factor)
-			if err != nil {
-				return nil, err
-			}
-			if state.IAM == domain.FactorStateActive {
-				event, err := c.addMultiFactorToLoginPolicy(ctx, multiFactorWriteModel, factor)
-				if err != nil {
-					return nil, err
-				}
-				if event != nil {
-					events = append(events, event)
-				}
-				continue
-			}
-			event, err := c.removeMultiFactorFromLoginPolicy(ctx, multiFactorWriteModel, factor)
-			if err != nil {
-				return nil, err
-			}
-			if event != nil {
-				events = append(events, event)
-			}
-		}
+		events = append(events, authFactorsEvents...)
 	}
 	if !features.LoginPolicyIDP {
 		if defaultPolicy.AllowExternalIDP != existingPolicy.AllowExternalIDP {
@@ -203,6 +158,61 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel), policy.AllowUserNamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType)
 	if hasChanged {
 		events = append(events, changedEvent)
+	}
+	return events, nil
+}
+
+func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	events := make([]eventstore.EventPusher, 0)
+	for factor, state := range orgAuthFactors.SecondFactors {
+		if state.IAM == state.Org {
+			continue
+		}
+		secondFactorWriteModel := orgAuthFactors.ToSecondFactorWriteModel(factor)
+		if state.IAM == domain.FactorStateActive {
+			event, err := c.addSecondFactorToLoginPolicy(ctx, secondFactorWriteModel, factor)
+			if err != nil {
+				return nil, err
+			}
+			if event != nil {
+				events = append(events, event)
+			}
+			continue
+		}
+		event, err := c.removeSecondFactorFromLoginPolicy(ctx, secondFactorWriteModel, factor)
+		if err != nil {
+			return nil, err
+		}
+		if event != nil {
+			events = append(events, event)
+		}
+	}
+	for factor, state := range orgAuthFactors.MultiFactors {
+		if state.IAM == state.Org {
+			continue
+		}
+		multiFactorWriteModel := orgAuthFactors.ToMultiFactorWriteModel(factor)
+		if state.IAM == domain.FactorStateActive {
+			event, err := c.addMultiFactorToLoginPolicy(ctx, multiFactorWriteModel, factor)
+			if err != nil {
+				return nil, err
+			}
+			if event != nil {
+				events = append(events, event)
+			}
+			continue
+		}
+		event, err := c.removeMultiFactorFromLoginPolicy(ctx, multiFactorWriteModel, factor)
+		if err != nil {
+			return nil, err
+		}
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	return events, nil
 }

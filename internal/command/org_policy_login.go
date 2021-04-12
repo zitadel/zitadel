@@ -303,7 +303,6 @@ func (c *Commands) removeSecondFactorFromLoginPolicy(ctx context.Context, second
 		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.NotExisting")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
-
 	return org.NewLoginPolicySecondFactorRemovedEvent(ctx, orgAgg, secondFactor), nil
 }
 
@@ -341,7 +340,6 @@ func (c *Commands) addMultiFactorToLoginPolicy(ctx context.Context, multiFactorM
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.WriteModel)
-
 	return org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, multiFactor), nil
 }
 
