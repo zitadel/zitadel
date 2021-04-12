@@ -38,11 +38,8 @@
         margin-bottom: 2rem;
     }
 
-    .doc-container .doc .text{
-        top: 180px;
-    }
-
     .doc-container .doc .text p{
+        max-width: 500px;
         font-size: 15px;
     }
 
@@ -56,6 +53,7 @@
         text-transform: uppercase;
         font-size: 12px;
         margin: .5rem 0;
+        display: block;
     }
 
     .doc-container .doc .text .logo-cloud {
@@ -135,7 +133,6 @@
             display: flex;
             margin: 1rem;
             flex: 1 0 auto;
-            max-height: 350px;
             transition: box-shadow .2 ease;
         }
 
@@ -206,22 +203,28 @@
                     <div class="sectionlinks">
                         <a class="link" href="angular">Single Page Applications (Angular)</a>
                         <a class="link" href="go">Serverside rendered Applications</a>
-                        <a class="link" href="flutter">Native Applications (Flutter)</a>
+                        <a class="link" href="oauth2-proxy">OAuth2 Proxy</a>
                     </div>
                 </div>
             </div>
 
             <div class="doc">
                 <div class="text">
-                    <h4>Administration</h4>
-                    <p>Learn how to manage your data and role associations in ZITADEL</p>
-                    <a href="administrate">Learn more<i class="las la-arrow-right"></i></a>
+                    <h4>Guides</h4>
+                    <p>Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.</p>
+                    <div class="logo-cloud">
+                        <img src="logos/zitadel-logo-solo-darkdesign.svg" alt="zitadel" />
+                        <img src="tech/oauth.svg" alt="oauth" />
+                    </div>
+                    
+                    <a href="guides">Learn more<i class="las la-arrow-right"></i></a>
 
                     <p class="section">In this section</p>
                     
                     <div class="sectionlinks">
-                        <a class="link" href="administrate#Organizations">Manage Organisations</a>
-                        <a class="link" href="administrate#Projects">Manage Projects</a>
+                        <a class="link" href="zitadel-organizations">ZITADEL Organizations</a>
+                        <a class="link" href="zitadel-projects">ZITADEL Projects</a>
+                        <a class="link" href="oauth-recommended-flows">Recommended OAuth Flows</a>
                     </div>
                 </div>
             </div>

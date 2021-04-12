@@ -314,7 +314,7 @@
 <header class:visible="{visible || open}">
 	<nav>
 		<a
-			rel="prefetch"
+			sapper:prefetch
 			href="."
 			class="home"
 			title="{title}"
