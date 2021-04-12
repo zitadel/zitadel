@@ -190,7 +190,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                         titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
                         descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
                         value: this.user.human?.email?.email,
-                        type: type
+                        type: type,
                     },
                     width: '400px',
                 });

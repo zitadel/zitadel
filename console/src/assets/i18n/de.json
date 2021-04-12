@@ -1,5 +1,10 @@
 {
     "APP_NAME": "ZITADEL",
+    "PAGINATOR": {
+        "PREVIOUS":"Zurück",
+        "NEXT":"Weiter",
+        "COUNT":"Ergebnisse"
+    },
     "ONBOARDING": {
         "HEADER":"Erste Schritte",
         "TITLE":"Lernen Sie unsere ZITADEL Console kennen.",
@@ -84,7 +89,8 @@
         "SHOWORGS":"Alle Organisationen anzeigen",
         "GRANTSECTION":"Berechtigungssektion",
         "GRANTS":"Berechtigungen",
-        "TOC":"Datenschutz und AGB",
+        "PRIVACY":"Datenschutz",
+        "TOS":"AGB",
         "TOOLTIP": {
             "PERSONAL":"Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
             "IAMPOLICIES":"Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
@@ -173,13 +179,12 @@
             "DEACTIVATE":"Deaktivieren",
             "ACTIVATE":"Aktivieren",
             "FILTER": {
-                "0":"Nach displayName filtern",
+                "0":"Nach Anzeigename filtern",
                 "1":"Nach Username filtern",
-                "2":"Nach Vornamen filtern",
-                "3":"Nach Nachnamen filtern",
-                "4":"Nach rollenschlüssel filtern",
+                "2":"Nach Displayname filtern",
+                "3":"Nach Benutzernamen filtern",
+                "4":"Nach Email filtern",
                 "5":"Nach Display Namen filtern",
-                "6":"Nach Email filtern",
                 "10":"Nach Organisationsname filtern",
                 "12":"Project Name"
             },
@@ -375,6 +380,12 @@
             "CREATE": {
                 "TITLE": "Benutzerberechtigung erstellen",
                 "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
+            },
+            "FILTER": {
+                "0":"Nach User Anzeigename filtern",
+                "1":"Nach Domain filtern",
+                "2":"Nach Projectnamen filtern",
+                "3":"Nach Rolle filtern"
             }
         },
         "VALIDATION": {
@@ -686,10 +697,11 @@
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt",
-            "SELECTION": "Ausgewählte Elemente",
+            "SELECTION": "ausgewählt",
             "DEACTIVATE": "Benutzer deaktivieren",
             "ACTIVATE": "Benutzer aktivieren",
-            "DELETE": "Benutzer löschen"
+            "DELETE": "Benutzer löschen",
+            "CLEAR":"Auswahl aufheben"
         }
     },
     "PROJECT": {
@@ -834,7 +846,7 @@
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",
-            "SELECTION": "Ausgewählte Elemente",
+            "SELECTION": "ausgewählt",
             "DEACTIVATE": "Projekt deaktivieren",
             "ACTIVATE": "Projekt aktivieren",
             "DELETE": "Projekt löschen",

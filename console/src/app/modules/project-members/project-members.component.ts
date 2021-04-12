@@ -111,18 +111,22 @@ export class ProjectMembersComponent {
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.map(member => {
             if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-                return this.mgmtService.removeProjectMember((this.project as Project.AsObject).id, member.userId).then(() => {
-                    this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
-            } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                return this.mgmtService.removeProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId,
-                    member.userId).then(() => {
+                return this.mgmtService.removeProjectMember((this.project as Project.AsObject).id, member.userId)
+                    .then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });
+            } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+                return this.mgmtService.removeProjectGrantMember(
+                    (this.project as GrantedProject.AsObject).projectId,
+                    this.grantId,
+                    member.userId,
+                ).then(() => {
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
             }
         })).then(() => {
             setTimeout(() => {
@@ -173,8 +177,12 @@ export class ProjectMembersComponent {
                             return this.mgmtService.addProjectMember((this.project as Project.AsObject).id, user.id, roles);
 
                         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                            return this.mgmtService.addProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId,
-                                user.id, roles);
+                            return this.mgmtService.addProjectGrantMember(
+                                (this.project as GrantedProject.AsObject).projectId,
+                                this.grantId,
+                                user.id,
+                                roles,
+                            );
                         }
                     })).then(() => {
                         setTimeout(() => {
