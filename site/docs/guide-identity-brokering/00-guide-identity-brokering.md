@@ -54,14 +54,14 @@ Because Google is registered as trusted identity provider the user will be able 
 
 In this exercise we will add a new Google identity provider to federate identities with ZITADEL. 
 
-#### 1. Create new oAuth Client
+#### 1. Create new OIDC Client
 
-1. Register an OAuth Client in your preferred provider
+1. Register an OIDC Client in your preferred provider
 2. Make sure you add the ZITADEL callback redirect uris
    https://accounts.zitadel.ch/register/externalidp/callback
    https://accounts.zitadel.ch/login/externalidp/callback
 
-> **Information:** Make sure the provider is oAuth 2.0 compliant
+> **Information:** Make sure the provider is OIDC 1.0 compliant with a proper Discovery Endpoint
    
 Google Example:
 1. Go to the Google Gloud Platform and choose youre project: https://console.cloud.google.com/apis/credentials
