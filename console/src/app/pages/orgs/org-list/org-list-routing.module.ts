@@ -4,15 +4,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { OrgListComponent } from './org-list.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: OrgListComponent,
-    },
-
+  {
+    path: '',
+    component: OrgListComponent,
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
 export class OrgListRoutingModule { }

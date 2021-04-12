@@ -47,7 +47,7 @@
             <tr mat-header-row *matHeaderRowDef="eventDisplayedColumns"></tr>
             <tr class="highlight" mat-row *matRowDef="let row; columns: eventDisplayedColumns;"></tr>
         </table>
-        <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
-        </mat-paginator>
+        <cnsl-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
+        </cnsl-paginator>
     </app-refresh-table>
 </div>
