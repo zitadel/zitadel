@@ -5,7 +5,7 @@ metadata:
   namespace: caos-system
 spec:
   boom:
-    version: v3.1.4
+    version: v4.0.0
   forceApply: true
   currentStatePath: caos-internal/boom
   apiGateway:
