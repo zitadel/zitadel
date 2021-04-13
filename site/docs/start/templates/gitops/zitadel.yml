@@ -17,14 +17,6 @@ iam:
         sharedMaxAge: 168h
         shortMaxAge: 5m
         shortSharedMaxAge: 15m
-      secrets:
-        userVerificationID: userverificationkey_1
-        otpVerificationID: otpverificationkey_1
-        oidcKeysID: oidckey_1
-        cookieID: cookiekey_1
-        csrfID: cookiekey_1
-        domainVerificationID: domainverificationkey_1
-        idpConfigVerificationID: idpconfigverificationkey_1
       notifications:
         email:
           smtpHost: smtp.gmail.com:465
