@@ -160,6 +160,8 @@ github.com/caos/orbos v1.5.14-0.20210413150324-b123b1c5d539 h1:k99cc1YAUkazGNB+P
 github.com/caos/orbos v1.5.14-0.20210413150324-b123b1c5d539/go.mod h1:2I8oiZb5SMRm/qTLvwpSmdV0M6ex8J/UKyxUGfKaqJo=
 github.com/caos/orbos v1.5.14-0.20210413153252-5a0b0c2ab92c h1:zq6N7LnbJBf971MTt9R260BkjjMxv+D936zNfusZ7B8=
 github.com/caos/orbos v1.5.14-0.20210413153252-5a0b0c2ab92c/go.mod h1:2I8oiZb5SMRm/qTLvwpSmdV0M6ex8J/UKyxUGfKaqJo=
+github.com/caos/orbos v1.5.14-0.20210413205649-d81250fd7d3b h1:eOLTMUk9dksVRTQXJHrqhbYPreIZs3FYziizbMY08SY=
+github.com/caos/orbos v1.5.14-0.20210413205649-d81250fd7d3b/go.mod h1:2I8oiZb5SMRm/qTLvwpSmdV0M6ex8J/UKyxUGfKaqJo=
 github.com/casbin/casbin/v2 v2.1.2/go.mod h1:YcPU1XXisHhLzuxH9coDNf2FbKpjGlbCg3n9yuLkIJQ=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=

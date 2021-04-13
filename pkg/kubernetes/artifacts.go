@@ -226,7 +226,7 @@ status:
 	}
 
 	var (
-		cmd          = []string{"/zitadelctl", "operator"}
+		cmd          = []string{"/zitadelctl", "operator", "--kubeconfig", ""}
 		volumes      []core.Volume
 		volumeMounts []core.VolumeMount
 	)
@@ -246,8 +246,6 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
-	} else {
-		cmd = append(cmd, "--kubeconfig", "")
 	}
 
 	deployment := &apps.Deployment{
@@ -526,7 +524,7 @@ status:
 	}
 
 	var (
-		cmd          = []string{"/zitadelctl", "database"}
+		cmd          = []string{"/zitadelctl", "database", "--kubeconfig", ""}
 		volumes      []core.Volume
 		volumeMounts []core.VolumeMount
 	)
@@ -546,8 +544,6 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
-	} else {
-		cmd = append(cmd, "--kubeconfig", "")
 	}
 
 	deployment := &apps.Deployment{
