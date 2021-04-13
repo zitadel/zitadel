@@ -18,9 +18,6 @@ sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 MY_GIT_REPO="git@github.com:me/my-orb.git"
 zitadelctl --gitops configure --repourl ${MY_GIT_REPO} --masterkey "$(openssl rand -base64 21)"
 
-# Write the minimal Secrets
-wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/example_keys && zitadelctl --gitops writesecret zitadel.keys.existing --file ./example_keys
-
 # Deploy the operators to the current-context of your ~/.kube/config file
 zitadelctl --gitops takeoff
 
@@ -28,11 +25,11 @@ zitadelctl --gitops takeoff
 watch "kubectl --namespace caos-zitadel get pods"
 ```
 
-ZITADEL needs [gRPC-Web](https://grpc.io/docs/platforms/web/basics/) for client-server communication, which the widely spread [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) doesn't support out-of-the-box but Ambassador does. If you don't have an [Ambassador](https://www.getambassador.io/) running, we recommend you run it with our operator [BOOM](https://github.com/caos/orbos/blob/v3.1.4/docs/boom/boom.md). Do so by adding the template [boom.yml](https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/boom.yml) to the root of your Repository 
+ZITADEL needs [gRPC-Web](https://grpc.io/docs/platforms/web/basics/) for client-server communication, which the widely spread [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) doesn't support out-of-the-box but Ambassador does. If you don't have an [Ambassador](https://www.getambassador.io/) running, we recommend you run it with our operator [BOOM](https://github.com/caos/orbos/blob/v4.0.0/docs/boom/boom.md). Do so by adding the template [boom.yml](https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/boom.yml) to the root of your Repository 
 
 ```bash
 # Download the orbctl binary
-curl -s https://api.github.com/repos/caos/orbos/releases/tags/v3.1.4 | grep "browser_download_url.*orbctl.$(uname).$(uname -m)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/orbctl
+curl -s https://api.github.com/repos/caos/orbos/releases/tags/v4.0.0 | grep "browser_download_url.*orbctl.$(uname).$(uname -m)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/orbctl
 sudo chmod +x /usr/local/bin/orbctl
 sudo chown $(id -u):$(id -g) /usr/local/bin/orbctl
 
