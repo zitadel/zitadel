@@ -10,5 +10,4 @@ type View struct {
 	CurrentSequence          uint64
 	EventTimestamp           time.Time
 	LastSuccessfulSpoolerRun time.Time
-	AggregateType            string
 }
