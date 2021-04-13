@@ -1,11 +1,7 @@
 package zitadel
 
 import (
-	"fmt"
 	"strconv"
-	"time"
-
-	macherrs "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/orbos/pkg/helper"
 
@@ -390,35 +386,7 @@ func AdaptFunc(
 				}
 
 				desiredKind.Spec.Configuration.Secrets.Keys.Value = string(newKeys)
-
-				if helper.IsNil(k8sClient) {
-					return nil
-				}
-
-				// Apply new secret
-				ensure, err := queryCfg(k8sClient, queried)
-				if err != nil {
-					return err
-				}
-				if err := ensure(k8sClient); err != nil {
-					if macherrs.IsNotFound(err) {
-						monitor.WithField("reason", err.Error()).Info("Reconfiguring Kubernetes skipped")
-						return nil
-					}
-					return err
-				}
-
-				// Rollout new deployment pods
-				err = k8sClient.PatchDeployment(
-					namespace,
-					zitadelDeploymentName.Name(),
-					fmt.Sprintf(`{"spec":{"template":{"metadata":{"annotations":{"zitadel.ch/rolled-out":"%s"}}}}}`, time.Now().String()),
-				)
-				if macherrs.IsNotFound(err) {
-					monitor.WithField("reason", err.Error()).Info("Rolling out ZITADEL pods skipped")
-					return nil
-				}
-				return err
+				return nil
 			},
 			allSecrets,
 			allExisting,
