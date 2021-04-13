@@ -8,6 +8,7 @@ OPENAPI_PATH=${GOPATH}/src/github.com/caos/zitadel/openapi/v2
 ZITADEL_PATH=${GOPATH}/src/github.com/caos/zitadel
 GRPC_PATH=${ZITADEL_PATH}/pkg/grpc
 PROTO_PATH=/proto/include/zitadel
+DOCS_PATH=${ZITADEL_PATH}/site/docs/apis
 
 # generate go stub and grpc code for all files
 protoc \
@@ -28,6 +29,7 @@ go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption
 
 # output folder for openapi v2
 mkdir -p ${OPENAPI_PATH}
+mkdir -p ${DOCS_PATH}
 
 # generate additional output
 
@@ -39,6 +41,7 @@ protoc \
   --openapiv2_opt logtostderr=true \
   --authoption_out ${GRPC_PATH}/admin \
   --validate_out=lang=go:${GOPATH}/src \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,03-administration.md \
   ${PROTO_PATH}/admin.proto
 
 # authoptions are generated into the wrong folder

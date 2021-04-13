@@ -1,0 +1,91 @@
+---
+title: Admin API
+description: …
+---
+
+### Administration aka Admin
+
+This API is intended to configure and manage the IAM itself.
+
+| Service | URI                                                                                                                             |
+|:--------|:--------------------------------------------------------------------------------------------------------------------------------|
+| REST    | [https://api.zitadel.ch/admin/v1/](https://api.zitadel.ch/admin/v1/)                                                            |
+| GRPC    | [https://api.zitadel.ch/caos.zitadel.admin.api.v1.AdminService/](https://api.zitadel.ch/caos.zitadel.admin.api.v1.AdminService) |
+
+[Latest API Version](https://github.com/caos/zitadel/blob/main/proto/zitadel/admin.proto)
+
+### Table of Contents
+{{range .Files}}
+{{if .HasServices}}
+- Services
+{{range .Services}}  - [{{.Name}}](#{{.FullName | lower | replace "." ""}})
+{{end}}
+{{end}}
+{{if .HasMessages}}
+- Messages
+{{range .Messages}}  - [{{.LongName}}](#{{.LongName | lower | replace "." ""}})
+{{end}}
+{{end}}
+{{if .HasEnums}}
+- Enums
+{{range .Enums}}  - [{{.LongName}}](#{{.LongName | lower | replace "." ""}})
+{{end}}
+{{end}}
+{{end}}
+- [Scalar Value Types](#scalar-value-types)
+
+{{range .Files}}
+
+{{range .Services -}}
+### {{.Name}} {#{{.FullName | lower | replace "." ""}}}
+{{.Description}}
+
+{{range .Methods -}}
+#### {{.Name}}
+
+> **rpc** {{.Name}}([{{.RequestLongType}}](#{{.RequestLongType | lower | replace "." ""}}))
+[{{.ResponseLongType}}](#{{.ResponseLongType | lower | replace "." ""}})
+
+{{ .Description}}
+{{end}} <!-- end methods -->
+{{end}} <!-- end services -->
+
+### Messages
+{{range .Messages}}
+
+#### {{.LongName}}
+{{.Description}}
+
+{{if .HasFields}}
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+{{range .Fields -}}
+| {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | [{{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}}](#{{.LongType | lower | replace "." ""}}) | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} |
+{{end}} <!-- end Fields -->
+{{end}} <!-- end HasFields -->
+{{end}} <!-- end messages -->
+
+{{if gt (len .Enums) 0 }}
+### Enums
+{{range .Enums}}
+
+#### {{.LongName}} {#{{.LongName | lower | replace "." ""}}}
+{{.Description}}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+| {{.Name}} | {{.Number}} | {{if .Description}}{{nobr .Description}}{{else}}-{{end}} |
+{{end}}
+
+{{end}} <!-- end Enums -->
+{{end}} <!-- end if Enums -->
+{{end}} <!-- end Files -->
+
+### Scalar Value Types
+
+| .proto Type | Notes | C++ Type | Java Type | Python Type |
+| ----------- | ----- | -------- | --------- | ----------- |
+{{range .Scalars -}}
+| <div><h4 id="{{.ProtoType | lower | replace "." ""}}" /></div><a name="{{.ProtoType}}" /> {{.ProtoType}} | {{.Notes}} | {{.CppType}} | {{.JavaType}} | {{.PythonType}} |
+{{end}}
