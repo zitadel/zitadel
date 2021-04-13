@@ -29,7 +29,7 @@ type EnsureFunc func(k8sClient kubernetes.ClientInt) error
 
 type DestroyFunc func(k8sClient kubernetes.ClientInt) error
 
-type ConfigureFunc func(k8sClient kubernetes.ClientInt, gitops bool) error
+type ConfigureFunc func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error
 
 type QueryFunc func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (EnsureFunc, error)
 

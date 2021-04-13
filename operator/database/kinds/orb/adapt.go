@@ -129,7 +129,9 @@ func AdaptFunc(
 				monitor.WithField("destroyers", len(queriers)).Info("Destroy")
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},
-			func(k8sClient kubernetes.ClientInt, gitops bool) error { return configureDB(k8sClient, gitops) },
+			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+				return configureDB(k8sClient, queried, gitops)
+			},
 			secrets,
 			existing,
 			migrate,

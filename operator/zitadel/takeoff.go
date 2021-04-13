@@ -25,7 +25,7 @@ func Takeoff(
 		}
 		treeCurrent := &tree.Tree{}
 
-		query, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
+		query, _, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 		if err != nil {
 			internalMonitor.Error(err)
 			return err

@@ -256,9 +256,9 @@ func Adapter(
 				return ensure, err
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-			func(k8sClient kubernetes.ClientInt, gitops bool) error {
+			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
 				for i := range configurers {
-					if err := configurers[i](k8sClient, gitops); err != nil {
+					if err := configurers[i](k8sClient, queried, gitops); err != nil {
 						return err
 					}
 				}
