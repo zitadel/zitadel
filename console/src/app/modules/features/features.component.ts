@@ -13,6 +13,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { SubscriptionService } from 'src/app/services/subscription.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 export enum FeatureServiceType {
@@ -41,6 +42,7 @@ export class FeaturesComponent implements OnDestroy {
         private sessionStorage: StorageService,
         private injector: Injector,
         private adminService: AdminService,
+        private subService: SubscriptionService,
     ) {
         const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
         if (temporg) {
@@ -55,6 +57,9 @@ export class FeaturesComponent implements OnDestroy {
         })).subscribe(_ => {
             this.fetchData();
         });
+
+        console.log(window.location.href);
+        this.subService.getLink(this.org.id, window.location.href).then(console.log).catch(console.error);
     }
 
     public ngOnDestroy(): void {
