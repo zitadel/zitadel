@@ -2,11 +2,11 @@ package bucket
 
 import (
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/helper"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/orbos/pkg/labels"
 	secretpkg "github.com/caos/orbos/pkg/secret"
+	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
@@ -158,7 +158,7 @@ func AdaptFunc(
 					databases = []string{}
 				}
 
-				value, err := helper.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
+				value, err := read.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
 				if err != nil {
 					return nil, err
 				}
@@ -270,7 +270,7 @@ func AdaptFunc(
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-			func(kubernetes.ClientInt, bool) error { return nil },
+			func(kubernetes.ClientInt, map[string]interface{}, bool) error { return nil },
 			secrets,
 			existing,
 			false,

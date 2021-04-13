@@ -62,7 +62,8 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 			return err
 		}
 
-		return cfg.ConfigureOperators(
+		queried := make(map[string]interface{})
+		if err := cfg.ConfigureOperators(
 			rv.GitClient,
 			rv.OrbConfig.Masterkey,
 			append(cfg.ORBOSConfigurers(
@@ -74,28 +75,44 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 				rv.Monitor,
 				rv.GitClient,
 				func() (*tree.Tree, interface{}, error) {
-					tree, err := rv.GitClient.ReadTree(git.DatabaseFile)
+					desired, err := rv.GitClient.ReadTree(git.DatabaseFile)
 					if err != nil {
 						return nil, nil, err
 					}
 
-					parsed, err := orbdb.ParseDesiredV0(tree)
-					return tree, parsed, err
+					_, _, configure, _, _, _, err := orbdb.AdaptFunc("", nil, rv.Gitops)(rv.Monitor, desired, &tree.Tree{})
+					if err != nil {
+						return nil, nil, err
+					}
+					return desired, desired.Parsed, configure(k8sClient, queried, rv.Gitops)
 				},
 			), cfg.OperatorConfigurer(
 				git.ZitadelFile,
 				rv.Monitor,
 				rv.GitClient,
 				func() (*tree.Tree, interface{}, error) {
-					tree, err := rv.GitClient.ReadTree(git.ZitadelFile)
+					desired, err := rv.GitClient.ReadTree(git.ZitadelFile)
 					if err != nil {
 						return nil, nil, err
 					}
 
-					parsed, err := orbzit.ParseDesiredV0(tree)
-					return tree, parsed, err
+					_, _, configure, _, _, _, err := orbzit.AdaptFunc(
+						rv.OrbConfig,
+						"configure",
+						nil,
+						rv.Gitops,
+						nil,
+					)(rv.Monitor, desired, &tree.Tree{})
+					if err != nil {
+						return nil, nil, err
+					}
+					return desired, desired.Parsed, configure(k8sClient, queried, rv.Gitops)
 				},
-			)))
+			))); err != nil {
+			return err
+		}
+		rv.Monitor.Info("Configuration succeeded")
+		return nil
 	}
 	return cmd
 }

@@ -1,7 +1,11 @@
 package zitadel
 
 import (
+	"fmt"
 	"strconv"
+	"time"
+
+	macherrs "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/orbos/pkg/helper"
 
@@ -222,33 +226,58 @@ func AdaptFunc(
 			}
 		}
 
+		concatQueriers := func(queriers ...operator.QueryFunc) operator.QueryFunc {
+			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc operator.EnsureFunc, err error) {
+				return operator.QueriersToEnsureFunc(
+					monitor,
+					true,
+					queriers,
+					k8sClient,
+					queried,
+				)
+			}
+		}
+
+		queryCfg := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc operator.EnsureFunc, err error) {
+			users, err := getAllUsers(k8sClient, desiredKind)
+			if err != nil {
+				return nil, err
+			}
+			return concatQueriers(
+				queryDB,
+				getQueryC(users),
+				operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(
+					monitor,
+					namespace,
+					secretName,
+					secretVarsName,
+					secretPasswordName,
+					cmName,
+					consoleCMName,
+				)),
+			)(k8sClient, queried)
+		}
+
+		queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
+
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				users, err := getAllUsers(k8sClient, desiredKind)
-				if err != nil {
-					return nil, err
-				}
 				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
 				if err != nil {
 					return nil, err
 				}
 
 				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespace, action))
-				queryC := getQueryC(users)
-				queryReadyC := operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName))
 				querySetup := getQuerySetup(allZitadelUsers, getConfigurationHashes)
 				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespace, action))
 				queryD := queryD(allZitadelUsers, getConfigurationHashes)
-				queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
 
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
 					switch feature {
 					case "migration":
 						queriers = append(queriers,
-							queryDB,
 							//configuration
-							queryC,
-							queryReadyC,
+							queryCfg,
 							//migration
 							queryM,
 							queryReadyM,
@@ -256,10 +285,8 @@ func AdaptFunc(
 						)
 					case "iam":
 						queriers = append(queriers,
-							queryDB,
 							//configuration
-							queryC,
-							queryReadyC,
+							queryCfg,
 							//migration
 							queryM,
 							queryReadyM,
@@ -272,8 +299,7 @@ func AdaptFunc(
 							queryD,
 							queryReadyD,
 							//handle change if necessary for clientID
-							queryC,
-							queryReadyC,
+							queryCfg,
 							//again apply deployment if config changed
 							queryD,
 							queryReadyD,
@@ -294,7 +320,8 @@ func AdaptFunc(
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
-			func(k8sClient kubernetes.ClientInt, gitops bool) error {
+			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+
 				if desiredKind.Spec == nil {
 					desiredKind.Spec = &Spec{}
 				}
@@ -332,7 +359,7 @@ func AdaptFunc(
 				keys := make(map[string]string)
 				if gitops {
 					if err := yaml.Unmarshal([]byte(desiredKind.Spec.Configuration.Secrets.Keys.Value), keys); err != nil {
-						return nil
+						return err
 					}
 				} else {
 					return errors.New("configure is not yet implemented for CRD mode")
@@ -356,7 +383,42 @@ func AdaptFunc(
 				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID]; !ok {
 					keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID] = helper.RandStringBytes(32)
 				}
-				return nil
+
+				newKeys, err := yaml.Marshal(keys)
+				if err != nil {
+					return err
+				}
+
+				desiredKind.Spec.Configuration.Secrets.Keys.Value = string(newKeys)
+
+				if helper.IsNil(k8sClient) {
+					return nil
+				}
+
+				// Apply new secret
+				ensure, err := queryCfg(k8sClient, queried)
+				if err != nil {
+					return err
+				}
+				if err := ensure(k8sClient); err != nil {
+					if macherrs.IsNotFound(err) {
+						monitor.WithField("reason", err.Error()).Info("Reconfiguring Kubernetes skipped")
+						return nil
+					}
+					return err
+				}
+
+				// Rollout new deployment pods
+				err = k8sClient.PatchDeployment(
+					namespace,
+					zitadelDeploymentName.Name(),
+					fmt.Sprintf(`{"spec":{"template":{"metadata":{"annotations":{"zitadel.ch/rolled-out":"%s"}}}}}`, time.Now().String()),
+				)
+				if macherrs.IsNotFound(err) {
+					monitor.WithField("reason", err.Error()).Info("Rolling out ZITADEL pods skipped")
+					return nil
+				}
+				return err
 			},
 			allSecrets,
 			allExisting,

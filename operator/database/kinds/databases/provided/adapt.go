@@ -47,7 +47,7 @@ func Adapter() operator.AdaptFunc {
 			}, func(k8sClient kubernetes.ClientInt) error {
 				return nil
 			},
-			func(kubernetes.ClientInt, bool) error { return nil },
+			func(kubernetes.ClientInt, map[string]interface{}, bool) error { return nil },
 			make(map[string]*secret.Secret),
 			make(map[string]*secret.Existing),
 			false,
