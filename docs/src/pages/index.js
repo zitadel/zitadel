@@ -8,32 +8,47 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: 'Easy to Use',
+    title: 'Manuals',
     imageUrl: 'img/undraw_docusaurus_mountain.svg',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Follow this guide to get started with ZITADEL as a user.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Quickstarts',
     imageUrl: 'img/undraw_docusaurus_tree.svg',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Guides',
     imageUrl: 'img/undraw_docusaurus_react.svg',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
+      </>
+    ),
+  },
+  {
+    title: 'APIs',
+    imageUrl: 'img/undraw_docusaurus_react.svg',
+    description: (
+      <>
+        Learn more about our APIs and how to integrate them in your apps.
+      </>
+    ),
+  },
+  {
+    title: 'Architecture',
+    imageUrl: 'img/undraw_docusaurus_react.svg',
+    description: (
+      <>
+        Learn more about engineering and design principles, ZITADELs architecture and used technologies.
       </>
     ),
   },
@@ -59,8 +74,8 @@ export default function Home() {
   const {siteConfig = {}} = context;
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={`${siteConfig.title}`}
+      description="This site bundles ZITADELs Documentations">
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>

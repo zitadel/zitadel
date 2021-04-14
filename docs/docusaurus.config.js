@@ -58,30 +58,54 @@ module.exports = {
           title: 'Community',
           items: [
             {
-              label: 'GitHub',
+              label: 'GitHub Discussions',
               href: 'https://github.com/caos/zitadel/discussions',
             },
             {
               label: 'Twitter',
               href: 'https://twitter.com/zitadel_ch',
             },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
+            {
+              label: 'Linkedin',
+              href: 'https://www.linkedin.com/company/caos-ag/',
+            },
             {
               label: 'Blog',
               href: 'https://zitadel.ch/blog',
             },
+          ],
+        },
+        {
+          title: 'Company',
+          items: [
+            {
+              label: 'About CAOS Ltd.',
+              href: 'https://caos.ch/#about',
+            },
+            {
+              label: 'Contact',
+              href: 'https://zitadel.ch/contact/',
+            },
             {
               label: 'GitHub',
-              href: 'https://github.com/caos/zitadel',
+              href: 'https://github.com/caos',
+            },
+            {
+              label: 'Status',
+              href: 'https://status.zitadel.ch/',
+            },
+            {
+              label: 'Terms and Conditions',
+              href: 'https://zitadel.ch/pdf/tos.pdf',
+            },
+            {
+              label: 'Privacy Policy',
+              href: 'https://zitadel.ch/pdf/privacy.pdf',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} CAOS Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} CAOS Ltd. Built with Docusaurus.`,
     },
   },
   presets: [
