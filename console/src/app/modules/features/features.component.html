@@ -9,17 +9,18 @@
       <p>{{features?.tier?.name}}</p>
     </div>
 
-    <div class="detail">
-      <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}</p>
-      <p>{{customer?.name}}</p>
-      <p>{{customer?.address}}</p>
-      <p>{{customer?.zip}} {{customer?.town}}, {{customer?.country}}</p>
-    </div>
+    <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
+      <div class="detail">
+        <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}</p>
+        <p>{{customer?.name}}</p>
+        <p>{{customer?.address}}</p>
+        <p>{{customer?.zip}} {{customer?.town}}, {{customer?.country}}</p>
+      </div>
 
-    <div class="current-tier">
-      <mat-spinner class="spinner" *ngIf="stripeLoading" diameter="20"></mat-spinner>
-      <a [disabled]="!stripeURL" mat-raised-button [href]="stripeURL" target="_blank" alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</a>
-  </div>
+      <div class="current-tier">
+        <button [disabled]="!org.id" mat-raised-button (click)="linkToStripe()" target="_blank" alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</button>
+      </div>
+    </ng-container>
 
     <ng-template appHasRole [appHasRole]="['iam.features.delete']">
         <button *ngIf="serviceType === FeatureServiceType.MGMT && !isDefault"
