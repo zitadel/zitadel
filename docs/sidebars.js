@@ -29,7 +29,27 @@ module.exports = {
     },
   ],
   apis: [
-    'apis'
+    'apis',
+    {
+      type: 'category',
+      label: 'Administration',
+      items: ['guides/organizations', 'guides/projects'],
+    },
+    {
+      type: 'category',
+      label: 'Authentication',
+      items: ['guides/organizations', 'guides/projects'],
+    },
+    {
+      type: 'category',
+      label: 'Management',
+      items: ['guides/organizations', 'guides/projects'],
+    },
+    {
+      type: 'category',
+      label: 'OpenID Connect & OAuth',
+      items: ['guides/organizations', 'guides/projects'],
+    },
   ],
   architecture: [
     'architecture',

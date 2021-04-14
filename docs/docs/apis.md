@@ -1,5 +1,3 @@
 ---
-title: Quickstarts
+title: APIs
 ---
-
-## Quickstarts
