@@ -16,9 +16,10 @@ A. Register an organization
  2. Verify your email
  3. Login to Zitadel and manage the organization
 
-An administrator can create and manage users within console.
+B. Create User
+ 1. An administrator can create and manage users within console.
 
-B. Enable self/registration for User
+C. Enable selfregistration for User
 
  1. Create an organization as above
  2. Create custom policy
@@ -33,6 +34,12 @@ This will enable the register option in the login dialog and will register the u
             <img src="img/register.gif" itemprop="thumbnail" alt="Register organization" />
         </a>
         <figcaption itemprop="caption description">Register Organization</figcaption>
+    </figure>
+      <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/create-user.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/create-user.gif" itemprop="thumbnail" alt="Create User" />
+        </a>
+        <figcaption itemprop="caption description">Create User</figcaption>
     </figure>
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/enable-selfregister.gif" itemprop="contentUrl" data-size="1100x906">
