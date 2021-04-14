@@ -4,7 +4,20 @@ module.exports = {
     {
       type: 'category',
       label: 'User',
-      items: ['greeting'],
+      items: ['manuals/user'],
+    },
+  ],
+  quickstarts: [
+    'quickstarts',
+    {
+      type: 'category',
+      label: 'Single Page Applications',
+      items: ['quickstarts/vue', 'quickstarts/angular'],
+    },
+    {
+      type: 'category',
+      label: 'Identity Aware Proxy',
+      items: ['quickstarts/oauth2-proxy'],
     }
   ],
   guides: [
@@ -15,12 +28,11 @@ module.exports = {
       items: ['guides/organizations', 'guides/projects'],
     },
   ],
-  manuals: [
-    'manuals',
-    {
-      type: 'category',
-      label: 'User',
-      items: ['manuals/user'],
-    },
+  apis: [
+    'apis'
+  ],
+  architecture: [
+    'architecture',
+    'architecture/principles',
   ]
 };

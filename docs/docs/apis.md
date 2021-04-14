@@ -1,5 +1,5 @@
 ---
-title: APIs
+title: Quickstarts
 ---
 
-## HURUHUR
+## Quickstarts
