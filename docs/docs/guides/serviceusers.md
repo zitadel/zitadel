@@ -22,7 +22,7 @@ title: Service Users
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/oauth-recommended-flows#Our_recommended_authorization_flows">Recommended Authorization Flows</a></li>
+                <li>Knowledge of <a href="/docs/guides/oauth-recommended-flows">Recommended Authorization Flows</a></li>
             </ul>
         </td>
     </tr>
