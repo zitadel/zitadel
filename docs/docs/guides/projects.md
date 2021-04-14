@@ -13,7 +13,7 @@ title: Projects
 
 The idea of projects is to have a vessel for all components who are closely related to each other. Multiple projects can exist within an organization.
 
-![ZITADEL Organization grant](/img/zitadel_organization_grant.png)
+![Organization grant](/img/zitadel_organization_grant.png)
 
 All applications within a project share the same roles, grants, and authorizations:
 
@@ -22,7 +22,7 @@ All applications within a project share the same roles, grants, and authorizatio
 * **Authorizations** define which users have which roles. Authorizations are also called “user grants”.
 * **Granted Organizations** can manage selected roles for your project on their own.
 
-![ZITADEL Organization grant](/img/console_projects_overview.png)
+![Organization grant](/img/console_projects_overview.png)
 
 The goal of this module is to give you an overview, but not dive too deep into details around managing access rights and delegating management of roles to third parties. So let’s create a straightforward example project first.
 
@@ -30,7 +30,7 @@ The goal of this module is to give you an overview, but not dive too deep into d
 
 Visit https://console.zitadel.ch/projects or select “Projects” within your organization, then click the button to create a new project. 
 
-![ZITADEL Organization grant](/img/console_projects_empty.png)
+![Empty Project](/img/console_projects_empty.png)
 
 Enter the name “ My first project” and continue.
 
@@ -48,25 +48,25 @@ and
 * Display Name: Editor
 * Group: user
 
-![ZITADEL Organization grant](/img/console_projects_add_new_roles.gif)
+![Add New Roles](/img/console_projects_add_new_roles.gif)
 
 Now, you can add roles to your own user, or you can create a new user. To create a new user, go to Users and click “New”. Enter the required contact details and save by clicking “Create”.
 
-![ZITADEL Organization grant](/img/console_users_create_new_user.gif)
+![Create new user](/img/console_users_create_new_user.gif)
 
 To grant users certain roles, you need to create authorizations. Go back to the project, and jump to the section AUTHORIZATIONS.
 
-![ZITADEL Organization grant](/img/console_projects_create_authorization.gif)
+![Verify your authorization](/img/console_projects_create_authorization.gif)
 
 You can verify the role grant on the user. Select Users from the navigation menu and click on the user Coyote. Scroll down to the section AUTHORIZATION, there you should be able to verify that the user has the role ‘reader’ for your project ‘My first project’.
 
-![ZITADEL Organization grant](/img/console_projects_authorization_created.png)
+![Organization grant](/img/console_projects_authorization_created.png)
 
 Now create another project (eg. “My second project”) and verify that there are no roles or authorizations on your second project.
 
 ## What is a granted project?
 
-![ZITADEL Organization grant](/img/zitadel_organization_grant.png)
+![Organization Grant](/img/zitadel_organization_grant.png)
 
 With ZITADEL you can grant selected roles within your project to an organization. The receiving organization can then create authorizations for their users on their own (self-service). 
 
@@ -76,11 +76,11 @@ The process of assigning certain roles by default or according to rules can be f
 
 Obviously, your organization can grant projects and receive projects. When you are granting, then the receiving organization will be displayed in the section GRANTED ORGANIZATIONS of your project.
 
-![ZITADEL Organization grant](/img/console_projects_granted.png)
+![Project granted to organization](/img/console_projects_granted.png)
 
 A granted project, on the other hand, belongs to a third party, granting you some rights to manage certain roles of their project. ZITADEL Console shows granted projects in a dedicated navigation menu, to clearly separate from your organization’s projects. 
 
-![ZITADEL Organization grant](/img/console_granted_projects_overview.png)
+![Granted Projects Overview](/img/console_granted_projects_overview.png)
 
 Please note that you can also grant selected roles of a project to an individual user, instead of an organization. We will discuss this in more detail in a later section.
 
@@ -91,7 +91,7 @@ Please note that you can also grant selected roles of a project to an individual
 3. Select some roles you would like to grant to the organization ACME and confirm.
 4. You should now see ACME in the section GRANTED ORGANIZATIONS
 
-![ZITADEL Organization grant](/img/projects_create_org_grant_caos2acme.gif)
+![Grant a project](/img/projects_create_org_grant_caos2acme.gif)
 
 ## Knowledge Check (2)
 
