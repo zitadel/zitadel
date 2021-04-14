@@ -11,7 +11,7 @@ title: OAuth 2.0 Proxy
 Before we can start building our application we have do do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your [Project](https://console.zitadel.ch/projects) and add a new application at the top of the page.
 Select Web Application and continue.
-We recommend that you use [Authorization Code](architecture#Authorization_Code) for the OAuth 2.0 Proxy.
+We recommend that you use [Authorization Code](../apis/openidoauth/grant-types#authorization-code) for the OAuth 2.0 Proxy.
 
 > Make sure Authentication Method is set to `BASIC` and the Application Type is set to `Web`.
 

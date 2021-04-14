@@ -36,7 +36,7 @@ module.exports = {
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
-      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims'],
+      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims', 'apis/openidoauth/authn-methods', 'apis/openidoauth/grant-types'],
     },
   ],
   architecture: [

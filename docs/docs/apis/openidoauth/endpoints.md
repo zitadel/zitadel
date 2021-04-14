@@ -22,7 +22,7 @@ Required request Parameters
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
-| scope         | `openid` is required, see [Scopes](architecture#Scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`         |
+| scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`         |
 
 Required parameters for PKCE (see PKCE guide for more information)
 
@@ -89,7 +89,7 @@ Depending on your authorization method you will have to provide additional param
 
 When using `client_secret_basic`
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](architecture#Client_Secret_Basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
 When using `client_secret_post`
 
@@ -114,7 +114,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 | Parameter             | Description                                                                                                     |
 | --------------------- | --------------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
 
 ### JWT Profile Grant
@@ -127,7 +127,7 @@ Required request Parameters
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
 | assertion  | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication)               |
-| scope      | [Scopes](architecture#Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile` |
+| scope      | [Scopes](Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile` |
 
 ```BASH
 curl --request POST \
@@ -151,7 +151,7 @@ Depending on your authorization method you will have to provide additional param
 
 When using `client_secret_basic`
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](architecture#Client_Secret_Basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
 ---
 
@@ -161,7 +161,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 | Parameter             | Description                                                                                                 |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](architecture#JWT_with_Private_Key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
 
 ```BASH
