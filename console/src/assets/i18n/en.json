@@ -571,6 +571,18 @@
         "TITLE":"Features",
         "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
         "BTN-EDIT":"Edit Featureset",
+        "TIER": {
+          "NAME":"Tier Name",
+          "DETAILS":"Details",
+          "ADDRESS":"Addresse",
+          "TOWN":"Town",
+          "ZIP":"ZIP",
+          "COUNTRY":"Country",
+          "TITLE":"Zitadel Tier",
+          "DESCRIPTION":"Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+          "QUESTIONS":"For questions regarding payments contact our support ",
+          "BTN":"Change Tier"
+        },
         "DATA": {
             "AUDITLOGRETENTION":"Audit Log retention",
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",

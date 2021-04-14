@@ -1,6 +1,43 @@
 .default {
   color: var(--color-main);
+  font-size: 14px;
+}
+
+.tier-desc {
+  color: var(--grey);
+  font-size: 14px;
   margin-top: 0;
+}
+
+.detail {
+  margin-bottom: .5rem;
+
+  p {
+    margin: 0;
+  }
+
+  .title {
+    font-size: 14px;
+    color: var(--grey);
+  }
+}
+.current-tier {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .spinner {
+    margin-right: .5rem;
+  }
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--grey);
+  opacity: .5;
+  margin: .5rem 0;
+  display: block;
 }
 
 .content {
