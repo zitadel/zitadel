@@ -1,16 +1,26 @@
 module.exports = {
-  docs: [
+  manuals: [
+    'manuals',
     {
       type: 'category',
-      label: 'Docusaurus Tutorial',
-      items: [
-        'getting-started',
-        'create-a-page',
-        'create-a-document',
-        'create-a-blog-post',
-        'markdown-features',
-        'thank-you',
-      ],
+      label: 'User',
+      items: ['greeting'],
+    }
+  ],
+  guides: [
+    'guides',
+    {
+      type: 'category',
+      label: 'Get to know ZITADEL',
+      items: ['guides/organizations', 'guides/projects'],
     },
   ],
+  manuals: [
+    'manuals',
+    {
+      type: 'category',
+      label: 'User',
+      items: ['manuals/user'],
+    },
+  ]
 };

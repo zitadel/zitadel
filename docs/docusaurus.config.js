@@ -6,23 +6,41 @@ module.exports = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'caos', // Usually your GitHub org/user name.
-  projectName: 'zitadel', // Usually your repo name.
+  organizationName: 'caos',
+  projectName: 'zitadel',
   themeConfig: {
     navbar: {
-      title: 'Docs',
+      title: 'ZITADEL',
       logo: {
         alt: 'ZITADEL logo',
-        src: 'img/zitadel-logo-light.svg',
+        src: 'img/zitadel-logo-solo-darkdesign.svg',
       },
       items: [
         {
-          to: 'docs/',
-          activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
+          to: 'docs/manuals',
+          label: 'Manuals',
+          position: 'left'
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
+        {
+          to: 'docs/quickstarts',
+          label: 'Quickstarts',
+          position: 'left'
+        },
+        {
+          to: 'docs/guides',
+          label: 'Guides',
+          position: 'left'
+        },
+        {
+          to: 'docs/apis',
+          label: 'APIs',
+          position: 'left'
+        },
+        {
+          to: 'docs/architecture',
+          label: 'Architecture',
+          position: 'left'
+        },
         {
           href: 'https://github.com/caos/zitadel',
           label: 'GitHub',
