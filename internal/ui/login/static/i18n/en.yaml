@@ -153,10 +153,13 @@ Registration:
   Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
-  Tos: Terms and conditions
-  TosConfirm: I agree the
+  TosAndPrivacy: Terms and conditions
+  TosConfirm: I accept the
   TosLinkText: TOS
+  TosConfirmAnd: and the
   TosLink: https://zitadel.ch/pdf/tos.pdf
+  PrivacyLinkText: privacy policy
+  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   ExternalLogin: or register with an external user
 
 RegistrationOrg:
@@ -178,10 +181,13 @@ RegistrationOrg:
   Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
-  Tos: Terms and conditions
-  TosConfirm: I agree the
+  TosAndPrivacy: Terms and conditions
+  TosConfirm: I accept the
   TosLinkText: TOS
+  TosConfirmAnd: and the
   TosLink: https://zitadel.ch/pdf/tos.pdf
+  PrivacyLinkText: privacy policy
+  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
 
 LogoutDone:
   Title: Logged out
@@ -213,8 +219,10 @@ Actions:
   PasswordLogin: Login with password
 
 Footer:
-  TosPrivacyPolicy: ToS and Privacy Policy
+  Tos: TOS
   TosLink: https://zitadel.ch/pdf/agb.pdf
+  Privacy: Privacy policy
+  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   Help: Help
 
 Errors:
