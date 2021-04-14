@@ -27,8 +27,9 @@ module.exports = {
           position: 'left'
         },
         {
-          to: 'docs/guides',
+          type: 'doc',
           label: 'Guides',
+          docId: 'guides/introduction',
           position: 'left'
         },
         {

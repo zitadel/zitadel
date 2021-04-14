@@ -21,11 +21,10 @@ module.exports = {
     }
   ],
   guides: [
-    'guides',
     {
       type: 'category',
       label: 'Get to know ZITADEL',
-      items: ['guides/organizations', 'guides/projects'],
+      items: ['guides/introduction', 'guides/organizations', 'guides/projects'],
     },
   ],
   apis: [
