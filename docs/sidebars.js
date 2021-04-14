@@ -24,7 +24,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Get to know ZITADEL',
-      items: ['guides/introduction', 'guides/organizations', 'guides/projects', 'guides/serviceusers'],
+      items: ['guides/introduction', 'guides/organizations', 'guides/projects', 'guides/serviceusers', 'guides/oauth-recommended-flows'],
     },
   ],
   apis: [
