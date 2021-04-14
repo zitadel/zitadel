@@ -2,24 +2,32 @@
     [title]="('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
 
     <h2>{{'FEATURES.TIER.TITLE' | translate}}</h2>
-    <p class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}} {{'FEATURES.TIER.QUESTIONS' | translate}} <a href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
+    <p class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}} {{'FEATURES.TIER.QUESTIONS' | translate}} <a
+            href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
 
     <div class="detail">
-      <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
-      <p>{{features?.tier?.name}}</p>
+        <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
+        <p>{{features?.tier?.name}}</p>
     </div>
 
     <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
-      <div class="detail">
-        <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}</p>
-        <p>{{customer?.name}}</p>
-        <p>{{customer?.address}}</p>
-        <p>{{customer?.zip}} {{customer?.town}}, {{customer?.country}}</p>
-      </div>
+        <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
+        <div class="detail" *ngIf="stripeCustomer">
+            <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
+                <a (click)="updateCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
+            </p>
+            <p>{{stripeCustomer?.contact}}</p>
+            <p>{{stripeCustomer?.address}}</p>
+            <p *ngIf="stripeCustomer?.postal_code || stripeCustomer?.city || stripeCustomer?.country">
+                {{stripeCustomer?.postal_code}} {{stripeCustomer?.city}} {{stripeCustomer?.country}}</p>
+        </div>
 
-      <div class="current-tier">
-        <button [disabled]="!org.id" mat-raised-button (click)="linkToStripe()" target="_blank" alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</button>
-      </div>
+        <p class="error" *ngIf="stripeCustomer && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
+
+        <div class="current-tier">
+            <a [disabled]="!org.id || !customerValid" mat-raised-button [href]="stripeURL" target="_blank"
+                alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</a>
+        </div>
     </ng-container>
 
     <ng-template appHasRole [appHasRole]="['iam.features.delete']">
@@ -36,7 +44,8 @@
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
             <span class="fill-space"></span>
-            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONHOURS' | translate}}</span>
+            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONHOURS' |
+                translate}}</span>
         </div>
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>

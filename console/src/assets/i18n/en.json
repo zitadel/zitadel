@@ -575,6 +575,7 @@
           "NAME":"Tier Name",
           "DETAILS":"Billing Details",
           "DETAILS_DESC":"Enter your billing data here.",
+          "CUSTOMERINVALID":"Billing data ist not complete!",
           "CONTACT":"Kontakt",
           "COMPANY":"Company",
           "ADDRESS":"Addresse",

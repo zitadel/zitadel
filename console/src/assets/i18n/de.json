@@ -577,6 +577,7 @@
           "NAME":"Preisstufe Name",
           "DETAILS":"Abrechnungsdetails",
           "DETAILS_DESC":"Geben Sie hier Ihre Abrechnungsdaten ein.",
+          "CUSTOMERINVALID":"Abrechnungsdaten sind nicht vollständig!",
           "CONTACT":"Kontakt",
           "COMPANY":"Name des Unternehmens",
           "ADDRESS":"Adresse",

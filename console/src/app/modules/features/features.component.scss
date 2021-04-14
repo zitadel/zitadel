@@ -1,78 +1,91 @@
 .default {
-  color: var(--color-main);
-  font-size: 14px;
+	color: var(--color-main);
+	font-size: 14px;
 }
 
 .tier-desc {
-  color: var(--grey);
-  font-size: 14px;
-  margin-top: 0;
+	color: var(--grey);
+	font-size: 14px;
+	margin-top: 0;
 }
 
 .detail {
-  margin-bottom: .5rem;
+	margin-bottom: 1rem;
 
-  p {
-    margin: 0;
-  }
+	p {
+		margin: 0;
+		font-size: 14px;
+	}
 
-  .title {
-    font-size: 14px;
-    color: var(--grey);
-  }
+	.title {
+		font-size: 14px;
+		color: var(--grey);
+		margin-bottom: .5rem;
+
+		a {
+			margin-left: .5rem;
+			cursor: pointer;
+		}
+	}
 }
-.current-tier {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
 
-  .spinner {
-    margin-right: .5rem;
-  }
+.spinner {
+	margin: .5rem;
+}
+
+.error {
+	color: #f44336;
+	font-size: 14px;
+}
+
+.current-tier {
+	display: flex;
+	align-items: center;
+	margin-bottom: 1rem;
 }
 
 .divider {
-  height: 1px;
-  width: 100%;
-  background-color: var(--grey);
-  opacity: .5;
-  margin: .5rem 0;
-  display: block;
+	height: 1px;
+	width: 100%;
+	background-color: var(--grey);
+	opacity: .5;
+	margin: .5rem 0;
+	display: block;
 }
 
 .content {
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+	padding-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 
-  .row {
-    display: flex;
-    align-items: center;
-    padding: .3rem 0;
+	.row {
+		display: flex;
+		align-items: center;
+		padding: .3rem 0;
 
-    .left-desc {
-      font-size: .9rem;
-    }
+		.left-desc {
+			font-size: .9rem;
+		}
 
-    .fill-space {
-      flex: 1;
-    }
+		.fill-space {
+			flex: 1;
+		}
 
-    .length-wrapper {
-      display: flex;
-      align-items: center;
-    }
-  }
+		.length-wrapper {
+			display: flex;
+			align-items: center;
+		}
+	}
 }
 
 .btn-container {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
 
-  button {
-    margin-top: 3rem;
-    display: block;
-  }
+	button {
+		margin-top: 3rem;
+		display: block;
+	}
 }
