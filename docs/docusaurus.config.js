@@ -22,8 +22,9 @@ module.exports = {
           position: 'left'
         },
         {
-          to: 'docs/quickstarts',
+          type: 'doc',
           label: 'Quickstarts',
+          docId: 'quickstarts/quickstarts',
           position: 'left'
         },
         {
@@ -33,8 +34,9 @@ module.exports = {
           position: 'left'
         },
         {
-          to: 'docs/apis',
+          type: 'doc',
           label: 'APIs',
+          docId: 'apis/apis',
           position: 'left'
         },
         {

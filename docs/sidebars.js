@@ -8,7 +8,7 @@ module.exports = {
     },
   ],
   quickstarts: [
-    'quickstarts',
+    'quickstarts/quickstarts',
     {
       type: 'category',
       label: 'Single Page Applications',
@@ -28,26 +28,15 @@ module.exports = {
     },
   ],
   apis: [
-    'apis',
-    {
-      type: 'category',
-      label: 'Administration',
-      items: ['guides/organizations', 'guides/projects'],
-    },
-    {
-      type: 'category',
-      label: 'Authentication',
-      items: ['guides/organizations', 'guides/projects'],
-    },
-    {
-      type: 'category',
-      label: 'Management',
-      items: ['guides/organizations', 'guides/projects'],
-    },
+    'apis/apis',
+    'apis/domains',
+    'apis/authn',
+    'apis/admin',
+    'apis/mgmt',
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
-      items: ['guides/organizations', 'guides/projects'],
+      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims'],
     },
   ],
   architecture: [
