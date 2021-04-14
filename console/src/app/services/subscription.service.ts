@@ -27,11 +27,7 @@ export class SubscriptionService {
             .toPromise().then((data: any) => {
                 if (data && data.subscriptionServiceUrl) {
                     const serviceUrl = data.subscriptionServiceUrl;
-                    console.log(serviceUrl);
-
                     const accessToken = this.storageService.getItem(accessTokenStorageKey);
-                    console.log(accessToken);
-
                     return this.http.get(`${serviceUrl}/redirect`, {
                         headers: {
                             // 'Content-Type': 'application/json; charset=utf-8',
@@ -54,11 +50,7 @@ export class SubscriptionService {
             .toPromise().then((data: any) => {
                 if (data && data.subscriptionServiceUrl) {
                     const serviceUrl = data.subscriptionServiceUrl;
-                    console.log(serviceUrl);
-
                     const accessToken = this.storageService.getItem(accessTokenStorageKey);
-                    console.log(accessToken);
-
                     return this.http.get(`${serviceUrl}/customer`, {
                         headers: {
                             // 'Content-Type': 'application/json; charset=utf-8',
@@ -79,11 +71,7 @@ export class SubscriptionService {
             .toPromise().then((data: any) => {
                 if (data && data.subscriptionServiceUrl) {
                     const serviceUrl = data.subscriptionServiceUrl;
-                    console.log(serviceUrl);
-
                     const accessToken = this.storageService.getItem(accessTokenStorageKey);
-                    console.log(accessToken);
-
                     return this.http.put(`${serviceUrl}/customer`, body, {
                         headers: {
                             // 'Content-Type': 'application/json; charset=utf-8',

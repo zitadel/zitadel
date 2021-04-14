@@ -74,7 +74,6 @@ export class FeaturesComponent implements OnDestroy {
             this.subService.getCustomer(this.org.id)
                 .then(payload => {
                     this.customerLoading = false;
-                    console.log(payload);
                     this.stripeCustomer = payload;
                     if (this.customerValid) {
                         this.getLinkToStripe();
