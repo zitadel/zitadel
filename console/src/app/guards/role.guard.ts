@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
-import { filter, first, switchMap } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 
 import { GrpcAuthService } from '../services/grpc-auth.service';
 
@@ -18,7 +18,6 @@ export class RoleGuard implements CanActivate {
     ): Observable<boolean> {
         return this.authService.fetchedZitadelPermissions.pipe(
             filter((permissionsFetched) => !!permissionsFetched),
-            first(),
         ).pipe(
             switchMap(_ => this.authService.isAllowed(route.data['roles'])),
         );

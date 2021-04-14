@@ -1,5 +1,10 @@
 name: Code Coverage
-on: push
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
 
 env:
   REGISTRY: ghcr.io

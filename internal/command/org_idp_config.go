@@ -142,22 +142,9 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	if err != nil {
 		return nil, err
 	}
-
-	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
-	}
-	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
-	}
-
-	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	events := []eventstore.EventPusher{
-		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, idpID, existingIDP.Name),
-	}
-
-	if cascadeRemoveProvider {
-		removeIDPEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpID, true, cascadeExternalIDPs...)
-		events = append(events, removeIDPEvents...)
+	events, err := c.removeIDPConfig(ctx, existingIDP, cascadeRemoveProvider, cascadeExternalIDPs...)
+	if err != nil {
+		return nil, err
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
@@ -168,6 +155,26 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfigWriteModel, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) ([]eventstore.EventPusher, error) {
+	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
+	}
+	if existingIDP.State != domain.IDPConfigStateInactive {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
+	events := []eventstore.EventPusher{
+		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, existingIDP.AggregateID, existingIDP.Name),
+	}
+
+	if cascadeRemoveProvider {
+		removeIDPEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, existingIDP.AggregateID, true, cascadeExternalIDPs...)
+		events = append(events, removeIDPEvents...)
+	}
+	return events, nil
 }
 
 func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string) (*domain.IDPConfig, error) {

@@ -1,9 +1,12 @@
 name: Docs
 on:
   push:
+    branches:
+     - '**'
+    tags-ignore:
+      - '**'
     paths:
       - 'site/**'
-
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

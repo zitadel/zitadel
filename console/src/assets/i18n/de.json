@@ -218,7 +218,7 @@
         "MFA": {
             "TABLETYPE":"Typ",
             "TABLESTATE":"Status",
-            "ATTRIBUTE":"Attribut",
+            "NAME":"Name",
             "TABLEACTIONS":"Aktionen",
             "TITLE": "Multifaktor-Authentisierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",

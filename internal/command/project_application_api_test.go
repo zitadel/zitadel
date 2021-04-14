@@ -273,27 +273,6 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid app, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				apiApp: &domain.APIApp{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
-					},
-					AppID: "app1",
-				},
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
 				eventstore: eventstoreExpect(

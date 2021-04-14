@@ -6,6 +6,8 @@
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
+                <button (click)="loadDomains()" card-actions mat-icon-button><mat-icon>refresh</mat-icon></button>
+
                 <div *ngFor="let domain of domains" class="domain">
                     <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain)"
                         class="title">{{domain.domainName}}</span>

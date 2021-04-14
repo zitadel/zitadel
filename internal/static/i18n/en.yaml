@@ -194,7 +194,7 @@ Errors:
       NotActive:: Application is not active
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
-      APIConfigInvalid: OIDC configuration is invalid
+      APIConfigInvalid: API configuration is invalid
       IsNotOIDC: Application is not type oidc
       IsNotAPI: Application is not type API
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret

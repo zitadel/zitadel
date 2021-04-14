@@ -9,6 +9,7 @@ import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/p
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageKey, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -51,6 +52,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         private route: ActivatedRoute,
         private authService: GrpcAuthService,
         private mgmtService: ManagementService,
+        private storage: StorageService,
     ) {
         this.subscription = this.route.params.subscribe((params: Params) => {
             const { projectid, grantid, userid } = params;
@@ -83,9 +85,10 @@ export class UserGrantCreateComponent implements OnDestroy {
             }
         });
 
-        this.authService.getActiveOrg().then(org => {
-            this.org = org;
-        });
+        const temporg = this.storage.getItem<Org.AsObject>(StorageKey.organization);
+        if (temporg) {
+            this.org = temporg;
+        }
     }
 
     public close(): void {
