@@ -1,4 +1,5 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -13,8 +14,9 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
-import { SubscriptionService } from 'src/app/services/subscription.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+import { PaymentInfoDialogComponent } from './payment-info-dialog/payment-info-dialog.component';
 
 export enum FeatureServiceType {
   MGMT,
@@ -33,12 +35,11 @@ export class FeaturesComponent implements OnDestroy {
   public features!: Features.AsObject;
 
   private sub: Subscription = new Subscription();
-  private org!: Org.AsObject;
+  public org!: Org.AsObject;
 
   public FeatureServiceType: any = FeatureServiceType;
 
   public stripeLoading: boolean = false;
-  public stripeURL: string = '';
   public customer = {
     name: '',
     address: '',
@@ -53,7 +54,7 @@ export class FeaturesComponent implements OnDestroy {
     private sessionStorage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
-    private subService: SubscriptionService,
+    private dialog: MatDialog,
   ) {
     const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
     if (temporg) {
@@ -68,25 +69,25 @@ export class FeaturesComponent implements OnDestroy {
     })).subscribe(_ => {
       this.fetchData();
     });
-
-    console.log(window.location.href);
-    this.stripeLoading = true;
-    this.subService.getLink(this.org.id, window.location.href)
-      .then(payload => {
-        this.stripeLoading = false;
-        console.log(payload);
-        if (payload.redirect_url) {
-          this.stripeURL = payload.redirect_url;
-        }
-      })
-      .catch(error => {
-        this.stripeLoading = false;
-        console.error(error);
-      });
   }
 
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  public linkToStripe(): void {
+    const dialogRefPhone = this.dialog.open(PaymentInfoDialogComponent, {
+      data: {
+        orgId: this.org.id,
+      },
+      width: '400px',
+    });
+
+    dialogRefPhone.afterClosed().subscribe(resp => {
+      if (resp.customer && this.serviceType === FeatureServiceType.MGMT && resp.redirect_url) {
+        window.open(resp.redirect_url, '_blank');
+      }
+    });
   }
 
   public fetchData(): void {

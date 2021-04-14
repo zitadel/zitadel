@@ -1,0 +1,31 @@
+h1 {
+  font-size: 1.5rem;
+  margin-top: 0;
+}
+
+.desc {
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.formfield {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+
+  button {
+    border-radius: .5rem;
+  }
+}
+
+img {
+  height: 15px;
+  width: auto;
+}
