@@ -22,8 +22,9 @@
   }
 
   function handleKeydown(event) {
-      const isCtrlKey = navigator.platform.indexOf('Mac') > -1 ? event.metaKey : event.ctrlKey
-    if ((event.keyCode == 114) || (isCtrlKey && event.keyCode == 70)) {
+      const isCtrlKey = navigator.platform.indexOf('Mac') > -1 ? event.metaKey : event.ctrlKey;
+      const isShiftKey = event.shiftKey;
+    if ((event.keyCode == 114 && isShiftKey) || (isCtrlKey && event.keyCode == 70 && isShiftKey)) {
         event.preventDefault();
         searchEnabled = !searchEnabled;
     }

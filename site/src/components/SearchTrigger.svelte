@@ -59,5 +59,5 @@
     <i class="las la-search"></i>
     <span>Search this site</span>
     <span class="fill-space"></span>
-    <span class="strg">{buttonname || 'Ctrl'} F</span>
+    <span class="strg">{buttonname || 'Ctrl'} Shift F</span>
 </button>

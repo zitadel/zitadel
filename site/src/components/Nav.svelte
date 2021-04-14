@@ -346,7 +346,7 @@
 
         <a class="show-if-desktop" href="https://console.zitadel.ch">
             <button>
-                <span>LOGIN</span>
+                <span>Login</span>
             </button>
         </a>
 	</nav>

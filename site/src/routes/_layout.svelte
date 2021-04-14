@@ -17,12 +17,12 @@
 </style>
 
 <Nav title="Zitadel docs" {segment} {page} logo="logos/zitadel-logo-light.svg">
-    <NavItem segment="start" prefetch>Get started</NavItem>
-    <NavItem segment="quickstarts">Quickstarts</NavItem>
-    <NavItem segment="guides" prefetch>Guides</NavItem>
-    <NavItem segment="apis" prefetch>APIs</NavItem>
-    <NavItem segment="architecture" prefetch>Architecture</NavItem>
-    <NavItem segment="use" prefetch>Manual</NavItem>
+    <NavItem segment="start" sapper:prefetch>Get started</NavItem>
+    <NavItem segment="quickstarts" sapper:prefetch>Quickstarts</NavItem>
+    <NavItem segment="guides" sapper:prefetch>Guides</NavItem>
+    <NavItem segment="apis" sapper:prefetch>APIs</NavItem>
+    <NavItem segment="architecture" sapper:prefetch>Architecture</NavItem>
+    <NavItem segment="use" sapper:prefetch>Manual</NavItem>
 </Nav>
 
 <main>
