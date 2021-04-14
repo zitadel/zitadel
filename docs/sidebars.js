@@ -12,7 +12,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Single Page Applications',
-      items: ['quickstarts/vue', 'quickstarts/angular'],
+      items: ['quickstarts/angular'],
     },
     {
       type: 'category',
