@@ -186,7 +186,7 @@ RegistrationOrg:
   TosLinkText: TOS
   TosConfirmAnd: and the
   TosLink: https://zitadel.ch/pdf/tos.pdf
-  PrivacyLinkText: Privacy policy
+  PrivacyLinkText: privacy policy
   PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
 
 LogoutDone:
