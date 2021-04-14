@@ -179,21 +179,21 @@ You can manage the linked external IDP Providers within the "Personal Informatio
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/accounts_page.png" itemprop="contentUrl" data-size="1920x1080">
+        <a href="img/accounts_page.png" itemprop="contentUrl" data-size="1716x+648">
             <img src="img/accounts_page.png" itemprop="thumbnail" alt="Login Username" />
         </a>
         <figcaption itemprop="caption description">Login Username</figcaption>
     </figure>
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/accounts_password.png" itemprop="contentUrl" data-size="1920x1080">
+        <a href="img/accounts_password.png" itemprop="contentUrl" data-size="1715x761">
             <img src="img/accounts_password.png" itemprop="thumbnail" alt="Login Password" />
         </a>
         <figcaption itemprop="caption description">Login Password</figcaption>
     </figure>
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/accounts_otp_verify.png" itemprop="contentUrl" data-size="1920x1080">
-            <img src="img/accounts_otp_verify.png" itemprop="thumbnail" alt="Login OTP" />
+        <a href="img/accounts_multifactor.png" itemprop="contentUrl" data-size="1715x598">
+            <img src="img/accounts_multifactor.png" itemprop="thumbnail" alt="Login OTP" />
         </a>
-        <figcaption itemprop="caption description">Login OTP</figcaption>
+        <figcaption itemprop="caption description">Login mfa</figcaption>
     </figure>
 </div>
