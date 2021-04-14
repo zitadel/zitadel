@@ -11,7 +11,8 @@ title: Organizations
 
 ## What is an organization?
 
-ZITADEL is organized around the idea that 
+ZITADEL is organized around the idea that:
+
 * Multiple organizations share the same system. In this case multiple organizations share the same service, zitadel.ch
 * organizations can grant each other rights to self-manage certain aspects of the IAM (eg, roles for access management)
 * organizations are vessels for users and projects
@@ -20,7 +21,7 @@ ZITADEL is organized around the idea that
 
 Organizations in ZITADEL are therefore comparable to tenants of a system or organizational units of a directory based system.
 
-You can use projects within your organization to manage the security context of closely related components, such as roles, grants and authorizations for multiple clients. You can set up multiple projects within your organization. 
+You can use projects within your organization to manage the security context of closely related components, such as roles, grants and authorizations for multiple clients. You can set up multiple projects within your organization.
 
 ZITADEL allows you to give other organizations permission to manage certain aspects of a project within your organization on their own. This means you could set up a project with roles that should exist within your service/software, but allow another organization to allocate the roles to users within their own organization. As a service provider, you will find this feature useful, as it allows you to establish a self-service culture for your business customers.
 
@@ -32,7 +33,7 @@ There are several more modules in our documentation to go into more detail regar
 
 ## Exercise - Create a new organization
 
-To register your organization and create a user for ZITADEL, visit zitadel.ch or directly https://accounts.zitadel.ch/register/org and fill in the required information.
+To register your organization and create a user for ZITADEL, visit zitadel.ch or directly <https://accounts.zitadel.ch/register/org> and fill in the required information.
 
 ![Register new Organization](/img/console_org_register.png)
 
@@ -42,7 +43,7 @@ If you already have an existing login for zitadel.ch, you need to visit the cons
 
 ## How ZITADEL handles usernames
 
-As we mentioned before, each organization has its own pool of usernames, which includes human and service. 
+As we mentioned before, each organization has its own pool of usernames, which includes human and service.
 
 This means that, for example a user with the username road.runner, can only exist once in an organization called ACME. ZITADEL will automatically generate a "logonname" for each  consisting of `{username}@{domainname}.{zitadeldomain}`, in our example road.runner@acme.zitadel.ch.
 
@@ -96,7 +97,7 @@ Please note that domain verification also removes the logonname from all users, 
 * You can delegate access management self-service to another organization
     - [x] yes
     - [ ] no
-    
+
 </details>
 
 ## Summary
@@ -106,7 +107,8 @@ Please note that domain verification also removes the logonname from all users, 
 * Verify your domain in the Console to improve user experience; remember to not delete the verification code to allow recheck of ownership
 * You can delegate certain aspects of your IAM to other organizations for self-service
 
-Where to go from here: 
+Where to go from here:
+
 * Create a project
 * Setup Passwordless MFA
 * Manage ZITADEL Roles

@@ -18,7 +18,7 @@ The idea of projects is to have a vessel for all components who are closely rela
 All applications within a project share the same roles, grants, and authorizations:
 
 * **Applications** is your software that initiates the authorization flow. This could be a web app and a mobile app that share the same roles.
-* **Roles** are a means of managing user access rights for a project. 
+* **Roles** are a means of managing user access rights for a project.
 * **Authorizations** define which users have which roles. Authorizations are also called “user grants”.
 * **Granted Organizations** can manage selected roles for your project on their own.
 
@@ -28,7 +28,7 @@ The goal of this module is to give you an overview, but not dive too deep into d
 
 ## Exercise - Create a simple project
 
-Visit https://console.zitadel.ch/projects or select “Projects” within your organization, then click the button to create a new project. 
+Visit <https://console.zitadel.ch/projects> or select “Projects” within your organization, then click the button to create a new project.
 
 ![Empty Project](/img/console_projects_empty.png)
 
@@ -68,7 +68,7 @@ Now create another project (eg. “My second project”) and verify that there a
 
 ![Organization Grant](/img/zitadel_organization_grant.png)
 
-With ZITADEL you can grant selected roles within your project to an organization. The receiving organization can then create authorizations for their users on their own (self-service). 
+With ZITADEL you can grant selected roles within your project to an organization. The receiving organization can then create authorizations for their users on their own (self-service).
 
 An example could be a service provider that offers a SaaS solution that has different permissions for employees working in Sales and Accounting. As soon as a new client purchases the service, the provider could grant the roles ‘sales’ and ‘accounting’ to that organization, allowing them to self-manage how they want to allocate the roles to their users.
 
@@ -78,7 +78,7 @@ Obviously, your organization can grant projects and receive projects. When you a
 
 ![Project granted to organization](/img/console_projects_granted.png)
 
-A granted project, on the other hand, belongs to a third party, granting you some rights to manage certain roles of their project. ZITADEL Console shows granted projects in a dedicated navigation menu, to clearly separate from your organization’s projects. 
+A granted project, on the other hand, belongs to a third party, granting you some rights to manage certain roles of their project. ZITADEL Console shows granted projects in a dedicated navigation menu, to clearly separate from your organization’s projects.
 
 ![Granted Projects Overview](/img/console_granted_projects_overview.png)
 
@@ -86,7 +86,7 @@ Please note that you can also grant selected roles of a project to an individual
 
 ## Exercise - Grant a project
 
-1. Visit the project that you have created before, then in the section GRANTED ORGANIZATIONS click New. 
+1. Visit the project that you have created before, then in the section GRANTED ORGANIZATIONS click New.
 2. Enter the domain ‘acme.zitadel.ch’, search the organization and continue to the next step.
 3. Select some roles you would like to grant to the organization ACME and confirm.
 4. You should now see ACME in the section GRANTED ORGANIZATIONS
@@ -119,7 +119,7 @@ Please note that you can also grant selected roles of a project to an individual
 * Your projects as well as projects granted to your organization are visible within the Tab Projects of your organization
     - [ ] yes
     - [x] no (Projects and Granted Projects are shown on different tabs)
-    
+
 </details>
 
 ## Summary (2)
@@ -128,7 +128,8 @@ Please note that you can also grant selected roles of a project to an individual
 * Create and assign roles to users of your organization within your project
 * Use project grants to enable other organizations to self-manage access rights (roles) to your applications
 
-Where to go from here: 
+Where to go from here:
+
 * Manage roles for your project
 * Grant roles to other organizations or users
 * Service Users
