@@ -96,7 +96,7 @@ To link an external Identity Provider with a Zitadel Account you have to:
 
 you can then either
 
-1. link the Identity to an existin ZITADEL useraccount
+1. link the Identity to an existing ZITADEL useraccount
 2. auto register a new ZITADEL useraccount 
 
 
