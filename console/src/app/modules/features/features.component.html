@@ -2,8 +2,8 @@
     [title]="('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
 
     <h2>{{'FEATURES.TIER.TITLE' | translate}}</h2>
-    <p class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}} {{'FEATURES.TIER.QUESTIONS' | translate}} <a
-            href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
+    <p *ngIf="serviceType === FeatureServiceType.MGMT" class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}}
+        {{'FEATURES.TIER.QUESTIONS' | translate}} <a href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
 
     <div class="detail">
         <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
@@ -17,9 +17,14 @@
                 <a (click)="updateCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
             </p>
             <p>{{stripeCustomer?.contact}}</p>
+            <p *ngIf="stripeCustomer.company">{{stripeCustomer?.company}}</p>
             <p>{{stripeCustomer?.address}}</p>
             <p *ngIf="stripeCustomer?.postal_code || stripeCustomer?.city || stripeCustomer?.country">
-                {{stripeCustomer?.postal_code}} {{stripeCustomer?.city}} {{stripeCustomer?.country}}</p>
+                {{stripeCustomer?.postal_code}} {{stripeCustomer?.city}} {{stripeCustomer?.country}}
+                <img *ngIf="customerCountry" height="20px" width="30px"
+                    style="margin-right: 1rem; border-radius: 2px; vertical-align: middle;"
+                    src="../../../assets/flags/{{customerCountry.isoCode.toLowerCase()}}.png" />
+            </p>
         </div>
 
         <p class="error" *ngIf="stripeCustomer && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>

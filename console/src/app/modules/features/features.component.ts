@@ -17,6 +17,7 @@ import { StorageService } from 'src/app/services/storage.service';
 import { StripeCustomer, SubscriptionService } from 'src/app/services/subscription.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { COUNTRIES, Country } from './country';
 import { PaymentInfoDialogComponent } from './payment-info-dialog/payment-info-dialog.component';
 
 export enum FeatureServiceType {
@@ -116,7 +117,7 @@ export class FeaturesComponent implements OnDestroy {
                 .then(payload => {
                     this.stripeLoading = false;
                     console.log(payload);
-                    this.stripeCustomer = payload;
+                    this.stripeURL = payload.redirect_url;
                 })
                 .catch(error => {
                     this.stripeLoading = false;
@@ -208,5 +209,9 @@ export class FeaturesComponent implements OnDestroy {
 
     get customerValid(): boolean {
         return !!this.stripeCustomer?.contact && !!this.stripeCustomer?.address && !!this.stripeCustomer?.city && !!this.stripeCustomer?.postal_code;
+    }
+
+    get customerCountry(): Country | undefined {
+        return COUNTRIES.find(country => country.isoCode == this.stripeCustomer.country);
     }
 }

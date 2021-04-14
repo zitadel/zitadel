@@ -49,6 +49,10 @@ export class PaymentInfoDialogComponent {
             this.form.patchValue(data.customer);
         }
 
+        if (!data.customer?.country) {
+            this.form.get('country')?.setValue('CH');
+        }
+
         this.getLink();
     }
 

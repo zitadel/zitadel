@@ -1,31 +1,47 @@
 h1 {
-  font-size: 1.5rem;
-  margin-top: 0;
+	font-size: 1.5rem;
+	margin-top: 0;
 }
 
 .desc {
-  font-size: 14px;
-  color: var(--grey);
+	font-size: 14px;
+	color: var(--grey);
 }
 
 .formfield {
-  width: 100%;
+	width: 100%;
 }
 
 .action {
-  display: flex;
-  justify-content: flex-end;
+	display: flex;
+	justify-content: flex-end;
 
-  .ok-button {
-    margin-left: .5rem;
-  }
+	.ok-button {
+		margin-left: .5rem;
+	}
 
-  button {
-    border-radius: .5rem;
-  }
+	button {
+		border-radius: .5rem;
+	}
 }
 
 img {
-  height: 15px;
-  width: auto;
+	height: 15px;
+	width: auto;
+}
+
+.img-wrapper {
+	width: 50px;
+	display: flex;
+}
+
+.lighter {
+	font-size: 12px;
+	color: var(--grey);
+	padding: 0 .5rem;
+}
+
+.center {
+	display: flex;
+	align-items: center;
 }
