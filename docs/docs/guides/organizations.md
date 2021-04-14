@@ -68,13 +68,6 @@ Please note that domain verification also removes the logonname from all users, 
 
 ![Verify Domain](/img/console_verify_domain.gif)
 
-<figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-    <a href="img/console_verify_domain.gif" itemprop="contentUrl" data-size="1920x1080">
-        <img src="img/console_verify_domain.gif" itemprop="thumbnail" alt="console_verify_domain" />
-    </a>
-    <figcaption itemprop="caption description">Verify Domain</figcaption>
-</figure>
-
 > **_Please note:_** Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
 
 ## Knowledge Check
