@@ -1679,7 +1679,7 @@ message HealthzRequest {}
 
 message HealthzResponse {}
 
-// parameters are ORed
+// if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {

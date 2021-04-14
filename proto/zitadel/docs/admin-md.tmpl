@@ -49,10 +49,10 @@ This API is intended to configure and manage the IAM itself.
 
 {{ .Description}}
 
-{{ range $key, $value := .Options }}
-    Key:{{ $key }}
-    Value:{{ $value }}
-{{end}} <!-- end options -->
+{{$httpOption := .Option "google.api.http"}}
+{{range $httpOption.Rules}}
+{{ .Method }}: {{ .Pattern }}
+{{end}}
 
 {{end}} <!-- end methods -->
 {{end}} <!-- end services -->

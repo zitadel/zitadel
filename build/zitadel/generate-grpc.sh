@@ -81,6 +81,6 @@ rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
 protoc \
   -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/admin-md.tmpl,03-administration.md \
-  ${PROTO_PATH}/*.proto
+  ${PROTO_PATH}/admin.proto
 
 echo "done generating grpc"
