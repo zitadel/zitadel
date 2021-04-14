@@ -10,15 +10,33 @@ title: User Manual
 
 Zitadel allows users to register a organization and/or user with just a few steps.
 
-1. Register a organization
-2. Verify your email
-3. Login to Zitadel and manage the organization
+1. Register an organization
 
+ 1. Create an organization
+ 2. Verify your email
+ 3. Login to Zitadel and manage the organization
+
+An administrator can create and manage users within console.
+
+2. Enable self/registration for User
+
+ 1. Create an organization as above
+ 2. Create custom policy
+ 3. Enable the "Register allowed" flag in the Login Policy
+ 4. Connect your application and add the applications [scope](https://docs.zitadel.ch/architecture/#Custom_Scopes) to the redirect URL.
+
+This will enable the register option in the login dialog and will register the user within your organization if he does not already have an account.
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/register.gif" itemprop="contentUrl" data-size="1100x906">
-            <img src="img/register.gif" itemprop="thumbnail" alt="Self Register" />
+            <img src="img/register.gif" itemprop="thumbnail" alt="Register organization" />
+        </a>
+        <figcaption itemprop="caption description">Self Register</figcaption>
+    </figure>
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/enable-selfregister.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/enable-selfregister.gif" itemprop="thumbnail" alt="Register organization" />
         </a>
         <figcaption itemprop="caption description">Self Register</figcaption>
     </figure>
