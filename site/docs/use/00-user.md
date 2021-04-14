@@ -36,21 +36,29 @@ This will enable the register option in the login dialog and will register the u
     </figure>
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/enable-selfregister.gif" itemprop="contentUrl" data-size="1100x906">
-            <img src="img/enable-selfregister.gif" itemprop="thumbnail" alt="Register organization" />
+            <img src="img/enable-selfregister.gif" itemprop="thumbnail" alt="enable selfregister" />
         </a>
         <figcaption itemprop="caption description">Self Register</figcaption>
+    </figure>
+      <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/email-verify.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/email-verify.gif" itemprop="thumbnail" alt="Verify EMail" />
+        </a>
+        <figcaption itemprop="caption description">Verify EMail</figcaption>
     </figure>
 </div>
 
 
-### Verify EMail
+### Change EMail
 
-To verify our email address just klick the "Finish Initialization" link in the email your received after registration. You could copy and paste the received code as well and enter it at the initial login.
+To change your email address visit your Personal Information page and amend the email field.
+
+
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-        <a href="img/email-verify.gif" itemprop="contentUrl" data-size="1100x906">
-            <img src="img/email-verify.gif" itemprop="thumbnail" alt="Verify EMail" />
+        <a href="img/change-email.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/change-email.gif" itemprop="thumbnail" alt="Change EMail" />
         </a>
         <figcaption itemprop="caption description">Verify EMail</figcaption>
     </figure>
@@ -90,7 +98,7 @@ You can either:
         <a href="img/enable-mfa-handling.gif" itemprop="contentUrl" data-size="1100x906">
             <img src="img/enable-mfa-handling.gif" itemprop="thumbnail" alt="Enable Multi Factor" />
         </a>
-        <figcaption itemprop="caption description">Encale Multi Factor</figcaption>
+        <figcaption itemprop="caption description">Enable Multi Factor</figcaption>
     </figure>
    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/login-mfa.gif" itemprop="contentUrl" data-size="1100x906">
@@ -137,7 +145,7 @@ You can manage the linked external IDP Providers within the "Personal Informatio
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/manage-external-idp.png" itemprop="contentUrl" data-size="1710x747">
-            <img src="img/manage-external-idp.png" itemprop="thumbnail" alt="Linking Accounts" />
+            <img src="img/manage-external-idp.png" itemprop="thumbnail" alt="manage external IDP" />
         </a>
         <figcaption itemprop="caption description">Linking Accounts</figcaption>
     </figure>
