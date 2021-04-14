@@ -10,7 +10,7 @@ title: User Manual
 
 Zitadel allows users to register a organization and/or user with just a few steps.
 
-1. Register an organization
+A. Register an organization
 
  1. Create an organization
  2. Verify your email
@@ -18,7 +18,7 @@ Zitadel allows users to register a organization and/or user with just a few step
 
 An administrator can create and manage users within console.
 
-2. Enable self/registration for User
+B. Enable self/registration for User
 
  1. Create an organization as above
  2. Create custom policy
