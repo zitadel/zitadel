@@ -6,7 +6,7 @@ title: User Manual
 
 > All documentations are under active work and subject to change soon!
 
-### Self Register User
+### Organization and user registration
 
 Zitadel allows users to register a organization and/or user with just a few steps.
 
@@ -32,13 +32,13 @@ This will enable the register option in the login dialog and will register the u
         <a href="img/register.gif" itemprop="contentUrl" data-size="1100x906">
             <img src="img/register.gif" itemprop="thumbnail" alt="Register organization" />
         </a>
-        <figcaption itemprop="caption description">Self Register</figcaption>
+        <figcaption itemprop="caption description">Register Organization</figcaption>
     </figure>
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/enable-selfregister.gif" itemprop="contentUrl" data-size="1100x906">
             <img src="img/enable-selfregister.gif" itemprop="thumbnail" alt="enable selfregister" />
         </a>
-        <figcaption itemprop="caption description">Self Register</figcaption>
+        <figcaption itemprop="caption description">Enable Selfregister</figcaption>
     </figure>
       <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="img/email-verify.gif" itemprop="contentUrl" data-size="1100x906">
@@ -60,7 +60,7 @@ To change your email address visit your Personal Information page and amend the 
         <a href="img/change-email.gif" itemprop="contentUrl" data-size="1100x906">
             <img src="img/change-email.gif" itemprop="thumbnail" alt="Change EMail" />
         </a>
-        <figcaption itemprop="caption description">Verify EMail</figcaption>
+        <figcaption itemprop="caption description">Change EMail</figcaption>
     </figure>
 </div>
 
