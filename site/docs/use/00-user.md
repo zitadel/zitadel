@@ -89,8 +89,12 @@ To change your password you can hit the link right at the overview page. Alterna
 To enable multifactor authentication visit the "Personal Information" page of your account and scroll to the "multifactor authentication". 
 You can either:
 
-1. Configure OTP
-2. AddU2F
+1. Configure OTP (One Time Password)
+2. Add U2F (Universal Second Factor)
+
+
+> **Information:** Some Example Authenticator Apps for OTP are: Google Authenticator, Microsoft Authenticator, Authy. You can choose the one you like the most.
+
 
 
 <div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
@@ -118,7 +122,7 @@ To link an external Identity Provider with a Zitadel Account you have to:
 
 you can then either
 
-1. link the Identity to an existin ZITADEL useraccount
+1. link the Identity to an existing ZITADEL useraccount
 2. auto register a new ZITADEL useraccount 
 
 
