@@ -24,8 +24,9 @@ func WriteSecretCommand(getRv GetRootValues) *cobra.Command {
 			Short: "Encrypt a secret and push it to the repository",
 			Long:  "Encrypt a secret and push it to the repository.\nIf no path is provided, a secret can interactively be chosen from a list of all possible secrets",
 			Args:  cobra.MaximumNArgs(1),
-			Example: `zitadelctl writesecret zitadel.keys.encrypted --file ~/keys
-zitadelctl writesecret zitadel.keys.encrypted --value "$(cat ~/keys)" `,
+			Example: `zitadelctl writesecret database.bucket.serviceaccountjson.encrypted --file ~/googlecloudstoragesa.json
+zitadelctl writesecret database.bucket.serviceaccountjson.encrypted --value "$(cat ~/googlecloudstoragesa.json)"
+cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.serviceaccountjson.encrypted --stdin`,
 		}
 	)
 
