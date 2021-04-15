@@ -18,7 +18,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	var (
 		cmd = &cobra.Command{
 			Use:   "takeoff",
-			Short: "Launch a ZITADEL operator on the orb",
+			Short: "Launch a ZITADEL operator and database operator on the orb",
 			Long:  "Ensures a desired state of the resources on the orb",
 		}
 	)
