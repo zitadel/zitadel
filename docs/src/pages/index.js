@@ -10,7 +10,7 @@ const features = [
   {
     title: 'Manuals',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: 'docs/manuals',
+    link: 'docs/manuals/user',
     description: (
       <>
         Follow this guide to get started with ZITADEL as a user.
@@ -20,7 +20,7 @@ const features = [
   {
     title: 'Quickstarts',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: 'docs/quickstarts/quickstarts',
+    link: 'docs/quickstarts/introduction',
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
@@ -30,7 +30,7 @@ const features = [
   {
     title: 'Guides',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: 'docs',
+    link: 'docs/guides/introduction',
     description: (
       <>
         Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
@@ -40,7 +40,7 @@ const features = [
   {
     title: 'APIs',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: '/docs/apis/apis',
+    link: '/docs/apis/introduction',
     description: (
       <>
         Learn more about our APIs and how to integrate them in your apps.
@@ -50,7 +50,7 @@ const features = [
   {
     title: 'Architecture',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: 'docs/architecture',
+    link: 'docs/architecture/introduction',
     description: (
       <>
         Learn more about engineering and design principles, ZITADELs architecture and used technologies.
