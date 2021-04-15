@@ -1,22 +1,53 @@
----
-title: Proto API Definition
+{{range .Files}}---
+title: {{.Name}}
 ---
 
-### Table of Contents
-{{range .Files}}
-{{if .HasServices}}
-- Services
-{{range .Services}}  - [{{.Name}}](#{{.FullName | lower | replace "." ""}})
+{{range .Services -}}
+## {{.Name}} {#{{.FullName | lower | replace "." ""}}}
+{{.Description}}
+
+{{range .Methods -}}
+### {{.Name}}
+
+> **rpc** {{.Name}}([{{.RequestLongType}}](#{{.RequestLongType | lower | replace "." ""}}))
+[{{.ResponseLongType}}](#{{.ResponseLongType | lower | replace "." ""}})
+
+{{ .Description}}
+
+{{$httpOption := .Option "google.api.http"}}
+{{range $httpOption.Rules}}
+    {{ .Method }}: {{ .Pattern }}
+{{end}}
+
 {{end}}
 {{end}}
-{{if .HasMessages}}
-- Messages
-{{range .Messages}}  - [{{.LongName}}](#{{.LongName | lower | replace "." ""}})
+
+## Messages
+{{range .Messages}}
+
+### {{.LongName}}
+{{.Description}}
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+{{range .Fields -}}
+| {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | [{{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}}](#{{.LongType | lower | replace "." ""}}) | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} |
 {{end}}
 {{end}}
-{{if .HasEnums}}
-- Enums
-{{range .Enums}}  - [{{.LongName}}](#{{.LongName | lower | replace "." ""}})
+
+{{if .HasEnums }}
+## Enums
+{{range .Enums}}
+
+### {{.LongName}} {#{{.LongName | lower | replace "." ""}}}
+{{.Description}}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+| {{.Name}} | {{.Number}} | {{if .Description}}{{nobr .Description}}{{else}}-{{end}} |
+{{end}}
+
 {{end}}
 {{end}}
 {{end}}

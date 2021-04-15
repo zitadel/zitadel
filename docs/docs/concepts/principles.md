@@ -2,7 +2,7 @@
 title: Principles
 ---
 
-### ZITADEL engineering and design principles
+## ZITADEL engineering and design principles
 
 - Be transparent about your decisions
 - Embrace stateless application design

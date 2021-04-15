@@ -31,9 +31,12 @@ module.exports = {
   apis: [
     'apis/introduction',
     'apis/domains',
-    'apis/authn',
-    'apis/admin',
-    'apis/mgmt',
+    'apis/apis',
+    {
+      type: 'category',
+      label: 'Proto API Definition',
+      items: ['apis/proto/admin'],
+    },
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
