@@ -14,7 +14,7 @@ type JobQueue struct {
 	queue      chan *job
 	cancel     context.CancelFunc
 	es         *Eventstore
-	shutdownWG sync.WaitGroup
+	shutdownWG *sync.WaitGroup
 }
 
 //NewJobQueue creates a new job queue
@@ -34,7 +34,7 @@ func NewJobQueue(ctx context.Context, workerCount uint16, eventstore *Eventstore
 		cancel: cancel,
 		//TODO: optimise size of queue
 		queue:      make(chan *job, 50),
-		shutdownWG: sync.WaitGroup{},
+		shutdownWG: &sync.WaitGroup{},
 	}
 
 	for i := uint16(0); i < workerCount; i++ {
@@ -63,6 +63,7 @@ func (q *JobQueue) Queue(ctx context.Context, query *SearchQueryBuilder, queue c
 //Shutdown gracefully stops all workers
 // and returns as soon as all workers are stopped
 func (q *JobQueue) Shutdown() {
+	close(q.queue)
 	q.cancel()
 	q.shutdownWG.Wait()
 }
