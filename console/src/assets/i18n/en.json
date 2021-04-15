@@ -513,6 +513,7 @@
         "PAGES": {
             "NAME":"Name",
             "ID":"ID",
+            "CREATIONDATE":"Creation Date",
             "FILTER":"Filter",
             "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",
@@ -582,6 +583,22 @@
         "TITLE":"Features",
         "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
         "BTN-EDIT":"Edit Featureset",
+        "TIER": {
+          "NAME":"Tier Name",
+          "DETAILS":"Billing Details",
+          "DETAILS_DESC":"Enter your billing data here.",
+          "CUSTOMERINVALID":"Billing data ist not complete!",
+          "CONTACT":"Kontakt",
+          "COMPANY":"Company",
+          "ADDRESS":"Addresse",
+          "CITY":"Town",
+          "POSTAL_CODE":"Postal Code",
+          "COUNTRY":"Country",
+          "TITLE":"Zitadel Tier",
+          "DESCRIPTION":"Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+          "QUESTIONS":"For questions regarding payments contact our support ",
+          "BTN":"Change Tier"
+        },
         "DATA": {
             "AUDITLOGRETENTION":"Audit Log retention",
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",

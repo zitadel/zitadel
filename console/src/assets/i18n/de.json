@@ -515,6 +515,7 @@
         "PAGES": {
             "NAME":"Name",
             "ID":"ID",
+            "CREATIONDATE":"Erstelldatum",
             "FILTER":"Filter",
             "FILTERPLACEHOLDER":"Filtern Sie nach dem Namen",
             "LIST": "Organisationen",
@@ -582,8 +583,24 @@
     },
     "FEATURES": {
         "TITLE":"Features",
-        "DESCRIPTION":"Hier können Sie Funktionen von ZITADEL auf Basis von Ihrem Tier aktivieren sowie deaktivieren.",
+        "DESCRIPTION":"Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe aktivieren sowie deaktivieren.",
         "BTN-EDIT":"Featureset anpassen",
+        "TIER": {
+          "NAME":"Preisstufe Name",
+          "DETAILS":"Abrechnungsdetails",
+          "DETAILS_DESC":"Geben Sie hier Ihre Abrechnungsdaten ein.",
+          "CUSTOMERINVALID":"Abrechnungsdaten sind nicht vollständig!",
+          "CONTACT":"Kontakt",
+          "COMPANY":"Name des Unternehmens",
+          "ADDRESS":"Adresse",
+          "CITY":"Ort",
+          "POSTAL_CODE":"Postleitzahl",
+          "COUNTRY":"Land",
+          "TITLE":"Zitadel Preisstufe",
+          "DESCRIPTION":"Zitadel arbeitet mit Stripe zusammen um die Rechnungsstellung zu vereinfachen. Der folgende Link leitet auf Stripe.com um.",
+          "QUESTIONS":"Bei Fragen kontaktieren Sie unseren Support per Mail an ",
+          "BTN":"Preisstufe ändern"
+        },
         "DATA": {
             "AUDITLOGRETENTION":"Audit Log retention",
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Username as login",
