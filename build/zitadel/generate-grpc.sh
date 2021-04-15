@@ -8,7 +8,7 @@ OPENAPI_PATH=${GOPATH}/src/github.com/caos/zitadel/openapi/v2
 ZITADEL_PATH=${GOPATH}/src/github.com/caos/zitadel
 GRPC_PATH=${ZITADEL_PATH}/pkg/grpc
 PROTO_PATH=/proto/include/zitadel
-DOCS_PATH=${ZITADEL_PATH}/site/docs/apis
+DOCS_PATH=${ZITADEL_PATH}/docs/apis
 
 # generate go stub and grpc code for all files
 protoc \
@@ -80,7 +80,7 @@ rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
 ## generate docs
 protoc \
   -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/admin-md.tmpl,03-administration.md \
-  ${PROTO_PATH}/admin.proto
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,proto-definition.md \
+  ${PROTO_PATH}/*.proto
 
 echo "done generating grpc"

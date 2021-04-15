@@ -1,0 +1,22 @@
+---
+title: Proto API Definition
+---
+
+### Table of Contents
+{{range .Files}}
+{{if .HasServices}}
+- Services
+{{range .Services}}  - [{{.Name}}](#{{.FullName | lower | replace "." ""}})
+{{end}}
+{{end}}
+{{if .HasMessages}}
+- Messages
+{{range .Messages}}  - [{{.LongName}}](#{{.LongName | lower | replace "." ""}})
+{{end}}
+{{end}}
+{{if .HasEnums}}
+- Enums
+{{range .Enums}}  - [{{.LongName}}](#{{.LongName | lower | replace "." ""}})
+{{end}}
+{{end}}
+{{end}}
