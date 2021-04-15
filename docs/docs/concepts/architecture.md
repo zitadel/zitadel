@@ -2,7 +2,7 @@
 title: ZITADEL Architecture
 ---
 
-### Software Architecture
+## Software Architecture
 
 **ZITADEL** is built with two essential patterns. Eventsourcing and CQRS. Due to the nature of eventsourcing **ZITADEL** provides the unique capability to generate a strong audit trail of ALL the things that happen to its resources, without compromising on storage cost or audit trail length.
 
@@ -12,7 +12,7 @@ Each **ZITADEL** contains all components of the IAM, from serving as API, render
 
 ![Software Architecture](/img/zitadel_software_architecture.png)
 
-#### Component Command Side
+### Component Command Side
 
 The **command handler** receives all operations who alter a IAM resource. For example if a user changes his name.
 This information is then passed to **command validation** for processing of the business logic, for example to make sure that the user actually can change his name. If this succeeds all generated events are inserted into the eventstore when required all within one transaction.
@@ -22,7 +22,7 @@ This information is then passed to **command validation** for processing of the 
 
 > When we classify this with the CAP theorem we would choose **Consistent** and **Available** but leave **Performance** aside.
 
-#### Component Spooler
+### Component Spooler
 
 The spoolers job is it to keep a query view up-to-date or at least look that it does not have a too big lag behind the eventstore.
 Each query view has its own spooler who is responsible to look for the events who are relevant to generate the query view. It does this by triggering the relevant projection.
@@ -31,7 +31,7 @@ Spoolers are especially necessary where someone can query datasets instead of si
 > The query side has the option to dynamically check the eventstore for newer events on a certain id, see query side for more information
 > Each view can have exactly one spooler, but spoolers are dynamically leader elected, so even if a spooler crashes it will be replaced in a short amount of time.
 
-#### Component Query Side
+### Component Query Side
 
 The query handler receives all read relevant operations. These can either be query or simple `getById` calls.
 When receiving a query it will proceed by passing this to the repository which will call the database and return the dataset.
@@ -44,11 +44,11 @@ If a request calls for a specific id the call will, most of the times, be revali
 > When we classify this with the CAP theorem we would choose **Available** and **Performance** but leave **Consistent** aside
 > TODO explain more here
 
-#### Component HTTP Server
+### Component HTTP Server
 
 The http server is responsible for serving the management GUI called **ZITADEL Console**, serving the static assets and as well rendering server side html (login, password-reset, verification, ...)
 
-### Cluster Architecture
+## Cluster Architecture
 
 A **ZITADEL Cluster** is a highly available IAM system with each component critical for serving traffic laid out at least three times.
 As our storage (CockroachDB) relies on Raft it is also necessary to always utilizes odd numbers to address for "split brain" scenarios.
@@ -60,7 +60,7 @@ If you deploy **ZITADEL** with our GITOPS Tooling [**ORBOS**](https://github.com
 
 ![Cluster Architecture](/img/zitadel_cluster_architecture.png)
 
-### Multi Cluster Architecture
+## Multi Cluster Architecture
 
 To scale **ZITADEL** is recommend to create smaller clusters, see cluster architecture and then create a fabric which interconnects the database.
 In our reference design we recommend to create a cluster per cloud provider or availability zone and to group them into regions.

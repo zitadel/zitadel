@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
 package zitadel.features.v1;

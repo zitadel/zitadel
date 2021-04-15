@@ -28,7 +28,7 @@ title: Identity Brokering
     </tr>
 </table>
 
-### What is Identity Brokering and Federated Identities?
+## What is Identity Brokering and Federated Identities?
 
 Federated identity management is an arrangement built upon the trust between two or more domains. Users of these domains are allowed to access applications and services using the same identity.
 This identity is known as federated identity and the pattern behind this as identity federation.
@@ -43,11 +43,11 @@ Because Google is registered as trusted identity provider the user will be able 
 
 ![Identity Brokering](/img/zitadel_identity_brokering.png)
 
-### Exercise: Register an external identity provider
+## Exercise: Register an external identity provider
 
 In this exercise we will add a new Google identity provider to federate identities with ZITADEL.
 
-#### 1. Create new OIDC Client
+### 1. Create new OIDC Client
 
 1. Register an OIDC Client in your preferred provider
 2. Make sure you add the ZITADEL callback redirect uris
@@ -66,7 +66,7 @@ Google Example:
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
 
-#### 2. Add custom login policy on your organisation
+### 2. Add custom login policy on your organisation
 
 1. Go to your organisation settings by clicking on "Organisation" in the menu or using the following link: <https://console.zitadel.ch/org>
 2. Modify your login policy
@@ -74,7 +74,7 @@ Google Example:
 
 ![Add custom login policy](/img/console_org_custom_login_policy.gif)
 
-#### 3.Configure new identity provider
+### 3.Configure new identity provider
 
 1. Go to the identity providers section and click new
 2. Fill out the form
@@ -89,7 +89,7 @@ Google Example:
 
 Your user will now be able to choose Google for login instead of username/password or mfa.
 
-### Knowledge Check
+## Knowledge Check
 
 * The issuer for your identity provider is <https://issuer.zitadel.ch>
     - [ ] yes
@@ -112,7 +112,7 @@ Your user will now be able to choose Google for login instead of username/passwo
 
 </details>
 
-### Summary
+## Summary
 
 * You can federate identities of all oAuth 2.0 compliant external identity providers
 * Configure the provider in your custom login policy

@@ -1,0 +1,58 @@
+{{range .Files}}---
+title: {{.Name}}
+---
+> This document reflects the state from API 1.0 (available from 20.04.2021)
+
+{{if .HasServices}}
+{{range .Services -}}
+## {{.Name}} {#{{.FullName | lower | replace "." ""}}}
+{{.Description}}
+
+{{range .Methods -}}
+### {{.Name}}
+
+> **rpc** {{.Name}}([{{.RequestLongType}}](#{{.RequestLongType | lower | replace "." ""}}))
+[{{.ResponseLongType}}](#{{.ResponseLongType | lower | replace "." ""}})
+
+{{ .Description}}
+
+{{$httpOption := .Option "google.api.http"}}
+{{range $httpOption.Rules}}
+    {{ .Method }}: {{ .Pattern }}
+{{end}}
+
+{{end}}
+{{end}}
+{{end}}
+
+{{if .HasServices}}
+## Messages
+{{range .Messages}}
+
+### {{.LongName}}
+{{.Description}}
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+{{range .Fields -}}
+| {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | {{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}} | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} |
+{{end}}
+{{end}}
+{{end}}
+
+{{if .HasEnums }}
+## Enums
+{{range .Enums}}
+
+### {{.LongName}} {#{{.LongName | lower | replace "." ""}}}
+{{.Description}}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+| {{.Name}} | {{.Number}} | {{if .Description}}{{nobr .Description}}{{else}}-{{end}} |
+{{end}}
+
+{{end}}
+{{end}}
+{{end}}
