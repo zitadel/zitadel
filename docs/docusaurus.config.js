@@ -17,7 +17,8 @@ module.exports = {
       },
       items: [
         {
-          to: 'docs/manuals/user',
+          type: 'doc',
+          docId: 'manuals/introduction',
           label: 'Manuals',
           position: 'left'
         },

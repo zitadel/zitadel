@@ -1,5 +1,6 @@
 module.exports = {
   manuals: [
+    'manuals/introduction',
     {
       type: 'category',
       label: 'User',
