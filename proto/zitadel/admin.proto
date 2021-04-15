@@ -361,7 +361,7 @@ service AdminService {
             tags: "oidc";
 
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -548,7 +548,7 @@ service AdminService {
             tags: "identity provider";
             tags: "oidc";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -1567,8 +1567,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1595,8 +1595,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1622,8 +1622,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1651,8 +1651,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -2371,7 +2371,7 @@ message UpdateLabelPolicyRequest {
     ];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
 }
