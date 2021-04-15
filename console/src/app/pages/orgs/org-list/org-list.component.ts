@@ -69,7 +69,6 @@ export class OrgListComponent implements AfterViewInit {
     ).subscribe(views => {
       this.dataSource = new MatTableDataSource(views);
       this.dataSource.paginator = this.paginator;
-      console.log(views);
       this.dataSource.sort = this.sort;
     });
   }
