@@ -62,7 +62,7 @@ const features = [
 function Feature({imageUrl, title, description, link}) {
   const imgUrl = useBaseUrl(imageUrl);
   return (
-        <div className={clsx('col col--4', styles.feature)}>
+        <div className={clsx('col col--4 docs-link', styles.feature)}>
           <Link to={useBaseUrl(link)}>
           {imgUrl && (
               <div className="text--center">
@@ -90,7 +90,7 @@ export default function Home() {
           <div className={styles.buttons}>
             <Link
               className={clsx(
-                'button button--outline button--secondary button--lg',
+                'button button--outline button--lg get-started',
                 styles.getStarted,
               )}
               to={useBaseUrl('docs/quickstarts/quickstarts')}>

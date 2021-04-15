@@ -6,6 +6,7 @@
  */
 
 /* You can override the default Infima variables here. */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat');
 
 :root {
   --ifm-color-primary: #556cd1;
@@ -16,6 +17,7 @@
   --ifm-color-primary-lighter: #788ada;
   --ifm-color-primary-lightest: #9aa8e4;
   --ifm-code-font-size: 95%;
+  --ifm-font-family-base: 'Montserrat', sans-serif;
 }
 
 
@@ -24,4 +26,23 @@
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
+}
+
+.get-started {
+  background-color: var(--ifm-font-color-base-inverse);
+  color: var(--ifm-color-primary);
+}
+
+.get-started:hover {
+  background-color: var(--ifm-color-primary);
+  color: var(--ifm-font-color-base-inverse);
+}
+
+.docs-link a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.docs-link a:hover {
+  color: var(--ifm-color-primary);
 }
