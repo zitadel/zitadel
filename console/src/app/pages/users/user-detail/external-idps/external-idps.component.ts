@@ -1,10 +1,10 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { IDPUserLink } from 'src/app/proto/generated/zitadel/idp_pb';
 
@@ -20,7 +20,7 @@ import { ToastService } from '../../../../services/toast.service';
 export class ExternalIdpsComponent implements OnInit {
     @Input() service!: GrpcAuthService | ManagementService;
     @Input() userId!: string;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
     public dataSource: MatTableDataSource<IDPUserLink.AsObject>

@@ -11,7 +11,7 @@ import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 enum OrgListSearchKey {
-    NAME = "NAME",
+    NAME = 'NAME',
 }
 
 @Component({
@@ -53,7 +53,7 @@ export class OrgListComponent implements AfterViewInit {
         this.loadingSubject.next(true);
         let query;
         if (filter) {
-            const query = new OrgQuery();
+            query = new OrgQuery();
             const orgNameQuery = new OrgNameQuery();
             orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
             orgNameQuery.setName(filter);

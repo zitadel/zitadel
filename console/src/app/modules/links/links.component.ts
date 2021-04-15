@@ -12,7 +12,7 @@ export interface CnslLinks {
 @Component({
     selector: 'cnsl-links',
     templateUrl: './links.component.html',
-    styleUrls: ['./links.component.scss']
+    styleUrls: ['./links.component.scss'],
 })
 export class LinksComponent implements OnInit {
     @Input() links: Array<CnslLinks> = [];

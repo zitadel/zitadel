@@ -1,15 +1,14 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { merge, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 import { ProjectApplicationsDataSource } from './applications-datasource';
-
 
 @Component({
     selector: 'app-applications',
@@ -19,7 +18,7 @@ import { ProjectApplicationsDataSource } from './applications-datasource';
 export class ApplicationsComponent implements AfterViewInit, OnInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatSort) public sort!: MatSort;
     @ViewChild(MatTable) public table!: MatTable<App.AsObject>;
     public dataSource!: ProjectApplicationsDataSource;

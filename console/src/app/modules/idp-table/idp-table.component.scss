@@ -1,6 +1,7 @@
 .ar-button {
-    margin-right: .5rem;
+  margin-right: .5rem;
 }
+
 .table-wrapper {
   overflow: auto;
   width: 100%;
@@ -27,12 +28,12 @@ td {
   outline: none;
 
   img {
-      height: 30px;
-      width: 30px;
-      margin-left: 1rem;
-      border-radius: .5rem;
-      object-fit: contain;
-      margin-top: .5rem;
+    height: 30px;
+    width: 30px;
+    margin-left: 1rem;
+    border-radius: .5rem;
+    object-fit: contain;
+    margin-top: .5rem;
   }
 }
 
@@ -100,15 +101,13 @@ tr {
   }
 }
 
-
 .date-block {
-    margin: .5rem 0;
+  margin: .5rem 0;
+  display: block;
+  min-width: 120px;
+
+  .date-sub {
+    font-size: 13px;
     display: block;
-    min-width: 120px;
-  
-    .date-sub {
-      font-size: 13px;
-      display: block;
-    }
+  }
 }
-  

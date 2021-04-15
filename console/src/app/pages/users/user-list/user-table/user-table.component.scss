@@ -53,7 +53,13 @@
 }
 
 .filtername {
-  margin: 0 1rem;
+  flex: 1;
+  margin-right: 1rem;
+
+  .filterinput {
+    height: 36px;
+    transform: translateY(1px);
+  }
 }
 
 .sa-icon {

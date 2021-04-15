@@ -100,8 +100,7 @@ export class MemberCreateDialogComponent {
         if (project.projectId && project.grantId) {
             this.projectId = project.projectId;
             this.grantId = project.grantId;
-        }
-        else if (project.id) {
+        } else if (project.id) {
             this.projectId = project.id;
         }
     }

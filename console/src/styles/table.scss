@@ -94,8 +94,8 @@
     background-color: if($is-dark-theme, #4f566b, #e4e7e4);
 
     &.active {
-        background-color: if($is-dark-theme, #4f566b, #cbf4c9);
-        color: if($is-dark-theme, #cbf4c9, #0e6245);
+      background-color: if($is-dark-theme, #4f566b, #cbf4c9);
+      color: if($is-dark-theme, #cbf4c9, #0e6245);
     }
 
     &.inactive {

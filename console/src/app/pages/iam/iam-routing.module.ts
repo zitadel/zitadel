@@ -39,7 +39,7 @@ const routes: Routes = [
         // canActivate: [RoleGuard],
         data: {
             roles: ['iam.features.read'],
-            serviceType: FeatureServiceType.ADMIN
+            serviceType: FeatureServiceType.ADMIN,
         },
     },
     {

@@ -1,13 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
@@ -48,7 +48,7 @@ export class UserTableComponent implements OnInit {
     @Input() type: Type = Type.TYPE_HUMAN;
     @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() disabled: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild('input') public filter!: Input;
 
     public viewTimestamp!: Timestamp.AsObject;
@@ -101,6 +101,7 @@ export class UserTableComponent implements OnInit {
 
 
     public changePage(event: PageEvent): void {
+        this.selection.clear();
         this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type);
     }
 
