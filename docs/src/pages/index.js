@@ -10,6 +10,7 @@ const features = [
   {
     title: 'Manuals',
     imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    link: 'docs/manuals',
     description: (
       <>
         Follow this guide to get started with ZITADEL as a user.
@@ -19,6 +20,7 @@ const features = [
   {
     title: 'Quickstarts',
     imageUrl: 'img/undraw_docusaurus_tree.svg',
+    link: 'docs/quickstarts/quickstarts',
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
@@ -28,6 +30,7 @@ const features = [
   {
     title: 'Guides',
     imageUrl: 'img/undraw_docusaurus_react.svg',
+    link: 'docs',
     description: (
       <>
         Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
@@ -37,6 +40,7 @@ const features = [
   {
     title: 'APIs',
     imageUrl: 'img/undraw_docusaurus_react.svg',
+    link: '/docs/apis/apis',
     description: (
       <>
         Learn more about our APIs and how to integrate them in your apps.
@@ -46,6 +50,7 @@ const features = [
   {
     title: 'Architecture',
     imageUrl: 'img/undraw_docusaurus_react.svg',
+    link: 'docs/architecture',
     description: (
       <>
         Learn more about engineering and design principles, ZITADELs architecture and used technologies.
@@ -54,18 +59,20 @@ const features = [
   },
 ];
 
-function Feature({imageUrl, title, description}) {
+function Feature({imageUrl, title, description, link}) {
   const imgUrl = useBaseUrl(imageUrl);
   return (
-    <div className={clsx('col col--4', styles.feature)}>
-      {imgUrl && (
-        <div className="text--center">
-          <img className={styles.featureImage} src={imgUrl} alt={title} />
+        <div className={clsx('col col--4', styles.feature)}>
+          <Link to={useBaseUrl(link)}>
+          {imgUrl && (
+              <div className="text--center">
+                <img className={styles.featureImage} src={imgUrl} alt={title} />
+              </div>
+          )}
+          <h3>{title}</h3>
+          <p>{description}</p>
+          </Link>
         </div>
-      )}
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
   );
 }
 
