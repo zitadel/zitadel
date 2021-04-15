@@ -9,7 +9,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: 'Manuals',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    imageUrl: 'img/zitadel-logo-solo-light.png',
     link: 'docs/manuals',
     description: (
       <>
@@ -19,7 +19,7 @@ const features = [
   },
   {
     title: 'Quickstarts',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    imageUrl: 'img/zitadel-logo-solo-light.png',
     link: 'docs/quickstarts/quickstarts',
     description: (
       <>
@@ -29,7 +29,7 @@ const features = [
   },
   {
     title: 'Guides',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/zitadel-logo-solo-light.png',
     link: 'docs',
     description: (
       <>
@@ -39,7 +39,7 @@ const features = [
   },
   {
     title: 'APIs',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/zitadel-logo-solo-light.png',
     link: '/docs/apis/apis',
     description: (
       <>
@@ -49,7 +49,7 @@ const features = [
   },
   {
     title: 'Architecture',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/zitadel-logo-solo-light.png',
     link: 'docs/architecture',
     description: (
       <>
