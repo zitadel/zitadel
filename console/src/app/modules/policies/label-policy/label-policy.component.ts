@@ -51,6 +51,8 @@ export class LabelPolicyComponent implements OnDestroy {
 
   public savePolicy(): void {
     const req = new UpdateLabelPolicyRequest();
+    req.setPrimaryColor(this.labelData.primaryColor);
+    req.setSecondaryColor(this.labelData.secondaryColor);
     req.setHideLoginNameSuffix(this.labelData.hideLoginNameSuffix);
     this.adminService.updateLabelPolicy(req).then(() => {
       this.toast.showInfo('POLICY.TOAST.SET', true);
