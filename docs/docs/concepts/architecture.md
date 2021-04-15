@@ -1,5 +1,5 @@
 ---
-title: Architecture
+title: ZITADEL Architecture
 ---
 
 > Images in better quality follow soon.

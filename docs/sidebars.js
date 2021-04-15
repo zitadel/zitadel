@@ -39,8 +39,9 @@ module.exports = {
       items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims', 'apis/openidoauth/authn-methods', 'apis/openidoauth/grant-types'],
     },
   ],
-  architecture: [
-    'architecture/introduction',
-    'architecture/principles',
+  concepts: [
+    'concepts/introduction',
+    'concepts/architecture',
+    'concepts/principles',
   ]
 };

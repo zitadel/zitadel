@@ -48,9 +48,9 @@ const features = [
     ),
   },
   {
-    title: 'Architecture',
+    title: 'Concepts',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: 'docs/architecture/introduction',
+    link: 'docs/concepts/introduction',
     description: (
       <>
         Learn more about engineering and design principles, ZITADELs architecture and used technologies.

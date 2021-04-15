@@ -41,8 +41,8 @@ module.exports = {
         },
         {
           type: 'doc',
-          docId: 'architecture/introduction',
-          label: 'Architecture',
+          docId: 'concepts/introduction',
+          label: 'Concepts',
           position: 'left'
         },
         {
