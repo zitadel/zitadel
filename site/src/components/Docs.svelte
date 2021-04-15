@@ -457,7 +457,7 @@
         {@html section.metadata.title}
         <small>
           <a
-            href="https://github.com/{owner}/{project}/edit/master/site/{path}/{dir}/{section.file}"
+            href="https://github.com/{owner}/{project}/edit/main/site/{path}/{dir}/{section.file}"
             title={edit_title}>
             <Icon name="las la-external-link-alt" size="24px" />
           </a>
