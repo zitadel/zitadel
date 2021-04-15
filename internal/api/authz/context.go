@@ -80,6 +80,9 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	if err := checkOrigin(ctx, origins); err != nil {
 		return CtxData{}, err
 	}
+	if orgID == "" {
+		orgID = resourceOwner
+	}
 	return CtxData{
 		UserID:            userID,
 		OrgID:             orgID,
