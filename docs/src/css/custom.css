@@ -29,6 +29,7 @@
 }
 
 .get-started {
+  border: 1px solid;
   background-color: var(--ifm-font-color-base-inverse);
   color: var(--ifm-color-primary);
 }
