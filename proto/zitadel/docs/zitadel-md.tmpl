@@ -2,6 +2,7 @@
 title: {{.Name}}
 ---
 
+{{if .HasServices}}
 {{range .Services -}}
 ## {{.Name}} {#{{.FullName | lower | replace "." ""}}}
 {{.Description}}
@@ -21,7 +22,9 @@ title: {{.Name}}
 
 {{end}}
 {{end}}
+{{end}}
 
+{{if .HasServices}}
 ## Messages
 {{range .Messages}}
 
@@ -32,6 +35,7 @@ title: {{.Name}}
 | ----- | ---- | ----------- |
 {{range .Fields -}}
 | {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | [{{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}}](#{{.LongType | lower | replace "." ""}}) | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} |
+{{end}}
 {{end}}
 {{end}}
 

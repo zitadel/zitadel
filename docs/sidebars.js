@@ -35,7 +35,22 @@ module.exports = {
     {
       type: 'category',
       label: 'Proto API Definition',
-      items: ['apis/proto/admin'],
+      items: [
+        'apis/proto/auth',
+        'apis/proto/management',
+        'apis/proto/admin',
+        'apis/proto/org',
+        'apis/proto/user',
+        'apis/proto/app',
+        'apis/proto/policy',
+        'apis/proto/auth_n_key',
+        'apis/proto/change',
+        'apis/proto/idp',
+        'apis/proto/member',
+        'apis/proto/message',
+        'apis/proto/object',
+        'apis/proto/options',
+      ],
     },
     {
       type: 'category',
