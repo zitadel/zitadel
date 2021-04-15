@@ -32,7 +32,7 @@ If you verify a domain you get the benefit that your organisations users can use
 #### Elect Managers
 
 ZITADEL allows you to give other users control over ZITADEL Console itself. This can be restricted to some kind of write and/or read. This can be especially useful for directing administration over several users. You can have managers able to edit project settings and others able to create/add users only.
-Read the [guides](guides) for more information.
+Read the [guides](introduction) for more information.
 
 > Note: ZITADEL Managers are always located on the right sidepanel of console.
 
