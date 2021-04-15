@@ -2,24 +2,23 @@ package handler
 
 import (
 	"context"
+
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
+	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"github.com/caos/zitadel/internal/org/repository/view"
-	"k8s.io/apimachinery/pkg/api/errors"
-
-	"github.com/caos/logging"
-
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -266,7 +265,7 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 		},
 	}
 	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 	if esOrg.Sequence == 0 {
