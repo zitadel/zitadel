@@ -48,7 +48,7 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
         });
     }
 
-    openDialog() {
+    private openDialog(): void {
         const dialogRef = this.dialog.open(WarnDialogComponent, {
             data: {
                 confirmKey: 'ACTIONS.LOGIN',

@@ -168,8 +168,9 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 		return nil, err
 	}
 	events := make([]eventstore.EventPusher, 0)
-	for factor, state := range orgAuthFactors.SecondFactors {
-		if state.IAM == state.Org {
+	for _, factor := range domain.SecondFactorTypes() {
+		state := orgAuthFactors.SecondFactors[factor]
+		if state == nil || state.IAM == state.Org {
 			continue
 		}
 		secondFactorWriteModel := orgAuthFactors.ToSecondFactorWriteModel(factor)
@@ -191,8 +192,10 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 			events = append(events, event)
 		}
 	}
-	for factor, state := range orgAuthFactors.MultiFactors {
-		if state.IAM == state.Org {
+
+	for _, factor := range domain.MultiFactorTypes() {
+		state := orgAuthFactors.MultiFactors[factor]
+		if state == nil || state.IAM == state.Org {
 			continue
 		}
 		multiFactorWriteModel := orgAuthFactors.ToMultiFactorWriteModel(factor)

@@ -1,7 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,6 +12,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
@@ -25,7 +25,7 @@ export class IdpTableComponent implements OnInit {
     @Input() public serviceType!: PolicyComponentServiceType;
     @Input() service!: AdminService | ManagementService;
     @Input() disabled: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     public dataSource: MatTableDataSource<IDP.AsObject>
         = new MatTableDataSource<IDP.AsObject>();
     public selection: SelectionModel<IDP.AsObject>
@@ -36,7 +36,7 @@ export class IdpTableComponent implements OnInit {
     public PolicyComponentServiceType: any = PolicyComponentServiceType;
     public IDPOwnerType: any = IDPOwnerType;
     public IDPState: any = IDPState;
-    public IdpStylingType: any = IDPStylingType;
+    public IDPSTYLINGTYPE: any = IDPStylingType;
     @Input() public displayedColumns: string[] = ['select', 'name', 'config', 'dates', 'state'];
 
     @Output() public changedSelection: EventEmitter<Array<IDP.AsObject>>

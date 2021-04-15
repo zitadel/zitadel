@@ -6,7 +6,7 @@
         <h2>{{'FEATURES.TITLE' | translate}}</h2>
         <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
         <div *ngIf="features" class="tier">
-            <mat-icon>stars</mat-icon>
+            <mat-icon class="icon">stars</mat-icon>
             <div class="text" *ngIf="features.tier">
                 <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
                 <p>{{features.tier?.description}}</p>

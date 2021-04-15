@@ -23,34 +23,34 @@ import { FeaturesComponent } from './features.component';
 import { PaymentInfoDialogComponent } from './payment-info-dialog/payment-info-dialog.component';
 
 @NgModule({
-  declarations: [
-    FeaturesComponent,
-    PaymentInfoDialogComponent,
-  ],
-  imports: [
-    FeaturesRoutingModule,
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    InputModule,
-    MatButtonModule,
-    FormFieldModule,
-    InputModule,
-    HasRoleModule,
-    MatSlideToggleModule,
-    MatSelectModule,
-    MatIconModule,
-    HasRoleModule,
-    HasRolePipeModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule,
-    InfoSectionModule,
-    TranslateModule,
-    DetailLayoutModule,
-    TimestampToRetentionPipeModule,
-  ],
-  exports: [
-    FeaturesComponent,
-  ]
+    declarations: [
+        FeaturesComponent,
+        PaymentInfoDialogComponent,
+    ],
+    imports: [
+        FeaturesRoutingModule,
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        InputModule,
+        MatButtonModule,
+        FormFieldModule,
+        InputModule,
+        HasRoleModule,
+        MatSlideToggleModule,
+        MatSelectModule,
+        MatIconModule,
+        HasRoleModule,
+        HasRolePipeModule,
+        MatTooltipModule,
+        MatProgressSpinnerModule,
+        InfoSectionModule,
+        TranslateModule,
+        DetailLayoutModule,
+        TimestampToRetentionPipeModule,
+    ],
+    exports: [
+        FeaturesComponent,
+    ],
 })
 export class FeaturesModule { }

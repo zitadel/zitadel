@@ -8,7 +8,7 @@ h2 {
   text-transform: uppercase;
   margin-top: 2rem;
 }
-  
+
 .top-desc {
   color: var(--grey);
   font-size: 14px;
@@ -20,43 +20,43 @@ h2 {
 }
 
 .tier {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  border-radius: .5rem;
+  color: white;
+  background-color: rgb(245, 203, 99);
+  margin-bottom: .5rem;
+
+  .ext {
+    margin-right: .5rem;
+    align-self: center;
+    color: inherit;
+  }
+
+  .icon {
+    margin-right: 1rem;
+    font-size: 2rem;
+  }
+
+  .text {
     display: flex;
-    flex-direction: row;
-    padding: 1rem;
-    border-radius: .5rem;
-    color: white;
-    background-color: rgb(245, 203, 99);
-    margin-bottom: .5rem;
+    flex-direction: column;
 
-    .ext {
-        margin-right: .5rem;
-        align-self: center;
-        color: inherit;
+    p {
+      margin: 0;
+      font-size: 14px;
     }
 
-    mat-icon {
-        margin-right: 1rem;
-        font-size: 2rem;
+    .title {
+      font-size: 16px;
+      margin-bottom: .5rem;
     }
+  }
 
-    .text {
-        display: flex;
-        flex-direction: column;
-        p {
-            margin: 0;
-            font-size: 14px;
-        }
-        .title {
-            font-size: 16px;
-            margin-bottom: .5rem;
-        }
-
-        
-    }
-
-    .fill-space {
-        flex: 1;
-    }
+  .fill-space {
+    flex: 1;
+  }
 }
 
 .domain {

@@ -114,14 +114,15 @@ export class ProjectGrantDetailComponent {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.map(member => {
-            return this.mgmtService.removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId).then(() => {
-                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
-                setTimeout(() => {
-                    this.changePage.emit();
-                }, 1000);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+            return this.mgmtService.removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId)
+                .then(() => {
+                    this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
+                    setTimeout(() => {
+                        this.changePage.emit();
+                    }, 1000);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
         }));
     }
 
@@ -157,11 +158,15 @@ export class ProjectGrantDetailComponent {
     }
 
     updateMemberRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
-        this.mgmtService.updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange.value)
-            .then(() => {
-                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+        this.mgmtService.updateProjectGrantMember(
+            this.grant.projectId,
+            this.grant.grantId,
+            member.userId,
+            selectionChange.value,
+        ).then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
+        }).catch(error => {
+            this.toast.showError(error);
+        });
     }
 }

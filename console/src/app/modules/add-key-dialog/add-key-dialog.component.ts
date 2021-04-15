@@ -4,8 +4,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 
 export enum AddKeyDialogType {
-    MACHINE = "MACHINE",
-    AUTHNKEY = "AUTHNKEY",
+    MACHINE = 'MACHINE',
+    AUTHNKEY = 'AUTHNKEY',
 }
 
 @Component({

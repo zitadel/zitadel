@@ -18,7 +18,7 @@
     }
 
     .info {
-        display: block;
+      display: block;
     }
   }
 }
@@ -51,25 +51,25 @@
     color: white;
 
     .line {
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
 
-        img {
-            height: 30px;
-            width: 30px;
-            margin-right: 1rem;
-            border-radius: .5rem;
-            object-fit: contain;
+      img {
+        height: 30px;
+        width: 30px;
+        margin-right: 1rem;
+        border-radius: .5rem;
+        object-fit: contain;
+      }
+
+      div {
+        flex: 1;
+        display: block;
+
+        * {
+          display: block;
         }
-
-        div {
-            flex: 1;
-            display: block;
-
-            * {
-                display: block;
-            }
-        }
+      }
     }
   }
 
@@ -116,13 +116,13 @@
     }
 
     &:not(.disabled) {
-        &:hover {
-            .rm {
-                display: block;
-            }
+      &:hover {
+        .rm {
+          display: block;
         }
+      }
     }
-    
+
     img {
       height: 100%;
       width: 100%;
