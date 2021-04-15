@@ -18,9 +18,9 @@ type BaseEvent struct {
 	sequence     uint64
 	creationDate time.Time
 
-	//User is the user who created the event
+	//User who created the event
 	User string `json:"-"`
-	//Service is the service which created the event
+	//Service which created the event
 	Service string `json:"-"`
 	Data    []byte `json:"-"`
 }

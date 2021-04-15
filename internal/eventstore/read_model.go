@@ -21,7 +21,7 @@ func (rm *ReadModel) AppendEvents(events ...EventReader) *ReadModel {
 	return rm
 }
 
-//Reduce is the basic implementaion of reducer
+//Reduce is the basic implementation of reducer
 // If this function is extended the extending function should be the last step
 func (rm *ReadModel) Reduce() error {
 	if len(rm.Events) == 0 {

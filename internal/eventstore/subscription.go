@@ -1,9 +1,10 @@
 package eventstore
 
 import (
+	"sync"
+
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"sync"
 )
 
 var (
@@ -16,10 +17,9 @@ type Subscription struct {
 	aggregates []AggregateType
 }
 
-func Subscribe(aggregates ...AggregateType) *Subscription {
-	events := make(chan EventReader, 100)
+func Subscribe(eventQueue chan EventReader, aggregates ...AggregateType) *Subscription {
 	sub := &Subscription{
-		Events:     events,
+		Events:     eventQueue,
 		aggregates: aggregates,
 	}
 
