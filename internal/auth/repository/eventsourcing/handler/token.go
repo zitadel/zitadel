@@ -3,12 +3,11 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
-	"k8s.io/apimachinery/pkg/api/errors"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
@@ -169,7 +168,7 @@ func (t *Token) getProjectByID(ctx context.Context, projID string) (*proj_model.
 		},
 	}
 	err = es_sdk.Filter(ctx, t.Eventstore().FilterEvents, esProject.AppendEvents, query)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 	if esProject.Sequence == 0 {
