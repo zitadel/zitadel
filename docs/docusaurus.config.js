@@ -17,14 +17,14 @@ module.exports = {
       },
       items: [
         {
-          to: 'docs/manuals',
+          to: 'docs/manuals/user',
           label: 'Manuals',
           position: 'left'
         },
         {
           type: 'doc',
           label: 'Quickstarts',
-          docId: 'quickstarts/quickstarts',
+          docId: 'quickstarts/introduction',
           position: 'left'
         },
         {
@@ -36,11 +36,11 @@ module.exports = {
         {
           type: 'doc',
           label: 'APIs',
-          docId: 'apis/apis',
+          docId: 'apis/introduction',
           position: 'left'
         },
         {
-          to: 'docs/architecture',
+          to: 'architecture/introduction',
           label: 'Architecture',
           position: 'left'
         },

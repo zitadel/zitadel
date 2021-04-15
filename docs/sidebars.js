@@ -1,6 +1,5 @@
 module.exports = {
   manuals: [
-    'manuals',
     {
       type: 'category',
       label: 'User',
@@ -8,7 +7,7 @@ module.exports = {
     },
   ],
   quickstarts: [
-    'quickstarts/quickstarts',
+    'quickstarts/introduction',
     {
       type: 'category',
       label: 'Single Page Applications',
@@ -21,14 +20,15 @@ module.exports = {
     }
   ],
   guides: [
+    'guides/introduction',
     {
       type: 'category',
       label: 'Get to know ZITADEL',
-      items: ['guides/introduction', 'guides/organizations', 'guides/projects', 'guides/serviceusers', 'guides/oauth-recommended-flows', 'guides/identity-brokering'],
+      items: ['guides/organizations', 'guides/projects', 'guides/serviceusers', 'guides/oauth-recommended-flows', 'guides/identity-brokering'],
     },
   ],
   apis: [
-    'apis/apis',
+    'apis/introduction',
     'apis/domains',
     'apis/authn',
     'apis/admin',
@@ -40,7 +40,7 @@ module.exports = {
     },
   ],
   architecture: [
-    'architecture',
+    'architecture/introduction',
     'architecture/principles',
   ]
 };
