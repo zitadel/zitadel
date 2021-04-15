@@ -515,6 +515,7 @@
         "PAGES": {
             "NAME":"Name",
             "ID":"ID",
+            "CREATIONDATE":"Erstelldatum",
             "FILTER":"Filter",
             "FILTERPLACEHOLDER":"Filtern Sie nach dem Namen",
             "LIST": "Organisationen",

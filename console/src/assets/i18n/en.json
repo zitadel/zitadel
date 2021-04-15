@@ -513,6 +513,7 @@
         "PAGES": {
             "NAME":"Name",
             "ID":"ID",
+            "CREATIONDATE":"Creation Date",
             "FILTER":"Filter",
             "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",

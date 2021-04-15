@@ -39,6 +39,16 @@
                 <td mat-cell *matCellDef="let org"> {{org.name}} </td>
             </ng-container>
 
+            <ng-container matColumnDef="creationDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  [ngClass]="{'search-active': this.orgSearchKey == OrgListSearchKey.NAME}">
+                  {{ 'ORG.PAGES.CREATIONDATE' | translate }}
+              </th>
+              <td mat-cell *matCellDef="let org">
+                {{org.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+              </td>
+          </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
