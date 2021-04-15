@@ -40,6 +40,7 @@ module.exports = {
           position: 'left'
         },
         {
+          type: 'doc',
           to: 'architecture/introduction',
           label: 'Architecture',
           position: 'left'
