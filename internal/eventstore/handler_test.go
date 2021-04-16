@@ -57,13 +57,14 @@ func (h *OrgHandler) processBulk(event eventstore.EventReader) error {
 func (h *OrgHandler) endBulk() {
 	stmts := make([]string, 0, len(h.orgs))
 	for _, org := range h.orgs {
-		stmt, err := org.Reduce()
+		err := org.Reduce()
 		if err != nil {
 			//TODO: how to handle this error?
 			logging.LogWithFields("EVENT-VbCAf", "orgID", org.AggregateID).Warn("reduce failed")
 			continue
 		}
-		stmts = append(stmts, stmt...)
+
+		// stmts = append(stmts, org.Statements()...)
 	}
 	//append unlock statement to stmts
 	//execute stmts

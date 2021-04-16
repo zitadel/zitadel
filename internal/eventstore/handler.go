@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/caos/logging"
@@ -85,4 +86,40 @@ func (h *ReadModelHandler) Process(ctx context.Context) {
 			}(event)
 		}
 	}
+}
+
+type Column struct {
+	Name  string
+	Value interface{}
+}
+
+type Statement interface {
+	ToSQL() (stmt string, args []interface{})
+}
+
+type CreateStatement struct {
+	TableName string
+	Values    []Column
+}
+
+func (stmt *CreateStatement) ToSQL() (query string, args []interface{}) {
+	// db := sql.OpenDB(nil)
+	return fmt.Sprintf("INSERT INTO %s", stmt.TableName), nil
+}
+
+type UpdateStatement struct {
+	PK     []Column
+	Values []Column
+}
+
+func (stmt *UpdateStatement) ToSQL() (string, []interface{}) {
+	return "", nil
+}
+
+type DeleteStatement struct {
+	PK []Column
+}
+
+func (stmt *DeleteStatement) ToSQL() (string, []interface{}) {
+	return "", nil
 }
