@@ -90,7 +90,7 @@ export class FeaturesComponent implements OnDestroy {
     this.sub.unsubscribe();
   }
 
-  public updateCustomer(): void {
+  public setCustomer(): void {
     const dialogRefPhone = this.dialog.open(PaymentInfoDialogComponent, {
       data: {
         customer: this.stripeCustomer,
@@ -102,7 +102,7 @@ export class FeaturesComponent implements OnDestroy {
       if (customer) {
         console.log(customer);
         this.stripeCustomer = customer;
-        this.subService.updateCustomer(this.org.id, customer).then(() => {
+        this.subService.setCustomer(this.org.id, customer).then(() => {
           this.getLinkToStripe();
         }).catch(console.error);
       }

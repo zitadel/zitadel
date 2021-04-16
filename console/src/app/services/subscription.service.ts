@@ -30,7 +30,6 @@ export class SubscriptionService {
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
           return this.http.get(`${serviceUrl}/redirect`, {
             headers: {
-              // 'Content-Type': 'application/json; charset=utf-8',
               [authorizationKey]: `${bearerPrefix} ${accessToken}`,
             },
             params: {
@@ -53,7 +52,6 @@ export class SubscriptionService {
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
           return this.http.get(`${serviceUrl}/customer`, {
             headers: {
-              // 'Content-Type': 'application/json; charset=utf-8',
               [authorizationKey]: `${bearerPrefix} ${accessToken}`,
             },
             params: {
@@ -66,15 +64,14 @@ export class SubscriptionService {
       });
   }
 
-  public updateCustomer(orgId: string, body: StripeCustomer): Promise<any> {
+  public setCustomer(orgId: string, body: StripeCustomer): Promise<any> {
     return this.http.get('./assets/environment.json')
       .toPromise().then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
           const serviceUrl = data.subscriptionServiceUrl;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
-          return this.http.put(`${serviceUrl}/customer`, body, {
+          return this.http.post(`${serviceUrl}/customer`, body, {
             headers: {
-              // 'Content-Type': 'application/json; charset=utf-8',
               [authorizationKey]: `${bearerPrefix} ${accessToken}`,
             },
             params: {
