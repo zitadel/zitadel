@@ -2,6 +2,8 @@ package eventstore_test
 
 import (
 	"context"
+	"database/sql"
+	"sync"
 	"time"
 
 	"github.com/caos/logging"
@@ -10,73 +12,132 @@ import (
 )
 
 type OrgHandler struct {
+	ctx context.Context
 	eventstore.ReadModelHandler
-	orgs []*query.OrgReadModel
+	client *sql.DB
+
+	shouldPush chan bool
+	lock       sync.Mutex
+	orgs       []*query.OrgReadModel
+	pushSet    bool
+
+	currentSequence uint64
 }
 
 func NewOrgHandler(
+	ctx context.Context,
 	es *eventstore.Eventstore,
+	client *sql.DB,
 	queue *eventstore.JobQueue,
 	requeueAfter time.Duration,
 ) *OrgHandler {
-	return &OrgHandler{
+	h := &OrgHandler{
+		ctx:              ctx,
 		ReadModelHandler: *eventstore.NewReadModelHandler(es, queue, requeueAfter),
+		client:           client,
+		shouldPush:       make(chan bool, 1),
 	}
+	go h.Process(ctx)
+
+	return h
 }
 
 func (h *OrgHandler) Process(ctx context.Context) {
 	for {
+		// workaround to priorice cancel and events before push
+		select {
+		case <-ctx.Done():
+			if h.pushSet {
+				h.push()
+			}
+			logging.Log("EVENT-XG5Og").Info("stop processing")
+			return
+		case event := <-h.Handler.EventQueue:
+			h.process(event)
+			continue
+		default:
+			//continue to lower prio select
+		}
+		// if not canceled and no events push is allowed
 		select {
 		case <-ctx.Done():
 			logging.Log("EVENT-XG5Og").Info("stop processing")
 			return
 		case event := <-h.Handler.EventQueue:
-			if h.HasLocked {
-				h.processBulk(event)
-				continue
-			}
 			h.process(event)
+		case <-h.shouldPush:
+			h.push()
 		}
 	}
 }
 
-func (h *OrgHandler) process(eventstore.EventReader) error {
-	return nil
-}
+func (h *OrgHandler) process(event eventstore.EventReader) error {
+	h.lock.Lock()
+	defer h.lock.Unlock()
 
-func (h *OrgHandler) processBulk(event eventstore.EventReader) error {
-	org := h.getBulkOrg(event.Aggregate().ID)
+	if h.currentSequence != event.PreviousSequence() {
+		//TODO: load current sequence of the view
+
+	}
+
+	org := h.getOrg(event.Aggregate().ID)
 	org.AppendEvents(event)
-
-	if h.BulkUntil == event.Sequence() {
-		h.endBulk()
+	err := org.Reduce()
+	if err != nil {
+		return err
 	}
+
+	if !h.pushSet {
+		h.pushSet = true
+		h.shouldPush <- true
+	}
+
 	return nil
 }
 
-func (h *OrgHandler) endBulk() {
-	stmts := make([]string, 0, len(h.orgs))
+func (h *OrgHandler) push() error {
+	h.lock.Lock()
+	defer h.lock.Unlock()
+
+	//TODO: lock table
+	//TODO: defer unlock table
+
+	stmts := make([]eventstore.Statement, 0, len(h.orgs))
 	for _, org := range h.orgs {
-		err := org.Reduce()
-		if err != nil {
-			//TODO: how to handle this error?
-			logging.LogWithFields("EVENT-VbCAf", "orgID", org.AggregateID).Warn("reduce failed")
-			continue
-		}
-
-		// stmts = append(stmts, org.Statements()...)
+		stmts = append(stmts, org.Statements()...)
 	}
-	//append unlock statement to stmts
-	//execute stmts
 
-	_ = stmts
+	prepareds := make([]func(context.Context, *sql.Tx) error, len(stmts))
+	for i, stmt := range stmts {
+		prepareds[i] = stmt.Prepare()
+	}
 
-	h.BulkUntil = 0
-	h.HasLocked = false
+	tx, err := h.client.Begin()
+	if err != nil {
+		return err
+	}
 
+	for _, prepared := range prepareds {
+		err = prepared(h.ctx, tx)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		//TODO: should we trigger a bulk load then?
+		return err
+	}
+
+	h.pushSet = false
+
+	return nil
 }
 
-func (h *OrgHandler) getBulkOrg(orgID string) *query.OrgReadModel {
+func (h *OrgHandler) getOrg(orgID string) *query.OrgReadModel {
 	for _, org := range h.orgs {
 		if org.AggregateID == orgID {
 			return org
