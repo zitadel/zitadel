@@ -14,7 +14,7 @@
         <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
         <div class="detail" *ngIf="stripeCustomer">
             <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
-                <a (click)="updateCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
+                <a (click)="setCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
             </p>
             <p>{{stripeCustomer?.contact}}</p>
             <p *ngIf="stripeCustomer.company">{{stripeCustomer?.company}}</p>
