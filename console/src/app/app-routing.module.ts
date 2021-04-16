@@ -18,7 +18,7 @@ const routes: Routes = [
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['iam.write'],
-        }
+        },
     },
     {
         path: 'granted-projects',

@@ -1,10 +1,10 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { GrantedProject, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -27,7 +27,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     @Input() refreshOnPreviousRoutes: string[] = [];
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
     public dataSource!: ProjectGrantsDataSource;
     public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);

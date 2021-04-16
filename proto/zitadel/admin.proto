@@ -361,7 +361,7 @@ service AdminService {
             tags: "oidc";
 
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -548,7 +548,7 @@ service AdminService {
             tags: "identity provider";
             tags: "oidc";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -1567,8 +1567,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1595,8 +1595,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1622,8 +1622,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1651,8 +1651,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/architecture#Software_Architecture";
-                description: "details of ZITADEL's event driven software architecture";
+                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
                 key: "200";
@@ -1679,7 +1679,7 @@ message HealthzRequest {}
 
 message HealthzResponse {}
 
-// parameters are ORed
+// if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -2284,7 +2284,7 @@ message AddCustomOrgIAMPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the username has to end with the domain of it's organisation"
         }
-    ];
+    ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
 }
 
 message AddCustomOrgIAMPolicyResponse {
@@ -2371,7 +2371,7 @@ message UpdateLabelPolicyRequest {
     ];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
 }
@@ -2442,7 +2442,7 @@ message AddIDPToLoginPolicyRequest {
             min_length: 1;
             max_length: 200;
         }
-    ];
+    ]; // Id of the predefined idp configuration
 }
 
 message AddIDPToLoginPolicyResponse {
@@ -2617,7 +2617,7 @@ message UpdatePasswordLockoutPolicyRequest {
             example: "\"10\""
         }
     ];
-    // TODO: how to describe?
+    // If an error should be displayed during a lockout or not
     bool show_lockout_failure = 2;
 }
 
@@ -2805,7 +2805,7 @@ message View {
             example: "\"2019-04-01T08:45:00.000000Z\"";
             description: "The timestamp the event occured";
         }
-    ];
+    ]; // The timestamp the event occured
     google.protobuf.Timestamp last_successful_spooler_run = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "The timestamp the event occured";

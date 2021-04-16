@@ -3,23 +3,28 @@
   display: flex;
   align-items: center;
 
-  .col {
+  .row {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-
-    .desc {
-      font-size: .8rem;
-      color: var(--grey);
-      margin-right: 1rem;
-
-      span {
-        display: block;
-      }
-    }
 
     .count {
-      font-size: 2rem;
+      margin-right: .5rem;
+      color: var(--grey);
+    }
+
+    .desc {
+      font-size: 14px;
+      color: var(--grey);
+    }
+
+    .slash {
+      margin: 0 .5rem;
+      color: var(--grey);
+    }
+
+    a {
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 2px;
     }
   }
 

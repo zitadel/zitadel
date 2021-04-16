@@ -1,0 +1,60 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'FEATURES.TIER.DETAILS' | translate}} {{data?.number}}</span>
+</h1>
+<p class="desc">{{'FEATURES.TIER.DETAILS_DESC' | translate}}</p>
+<mat-spinner class="spinner" *ngIf="stripeLoading" diameter="20"></mat-spinner>
+
+<div mat-dialog-content>
+    <form [formGroup]="form">
+        <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'FEATURES.TIER.CONTACT' | translate }}</cnsl-label>
+            <input cnslInput name="contact" formControlName="contact" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'FEATURES.TIER.COMPANY' | translate }}</cnsl-label>
+            <input cnslInput name="company" formControlName="company" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'FEATURES.TIER.ADDRESS' | translate }}</cnsl-label>
+            <input cnslInput name="address" formControlName="address" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'FEATURES.TIER.CITY' | translate }}</cnsl-label>
+            <input cnslInput name="city" formControlName="city" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'FEATURES.TIER.POSTAL_CODE' | translate }}</cnsl-label>
+            <input cnslInput name="postal_code" formControlName="postal_code" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'FEATURES.TIER.COUNTRY' | translate }}</cnsl-label>
+            <mat-select formControlName="country" name="country" (selectionChange)="changeCountry($event)">
+                <mat-option *ngFor="let country of COUNTRIES" [value]="country.isoCode" class="center-row">
+                    <div class="center">
+                        <div class="img-wrapper">
+                            <img height="20px" width="30px"
+                                style="margin-right: 1rem; border-radius: 2px; vertical-align: middle;"
+                                src="../../../../assets/flags/{{country.isoCode.toLowerCase()}}.png" />
+                        </div>
+                        {{country.isoCode}} <span class="lighter">|&nbsp;{{country.name}}</span>
+                    </div>
+                </mat-option>
+            </mat-select>
+        </cnsl-form-field>
+    </form>
+</div>
+<div mat-dialog-actions class="action">
+    <button cdkFocusInitial color="primary" mat-button class="ok-button" (click)="dialogRef.close()">
+        {{'ACTIONS.CLOSE' | translate}}
+    </button>
+
+    <button [disabled]="form.invalid" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+        (click)="submitAndCloseDialog()">
+        {{'ACTIONS.OK' | translate}}
+    </button>
+</div>

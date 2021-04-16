@@ -1,12 +1,12 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { GrantedProject } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -41,7 +41,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
 
     public dataSource: MatTableDataSource<GrantedProject.AsObject> =
         new MatTableDataSource<GrantedProject.AsObject>();
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
 
     public grantedProjectList: GrantedProject.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'resourceOwnerName', 'state', 'creationDate', 'changeDate'];

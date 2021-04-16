@@ -154,10 +154,13 @@ Registration:
   Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
-  Tos: Allgemeine Geschäftsbedingungen
+  TosAndPrivacy: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
+  TosConfirmAnd: und die
   TosLink: https://zitadel.ch/pdf/agb.pdf
+  PrivacyLinkText: Datenschutzerklärung
+  PrivacyLink: https://zitadel.ch/pdf/datenschutz.pdf
   ExternalLogin: oder registriere dich mit einem externen Benutzer
 
 RegistrationOrg:
@@ -179,10 +182,13 @@ RegistrationOrg:
   Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
-  Tos: Allgemeine Geschäftsbedingungen
+  TosAndPrivacy: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
+  TosConfirmAnd: und die
   TosLink: https://zitadel.ch/pdf/agb.pdf
+  PrivacyLinkText: Datenschutzerklärung
+  PrivacyLink: https://zitadel.ch/pdf/datenschutz.pdf
 
 LinkingUsersDone:
   Title: Benutzerlinking
@@ -214,8 +220,10 @@ Actions:
   PasswordLogin: Mit Passwort anmelden
 
 Footer:
-  TosPrivacyPolicy: Datenschutz und AGB
+  Tos: AGB
   TosLink: https://zitadel.ch/pdf/agb.pdf
+  Privacy: Datenschutzerklärung
+  PrivacyLink: https://zitadel.ch/pdf/datenschutz.pdf
   Help: Hilfe
 
 Errors:

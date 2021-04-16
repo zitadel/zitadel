@@ -2,13 +2,13 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -45,7 +45,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public dataSource: MatTableDataSource<Project.AsObject> =
         new MatTableDataSource<Project.AsObject>();
 
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
 
     public ownedProjectList: Project.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
@@ -99,7 +99,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     }
 
     public changePage(event: PageEvent): void {
-        this.getData(event.pageSize, event.pageIndex);
+        this.getData(event.pageSize, event.pageSize * event.pageIndex);
     }
 
     public addProject(): void {

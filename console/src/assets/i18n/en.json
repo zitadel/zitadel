@@ -1,5 +1,10 @@
 {
     "APP_NAME": "ZITADEL",
+    "PAGINATOR": {
+        "PREVIOUS":"Previous",
+        "NEXT":"Next",
+        "COUNT":"Total Results"
+    },
     "ONBOARDING": {
         "HEADER":"First Steps",
         "TITLE":"Learn how to use ZITADEL",
@@ -84,7 +89,8 @@
         "SHOWORGS":"Show All Organisations",
         "GRANTSECTION":"Authorization Section",
         "GRANTS":"Authorizations",
-        "TOC":"Privacy Policy and TOC",
+        "PRIVACY":"Privacy",
+        "TOS":"Terms of Service",
         "TOOLTIP": {
             "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
             "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",
@@ -175,11 +181,10 @@
             "FILTER": {
                 "0":"Filter for DisplayName",
                 "1":"Filter for Username",
-                "2":"filter for Firstname",
-                "3":"filter for Lastname",
-                "4":"filter for role Key",
+                "2":"filter for DisplayName",
+                "3":"filter for Username",
+                "4":"filter for Email",
                 "5":"filter for DisplayName",
-                "6":"filter for email",
                 "10":"filter for organisation name",
                 "12":"filter for project name"
             },
@@ -373,6 +378,12 @@
             "CREATE": {
                 "TITLE": "Create User Grant",
                 "DESCRIPTION": "Search for the organisation, the project and the corresponding project roles."
+            },
+            "FILTER": {
+                "0":"filter for user",
+                "1":"filter for domain",
+                "2":"filter for projectname",
+                "3":"filter for rolename"
             }
         },
         "VALIDATION": {
@@ -502,6 +513,7 @@
         "PAGES": {
             "NAME":"Name",
             "ID":"ID",
+            "CREATIONDATE":"Creation Date",
             "FILTER":"Filter",
             "FILTERPLACEHOLDER":"Filter for the name",
             "LIST": "Organisations",
@@ -571,6 +583,22 @@
         "TITLE":"Features",
         "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
         "BTN-EDIT":"Edit Featureset",
+        "TIER": {
+          "NAME":"Tier Name",
+          "DETAILS":"Billing Details",
+          "DETAILS_DESC":"Enter your billing data here.",
+          "CUSTOMERINVALID":"Billing data ist not complete!",
+          "CONTACT":"Kontakt",
+          "COMPANY":"Company",
+          "ADDRESS":"Addresse",
+          "CITY":"Town",
+          "POSTAL_CODE":"Postal Code",
+          "COUNTRY":"Country",
+          "TITLE":"Zitadel Tier",
+          "DESCRIPTION":"Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+          "QUESTIONS":"For questions regarding payments contact our support ",
+          "BTN":"Change Tier"
+        },
         "DATA": {
             "AUDITLOGRETENTION":"Audit Log retention",
             "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
@@ -687,7 +715,8 @@
             "SELECTION": "Selected Elements",
             "DEACTIVATE": "Deactivate User",
             "ACTIVATE": "Activate User",
-            "DELETE": "Delete User"
+            "DELETE": "Delete User",
+            "CLEAR":"Clear selection"
         }
     },
     "PROJECT": {

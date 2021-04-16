@@ -157,7 +157,7 @@ export class UserDetailComponent implements OnInit {
         if (this.user.id && email) {
             this.mgmtUserService.updateHumanEmail(this.user.id, email).then(() => {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-                if (this.user.state == UserState.USER_STATE_INITIAL) {
+                if (this.user.state === UserState.USER_STATE_INITIAL) {
                     this.mgmtUserService.resendHumanInitialization(this.user.id, email ?? '').then(() => {
                         this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
                         this.refreshChanges$.emit();
@@ -195,13 +195,15 @@ export class UserDetailComponent implements OnInit {
     }
 
     public sendSetPasswordNotification(): void {
-        this.mgmtUserService.sendHumanResetPasswordNotification(this.user.id, SendHumanResetPasswordNotificationRequest.Type.TYPE_EMAIL)
-            .then(() => {
-                this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
-                this.refreshChanges$.emit();
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+        this.mgmtUserService.sendHumanResetPasswordNotification(
+            this.user.id,
+            SendHumanResetPasswordNotificationRequest.Type.TYPE_EMAIL,
+        ).then(() => {
+            this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
+            this.refreshChanges$.emit();
+        }).catch(error => {
+            this.toast.showError(error);
+        });
     }
 
     public deleteUser(): void {
