@@ -166,7 +166,6 @@ Registration:
 RegistrationOrg:
   Title: Organisation Registration
   Description: Enter your organisationname and userdata.
-  FreeTillEndOfYear: We are offering the premium tier FORTRESS free of charge during the introductory phase until the end of the first quarter 2021.
   OrgName: Organisationname
   OrgDomain: Domäne
   Email: E-Mail
