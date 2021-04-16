@@ -1,1256 +1,1258 @@
 {
-    "APP_NAME": "ZITADEL",
-    "PAGINATOR": {
-        "PREVIOUS":"Previous",
-        "NEXT":"Next",
-        "COUNT":"Total Results"
+  "APP_NAME": "ZITADEL",
+  "PAGINATOR": {
+    "PREVIOUS": "Previous",
+    "NEXT": "Next",
+    "COUNT": "Total Results"
+  },
+  "ONBOARDING": {
+    "HEADER": "First Steps",
+    "TITLE": "Learn how to use ZITADEL",
+    "LOGINDESC": "You need to log in to control your ZITADEL settings.",
+    "LOGIN": "Login",
+    "DESCRIPTION": "We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
+    "STEPS_TITLE": "Complete the following steps in the order you want:",
+    "STEPS": {
+      "1": {
+        "TITLE": "Create a project",
+        "DESC": "Create your first project and define access rights for any employees."
+      },
+      "2": {
+        "TITLE": "Create Application",
+        "DESC": "Create an application within your project and define its properties."
+      },
+      "3": {
+        "TITLE": "Improve security",
+        "DESC": "Extend the access policies and thereby increase the security of your users."
+      }
     },
-    "ONBOARDING": {
-        "HEADER":"First Steps",
-        "TITLE":"Learn how to use ZITADEL",
-        "LOGINDESC":"You need to log in to control your ZITADEL settings.",
-        "LOGIN":"Login",
-        "DESCRIPTION":"We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
-        "STEPS_TITLE":"Complete the following steps in the order you want:",
-        "STEPS": {
-            "1": {
-                "TITLE":"Create a project",
-                "DESC":"Create your first project and define access rights for any employees."
-            },
-            "2": {
-                "TITLE":"Create Application",
-                "DESC":"Create an application within your project and define its properties."
-            },
-            "3": {
-                "TITLE":"Improve security",
-                "DESC":"Extend the access policies and thereby increase the security of your users."
-            }
-        },
-        "START":"Start",
-        "DOCS":"Docs"
+    "START": "Start",
+    "DOCS": "Docs"
+  },
+  "HOME": {
+    "TITLE": "ZITADEL",
+    "SECURITYANDPRIVACY": "Data Protection and Personalisation",
+    "SECURITYANDPRIVACY_DESC": "Manage Your Information and Security Settings",
+    "SECURITYANDPRIVACY_BUTTON": "Personalise Information and Security",
+    "CHANGE_PWD": "Change Password",
+    "PROTECTION": "Organisational Policies",
+    "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
+    "PROTECTION_BUTTON": "Explore",
+    "PROJECTS": "Create and Manage Your Applications and Projects",
+    "PROJECTS_DESC": "Authorize others to use your projects or define custom roles on eligible projects.",
+    "PROJECTS_BUTTON": "Project Overview",
+    "PROJECTS_NEW_LINK": "Create new project",
+    "ORG_POLICY_COMPLEXITY": "Password Complexity Settings",
+    "ORG_POLICY_IAM": "Organisation Access Properties",
+    "ORG_POLICY_LOGIN": "Login Policy",
+    "IAM_CREATE_ORG": "Create organisation",
+    "IAM_POLICY_COMPLEXITY": "System Password Complexity Settings",
+    "IAM_POLICY_IAM": "System Access Properties",
+    "IAM_POLICY_LOGIN": "System Login Policy",
+    "USERS": "Create and Manage Your Users",
+    "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
+    "USERS_HUMANS": "Show human users",
+    "USERS_MACHINES": "Show machine users",
+    "USERS_CREATE": "Create User",
+    "USERS_BUTTON": "Show Users",
+    "IAM": "Identity and Access Management",
+    "IAM_DESC": "Manage your organisations and administrators.",
+    "IAM_BUTTON": "Manage ZITADEL",
+    "WELCOME": "Welcome",
+    "WELCOMESENTENCE": "Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
+    "DISCLAIMER": "You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
+    "DISCLAIMERLINK": "Further information",
+    "QUICKSTARTS": {
+      "LABEL": "First Steps",
+      "TITLE": "Quickstarts",
+      "DESCRIPTION": "Get started with ZITADEL quickly."
+    }
+  },
+  "MENU": {
+    "DASHBOARD": "Overview",
+    "PERSONAL_INFO": "Personal Information",
+    "DOCUMENTATION": "Documentation",
+    "IAMPOLICIES": "IAM",
+    "IAMEVENTSTORE": "Storage",
+    "ORGANIZATION": "Organisation",
+    "ADMINSECTION": "ZITADEL Administration",
+    "ORGSECTION": "Organisation",
+    "PROJECTSSECTION": "Projects Section",
+    "PROJECT": "Projects",
+    "GRANTEDPROJECT": "Granted Projects",
+    "USERSECTION": "User Section",
+    "HUMANUSERS": "Users",
+    "MACHINEUSERS": "Service Users",
+    "LOGOUT": "Logout All Users",
+    "NEWORG": "New Organisation",
+    "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
+    "SHOWORGS": "Show All Organisations",
+    "GRANTSECTION": "Authorization Section",
+    "GRANTS": "Authorizations",
+    "PRIVACY": "Privacy",
+    "TOS": "Terms of Service",
+    "TOOLTIP": {
+      "PERSONAL": "Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
+      "IAMPOLICIES": "Manage ZITADELs global Access policies und elect ZITADEL Managers",
+      "IAMEVENTSTORE": "Clear views and failed events",
+      "ORG": "Show your organisations access policies, and manage your domain names",
+      "SELFPROJECTS": "Show your organisations own projects",
+      "GRANTEDPROJECTS": "Show projects your organisation was granted access",
+      "HUMANUSERS": "Show all registered human users on your organisation",
+      "MACHINEUSERS": "Show service users of your organisation",
+      "AUTHZ": "Show authorizations available to your organisation users"
+    }
+  },
+  "ACTIONS": {
+    "SAVE": "Save",
+    "SAVENOW": "Save now",
+    "NEW": "New",
+    "ADD": "Add",
+    "CREATE": "Create",
+    "CONTINUE": "Continue",
+    "BACK": "Back",
+    "CLOSE": "Close",
+    "CLEAR": "Clear",
+    "CANCEL": "Cancel",
+    "INFO": "Info",
+    "OK": "OK",
+    "VIEW": "Show",
+    "SELECTIONDELETE": "Delete selection",
+    "DELETE": "Delete",
+    "REMOVE": "Remove",
+    "VERIFY": "Verify",
+    "FINISH": "Finish",
+    "CHANGE": "Change",
+    "REACTIVATE": "Reactivate",
+    "DEACTIVATE": "Deactivate",
+    "REFRESH": "Refresh",
+    "LOGIN": "Login",
+    "EDIT": "Edit",
+    "PIN": "Pin / Unpin",
+    "CONFIGURE": "Configure",
+    "SEND": "Send",
+    "NEWVALUE": "New Value"
+  },
+  "RESOURCEID": "Resource Id",
+  "TABLE": {
+    "NOROWS": "No data"
+  },
+  "ERRORS": {
+    "REQUIRED": "Some required fields are missing.",
+    "TOKENINVALID": {
+      "TITLE": "Your authorization token has expired.",
+      "DESCRIPTION": "Click the button below to log in again."
+    }
+  },
+  "USER": {
+    "TITLE": "Personal Information",
+    "DESCRIPTION": "Manage your information and security settings.",
+    "PAGES": {
+      "LIST": "Users",
+      "TITLE": "User",
+      "DESCRIPTION": "Create new users in your organisation and manage existing ones.",
+      "LISTMACHINE": "Service Users",
+      "DESCRIPTIONMACHINE": "Create and manage Service Users of your organisation",
+      "DETAIL": "Detail",
+      "CREATE": "Create",
+      "MY": "My Informations",
+      "LOGINNAMES": "Loginnames",
+      "LOGINNAMESDESC": "These are your login names:",
+      "COPY": "Copy to Clipboard",
+      "COPIED": "Copied to clipboard.",
+      "NOUSER": "No associated users.",
+      "REACTIVATE": "Reactivate",
+      "DEACTIVATE": "Deactivate",
+      "FILTER": "Filter",
+      "DELETE": "Delete User"
     },
-    "HOME": {
-        "TITLE": "ZITADEL",
-        "SECURITYANDPRIVACY": "Data Protection and Personalisation",
-        "SECURITYANDPRIVACY_DESC": "Manage Your Information and Security Settings",
-        "SECURITYANDPRIVACY_BUTTON": "Personalise Information and Security",
-        "CHANGE_PWD":"Change Password",
-        "PROTECTION": "Organisational Policies",
-        "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
-        "PROTECTION_BUTTON": "Explore",
-        "PROJECTS": "Create and Manage Your Applications and Projects",
-        "PROJECTS_DESC": "Authorize others to use your projects or define custom roles on eligible projects.",
-        "PROJECTS_BUTTON": "Project Overview",
-        "PROJECTS_NEW_LINK":"Create new project",
-        "ORG_POLICY_COMPLEXITY":"Password Complexity Settings",
-        "ORG_POLICY_IAM":"Organisation Access Properties",
-        "ORG_POLICY_LOGIN":"Login Policy",
-        "IAM_CREATE_ORG":"Create organisation",
-        "IAM_POLICY_COMPLEXITY":"System Password Complexity Settings",
-        "IAM_POLICY_IAM":"System Access Properties",
-        "IAM_POLICY_LOGIN":"System Login Policy",
-        "USERS": "Create and Manage Your Users",
-        "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
-        "USERS_HUMANS":"Show human users",
-        "USERS_MACHINES": "Show machine users",
-        "USERS_CREATE":"Create User",
-        "USERS_BUTTON": "Show Users",
-        "IAM": "Identity and Access Management",
-        "IAM_DESC": "Manage your organisations and administrators.",
-        "IAM_BUTTON": "Manage ZITADEL",
-        "WELCOME":"Welcome",
-        "WELCOMESENTENCE":"Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
-        "DISCLAIMER":"You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
-        "DISCLAIMERLINK":"Further information",
-        "QUICKSTARTS": {
-            "LABEL":"First Steps",
-            "TITLE":"Quickstarts",
-            "DESCRIPTION":"Get started with ZITADEL quickly."
-        }
+    "DIALOG": {
+      "DELETE_TITLE": "Delete User",
+      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?"
     },
-    "MENU": {
-        "DASHBOARD":"Overview",
-        "PERSONAL_INFO": "Personal Information",
-        "DOCUMENTATION":"Documentation",
-        "IAMPOLICIES":"IAM",
-        "IAMEVENTSTORE":"Storage",
-        "ORGANIZATION": "Organisation",
-        "ADMINSECTION":"ZITADEL Administration",
-        "ORGSECTION":"Organisation",
-        "PROJECTSSECTION":"Projects Section",
-        "PROJECT": "Projects",
-        "GRANTEDPROJECT":"Granted Projects",
-        "USERSECTION":"User Section",
-        "HUMANUSERS": "Users",
-        "MACHINEUSERS":"Service Users",
-        "LOGOUT": "Logout All Users",
-        "NEWORG":"New Organisation",
-        "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions.",
-        "SHOWORGS":"Show All Organisations",
-        "GRANTSECTION":"Authorization Section",
-        "GRANTS":"Authorizations",
-        "PRIVACY":"Privacy",
-        "TOS":"Terms of Service",
-        "TOOLTIP": {
-            "PERSONAL":"Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
-            "IAMPOLICIES":"Manage ZITADELs global Access policies und elect ZITADEL Managers",
-            "IAMEVENTSTORE":"Clear views and failed events",
-            "ORG":"Show your organisations access policies, and manage your domain names",
-            "SELFPROJECTS":"Show your organisations own projects",
-            "GRANTEDPROJECTS":"Show projects your organisation was granted access",
-            "HUMANUSERS":"Show all registered human users on your organisation",
-            "MACHINEUSERS":"Show service users of your organisation",
-            "AUTHZ":"Show authorizations available to your organisation users"
-        }
+    "SENDEMAILDIALOG": {
+      "TITLE": "Send Email Notification",
+      "DESCRIPTION": "Click the button below to send a notification to the current email address or change the email address in the field.",
+      "NEWEMAIL": "New email address"
     },
-    "ACTIONS": {
-        "SAVE": "Save",
-        "SAVENOW":"Save now",
-        "NEW": "New",
-        "ADD":"Add",
-        "CREATE": "Create",
-        "CONTINUE": "Continue",
-        "BACK": "Back",
-        "CLOSE": "Close",
-        "CLEAR": "Clear",
-        "CANCEL":"Cancel",
-        "INFO": "Info",
-        "OK": "OK",
-        "VIEW": "Show",
-        "SELECTIONDELETE":"Delete selection",
-        "DELETE": "Delete",
-        "REMOVE":"Remove",
-        "VERIFY":"Verify",
-        "FINISH":"Finish",
-        "CHANGE":"Change",
-        "REACTIVATE":"Reactivate",
-        "DEACTIVATE":"Deactivate",
-        "REFRESH":"Refresh",
-        "LOGIN":"Login",
-        "EDIT":"Edit",
-        "PIN":"Pin / Unpin",
-        "CONFIGURE":"Configure",
-        "SEND":"Send",
-        "NEWVALUE":"New Value"
-    },
-    "RESOURCEID":"Resource Id",
     "TABLE": {
-        "NOROWS":"No data"
+      "DEACTIVATE": "Deactivate",
+      "ACTIVATE": "Activate",
+      "FILTER": {
+        "0": "Filter for DisplayName",
+        "1": "Filter for Username",
+        "2": "filter for DisplayName",
+        "3": "filter for Username",
+        "4": "filter for Email",
+        "5": "filter for DisplayName",
+        "10": "filter for organisation name",
+        "12": "filter for project name"
+      },
+      "EMPTY": "No entries"
     },
-    "ERRORS": {
-        "REQUIRED": "Some required fields are missing.",
-        "TOKENINVALID": {
-            "TITLE":"Your authorization token has expired.",
-            "DESCRIPTION":"Click the button below to log in again."
+    "PASSWORDLESS": {
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Name",
+      "TABLEACTIONS": "Actions",
+      "TITLE": "Passwordless Authentication",
+      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
+      "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
+      "U2F": "Add authenticator",
+      "U2F_DIALOG_TITLE": "Verify authenticator",
+      "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
+      "U2F_SUCCESS": "Passwordless Auth created successfully!",
+      "U2F_ERROR": "An error during U2F setup occurred!",
+      "U2F_NAME": "Authenticator Name",
+      "TYPE": {
+        "0": "No MFA defined",
+        "1": "OTP",
+        "2": "U2F"
+      },
+      "STATE": {
+        "0": "No State",
+        "1": "Not Ready",
+        "2": "Ready",
+        "3": "Deleted"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Remove Passwordless Authentication Method",
+        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Name",
+      "TABLEACTIONS": "Actions",
+      "TITLE": "Multifactor Authentication",
+      "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
+      "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
+      "ADD": "Add AuthFactor",
+      "OTP": "OTP (One-Time Password)",
+      "OTP_DIALOG_TITLE": "Add OTP",
+      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+      "U2F": "U2F (Universal 2nd Factor)",
+      "U2F_DIALOG_TITLE": "Verify U2F",
+      "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
+      "U2F_SUCCESS": "U2F created successfully!",
+      "U2F_ERROR": "An error during U2F setup occurred!",
+      "U2F_NAME": "U2F Name",
+      "TYPE": {
+        "0": "No MFA defined",
+        "1": "OTP",
+        "2": "U2F"
+      },
+      "STATE": {
+        "0": "No State",
+        "1": "Not Ready",
+        "2": "Ready",
+        "3": "Deleted"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Remove Secondfactor",
+        "MFA_DELETE_DESCRIPTION": "You are about to delete a second factor. Are you sure?",
+        "ADD_MFA_TITLE": "Add Second Factor",
+        "ADD_MFA_DESCRIPTION": "Select one of the following options."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "External Identity Providers",
+      "DESC": "",
+      "IDPCONFIGID": "Idp Config ID",
+      "IDPNAME": "Idp Name",
+      "USERDISPLAYNAME": "External Name",
+      "EXTERNALUSERID": "External User ID",
+      "DIALOG": {
+        "REMOVE_TITLE": "Remove IDP",
+        "REMOVE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Create a New User",
+      "DESCRIPTION": "Please provide the necesary information.",
+      "NAMEANDEMAILSECTION": "Name and E-mail",
+      "GENDERLANGSECTION": "Gender and Language",
+      "PHONESECTION": "Phonenumbers",
+      "PASSWORDSECTION": "Initial Password",
+      "ADDRESSANDPHONESECTION": "Phonenumber"
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verify Phone Number",
+      "DESCRIPTION": "Enter the code you recieved by text message to verify your phone number.",
+      "CODE": "Code"
+    },
+    "DATA": {
+      "STATE": "Status",
+      "STATE0": "Unknown",
+      "STATE1": "Active",
+      "STATE2": "Inactive",
+      "STATE3": "Deleted",
+      "STATE4": "Locked",
+      "STATE5": "Supend",
+      "STATE6": "Initial"
+    },
+    "PROFILE": {
+      "TITLE": "Profile",
+      "EMAIL": "E-mail",
+      "PHONE": "Phonenumber",
+      "USERNAME": "User Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
+      "NICKNAME": "Nickname",
+      "DISPLAYNAME": "Display Name",
+      "PREFERRED_LANGUAGE": "Language",
+      "GENDER": "Gender",
+      "PASSWORD": "Password"
+    },
+    "MACHINE": {
+      "TITLE": "Service User Details",
+      "USERNAME": "User Name",
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "KEYSTITLE": "Keys",
+      "KEYSDESC": "Define your keys and add an optional expiration date.",
+      "ID": "Key ID",
+      "TYPE": "Type",
+      "EXPIRATIONDATE": "Expiration date",
+      "CHOOSEDATEAFTER": "Enter a valid expiration after",
+      "CHOOSEEXPIRY": "Select an expiration date",
+      "CREATIONDATE": "Creation Date",
+      "KEYDETAILS": "Key Details",
+      "ADD": {
+        "TITLE": "Add Key",
+        "DESCRIPTION": "Select your key type and choose an optional expiration date."
+      },
+      "ADDED": {
+        "TITLE": "The key was created",
+        "DESCRIPTION": "Download the key as it won't be visible after closing this dialog!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Password",
+      "DESCRIPTION": "Enter the new password according to the policy below.",
+      "OLD": "Current Password",
+      "NEW": "New Password",
+      "CONFIRM": "Confirm New Password",
+      "RESET": "Reset Current Password",
+      "SET": "Set New Password",
+      "RESENDNOTIFICATION": "Resend Password Reset Link",
+      "REQUIRED": "Some required fields are missing.",
+      "MINLENGTHERROR": "The password has to be at least {{value}} characters long.",
+      "NOTEQUAL": "The passwords provided do not match."
+    },
+    "EMAIL": "E-mail",
+    "PHONE": "Phonenumber",
+    "PHONEEMPTY": "No phonenumber defined",
+    "PHONEVERIFIED": "Phonenumber verified.",
+    "EMAILVERIFIED": "Email verified",
+    "NOTVERIFIED": "not verified",
+    "PREFERRED_LOGINNAME": "Preferred Loginname",
+    "LOGINMETHODS": {
+      "TITLE": "Contact Information",
+      "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "validated",
+        "RESEND": "Resend Verification E-mail",
+        "EDITTITLE": "Change Email",
+        "EDITDESC": "Enter the new email in the field below."
+      },
+      "PHONE": {
+        "TITLE": "Phone",
+        "VALID": "validated",
+        "RESEND": "Resend Verification Text Message",
+        "EDITTITLE": "Change number",
+        "EDITDESC": "Enter the new phonenumber in the field below.",
+        "DELETETITLE": "Delete Phonenumber",
+        "DELETEDESC": "Do you really want to delete the phonenumber"
+      },
+      "RESENDCODE": "Resend Code",
+      "ENTERCODE": "Verify",
+      "ENTERCODE_DESC": "Verify Code"
+    },
+    "GRANTS": {
+      "TITLE": "User Grants",
+      "DESCRIPTION": "Grant this user access to certain projects",
+      "CREATE": {
+        "TITLE": "Create User Grant",
+        "DESCRIPTION": "Search for the organisation, the project and the corresponding project roles."
+      },
+      "FILTER": {
+        "0": "filter for user",
+        "1": "filter for domain",
+        "2": "filter for projectname",
+        "3": "filter for rolename"
+      }
+    },
+    "VALIDATION": {
+      "INVALIDPATTERN": "The password does not fulfil the defined rules.",
+      "NOTANEMAIL": "The given value is not an e-mail address",
+      "REQUIRED": "The input field is empty.",
+      "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
+      "NOEMAIL": "The user name cannot be an e-mail address.",
+      "UPPERCASEMISSING": "The password must include an uppercase character.",
+      "LOWERCASEMISSING": "The password must include a lowercase character.",
+      "SYMBOLERROR": "The password must include a symbol or punctuation mark.",
+      "NUMBERERROR": "The password must include a digit."
+    },
+    "STATE": {
+      "0": "Unknown",
+      "1": "Active",
+      "2": "Expired"
+    },
+    "SEARCH": {
+      "FOUND": "Found"
+    },
+    "TARGET": {
+      "SELF": "If you want to grant a user of an other organisation access",
+      "EXTERNAL": "To grant a user of your organisation access",
+      "CLICKHERE": "click here"
+    },
+    "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
+    "SIGNEDOUT_BTN": "Sign In",
+    "EDITACCOUNT": "Edit Account",
+    "ADDACCOUNT": "Log in With Another Account",
+    "RESENDINITIALEMAIL": "Send new initialisation mail",
+    "RESENDEMAILNOTIFICATION": "Resend Email notification",
+    "TOAST": {
+      "CREATED": "User created successfully.",
+      "SAVED": "Profile saved successfully.",
+      "EMAILSAVED": "E-mail saved successfully.",
+      "INITEMAILSENT": "Initializing mail sent.",
+      "PHONESAVED": "Phone saved successfully.",
+      "PHONEREMOVED": "Phone has been removed.",
+      "PHONEVERIFIED": "Phone verified successfully.",
+      "PHONEVERIFICATIONSENT": "Phone verification code sent.",
+      "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
+      "OTPREMOVED": "OTP removed.",
+      "U2FREMOVED": "U2F removed.",
+      "PASSWORDLESSREMOVED": "Passwordless removed.",
+      "INITIALPASSWORDSET": "Initial password set.",
+      "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
+      "PASSWORDCHANGED": "Password changed successfully.",
+      "REACTIVATED": "User reactivated.",
+      "DEACTIVATED": "User deactivated.",
+      "SELECTEDREACTIVATED": "Selected users reactivated.",
+      "SELECTEDDEACTIVATED": "Selected users deactivated.",
+      "SELECTEDKEYSDELETED": "Selected keys deleted.",
+      "KEYADDED": "Key added!",
+      "MACHINEADDED": "Service User created!",
+      "DELETED": "User deleted successfully!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "ZITADEL Manager Roles",
+      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organisation, project, or IAM detail pages.",
+      "CREATIONDATE": "Creation Date",
+      "CHANGEDATE": "Last Modified",
+      "DISPLAYNAME": "Display Name",
+      "REMOVE": "Remove",
+      "TYPE": "Type",
+      "TYPES": {
+        "UNKNOWN": "Unknown",
+        "ORG": "Organisation",
+        "PROJECT": "Project",
+        "GRANTEDPROJECT": "Granted Project"
+      }
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "IAM Policies and Access Settings",
+      "DESCRIPTION": "Manage your ZITADEL Policies and Management Access Settings."
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM Storage Administration",
+      "DESCRIPTION": "Manage your ZITADEL views and failed events."
+    },
+    "MEMBER": {
+      "TITLE": "Managers",
+      "DESCRIPTION": "Managers can add and edit organisations and make changes to their corresponding projects and applications."
+    },
+    "VIEWS": {
+      "TITLE": "Views",
+      "DESCRIPTION": "This card shows your ZITADEL views.",
+      "VIEWNAME": "Name",
+      "DATABASE": "Database",
+      "SEQUENCE": "Sequence",
+      "EVENTTIMESTAMP": "Timestamp",
+      "LASTSPOOL": "Successful spool",
+      "ACTIONS": "Actions",
+      "CLEAR": "Clear",
+      "CLEARED": "View was successfully cleared!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Clear View",
+        "VIEW_CLEAR_DESCRIPTION": "You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "TITLE": "Failed Events",
+      "DESCRIPTION": "This card shows your failed events.",
+      "VIEWNAME": "Name",
+      "DATABASE": "Database",
+      "FAILEDSEQUENCE": "Failed Sequence",
+      "FAILURECOUNT": "Failure Count",
+      "ERRORMESSAGE": "Error Message",
+      "ACTIONS": "Actions",
+      "DELETE": "Remove",
+      "DELETESUCCESS": "Failed events removed."
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manager removed.",
+      "MEMBERSADDED": "Managers added.",
+      "MEMBERADDED": "Manager added.",
+      "MEMBERCHANGED": "Manager changed.",
+      "ROLEREMOVED": "Role removed.",
+      "ROLECHANGED": "Role changed.",
+      "REACTIVATED": "Reactivated",
+      "DEACTIVATED": "Deactivated"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Name",
+      "ID": "ID",
+      "CREATIONDATE": "Creation Date",
+      "FILTER": "Filter",
+      "FILTERPLACEHOLDER": "Filter for the name",
+      "LIST": "Organisations",
+      "LISTDESCRIPTION": "Choose an organisation.",
+      "ACTIVE": "Active",
+      "CREATE": "Create Organisation",
+      "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
+      "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
+      "ORGDOMAIN": {
+        "TITLE": "Organisation Domain Ownership Verification",
+        "VERIFICATION": "Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
+        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
+        "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
+        "VERIFICATION_NEWTOKEN_DESC": "If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
+        "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
+        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
+        "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
+        "REQUESTNEWTOKEN": "Request new Token",
+        "TYPES": {
+          "1": "HTTP",
+          "2": "DNS"
         }
+      },
+      "DOWNLOAD_FILE": "Download File",
+      "SELECTORGTOOLTIP": "Select this organisation.",
+      "PRIMARYDOMAIN": "Primary Domain",
+      "STATE": "State",
+      "USEPASSWORD": "Set Initial Password"
     },
-    "USER": {
-        "TITLE": "Personal Information",
-        "DESCRIPTION": "Manage your information and security settings.",
-        "PAGES": {
-            "LIST": "Users",
-            "TITLE": "User",
-            "DESCRIPTION": "Create new users in your organisation and manage existing ones.",
-            "LISTMACHINE": "Service Users",
-            "DESCRIPTIONMACHINE": "Create and manage Service Users of your organisation",
-            "DETAIL": "Detail",
-            "CREATE": "Create",
-            "MY": "My Informations",
-            "LOGINNAMES":"Loginnames",
-            "LOGINNAMESDESC":"These are your login names:",
-            "COPY":"Copy to Clipboard",
-            "COPIED":"Copied to clipboard.",
-            "NOUSER":"No associated users.",
-            "REACTIVATE":"Reactivate",
-            "DEACTIVATE":"Deactivate",
-            "FILTER":"Filter",
-            "DELETE":"Delete User"
-        },
-        "DIALOG": {
-            "DELETE_TITLE":"Delete User",
-            "DELETE_DESCRIPTION":"You are about to permanently delete a user. Are you sure?"
-        },
-        "SENDEMAILDIALOG":{
-            "TITLE":"Send Email Notification",
-            "DESCRIPTION":"Click the button below to send a notification to the current email address or change the email address in the field.",
-            "NEWEMAIL":"New email address"
-        },
-        "TABLE":{
-            "DEACTIVATE":"Deactivate",
-            "ACTIVATE":"Activate",
-            "FILTER": {
-                "0":"Filter for DisplayName",
-                "1":"Filter for Username",
-                "2":"filter for DisplayName",
-                "3":"filter for Username",
-                "4":"filter for Email",
-                "5":"filter for DisplayName",
-                "10":"filter for organisation name",
-                "12":"filter for project name"
-            },
-            "EMPTY":"No entries"
-        },
-        "PASSWORDLESS": {
-            "TABLETYPE":"Type",
-            "TABLESTATE":"Status",
-            "NAME":"Name",
-            "TABLEACTIONS":"Actions",
-            "TITLE": "Passwordless Authentication",
-            "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
-            "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-            "U2F":"Add authenticator",
-            "U2F_DIALOG_TITLE": "Verify authenticator",
-            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
-            "U2F_SUCCESS":"Passwordless Auth created successfully!",
-            "U2F_ERROR":"An error during U2F setup occurred!",
-            "U2F_NAME":"Authenticator Name",
-            "TYPE": {
-                "0": "No MFA defined",
-                "1": "OTP",
-                "2": "U2F"
-            },
-            "STATE": {
-                "0": "No State",
-                "1": "Not Ready",
-                "2": "Ready",
-                "3": "Deleted"
-            },
-            "DIALOG": {
-                "DELETE_TITLE":"Remove Passwordless Authentication Method",
-                "DELETE_DESCRIPTION":"You are about to delete a passwordless Authentication method. Are you sure?"
-            }
-        },
-        "MFA": {
-            "TABLETYPE":"Type",
-            "TABLESTATE":"Status",
-            "NAME":"Name",
-            "TABLEACTIONS":"Actions",
-            "TITLE": "Multifactor Authentication",
-            "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
-            "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-            "ADD":"Add AuthFactor",
-            "OTP": "OTP (One-Time Password)",
-            "OTP_DIALOG_TITLE": "Add OTP",
-            "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-            "U2F":"U2F (Universal 2nd Factor)",
-            "U2F_DIALOG_TITLE": "Verify U2F",
-            "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
-            "U2F_SUCCESS":"U2F created successfully!",
-            "U2F_ERROR":"An error during U2F setup occurred!",
-            "U2F_NAME":"U2F Name",
-            "TYPE": {
-                "0": "No MFA defined",
-                "1": "OTP",
-                "2": "U2F"
-            },
-            "STATE": {
-                "0": "No State",
-                "1": "Not Ready",
-                "2": "Ready",
-                "3": "Deleted"
-            },
-            "DIALOG": {
-                "MFA_DELETE_TITLE":"Remove Secondfactor",
-                "MFA_DELETE_DESCRIPTION":"You are about to delete a second factor. Are you sure?"
-            }
-        },
-        "EXTERNALIDP": {
-          "TITLE": "External Identity Providers",
-          "DESC": "",
-          "IDPCONFIGID": "Idp Config ID",
-          "IDPNAME": "Idp Name",
-          "USERDISPLAYNAME":  "External Name",
-          "EXTERNALUSERID": "External User ID",
-          "DIALOG": {
-            "REMOVE_TITLE":"Remove IDP",
-            "REMOVE_DESCRIPTION":"You are about to delete an Identity Provider from a user. Do you really want to continue?"
-        }
-        },
-        "CREATE": {
-            "TITLE": "Create a New User",
-            "DESCRIPTION": "Please provide the necesary information.",
-            "NAMEANDEMAILSECTION":"Name and E-mail",
-            "GENDERLANGSECTION":"Gender and Language",
-            "PHONESECTION":"Phonenumbers",
-            "PASSWORDSECTION":"Initial Password",
-            "ADDRESSANDPHONESECTION":"Phonenumber"
-        },
-        "CODEDIALOG": {
-            "TITLE":"Verify Phone Number",
-            "DESCRIPTION":"Enter the code you recieved by text message to verify your phone number.",
-            "CODE":"Code"
-        },
-        "DATA": {
-            "STATE": "Status",
-            "STATE0": "Unknown",
-            "STATE1": "Active",
-            "STATE2": "Inactive",
-            "STATE3": "Deleted",
-            "STATE4": "Locked",
-            "STATE5": "Supend",
-            "STATE6": "Initial"
-        },
-        "PROFILE": {
-            "TITLE": "Profile",
-            "EMAIL": "E-mail",
-            "PHONE": "Phonenumber",
-            "USERNAME": "User Name",
-            "FIRSTNAME": "First Name",
-            "LASTNAME": "Last Name",
-            "NICKNAME": "Nickname",
-            "DISPLAYNAME": "Display Name",
-            "PREFERRED_LANGUAGE": "Language",
-            "GENDER": "Gender",
-            "PASSWORD":"Password"
-        },
-        "MACHINE": {
-            "TITLE":"Service User Details",
-            "USERNAME":"User Name",
-            "NAME":"Name",
-            "DESCRIPTION":"Description",
-            "KEYSTITLE":"Keys",
-            "KEYSDESC":"Define your keys and add an optional expiration date.",
-            "ID":"Key ID",
-            "TYPE":"Type",
-            "EXPIRATIONDATE":"Expiration date",
-            "CHOOSEDATEAFTER":"Enter a valid expiration after",
-            "CHOOSEEXPIRY":"Select an expiration date",
-            "CREATIONDATE":"Creation Date",
-            "KEYDETAILS":"Key Details",
-            "ADD": {
-                "TITLE":"Add Key",
-                "DESCRIPTION":"Select your key type and choose an optional expiration date."
-            },
-            "ADDED": {
-                "TITLE":"The key was created",
-                "DESCRIPTION":"Download the key as it won't be visible after closing this dialog!"
-            },
-            "KEYTYPES": {
-                "1":"JSON"
-            }
-        },
-        "PASSWORD": {
-            "TITLE": "Password",
-            "DESCRIPTION": "Enter the new password according to the policy below.",
-            "OLD": "Current Password",
-            "NEW": "New Password",
-            "CONFIRM": "Confirm New Password",
-            "RESET": "Reset Current Password",
-            "SET":"Set New Password",
-            "RESENDNOTIFICATION": "Resend Password Reset Link",
-            "REQUIRED": "Some required fields are missing.",
-            "MINLENGTHERROR":"The password has to be at least {{value}} characters long.",
-            "NOTEQUAL":"The passwords provided do not match."
-        },
-        "EMAIL": "E-mail",
-        "PHONE": "Phonenumber",
-        "PHONEEMPTY":"No phonenumber defined",
-        "PHONEVERIFIED":"Phonenumber verified.",
-        "EMAILVERIFIED":"Email verified",
-        "NOTVERIFIED":"not verified",
-        "PREFERRED_LOGINNAME":"Preferred Loginname",
-        "LOGINMETHODS": {
-            "TITLE": "Contact Information",
-            "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
-            "EMAIL": {
-                "TITLE": "E-mail",
-                "VALID": "validated",
-                "RESEND": "Resend Verification E-mail",
-                "EDITTITLE":"Change Email",
-                "EDITDESC":"Enter the new email in the field below."
-            },
-            "PHONE": {
-                "TITLE": "Phone",
-                "VALID": "validated",
-                "RESEND": "Resend Verification Text Message",
-                "EDITTITLE":"Change number",
-                "EDITDESC":"Enter the new phonenumber in the field below.",
-                "DELETETITLE":"Delete Phonenumber",
-                "DELETEDESC":"Do you really want to delete the phonenumber"
-            },
-            "RESENDCODE": "Resend Code",
-            "ENTERCODE":"Verify",
-            "ENTERCODE_DESC":"Verify Code"
-        },
-        "GRANTS": {
-            "TITLE": "User Grants",
-            "DESCRIPTION": "Grant this user access to certain projects",
-            "CREATE": {
-                "TITLE": "Create User Grant",
-                "DESCRIPTION": "Search for the organisation, the project and the corresponding project roles."
-            },
-            "FILTER": {
-                "0":"filter for user",
-                "1":"filter for domain",
-                "2":"filter for projectname",
-                "3":"filter for rolename"
-            }
-        },
-        "VALIDATION": {
-            "INVALIDPATTERN": "The password does not fulfil the defined rules.",
-            "NOTANEMAIL":"The given value is not an e-mail address",
-            "REQUIRED": "The input field is empty.",
-            "MINLENGTH":"The password has to be at least {{requiredLength}} characters long.",
-            "NOEMAIL":"The user name cannot be an e-mail address.",
-            "UPPERCASEMISSING":"The password must include an uppercase character.",
-            "LOWERCASEMISSING":"The password must include a lowercase character.",
-            "SYMBOLERROR":"The password must include a symbol or punctuation mark.",
-            "NUMBERERROR":"The password must include a digit."
-        },
-        "STATE": {
-            "0":"Unknown",
-            "1":"Active",
-            "2":"Expired"
-        },
-        "SEARCH":{
-            "FOUND":"Found"
-        },
-        "TARGET": {
-            "SELF":"If you want to grant a user of an other organisation access",
-            "EXTERNAL":"To grant a user of your organisation access",
-            "CLICKHERE":"click here"
-        },
-        "SIGNEDOUT":"You are signed out. Click the button \"Sign In\" to sign in again.",
-        "SIGNEDOUT_BTN":"Sign In",
-        "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Log in With Another Account",
-        "RESENDINITIALEMAIL":"Send new initialisation mail",
-        "RESENDEMAILNOTIFICATION":"Resend Email notification",
-        "TOAST": {
-            "CREATED":"User created successfully.",
-            "SAVED":"Profile saved successfully.",
-            "EMAILSAVED":"E-mail saved successfully.",
-            "INITEMAILSENT":"Initializing mail sent.",
-            "PHONESAVED":"Phone saved successfully.",
-            "PHONEREMOVED":"Phone has been removed.",
-            "PHONEVERIFIED":"Phone verified successfully.",
-            "PHONEVERIFICATIONSENT":"Phone verification code sent.",
-            "EMAILVERIFICATIONSENT":"E-mail verification code sent.",
-            "OTPREMOVED":"OTP removed.",
-            "U2FREMOVED":"U2F removed.",
-            "PASSWORDLESSREMOVED":"Passwordless removed.",
-            "INITIALPASSWORDSET":"Initial password set.",
-            "PASSWORDNOTIFICATIONSENT":"Password change notification sent.",
-            "PASSWORDCHANGED":"Password changed successfully.",
-            "REACTIVATED":"User reactivated.",
-            "DEACTIVATED":"User deactivated.",
-            "SELECTEDREACTIVATED":"Selected users reactivated.",
-            "SELECTEDDEACTIVATED":"Selected users deactivated.",
-            "SELECTEDKEYSDELETED":"Selected keys deleted.",
-            "KEYADDED":"Key added!",
-            "MACHINEADDED":"Service User created!",
-            "DELETED":"User deleted successfully!"
-        },
-        "MEMBERSHIPS": {
-            "TITLE":"ZITADEL Manager Roles",
-            "DESCRIPTION":"These are all member grants of the user. You can modify them also on organisation, project, or IAM detail pages.",
-            "CREATIONDATE":"Creation Date",
-            "CHANGEDATE":"Last Modified",
-            "DISPLAYNAME":"Display Name",
-            "REMOVE":"Remove",
-            "TYPE":"Type",
-            "TYPES":{
-                "UNKNOWN":"Unknown",
-                "ORG":"Organisation",
-                "PROJECT":"Project",
-                "GRANTEDPROJECT":"Granted Project"
-            }
-        }
+    "DOMAINS": {
+      "NEW": "Add Domain",
+      "TITLE": "Domains",
+      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "SETPRIMARY": "Set as Primary",
+      "DELETE": {
+        "TITLE": "Delete Domain",
+        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+      },
+      "ADD": {
+        "TITLE": "Add Domain",
+        "DESCRIPTION": "You are about to add a domain for your organisation. After successful process, you users will be able to use the domain for their login."
+      }
     },
-    "IAM": {
-        "POLICIES": {
-            "TITLE":"IAM Policies and Access Settings",
-            "DESCRIPTION":"Manage your ZITADEL Policies and Management Access Settings."
-        },
-        "EVENTSTORE": {
-            "TITLE":"IAM Storage Administration",
-            "DESCRIPTION":"Manage your ZITADEL views and failed events."
-        },
-        "MEMBER": {
-            "TITLE":"Managers",
-            "DESCRIPTION":"Managers can add and edit organisations and make changes to their corresponding projects and applications."
-        },
-        "VIEWS": {
-            "TITLE":"Views",
-            "DESCRIPTION":"This card shows your ZITADEL views.",
-            "VIEWNAME":"Name",
-            "DATABASE":"Database",
-            "SEQUENCE":"Sequence",
-            "EVENTTIMESTAMP":"Timestamp",
-            "LASTSPOOL": "Successful spool",
-            "ACTIONS":"Actions",
-            "CLEAR":"Clear",
-            "CLEARED":"View was successfully cleared!",
-            "DIALOG": {
-                "VIEW_CLEAR_TITLE": "Clear View",
-                "VIEW_CLEAR_DESCRIPTION":"You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
-            }
-        },
-        "FAILEDEVENTS": {
-            "TITLE":"Failed Events",
-            "DESCRIPTION":"This card shows your failed events.",
-            "VIEWNAME":"Name",
-            "DATABASE":"Database",
-            "FAILEDSEQUENCE":"Failed Sequence",
-            "FAILURECOUNT":"Failure Count",
-            "ERRORMESSAGE":"Error Message",
-            "ACTIONS":"Actions",
-            "DELETE":"Remove",
-            "DELETESUCCESS":"Failed events removed."
-        },
-        "TOAST":{
-            "MEMBERREMOVED":"Manager removed.",
-            "MEMBERSADDED": "Managers added.",
-            "MEMBERADDED": "Manager added.",
-            "MEMBERCHANGED":"Manager changed.",
-            "ROLEREMOVED":"Role removed.",
-            "ROLECHANGED":"Role changed.",
-            "REACTIVATED":"Reactivated",
-            "DEACTIVATED":"Deactivated"
-        }
+    "STATE": {
+      "0": "Not defined",
+      "1": "Active",
+      "2": "Deactivated"
     },
-    "ORG": {
-        "PAGES": {
-            "NAME":"Name",
-            "ID":"ID",
-            "CREATIONDATE":"Creation Date",
-            "FILTER":"Filter",
-            "FILTERPLACEHOLDER":"Filter for the name",
-            "LIST": "Organisations",
-            "LISTDESCRIPTION":"Choose an organisation.",
-            "ACTIVE":"Active",
-            "CREATE":"Create Organisation",
-            "ORGDETAIL_TITLE":"Enter the name and domain of your new organisation.",
-            "ORGDETAIL_TITLE_WITHOUT_DOMAIN":"Enter the name of your new organisation.",
-            "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
-            "ORGDOMAIN": {
-                "TITLE":"Organisation Domain Ownership Verification",
-                "VERIFICATION":"Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-                "VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
-                "VERIFICATION_VALIDATION_DESC":"The tokens are checked regularly to ensure you are still owner of the domain.",
-                "VERIFICATION_NEWTOKEN_TITLE":"Request New Token",
-                "VERIFICATION_NEWTOKEN_DESC":"If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
-                "VERIFICATION_VALIDATION_ONGOING":"A verification token has already been requested. Click on the button to trigger a verification check.",
-                "VERIFICATION_VALIDATION_ONGOING_TYPE":"Type of the token:",
-                "VERIFICATION_SUCCESSFUL":"Domain successfully verified!",
-                "REQUESTNEWTOKEN":"Request new Token",
-                "TYPES": {
-                    "1":"HTTP",
-                    "2":"DNS"
-                }
-            },
-            "DOWNLOAD_FILE":"Download File",
-            "SELECTORGTOOLTIP":"Select this organisation.",
-            "PRIMARYDOMAIN":"Primary Domain",
-            "STATE":"State",
-            "USEPASSWORD":"Set Initial Password"
-        },
-        "DOMAINS": {
-            "NEW":"Add Domain",
-            "TITLE":"Domains",
-            "DESCRIPTION":"Configure your domains. This domain can be used to log in with your users.",
-            "SETPRIMARY":"Set as Primary",
-            "DELETE": {
-                "TITLE":"Delete Domain",
-                "DESCRIPTION":"You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
-            },
-            "ADD": {
-                "TITLE":"Add Domain",
-                "DESCRIPTION":"You are about to add a domain for your organisation. After successful process, you users will be able to use the domain for their login."
-            }
-        },
-        "STATE": {
-            "0": "Not defined",
-            "1": "Active",
-            "2": "Deactivated"
-        },
-        "MEMBER": {
-            "TITLE":"Organisation Managers",
-            "DESCRIPTION":"Define the users who can change your organisations preferences."
-        },
-        "TOAST": {
-            "DEACTIVATED":"Organisation deactivated.",
-            "REACTIVATED":"Organisation reactivated.",
-            "DOMAINADDED":"Added domain.",
-            "DOMAINREMOVED":"Removed domain.",
-            "MEMBERADDED":"Manager added.",
-            "MEMBERREMOVED":"Manager removed.",
-            "MEMBERCHANGED":"Manager changed.",
-            "SETPRIMARY":"Primary domain set."
-        }
+    "MEMBER": {
+      "TITLE": "Organisation Managers",
+      "DESCRIPTION": "Define the users who can change your organisations preferences."
     },
-    "FEATURES": {
-        "TITLE":"Features",
-        "DESCRIPTION":"here you can edit your ZITADEL Features based on your Tier",
-        "BTN-EDIT":"Edit Featureset",
-        "TIER": {
-          "NAME":"Tier Name",
-          "DETAILS":"Billing Details",
-          "DETAILS_DESC":"Enter your billing data here.",
-          "CUSTOMERINVALID":"Billing data ist not complete!",
-          "CONTACT":"Kontakt",
-          "COMPANY":"Company",
-          "ADDRESS":"Addresse",
-          "CITY":"Town",
-          "POSTAL_CODE":"Postal Code",
-          "COUNTRY":"Country",
-          "TITLE":"Zitadel Tier",
-          "DESCRIPTION":"Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
-          "QUESTIONS":"For questions regarding payments contact our support ",
-          "BTN":"Change Tier"
-        },
-        "DATA": {
-            "AUDITLOGRETENTION":"Audit Log retention",
-            "LOGINPOLICYUSERNAMELOGIN":"Login Policy - Benutzername als Loginname",
-            "LOGINPOLICYREGISTRATION":"Login Policy - Registration",
-            "LOGINPOLICYIDP":"Login Policy - Identity Provider",
-            "LOGINPOLICYFACTORS":"Login Policy - Multifaktoren",
-            "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
-            "LOGINPOLICYCOMPLEXITYPOLICY":"Password Komplexitätseinstellungen",
-            "LABELPOLICY":"Labelling Einstellungen"
-        },
-        "TIERSTATES": {
-            "0":"Active",
-            "1":"Action required",
-            "2":"Cancelled",
-            "3":"Grandfathered"
-        },
-        "NOTAVAILABLE":"Feature {{value}} is missing on your organization.",
-        "RETENTIONHOURS":"Hours"
+    "TOAST": {
+      "DEACTIVATED": "Organisation deactivated.",
+      "REACTIVATED": "Organisation reactivated.",
+      "DOMAINADDED": "Added domain.",
+      "DOMAINREMOVED": "Removed domain.",
+      "MEMBERADDED": "Manager added.",
+      "MEMBERREMOVED": "Manager removed.",
+      "MEMBERCHANGED": "Manager changed.",
+      "SETPRIMARY": "Primary domain set."
+    }
+  },
+  "FEATURES": {
+    "TITLE": "Features",
+    "DESCRIPTION": "here you can edit your ZITADEL Features based on your Tier",
+    "BTN-EDIT": "Edit Featureset",
+    "TIER": {
+      "NAME": "Tier Name",
+      "DETAILS": "Billing Details",
+      "DETAILS_DESC": "Enter your billing data here.",
+      "CUSTOMERINVALID": "Billing data ist not complete!",
+      "CONTACT": "Kontakt",
+      "COMPANY": "Company",
+      "ADDRESS": "Addresse",
+      "CITY": "Town",
+      "POSTAL_CODE": "Postal Code",
+      "COUNTRY": "Country",
+      "TITLE": "Zitadel Tier",
+      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+      "QUESTIONS": "For questions regarding payments contact our support ",
+      "BTN": "Change Tier"
     },
-    "POLICY": {
-        "TITLE":"Explore Policies",
-        "DESCRIPTION":"Pre-packaged policies that enhance your security.",
-        "PWD_COMPLEXITY": {
-            "TITLE":"Password Complexity",
-            "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
-            "SYMBOLANDNUMBERERROR":"The password must consist of a digit and a symbol/punctuation mark.",
-            "SYMBOLERROR":"The password must include a symbol/punctuation mark.",
-            "NUMBERERROR":"The password must include a digit.",
-            "PATTERNERROR":"The password does not meet the required pattern."
-        },
-        "PWD_AGE": {
-            "TITLE":"Password Aging",
-            "DESCRIPTION":"You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
-        },
-        "PWD_LOCKOUT": {
-            "TITLE":"Password Lockout",
-            "DESCRIPTION":"Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
-        },
-        "IAM_POLICY": {
-            "TITLE":"IAM Access Preferences",
-            "DESCRIPTION":"Define access properties of your users."
-        },
-        "LOGIN_POLICY": {
-            "TITLE":"Login Policy",
-            "DESCRIPTION":"Define how Users can be authenticated and configure Identity Providers",
-            "DESCRIPTIONCREATEADMIN":"Users can choose from the available identity providers below.",
-            "DESCRIPTIONCREATEMGMT":"Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
-            "SAVED":"Saved successfully!"
-        },
-        "LABEL": {
-            "TITLE":"Email Labelling Settings",
-            "DESCRIPTION":"Change the look of your emails.",
-            "PRIMARYCOLOR":"Background color",
-            "SECONDARYCOLOR":"Font color",
-            "SAVED":"Saved successfully"
-        },
-        "DEFAULTLABEL":"The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
-        "BTN_INSTALL":"Setup",
-        "BTN_EDIT":"Modify",
-        "DATA": {
-            "DESCRIPTION":"Description",
-            "MINLENGTH":"minimum length",
-            "HASNUMBER": "has number",
-            "HASSYMBOL": "has symbol",
-            "HASLOWERCASE": "has lowercase",
-            "HASUPPERCASE": "has uppercase",
-            "SHOWLOCKOUTFAILURES":"show lockout failures",
-            "MAXATTEMPTS":"Max Attempts",
-            "EXPIREWARNDAYS":"Expiration Warning after day",
-            "MAXAGEDAYS":"Max Age in days",
-            "USERLOGINMUSTBEDOMAIN":"User Login must be Domain",
-            "ALLOWUSERNAMEPASSWORD":"Username Password allowed",
-            "ALLOWEXTERNALIDP":"External IDP allowed",
-            "ALLOWREGISTER":"Register allowed",
-            "ALLOWUSERNAMEPASSWORD_DESC":"The conventional login with user name and password is allowed.",
-            "ALLOWEXTERNALIDP_DESC":"The login is allowed for the underlying identity providers",
-            "ALLOWREGISTER_DESC":"If the option is selected, an additional step for registering a user appears in the login.",
-            "FORCEMFA":"Force MFA",
-            "FORCEMFA_DESC":"If the option is selected, users have to configure a second factor for login."
-        },
-        "RESET":"Reset Policy",
-        "CREATECUSTOM":"Create Custom Policy",
-        "TOAST":{
-            "SET":"Policy set successfully!",
-            "RESETSUCCESS":"Policy reset successfully!"
-        }
+    "DATA": {
+      "AUDITLOGRETENTION": "Audit Log retention",
+      "LOGINPOLICYUSERNAMELOGIN": "Login Policy - Benutzername als Loginname",
+      "LOGINPOLICYREGISTRATION": "Login Policy - Registration",
+      "LOGINPOLICYIDP": "Login Policy - Identity Provider",
+      "LOGINPOLICYFACTORS": "Login Policy - Multifaktoren",
+      "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
+      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Komplexitätseinstellungen",
+      "LABELPOLICY": "Labelling Einstellungen"
     },
-    "ORG_DETAIL": {
-        "TITLE": "Organisation",
-        "DESCRIPTION": "Here you can edit the configuration of your organisation and manage the members.",
-        "DETAIL": {
-            "TITLE": "Detail",
-            "NAME": "Name",
-            "DOMAIN": "Domain",
-            "STATE": {
-                "0": "Not defined",
-                "1": "Active",
-                "2": "Inactive"
-            }
-        },
-        "MEMBER": {
-            "TITLE": "Members",
-            "USERNAME": "User Name",
-            "FIRSTNAME": "First Name",
-            "LASTNAME": "Last Name",
-            "LOGINNAME":"Login Name",
-            "EMAIL": "E-mail",
-            "ROLES": "Roles",
-            "ADD": "Add Member",
-            "ADDDESCRIPTION": "Enter the e-mail addresses of the users to be added."
-        },
-        "TABLE": {
-            "TOTAL": "Entries total",
-            "SELECTION": "Selected Elements",
-            "DEACTIVATE": "Deactivate User",
-            "ACTIVATE": "Activate User",
-            "DELETE": "Delete User",
-            "CLEAR":"Clear selection"
-        }
+    "TIERSTATES": {
+      "0": "Active",
+      "1": "Action required",
+      "2": "Cancelled",
+      "3": "Grandfathered"
     },
-    "PROJECT": {
-        "PAGES": {
-            "TITLE": "Project",
-            "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
-            "LIST": "Projects",
-            "LISTDESCRIPTION":"Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
-            "DETAIL": "Detail",
-            "CREATE": "Create project",
-            "CREATE_DESC": "Insert your project's name.",
-            "ROLE": "Role",
-            "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
-            "TYPE":{
-                "OWNED":"Owned Projects",
-                "GRANTED":"Granted Projects"
-            },
-            "PINNED":"Pinned",
-            "ALL": "All",
-            "CREATEDON":"Created on",
-            "LASTMODIFIED":"Last modified on",
-            "ADDNEW":"Create New Project",
-            "DIALOG": {
-                "REACTIVATE": {
-                    "TITLE":"Reactivate Project",
-                    "DESCRIPTION":"Do you really want to ractivate your project?"
-                },
-                "DEACTIVATE": {
-                    "TITLE":"Deactivate Project",
-                    "DESCRIPTION":"Do you really want to deactivate your project?"
-                },
-                "DELETE": {
-                    "TITLE":"Delete Project",
-                    "DESCRIPTION":"Do you really want to delete your project?"
-                }
-            }
-        },
-        "STATE": {
-            "TITLE":"State",
-            "0": "Not defined",
-            "1": "Active",
-            "2": "Inactive"
-        },
-        "TYPE": {
-            "TITLE": "Type",
-            "0": "Unknown type",
-            "1": "Owned",
-            "2": "Granted"
-        },
-        "NAME": "Name",
-        "MEMBER": {
-            "TITLE": "Managers",
-            "TITLEDESC":"Managers can make changes to this project based on their role.",
-            "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage existing ones.",
-            "USERNAME": "User Name",
-            "FIRSTNAME": "First Name",
-            "LASTNAME": "Last Name",
-            "LOGINNAME":"Loginname",
-            "EMAIL": "E-mail",
-            "ROLES": "Roles",
-            "USERID":"User ID"
-        },
-        "GRANT": {
-            "EMPTY":"No granted organisation.",
-            "TITLE": "Granted Organisations",
-            "DESCRIPTION": "Allow an other organisation to use your project.",
-            "CREATE": {
-                "TITLE": "Create Organisation Grant",
-                "SEL_USERS": "Select the users you wish to grant access",
-                "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want to be added to the grant",
-                "SEL_USER":"Search for a user",
-                "SEL_ORG": "Set the domain",
-                "SEL_ORG_DESC":"Enter the complete domain to specify the organisation to grant.",
-                "ORG_TITLE":"Organisation",
-                "ORG_DESCRIPTION":"You are about to grant a user for the organisation {{name}}.",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organisation.",
-                "SEL_ORG_FORMFIELD":"Complete Domain",
-                "SEL_ORG_BUTTON": "Search Organisation",
-                "FOR_ORG":"The grant is created for:"
-            },
-            "DETAIL": {
-                "TITLE":"Managers of the Granted Organisation",
-                "DESC":"These are the managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
-                "MEMBERTITLE":"Managers",
-                "MEMBERDESC":"These are the managers of the granted organisation. Add users here who should gain access to edit the data of the project.",
-                "PROJECTNAME":"Project Name",
-                "RESOURCEOWNER":"Resource Owner"
-            },
-            "SHOWDETAIL":"Show Details",
-            "USER":"User",
-            "MEMBERS":"Managers",
-            "PROJECTNAME":"Project Name",
-            "GRANTEDORG": "Granted Organisation",
-            "GRANTEDORGDOMAIN": "Domain",
-            "RESOURCEOWNER":"Resource Owner",
-            "GRANTEDORGNAME":"Organisation Name",
-            "CREATIONDATE": "Creation Date",
-            "CHANGEDATE": "Last modified",
-            "DATES":"Dates",
-            "ROLENAMESLIST": "Roles",
-            "NOROLES":"No roles",
-            "TOAST": {
-                "PROJECTGRANTUSERGRANTADDED":"Project grant created.",
-                "PROJECTGRANTADDED":"Project grant created.",
-                "PROJECTGRANTCHANGED":"Project grant changed.",
-                "PROJECTGRANTMEMBERADDED":"Grant manager added.",
-                "PROJECTGRANTMEMBERCHANGED":"Grant manager changed.",
-                "PROJECTGRANTMEMBERREMOVED":"Grant manager removed.",
-                "PROJECTGRANTUPDATED":"Project Grant updated"
-            },
-            "ROLES":"Project Roles"
-        },
-        "APP": {
-            "TITLE": "Applications",
-            "NAME": "Name",
-            "NAMEREQUIRED":"A name ist required."
-        },
-        "ROLE": {
-            "EMPTY":"No role has been created yet.",
-            "ADDNEWLINE":"Add additional role",
-            "KEY":"Key",
-            "TITLE": "Roles",
-            "DESCRIPTION":"Define some roles which can be used to create project-grants.",
-            "NAME": "Name",
-            "DISPLAY_NAME": "Display Name",
-            "GROUP": "Group",
-            "ACTIONS": "Actions",
-            "ADDTITLE": "Create Role",
-            "ADDDESCRIPTION": "Enter the data for the new role.",
-            "EDITTITLE": "Edit Role",
-            "EDITDESCRIPTION": "Enter the new data for the role.",
-            "DELETE":"Delete Role",
-            "CREATIONDATE":"Created",
-            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}.",
-            "OPTIONS":"Options",
-            "ASSERTION":"Assert Roles on Authentication.",
-            "ASSERTION_DESCRIPTION":"Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your application settings.",
-            "CHECK":"Check roles on Authentication",
-            "CHECK_DESCRIPTION":"If set, users are only allowed to authenticate if any role is assigned to their account."
-        },
-        "TABLE": {
-            "TOTAL": "Entries total:",
-            "SELECTION": "Selected Elements",
-            "DEACTIVATE": "Deactivate Project",
-            "ACTIVATE": "Activate Project",
-            "DELETE": "Delete Project",
-            "ORGNAME":"Organisation Name",
-            "ORGDOMAIN":"Organisation Domain",
-            "STATE":"Status",
-            "TYPE":"Type",
-            "CREATIONDATE":"Created at",
-            "CHANGEDATE":"Last modified",
-            "RESOURCEOWNER":"Owner",
-            "SHOWTABLE":"Show table",
-            "SHOWGRID":"Show grid",
-            "EMPTY":"No project found"
-        },
-        "TOAST":{
-            "MEMBERREMOVED":"Manager removed.",
-            "MEMBERSADDED": "Managers added.",
-            "MEMBERADDED": "Manager added.",
-            "MEMBERCHANGED":"Manager changed.",
-            "ROLEREMOVED":"Role removed.",
-            "ROLECHANGED":"Role changed.",
-            "REACTIVATED":"Reactivated.",
-            "DEACTIVATED":"Deactivated.",
-            "UPDATED":"Project changed.",
-            "GRANTUPDATED":"Grant changed.",
-            "DELETED":"Deleted Project."
-        }
+    "NOTAVAILABLE": "Feature {{value}} is missing on your organization.",
+    "RETENTIONHOURS": "Hours"
+  },
+  "POLICY": {
+    "TITLE": "Explore Policies",
+    "DESCRIPTION": "Pre-packaged policies that enhance your security.",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Password Complexity",
+      "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",
+      "SYMBOLANDNUMBERERROR": "The password must consist of a digit and a symbol/punctuation mark.",
+      "SYMBOLERROR": "The password must include a symbol/punctuation mark.",
+      "NUMBERERROR": "The password must include a digit.",
+      "PATTERNERROR": "The password does not meet the required pattern."
     },
-    "NEXTSTEPS": {
-        "TITLE":"Next Steps"
+    "PWD_AGE": {
+      "TITLE": "Password Aging",
+      "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
     },
-    "IDP":{
-        "LIST": {
-            "TITLE":"Identity Providers",
-            "DESCRIPTION":"Define additional Identity Providers, which can be used to authenticate in your organisations."
-        },
-        "CREATE": {
-            "TITLE":"New Identity Provider",
-            "DESCRIPTION":"Configure the Endpoint of your new service provider."
-        },
-        "DETAIL": {
-          "TITLE":"Identity Provider",
-          "DESCRIPTION":"General Configuration of your identity provider.",
-          "OIDC": {
-            "TITLE": "OIDC Configuration",
-            "DESCRIPTION":"Provide the correct OIDC Configuration for your identity Provider below!"
-          }
-        },
-        "OWNERTYPES": {
-            "0":"unknown",
-            "1":"System",
-            "2":"Organisation"
-        },
-        "STATES":{
-            "1":"active",
-            "2":"inactive"
-        },
-        "MAPPINGFIELD": {
-          "1": "Preferred Username",
-          "2": "Email"
-        },
-        "STYLE":"Style",
-        "STYLEFIELD": {
-            "0": "No Styling",
-            "1": "Google"
-          },
-        "TYPE":"Type",
-        "ID": "ID",
-        "NAME":"Name",
-        "CONFIG":"Configuration",
-        "STATE":"State",
-        "ISSUER":"Issuer",
-        "SCOPESLIST":"Scopes List",
-        "CLIENTID":"Client ID",
-        "CLIENTSECRET":"Client Secret",
-        "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
-        "USERNAMEMAPPING": "Username Mapping",
-        "CREATIONDATE":"Created At",
-        "CHANGEDATE":"Last Modified",
-        "DEACTIVATE":"Deactivate",
-        "ACTIVATE":"Activate",
-        "DELETE":"Delete",
-        "DELETE_TITLE":"Delete Idp",
-        "DELETE_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-        "DELETE_SELECTION_TITLE":"Delete Idp",
-        "DELETE_SELECTION_DESCRIPTION":"You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-        "TOAST": {
-            "SAVED": "Successfully saved.",
-            "REACTIVATED":"Idp reactivated.",
-            "DEACTIVATED":"Idp deactivated.",
-            "SELECTEDREACTIVATED":"Selected idps reactivated.",
-            "SELECTEDDEACTIVATED":"Selected idps deactivated.",
-            "SELECTEDKEYSDELETED":"Selected idps deleted.",
-            "DELETED":"Idp removed successfully!"
-        }
+    "PWD_LOCKOUT": {
+      "TITLE": "Password Lockout",
+      "DESCRIPTION": "Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
     },
-    "MFA":{
-        "LIST": {
-            "MULTIFACTORTITLE":"Multifactors",
-            "MULTIFACTORDESCRIPTION":"Define your Multifactors for Authentication here.",
-            "SECONDFACTORTITLE":"Secondfactors",
-            "SECONDFACTORDESCRIPTION":"Define your Secondfactors for Authentication here."
+    "IAM_POLICY": {
+      "TITLE": "IAM Access Preferences",
+      "DESCRIPTION": "Define access properties of your users."
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Login Policy",
+      "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
+      "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
+      "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+      "SAVED": "Saved successfully!"
+    },
+    "LABEL": {
+      "TITLE": "Email Labelling Settings",
+      "DESCRIPTION": "Change the look of your emails.",
+      "PRIMARYCOLOR": "Background color",
+      "SECONDARYCOLOR": "Font color",
+      "SAVED": "Saved successfully"
+    },
+    "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
+    "BTN_INSTALL": "Setup",
+    "BTN_EDIT": "Modify",
+    "DATA": {
+      "DESCRIPTION": "Description",
+      "MINLENGTH": "minimum length",
+      "HASNUMBER": "has number",
+      "HASSYMBOL": "has symbol",
+      "HASLOWERCASE": "has lowercase",
+      "HASUPPERCASE": "has uppercase",
+      "SHOWLOCKOUTFAILURES": "show lockout failures",
+      "MAXATTEMPTS": "Max Attempts",
+      "EXPIREWARNDAYS": "Expiration Warning after day",
+      "MAXAGEDAYS": "Max Age in days",
+      "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",
+      "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
+      "ALLOWEXTERNALIDP": "External IDP allowed",
+      "ALLOWREGISTER": "Register allowed",
+      "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
+      "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
+      "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
+      "FORCEMFA": "Force MFA",
+      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login."
+    },
+    "RESET": "Reset Policy",
+    "CREATECUSTOM": "Create Custom Policy",
+    "TOAST": {
+      "SET": "Policy set successfully!",
+      "RESETSUCCESS": "Policy reset successfully!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organisation",
+    "DESCRIPTION": "Here you can edit the configuration of your organisation and manage the members.",
+    "DETAIL": {
+      "TITLE": "Detail",
+      "NAME": "Name",
+      "DOMAIN": "Domain",
+      "STATE": {
+        "0": "Not defined",
+        "1": "Active",
+        "2": "Inactive"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Members",
+      "USERNAME": "User Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
+      "LOGINNAME": "Login Name",
+      "EMAIL": "E-mail",
+      "ROLES": "Roles",
+      "ADD": "Add Member",
+      "ADDDESCRIPTION": "Enter the e-mail addresses of the users to be added."
+    },
+    "TABLE": {
+      "TOTAL": "Entries total",
+      "SELECTION": "Selected Elements",
+      "DEACTIVATE": "Deactivate User",
+      "ACTIVATE": "Activate User",
+      "DELETE": "Delete User",
+      "CLEAR": "Clear selection"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Project",
+      "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
+      "LIST": "Projects",
+      "LISTDESCRIPTION": "Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
+      "DETAIL": "Detail",
+      "CREATE": "Create project",
+      "CREATE_DESC": "Insert your project's name.",
+      "ROLE": "Role",
+      "NOITEMS": "No projects",
+      "ZITADELPROJECT": "This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
+      "TYPE": {
+        "OWNED": "Owned Projects",
+        "GRANTED": "Granted Projects"
+      },
+      "PINNED": "Pinned",
+      "ALL": "All",
+      "CREATEDON": "Created on",
+      "LASTMODIFIED": "Last modified on",
+      "ADDNEW": "Create New Project",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Reactivate Project",
+          "DESCRIPTION": "Do you really want to ractivate your project?"
         },
-        "CREATE": {
-            "TITLE":"New Factor",
-            "DESCRIPTION":"Select your new Factor type."
+        "DEACTIVATE": {
+          "TITLE": "Deactivate Project",
+          "DESCRIPTION": "Do you really want to deactivate your project?"
         },
         "DELETE": {
-            "TITLE":"Delete Factor",
-            "DESCRIPTION":"You are about to delete a Factor from Login Policy. Are you sure?"
-        },
-        "TOAST": {
-            "ADDED":"Added successfully.",
-            "SAVED": "Saved successfully.",
-            "DELETED":"Removed successfully"
-        },
-        "TYPE":"Type",
-        "MULTIFACTORTYPES": {
-            "0":"Unknown",
-            "1":"U2F with Pin"
-        },
-        "SECONDFACTORTYPES": {
-            "0":"Unknown",
-            "1":"OTP",
-            "2":"U2F"
+          "TITLE": "Delete Project",
+          "DESCRIPTION": "Do you really want to delete your project?"
         }
+      }
     },
-    "LOGINPOLICY": {
-        "CREATE": {
-            "TITLE":"Login Policy",
-            "DESCRIPTION":"Define how your users can be authenticated on your organisation."
-        },
-        "IDPS":"Identity Providers",
-        "ADDIDP": {
-            "TITLE":"Add Identity Provider",
-            "DESCRIPTION":"You can select predefined or selfcreated providers for authentication.",
-            "SELECTIDPS":"Identity providers"
-        },
-        "PASSWORDLESS":"Passwordless Login",
-        "PASSWORDLESSTYPE": {
-            "0":"Not allowed",
-            "1":"Allowed"
-        }
+    "STATE": {
+      "TITLE": "State",
+      "0": "Not defined",
+      "1": "Active",
+      "2": "Inactive"
+    },
+    "TYPE": {
+      "TITLE": "Type",
+      "0": "Unknown type",
+      "1": "Owned",
+      "2": "Granted"
+    },
+    "NAME": "Name",
+    "MEMBER": {
+      "TITLE": "Managers",
+      "TITLEDESC": "Managers can make changes to this project based on their role.",
+      "DESCRIPTION": "Here you can find all managers of this project. You can add a new member and manage existing ones.",
+      "USERNAME": "User Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
+      "LOGINNAME": "Loginname",
+      "EMAIL": "E-mail",
+      "ROLES": "Roles",
+      "USERID": "User ID"
+    },
+    "GRANT": {
+      "EMPTY": "No granted organisation.",
+      "TITLE": "Granted Organisations",
+      "DESCRIPTION": "Allow an other organisation to use your project.",
+      "CREATE": {
+        "TITLE": "Create Organisation Grant",
+        "SEL_USERS": "Select the users you wish to grant access",
+        "SEL_PROJECT": "Search for a project",
+        "SEL_ROLES": "Select the roles you want to be added to the grant",
+        "SEL_USER": "Search for a user",
+        "SEL_ORG": "Set the domain",
+        "SEL_ORG_DESC": "Enter the complete domain to specify the organisation to grant.",
+        "ORG_TITLE": "Organisation",
+        "ORG_DESCRIPTION": "You are about to grant a user for the organisation {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organisation.",
+        "SEL_ORG_FORMFIELD": "Complete Domain",
+        "SEL_ORG_BUTTON": "Search Organisation",
+        "FOR_ORG": "The grant is created for:"
+      },
+      "DETAIL": {
+        "TITLE": "Managers of the Granted Organisation",
+        "DESC": "These are the managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+        "MEMBERTITLE": "Managers",
+        "MEMBERDESC": "These are the managers of the granted organisation. Add users here who should gain access to edit the data of the project.",
+        "PROJECTNAME": "Project Name",
+        "RESOURCEOWNER": "Resource Owner"
+      },
+      "SHOWDETAIL": "Show Details",
+      "USER": "User",
+      "MEMBERS": "Managers",
+      "PROJECTNAME": "Project Name",
+      "GRANTEDORG": "Granted Organisation",
+      "GRANTEDORGDOMAIN": "Domain",
+      "RESOURCEOWNER": "Resource Owner",
+      "GRANTEDORGNAME": "Organisation Name",
+      "CREATIONDATE": "Creation Date",
+      "CHANGEDATE": "Last modified",
+      "DATES": "Dates",
+      "ROLENAMESLIST": "Roles",
+      "NOROLES": "No roles",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Project grant created.",
+        "PROJECTGRANTADDED": "Project grant created.",
+        "PROJECTGRANTCHANGED": "Project grant changed.",
+        "PROJECTGRANTMEMBERADDED": "Grant manager added.",
+        "PROJECTGRANTMEMBERCHANGED": "Grant manager changed.",
+        "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
+        "PROJECTGRANTUPDATED": "Project Grant updated"
+      },
+      "ROLES": "Project Roles"
     },
     "APP": {
-        "LIST": "Applications",
-        "PAGES": {
-            "TITLE": "Application",
-            "DESCRIPTION": "Here you can edit your application data and it's configuration.",
-            "CREATE_OIDC": "OIDC Application",
-            "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
-            "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
-            "DETAIL": {
-                "TITLE": "Detail",
-                "STATE": {
-                    "0": "Not defined",
-                    "1": "Active",
-                    "2": "Inactive"
-                }
-            },
-            "DIALOG": {
-                "DELETE": {
-                    "TITLE": "Delete App",
-                    "DESCRIPTION":"Do you really want to delete this application?"
-                }
-            },
-            "NEXTSTEPS": {
-                "TITLE":"Next Steps",
-                "0": {
-                    "TITLE":"Add roles",
-                    "DESC":"Enter your project roles"
-                },
-                "1": {
-                    "TITLE":"Add users",
-                    "DESC":"Add new users of your organization"
-                },
-                "2": {
-                    "TITLE":"Help & Support",
-                    "DESC":"Read our documentation on creating applications or contact our support"
-                }
-            }
-        },
-        "NAME": "Name",
-        "TYPE":"Application Type",
-        "AUTHMETHOD":"Authentication Method",
-        "AUTHMETHODSECTION":"Authentication Method",
-        "GRANT":"Grant Types",
-        "OIDC": {
-            "INFO": {
-                "ISSUER":"Issuer",
-                "CLIENTID":"Client Id"
-            },
-            "CURRENT":"Current Config",
-            "TOKENSECTIONTITLE":"AuthToken Options",
-            "REDIRECTSECTIONTITLE":"Redirect Settings",
-            "PROSWITCH":"I'm a pro. Skip this wizard.",
-            "NAMEANDTYPESECTION":"Name and Type",
-            "TITLEFIRST":"Insert a name first.",
-            "TYPETITLE":"What type of application do you want to create?",
-            "REDIRECTTITLE":"Specify the URIs where the login will redirect to.",
-            "POSTREDIRECTTITLE":"This is the redirect URI after logout.",
-            "REDIRECTDESCRIPTIONWEB":"Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
-            "REDIRECTDESCRIPTIONNATIVE":"Redirect URIs must begin with your own protocol or http://localhost.",
-            "REDIRECTNOTVALID":"This redirect URI is not valid.",
-            "COMMAORENTERSEPERATION":"seperate with ↵",
-            "TYPEREQUIRED":"The type is required.",
-            "TITLE": "OIDC Configuration",
-            "CLIENTID": "Client ID",
-            "CLIENTSECRET": "Client Secret",
-            "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
-            "REGENERATESECRET": "Regenerate Client Secret",
-            "DEVMODE":"Development Mode",
-            "DEVMODEDESC":"Beware: With development mode enabled redirect URIs will not be validated.",
-            "REDIRECT": "Redirect URIs",
-            "REDIRECTSECTION": "Redirect URIs",
-            "POSTLOGOUTREDIRECT":"Post Logout URIs",
-            "RESPONSESECTION": "Response Types",
-            "GRANTSECTION":"Grant Types",
-            "GRANTTITLE":"Select your grant types. Note: Implicit is only available for browser-based applications.",
-            "APPTYPE": {
-                "0": "Web",
-                "1": "User Agent",
-                "2": "Native"
-            },
-            "RESPONSETYPE": "Response Types",
-            "RESPONSE": {
-                "0": "Code",
-                "1": "ID Token",
-                "2": "Token-ID Token"
-            },
-            "GRANTTYPE": "Grant Types",
-            "GRANT": {
-                "0": "Authorization Code",
-                "1": "Implicit",
-                "2": "Refresh Token"
-            },
-            "AUTHMETHOD": {
-                "0":"Basic",
-                "1":"Post",
-                "2":"None",
-                "3":"Private Key JWT"
-            },
-            "TOKENTYPE":"Auth Token Type",
-            "TOKENTYPE0": "Bearer Token",
-            "TOKENTYPE1": "JWT",
-            "UNSECUREREDIRECT":"I sure hope you know what you are doing.",
-            "OVERVIEWSECTION":"Overview",
-            "OVERVIEWTITLE":"You are now done. Review your configuration.",
-            "ACCESSTOKENROLEASSERTION":"Add user roles to the access token",
-            "ACCESSTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the access token.",
-            "IDTOKENROLEASSERTION":"User roles inside ID Token",
-            "IDTOKENROLEASSERTION_DESCRIPTION":"If selected, the roles of the authenticated user are added to the ID token.",
-            "IDTOKENUSERINFOASSERTION":"User Info inside ID Token",
-            "IDTOKENUSERINFOASSERTION_DESCRIPTION":"Enables clients to retrieve profile, email, phone and address claims from ID token.",
-            "CLOCKSKEW":"Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
-            "RECOMMENDED":"recommended",
-            "NOTRECOMMENDED":"not recommended",
-            "SELECTION":{
-                "APPTYPE": {
-                    "WEB": {
-                        "TITLE":"Web",
-                        "DESCRIPTION":"Regular Web applications like .net, PHP, Node.js, Java, etc."
-                    },
-                    "NATIVE": {
-                        "TITLE":"Native",
-                        "DESCRIPTION":"Mobile Apps, Desktop, Smart Devices, etc."
-                    },
-                    "USERAGENT": {
-                        "TITLE":"User Agent",
-                        "DESCRIPTION":"Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
-                    }
-                }
-            }
-        },
-        "API": {
-            "REGENERATESECRET": "Regenerate Client Secret",
-            "SELECTION":{
-                "TITLE":"API",
-                "DESCRIPTION":"APIs in general"
-            },
-            "AUTHMETHOD": {
-                "0":"Basic",
-                "1":"Private Key JWT"
-            }
-        },
-        "AUTHMETHODS": {
-            "CODE": {
-                "TITLE":"Code",
-                "DESCRIPTION":"Exchange the authorization code for the tokens"
-            },
-            "PKCE": {
-                "TITLE":"PKCE",
-                "DESCRIPTION":"Use a random hash instead of a static client secret for more security"
-            },
-            "POST": {
-                "TITLE":"POST",
-                "DESCRIPTION":"Send client_id and client_secret as part of the form"
-            },
-            "PK_JWT": {
-                "TITLE":"Private Key JWT",
-                "DESCRIPTION":"Use a private key to authorize your application"
-            },
-            "BASIC": {
-                "TITLE":"Basic",
-                "DESCRIPTION":"Authentication with Username and Passwort"
-            },
-            "IMPLICIT": {
-                "TITLE":"Implicit",
-                "DESCRIPTION":"Get the tokens directly from the authorization endpoint"
-            },
-            "CUSTOM": {
-                "TITLE":"Custom",
-                "DESCRIPTION":"Your setting doesn't correspond to any other option."
-            }
-        },
-        "TOAST": {
-            "REACTIVATED":"Application reactivated.",
-            "DEACTIVATED":"Application deactivated.",
-            "OIDCUPDATED":"OIDC configuration updated.",
-            "UPDATED":"App updated.",
-            "CLIENTSECRETREGENERATED":"client secret generated.",
-            "DELETED":"App deleted.",
-            "CONFIGCHANGED":"Changes detected!"
-        }
+      "TITLE": "Applications",
+      "NAME": "Name",
+      "NAMEREQUIRED": "A name ist required."
     },
-    "GENDERS": {
-        "0": "Unknown",
-        "1": "Female",
-        "2": "Male",
-        "3": "Other"
+    "ROLE": {
+      "EMPTY": "No role has been created yet.",
+      "ADDNEWLINE": "Add additional role",
+      "KEY": "Key",
+      "TITLE": "Roles",
+      "DESCRIPTION": "Define some roles which can be used to create project-grants.",
+      "NAME": "Name",
+      "DISPLAY_NAME": "Display Name",
+      "GROUP": "Group",
+      "ACTIONS": "Actions",
+      "ADDTITLE": "Create Role",
+      "ADDDESCRIPTION": "Enter the data for the new role.",
+      "EDITTITLE": "Edit Role",
+      "EDITDESCRIPTION": "Enter the new data for the role.",
+      "DELETE": "Delete Role",
+      "CREATIONDATE": "Created",
+      "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
+      "OPTIONS": "Options",
+      "ASSERTION": "Assert Roles on Authentication.",
+      "ASSERTION_DESCRIPTION": "Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your application settings.",
+      "CHECK": "Check roles on Authentication",
+      "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
-    "LANGUAGES": {
-        "de": "German",
-        "en": "English"
+    "TABLE": {
+      "TOTAL": "Entries total:",
+      "SELECTION": "Selected Elements",
+      "DEACTIVATE": "Deactivate Project",
+      "ACTIVATE": "Activate Project",
+      "DELETE": "Delete Project",
+      "ORGNAME": "Organisation Name",
+      "ORGDOMAIN": "Organisation Domain",
+      "STATE": "Status",
+      "TYPE": "Type",
+      "CREATIONDATE": "Created at",
+      "CHANGEDATE": "Last modified",
+      "RESOURCEOWNER": "Owner",
+      "SHOWTABLE": "Show table",
+      "SHOWGRID": "Show grid",
+      "EMPTY": "No project found"
     },
-    "MEMBER":{
-        "ADD":"Add a Manager",
-        "CREATIONTYPE":"Creation Type",
-        "CREATIONTYPES":{
-            "3":"IAM",
-            "2":"Organisation",
-            "0":"Owned Project",
-            "1":"Granted Project",
-            "4":"Project"
-        }
-    },
-    "ROLESLABEL":"Roles",
-    "GRANTS": {
-        "TITLE":"Authorizations",
-        "DESC":"Here you can manage authorizations of your organization users.",
-        "DELETE":"Delete Authorization",
-        "EMPTY":"No authorization found",
-        "ADD":"Create Authorization",
-        "ADD_BTN":"New",
-        "PROJECT": {
-            "TITLE": "Authorization",
-            "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
-        },
-        "USER": {
-            "TITLE": "Authorization",
-            "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
-        },
-        "CREATE": {
-            "TITLE": "Create authorization",
-            "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
-        },
-        "DETAIL": {
-            "TITLE":"Authorization Detail",
-            "DESCRIPTION":"Here you can see all the details of the authorization."
-        },
-        "TOAST": {
-            "UPDATED":"Grant updated.",
-            "BULKREMOVED":"Grants removed."
-        }
-    },
-    "CHANGES": {
-        "LISTTITLE":"Last Changes",
-        "BOTTOM":"You've reached the end of the list.",
-        "ORG": {
-            "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have generated an organisation change."
-        },
-        "PROJECT": {
-            "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have generated a project change."
-        },
-        "USER": {
-            "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have generated a user change."
-        }
+    "TOAST": {
+      "MEMBERREMOVED": "Manager removed.",
+      "MEMBERSADDED": "Managers added.",
+      "MEMBERADDED": "Manager added.",
+      "MEMBERCHANGED": "Manager changed.",
+      "ROLEREMOVED": "Role removed.",
+      "ROLECHANGED": "Role changed.",
+      "REACTIVATED": "Reactivated.",
+      "DEACTIVATED": "Deactivated.",
+      "UPDATED": "Project changed.",
+      "GRANTUPDATED": "Grant changed.",
+      "DELETED": "Deleted Project."
     }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Next Steps"
+  },
+  "IDP": {
+    "LIST": {
+      "TITLE": "Identity Providers",
+      "DESCRIPTION": "Define additional Identity Providers, which can be used to authenticate in your organisations."
+    },
+    "CREATE": {
+      "TITLE": "New Identity Provider",
+      "DESCRIPTION": "Configure the Endpoint of your new service provider."
+    },
+    "DETAIL": {
+      "TITLE": "Identity Provider",
+      "DESCRIPTION": "General Configuration of your identity provider.",
+      "OIDC": {
+        "TITLE": "OIDC Configuration",
+        "DESCRIPTION": "Provide the correct OIDC Configuration for your identity Provider below!"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "unknown",
+      "1": "System",
+      "2": "Organisation"
+    },
+    "STATES": {
+      "1": "active",
+      "2": "inactive"
+    },
+    "MAPPINGFIELD": {
+      "1": "Preferred Username",
+      "2": "Email"
+    },
+    "STYLE": "Style",
+    "STYLEFIELD": {
+      "0": "No Styling",
+      "1": "Google"
+    },
+    "TYPE": "Type",
+    "ID": "ID",
+    "NAME": "Name",
+    "CONFIG": "Configuration",
+    "STATE": "State",
+    "ISSUER": "Issuer",
+    "SCOPESLIST": "Scopes List",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Client Secret",
+    "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+    "USERNAMEMAPPING": "Username Mapping",
+    "CREATIONDATE": "Created At",
+    "CHANGEDATE": "Last Modified",
+    "DEACTIVATE": "Deactivate",
+    "ACTIVATE": "Activate",
+    "DELETE": "Delete",
+    "DELETE_TITLE": "Delete Idp",
+    "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "DELETE_SELECTION_TITLE": "Delete Idp",
+    "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "TOAST": {
+      "SAVED": "Successfully saved.",
+      "REACTIVATED": "Idp reactivated.",
+      "DEACTIVATED": "Idp deactivated.",
+      "SELECTEDREACTIVATED": "Selected idps reactivated.",
+      "SELECTEDDEACTIVATED": "Selected idps deactivated.",
+      "SELECTEDKEYSDELETED": "Selected idps deleted.",
+      "DELETED": "Idp removed successfully!"
+    }
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Multifactors",
+      "MULTIFACTORDESCRIPTION": "Define your Multifactors for Authentication here.",
+      "SECONDFACTORTITLE": "Secondfactors",
+      "SECONDFACTORDESCRIPTION": "Define your Secondfactors for Authentication here."
+    },
+    "CREATE": {
+      "TITLE": "New Factor",
+      "DESCRIPTION": "Select your new Factor type."
+    },
+    "DELETE": {
+      "TITLE": "Delete Factor",
+      "DESCRIPTION": "You are about to delete a Factor from Login Policy. Are you sure?"
+    },
+    "TOAST": {
+      "ADDED": "Added successfully.",
+      "SAVED": "Saved successfully.",
+      "DELETED": "Removed successfully"
+    },
+    "TYPE": "Type",
+    "MULTIFACTORTYPES": {
+      "0": "Unknown",
+      "1": "U2F with Pin"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Unknown",
+      "1": "OTP",
+      "2": "U2F"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Login Policy",
+      "DESCRIPTION": "Define how your users can be authenticated on your organisation."
+    },
+    "IDPS": "Identity Providers",
+    "ADDIDP": {
+      "TITLE": "Add Identity Provider",
+      "DESCRIPTION": "You can select predefined or selfcreated providers for authentication.",
+      "SELECTIDPS": "Identity providers"
+    },
+    "PASSWORDLESS": "Passwordless Login",
+    "PASSWORDLESSTYPE": {
+      "0": "Not allowed",
+      "1": "Allowed"
+    }
+  },
+  "APP": {
+    "LIST": "Applications",
+    "PAGES": {
+      "TITLE": "Application",
+      "DESCRIPTION": "Here you can edit your application data and it's configuration.",
+      "CREATE_OIDC": "OIDC Application",
+      "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
+      "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "DETAIL": {
+        "TITLE": "Detail",
+        "STATE": {
+          "0": "Not defined",
+          "1": "Active",
+          "2": "Inactive"
+        }
+      },
+      "DIALOG": {
+        "DELETE": {
+          "TITLE": "Delete App",
+          "DESCRIPTION": "Do you really want to delete this application?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Next Steps",
+        "0": {
+          "TITLE": "Add roles",
+          "DESC": "Enter your project roles"
+        },
+        "1": {
+          "TITLE": "Add users",
+          "DESC": "Add new users of your organization"
+        },
+        "2": {
+          "TITLE": "Help & Support",
+          "DESC": "Read our documentation on creating applications or contact our support"
+        }
+      }
+    },
+    "NAME": "Name",
+    "TYPE": "Application Type",
+    "AUTHMETHOD": "Authentication Method",
+    "AUTHMETHODSECTION": "Authentication Method",
+    "GRANT": "Grant Types",
+    "OIDC": {
+      "INFO": {
+        "ISSUER": "Issuer",
+        "CLIENTID": "Client Id"
+      },
+      "CURRENT": "Current Config",
+      "TOKENSECTIONTITLE": "AuthToken Options",
+      "REDIRECTSECTIONTITLE": "Redirect Settings",
+      "PROSWITCH": "I'm a pro. Skip this wizard.",
+      "NAMEANDTYPESECTION": "Name and Type",
+      "TITLEFIRST": "Insert a name first.",
+      "TYPETITLE": "What type of application do you want to create?",
+      "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
+      "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
+      "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
+      "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol or http://localhost.",
+      "REDIRECTNOTVALID": "This redirect URI is not valid.",
+      "COMMAORENTERSEPERATION": "seperate with ↵",
+      "TYPEREQUIRED": "The type is required.",
+      "TITLE": "OIDC Configuration",
+      "CLIENTID": "Client ID",
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
+      "REGENERATESECRET": "Regenerate Client Secret",
+      "DEVMODE": "Development Mode",
+      "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
+      "REDIRECT": "Redirect URIs",
+      "REDIRECTSECTION": "Redirect URIs",
+      "POSTLOGOUTREDIRECT": "Post Logout URIs",
+      "RESPONSESECTION": "Response Types",
+      "GRANTSECTION": "Grant Types",
+      "GRANTTITLE": "Select your grant types. Note: Implicit is only available for browser-based applications.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "Response Types",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "GRANTTYPE": "Grant Types",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Auth Token Type",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "I sure hope you know what you are doing.",
+      "OVERVIEWSECTION": "Overview",
+      "OVERVIEWTITLE": "You are now done. Review your configuration.",
+      "ACCESSTOKENROLEASSERTION": "Add user roles to the access token",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the roles of the authenticated user are added to the access token.",
+      "IDTOKENROLEASSERTION": "User roles inside ID Token",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "If selected, the roles of the authenticated user are added to the ID token.",
+      "IDTOKENUSERINFOASSERTION": "User Info inside ID Token",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
+      "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
+      "RECOMMENDED": "recommended",
+      "NOTRECOMMENDED": "not recommended",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Regular Web applications like .net, PHP, Node.js, Java, etc."
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "Mobile Apps, Desktop, Smart Devices, etc."
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
+          }
+        }
+      }
+    },
+    "API": {
+      "REGENERATESECRET": "Regenerate Client Secret",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "APIs in general"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "Exchange the authorization code for the tokens"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Use a random hash instead of a static client secret for more security"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Send client_id and client_secret as part of the form"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Use a private key to authorize your application"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Authentication with Username and Passwort"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Get the tokens directly from the authorization endpoint"
+      },
+      "CUSTOM": {
+        "TITLE": "Custom",
+        "DESCRIPTION": "Your setting doesn't correspond to any other option."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Application reactivated.",
+      "DEACTIVATED": "Application deactivated.",
+      "OIDCUPDATED": "OIDC configuration updated.",
+      "UPDATED": "App updated.",
+      "CLIENTSECRETREGENERATED": "client secret generated.",
+      "DELETED": "App deleted.",
+      "CONFIGCHANGED": "Changes detected!"
+    }
+  },
+  "GENDERS": {
+    "0": "Unknown",
+    "1": "Female",
+    "2": "Male",
+    "3": "Other"
+  },
+  "LANGUAGES": {
+    "de": "German",
+    "en": "English"
+  },
+  "MEMBER": {
+    "ADD": "Add a Manager",
+    "CREATIONTYPE": "Creation Type",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organisation",
+      "0": "Owned Project",
+      "1": "Granted Project",
+      "4": "Project"
+    }
+  },
+  "ROLESLABEL": "Roles",
+  "GRANTS": {
+    "TITLE": "Authorizations",
+    "DESC": "Here you can manage authorizations of your organization users.",
+    "DELETE": "Delete Authorization",
+    "EMPTY": "No authorization found",
+    "ADD": "Create Authorization",
+    "ADD_BTN": "New",
+    "PROJECT": {
+      "TITLE": "Authorization",
+      "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
+    },
+    "USER": {
+      "TITLE": "Authorization",
+      "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
+    },
+    "CREATE": {
+      "TITLE": "Create authorization",
+      "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
+    },
+    "DETAIL": {
+      "TITLE": "Authorization Detail",
+      "DESCRIPTION": "Here you can see all the details of the authorization."
+    },
+    "TOAST": {
+      "UPDATED": "Grant updated.",
+      "BULKREMOVED": "Grants removed."
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Last Changes",
+    "BOTTOM": "You've reached the end of the list.",
+    "ORG": {
+      "TITLE": "Activity",
+      "DESCRIPTION": "Here you can see the latest events that have generated an organisation change."
+    },
+    "PROJECT": {
+      "TITLE": "Activity",
+      "DESCRIPTION": "Here you can see the latest events that have generated a project change."
+    },
+    "USER": {
+      "TITLE": "Activity",
+      "DESCRIPTION": "Here you can see the latest events that have generated a user change."
+    }
+  }
 }
