@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"strings"
+
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -27,6 +29,10 @@ func (domain *OrgDomain) GenerateVerificationCode(codeGenerator crypto.Generator
 	}
 	domain.ValidationCode = validationCodeCrypto
 	return validationCode, nil
+}
+
+func NewIAMDomainName(orgName, iamDomain string) string {
+	return strings.ToLower(strings.ReplaceAll(orgName, " ", "-") + "." + iamDomain)
 }
 
 type OrgDomainValidationType int32

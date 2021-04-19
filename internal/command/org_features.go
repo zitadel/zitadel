@@ -113,6 +113,15 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeLabelPolicyEvent)
 		}
 	}
+	if !features.CustomDomain {
+		removeCustomDomainsEvents, err := c.removeCustomDomains(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removeCustomDomainsEvents != nil {
+			events = append(events, removeCustomDomainsEvents...)
+		}
+	}
 	return events, nil
 }
 

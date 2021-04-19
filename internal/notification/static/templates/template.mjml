@@ -28,7 +28,7 @@
         <mj-column width="60%">
           <mj-text font-size="24px" font-weight="500">{{.Greeting}}</mj-text>
           <mj-text font-size="16px" line-height="1.5" font-weight="light">{{.Text}}</mj-text>
-          <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" background-color="#5282C1" font-size="14px" font-weight="500" >{{.ButtonText}}</mj-button>
+          <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" rel="noopener noreferrer" background-color="#5282C1" font-size="14px" font-weight="500" >{{.ButtonText}}</mj-button>
        <mj-divider
           border-color="#dbdbdb"
           border-width="2px"
