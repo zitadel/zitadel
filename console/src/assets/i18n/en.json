@@ -583,8 +583,8 @@
   },
   "FEATURES": {
     "TITLE": "Features",
-    "DESCRIPTION": "here you can edit your ZITADEL Features based on your Tier",
-    "BTN-EDIT": "Edit Featureset",
+    "DESCRIPTION": "Here you can see your ZITADEL Features based on your Tier.",
+    "BTN-EDIT": "Display Featureset",
     "TIER": {
       "NAME": "Tier Name",
       "DETAILS": "Billing Details",

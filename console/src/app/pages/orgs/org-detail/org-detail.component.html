@@ -6,7 +6,9 @@
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
-                <button (click)="loadDomains()" card-actions mat-icon-button><mat-icon>refresh</mat-icon></button>
+                <button (click)="loadDomains()" card-actions mat-icon-button>
+                    <mat-icon>refresh</mat-icon>
+                </button>
 
                 <div *ngFor="let domain of domains" class="domain">
                     <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain)"
@@ -30,22 +32,24 @@
             </app-card>
         </ng-container>
 
-        <h2>{{'FEATURES.TITLE' | translate}}</h2>
-        <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
-        <div *ngIf="features" class="tier">
-            <mat-icon class="icon">stars</mat-icon>
-            <div class="text" *ngIf="features.tier">
-                <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
-                <p>{{features.tier?.description}}</p>
-                <p>{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
-                <p>{{features.tier?.statusInfo}}</p>
-            </div>
-            <span class="fill-space"></span>
-            <a class="ext" href="https://zitadel.ch/pricing" target="_blank"><i
-                    class="las la-external-link-alt"></i></a>
+        <ng-container *ngIf="['features.read'] | hasRole | async">
+            <h2>{{'FEATURES.TITLE' | translate}}</h2>
+            <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+            <div *ngIf="features" class="tier">
+                <mat-icon class="icon">stars</mat-icon>
+                <div class="text" *ngIf="features.tier">
+                    <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
+                    <p>{{features.tier?.description}}</p>
+                    <p>{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
+                    <p>{{features.tier?.statusInfo}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <a *ngIf="['features.write'] | hasRole | async" class="ext" href="https://zitadel.ch/pricing"
+                    target="_blank"><i class="las la-external-link-alt"></i></a>
 
-            <button mat-raised-button [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
-        </div>
+                <button mat-raised-button [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
+            </div>
+        </ng-container>
 
         <ng-template appHasRole [appHasRole]="['policy.read']">
             <app-policy-grid [type]="PolicyGridType.ORG"></app-policy-grid>

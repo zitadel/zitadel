@@ -583,8 +583,8 @@
   },
   "FEATURES": {
     "TITLE": "Features",
-    "DESCRIPTION": "Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe aktivieren sowie deaktivieren.",
-    "BTN-EDIT": "Featureset anpassen",
+    "DESCRIPTION": "Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe einsehen.",
+    "BTN-EDIT": "Featureset anzeigen",
     "TIER": {
       "NAME": "Preisstufe Name",
       "DETAILS": "Abrechnungsdetails",
