@@ -25,6 +25,7 @@ type FeaturesView struct {
 	LoginPolicyUsernameLogin bool
 	PasswordComplexityPolicy bool
 	LabelPolicy              bool
+	CustomDomain             bool
 }
 
 func (f *FeaturesView) FeatureList() []string {
@@ -49,6 +50,9 @@ func (f *FeaturesView) FeatureList() []string {
 	}
 	if f.LabelPolicy {
 		list = append(list, domain.FeatureLabelPolicy)
+	}
+	if f.CustomDomain {
+		list = append(list, domain.FeatureCustomDomain)
 	}
 	return list
 }

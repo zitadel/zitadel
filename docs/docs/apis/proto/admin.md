@@ -1427,6 +1427,7 @@ if name or domain is already in use, org is not unique
 | login_policy_passwordless |  bool | - |
 | password_complexity_policy |  bool | - |
 | label_policy |  bool | - |
+| custom_domain |  bool | - |
 
 
 
@@ -1457,6 +1458,7 @@ if name or domain is already in use, org is not unique
 | login_policy_passwordless |  bool | - |
 | password_complexity_policy |  bool | - |
 | label_policy |  bool | - |
+| custom_domain |  bool | - |
 
 
 
