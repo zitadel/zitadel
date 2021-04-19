@@ -32,6 +32,16 @@
             <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
         </div>
 
+        {{if .ShowUsername}}
+        <div class="lgn-field double">
+            <label class="lgn-label" for="email">{{t "Registration.Username"}}</label>
+            <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
+            {{if .DisplayLoginNameSuffix}}
+            <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
+            {{end}}
+        </div>
+        {{end}}
+
         <div class="double-col">
             <div class="lgn-field">
                 <label class="lgn-label" for="languages">{{t "Registration.Language"}}</label>
