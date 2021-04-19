@@ -218,13 +218,13 @@ func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eve
 	isPrimary := defaultDomain == orgDomains.PrimaryDomain
 	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
 	events := make([]eventstore.EventPusher, 0, len(orgDomains.Domains))
-	for domainName, orgDomain := range orgDomains.Domains {
+	for _, orgDomain := range orgDomains.Domains {
 		if orgDomain.State == domain.OrgDomainStateActive {
-			if domainName == defaultDomain {
+			if orgDomain.Domain == defaultDomain {
 				hasDefault = true
 				continue
 			}
-			events = append(events, org.NewDomainRemovedEvent(ctx, orgAgg, domainName, orgDomain.Verified))
+			events = append(events, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, orgDomain.Verified))
 		}
 	}
 	if !hasDefault {

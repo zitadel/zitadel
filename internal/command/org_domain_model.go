@@ -99,12 +99,13 @@ func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 type OrgDomainsWriteModel struct {
 	eventstore.WriteModel
 
-	Domains       map[string]*Domain
+	Domains       []*Domain
 	PrimaryDomain string
 	OrgName       string
 }
 
 type Domain struct {
+	Domain   string
 	Verified bool
 	State    domain.OrgDomainState
 }
@@ -115,7 +116,7 @@ func NewOrgDomainsWriteModel(orgID string) *OrgDomainsWriteModel {
 			AggregateID:   orgID,
 			ResourceOwner: orgID,
 		},
-		Domains: make(map[string]*Domain),
+		Domains: make([]*Domain, 0),
 	}
 }
 
@@ -127,13 +128,23 @@ func (wm *OrgDomainsWriteModel) Reduce() error {
 		case *org.OrgChangedEvent:
 			wm.OrgName = e.Name
 		case *org.DomainAddedEvent:
-			wm.Domains[e.Domain] = &Domain{State: domain.OrgDomainStateActive}
+			wm.Domains = append(wm.Domains, &Domain{Domain: e.Domain, State: domain.OrgDomainStateActive})
 		case *org.DomainVerifiedEvent:
-			wm.Domains[e.Domain].Verified = true
+			for _, d := range wm.Domains {
+				if d.Domain == e.Domain {
+					d.Verified = true
+					continue
+				}
+			}
 		case *org.DomainPrimarySetEvent:
 			wm.PrimaryDomain = e.Domain
 		case *org.DomainRemovedEvent:
-			wm.Domains[e.Domain].State = domain.OrgDomainStateRemoved
+			for _, d := range wm.Domains {
+				if d.Domain == e.Domain {
+					d.State = domain.OrgDomainStateRemoved
+					continue
+				}
+			}
 		}
 	}
 	return nil
