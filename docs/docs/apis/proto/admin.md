@@ -169,67 +169,6 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
     PUT: /idps/{idp_id}/oidc_config
 
-
-### GetDefaultFeatures
-
-> **rpc** GetDefaultFeatures([GetDefaultFeaturesRequest](#getdefaultfeaturesrequest))
-[GetDefaultFeaturesResponse](#getdefaultfeaturesresponse)
-
-
-
-
-
-    GET: /features
-
-
-### SetDefaultFeatures
-
-> **rpc** SetDefaultFeatures([SetDefaultFeaturesRequest](#setdefaultfeaturesrequest))
-[SetDefaultFeaturesResponse](#setdefaultfeaturesresponse)
-
-
-
-
-
-    PUT: /features
-
-
-### GetOrgFeatures
-
-> **rpc** GetOrgFeatures([GetOrgFeaturesRequest](#getorgfeaturesrequest))
-[GetOrgFeaturesResponse](#getorgfeaturesresponse)
-
-
-
-
-
-    GET: /orgs/{org_id}/features
-
-
-### SetOrgFeatures
-
-> **rpc** SetOrgFeatures([SetOrgFeaturesRequest](#setorgfeaturesrequest))
-[SetOrgFeaturesResponse](#setorgfeaturesresponse)
-
-
-
-
-
-    PUT: /orgs/{org_id}/features
-
-
-### ResetOrgFeatures
-
-> **rpc** ResetOrgFeatures([ResetOrgFeaturesRequest](#resetorgfeaturesrequest))
-[ResetOrgFeaturesResponse](#resetorgfeaturesresponse)
-
-
-
-
-
-    DELETE: /orgs/{org_id}/features
-
-
 ### GetOrgIAMPolicy
 
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
