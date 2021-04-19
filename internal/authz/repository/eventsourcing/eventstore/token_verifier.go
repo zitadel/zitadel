@@ -69,7 +69,7 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, clientID string) (userID string, agentID string, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	tokenData, err := base64.URLEncoding.DecodeString(tokenString)
+	tokenData, err := base64.RawURLEncoding.DecodeString(tokenString)
 	if err != nil {
 		return "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
 	}
