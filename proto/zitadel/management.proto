@@ -597,6 +597,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -618,6 +619,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -629,6 +631,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -639,6 +642,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
