@@ -1,117 +1,121 @@
 .h1 {
-  margin-top: 0;
+	margin-top: 0;
 }
 
 h2 {
-  font-size: 1.2rem;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  margin-top: 2rem;
+	font-size: 1.2rem;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	margin-top: 2rem;
 }
 
 .top-desc {
-  color: var(--grey);
-  font-size: 14px;
+	color: var(--grey);
+	font-size: 14px;
 }
 
 .sub {
-  color: var(--grey);
-  margin-bottom: 2rem;
+	color: var(--grey);
+	margin-bottom: 2rem;
 }
 
 .tier {
-  display: flex;
-  flex-direction: row;
-  padding: 1rem;
-  border-radius: .5rem;
-  color: white;
-  background-color: rgb(245, 203, 99);
-  margin-bottom: .5rem;
+	display: flex;
+	flex-direction: row;
+	padding: 1rem;
+	border-radius: .5rem;
+	color: white;
+	background-color: rgb(245, 203, 99);
+	margin-bottom: .5rem;
 
-  .ext {
-    margin-right: .5rem;
-    align-self: center;
-    color: inherit;
-  }
+	.ext {
+		margin-right: .5rem;
+		align-self: center;
+		color: inherit;
+	}
 
-  .icon {
-    margin-right: 1rem;
-    font-size: 2rem;
-  }
+	.icon {
+		margin-right: 1rem;
+		font-size: 2rem;
+	}
 
-  .text {
-    display: flex;
-    flex-direction: column;
+	.text {
+		display: flex;
+		flex-direction: column;
 
-    p {
-      margin: 0;
-      font-size: 14px;
-    }
+		p {
+			margin: 0;
+			font-size: 14px;
+		}
 
-    .title {
-      font-size: 16px;
-      margin-bottom: .5rem;
-    }
-  }
+		.title {
+			font-size: 16px;
+			margin-bottom: .5rem;
+		}
+	}
 
-  .fill-space {
-    flex: 1;
-  }
+	.fill-space {
+		flex: 1;
+	}
+
+	button {
+		min-width: 200px;
+	}
 }
 
 .domain {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
 
-  .title {
-    font-size: 16px;
-    margin-right: 1rem;
-    cursor: pointer;
+	.title {
+		font-size: 16px;
+		margin-right: 1rem;
+		cursor: pointer;
 
-    &:not(.disabled) {
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
+		&:not(.disabled) {
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
 
-  .primaryset {
-    font-size: 13px;
-    cursor: pointer;
+	.primaryset {
+		font-size: 13px;
+		cursor: pointer;
 
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 
-  .verified,
-  .primary {
-    color: var(--color-main);
-    margin-right: 1rem;
-  }
+	.verified,
+	.primary {
+		color: var(--color-main);
+		margin-right: 1rem;
+	}
 
-  .verify-btn {
-    font-size: 13px;
-  }
+	.verify-btn {
+		font-size: 13px;
+	}
 
-  .fill-space {
-    flex: 1;
-  }
+	.fill-space {
+		flex: 1;
+	}
 
-  .rem-button {
-    visibility: hidden;
-  }
+	.rem-button {
+		visibility: hidden;
+	}
 
-  &:hover {
-    .rem-button {
-      visibility: visible;
-      transition: none;
-    }
-  }
+	&:hover {
+		.rem-button {
+			visibility: visible;
+			transition: none;
+		}
+	}
 }
 
 .new-desc {
-  font-size: 14px;
-  color: #818a8a;
+	font-size: 14px;
+	color: #818a8a;
 }
