@@ -87,6 +87,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					PasswordComplexityPolicy: false,
 					LabelPolicy:              false,
+					CustomDomain:             false,
 				},
 			},
 			res: res{
@@ -159,6 +160,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					PasswordComplexityPolicy: false,
 					LabelPolicy:              false,
+					CustomDomain:             false,
 				},
 			},
 			res: res{
