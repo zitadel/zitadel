@@ -19,6 +19,7 @@ import (
 func TestCommandSide_SetOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		iamDomain  string
 	}
 	type args struct {
 		ctx           context.Context
@@ -55,6 +56,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					PasswordComplexityPolicy: false,
 					LabelPolicy:              false,
+					CustomDomain:             false,
 				},
 			},
 			res: res{
@@ -137,6 +139,36 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -145,6 +177,439 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						},
 					),
 				),
+				iamDomain: "iam-domain",
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				features: &domain.Features{
+					TierName:                 "Test",
+					State:                    domain.FeaturesStateActive,
+					AuditLogRetention:        time.Hour,
+					LoginPolicyFactors:       false,
+					LoginPolicyIDP:           false,
+					LoginPolicyPasswordless:  false,
+					LoginPolicyRegistration:  false,
+					LoginPolicyUsernameLogin: false,
+					PasswordComplexityPolicy: false,
+					LabelPolicy:              false,
+					CustomDomain:             false,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "set with default policies, custom domains, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLoginPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPasswordComplexityPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								8,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary",
+								"secondary",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test2",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test1", true),
+							),
+							eventFromEventPusher(
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test2", false),
+							),
+							eventFromEventPusher(
+								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("test1")),
+					),
+				),
+				iamDomain: "iam-domain",
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				features: &domain.Features{
+					TierName:                 "Test",
+					State:                    domain.FeaturesStateActive,
+					AuditLogRetention:        time.Hour,
+					LoginPolicyFactors:       false,
+					LoginPolicyIDP:           false,
+					LoginPolicyPasswordless:  false,
+					LoginPolicyRegistration:  false,
+					LoginPolicyUsernameLogin: false,
+					PasswordComplexityPolicy: false,
+					LabelPolicy:              false,
+					CustomDomain:             false,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "set with default policies, custom domains, default not primary, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLoginPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPasswordComplexityPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								8,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary",
+								"secondary",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test2",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "org1.iam-domain"),
+							),
+							eventFromEventPusher(
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test1", true),
+							),
+							eventFromEventPusher(
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test2", false),
+							),
+							eventFromEventPusher(
+								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("test1")),
+					),
+				),
+				iamDomain: "iam-domain",
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				features: &domain.Features{
+					TierName:                 "Test",
+					State:                    domain.FeaturesStateActive,
+					AuditLogRetention:        time.Hour,
+					LoginPolicyFactors:       false,
+					LoginPolicyIDP:           false,
+					LoginPolicyPasswordless:  false,
+					LoginPolicyRegistration:  false,
+					LoginPolicyUsernameLogin: false,
+					PasswordComplexityPolicy: false,
+					LabelPolicy:              false,
+					CustomDomain:             false,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "set with default policies, custom domains, default not existing, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLoginPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPasswordComplexityPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								8,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary",
+								"secondary",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"test2",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainRemovedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain", true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "org1.iam-domain"),
+							),
+							eventFromEventPusher(
+								org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "org1.iam-domain"),
+							),
+							eventFromEventPusher(
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test1", true),
+							),
+							eventFromEventPusher(
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test2", false),
+							),
+							eventFromEventPusher(
+								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("test1")),
+					),
+				),
+				iamDomain: "iam-domain",
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -283,6 +748,36 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -309,6 +804,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						},
 					),
 				),
+				iamDomain: "iam-domain",
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -337,6 +833,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				iamDomain:  tt.fields.iamDomain,
 			}
 			got, err := r.SetOrgFeatures(tt.args.ctx, tt.args.resourceOwner, tt.args.features)
 			if tt.res.err == nil {
@@ -355,6 +852,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		iamDomain  string
 	}
 	type args struct {
 		ctx           context.Context
@@ -450,6 +948,36 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -458,6 +986,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						},
 					),
 				),
+				iamDomain: "iam-domain",
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -474,6 +1003,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				iamDomain:  tt.fields.iamDomain,
 			}
 			got, err := r.RemoveOrgFeatures(tt.args.ctx, tt.args.resourceOwner)
 			if tt.res.err == nil {
