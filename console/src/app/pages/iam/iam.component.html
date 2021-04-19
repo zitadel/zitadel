@@ -8,7 +8,7 @@
         <div *ngIf="features" class="tier">
             <mat-icon class="icon">stars</mat-icon>
             <div class="text" *ngIf="features.tier">
-                <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
+                <p class="title"><strong>{{features.tier.name}}</strong></p>
                 <p>{{features.tier?.description}}</p>
                 <p>{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
                 <p>{{features.tier?.statusInfo}}</p>
