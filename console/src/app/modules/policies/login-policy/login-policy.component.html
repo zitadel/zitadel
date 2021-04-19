@@ -33,8 +33,9 @@
             </cnsl-info-section>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
-                [(ngModel)]="loginData.allowRegister">
+            <mat-slide-toggle class="toggle" color="primary"
+                [disabled]="disabled || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) == false)"
+                ngDefaultControl [(ngModel)]="loginData.allowRegister">
                 {{'POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
 
