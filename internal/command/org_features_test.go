@@ -852,6 +852,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		iamDomain  string
 	}
 	type args struct {
 		ctx           context.Context
@@ -947,6 +948,36 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1.iam-domain",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -955,6 +986,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						},
 					),
 				),
+				iamDomain: "iam-domain",
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -971,6 +1003,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				iamDomain:  tt.fields.iamDomain,
 			}
 			got, err := r.RemoveOrgFeatures(tt.args.ctx, tt.args.resourceOwner)
 			if tt.res.err == nil {
