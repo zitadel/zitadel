@@ -913,9 +913,10 @@ export class ManagementService {
         return this.grpcService.mgmt.removeHumanAuthFactorOTP(req, null).then(resp => resp.toObject());
     }
 
-    public removeHumanAuthFactorU2F(userId: string): Promise<RemoveHumanAuthFactorU2FResponse.AsObject> {
+    public removeHumanAuthFactorU2F(userId: string, tokenId: string): Promise<RemoveHumanAuthFactorU2FResponse.AsObject> {
         const req = new RemoveHumanAuthFactorU2FRequest();
         req.setUserId(userId);
+        req.setTokenId(tokenId);
         return this.grpcService.mgmt.removeHumanAuthFactorU2F(req, null).then(resp => resp.toObject());
     }
 

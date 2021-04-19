@@ -15,6 +15,7 @@ const (
 	Step10
 	Step11
 	Step12
+	Step13
 	//StepCount marks the the length of possible steps (StepCount-1 == last possible step)
 	StepCount
 )

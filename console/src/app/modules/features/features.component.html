@@ -12,12 +12,12 @@
 
     <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
         <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
-        <div class="detail" *ngIf="stripeCustomer">
+        <div class="detail" *ngIf="stripeCustomer || stripeCustomer == null">
             <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
-                <a (click)="updateCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
+                <a (click)="setCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
             </p>
             <p>{{stripeCustomer?.contact}}</p>
-            <p *ngIf="stripeCustomer.company">{{stripeCustomer?.company}}</p>
+            <p *ngIf="stripeCustomer?.company">{{stripeCustomer?.company}}</p>
             <p>{{stripeCustomer?.address}}</p>
             <p *ngIf="stripeCustomer?.postal_code || stripeCustomer?.city || stripeCustomer?.country">
                 {{stripeCustomer?.postal_code}} {{stripeCustomer?.city}} {{stripeCustomer?.country}}
@@ -27,7 +27,7 @@
             </p>
         </div>
 
-        <p class="error" *ngIf="stripeCustomer && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
+        <p class="error" *ngIf="(stripeCustomer || stripeCustomer == null) && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
         <div class="current-tier">
             <a [disabled]="!org.id || !customerValid" mat-raised-button [href]="stripeURL" target="_blank"
@@ -49,7 +49,7 @@
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
             <span class="fill-space"></span>
-            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONHOURS' |
+            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONDAYS' |
                 translate}}</span>
         </div>
         <div class="row">

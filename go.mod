@@ -46,14 +46,11 @@ require (
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/copystructure v1.1.2 // indirect
-	github.com/mitchellh/reflectwalk v1.0.1 // indirect
-	github.com/mwitkow/go-proto-validators v0.3.2 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
 	github.com/prometheus/client_golang v1.8.0 // indirect
 	github.com/prometheus/common v0.15.0 // indirect
-	github.com/pseudomuto/protoc-gen-doc v1.4.1 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sony/sonyflake v1.0.0

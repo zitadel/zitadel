@@ -28,13 +28,24 @@
                 [(ngModel)]="loginData.allowUsernamePassword">
                 {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
-            <cnsl-info-section class="info">
-                {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}
-            </cnsl-info-section>
+
+            <ng-container
+                *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) == false; else usernameInfo">
+                <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                    'login_policy.username_login'})}}
+                </cnsl-info-section>
+            </ng-container>
+
+            <ng-template #usernameInfo>
+                <cnsl-info-section class="info">
+                    {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}
+                </cnsl-info-section>
+            </ng-template>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
-                [(ngModel)]="loginData.allowRegister">
+            <mat-slide-toggle class="toggle" color="primary"
+                [disabled]="disabled || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) == false)"
+                ngDefaultControl [(ngModel)]="loginData.allowRegister">
                 {{'POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
 
@@ -55,18 +66,34 @@
                 [(ngModel)]="loginData.allowExternalIdp">
                 {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
-            <cnsl-info-section class="info">
-                {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}}
-            </cnsl-info-section>
+            <ng-container
+                *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false; else idpInfo">
+                <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                    'login_policy.idp'})}}
+                </cnsl-info-section>
+            </ng-container>
+            <ng-template #idpInfo>
+                <cnsl-info-section class="info">
+                    {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}}
+                </cnsl-info-section>
+            </ng-template>
         </div>
         <div class="row">
             <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
                 [(ngModel)]="loginData.forceMfa">
                 {{'POLICY.DATA.FORCEMFA' | translate}}
             </mat-slide-toggle>
-            <cnsl-info-section class="info">
-                {{'POLICY.DATA.FORCEMFA_DESC' | translate}}
-            </cnsl-info-section>
+            <ng-container
+                *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false; else factorsInfo">
+                <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+                    'login_policy.factors'})}}
+                </cnsl-info-section>
+            </ng-container>
+            <ng-template #factorsInfo>
+                <cnsl-info-section class="info">
+                    {{'POLICY.DATA.FORCEMFA_DESC' | translate}}
+                </cnsl-info-section>
+            </ng-template>
         </div>
         <div class="row">
 
@@ -142,8 +169,8 @@
                 <img src="../../../assets/images/google.png"
                     *ngIf="idp.stylingType == IDPStylingType.STYLING_TYPE_GOOGLE" alt="google" />
                 <div>
-                    <span class="name">{{idp.name}}</span>
-                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.OWNERTYPES.'+idp.idpType |
+                    <span class="name">{{idp.idpName}}</span>
+                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.idpType |
                         translate
                         }}</span>
                     <span class="meta-info">{{ 'IDP.ID' | translate }}: {{idp.idpId}}</span>
