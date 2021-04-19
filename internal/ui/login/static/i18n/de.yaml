@@ -143,6 +143,7 @@ Registration:
   Title: Registration
   Description: Gib deine Benutzerangaben an. Die E-Mail Adresse wird als Benutzernamen verwendet.
   Email: E-Mail
+  Username: Benutzername
   Firstname: Vorname
   Lastname: Nachname
   Language: Sprache
