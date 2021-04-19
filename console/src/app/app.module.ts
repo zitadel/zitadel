@@ -25,6 +25,7 @@ import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { OnboardingModule } from 'src/app/modules/onboarding/onboarding.module';
 import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
+import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -178,6 +179,7 @@ const authConfig: AuthConfig = {
         GrpcService,
         AuthenticationService,
         GrpcAuthService,
+        SubscriptionService,
         { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],

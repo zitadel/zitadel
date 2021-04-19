@@ -2,6 +2,7 @@
     "authServiceUrl": "https://api.zitadel.io",
     "mgmtServiceUrl": "https://api.zitadel.io",
     "adminServiceUrl":"https://api.zitadel.io",
+    "subscriptionServiceUrl":"https://sub.zitadel.io",
     "issuer": "https://issuer.zitadel.io",
     "clientid": "69234247558357051@zitadel"
 }

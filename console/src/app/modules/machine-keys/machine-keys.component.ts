@@ -1,7 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -14,6 +13,8 @@ import { ListMachineKeysResponse } from 'src/app/proto/generated/zitadel/managem
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
+
 @Component({
     selector: 'app-machine-keys',
     templateUrl: './machine-keys.component.html',
@@ -22,7 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 export class MachineKeysComponent implements OnInit {
     @Input() userId!: string;
 
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
     public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
     public keyResult!: ListMachineKeysResponse.AsObject;
@@ -103,7 +104,7 @@ export class MachineKeysComponent implements OnInit {
                             this.dialog.open(ShowKeyDialogComponent, {
                                 data: {
                                     key: response,
-                                    type: AddKeyDialogType.MACHINE
+                                    type: AddKeyDialogType.MACHINE,
                                 },
                                 width: '400px',
                             });

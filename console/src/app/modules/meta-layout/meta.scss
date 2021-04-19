@@ -2,7 +2,7 @@
 @import '~@angular/material/theming';
 
 @mixin meta-theme($theme) {
-    $is-dark-theme: map-get($theme, is-dark);
+  $is-dark-theme: map-get($theme, is-dark);
 
   .meta-details {
     margin-bottom: 1rem;

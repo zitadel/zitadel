@@ -195,7 +195,7 @@ export class LoginPolicyComponent implements OnDestroy {
         });
 
         dialogRef.afterClosed().subscribe(resp => {
-            if (resp && resp.idp) {
+            if (resp && resp.idp && resp.type) {
                 this.addIdp(resp.idp, resp.type).then(() => {
                     this.loading = true;
                     setTimeout(() => {
@@ -208,12 +208,10 @@ export class LoginPolicyComponent implements OnDestroy {
         });
     }
 
-    private addIdp(idp: IDP.AsObject | IDP.AsObject, ownerType?: IDPOwnerType): Promise<any> {
+    private addIdp(idp: IDP.AsObject | IDP.AsObject, ownerType: IDPOwnerType): Promise<any> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-                if (ownerType) {
-                    return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, ownerType);
-                }
+                return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, ownerType);
             case PolicyComponentServiceType.ADMIN:
                 return (this.service as AdminService).addIDPToLoginPolicy(idp.id);
         }

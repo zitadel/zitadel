@@ -214,7 +214,7 @@ func (u *ProjectMember) getUserByID(userID string) (*usr_view_model.UserView, er
 			return user, nil
 		}
 	}
-	if userCopy.State == int32(usr_model.UserStateDeleted) {
+	if userCopy.State == int32(usr_model.UserStateUnspecified) || userCopy.State == int32(usr_model.UserStateDeleted) {
 		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-m9dos", "Errors.User.NotFound")
 	}
 	return &userCopy, nil

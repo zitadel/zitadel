@@ -51,6 +51,7 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
 COPY proto/ include/.
 
 
+
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
@@ -74,20 +75,18 @@ RUN build/console/generate-grpc.sh
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
-
 #######################
-## anular dev build
+## angular dev build
 #######################
 FROM npm-base as dev-angular-build
 RUN npm install -g @angular/cli
 
-
 #######################
-## anular prod build
+## angular lint workspace and prod build
 #######################
 FROM npm-base as prod-angular-build
+RUN npm run lint
 RUN npm run prodbuild
-
 
 #######################
 ## Go dependencies
@@ -127,6 +126,7 @@ COPY --from=go-gen /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
 COPY --from=go-gen /go/src/github.com/caos/zitadel/openapi/v2/zitadel ./openapi/v2/zitadel
 COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
+COPY --from=go-gen /go/src/github.com/caos/zitadel/docs/apis/proto ./docs/docs/apis/proto
 
 
 #######################

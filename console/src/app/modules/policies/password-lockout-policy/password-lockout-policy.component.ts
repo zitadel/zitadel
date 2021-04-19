@@ -66,7 +66,8 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
         });
     }
 
-    private getData(): Promise<AdminGetPasswordLockoutPolicyResponse.AsObject | MgmtGetPasswordLockoutPolicyResponse.AsObject> {
+    private getData():
+        Promise<AdminGetPasswordLockoutPolicyResponse.AsObject | MgmtGetPasswordLockoutPolicyResponse.AsObject> {
         switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
                 return (this.service as ManagementService).getPasswordLockoutPolicy();
