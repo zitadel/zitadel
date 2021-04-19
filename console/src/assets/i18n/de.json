@@ -602,22 +602,22 @@
       "BTN": "Preisstufe ändern"
     },
     "DATA": {
-      "AUDITLOGRETENTION": "Audit Log retention",
-      "LOGINPOLICYUSERNAMELOGIN": "Login Policy - Username as login",
-      "LOGINPOLICYREGISTRATION": "Login Policy - Registration",
-      "LOGINPOLICYIDP": "Login Policy - Identity Providers",
-      "LOGINPOLICYFACTORS": "Login Policy - Factors",
-      "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwordless Authentication",
-      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Settings",
-      "LABELPOLICY": "Label Policy"
+      "AUDITLOGRETENTION": "Audit Log Retention",
+      "LOGINPOLICYUSERNAMELOGIN": "Login Richtlinie: Login mit Username erlauben - benutzerdefiniert",
+      "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
+      "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
+      "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",
+      "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
+      "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
+      "LABELPOLICY": "Label Richtlinie - benutzerdefiniert"
     },
     "TIERSTATES": {
       "0": "Aktiv",
       "1": "Aktion erforderlich",
       "2": "Annuliert",
-      "3": "Besitzstandswahrend"
+      "3": "Durch IAM Owner gesetzt"
     },
-    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!",
+    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer Organisation nicht freigeschaltet!",
     "RETENTIONHOURS": "Stunden"
   },
   "POLICY": {
