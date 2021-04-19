@@ -35,10 +35,12 @@
         {{if .ShowUsername}}
         <div class="lgn-field double">
             <label class="lgn-label" for="email">{{t "Registration.Username"}}</label>
-            <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
-            {{if .DisplayLoginNameSuffix}}
-            <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
-            {{end}}
+            <div class="lgn-suffix-wrapper">
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
+                {{if .DisplayLoginNameSuffix}}
+                    <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
+                {{end}}
+            </div>
         </div>
         {{end}}
 
@@ -119,6 +121,7 @@
     </div>
 </form>
 
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
 <script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
