@@ -142,8 +142,8 @@
                 <img src="../../../assets/images/google.png"
                     *ngIf="idp.stylingType == IDPStylingType.STYLING_TYPE_GOOGLE" alt="google" />
                 <div>
-                    <span class="name">{{idp.name}}</span>
-                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.OWNERTYPES.'+idp.idpType |
+                    <span class="name">{{idp.idpName}}</span>
+                    <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.idpType |
                         translate
                         }}</span>
                     <span class="meta-info">{{ 'IDP.ID' | translate }}: {{idp.idpId}}</span>

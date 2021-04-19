@@ -917,6 +917,10 @@
       "1": "System",
       "2": "Organisation"
     },
+    "TYPES": {
+        "0": "unknown",
+        "1": "OIDC"
+    },
     "STATES": {
       "1": "aktiv",
       "2": "inaktiv"
