@@ -618,7 +618,7 @@
       "3": "Besitzstandswahrend"
     },
     "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!",
-    "RETENTIONHOURS": "Stunden"
+    "RETENTIONDAYS": "Tage"
   },
   "POLICY": {
     "TITLE": "Richtlinen entdecken",

@@ -618,7 +618,7 @@
       "3": "Grandfathered"
     },
     "NOTAVAILABLE": "Feature {{value}} is missing on your organization.",
-    "RETENTIONHOURS": "Hours"
+    "RETENTIONDAYS": "Days"
   },
   "POLICY": {
     "TITLE": "Explore Policies",
