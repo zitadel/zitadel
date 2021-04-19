@@ -52,7 +52,7 @@ func (f Gender) Valid() bool {
 }
 
 func (u *Human) IsValid() bool {
-	return u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
+	return u.Username != "" && u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
 func (u *Human) CheckOrgIAMPolicy(policy *OrgIAMPolicy) error {

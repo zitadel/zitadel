@@ -143,6 +143,7 @@ Registration:
   Title: Registration
   Description: Enter your Userdata. Your email address will be used as loginname.
   Email: E-Mail
+  Username: Username
   Firstname: Firstname
   Lastname: Lastname
   Language: Language

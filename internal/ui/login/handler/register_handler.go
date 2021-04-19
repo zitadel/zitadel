@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/domain"
 
 	"golang.org/x/text/language"
 
@@ -15,6 +16,7 @@ const (
 
 type registerFormData struct {
 	Email        string `schema:"email"`
+	Username     string `schema:"username"`
 	Firstname    string `schema:"firstname"`
 	Lastname     string `schema:"lastname"`
 	Language     string `schema:"language"`
@@ -33,6 +35,7 @@ type registerData struct {
 	HasLowercase              string
 	HasNumber                 string
 	HasSymbol                 string
+	ShowUsername              bool
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -98,26 +101,42 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,
 	}
-	iam, _ := l.authRepo.GetIAM(r.Context())
-	if iam != nil {
-		policy, description, _ := l.getPasswordComplexityPolicy(r, iam.GlobalOrgID)
-		if policy != nil {
-			data.PasswordPolicyDescription = description
-			data.MinLength = policy.MinLength
-			if policy.HasUppercase {
-				data.HasUppercase = UpperCaseRegex
-			}
-			if policy.HasLowercase {
-				data.HasLowercase = LowerCaseRegex
-			}
-			if policy.HasSymbol {
-				data.HasSymbol = SymbolRegex
-			}
-			if policy.HasNumber {
-				data.HasNumber = NumberRegex
-			}
+
+	resourceOwner := authRequest.RequestedOrgID
+
+	if resourceOwner == "" {
+		iam, err := l.authRepo.GetIAM(r.Context())
+		if err != nil {
+			l.renderRegister(w, r, authRequest, formData, err)
+			return
+		}
+		resourceOwner = iam.GlobalOrgID
+	}
+
+	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, resourceOwner)
+	if pwPolicy != nil {
+		data.PasswordPolicyDescription = description
+		data.MinLength = pwPolicy.MinLength
+		if pwPolicy.HasUppercase {
+			data.HasUppercase = UpperCaseRegex
+		}
+		if pwPolicy.HasLowercase {
+			data.HasLowercase = LowerCaseRegex
+		}
+		if pwPolicy.HasSymbol {
+			data.HasSymbol = SymbolRegex
+		}
+		if pwPolicy.HasNumber {
+			data.HasNumber = NumberRegex
 		}
 	}
+
+	orgIAMPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, formData, err)
+		return
+	}
+	data.ShowUsername = orgIAMPolicy.UserLoginMustBeDomain
 
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {
@@ -138,6 +157,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 
 func (d registerFormData) toHumanDomain() *domain.Human {
 	return &domain.Human{
+		Username: d.Username,
 		Profile: &domain.Profile{
 			FirstName:         d.Firstname,
 			LastName:          d.Lastname,

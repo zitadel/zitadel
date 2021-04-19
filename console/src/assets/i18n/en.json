@@ -602,14 +602,14 @@
       "BTN": "Change Tier"
     },
     "DATA": {
-      "AUDITLOGRETENTION": "Audit Log retention",
-      "LOGINPOLICYUSERNAMELOGIN": "Login Policy - Benutzername als Loginname",
-      "LOGINPOLICYREGISTRATION": "Login Policy - Registration",
-      "LOGINPOLICYIDP": "Login Policy - Identity Provider",
-      "LOGINPOLICYFACTORS": "Login Policy - Multifaktoren",
-      "LOGINPOLICYPASSWORDLESS": "Login Policy - Passwortlose Authentifizierung",
-      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Komplexitätseinstellungen",
-      "LABELPOLICY": "Labelling Einstellungen"
+      "AUDITLOGRETENTION": "Audit Log Retention",
+      "LOGINPOLICYUSERNAMELOGIN": "Login Policy: Allow login with Username - custom",
+      "LOGINPOLICYREGISTRATION": "Login Policy: Allow self registration - custom",
+      "LOGINPOLICYIDP": "Login Policy: Identity Provider - custom",
+      "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
+      "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
+      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
+      "LABELPOLICY": "Labeling Policy - custom"
     },
     "TIERSTATES": {
       "0": "Active",
