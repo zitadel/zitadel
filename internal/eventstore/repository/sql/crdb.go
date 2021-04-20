@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/lib/pq"
 	"regexp"
 	"strconv"
 
@@ -12,6 +11,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/lib/pq"
 
 	//sql import for cockroach
 	_ "github.com/lib/pq"
@@ -241,7 +241,7 @@ func (db *CRDB) eventQuery() string {
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
-		" FROM eventstore.events"
+		" FROM eventstore.events@default_event_query"
 }
 func (db *CRDB) maxSequenceQuery() string {
 	return "SELECT MAX(event_sequence) FROM eventstore.events"
