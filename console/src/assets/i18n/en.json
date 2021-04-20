@@ -611,7 +611,7 @@
       "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
       "LABELPOLICY": "Labeling Policy - custom",
-      "CUSTOMDOMAIN": "Domain - custom"
+      "CUSTOMDOMAIN": "Domain Verification - available"
     },
     "TIERSTATES": {
       "0": "Active",
