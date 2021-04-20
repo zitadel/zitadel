@@ -9,8 +9,12 @@
                 <button (click)="loadDomains()" card-actions mat-icon-button><mat-icon>refresh</mat-icon></button>
 
                 <div *ngFor="let domain of domains" class="domain">
-                    <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain)"
+                    <span *ngIf="(canwrite$ | async) && (['custom_domain'] | hasFeature | async); else noCustom" (click)="verifyDomain(domain)"
                         class="title">{{domain.domainName}}</span>
+
+                    <ng-template #noCustom>
+                      <span class="title disabled">{{domain.domainName}}</span>
+                    </ng-template>
                     <span *ngIf="(canwrite$ | async) == false" class="title disabled">{{domain?.domainName}}</span>
 
                     <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
@@ -24,7 +28,12 @@
                             class="las la-trash"></i></button>
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
-                <button [disabled]="(canwrite$ | async) == false" matTooltip="Add domain" mat-raised-button
+
+                <cnsl-info-section type="WARN" *ngIf="(['custom_domain'] | hasFeature | async) == false" class="custom-domain-deactivated">
+                    {{'ORG.PAGES.CUSTOMDOMAINFEATUREMISSING' | translate}}
+                </cnsl-info-section>
+            
+                <button [disabled]="(canwrite$ | async) == false || (['custom_domain'] | hasFeature | async) == false" matTooltip="Add domain" mat-raised-button
                     color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
                 </button>
             </app-card>

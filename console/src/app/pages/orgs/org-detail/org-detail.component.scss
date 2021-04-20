@@ -67,11 +67,11 @@ h2 {
   .title {
     font-size: 16px;
     margin-right: 1rem;
-    cursor: pointer;
 
     &:not(.disabled) {
       &:hover {
         text-decoration: underline;
+        cursor: pointer;
       }
     }
   }
@@ -114,4 +114,8 @@ h2 {
 .new-desc {
   font-size: 14px;
   color: #818a8a;
+}
+
+.custom-domain-deactivated {
+  margin-bottom: 1rem;
 }
