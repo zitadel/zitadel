@@ -499,6 +499,9 @@ EventTypes:
         set: Primäre Domäne gesetzt
       reserved: Domäne reserviert
       released: Domäne freigegeben
+    features:
+      set: Feature hinzugefügt
+      removed: Feature entfernt
     name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben

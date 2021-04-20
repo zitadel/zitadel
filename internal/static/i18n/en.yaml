@@ -500,6 +500,9 @@ EventTypes:
         set: Primary domain set
       reserved: Domain reserved
       released: Domain released
+    features:
+      set: Feature added
+      removed: Feature removed
     name:
       reserved: Organization name reserved
       released: Organization name released
