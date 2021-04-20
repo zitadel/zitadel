@@ -109,6 +109,10 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} CAOS Ltd. Built with Docusaurus.`,
     },
+    algolia: {
+      apiKey: 'bff480bce03126c2d348345647854e91',
+      indexName: 'zitadel'
+    },
   },
   presets: [
     [
