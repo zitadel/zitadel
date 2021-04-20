@@ -1883,11 +1883,8 @@ message SetUpOrgRequest {
         Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
         string password = 5 [
-            (validate.rules).string = {min_len: 1, max_len: 72},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 description: "the initial password of the user";
-                min_length: 1;
-                max_length: 72;
                 example: "\"my_53cr3t-P4$$w0rd\"";
             }
         ];
