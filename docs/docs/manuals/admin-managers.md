@@ -29,6 +29,3 @@ In the right part of the console you can finde **MANAGERS** in the details part.
 | PROJECT_OWNER_GLOBAL  | Same as PROJECT_OWNER, but in the global organisation. |
 | PROJECT_OWNER_VIEWER_GLOBAL  | Same as PROJECT_OWNER_VIEWER, but in the global organisation. |
 | PROJECT_GRANT_OWNER  | Same as PROJECT_OWNER but for a granted proejct. |
-
-
-
