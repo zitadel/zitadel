@@ -1,8 +1,6 @@
 package configuration
 
 import (
-	"time"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
@@ -11,6 +9,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration/users"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"time"
 )
 
 type ConsoleEnv struct {
@@ -18,6 +17,7 @@ type ConsoleEnv struct {
 	MgmtServiceURL string `json:"mgmtServiceUrl"`
 	Issuer         string `json:"issuer"`
 	ClientID       string `json:"clientid"`
+	SubServiceURL  string `json:"subscriptionServiceUrl"`
 }
 
 const (

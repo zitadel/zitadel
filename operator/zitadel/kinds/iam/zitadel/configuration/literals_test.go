@@ -62,10 +62,11 @@ var (
 			Domain:    "",
 			TlsSecret: "",
 			Subdomains: &Subdomains{
-				Accounts: "",
-				API:      "",
-				Console:  "",
-				Issuer:   "",
+				Accounts:     "",
+				API:          "",
+				Console:      "",
+				Issuer:       "",
+				Subscription: "",
 			},
 		},
 		ClusterDNS: "",
@@ -119,10 +120,11 @@ var (
 			Domain:    "domain",
 			TlsSecret: "tls",
 			Subdomains: &Subdomains{
-				Accounts: "accounts",
-				API:      "api",
-				Console:  "console",
-				Issuer:   "issuer",
+				Accounts:     "accounts",
+				API:          "api",
+				Console:      "console",
+				Issuer:       "issuer",
+				Subscription: "sub",
 			},
 		},
 		ClusterDNS: "cluster",
@@ -175,10 +177,11 @@ var (
 			Domain:    "domain",
 			TlsSecret: "tls",
 			Subdomains: &Subdomains{
-				Accounts: "accounts",
-				API:      "api",
-				Console:  "console",
-				Issuer:   "issuer",
+				Accounts:     "accounts",
+				API:          "api",
+				Console:      "console",
+				Issuer:       "issuer",
+				Subscription: "sub",
 			},
 		},
 		ClusterDNS: "cluster",
@@ -496,10 +499,10 @@ func TestConfiguration_LiteralsConsoleCM(t *testing.T) {
 			Namespace: namespace,
 			Name:      cmName,
 		},
-		Data: map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\"}"},
+		Data: map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://.\"}"},
 	}
 
-	equals := map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\"}"}
+	equals := map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://.\"}"}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
 	literals := literalsConsoleCM(clientID, desiredEmpty.DNS, k8sClient, namespace, cmName)
@@ -521,7 +524,7 @@ func TestConfiguration_LiteralsConsoleCMFull(t *testing.T) {
 	}
 
 	equals := map[string]string{
-		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\"}",
+		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
@@ -541,12 +544,12 @@ func TestConfiguration_LiteralsConsoleCMWithCM(t *testing.T) {
 			Name:      cmName,
 		},
 		Data: map[string]string{
-			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"\"}",
+			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
 		},
 	}
 
 	equals := map[string]string{
-		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\"}",
+		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
@@ -566,12 +569,12 @@ func TestConfiguration_LiteralsConsoleCMWithCMFull(t *testing.T) {
 			Name:      cmName,
 		},
 		Data: map[string]string{
-			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\"}",
+			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
 		},
 	}
 
 	equals := map[string]string{
-		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\"}",
+		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 

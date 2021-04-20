@@ -199,6 +199,7 @@ func literalsConsoleCM(
 	consoleEnv.Issuer = "https://" + dns.Subdomains.Issuer + "." + dns.Domain
 	consoleEnv.AuthServiceURL = "https://" + dns.Subdomains.API + "." + dns.Domain
 	consoleEnv.MgmtServiceURL = "https://" + dns.Subdomains.API + "." + dns.Domain
+	consoleEnv.SubServiceURL = "https://" + dns.Subdomains.Subscription + "." + dns.Domain
 
 	data, err := json.Marshal(consoleEnv)
 	if err != nil {
