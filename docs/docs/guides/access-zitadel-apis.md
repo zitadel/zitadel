@@ -32,10 +32,10 @@ title: Access ZITADEL APIs
 
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers. 
 
-IAM Managers: This is the highest level. Users with IAM Manager roles are able to manage the whole IAM. 
-Org Managers: Managers in the Organisation Level are able to manage everything within the granted Organisation.
-Project Mangers: In this level the user is able to manage a project.
-Project Grant Manager: The project grant manager is for projects, which are granted of another organisation.
+- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole IAM. 
+- **Org Managers**: Managers in the Organisation Level are able to manage everything within the granted Organisation.
+- **Project Mangers**: In this level the user is able to manage a project.
+- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organisation.
 
 On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../manuals/admin-managers)
 
@@ -76,7 +76,7 @@ curl --request POST \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
-* `grant_type` should be set to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+* `grant_type` must be set to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
 * `scope` should contain any [Scopes](../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
