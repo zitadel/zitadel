@@ -20,6 +20,7 @@ message Features {
   bool login_policy_passwordless = 9;
   bool password_complexity_policy = 10;
   bool label_policy = 11;
+  bool custom_domain = 12;
 }
 
 message FeatureTier {

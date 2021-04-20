@@ -22,10 +22,11 @@ type DNS struct {
 }
 
 type Subdomains struct {
-	Accounts string `yaml:"accounts"`
-	API      string `yaml:"api"`
-	Console  string `yaml:"console"`
-	Issuer   string `yaml:"issuer"`
+	Accounts     string `yaml:"accounts"`
+	API          string `yaml:"api"`
+	Console      string `yaml:"console"`
+	Issuer       string `yaml:"issuer"`
+	Subscription string `yaml:"subscription"`
 }
 type Passwords struct {
 	Migration            *secret.Secret   `yaml:"migration"`

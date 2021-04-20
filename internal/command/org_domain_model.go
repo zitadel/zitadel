@@ -95,3 +95,72 @@ func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgDomainPrimarySetEventType,
 			org.OrgDomainRemovedEventType)
 }
+
+type OrgDomainsWriteModel struct {
+	eventstore.WriteModel
+
+	Domains       []*Domain
+	PrimaryDomain string
+	OrgName       string
+}
+
+type Domain struct {
+	Domain   string
+	Verified bool
+	State    domain.OrgDomainState
+}
+
+func NewOrgDomainsWriteModel(orgID string) *OrgDomainsWriteModel {
+	return &OrgDomainsWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   orgID,
+			ResourceOwner: orgID,
+		},
+		Domains: make([]*Domain, 0),
+	}
+}
+
+func (wm *OrgDomainsWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *org.OrgAddedEvent:
+			wm.OrgName = e.Name
+		case *org.OrgChangedEvent:
+			wm.OrgName = e.Name
+		case *org.DomainAddedEvent:
+			wm.Domains = append(wm.Domains, &Domain{Domain: e.Domain, State: domain.OrgDomainStateActive})
+		case *org.DomainVerifiedEvent:
+			for _, d := range wm.Domains {
+				if d.Domain == e.Domain {
+					d.Verified = true
+					continue
+				}
+			}
+		case *org.DomainPrimarySetEvent:
+			wm.PrimaryDomain = e.Domain
+		case *org.DomainRemovedEvent:
+			for _, d := range wm.Domains {
+				if d.Domain == e.Domain {
+					d.State = domain.OrgDomainStateRemoved
+					continue
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (wm *OrgDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgChangedEventType,
+			org.OrgDomainAddedEventType,
+			org.OrgDomainVerifiedEventType,
+			org.OrgDomainVerificationAddedEventType,
+			org.OrgDomainVerifiedEventType,
+			org.OrgDomainPrimarySetEventType,
+			org.OrgDomainRemovedEventType)
+}
