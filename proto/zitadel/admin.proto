@@ -23,13 +23,14 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
-        title: "Administrator API for ZITADEL";
-        description: "This API provides all functions to administrate ZITADEL.";
+        title: "Administration API aka Admin";
         version: "1.0";
-        contact: {
-            name: "file an issue",
-            url: "https://github.com/caos/zitadel";
-        };
+        description: "This API is intended to configure and manage the IAM itself.";
+        contact:{
+            name: "CAOS developers of ZITADEL"
+            url: "https://zitadel.ch"
+            email: "hi@zitadel.ch"
+        }
         license: {
             name: "Apache 2.0",
             url: "https://github.com/caos/zitadel/blob/main/LICENSE";

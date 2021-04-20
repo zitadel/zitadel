@@ -7,13 +7,11 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"k8s.io/apimachinery/pkg/api/errors"
-
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	features_view_model "github.com/caos/zitadel/internal/features/repository/view/model"
@@ -211,7 +209,7 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 		},
 	}
 	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
-	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
 		return nil, err
 	}
 	return iam_es_model.IAMToModel(iam), nil
@@ -219,14 +217,14 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 
 func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {
 	features, viewErr := repo.View.FeaturesByAggregateID(domain.IAMID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return viewErr
 	}
-	if errors.IsNotFound(viewErr) {
+	if caos_errs.IsNotFound(viewErr) {
 		features = new(features_view_model.FeaturesView)
 	}
 	events, esErr := repo.getIAMEvents(ctx, features.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return checkFeatures(features, requiredFeatures...)
 	}
 	if esErr != nil {

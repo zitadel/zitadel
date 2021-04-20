@@ -350,7 +350,6 @@ message WebAuthNVerification {
             description: "json representation of public key credential issued by the webauthn client";
             min_length: 55;
             max_length: 1048576; //1 mb
-            //TODO: add example validate max
         }
     ];
     string token_name = 2 [
