@@ -583,8 +583,8 @@
   },
   "FEATURES": {
     "TITLE": "Features",
-    "DESCRIPTION": "here you can edit your ZITADEL Features based on your Tier",
-    "BTN-EDIT": "Edit Featureset",
+    "DESCRIPTION": "Here you can see your ZITADEL Features based on your Tier.",
+    "BTN-EDIT": "Display Featureset",
     "TIER": {
       "NAME": "Tier Name",
       "DETAILS": "Billing Details",
@@ -618,7 +618,7 @@
       "3": "Grandfathered"
     },
     "NOTAVAILABLE": "Feature {{value}} is missing on your organization.",
-    "RETENTIONHOURS": "Hours"
+    "RETENTIONDAYS": "Days"
   },
   "POLICY": {
     "TITLE": "Explore Policies",
@@ -916,6 +916,10 @@
       "0": "unknown",
       "1": "System",
       "2": "Organisation"
+    },
+    "TYPES": {
+        "0": "unknown",
+        "1": "OIDC"
     },
     "STATES": {
       "1": "active",

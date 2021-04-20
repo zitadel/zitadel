@@ -79,7 +79,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                         this.toast.showError(error);
                     });
                 } else if (factor.u2f) {
-                    this.mgmtUserService.removeHumanAuthFactorU2F(this.user.id).then(() => {
+                    this.mgmtUserService.removeHumanAuthFactorU2F(this.user.id, factor.u2f.id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
                         const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);

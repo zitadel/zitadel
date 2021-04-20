@@ -583,8 +583,8 @@
   },
   "FEATURES": {
     "TITLE": "Features",
-    "DESCRIPTION": "Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe aktivieren sowie deaktivieren.",
-    "BTN-EDIT": "Featureset anpassen",
+    "DESCRIPTION": "Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe einsehen.",
+    "BTN-EDIT": "Featureset anzeigen",
     "TIER": {
       "NAME": "Preisstufe Name",
       "DETAILS": "Abrechnungsdetails",
@@ -617,8 +617,8 @@
       "2": "Annuliert",
       "3": "Durch IAM Owner gesetzt"
     },
-    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer Organisation nicht freigeschaltet!",
-    "RETENTIONHOURS": "Stunden"
+    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!",
+    "RETENTIONDAYS": "Tage"
   },
   "POLICY": {
     "TITLE": "Richtlinen entdecken",
@@ -916,6 +916,10 @@
       "0": "unknown",
       "1": "System",
       "2": "Organisation"
+    },
+    "TYPES": {
+        "0": "unknown",
+        "1": "OIDC"
     },
     "STATES": {
       "1": "aktiv",

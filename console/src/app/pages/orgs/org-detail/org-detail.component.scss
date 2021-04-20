@@ -57,6 +57,10 @@ h2 {
   .fill-space {
     flex: 1;
   }
+
+  button {
+    min-width: 200px;
+  }
 }
 
 .domain {
