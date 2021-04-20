@@ -611,7 +611,7 @@
       "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
       "LABELPOLICY": "Label Richtlinie - benutzerdefiniert",
-      "CUSTOMDOMAIN": "Domain - benutzerdefiniert"
+      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar" 
     },
     "TIERSTATES": {
       "0": "Aktiv",
