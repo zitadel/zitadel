@@ -6,6 +6,11 @@ module.exports = {
       label: 'User',
       items: ['manuals/user'],
     },
+    {
+      type: 'category',
+      label: 'Administrator',
+      items: ['manuals/admin-managers'],
+    },
   ],
   quickstarts: [
     'quickstarts/introduction',
@@ -25,7 +30,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Get to know ZITADEL',
-      items: ['guides/get-started', 'guides/organizations', 'guides/projects', 'guides/serviceusers', 'guides/oauth-recommended-flows', 'guides/identity-brokering'],
+      items: ['guides/get-started', 'guides/organizations', 'guides/projects', 'guides/oauth-recommended-flows', 'guides/serviceusers', 'guides/access-zitadel-apis', 'guides/identity-brokering'],
     },
   ],
   apis: [
