@@ -6,20 +6,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
 )
 
 type OrgHandler struct {
-	ctx context.Context
 	eventstore.ReadModelHandler
 	client *sql.DB
 
-	shouldPush chan bool
-	lock       sync.Mutex
-	orgs       []*query.OrgReadModel
-	pushSet    bool
+	lock sync.Mutex
+	orgs []*query.OrgReadModel
 
 	currentSequence uint64
 }
@@ -28,47 +24,14 @@ func NewOrgHandler(
 	ctx context.Context,
 	es *eventstore.Eventstore,
 	client *sql.DB,
-	queue *eventstore.JobQueue,
-	requeueAfter time.Duration,
 ) *OrgHandler {
 	h := &OrgHandler{
-		ctx:              ctx,
-		ReadModelHandler: *eventstore.NewReadModelHandler(es, queue, requeueAfter),
+		ReadModelHandler: *eventstore.NewReadModelHandler(ctx, es, 1*time.Minute),
 		client:           client,
-		shouldPush:       make(chan bool, 1),
 	}
 	go h.Process(ctx)
 
 	return h
-}
-
-func (h *OrgHandler) Process(ctx context.Context) {
-	for {
-		// workaround to priorice cancel and events before push
-		select {
-		case <-ctx.Done():
-			if h.pushSet {
-				h.push()
-			}
-			logging.Log("EVENT-XG5Og").Info("stop processing")
-			return
-		case event := <-h.Handler.EventQueue:
-			h.process(event)
-			continue
-		default:
-			//continue to lower prio select
-		}
-		// if not canceled and no events push is allowed
-		select {
-		case <-ctx.Done():
-			logging.Log("EVENT-XG5Og").Info("stop processing")
-			return
-		case event := <-h.Handler.EventQueue:
-			h.process(event)
-		case <-h.shouldPush:
-			h.push()
-		}
-	}
 }
 
 func (h *OrgHandler) process(event eventstore.EventReader) error {

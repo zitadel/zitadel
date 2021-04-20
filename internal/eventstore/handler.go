@@ -2,29 +2,23 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
-	"strconv"
-	"strings"
+	"sync"
 	"time"
 
 	"github.com/caos/logging"
 )
 
 type Handler struct {
+	ctx context.Context
+
 	Eventstore *Eventstore
-	JobQueue   *JobQueue
 	Sub        *Subscription
 	EventQueue chan EventReader
 }
 
-func NewHandler(
-	eventstore *Eventstore,
-	queue *JobQueue,
-) *Handler {
+func NewHandler(eventstore *Eventstore) *Handler {
 	h := Handler{
 		Eventstore: eventstore,
-		JobQueue:   queue,
 		//TODO: how huge should the queue be?
 		EventQueue: make(chan EventReader, 100),
 	}
@@ -41,17 +35,20 @@ type ReadModelHandler struct {
 	Handler
 	RequeueAfter time.Duration
 	Timer        *time.Timer
-	HasLocked    bool
-	BulkUntil    uint64
+
+	lock       sync.Mutex
+	stmts      []Statement
+	pushSet    bool
+	shouldPush chan *struct{}
 }
 
 func NewReadModelHandler(
+	ctx context.Context,
 	eventstore *Eventstore,
-	queue *JobQueue,
 	requeueAfter time.Duration,
 ) *ReadModelHandler {
 	return &ReadModelHandler{
-		Handler:      *NewHandler(eventstore, queue),
+		Handler:      *NewHandler(eventstore),
 		RequeueAfter: requeueAfter,
 		// first requeue is instant on startup
 		Timer: time.NewTimer(0),
@@ -62,113 +59,65 @@ func (h *ReadModelHandler) ResetTimer() {
 	h.Timer.Reset(h.RequeueAfter)
 }
 
-func (h *ReadModelHandler) Lock() (currentSequence uint64, err error) {
-	return 0, nil
-}
+type Update func([]Statement) error
+type Reduce func(EventReader) (Statement, error)
 
-func (h *ReadModelHandler) Queue(ctx context.Context, query *SearchQueryBuilder) error {
-	latestSeq, err := h.Handler.JobQueue.Queue(ctx, query, h.EventQueue)
-	if err != nil {
-		return err
-	}
-	if latestSeq > query.eventSequence {
-		h.BulkUntil = latestSeq
-	}
-	return nil
-}
-
-func (h *ReadModelHandler) Process(ctx context.Context) {
+func (h *ReadModelHandler) Process(
+	ctx context.Context,
+	reduce Reduce,
+	update Update,
+) {
 	for {
+		select {
+		case <-ctx.Done():
+			h.Sub.Unsubscribe()
+			logging.Log("EVENT-XG5Og").Info("stop processing")
+			return
+		case event := <-h.Handler.EventQueue:
+			stmt, err := reduce(event)
+			if err != nil {
+				logging.Log("EVENT-PTr4j").OnError(err).Warn("unable to process event")
+				continue
+			}
+
+			h.lock.Lock()
+			defer h.lock.Unlock()
+
+			h.stmts = append(h.stmts, stmt)
+			if !h.pushSet {
+				h.pushSet = true
+				h.shouldPush <- nil
+			}
+		case <-h.Timer.C:
+			//TODO: bulk run
+		default:
+			//continue to lower prio select
+		}
+
+		// if not canceled and no events push is allowed
 		select {
 		case <-ctx.Done():
 			logging.Log("EVENT-XG5Og").Info("stop processing")
 			return
 		case event := <-h.Handler.EventQueue:
-			func(event EventReader) {
-				logging.LogWithFields("EVENT-Sls2l", "seq", event.Sequence()).Info("event received")
-			}(event)
+			stmt, err := reduce(event)
+			logging.Log("EVENT-PTr4j").WithError(err).Warn("unable to process event")
+			if err == nil {
+				h.stmts = append(h.stmts, stmt)
+			}
+		case <-h.Timer.C:
+			//TODO: bulk run
+		case <-h.shouldPush:
+			h.lock.Lock()
+			defer h.lock.Unlock()
+
+			h.pushSet = false
+			if err := update(h.stmts); err != nil {
+				logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
+				continue
+			}
+
+			h.stmts = []Statement{}
 		}
-	}
-}
-
-type Column struct {
-	Name  string
-	Value interface{}
-}
-
-func columnsToQuery(cols []Column) (names []string, parameters []string, values []interface{}) {
-	names = make([]string, len(cols))
-	values = make([]interface{}, len(cols))
-	parameters = make([]string, len(cols))
-	for i, col := range cols {
-		names[i] = col.Name
-		values[i] = col.Value
-		parameters[i] = "$" + strconv.Itoa(i+1)
-
-	}
-	return names, parameters, values
-}
-
-func columnsToWhere(cols []Column, paramOffset int) (wheres []string, values []interface{}) {
-	wheres = make([]string, len(cols))
-	values = make([]interface{}, len(cols))
-
-	for i, col := range cols {
-		wheres[i] = "(" + col.Name + " = " + strconv.Itoa(i+1+paramOffset) + ")"
-		values[i] = col.Value
-	}
-
-	return wheres, values
-}
-
-type Statement interface {
-	Prepare() func(context.Context, *sql.Tx) error
-}
-
-type CreateStatement struct {
-	TableName string
-	Values    []Column
-}
-
-func (stmt *CreateStatement) Prepare() func(ctx context.Context, tx *sql.Tx) error {
-	cols, params, args := columnsToQuery(stmt.Values)
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", stmt.TableName, strings.Join(cols, ", "), strings.Join(params, ", "))
-
-	return func(ctx context.Context, tx *sql.Tx) error {
-		_, err := tx.QueryContext(ctx, query, args...)
-		return err
-	}
-}
-
-type UpdateStatement struct {
-	TableName string
-	PK        []Column
-	Values    []Column
-}
-
-func (stmt *UpdateStatement) Prepare() func(context.Context, *sql.Tx) error {
-	cols, params, args := columnsToQuery(stmt.Values)
-	wheres, whereArgs := columnsToWhere(stmt.PK, len(params))
-	args = append(args, whereArgs)
-	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE %s", stmt.TableName, strings.Join(cols, ", "), strings.Join(params, ", "), strings.Join(wheres, " AND "))
-
-	return func(ctx context.Context, tx *sql.Tx) error {
-		_, err := tx.ExecContext(ctx, query, args...)
-		return err
-	}
-}
-
-type DeleteStatement struct {
-	TableName string
-	PK        []Column
-}
-
-func (stmt *DeleteStatement) Prepare() func(context.Context, *sql.Tx) error {
-	wheres, args := columnsToWhere(stmt.PK, 0)
-	query := fmt.Sprintf("DELETE FROM %s WHERE %s", stmt.TableName, strings.Join(wheres, " AND "))
-
-	return func(ctx context.Context, tx *sql.Tx) error {
-		_, err := tx.ExecContext(ctx, query, args...)
-		return err
 	}
 }
