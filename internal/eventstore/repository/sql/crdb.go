@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/lib/pq"
 	"regexp"
 	"strconv"
 
@@ -12,6 +11,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/lib/pq"
 
 	//sql import for cockroach
 	_ "github.com/lib/pq"
@@ -117,15 +117,10 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
-		stmt, err := tx.PrepareContext(ctx, crdbInsert)
-		if err != nil {
-			logging.Log("SQL-3to5p").WithError(err).Warn("prepare failed")
-			return caos_errs.ThrowInternal(err, "SQL-OdXRE", "prepare failed")
-		}
 
 		var previousSequence Sequence
 		for _, event := range events {
-			err = stmt.QueryRowContext(ctx,
+			err := tx.QueryRowContext(ctx, crdbInsert,
 				event.Type,
 				event.AggregateType,
 				event.AggregateID,
@@ -149,7 +144,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 			}
 		}
 
-		err = db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
+		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
 		if err != nil {
 			return err
 		}

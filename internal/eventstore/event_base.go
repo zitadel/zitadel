@@ -15,8 +15,9 @@ type BaseEvent struct {
 
 	aggregate Aggregate
 
-	sequence     uint64
-	creationDate time.Time
+	sequence         uint64
+	creationDate     time.Time
+	previousSequence uint64
 
 	//User who created the event
 	User string `json:"-"`
@@ -60,6 +61,11 @@ func (e *BaseEvent) DataAsBytes() []byte {
 	return e.Data
 }
 
+//PreviousSequence returns the sequence of the previous event from the aggregate
+func (e *BaseEvent) PreviousSequence() uint64 {
+	return e.previousSequence
+}
+
 //BaseEventFromRepo maps a stored event to a BaseEvent
 func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	return &BaseEvent{
@@ -69,12 +75,13 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 			ResourceOwner: event.ResourceOwner,
 			Version:       Version(event.Version),
 		},
-		EventType:    EventType(event.Type),
-		creationDate: event.CreationDate,
-		sequence:     event.Sequence,
-		Service:      event.EditorService,
-		User:         event.EditorUser,
-		Data:         event.Data,
+		EventType:        EventType(event.Type),
+		creationDate:     event.CreationDate,
+		sequence:         event.Sequence,
+		previousSequence: event.PreviousSequence,
+		Service:          event.EditorService,
+		User:             event.EditorUser,
+		Data:             event.Data,
 	}
 }
 

@@ -36,6 +36,7 @@ type EventReader interface {
 
 	Sequence() uint64
 	CreationDate() time.Time
+	PreviousSequence() uint64
 	//DataAsBytes returns the payload of the event. It represent the changed fields by the event
 	DataAsBytes() []byte
 }

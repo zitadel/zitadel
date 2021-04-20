@@ -122,7 +122,7 @@ func columnsToWhere(cols []Column, paramOffset int) (wheres []string, values []i
 }
 
 type Statement interface {
-	Prepare(ctx context.Context, tx *sql.Tx) func() (sql.Result, error)
+	Prepare() func(context.Context, *sql.Tx) error
 }
 
 type CreateStatement struct {
@@ -130,16 +130,13 @@ type CreateStatement struct {
 	Values    []Column
 }
 
-func (stmt *CreateStatement) Prepare(ctx context.Context, tx *sql.Tx) func() (sql.Result, error) {
+func (stmt *CreateStatement) Prepare() func(ctx context.Context, tx *sql.Tx) error {
 	cols, params, args := columnsToQuery(stmt.Values)
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", stmt.TableName, strings.Join(cols, ", "), strings.Join(params, ", "))
-	statement, err := tx.PrepareContext(ctx, query)
 
-	return func() (sql.Result, error) {
-		if err != nil {
-			return nil, err
-		}
-		return statement.ExecContext(ctx, args)
+	return func(ctx context.Context, tx *sql.Tx) error {
+		_, err := tx.QueryContext(ctx, query, args...)
+		return err
 	}
 }
 
@@ -149,18 +146,15 @@ type UpdateStatement struct {
 	Values    []Column
 }
 
-func (stmt *UpdateStatement) Prepare(ctx context.Context, tx *sql.Tx) func() (sql.Result, error) {
+func (stmt *UpdateStatement) Prepare() func(context.Context, *sql.Tx) error {
 	cols, params, args := columnsToQuery(stmt.Values)
 	wheres, whereArgs := columnsToWhere(stmt.PK, len(params))
 	args = append(args, whereArgs)
 	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE %s", stmt.TableName, strings.Join(cols, ", "), strings.Join(params, ", "), strings.Join(wheres, " AND "))
-	statement, err := tx.PrepareContext(ctx, query)
 
-	return func() (sql.Result, error) {
-		if err != nil {
-			return nil, err
-		}
-		return statement.ExecContext(ctx, args)
+	return func(ctx context.Context, tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx, query, args...)
+		return err
 	}
 }
 
@@ -169,15 +163,12 @@ type DeleteStatement struct {
 	PK        []Column
 }
 
-func (stmt *DeleteStatement) Prepare(ctx context.Context, tx *sql.Tx) func() (sql.Result, error) {
+func (stmt *DeleteStatement) Prepare() func(context.Context, *sql.Tx) error {
 	wheres, args := columnsToWhere(stmt.PK, 0)
 	query := fmt.Sprintf("DELETE FROM %s WHERE %s", stmt.TableName, strings.Join(wheres, " AND "))
-	statement, err := tx.PrepareContext(ctx, query)
 
-	return func() (sql.Result, error) {
-		if err != nil {
-			return nil, err
-		}
-		return statement.ExecContext(ctx, args)
+	return func(ctx context.Context, tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx, query, args...)
+		return err
 	}
 }
