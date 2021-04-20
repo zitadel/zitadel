@@ -18,10 +18,17 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
-        title: "auth service";
+        title: "Authentication API aka Auth";
         version: "1.0";
+        description: "The authentication API is used for all operations on the currently logged in user.";
         contact:{
-            url: "https://github.com/caos/zitadel/api/auth" //TODO: should be swagger path
+            name: "CAOS developers of ZITADEL"
+            url: "https://zitadel.ch"
+            email: "hi@zitadel.ch"
+        }
+        license: {
+            name: "Apache License 2.0",
+            url: "https://github.com/caos/zitadel/blob/main/LICENSE"
         };
     };
 

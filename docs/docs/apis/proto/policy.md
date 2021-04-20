@@ -17,7 +17,7 @@ title: zitadel/policy.proto
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | MULTI_FACTOR_TYPE_UNSPECIFIED | 0 | - |
-| MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION | 1 | TODO: what does livio think after the weekend? :D |
+| MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION | 1 | - |
 
 
 
