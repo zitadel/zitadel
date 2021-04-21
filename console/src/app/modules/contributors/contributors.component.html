@@ -1,6 +1,8 @@
 <div class="groups">
     <span class="co-header">{{ title }}</span>
-    <span class="sub-header">{{ description }}</span>
+    <span class="sub-header">{{ description }} {{'MEMBER.DOCSINFO' | translate}} <a
+            href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">ZITADEL Managers</a>.
+    </span>
     <div class="people">
         <div class="img-list" [@cardAnimation]="totalResult">
             <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
