@@ -13,8 +13,8 @@ The client [SDK](https://github.com/caos/zitadel-go) will handle all necessary O
 All that is required, is a service account with an Org Owner role assigned and its key JSON.
 
 However, we recommend you read the guide on [how to access ZITADEL API](../guides/access-zitadel-apis) and the associated guides for a basic knowledge of :
- - <a href="../guides/oauth-recommended-flows">Recommended Authorization Flows</a>
- - <a href="../guides/serviceusers">Service Users</a>
+ - [Recommended Authorization Flows](../guides/oauth-recommended-flows)
+ - [Service Users](../guides/serviceusers)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
