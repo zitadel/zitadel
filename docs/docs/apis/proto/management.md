@@ -36,7 +36,7 @@ title: zitadel/management.proto
 > **rpc** GetIAM([GetIAMRequest](#getiamrequest))
 [GetIAMResponse](#getiamresponse)
 
-GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
+Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project ID)
 
 
 
@@ -48,7 +48,7 @@ GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel 
 > **rpc** GetUserByID([GetUserByIDRequest](#getuserbyidrequest))
 [GetUserByIDResponse](#getuserbyidresponse)
 
-
+Returns the requested full blown user (human or machine)
 
 
 
@@ -60,7 +60,7 @@ GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel 
 > **rpc** GetUserByLoginNameGlobal([GetUserByLoginNameGlobalRequest](#getuserbyloginnameglobalrequest))
 [GetUserByLoginNameGlobalResponse](#getuserbyloginnameglobalresponse)
 
-GetUserByLoginNameGlobal searches a user over all organisations
+Searches a user over all organisations
 the login name has to match exactly
 
 
@@ -73,6 +73,7 @@ the login name has to match exactly
 > **rpc** ListUsers([ListUsersRequest](#listusersrequest))
 [ListUsersResponse](#listusersresponse)
 
+Return the users matching the query
 Limit should always be set, there is a default limit set by the service
 
 
@@ -85,7 +86,8 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** ListUserChanges([ListUserChangesRequest](#listuserchangesrequest))
 [ListUserChangesResponse](#listuserchangesresponse)
 
-
+Returns the history of the user (each event)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -97,7 +99,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** IsUserUnique([IsUserUniqueRequest](#isuseruniquerequest))
 [IsUserUniqueResponse](#isuseruniqueresponse)
 
-
+Returns if a user with the searched email or username is unique
 
 
 
@@ -109,7 +111,9 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** AddHumanUser([AddHumanUserRequest](#addhumanuserrequest))
 [AddHumanUserResponse](#addhumanuserresponse)
 
-
+Create a user of the type human
+A email will be sent to the user if email is not verified or no password is set
+If a password is given, the user has to change on the next login
 
 
 
@@ -121,7 +125,9 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** ImportHumanUser([ImportHumanUserRequest](#importhumanuserrequest))
 [ImportHumanUserResponse](#importhumanuserresponse)
 
-
+Create a user of the type human
+A email will be sent to the user if email is not verified or no password is set
+If a password is given, the user doesn't have to change on the next login
 
 
 
@@ -133,7 +139,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** AddMachineUser([AddMachineUserRequest](#addmachineuserrequest))
 [AddMachineUserResponse](#addmachineuserresponse)
 
-
+Create a user of the type machine
 
 
 
@@ -145,7 +151,9 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** DeactivateUser([DeactivateUserRequest](#deactivateuserrequest))
 [DeactivateUserResponse](#deactivateuserresponse)
 
-
+Changes the user state to deactivated
+The user will not be able to login
+returns an error if user state is already deactivated
 
 
 
@@ -157,7 +165,8 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** ReactivateUser([ReactivateUserRequest](#reactivateuserrequest))
 [ReactivateUserResponse](#reactivateuserresponse)
 
-
+Changes the user state to active
+returns an error if user state is not deactivated
 
 
 
@@ -169,7 +178,9 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** LockUser([LockUserRequest](#lockuserrequest))
 [LockUserResponse](#lockuserresponse)
 
-
+Changes the user state to deactivated
+The user will not be able to login
+returns an error if user state is already locked
 
 
 
@@ -181,7 +192,8 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** UnlockUser([UnlockUserRequest](#unlockuserrequest))
 [UnlockUserResponse](#unlockuserresponse)
 
-
+Changes the user state to active
+returns an error if user state is not locked
 
 
 
@@ -193,7 +205,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** RemoveUser([RemoveUserRequest](#removeuserrequest))
 [RemoveUserResponse](#removeuserresponse)
 
-
+Changes the user state to deleted
 
 
 
@@ -205,7 +217,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** UpdateUserName([UpdateUserNameRequest](#updateusernamerequest))
 [UpdateUserNameResponse](#updateusernameresponse)
 
-
+Changes the username
 
 
 
@@ -217,7 +229,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** GetHumanProfile([GetHumanProfileRequest](#gethumanprofilerequest))
 [GetHumanProfileResponse](#gethumanprofileresponse)
 
-
+Returns the profile of the human
 
 
 
@@ -229,7 +241,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** UpdateHumanProfile([UpdateHumanProfileRequest](#updatehumanprofilerequest))
 [UpdateHumanProfileResponse](#updatehumanprofileresponse)
 
-
+Changes the profile of the human
 
 
 
@@ -241,7 +253,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** GetHumanEmail([GetHumanEmailRequest](#gethumanemailrequest))
 [GetHumanEmailResponse](#gethumanemailresponse)
 
-
+GetHumanEmail returns the email and verified state of the human
 
 
 
@@ -253,7 +265,8 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** UpdateHumanEmail([UpdateHumanEmailRequest](#updatehumanemailrequest))
 [UpdateHumanEmailResponse](#updatehumanemailresponse)
 
-
+Changes the email of the human
+If state is not verified, the user will get a verification email
 
 
 
@@ -265,7 +278,8 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** ResendHumanInitialization([ResendHumanInitializationRequest](#resendhumaninitializationrequest))
 [ResendHumanInitializationResponse](#resendhumaninitializationresponse)
 
-
+Resends an email to the given email address to finish the initialization process of the user
+Changes the email address of the user if it is provided
 
 
 
@@ -277,7 +291,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** ResendHumanEmailVerification([ResendHumanEmailVerificationRequest](#resendhumanemailverificationrequest))
 [ResendHumanEmailVerificationResponse](#resendhumanemailverificationresponse)
 
-
+Resends an email to the given email address to finish the email verification process of the user
 
 
 
@@ -289,7 +303,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** GetHumanPhone([GetHumanPhoneRequest](#gethumanphonerequest))
 [GetHumanPhoneResponse](#gethumanphoneresponse)
 
-
+Returns the phone and verified state of the human phone
 
 
 
@@ -301,7 +315,8 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** UpdateHumanPhone([UpdateHumanPhoneRequest](#updatehumanphonerequest))
 [UpdateHumanPhoneResponse](#updatehumanphoneresponse)
 
-
+Changes the phone number
+If verified is not set, the user will get an sms to verify the number
 
 
 
@@ -313,7 +328,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** RemoveHumanPhone([RemoveHumanPhoneRequest](#removehumanphonerequest))
 [RemoveHumanPhoneResponse](#removehumanphoneresponse)
 
-
+Removes the phone number of the human
 
 
 
@@ -325,7 +340,7 @@ Limit should always be set, there is a default limit set by the service
 > **rpc** ResendHumanPhoneVerification([ResendHumanPhoneVerificationRequest](#resendhumanphoneverificationrequest))
 [ResendHumanPhoneVerificationResponse](#resendhumanphoneverificationresponse)
 
-
+An sms will be sent to the given phone number to finish the phone verification process of the user
 
 
 
@@ -349,7 +364,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** SendHumanResetPasswordNotification([SendHumanResetPasswordNotificationRequest](#sendhumanresetpasswordnotificationrequest))
 [SendHumanResetPasswordNotificationResponse](#sendhumanresetpasswordnotificationresponse)
 
-
+An email will be sent to the given address to reset the password of the user
 
 
 
@@ -361,7 +376,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListHumanAuthFactors([ListHumanAuthFactorsRequest](#listhumanauthfactorsrequest))
 [ListHumanAuthFactorsResponse](#listhumanauthfactorsresponse)
 
-
+Returns a list of all factors (second and multi) which are configured on the user
 
 
 
@@ -373,7 +388,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveHumanAuthFactorOTP([RemoveHumanAuthFactorOTPRequest](#removehumanauthfactorotprequest))
 [RemoveHumanAuthFactorOTPResponse](#removehumanauthfactorotpresponse)
 
-
+The otp second factor will be removed from the user
+Because only one otp can be configured per user, the configured one will be removed
 
 
 
@@ -385,7 +401,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveHumanAuthFactorU2F([RemoveHumanAuthFactorU2FRequest](#removehumanauthfactoru2frequest))
 [RemoveHumanAuthFactorU2FResponse](#removehumanauthfactoru2fresponse)
 
-
+The u2f (universial second factor) will be removed from the user
 
 
 
@@ -397,7 +413,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListHumanPasswordless([ListHumanPasswordlessRequest](#listhumanpasswordlessrequest))
 [ListHumanPasswordlessResponse](#listhumanpasswordlessresponse)
 
-
+Returns all configured passwordless authentications
 
 
 
@@ -409,7 +425,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveHumanPasswordless([RemoveHumanPasswordlessRequest](#removehumanpasswordlessrequest))
 [RemoveHumanPasswordlessResponse](#removehumanpasswordlessresponse)
 
-
+Removed a configured passwordless authentication
 
 
 
@@ -421,7 +437,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** UpdateMachine([UpdateMachineRequest](#updatemachinerequest))
 [UpdateMachineResponse](#updatemachineresponse)
 
-
+Changes a machine user
 
 
 
@@ -433,7 +449,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** GetMachineKeyByIDs([GetMachineKeyByIDsRequest](#getmachinekeybyidsrequest))
 [GetMachineKeyByIDsResponse](#getmachinekeybyidsresponse)
 
-
+Returns a machine key of a (machine) user
 
 
 
@@ -445,7 +461,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListMachineKeys([ListMachineKeysRequest](#listmachinekeysrequest))
 [ListMachineKeysResponse](#listmachinekeysresponse)
 
-
+Returns all machine keys of a (machine) user which match the query
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -457,7 +474,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** AddMachineKey([AddMachineKeyRequest](#addmachinekeyrequest))
 [AddMachineKeyResponse](#addmachinekeyresponse)
 
-
+Generates a new machine key, details should be stored after return
 
 
 
@@ -469,7 +486,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveMachineKey([RemoveMachineKeyRequest](#removemachinekeyrequest))
 [RemoveMachineKeyResponse](#removemachinekeyresponse)
 
-
+Removed a machine key
 
 
 
@@ -481,7 +498,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListHumanLinkedIDPs([ListHumanLinkedIDPsRequest](#listhumanlinkedidpsrequest))
 [ListHumanLinkedIDPsResponse](#listhumanlinkedidpsresponse)
 
-
+Lists all identity providers (social logins) which a human has configured (e.g Google, Microsoft, AD, etc..)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -493,7 +511,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveHumanLinkedIDP([RemoveHumanLinkedIDPRequest](#removehumanlinkedidprequest))
 [RemoveHumanLinkedIDPResponse](#removehumanlinkedidpresponse)
 
-
+Removed a configured identity provider (social login) of a human
 
 
 
@@ -505,7 +523,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListUserMemberships([ListUserMembershipsRequest](#listusermembershipsrequest))
 [ListUserMembershipsResponse](#listusermembershipsresponse)
 
-
+Show all the permissions a user has iin ZITADEL (ZITADEL Manager)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -517,7 +536,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** GetMyOrg([GetMyOrgRequest](#getmyorgrequest))
 [GetMyOrgResponse](#getmyorgresponse)
 
-
+Returns the org given in the header
 
 
 
@@ -529,7 +548,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** GetOrgByDomainGlobal([GetOrgByDomainGlobalRequest](#getorgbydomainglobalrequest))
 [GetOrgByDomainGlobalResponse](#getorgbydomainglobalresponse)
 
-
+Search a org over all organisations
+Domain must match exactly
 
 
 
@@ -541,7 +561,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListOrgChanges([ListOrgChangesRequest](#listorgchangesrequest))
 [ListOrgChangesResponse](#listorgchangesresponse)
 
-
+Returns the history of my organisation (each event)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -553,7 +574,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** AddOrg([AddOrgRequest](#addorgrequest))
 [AddOrgResponse](#addorgresponse)
 
-
+Creates a new organisation
 
 
 
@@ -565,7 +586,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** DeactivateOrg([DeactivateOrgRequest](#deactivateorgrequest))
 [DeactivateOrgResponse](#deactivateorgresponse)
 
-
+Sets the state of my organisation to deactivated
+Users of this organisation will not be able login
 
 
 
@@ -577,7 +599,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ReactivateOrg([ReactivateOrgRequest](#reactivateorgrequest))
 [ReactivateOrgResponse](#reactivateorgresponse)
 
-
+Sets the state of my organisation to active
 
 
 
@@ -589,7 +611,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListOrgDomains([ListOrgDomainsRequest](#listorgdomainsrequest))
 [ListOrgDomainsResponse](#listorgdomainsresponse)
 
-
+Returns all registered domains of my organisation
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -601,7 +624,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** AddOrgDomain([AddOrgDomainRequest](#addorgdomainrequest))
 [AddOrgDomainResponse](#addorgdomainresponse)
 
-
+Adds a new domain to my organisation
 
 
 
@@ -613,7 +636,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveOrgDomain([RemoveOrgDomainRequest](#removeorgdomainrequest))
 [RemoveOrgDomainResponse](#removeorgdomainresponse)
 
-
+Removed the domain from my organisation
 
 
 
@@ -625,7 +648,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** GenerateOrgDomainValidation([GenerateOrgDomainValidationRequest](#generateorgdomainvalidationrequest))
 [GenerateOrgDomainValidationResponse](#generateorgdomainvalidationresponse)
 
-
+Generates a new file to validate you domain
 
 
 
@@ -637,7 +660,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ValidateOrgDomain([ValidateOrgDomainRequest](#validateorgdomainrequest))
 [ValidateOrgDomainResponse](#validateorgdomainresponse)
 
-
+Validates your domain with the choosen method
+Validated domains must be unique
 
 
 
@@ -649,7 +673,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** SetPrimaryOrgDomain([SetPrimaryOrgDomainRequest](#setprimaryorgdomainrequest))
 [SetPrimaryOrgDomainResponse](#setprimaryorgdomainresponse)
 
-
+Sets the domain as primary
+Primary domain is shown as suffix on the preferred username on the users of the organisation
 
 
 
@@ -661,7 +686,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListOrgMemberRoles([ListOrgMemberRolesRequest](#listorgmemberrolesrequest))
 [ListOrgMemberRolesResponse](#listorgmemberrolesresponse)
 
-
+Returns all ZITADEL roles which are for organisation managers
 
 
 
@@ -673,7 +698,8 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** ListOrgMembers([ListOrgMembersRequest](#listorgmembersrequest))
 [ListOrgMembersResponse](#listorgmembersresponse)
 
-
+Returns all ZITADEL managers of this organisation (Project and Project Grant managers not included)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -685,7 +711,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** AddOrgMember([AddOrgMemberRequest](#addorgmemberrequest))
 [AddOrgMemberResponse](#addorgmemberresponse)
 
-
+Adds a new organisation manager, which is allowed to administrate ZITADEL
 
 
 
@@ -697,7 +723,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** UpdateOrgMember([UpdateOrgMemberRequest](#updateorgmemberrequest))
 [UpdateOrgMemberResponse](#updateorgmemberresponse)
 
-
+Changes the organisation manager
 
 
 
@@ -709,7 +735,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** RemoveOrgMember([RemoveOrgMemberRequest](#removeorgmemberrequest))
 [RemoveOrgMemberResponse](#removeorgmemberresponse)
 
-
+Removes an organisation manager
 
 
 
@@ -721,7 +747,7 @@ A Manager is only allowed to set an initial password, on the next login the user
 > **rpc** GetProjectByID([GetProjectByIDRequest](#getprojectbyidrequest))
 [GetProjectByIDResponse](#getprojectbyidresponse)
 
-
+Returns a project from my organisation (no granted projects)
 
 
 
@@ -745,7 +771,8 @@ returns a project my organisation got granted from another organisation
 > **rpc** ListProjects([ListProjectsRequest](#listprojectsrequest))
 [ListProjectsResponse](#listprojectsresponse)
 
-
+Returns all projects my organisation is the owner (no granted projects)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -758,6 +785,7 @@ returns a project my organisation got granted from another organisation
 [ListGrantedProjectsResponse](#listgrantedprojectsresponse)
 
 returns all projects my organisation got granted from another organisation
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -770,6 +798,7 @@ returns all projects my organisation got granted from another organisation
 [ListGrantedProjectRolesResponse](#listgrantedprojectrolesresponse)
 
 returns all roles of a project grant
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -781,7 +810,8 @@ returns all roles of a project grant
 > **rpc** ListProjectChanges([ListProjectChangesRequest](#listprojectchangesrequest))
 [ListProjectChangesResponse](#listprojectchangesresponse)
 
-
+Returns the history of the project (each event)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -793,7 +823,7 @@ returns all roles of a project grant
 > **rpc** AddProject([AddProjectRequest](#addprojectrequest))
 [AddProjectResponse](#addprojectresponse)
 
-
+Adds an new project to the organisation
 
 
 
@@ -805,7 +835,7 @@ returns all roles of a project grant
 > **rpc** UpdateProject([UpdateProjectRequest](#updateprojectrequest))
 [UpdateProjectResponse](#updateprojectresponse)
 
-
+Changes a project
 
 
 
@@ -817,7 +847,8 @@ returns all roles of a project grant
 > **rpc** DeactivateProject([DeactivateProjectRequest](#deactivateprojectrequest))
 [DeactivateProjectResponse](#deactivateprojectresponse)
 
-
+Sets the state of a project to deactivated
+Returns an error if project is already deactivated
 
 
 
@@ -829,7 +860,8 @@ returns all roles of a project grant
 > **rpc** ReactivateProject([ReactivateProjectRequest](#reactivateprojectrequest))
 [ReactivateProjectResponse](#reactivateprojectresponse)
 
-
+Sets the state of a project to active
+Returns an error if project is not deactivated
 
 
 
@@ -841,7 +873,8 @@ returns all roles of a project grant
 > **rpc** RemoveProject([RemoveProjectRequest](#removeprojectrequest))
 [RemoveProjectResponse](#removeprojectresponse)
 
-
+Removes a project
+All project grants, applications and user grants for this project will be removed
 
 
 
@@ -853,7 +886,8 @@ returns all roles of a project grant
 > **rpc** ListProjectRoles([ListProjectRolesRequest](#listprojectrolesrequest))
 [ListProjectRolesResponse](#listprojectrolesresponse)
 
-
+Returns all roles of a project matching the search query
+If no limit is requested, default limit will be set, if the limit is higher then the default an error will be returned
 
 
 
@@ -865,7 +899,7 @@ returns all roles of a project grant
 > **rpc** AddProjectRole([AddProjectRoleRequest](#addprojectrolerequest))
 [AddProjectRoleResponse](#addprojectroleresponse)
 
-
+Adds a role to a project, key must be unique in the project
 
 
 
@@ -889,7 +923,8 @@ add a list of project roles in one request
 > **rpc** UpdateProjectRole([UpdateProjectRoleRequest](#updateprojectrolerequest))
 [UpdateProjectRoleResponse](#updateprojectroleresponse)
 
-
+Changes a project role, key is not editable
+If a key should change, remove the role and create a new
 
 
 
@@ -901,7 +936,7 @@ add a list of project roles in one request
 > **rpc** RemoveProjectRole([RemoveProjectRoleRequest](#removeprojectrolerequest))
 [RemoveProjectRoleResponse](#removeprojectroleresponse)
 
-RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
+Removes role from UserGrants, ProjectGrants and from Project
 
 
 
@@ -913,7 +948,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ListProjectMemberRoles([ListProjectMemberRolesRequest](#listprojectmemberrolesrequest))
 [ListProjectMemberRolesResponse](#listprojectmemberrolesresponse)
 
-
+Returns all ZITADEL roles which are for project managers
 
 
 
@@ -925,7 +960,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ListProjectMembers([ListProjectMembersRequest](#listprojectmembersrequest))
 [ListProjectMembersResponse](#listprojectmembersresponse)
 
-
+Returns all ZITADEL managers of a projects
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -937,7 +973,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** AddProjectMember([AddProjectMemberRequest](#addprojectmemberrequest))
 [AddProjectMemberResponse](#addprojectmemberresponse)
 
-
+Adds a new project manager, which is allowed to administrate in ZITADEL
 
 
 
@@ -949,7 +985,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** UpdateProjectMember([UpdateProjectMemberRequest](#updateprojectmemberrequest))
 [UpdateProjectMemberResponse](#updateprojectmemberresponse)
 
-
+Change project manager, which is allowed to administrate in ZITADEL
 
 
 
@@ -961,7 +997,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** RemoveProjectMember([RemoveProjectMemberRequest](#removeprojectmemberrequest))
 [RemoveProjectMemberResponse](#removeprojectmemberresponse)
 
-
+Remove project manager, which is allowed to administrate in ZITADEL
 
 
 
@@ -973,7 +1009,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** GetAppByID([GetAppByIDRequest](#getappbyidrequest))
 [GetAppByIDResponse](#getappbyidresponse)
 
-
+Returns an application (oidc or api)
 
 
 
@@ -985,7 +1021,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ListApps([ListAppsRequest](#listappsrequest))
 [ListAppsResponse](#listappsresponse)
 
-
+Returns all applications of a project matching the query
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -997,7 +1034,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ListAppChanges([ListAppChangesRequest](#listappchangesrequest))
 [ListAppChangesResponse](#listappchangesresponse)
 
-
+Returns the history of the application (each event)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1009,7 +1047,9 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** AddOIDCApp([AddOIDCAppRequest](#addoidcapprequest))
 [AddOIDCAppResponse](#addoidcappresponse)
 
-
+Adds a new oidc client
+Returns a client id
+Returns a new generated secret if needed (Depending on the configuration)
 
 
 
@@ -1021,7 +1061,9 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** AddAPIApp([AddAPIAppRequest](#addapiapprequest))
 [AddAPIAppResponse](#addapiappresponse)
 
-
+Adds a new api application
+Returns a client id
+Returns a new generated secret if needed (Depending on the configuration)
 
 
 
@@ -1033,7 +1075,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** UpdateApp([UpdateAppRequest](#updateapprequest))
 [UpdateAppResponse](#updateappresponse)
 
-
+Changes application
 
 
 
@@ -1045,7 +1087,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** UpdateOIDCAppConfig([UpdateOIDCAppConfigRequest](#updateoidcappconfigrequest))
 [UpdateOIDCAppConfigResponse](#updateoidcappconfigresponse)
 
-
+Changes the configuration of the oidc client
 
 
 
@@ -1057,7 +1099,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** UpdateAPIAppConfig([UpdateAPIAppConfigRequest](#updateapiappconfigrequest))
 [UpdateAPIAppConfigResponse](#updateapiappconfigresponse)
 
-
+Changes the configuration of the api application
 
 
 
@@ -1069,7 +1111,9 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** DeactivateApp([DeactivateAppRequest](#deactivateapprequest))
 [DeactivateAppResponse](#deactivateappresponse)
 
-
+Set the state to deactivated
+Its not possible to request tokens for deactivated apps
+Returns an error if already deactivated
 
 
 
@@ -1081,7 +1125,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ReactivateApp([ReactivateAppRequest](#reactivateapprequest))
 [ReactivateAppResponse](#reactivateappresponse)
 
-
+Set the state to active
+Returns an error if not deactivated
 
 
 
@@ -1093,7 +1138,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** RemoveApp([RemoveAppRequest](#removeapprequest))
 [RemoveAppResponse](#removeappresponse)
 
-
+Removed the application
 
 
 
@@ -1105,7 +1150,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** RegenerateOIDCClientSecret([RegenerateOIDCClientSecretRequest](#regenerateoidcclientsecretrequest))
 [RegenerateOIDCClientSecretResponse](#regenerateoidcclientsecretresponse)
 
-
+Generates a new client secret for the oidc client, make sure to save the response
 
 
 
@@ -1117,7 +1162,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** RegenerateAPIClientSecret([RegenerateAPIClientSecretRequest](#regenerateapiclientsecretrequest))
 [RegenerateAPIClientSecretResponse](#regenerateapiclientsecretresponse)
 
-
+Generates a new client secret for the api application, make sure to save the response
 
 
 
@@ -1129,7 +1174,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** GetAppKey([GetAppKeyRequest](#getappkeyrequest))
 [GetAppKeyResponse](#getappkeyresponse)
 
-
+Returns an application key
 
 
 
@@ -1141,7 +1186,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ListAppKeys([ListAppKeysRequest](#listappkeysrequest))
 [ListAppKeysResponse](#listappkeysresponse)
 
-
+Returns all application keys matching the result
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1153,7 +1199,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** AddAppKey([AddAppKeyRequest](#addappkeyrequest))
 [AddAppKeyResponse](#addappkeyresponse)
 
-
+Creates a new app key
+Will return key details in result, make sure to save it
 
 
 
@@ -1165,7 +1212,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** RemoveAppKey([RemoveAppKeyRequest](#removeappkeyrequest))
 [RemoveAppKeyResponse](#removeappkeyresponse)
 
-
+Removes an app key
 
 
 
@@ -1177,7 +1224,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** GetProjectGrantByID([GetProjectGrantByIDRequest](#getprojectgrantbyidrequest))
 [GetProjectGrantByIDResponse](#getprojectgrantbyidresponse)
 
-
+Returns a project grant (ProjectGrant = Grant another organisation for my project)
 
 
 
@@ -1189,7 +1236,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ListProjectGrants([ListProjectGrantsRequest](#listprojectgrantsrequest))
 [ListProjectGrantsResponse](#listprojectgrantsresponse)
 
-
+Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1201,7 +1249,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** AddProjectGrant([AddProjectGrantRequest](#addprojectgrantrequest))
 [AddProjectGrantResponse](#addprojectgrantresponse)
 
-
+Add a new project grant (ProjectGrant = Grant another organisation for my project)
+Project Grant will be listed in granted project of the other organisation
 
 
 
@@ -1213,7 +1262,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** UpdateProjectGrant([UpdateProjectGrantRequest](#updateprojectgrantrequest))
 [UpdateProjectGrantResponse](#updateprojectgrantresponse)
 
-
+Change project grant (ProjectGrant = Grant another organisation for my project)
+Project Grant will be listed in granted project of the other organisation
 
 
 
@@ -1225,7 +1275,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** DeactivateProjectGrant([DeactivateProjectGrantRequest](#deactivateprojectgrantrequest))
 [DeactivateProjectGrantResponse](#deactivateprojectgrantresponse)
 
-
+Set state of project grant to deactivated (ProjectGrant = Grant another organisation for my project)
+Returns error if project not active
 
 
 
@@ -1237,7 +1288,8 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** ReactivateProjectGrant([ReactivateProjectGrantRequest](#reactivateprojectgrantrequest))
 [ReactivateProjectGrantResponse](#reactivateprojectgrantresponse)
 
-
+Set state of project grant to active (ProjectGrant = Grant another organisation for my project)
+Returns error if project not deactivated
 
 
 
@@ -1249,7 +1301,7 @@ RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
 > **rpc** RemoveProjectGrant([RemoveProjectGrantRequest](#removeprojectgrantrequest))
 [RemoveProjectGrantResponse](#removeprojectgrantresponse)
 
-RemoveProjectGrant removes project grant and all user grants for this project grant
+Removes project grant and all user grants for this project grant
 
 
 
@@ -1261,7 +1313,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** ListProjectGrantMemberRoles([ListProjectGrantMemberRolesRequest](#listprojectgrantmemberrolesrequest))
 [ListProjectGrantMemberRolesResponse](#listprojectgrantmemberrolesresponse)
 
-
+Returns all ZITADEL roles which are for project grant managers
 
 
 
@@ -1273,7 +1325,8 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** ListProjectGrantMembers([ListProjectGrantMembersRequest](#listprojectgrantmembersrequest))
 [ListProjectGrantMembersResponse](#listprojectgrantmembersresponse)
 
-
+Returns all ZITADEL managers of this project grant
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1285,7 +1338,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** AddProjectGrantMember([AddProjectGrantMemberRequest](#addprojectgrantmemberrequest))
 [AddProjectGrantMemberResponse](#addprojectgrantmemberresponse)
 
-
+Adds a new project grant manager, which is allowed to administrate in ZITADEL
 
 
 
@@ -1297,7 +1350,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** UpdateProjectGrantMember([UpdateProjectGrantMemberRequest](#updateprojectgrantmemberrequest))
 [UpdateProjectGrantMemberResponse](#updateprojectgrantmemberresponse)
 
-
+Changes project grant manager, which is allowed to administrate in ZITADEL
 
 
 
@@ -1309,7 +1362,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** RemoveProjectGrantMember([RemoveProjectGrantMemberRequest](#removeprojectgrantmemberrequest))
 [RemoveProjectGrantMemberResponse](#removeprojectgrantmemberresponse)
 
-
+Removed project grant manager
 
 
 
@@ -1321,7 +1374,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** GetUserGrantByID([GetUserGrantByIDRequest](#getusergrantbyidrequest))
 [GetUserGrantByIDResponse](#getusergrantbyidresponse)
 
-
+Returns a user grant (authorization of a user for a project)
 
 
 
@@ -1333,7 +1386,8 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** ListUserGrants([ListUserGrantRequest](#listusergrantrequest))
 [ListUserGrantResponse](#listusergrantresponse)
 
-
+Returns al user grant matching the query (authorizations of user for projects)
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1345,7 +1399,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** AddUserGrant([AddUserGrantRequest](#addusergrantrequest))
 [AddUserGrantResponse](#addusergrantresponse)
 
-
+Creates a new user grant (authorization of a user for a project with specified roles)
 
 
 
@@ -1357,7 +1411,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** UpdateUserGrant([UpdateUserGrantRequest](#updateusergrantrequest))
 [UpdateUserGrantResponse](#updateusergrantresponse)
 
-
+Changes a user grant (authorization of a user for a project with specified roles)
 
 
 
@@ -1369,7 +1423,9 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** DeactivateUserGrant([DeactivateUserGrantRequest](#deactivateusergrantrequest))
 [DeactivateUserGrantResponse](#deactivateusergrantresponse)
 
-
+Sets the state of a user grant to deactivated
+User will not be able to use the granted project anymore
+Returns an error if user grant is already deactivated
 
 
 
@@ -1381,7 +1437,8 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** ReactivateUserGrant([ReactivateUserGrantRequest](#reactivateusergrantrequest))
 [ReactivateUserGrantResponse](#reactivateusergrantresponse)
 
-
+Sets the state of a user grant to active
+Returns an error if user grant is not deactivated
 
 
 
@@ -1393,7 +1450,7 @@ RemoveProjectGrant removes project grant and all user grants for this project gr
 > **rpc** RemoveUserGrant([RemoveUserGrantRequest](#removeusergrantrequest))
 [RemoveUserGrantResponse](#removeusergrantresponse)
 
-
+Removes a user grant
 
 
 
@@ -1429,7 +1486,7 @@ remove a list of user grants in one request
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
 [GetOrgIAMPolicyResponse](#getorgiampolicyresponse)
 
-
+Returns the org iam policy (this policy is managed by the iam administrator)
 
 
 
@@ -1441,7 +1498,8 @@ remove a list of user grants in one request
 > **rpc** GetLoginPolicy([GetLoginPolicyRequest](#getloginpolicyrequest))
 [GetLoginPolicyResponse](#getloginpolicyresponse)
 
-
+Returns the login policy of the organisation
+With this policy the login gui can be configured
 
 
 
@@ -1453,7 +1511,7 @@ remove a list of user grants in one request
 > **rpc** GetDefaultLoginPolicy([GetDefaultLoginPolicyRequest](#getdefaultloginpolicyrequest))
 [GetDefaultLoginPolicyResponse](#getdefaultloginpolicyresponse)
 
-
+Returns the default login policy configured in the IAM
 
 
 
@@ -1465,7 +1523,8 @@ remove a list of user grants in one request
 > **rpc** AddCustomLoginPolicy([AddCustomLoginPolicyRequest](#addcustomloginpolicyrequest))
 [AddCustomLoginPolicyResponse](#addcustomloginpolicyresponse)
 
-
+Add a custom login policy for the organisation
+With this policy the login gui can be configured
 
 
 
@@ -1477,7 +1536,8 @@ remove a list of user grants in one request
 > **rpc** UpdateCustomLoginPolicy([UpdateCustomLoginPolicyRequest](#updatecustomloginpolicyrequest))
 [UpdateCustomLoginPolicyResponse](#updatecustomloginpolicyresponse)
 
-
+Change the custom login policy for the organisation
+With this policy the login gui can be configured
 
 
 
@@ -1489,7 +1549,8 @@ remove a list of user grants in one request
 > **rpc** ResetLoginPolicyToDefault([ResetLoginPolicyToDefaultRequest](#resetloginpolicytodefaultrequest))
 [ResetLoginPolicyToDefaultResponse](#resetloginpolicytodefaultresponse)
 
-
+Removes the custom login policy of the organisation
+The default policy of the IAM will trigger after
 
 
 
@@ -1501,7 +1562,8 @@ remove a list of user grants in one request
 > **rpc** ListLoginPolicyIDPs([ListLoginPolicyIDPsRequest](#listloginpolicyidpsrequest))
 [ListLoginPolicyIDPsResponse](#listloginpolicyidpsresponse)
 
-
+Lists all possible identity providers configured on the organisation
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1513,7 +1575,7 @@ remove a list of user grants in one request
 > **rpc** AddIDPToLoginPolicy([AddIDPToLoginPolicyRequest](#addidptologinpolicyrequest))
 [AddIDPToLoginPolicyResponse](#addidptologinpolicyresponse)
 
-
+Add a (preconfigured) identity provider to the custom login policy
 
 
 
@@ -1525,7 +1587,7 @@ remove a list of user grants in one request
 > **rpc** RemoveIDPFromLoginPolicy([RemoveIDPFromLoginPolicyRequest](#removeidpfromloginpolicyrequest))
 [RemoveIDPFromLoginPolicyResponse](#removeidpfromloginpolicyresponse)
 
-
+Remove a identity provider from the custom login policy
 
 
 
@@ -1537,7 +1599,7 @@ remove a list of user grants in one request
 > **rpc** ListLoginPolicySecondFactors([ListLoginPolicySecondFactorsRequest](#listloginpolicysecondfactorsrequest))
 [ListLoginPolicySecondFactorsResponse](#listloginpolicysecondfactorsresponse)
 
-
+Returns all configured second factors of the custom login policy
 
 
 
@@ -1549,7 +1611,7 @@ remove a list of user grants in one request
 > **rpc** AddSecondFactorToLoginPolicy([AddSecondFactorToLoginPolicyRequest](#addsecondfactortologinpolicyrequest))
 [AddSecondFactorToLoginPolicyResponse](#addsecondfactortologinpolicyresponse)
 
-
+Adds a new second factor to the custom login policy
 
 
 
@@ -1561,7 +1623,7 @@ remove a list of user grants in one request
 > **rpc** RemoveSecondFactorFromLoginPolicy([RemoveSecondFactorFromLoginPolicyRequest](#removesecondfactorfromloginpolicyrequest))
 [RemoveSecondFactorFromLoginPolicyResponse](#removesecondfactorfromloginpolicyresponse)
 
-
+Remove a second factor from the custom login policy
 
 
 
@@ -1573,7 +1635,7 @@ remove a list of user grants in one request
 > **rpc** ListLoginPolicyMultiFactors([ListLoginPolicyMultiFactorsRequest](#listloginpolicymultifactorsrequest))
 [ListLoginPolicyMultiFactorsResponse](#listloginpolicymultifactorsresponse)
 
-
+Returns all configured multi factors of the custom login policy
 
 
 
@@ -1585,7 +1647,7 @@ remove a list of user grants in one request
 > **rpc** AddMultiFactorToLoginPolicy([AddMultiFactorToLoginPolicyRequest](#addmultifactortologinpolicyrequest))
 [AddMultiFactorToLoginPolicyResponse](#addmultifactortologinpolicyresponse)
 
-
+Adds a new multi factor to the custom login policy
 
 
 
@@ -1597,7 +1659,7 @@ remove a list of user grants in one request
 > **rpc** RemoveMultiFactorFromLoginPolicy([RemoveMultiFactorFromLoginPolicyRequest](#removemultifactorfromloginpolicyrequest))
 [RemoveMultiFactorFromLoginPolicyResponse](#removemultifactorfromloginpolicyresponse)
 
-
+Remove a multi factor from the custom login policy
 
 
 
@@ -1609,7 +1671,8 @@ remove a list of user grants in one request
 > **rpc** GetPasswordComplexityPolicy([GetPasswordComplexityPolicyRequest](#getpasswordcomplexitypolicyrequest))
 [GetPasswordComplexityPolicyResponse](#getpasswordcomplexitypolicyresponse)
 
-
+Returns the password complexity policy of the organisation
+With this policy the password strength can be configured
 
 
 
@@ -1621,7 +1684,8 @@ remove a list of user grants in one request
 > **rpc** GetDefaultPasswordComplexityPolicy([GetDefaultPasswordComplexityPolicyRequest](#getdefaultpasswordcomplexitypolicyrequest))
 [GetDefaultPasswordComplexityPolicyResponse](#getdefaultpasswordcomplexitypolicyresponse)
 
-
+Returns the default password complexity policy of the IAM
+With this policy the password strength can be configured
 
 
 
@@ -1633,7 +1697,8 @@ remove a list of user grants in one request
 > **rpc** AddCustomPasswordComplexityPolicy([AddCustomPasswordComplexityPolicyRequest](#addcustompasswordcomplexitypolicyrequest))
 [AddCustomPasswordComplexityPolicyResponse](#addcustompasswordcomplexitypolicyresponse)
 
-
+Add a custom password complexity policy for the organisation
+With this policy the password strength can be configured
 
 
 
@@ -1645,7 +1710,8 @@ remove a list of user grants in one request
 > **rpc** UpdateCustomPasswordComplexityPolicy([UpdateCustomPasswordComplexityPolicyRequest](#updatecustompasswordcomplexitypolicyrequest))
 [UpdateCustomPasswordComplexityPolicyResponse](#updatecustompasswordcomplexitypolicyresponse)
 
-
+Update the custom password complexity policy for the organisation
+With this policy the password strength can be configured
 
 
 
@@ -1657,7 +1723,8 @@ remove a list of user grants in one request
 > **rpc** ResetPasswordComplexityPolicyToDefault([ResetPasswordComplexityPolicyToDefaultRequest](#resetpasswordcomplexitypolicytodefaultrequest))
 [ResetPasswordComplexityPolicyToDefaultResponse](#resetpasswordcomplexitypolicytodefaultresponse)
 
-
+Removes the custom password complexity policy of the organisation
+The default policy of the IAM will trigger after
 
 
 
@@ -1669,7 +1736,7 @@ remove a list of user grants in one request
 > **rpc** GetPasswordAgePolicy([GetPasswordAgePolicyRequest](#getpasswordagepolicyrequest))
 [GetPasswordAgePolicyResponse](#getpasswordagepolicyresponse)
 
-
+The password age policy is not used at the moment
 
 
 
@@ -1681,7 +1748,7 @@ remove a list of user grants in one request
 > **rpc** GetDefaultPasswordAgePolicy([GetDefaultPasswordAgePolicyRequest](#getdefaultpasswordagepolicyrequest))
 [GetDefaultPasswordAgePolicyResponse](#getdefaultpasswordagepolicyresponse)
 
-
+The password age policy is not used at the moment
 
 
 
@@ -1693,7 +1760,7 @@ remove a list of user grants in one request
 > **rpc** AddCustomPasswordAgePolicy([AddCustomPasswordAgePolicyRequest](#addcustompasswordagepolicyrequest))
 [AddCustomPasswordAgePolicyResponse](#addcustompasswordagepolicyresponse)
 
-
+The password age policy is not used at the moment
 
 
 
@@ -1705,7 +1772,7 @@ remove a list of user grants in one request
 > **rpc** UpdateCustomPasswordAgePolicy([UpdateCustomPasswordAgePolicyRequest](#updatecustompasswordagepolicyrequest))
 [UpdateCustomPasswordAgePolicyResponse](#updatecustompasswordagepolicyresponse)
 
-
+The password age policy is not used at the moment
 
 
 
@@ -1717,7 +1784,7 @@ remove a list of user grants in one request
 > **rpc** ResetPasswordAgePolicyToDefault([ResetPasswordAgePolicyToDefaultRequest](#resetpasswordagepolicytodefaultrequest))
 [ResetPasswordAgePolicyToDefaultResponse](#resetpasswordagepolicytodefaultresponse)
 
-
+The password age policy is not used at the moment
 
 
 
@@ -1729,7 +1796,7 @@ remove a list of user grants in one request
 > **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
 [GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
 
-
+The password lockout policy is not used at the moment
 
 
 
@@ -1741,7 +1808,7 @@ remove a list of user grants in one request
 > **rpc** GetDefaultPasswordLockoutPolicy([GetDefaultPasswordLockoutPolicyRequest](#getdefaultpasswordlockoutpolicyrequest))
 [GetDefaultPasswordLockoutPolicyResponse](#getdefaultpasswordlockoutpolicyresponse)
 
-
+The password lockout policy is not used at the moment
 
 
 
@@ -1753,7 +1820,7 @@ remove a list of user grants in one request
 > **rpc** AddCustomPasswordLockoutPolicy([AddCustomPasswordLockoutPolicyRequest](#addcustompasswordlockoutpolicyrequest))
 [AddCustomPasswordLockoutPolicyResponse](#addcustompasswordlockoutpolicyresponse)
 
-
+The password lockout policy is not used at the moment
 
 
 
@@ -1765,7 +1832,7 @@ remove a list of user grants in one request
 > **rpc** UpdateCustomPasswordLockoutPolicy([UpdateCustomPasswordLockoutPolicyRequest](#updatecustompasswordlockoutpolicyrequest))
 [UpdateCustomPasswordLockoutPolicyResponse](#updatecustompasswordlockoutpolicyresponse)
 
-
+The password lockout policy is not used at the moment
 
 
 
@@ -1777,7 +1844,7 @@ remove a list of user grants in one request
 > **rpc** ResetPasswordLockoutPolicyToDefault([ResetPasswordLockoutPolicyToDefaultRequest](#resetpasswordlockoutpolicytodefaultrequest))
 [ResetPasswordLockoutPolicyToDefaultResponse](#resetpasswordlockoutpolicytodefaultresponse)
 
-
+The password lockout policy is not used at the moment
 
 
 
@@ -1789,7 +1856,8 @@ remove a list of user grants in one request
 > **rpc** GetLabelPolicy([GetLabelPolicyRequest](#getlabelpolicyrequest))
 [GetLabelPolicyResponse](#getlabelpolicyresponse)
 
-
+Returns the label policy of the organisation
+With this policy the private labeling can be configured (colors, etc.)
 
 
 
@@ -1801,7 +1869,8 @@ remove a list of user grants in one request
 > **rpc** GetDefaultLabelPolicy([GetDefaultLabelPolicyRequest](#getdefaultlabelpolicyrequest))
 [GetDefaultLabelPolicyResponse](#getdefaultlabelpolicyresponse)
 
-
+Returns the default label policy of the IAM
+With this policy the private labeling can be configured (colors, etc.)
 
 
 
@@ -1813,7 +1882,8 @@ remove a list of user grants in one request
 > **rpc** AddCustomLabelPolicy([AddCustomLabelPolicyRequest](#addcustomlabelpolicyrequest))
 [AddCustomLabelPolicyResponse](#addcustomlabelpolicyresponse)
 
-
+Add a custom label policy for the organisation
+With this policy the private labeling can be configured (colors, etc.)
 
 
 
@@ -1825,7 +1895,8 @@ remove a list of user grants in one request
 > **rpc** UpdateCustomLabelPolicy([UpdateCustomLabelPolicyRequest](#updatecustomlabelpolicyrequest))
 [UpdateCustomLabelPolicyResponse](#updatecustomlabelpolicyresponse)
 
-
+Changes the custom label policy for the organisation
+With this policy the private labeling can be configured (colors, etc.)
 
 
 
@@ -1837,7 +1908,8 @@ remove a list of user grants in one request
 > **rpc** ResetLabelPolicyToDefault([ResetLabelPolicyToDefaultRequest](#resetlabelpolicytodefaultrequest))
 [ResetLabelPolicyToDefaultResponse](#resetlabelpolicytodefaultresponse)
 
-
+Removes the custom label policy of the organisation
+The default policy of the IAM will trigger after
 
 
 
@@ -1849,7 +1921,7 @@ remove a list of user grants in one request
 > **rpc** GetOrgIDPByID([GetOrgIDPByIDRequest](#getorgidpbyidrequest))
 [GetOrgIDPByIDResponse](#getorgidpbyidresponse)
 
-
+Returns a identity provider configuration of the organisation
 
 
 
@@ -1861,7 +1933,8 @@ remove a list of user grants in one request
 > **rpc** ListOrgIDPs([ListOrgIDPsRequest](#listorgidpsrequest))
 [ListOrgIDPsResponse](#listorgidpsresponse)
 
-
+Returns all identity provider configuration in the organisation, which match the query
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -1873,7 +1946,8 @@ remove a list of user grants in one request
 > **rpc** AddOrgOIDCIDP([AddOrgOIDCIDPRequest](#addorgoidcidprequest))
 [AddOrgOIDCIDPResponse](#addorgoidcidpresponse)
 
-
+Add a new identity provider configuration in the organisation
+Provider must be OIDC compliant
 
 
 
@@ -1885,7 +1959,9 @@ remove a list of user grants in one request
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
 [DeactivateOrgIDPResponse](#deactivateorgidpresponse)
 
-
+Deactivate identity provider configuration
+Users will not be able to use this provider for login (e.g Google, Microsoft, AD, etc)
+Returns error if already deactivated
 
 
 
@@ -1897,7 +1973,8 @@ remove a list of user grants in one request
 > **rpc** ReactivateOrgIDP([ReactivateOrgIDPRequest](#reactivateorgidprequest))
 [ReactivateOrgIDPResponse](#reactivateorgidpresponse)
 
-
+Activate identity provider configuration
+Returns error if not deactivated
 
 
 
@@ -1909,7 +1986,8 @@ remove a list of user grants in one request
 > **rpc** RemoveOrgIDP([RemoveOrgIDPRequest](#removeorgidprequest))
 [RemoveOrgIDPResponse](#removeorgidpresponse)
 
-
+Removes identity provider configuration
+Will remove all linked providers of this configuration on the users
 
 
 
@@ -1921,7 +1999,7 @@ remove a list of user grants in one request
 > **rpc** UpdateOrgIDP([UpdateOrgIDPRequest](#updateorgidprequest))
 [UpdateOrgIDPResponse](#updateorgidpresponse)
 
-
+Change identity provider configuration of the organisation
 
 
 
@@ -1933,7 +2011,7 @@ remove a list of user grants in one request
 > **rpc** UpdateOrgIDPOIDCConfig([UpdateOrgIDPOIDCConfigRequest](#updateorgidpoidcconfigrequest))
 [UpdateOrgIDPOIDCConfigResponse](#updateorgidpoidcconfigresponse)
 
-
+Change OIDC identity provider configuration of the organisation
 
 
 
