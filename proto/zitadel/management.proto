@@ -72,7 +72,7 @@ service ManagementService {
         };
     }
 
-    // GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
+    // Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project ID)
     rpc GetIAM(GetIAMRequest) returns (GetIAMResponse) {
         option (google.api.http) = {
             get: "/iam"
@@ -83,6 +83,7 @@ service ManagementService {
         };
     }
 
+    // Returns the requested full blown user (human or machine)
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -93,7 +94,7 @@ service ManagementService {
         };
     }
 
-    // GetUserByLoginNameGlobal searches a user over all organisations
+    // Searches a user over all organisations
     // the login name has to match exactly
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
         option (google.api.http) = {
@@ -119,6 +120,7 @@ service ManagementService {
         };
     }
 
+    // Return the users matching the query
     // Limit should always be set, there is a default limit set by the service
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
         option (google.api.http) = {
@@ -131,6 +133,7 @@ service ManagementService {
         };
     }
 
+    // Returns the history of the user (each event)
     rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/changes/_search"
@@ -142,6 +145,7 @@ service ManagementService {
         };
     }
 
+    // Returns if a user with the searched email or username is unique
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
         option (google.api.http) = {
             get: "/users/_is_unique"
@@ -152,6 +156,9 @@ service ManagementService {
         };
     }
 
+    // Create a user of the type human
+    // A email will be sent to the user if email is not verified or no password is set
+    // If a password is given, the user has to change on the next login
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -163,6 +170,9 @@ service ManagementService {
         };
     }
 
+    // Create a user of the type human
+    // A email will be sent to the user if email is not verified or no password is set
+    // If a password is given, the user doesn't have to change on the next login
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -174,6 +184,7 @@ service ManagementService {
         };
     }
 
+    // Create a user of the type machine
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
             post: "/users/machine"
@@ -185,6 +196,9 @@ service ManagementService {
         };
     }
 
+    // Changes the user state to deactivated
+    // The user will not be able to login
+    // returns an error if user state is already deactivated
     rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_deactivate"
@@ -196,6 +210,8 @@ service ManagementService {
         };
     }
 
+    // Changes the user state to active
+    // returns an error if user state is not deactivated
     rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_reactivate"
@@ -207,6 +223,9 @@ service ManagementService {
         };
     }
 
+    // Changes the user state to deactivated
+    // The user will not be able to login
+    // returns an error if user state is already locked
     rpc LockUser(LockUserRequest) returns (LockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_lock"
@@ -218,6 +237,8 @@ service ManagementService {
         };
     }
 
+    // Changes the user state to active
+    // returns an error if user state is not locked
     rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_unlock"
@@ -229,6 +250,7 @@ service ManagementService {
         };
     }
 
+    // Changes the user state to deleted
     rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
@@ -239,6 +261,7 @@ service ManagementService {
         };
     }
 
+    // Changes the username
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/username"
@@ -249,6 +272,7 @@ service ManagementService {
         };
     }
 
+    // Returns the profile of the human
     rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/profile"
@@ -259,6 +283,7 @@ service ManagementService {
         };
     }
 
+    // Changes the profile of the human
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
@@ -270,6 +295,7 @@ service ManagementService {
         };
     }
 
+    // GetHumanEmail returns the email and verified state of the human
     rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/email"
@@ -280,6 +306,8 @@ service ManagementService {
         };
     }
 
+    // Changes the email of the human
+    // If state is not verified, the user will get a verification email
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
@@ -291,6 +319,8 @@ service ManagementService {
         };
     }
 
+    // Resends an email to the given email address to finish the initialization process of the user
+    // Changes the email address of the user if it is provided
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
@@ -302,6 +332,7 @@ service ManagementService {
         };
     }
 
+    // Resends an email to the given email address to finish the email verification process of the user
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resend_verification"
@@ -313,6 +344,7 @@ service ManagementService {
         };
     }
 
+    // Returns the phone and verified state of the human phone
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/phone"
@@ -323,6 +355,8 @@ service ManagementService {
         };
     }
 
+    // Changes the phone number
+    // If verified is not set, the user will get an sms to verify the number
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/phone"
@@ -334,6 +368,7 @@ service ManagementService {
         };
     }
 
+    // Removes the phone number of the human
     rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/phone"
@@ -344,6 +379,7 @@ service ManagementService {
         };
     }
 
+    // An sms will be sent to the given phone number to finish the phone verification process of the user
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/phone/_resend_verification"
@@ -367,6 +403,7 @@ service ManagementService {
         };
     }
 
+    // An email will be sent to the given address to reset the password of the user
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_reset"
@@ -378,6 +415,7 @@ service ManagementService {
         };
     }
 
+    // Returns a list of all factors (second and multi) which are configured on the user
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/auth_factors/_search"
@@ -388,6 +426,8 @@ service ManagementService {
         };
     }
 
+    // The otp second factor will be removed from the user
+    // Because only one otp can be configured per user, the configured one will be removed
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -398,6 +438,7 @@ service ManagementService {
         };
     }
 
+    // The u2f (universial second factor) will be removed from the user
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
@@ -408,6 +449,7 @@ service ManagementService {
         };
     }
 
+    // Returns all configured passwordless authentications
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -418,6 +460,7 @@ service ManagementService {
         };
     }
 
+    // Removed a configured passwordless authentication
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -428,6 +471,7 @@ service ManagementService {
         };
     }
 
+    // Changes a machine user
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/machine"
@@ -439,6 +483,7 @@ service ManagementService {
         };
     }
 
+    // Returns a machine key of a (machine) user
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/keys/{key_id}"
@@ -449,6 +494,7 @@ service ManagementService {
         };
     }
 
+    // Returns all machine keys of a (machine) user which match the query
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys/_search"
@@ -460,6 +506,7 @@ service ManagementService {
         };
     }
 
+    // Generates a new machine key, details should be stored after return
     rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys"
@@ -471,6 +518,7 @@ service ManagementService {
         };
     }
 
+    // Removed a machine key
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
@@ -481,6 +529,7 @@ service ManagementService {
         };
     }
 
+    // Lists all identity providers (social logins) which a human has configured (e.g Google, Microsoft, AD, etc..)
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/idps/_search"
@@ -492,6 +541,7 @@ service ManagementService {
         };
     }
 
+    // Removed a configured identity provider (social login) of a human
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -502,6 +552,7 @@ service ManagementService {
         };
     }
 
+    // Show all the permissions a user has iin ZITADEL (ZITADEL Manager)
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/memberships/_search"
@@ -513,6 +564,7 @@ service ManagementService {
         };
     }
 
+    // Returns the org given in the header
     rpc GetMyOrg(GetMyOrgRequest) returns (GetMyOrgResponse) {
         option (google.api.http) = {
             get: "/orgs/me"
@@ -523,6 +575,8 @@ service ManagementService {
         };
     }
 
+    // Search a org over all organisations
+    // Domain must match exactly
     rpc GetOrgByDomainGlobal(GetOrgByDomainGlobalRequest) returns (GetOrgByDomainGlobalResponse) {
         option (google.api.http) = {
             get: "/global/orgs/_by_domain"
@@ -533,6 +587,7 @@ service ManagementService {
         };
     }
 
+    // Returns the history of my organisation (each event)
     rpc ListOrgChanges(ListOrgChangesRequest) returns (ListOrgChangesResponse) {
         option (google.api.http) = {
             post: "/orgs/me/changes/_search"
@@ -544,6 +599,7 @@ service ManagementService {
         };
     }
 
+    // Creates a new organisation
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
@@ -555,6 +611,8 @@ service ManagementService {
         };
     }
 
+    // Sets the state of my organisation to deactivated
+    // Users of this organisation will not be able login
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_deactivate"
@@ -566,6 +624,7 @@ service ManagementService {
         };
     }
 
+    // Sets the state of my organisation to active
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_reactivate"
@@ -577,6 +636,7 @@ service ManagementService {
         };
     }
 
+    // Returns all registered domains of my organisation
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/_search"
@@ -588,6 +648,7 @@ service ManagementService {
         };
     }
 
+    // Adds a new domain to my organisation
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains"
@@ -600,6 +661,7 @@ service ManagementService {
         };
     }
 
+    // Removed the domain from my organisation
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -610,6 +672,7 @@ service ManagementService {
         };
     }
 
+    // Generates a new file to validate you domain
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_generate"
@@ -622,6 +685,8 @@ service ManagementService {
         };
     }
 
+    // Validates your domain with the choosen method
+    // Validated domains must be unique
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_validate"
@@ -634,6 +699,8 @@ service ManagementService {
         };
     }
 
+    // Sets the domain as primary
+    // Primary domain is shown as suffix on the preferred username on the users of the organisation
     rpc SetPrimaryOrgDomain(SetPrimaryOrgDomainRequest) returns (SetPrimaryOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/_set_primary"
@@ -645,6 +712,7 @@ service ManagementService {
         };
     }
 
+    // Returns all ZITADEL roles which are for organisation managers
     rpc ListOrgMemberRoles(ListOrgMemberRolesRequest) returns (ListOrgMemberRolesResponse) {
         option (google.api.http) = {
             post: "/orgs/members/roles/_search"
@@ -655,6 +723,7 @@ service ManagementService {
         };
     }
 
+    // Returns all ZITADEL managers of this organisation (Project and Project Grant managers not included)
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members/_search"
@@ -666,6 +735,7 @@ service ManagementService {
         };
     }
 
+    // Adds a new organisation manager, which is allowed to administrate ZITADEL
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members"
@@ -677,6 +747,7 @@ service ManagementService {
         };
     }
 
+    // Changes the organisation manager
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
         option (google.api.http) = {
             put: "/orgs/me/members/{user_id}"
@@ -688,6 +759,7 @@ service ManagementService {
         };
     }
 
+    // Removes an organisation manager
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/members/{user_id}"
@@ -698,6 +770,7 @@ service ManagementService {
         };
     }
 
+    // Returns a project from my organisation (no granted projects)
     rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
@@ -721,6 +794,7 @@ service ManagementService {
         };
     }
 
+    // Returns all projects my organisation is the owner (no granted projects)
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
         option (google.api.http) = {
             post: "/projects/_search"
@@ -756,6 +830,7 @@ service ManagementService {
         };
     }
 
+    // Returns the history of the project (each event)
     rpc ListProjectChanges(ListProjectChangesRequest) returns (ListProjectChangesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/changes/_search"
@@ -766,6 +841,7 @@ service ManagementService {
         };
     }
 
+    // Adds an new project to the organisation
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
@@ -777,6 +853,7 @@ service ManagementService {
         };
     }
 
+    // Changes a project
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
         option (google.api.http) = {
             put: "/projects/{id}"
@@ -789,6 +866,8 @@ service ManagementService {
         };
     }
 
+    // Sets the state of a project to deactivated
+    // Returns an error if project is already deactivated
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_deactivate"
@@ -801,6 +880,8 @@ service ManagementService {
         };
     }
 
+    // Sets the state of a project to active
+    // Returns an error if project is not deactivated
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_reactivate"
@@ -813,6 +894,8 @@ service ManagementService {
         };
     }
 
+    // Removes a project
+    // All project grants, applications and user grants for this project will be removed
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
         option (google.api.http) = {
             delete: "/projects/{id}"
@@ -824,6 +907,8 @@ service ManagementService {
         };
     }
 
+    // Returns all roles of a project matching the search query
+    // If no limit is requested, default limit will be set, if the limit is higher then the default an error will be returned
     rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_search"
@@ -835,6 +920,7 @@ service ManagementService {
             check_field_name: "ProjectId"
         };
     }
+
 
     rpc AddProjectRole(AddProjectRoleRequest) returns (AddProjectRoleResponse) {
         option (google.api.http) = {
