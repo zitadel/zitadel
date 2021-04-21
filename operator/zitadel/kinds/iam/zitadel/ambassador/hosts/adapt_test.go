@@ -1,10 +1,11 @@
 package hosts
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/stretchr/testify/assert"
-	"testing"
 
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"
@@ -46,6 +47,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			Console:  "",
 			Issuer:   "",
 		},
+		ACMEAuthority: "none",
 	}
 
 	componentLabels := mocklabels.Component
@@ -218,6 +220,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			Console:  "console",
 			Issuer:   "issuer",
 		},
+		ACMEAuthority: "none",
 	}
 
 	componentLabels := mocklabels.Component
