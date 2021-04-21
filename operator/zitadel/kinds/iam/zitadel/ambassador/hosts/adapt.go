@@ -66,11 +66,12 @@ func AdaptFunc(
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 			issuerDomain := dns.Subdomains.Issuer + "." + dns.Domain
 			originCASecretName := dns.TlsSecret
+			authority := dns.ACMEAuthority
 
 			accountsSelector := map[string]string{
 				"hostname": accountsDomain,
 			}
-			queryAccounts, err := host.AdaptFuncToEnsure(namespace, AccountsHostName, labels.MustForNameK8SMap(componentLabels, AccountsHostName), accountsDomain, "none", "", accountsSelector, originCASecretName)
+			queryAccounts, err := host.AdaptFuncToEnsure(namespace, AccountsHostName, labels.MustForNameK8SMap(componentLabels, AccountsHostName), accountsDomain, authority, "", accountsSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -78,7 +79,7 @@ func AdaptFunc(
 			apiSelector := map[string]string{
 				"hostname": apiDomain,
 			}
-			queryAPI, err := host.AdaptFuncToEnsure(namespace, ApiHostName, labels.MustForNameK8SMap(componentLabels, ApiHostName), apiDomain, "none", "", apiSelector, originCASecretName)
+			queryAPI, err := host.AdaptFuncToEnsure(namespace, ApiHostName, labels.MustForNameK8SMap(componentLabels, ApiHostName), apiDomain, authority, "", apiSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -86,7 +87,7 @@ func AdaptFunc(
 			consoleSelector := map[string]string{
 				"hostname": consoleDomain,
 			}
-			queryConsole, err := host.AdaptFuncToEnsure(namespace, ConsoleHostName, labels.MustForNameK8SMap(componentLabels, ConsoleHostName), consoleDomain, "none", "", consoleSelector, originCASecretName)
+			queryConsole, err := host.AdaptFuncToEnsure(namespace, ConsoleHostName, labels.MustForNameK8SMap(componentLabels, ConsoleHostName), consoleDomain, authority, "", consoleSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
@@ -94,7 +95,7 @@ func AdaptFunc(
 			issuerSelector := map[string]string{
 				"hostname": issuerDomain,
 			}
-			queryIssuer, err := host.AdaptFuncToEnsure(namespace, IssuerHostName, labels.MustForNameK8SMap(componentLabels, IssuerHostName), issuerDomain, "none", "", issuerSelector, originCASecretName)
+			queryIssuer, err := host.AdaptFuncToEnsure(namespace, IssuerHostName, labels.MustForNameK8SMap(componentLabels, IssuerHostName), issuerDomain, authority, "", issuerSelector, originCASecretName)
 			if err != nil {
 				return nil, err
 			}
