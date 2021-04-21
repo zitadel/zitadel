@@ -6,7 +6,7 @@ title: Managed Dedicated Instance
 I'd like to simply use ZITADEL without having to take care of any operational tasks, yet keeping control over all its data.
 :::
 
-CAOS bootstraps and maintains a new ZITADEL instance just for you. This includes its underlying infrastructure with Kubernetes on top of it as well as monitoring tools and an API gateway.
+CAOS bootstraps and maintains a new ZITADEL instance just for you. This includes its underlying infrastructure with Kubernetes on top of it as well as monitoring tools and an API gateway. Contact us at <hi@zitadel.ch> for purchasing ZITADEL Enterprise Cloud.
 
 # Prerequisites
 
