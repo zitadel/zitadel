@@ -16,8 +16,6 @@ title: zitadel/management.proto
 
 
 
-    GET: /healthz
-
 
 ### GetOIDCInformation
 
@@ -27,8 +25,6 @@ title: zitadel/management.proto
 
 
 
-
-    GET: /zitadel/docs
 
 
 ### GetIAM
@@ -40,8 +36,6 @@ Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project
 
 
 
-    GET: /iam
-
 
 ### GetUserByID
 
@@ -51,8 +45,6 @@ Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project
 Returns the requested full blown user (human or machine)
 
 
-
-    GET: /users/{id}
 
 
 ### GetUserByLoginNameGlobal
@@ -65,8 +57,6 @@ the login name has to match exactly
 
 
 
-    GET: /global/users/_by_login_name
-
 
 ### ListUsers
 
@@ -77,8 +67,6 @@ Return the users matching the query
 Limit should always be set, there is a default limit set by the service
 
 
-
-    POST: /users/_search
 
 
 ### ListUserChanges
@@ -91,8 +79,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /users/{user_id}/changes/_search
-
 
 ### IsUserUnique
 
@@ -102,8 +88,6 @@ Limit should always be set, there is a default limit set by the service
 Returns if a user with the searched email or username is unique
 
 
-
-    GET: /users/_is_unique
 
 
 ### AddHumanUser
@@ -117,8 +101,6 @@ If a password is given, the user has to change on the next login
 
 
 
-    POST: /users/human
-
 
 ### ImportHumanUser
 
@@ -131,8 +113,6 @@ If a password is given, the user doesn't have to change on the next login
 
 
 
-    POST: /users/human/_import
-
 
 ### AddMachineUser
 
@@ -142,8 +122,6 @@ If a password is given, the user doesn't have to change on the next login
 Create a user of the type machine
 
 
-
-    POST: /users/machine
 
 
 ### DeactivateUser
@@ -157,8 +135,6 @@ returns an error if user state is already deactivated
 
 
 
-    POST: /users/{id}/_deactivate
-
 
 ### ReactivateUser
 
@@ -169,8 +145,6 @@ Changes the user state to active
 returns an error if user state is not deactivated
 
 
-
-    POST: /users/{id}/_reactivate
 
 
 ### LockUser
@@ -184,8 +158,6 @@ returns an error if user state is already locked
 
 
 
-    POST: /users/{id}/_lock
-
 
 ### UnlockUser
 
@@ -197,8 +169,6 @@ returns an error if user state is not locked
 
 
 
-    POST: /users/{id}/_unlock
-
 
 ### RemoveUser
 
@@ -208,8 +178,6 @@ returns an error if user state is not locked
 Changes the user state to deleted
 
 
-
-    DELETE: /users/{id}
 
 
 ### UpdateUserName
@@ -221,8 +189,6 @@ Changes the username
 
 
 
-    GET: /users/{user_id}/username
-
 
 ### GetHumanProfile
 
@@ -232,8 +198,6 @@ Changes the username
 Returns the profile of the human
 
 
-
-    GET: /users/{user_id}/profile
 
 
 ### UpdateHumanProfile
@@ -245,8 +209,6 @@ Changes the profile of the human
 
 
 
-    PUT: /users/{user_id}/profile
-
 
 ### GetHumanEmail
 
@@ -256,8 +218,6 @@ Changes the profile of the human
 GetHumanEmail returns the email and verified state of the human
 
 
-
-    GET: /users/{user_id}/email
 
 
 ### UpdateHumanEmail
@@ -270,8 +230,6 @@ If state is not verified, the user will get a verification email
 
 
 
-    PUT: /users/{user_id}/email
-
 
 ### ResendHumanInitialization
 
@@ -283,8 +241,6 @@ Changes the email address of the user if it is provided
 
 
 
-    POST: /users/{user_id}/_resend_initialization
-
 
 ### ResendHumanEmailVerification
 
@@ -295,8 +251,6 @@ Resends an email to the given email address to finish the email verification pro
 
 
 
-    POST: /users/{user_id}/email/_resend_verification
-
 
 ### GetHumanPhone
 
@@ -306,8 +260,6 @@ Resends an email to the given email address to finish the email verification pro
 Returns the phone and verified state of the human phone
 
 
-
-    GET: /users/{user_id}/phone
 
 
 ### UpdateHumanPhone
@@ -320,8 +272,6 @@ If verified is not set, the user will get an sms to verify the number
 
 
 
-    PUT: /users/{user_id}/phone
-
 
 ### RemoveHumanPhone
 
@@ -331,8 +281,6 @@ If verified is not set, the user will get an sms to verify the number
 Removes the phone number of the human
 
 
-
-    DELETE: /users/{user_id}/phone
 
 
 ### ResendHumanPhoneVerification
@@ -344,8 +292,6 @@ An sms will be sent to the given phone number to finish the phone verification p
 
 
 
-    POST: /users/{user_id}/phone/_resend_verification
-
 
 ### SetHumanInitialPassword
 
@@ -355,8 +301,6 @@ An sms will be sent to the given phone number to finish the phone verification p
 A Manager is only allowed to set an initial password, on the next login the user has to change his password
 
 
-
-    POST: /users/{user_id}/password/_initialize
 
 
 ### SendHumanResetPasswordNotification
@@ -368,8 +312,6 @@ An email will be sent to the given address to reset the password of the user
 
 
 
-    POST: /users/{user_id}/password/_reset
-
 
 ### ListHumanAuthFactors
 
@@ -379,8 +321,6 @@ An email will be sent to the given address to reset the password of the user
 Returns a list of all factors (second and multi) which are configured on the user
 
 
-
-    POST: /users/{user_id}/auth_factors/_search
 
 
 ### RemoveHumanAuthFactorOTP
@@ -393,8 +333,6 @@ Because only one otp can be configured per user, the configured one will be remo
 
 
 
-    DELETE: /users/{user_id}/auth_factors/otp
-
 
 ### RemoveHumanAuthFactorU2F
 
@@ -404,8 +342,6 @@ Because only one otp can be configured per user, the configured one will be remo
 The u2f (universial second factor) will be removed from the user
 
 
-
-    DELETE: /users/{user_id}/auth_factors/u2f/{token_id}
 
 
 ### ListHumanPasswordless
@@ -417,8 +353,6 @@ Returns all configured passwordless authentications
 
 
 
-    POST: /users/{user_id}/passwordless/_search
-
 
 ### RemoveHumanPasswordless
 
@@ -428,8 +362,6 @@ Returns all configured passwordless authentications
 Removed a configured passwordless authentication
 
 
-
-    DELETE: /users/{user_id}/passwordless/{token_id}
 
 
 ### UpdateMachine
@@ -441,8 +373,6 @@ Changes a machine user
 
 
 
-    PUT: /users/{user_id}/machine
-
 
 ### GetMachineKeyByIDs
 
@@ -452,8 +382,6 @@ Changes a machine user
 Returns a machine key of a (machine) user
 
 
-
-    GET: /users/{user_id}/keys/{key_id}
 
 
 ### ListMachineKeys
@@ -466,8 +394,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /users/{user_id}/keys/_search
-
 
 ### AddMachineKey
 
@@ -478,8 +404,6 @@ Generates a new machine key, details should be stored after return
 
 
 
-    POST: /users/{user_id}/keys
-
 
 ### RemoveMachineKey
 
@@ -489,8 +413,6 @@ Generates a new machine key, details should be stored after return
 Removed a machine key
 
 
-
-    DELETE: /users/{user_id}/keys/{key_id}
 
 
 ### ListHumanLinkedIDPs
@@ -503,8 +425,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /users/{user_id}/idps/_search
-
 
 ### RemoveHumanLinkedIDP
 
@@ -514,8 +434,6 @@ Limit should always be set, there is a default limit set by the service
 Removed a configured identity provider (social login) of a human
 
 
-
-    DELETE: /users/{user_id}/idps/{idp_id}/{linked_user_id}
 
 
 ### ListUserMemberships
@@ -528,8 +446,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /users/{user_id}/memberships/_search
-
 
 ### GetMyOrg
 
@@ -539,8 +455,6 @@ Limit should always be set, there is a default limit set by the service
 Returns the org given in the header
 
 
-
-    GET: /orgs/me
 
 
 ### GetOrgByDomainGlobal
@@ -553,8 +467,6 @@ Domain must match exactly
 
 
 
-    GET: /global/orgs/_by_domain
-
 
 ### ListOrgChanges
 
@@ -566,8 +478,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /orgs/me/changes/_search
-
 
 ### AddOrg
 
@@ -577,8 +487,6 @@ Limit should always be set, there is a default limit set by the service
 Creates a new organisation
 
 
-
-    POST: /orgs
 
 
 ### DeactivateOrg
@@ -591,8 +499,6 @@ Users of this organisation will not be able login
 
 
 
-    POST: /orgs/me/_deactivate
-
 
 ### ReactivateOrg
 
@@ -602,8 +508,6 @@ Users of this organisation will not be able login
 Sets the state of my organisation to active
 
 
-
-    POST: /orgs/me/_reactivate
 
 
 ### ListOrgDomains
@@ -616,8 +520,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /orgs/me/domains/_search
-
 
 ### AddOrgDomain
 
@@ -627,8 +529,6 @@ Limit should always be set, there is a default limit set by the service
 Adds a new domain to my organisation
 
 
-
-    POST: /orgs/me/domains
 
 
 ### RemoveOrgDomain
@@ -640,8 +540,6 @@ Removed the domain from my organisation
 
 
 
-    DELETE: /orgs/me/domains/{domain}
-
 
 ### GenerateOrgDomainValidation
 
@@ -651,8 +549,6 @@ Removed the domain from my organisation
 Generates a new file to validate you domain
 
 
-
-    POST: /orgs/me/domains/{domain}/validation/_generate
 
 
 ### ValidateOrgDomain
@@ -665,8 +561,6 @@ Validated domains must be unique
 
 
 
-    POST: /orgs/me/domains/{domain}/validation/_validate
-
 
 ### SetPrimaryOrgDomain
 
@@ -678,8 +572,6 @@ Primary domain is shown as suffix on the preferred username on the users of the 
 
 
 
-    POST: /orgs/me/domains/{domain}/_set_primary
-
 
 ### ListOrgMemberRoles
 
@@ -689,8 +581,6 @@ Primary domain is shown as suffix on the preferred username on the users of the 
 Returns all ZITADEL roles which are for organisation managers
 
 
-
-    POST: /orgs/members/roles/_search
 
 
 ### ListOrgMembers
@@ -703,8 +593,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /orgs/me/members/_search
-
 
 ### AddOrgMember
 
@@ -714,8 +602,6 @@ Limit should always be set, there is a default limit set by the service
 Adds a new organisation manager, which is allowed to administrate ZITADEL
 
 
-
-    POST: /orgs/me/members
 
 
 ### UpdateOrgMember
@@ -727,8 +613,6 @@ Changes the organisation manager
 
 
 
-    PUT: /orgs/me/members/{user_id}
-
 
 ### RemoveOrgMember
 
@@ -738,8 +622,6 @@ Changes the organisation manager
 Removes an organisation manager
 
 
-
-    DELETE: /orgs/me/members/{user_id}
 
 
 ### GetProjectByID
@@ -751,8 +633,6 @@ Returns a project from my organisation (no granted projects)
 
 
 
-    GET: /projects/{id}
-
 
 ### GetGrantedProjectByID
 
@@ -762,8 +642,6 @@ Returns a project from my organisation (no granted projects)
 returns a project my organisation got granted from another organisation
 
 
-
-    GET: /granted_projects/{project_id}/grants/{grant_id}
 
 
 ### ListProjects
@@ -776,8 +654,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/_search
-
 
 ### ListGrantedProjects
 
@@ -788,8 +664,6 @@ returns all projects my organisation got granted from another organisation
 Limit should always be set, there is a default limit set by the service
 
 
-
-    POST: /granted_projects/_search
 
 
 ### ListGrantedProjectRoles
@@ -802,8 +676,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    GET: /granted_projects/{project_id}/grants/{grant_id}/roles/_search
-
 
 ### ListProjectChanges
 
@@ -815,8 +687,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/{project_id}/changes/_search
-
 
 ### AddProject
 
@@ -827,8 +697,6 @@ Adds an new project to the organisation
 
 
 
-    POST: /projects
-
 
 ### UpdateProject
 
@@ -838,8 +706,6 @@ Adds an new project to the organisation
 Changes a project
 
 
-
-    PUT: /projects/{id}
 
 
 ### DeactivateProject
@@ -852,8 +718,6 @@ Returns an error if project is already deactivated
 
 
 
-    POST: /projects/{id}/_deactivate
-
 
 ### ReactivateProject
 
@@ -864,8 +728,6 @@ Sets the state of a project to active
 Returns an error if project is not deactivated
 
 
-
-    POST: /projects/{id}/_reactivate
 
 
 ### RemoveProject
@@ -878,8 +740,6 @@ All project grants, applications and user grants for this project will be remove
 
 
 
-    DELETE: /projects/{id}
-
 
 ### ListProjectRoles
 
@@ -891,8 +751,6 @@ If no limit is requested, default limit will be set, if the limit is higher then
 
 
 
-    POST: /projects/{project_id}/roles/_search
-
 
 ### AddProjectRole
 
@@ -903,8 +761,6 @@ Adds a role to a project, key must be unique in the project
 
 
 
-    POST: /projects/{project_id}/roles
-
 
 ### BulkAddProjectRoles
 
@@ -914,8 +770,6 @@ Adds a role to a project, key must be unique in the project
 add a list of project roles in one request
 
 
-
-    POST: /projects/{project_id}/roles/_bulk
 
 
 ### UpdateProjectRole
@@ -928,8 +782,6 @@ If a key should change, remove the role and create a new
 
 
 
-    PUT: /projects/{project_id}/roles/{role_key}
-
 
 ### RemoveProjectRole
 
@@ -940,8 +792,6 @@ Removes role from UserGrants, ProjectGrants and from Project
 
 
 
-    DELETE: /projects/{project_id}/roles/{role_key}
-
 
 ### ListProjectMemberRoles
 
@@ -951,8 +801,6 @@ Removes role from UserGrants, ProjectGrants and from Project
 Returns all ZITADEL roles which are for project managers
 
 
-
-    POST: /projects/members/roles/_search
 
 
 ### ListProjectMembers
@@ -965,8 +813,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/{project_id}/members/_search
-
 
 ### AddProjectMember
 
@@ -976,8 +822,6 @@ Limit should always be set, there is a default limit set by the service
 Adds a new project manager, which is allowed to administrate in ZITADEL
 
 
-
-    POST: /projects/{project_id}/members
 
 
 ### UpdateProjectMember
@@ -989,8 +833,6 @@ Change project manager, which is allowed to administrate in ZITADEL
 
 
 
-    PUT: /projects/{project_id}/members/{user_id}
-
 
 ### RemoveProjectMember
 
@@ -1001,8 +843,6 @@ Remove project manager, which is allowed to administrate in ZITADEL
 
 
 
-    DELETE: /projects/{project_id}/members/{user_id}
-
 
 ### GetAppByID
 
@@ -1012,8 +852,6 @@ Remove project manager, which is allowed to administrate in ZITADEL
 Returns an application (oidc or api)
 
 
-
-    GET: /projects/{project_id}/apps/{app_id}
 
 
 ### ListApps
@@ -1026,8 +864,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/{project_id}/apps/_search
-
 
 ### ListAppChanges
 
@@ -1038,8 +874,6 @@ Returns the history of the application (each event)
 Limit should always be set, there is a default limit set by the service
 
 
-
-    POST: /projects/{project_id}/apps/{app_id}/changes/_search
 
 
 ### AddOIDCApp
@@ -1053,8 +887,6 @@ Returns a new generated secret if needed (Depending on the configuration)
 
 
 
-    POST: /projects/{project_id}/apps/oidc
-
 
 ### AddAPIApp
 
@@ -1067,8 +899,6 @@ Returns a new generated secret if needed (Depending on the configuration)
 
 
 
-    POST: /projects/{project_id}/apps/api
-
 
 ### UpdateApp
 
@@ -1078,8 +908,6 @@ Returns a new generated secret if needed (Depending on the configuration)
 Changes application
 
 
-
-    PUT: /projects/{project_id}/apps/{app_id}
 
 
 ### UpdateOIDCAppConfig
@@ -1091,8 +919,6 @@ Changes the configuration of the oidc client
 
 
 
-    PUT: /projects/{project_id}/apps/{app_id}/oidc_config
-
 
 ### UpdateAPIAppConfig
 
@@ -1102,8 +928,6 @@ Changes the configuration of the oidc client
 Changes the configuration of the api application
 
 
-
-    PUT: /projects/{project_id}/apps/{app_id}/api_config
 
 
 ### DeactivateApp
@@ -1117,8 +941,6 @@ Returns an error if already deactivated
 
 
 
-    POST: /projects/{project_id}/apps/{app_id}/_deactivate
-
 
 ### ReactivateApp
 
@@ -1130,8 +952,6 @@ Returns an error if not deactivated
 
 
 
-    POST: /projects/{project_id}/apps/{app_id}/_reactivate
-
 
 ### RemoveApp
 
@@ -1141,8 +961,6 @@ Returns an error if not deactivated
 Removed the application
 
 
-
-    DELETE: /projects/{project_id}/apps/{app_id}
 
 
 ### RegenerateOIDCClientSecret
@@ -1154,8 +972,6 @@ Generates a new client secret for the oidc client, make sure to save the respons
 
 
 
-    POST: /projects/{project_id}/apps/{app_id}/oidc_config/_generate_client_secret
-
 
 ### RegenerateAPIClientSecret
 
@@ -1166,8 +982,6 @@ Generates a new client secret for the api application, make sure to save the res
 
 
 
-    POST: /projects/{project_id}/apps/{app_id}/api_config/_generate_client_secret
-
 
 ### GetAppKey
 
@@ -1177,8 +991,6 @@ Generates a new client secret for the api application, make sure to save the res
 Returns an application key
 
 
-
-    GET: /projects/{project_id}/apps/{app_id}/keys/{key_id}
 
 
 ### ListAppKeys
@@ -1191,8 +1003,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/{project_id}/apps/{app_id}/keys/_search
-
 
 ### AddAppKey
 
@@ -1204,8 +1014,6 @@ Will return key details in result, make sure to save it
 
 
 
-    POST: /projects/{project_id}/apps/{app_id}/keys
-
 
 ### RemoveAppKey
 
@@ -1216,8 +1024,6 @@ Removes an app key
 
 
 
-    DELETE: /projects/{project_id}/apps/{app_id}/keys/{key_id}
-
 
 ### GetProjectGrantByID
 
@@ -1227,8 +1033,6 @@ Removes an app key
 Returns a project grant (ProjectGrant = Grant another organisation for my project)
 
 
-
-    GET: /projects/{project_id}/grants/{grant_id}
 
 
 ### ListProjectGrants
@@ -1241,8 +1045,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/{project_id}/grants/_search
-
 
 ### AddProjectGrant
 
@@ -1253,8 +1055,6 @@ Add a new project grant (ProjectGrant = Grant another organisation for my projec
 Project Grant will be listed in granted project of the other organisation
 
 
-
-    POST: /projects/{project_id}/grants
 
 
 ### UpdateProjectGrant
@@ -1267,8 +1067,6 @@ Project Grant will be listed in granted project of the other organisation
 
 
 
-    PUT: /projects/{project_id}/grants/{grant_id}
-
 
 ### DeactivateProjectGrant
 
@@ -1279,8 +1077,6 @@ Set state of project grant to deactivated (ProjectGrant = Grant another organisa
 Returns error if project not active
 
 
-
-    POST: /projects/{project_id}/grants/{grant_id}/_deactivate
 
 
 ### ReactivateProjectGrant
@@ -1293,8 +1089,6 @@ Returns error if project not deactivated
 
 
 
-    POST: /projects/{project_id}/grants/{grant_id}/_reactivate
-
 
 ### RemoveProjectGrant
 
@@ -1305,8 +1099,6 @@ Removes project grant and all user grants for this project grant
 
 
 
-    DELETE: /projects/{project_id}/grants/{grant_id}
-
 
 ### ListProjectGrantMemberRoles
 
@@ -1316,8 +1108,6 @@ Removes project grant and all user grants for this project grant
 Returns all ZITADEL roles which are for project grant managers
 
 
-
-    POST: /projects/grants/members/roles/_search
 
 
 ### ListProjectGrantMembers
@@ -1330,8 +1120,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /projects/{project_id}/grants/{grant_id}/members/_search
-
 
 ### AddProjectGrantMember
 
@@ -1341,8 +1129,6 @@ Limit should always be set, there is a default limit set by the service
 Adds a new project grant manager, which is allowed to administrate in ZITADEL
 
 
-
-    POST: /projects/{project_id}/grants/{grant_id}/members
 
 
 ### UpdateProjectGrantMember
@@ -1354,8 +1140,6 @@ Changes project grant manager, which is allowed to administrate in ZITADEL
 
 
 
-    PUT: /projects/{project_id}/grants/{grant_id}/members/{user_id}
-
 
 ### RemoveProjectGrantMember
 
@@ -1366,8 +1150,6 @@ Removed project grant manager
 
 
 
-    DELETE: /projects/{project_id}/grants/{grant_id}/members/{user_id}
-
 
 ### GetUserGrantByID
 
@@ -1377,8 +1159,6 @@ Removed project grant manager
 Returns a user grant (authorization of a user for a project)
 
 
-
-    GET: /users/{user_id}/grants/{grant_id}
 
 
 ### ListUserGrants
@@ -1391,8 +1171,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /users/grants/_search
-
 
 ### AddUserGrant
 
@@ -1403,8 +1181,6 @@ Creates a new user grant (authorization of a user for a project with specified r
 
 
 
-    POST: /users/{user_id}/grants
-
 
 ### UpdateUserGrant
 
@@ -1414,8 +1190,6 @@ Creates a new user grant (authorization of a user for a project with specified r
 Changes a user grant (authorization of a user for a project with specified roles)
 
 
-
-    PUT: /users/{user_id}/grants/{grant_id}
 
 
 ### DeactivateUserGrant
@@ -1429,8 +1203,6 @@ Returns an error if user grant is already deactivated
 
 
 
-    POST: /users/{user_id}/grants/{grant_id}/_deactivate
-
 
 ### ReactivateUserGrant
 
@@ -1442,8 +1214,6 @@ Returns an error if user grant is not deactivated
 
 
 
-    POST: /users/{user_id}/grants/{grant_id}/_reactivate
-
 
 ### RemoveUserGrant
 
@@ -1453,8 +1223,6 @@ Returns an error if user grant is not deactivated
 Removes a user grant
 
 
-
-    DELETE: /users/{user_id}/grants/{grant_id}
 
 
 ### BulkRemoveUserGrant
@@ -1466,8 +1234,6 @@ remove a list of user grants in one request
 
 
 
-    DELETE: /user_grants/_bulk
-
 
 ### GetFeatures
 
@@ -1478,8 +1244,6 @@ remove a list of user grants in one request
 
 
 
-    GET: /features
-
 
 ### GetOrgIAMPolicy
 
@@ -1489,8 +1253,6 @@ remove a list of user grants in one request
 Returns the org iam policy (this policy is managed by the iam administrator)
 
 
-
-    GET: /policies/orgiam
 
 
 ### GetLoginPolicy
@@ -1503,8 +1265,6 @@ With this policy the login gui can be configured
 
 
 
-    GET: /policies/login
-
 
 ### GetDefaultLoginPolicy
 
@@ -1514,8 +1274,6 @@ With this policy the login gui can be configured
 Returns the default login policy configured in the IAM
 
 
-
-    GET: /policies/default/login
 
 
 ### AddCustomLoginPolicy
@@ -1528,8 +1286,6 @@ With this policy the login gui can be configured
 
 
 
-    POST: /policies/login
-
 
 ### UpdateCustomLoginPolicy
 
@@ -1540,8 +1296,6 @@ Change the custom login policy for the organisation
 With this policy the login gui can be configured
 
 
-
-    PUT: /policies/login
 
 
 ### ResetLoginPolicyToDefault
@@ -1554,8 +1308,6 @@ The default policy of the IAM will trigger after
 
 
 
-    DELETE: /policies/login
-
 
 ### ListLoginPolicyIDPs
 
@@ -1567,8 +1319,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /policies/login/idps/_search
-
 
 ### AddIDPToLoginPolicy
 
@@ -1578,8 +1328,6 @@ Limit should always be set, there is a default limit set by the service
 Add a (preconfigured) identity provider to the custom login policy
 
 
-
-    POST: /policies/login/idps
 
 
 ### RemoveIDPFromLoginPolicy
@@ -1591,8 +1339,6 @@ Remove a identity provider from the custom login policy
 
 
 
-    DELETE: /policies/login/idps/{idp_id}
-
 
 ### ListLoginPolicySecondFactors
 
@@ -1602,8 +1348,6 @@ Remove a identity provider from the custom login policy
 Returns all configured second factors of the custom login policy
 
 
-
-    POST: /policies/login/second_factors/_search
 
 
 ### AddSecondFactorToLoginPolicy
@@ -1615,8 +1359,6 @@ Adds a new second factor to the custom login policy
 
 
 
-    POST: /policies/login/second_factors
-
 
 ### RemoveSecondFactorFromLoginPolicy
 
@@ -1626,8 +1368,6 @@ Adds a new second factor to the custom login policy
 Remove a second factor from the custom login policy
 
 
-
-    DELETE: /policies/login/second_factors/{type}
 
 
 ### ListLoginPolicyMultiFactors
@@ -1639,8 +1379,6 @@ Returns all configured multi factors of the custom login policy
 
 
 
-    POST: /policies/login/auth_factors/_search
-
 
 ### AddMultiFactorToLoginPolicy
 
@@ -1651,8 +1389,6 @@ Adds a new multi factor to the custom login policy
 
 
 
-    POST: /policies/login/multi_factors
-
 
 ### RemoveMultiFactorFromLoginPolicy
 
@@ -1662,8 +1398,6 @@ Adds a new multi factor to the custom login policy
 Remove a multi factor from the custom login policy
 
 
-
-    DELETE: /policies/login/multi_factors/{type}
 
 
 ### GetPasswordComplexityPolicy
@@ -1676,8 +1410,6 @@ With this policy the password strength can be configured
 
 
 
-    GET: /policies/password/complexity
-
 
 ### GetDefaultPasswordComplexityPolicy
 
@@ -1688,8 +1420,6 @@ Returns the default password complexity policy of the IAM
 With this policy the password strength can be configured
 
 
-
-    GET: /policies/default/password/complexity
 
 
 ### AddCustomPasswordComplexityPolicy
@@ -1702,8 +1432,6 @@ With this policy the password strength can be configured
 
 
 
-    POST: /policies/password/complexity
-
 
 ### UpdateCustomPasswordComplexityPolicy
 
@@ -1714,8 +1442,6 @@ Update the custom password complexity policy for the organisation
 With this policy the password strength can be configured
 
 
-
-    PUT: /policies/password/complexity
 
 
 ### ResetPasswordComplexityPolicyToDefault
@@ -1728,8 +1454,6 @@ The default policy of the IAM will trigger after
 
 
 
-    DELETE: /policies/password/complexity
-
 
 ### GetPasswordAgePolicy
 
@@ -1739,8 +1463,6 @@ The default policy of the IAM will trigger after
 The password age policy is not used at the moment
 
 
-
-    GET: /policies/password/age
 
 
 ### GetDefaultPasswordAgePolicy
@@ -1752,8 +1474,6 @@ The password age policy is not used at the moment
 
 
 
-    GET: /policies/default/password/age
-
 
 ### AddCustomPasswordAgePolicy
 
@@ -1763,8 +1483,6 @@ The password age policy is not used at the moment
 The password age policy is not used at the moment
 
 
-
-    POST: /policies/password/age
 
 
 ### UpdateCustomPasswordAgePolicy
@@ -1776,8 +1494,6 @@ The password age policy is not used at the moment
 
 
 
-    PUT: /policies/password/age
-
 
 ### ResetPasswordAgePolicyToDefault
 
@@ -1787,8 +1503,6 @@ The password age policy is not used at the moment
 The password age policy is not used at the moment
 
 
-
-    DELETE: /policies/password/age
 
 
 ### GetPasswordLockoutPolicy
@@ -1800,8 +1514,6 @@ The password lockout policy is not used at the moment
 
 
 
-    GET: /policies/password/lockout
-
 
 ### GetDefaultPasswordLockoutPolicy
 
@@ -1811,8 +1523,6 @@ The password lockout policy is not used at the moment
 The password lockout policy is not used at the moment
 
 
-
-    GET: /policies/default/password/lockout
 
 
 ### AddCustomPasswordLockoutPolicy
@@ -1824,8 +1534,6 @@ The password lockout policy is not used at the moment
 
 
 
-    POST: /policies/password/lockout
-
 
 ### UpdateCustomPasswordLockoutPolicy
 
@@ -1836,8 +1544,6 @@ The password lockout policy is not used at the moment
 
 
 
-    PUT: /policies/password/lockout
-
 
 ### ResetPasswordLockoutPolicyToDefault
 
@@ -1847,8 +1553,6 @@ The password lockout policy is not used at the moment
 The password lockout policy is not used at the moment
 
 
-
-    DELETE: /policies/password/lockout
 
 
 ### GetLabelPolicy
@@ -1861,8 +1565,6 @@ With this policy the private labeling can be configured (colors, etc.)
 
 
 
-    GET: /policies/label
-
 
 ### GetDefaultLabelPolicy
 
@@ -1873,8 +1575,6 @@ Returns the default label policy of the IAM
 With this policy the private labeling can be configured (colors, etc.)
 
 
-
-    GET: /policies/default/label
 
 
 ### AddCustomLabelPolicy
@@ -1887,8 +1587,6 @@ With this policy the private labeling can be configured (colors, etc.)
 
 
 
-    POST: /policies/label
-
 
 ### UpdateCustomLabelPolicy
 
@@ -1899,8 +1597,6 @@ Changes the custom label policy for the organisation
 With this policy the private labeling can be configured (colors, etc.)
 
 
-
-    PUT: /policies/label
 
 
 ### ResetLabelPolicyToDefault
@@ -1913,8 +1609,6 @@ The default policy of the IAM will trigger after
 
 
 
-    DELETE: /policies/label
-
 
 ### GetOrgIDPByID
 
@@ -1924,8 +1618,6 @@ The default policy of the IAM will trigger after
 Returns a identity provider configuration of the organisation
 
 
-
-    GET: /idps/{id}
 
 
 ### ListOrgIDPs
@@ -1938,8 +1630,6 @@ Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /idps/_search
-
 
 ### AddOrgOIDCIDP
 
@@ -1950,8 +1640,6 @@ Add a new identity provider configuration in the organisation
 Provider must be OIDC compliant
 
 
-
-    POST: /idps/oidc
 
 
 ### DeactivateOrgIDP
@@ -1965,8 +1653,6 @@ Returns error if already deactivated
 
 
 
-    POST: /idps/{idp_id}/_deactivate
-
 
 ### ReactivateOrgIDP
 
@@ -1977,8 +1663,6 @@ Activate identity provider configuration
 Returns error if not deactivated
 
 
-
-    POST: /idps/{idp_id}/_reactivate
 
 
 ### RemoveOrgIDP
@@ -1991,8 +1675,6 @@ Will remove all linked providers of this configuration on the users
 
 
 
-    DELETE: /idps/{idp_id}
-
 
 ### UpdateOrgIDP
 
@@ -2003,8 +1685,6 @@ Change identity provider configuration of the organisation
 
 
 
-    PUT: /idps/{idp_id}
-
 
 ### UpdateOrgIDPOIDCConfig
 
@@ -2014,8 +1694,6 @@ Change identity provider configuration of the organisation
 Change OIDC identity provider configuration of the organisation
 
 
-
-    PUT: /idps/{idp_id}/oidc_config
 
 
 
@@ -2029,3222 +1707,3222 @@ Change OIDC identity provider configuration of the organisation
 ### AddAPIAppRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| name |  string | - |
-| auth_method_type |  zitadel.app.v1.APIAuthMethodType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auth_method_type |  zitadel.app.v1.APIAuthMethodType | - | enum.defined_only: true<br />  |
 
 
 
 ### AddAPIAppResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| app_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
-| client_id |  string | - |
-| client_secret |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
 
 
 
 ### AddAppKeyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
-| type |  zitadel.authn.v1.KeyType | - |
-| expiration_date |  google.protobuf.Timestamp | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| type |  zitadel.authn.v1.KeyType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
 
 
 
 ### AddAppKeyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
-| key_details |  bytes | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| key_details |  bytes | - |  |
 
 
 
 ### AddCustomLabelPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| primary_color |  string | - |
-| secondary_color |  string | - |
-| hide_login_name_suffix |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| hide_login_name_suffix |  bool | - |  |
 
 
 
 ### AddCustomLabelPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddCustomLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| allow_username_password |  bool | - |
-| allow_register |  bool | - |
-| allow_external_idp |  bool | - |
-| force_mfa |  bool | - |
-| passwordless_type |  zitadel.policy.v1.PasswordlessType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| allow_username_password |  bool | - |  |
+| allow_register |  bool | - |  |
+| allow_external_idp |  bool | - |  |
+| force_mfa |  bool | - |  |
+| passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 
 
 
 ### AddCustomLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddCustomPasswordAgePolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| max_age_days |  uint32 | - |
-| expire_warn_days |  uint32 | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_age_days |  uint32 | - |  |
+| expire_warn_days |  uint32 | - |  |
 
 
 
 ### AddCustomPasswordAgePolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddCustomPasswordComplexityPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| min_length |  uint64 | - |
-| has_uppercase |  bool | - |
-| has_lowercase |  bool | - |
-| has_number |  bool | - |
-| has_symbol |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| min_length |  uint64 | - |  |
+| has_uppercase |  bool | - |  |
+| has_lowercase |  bool | - |  |
+| has_number |  bool | - |  |
+| has_symbol |  bool | - |  |
 
 
 
 ### AddCustomPasswordComplexityPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddCustomPasswordLockoutPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| max_attempts |  uint32 | - |
-| show_lockout_failure |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_attempts |  uint32 | - |  |
+| show_lockout_failure |  bool | - |  |
 
 
 
 ### AddCustomPasswordLockoutPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddHumanUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_name |  string | - |
-| profile |  AddHumanUserRequest.Profile | - |
-| email |  AddHumanUserRequest.Email | - |
-| phone |  AddHumanUserRequest.Phone | - |
-| initial_password |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| profile |  AddHumanUserRequest.Profile | - | message.required: true<br />  |
+| email |  AddHumanUserRequest.Email | - | message.required: true<br />  |
+| phone |  AddHumanUserRequest.Phone | - |  |
+| initial_password |  string | - |  |
 
 
 
 ### AddHumanUserRequest.Email
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| email |  string | TODO: check if no value is allowed |
-| is_email_verified |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| is_email_verified |  bool | - |  |
 
 
 
 ### AddHumanUserRequest.Phone
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| phone |  string | has to be a global number |
-| is_phone_verified |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| phone |  string | has to be a global number | string.min_len: 1<br /> string.max_len: 50<br /> string.prefix: +<br />  |
+| is_phone_verified |  bool | - |  |
 
 
 
 ### AddHumanUserRequest.Profile
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| first_name |  string | - |
-| last_name |  string | - |
-| nick_name |  string | - |
-| display_name |  string | - |
-| preferred_language |  string | - |
-| gender |  zitadel.user.v1.Gender | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| nick_name |  string | - | string.max_len: 200<br />  |
+| display_name |  string | - | string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
+| gender |  zitadel.user.v1.Gender | - |  |
 
 
 
 ### AddHumanUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddIDPToLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
-| ownerType |  zitadel.idp.v1.IDPOwnerType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| ownerType |  zitadel.idp.v1.IDPOwnerType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
 ### AddIDPToLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddMachineKeyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| type |  zitadel.authn.v1.KeyType | - |
-| expiration_date |  google.protobuf.Timestamp | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| type |  zitadel.authn.v1.KeyType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
 
 
 
 ### AddMachineKeyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| key_id |  string | - |
-| key_details |  bytes | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key_id |  string | - |  |
+| key_details |  bytes | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddMachineUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_name |  string | - |
-| name |  string | - |
-| description |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| description |  string | - | string.max_len: 500<br />  |
 
 
 
 ### AddMachineUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddMultiFactorToLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| type |  zitadel.policy.v1.MultiFactorType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.policy.v1.MultiFactorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
 ### AddMultiFactorToLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddOIDCAppRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| name |  string | - |
-| redirect_uris | repeated string | - |
-| response_types | repeated zitadel.app.v1.OIDCResponseType | - |
-| grant_types | repeated zitadel.app.v1.OIDCGrantType | - |
-| app_type |  zitadel.app.v1.OIDCAppType | - |
-| auth_method_type |  zitadel.app.v1.OIDCAuthMethodType | - |
-| post_logout_redirect_uris | repeated string | - |
-| version |  zitadel.app.v1.OIDCVersion | - |
-| dev_mode |  bool | - |
-| access_token_type |  zitadel.app.v1.OIDCTokenType | - |
-| access_token_role_assertion |  bool | - |
-| id_token_role_assertion |  bool | - |
-| id_token_userinfo_assertion |  bool | - |
-| clock_skew |  google.protobuf.Duration | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| redirect_uris | repeated string | - |  |
+| response_types | repeated zitadel.app.v1.OIDCResponseType | - |  |
+| grant_types | repeated zitadel.app.v1.OIDCGrantType | - |  |
+| app_type |  zitadel.app.v1.OIDCAppType | - | enum.defined_only: true<br />  |
+| auth_method_type |  zitadel.app.v1.OIDCAuthMethodType | - | enum.defined_only: true<br />  |
+| post_logout_redirect_uris | repeated string | - |  |
+| version |  zitadel.app.v1.OIDCVersion | - | enum.defined_only: true<br />  |
+| dev_mode |  bool | - |  |
+| access_token_type |  zitadel.app.v1.OIDCTokenType | - | enum.defined_only: true<br />  |
+| access_token_role_assertion |  bool | - |  |
+| id_token_role_assertion |  bool | - |  |
+| id_token_userinfo_assertion |  bool | - |  |
+| clock_skew |  google.protobuf.Duration | - | duration.lte.seconds: 5<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
 
 
 
 ### AddOIDCAppResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| app_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
-| client_id |  string | - |
-| client_secret |  string | - |
-| none_compliant |  bool | - |
-| compliance_problems | repeated zitadel.v1.LocalizedMessage | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
+| none_compliant |  bool | - |  |
+| compliance_problems | repeated zitadel.v1.LocalizedMessage | - |  |
 
 
 
 ### AddOrgDomainRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| domain |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### AddOrgDomainResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddOrgMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| roles | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated string | - |  |
 
 
 
 ### AddOrgMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddOrgOIDCIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| name |  string | - |
-| styling_type |  zitadel.idp.v1.IDPStylingType | - |
-| client_id |  string | - |
-| client_secret |  string | - |
-| issuer |  string | - |
-| scopes | repeated string | - |
-| display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - |
-| username_mapping |  zitadel.idp.v1.OIDCMappingField | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - |  |
+| display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 
 
 
 ### AddOrgOIDCIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| idp_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
 
 
 
 ### AddOrgRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| name |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### AddOrgResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddProjectGrantMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
-| user_id |  string | - |
-| roles | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated string | - |  |
 
 
 
 ### AddProjectGrantMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddProjectGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| granted_org_id |  string | - |
-| role_keys | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| granted_org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| role_keys | repeated string | - |  |
 
 
 
 ### AddProjectGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| grant_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddProjectMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| user_id |  string | - |
-| roles | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated string | - |  |
 
 
 
 ### AddProjectMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddProjectRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| name |  string | - |
-| project_role_assertion |  bool | - |
-| project_role_check |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| project_role_assertion |  bool | - |  |
+| project_role_check |  bool | - |  |
 
 
 
 ### AddProjectResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddProjectRoleRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| role_key |  string | - |
-| display_name |  string | - |
-| group |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| role_key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| display_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| group |  string | - | string.max_len: 200<br />  |
 
 
 
 ### AddProjectRoleResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddSecondFactorToLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| type |  zitadel.policy.v1.SecondFactorType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.policy.v1.SecondFactorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
 ### AddSecondFactorToLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### AddUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| project_id |  string | - |
-| project_grant_id |  string | - |
-| role_keys | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| project_grant_id |  string | - | string.max_len: 200<br />  |
+| role_keys | repeated string | - |  |
 
 
 
 ### AddUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_grant_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_grant_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### BulkAddProjectRolesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| roles | repeated BulkAddProjectRolesRequest.Role | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated BulkAddProjectRolesRequest.Role | - |  |
 
 
 
 ### BulkAddProjectRolesRequest.Role
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| key |  string | - |
-| display_name |  string | - |
-| group |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| display_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| group |  string | - | string.max_len: 200<br />  |
 
 
 
 ### BulkAddProjectRolesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### BulkRemoveUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| grant_id | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id | repeated string | - |  |
 
 
 
 ### BulkRemoveUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### DeactivateAppRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### DeactivateAppResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### DeactivateOrgIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### DeactivateOrgIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### DeactivateOrgRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### DeactivateOrgResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### DeactivateProjectGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### DeactivateProjectGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### DeactivateProjectRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### DeactivateProjectResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### DeactivateUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### DeactivateUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### DeactivateUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### DeactivateUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### GenerateOrgDomainValidationRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| domain |  string | - |
-| type |  zitadel.org.v1.DomainValidationType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| type |  zitadel.org.v1.DomainValidationType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
 ### GenerateOrgDomainValidationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| token |  string | - |
-| url |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token |  string | - |  |
+| url |  string | - |  |
 
 
 
 ### GetAppByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetAppByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| app |  zitadel.app.v1.App | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app |  zitadel.app.v1.App | - |  |
 
 
 
 ### GetAppKeyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
-| key_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetAppKeyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| key |  zitadel.authn.v1.Key | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  zitadel.authn.v1.Key | - |  |
 
 
 
 ### GetDefaultLabelPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultLabelPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.LabelPolicy | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
 
 
 
 ### GetDefaultLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.LoginPolicy | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LoginPolicy | - |  |
 
 
 
 ### GetDefaultPasswordAgePolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultPasswordAgePolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordAgePolicy | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
 
 
 
 ### GetDefaultPasswordComplexityPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultPasswordComplexityPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
 
 
 
 ### GetDefaultPasswordLockoutPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultPasswordLockoutPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
 ### GetFeaturesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetFeaturesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| features |  zitadel.features.v1.Features | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| features |  zitadel.features.v1.Features | - |  |
 
 
 
 ### GetGrantedProjectByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetGrantedProjectByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| granted_project |  zitadel.project.v1.GrantedProject | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| granted_project |  zitadel.project.v1.GrantedProject | - |  |
 
 
 
 ### GetHumanEmailRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetHumanEmailResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| email |  zitadel.user.v1.Email | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| email |  zitadel.user.v1.Email | - |  |
 
 
 
 ### GetHumanPhoneRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetHumanPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| phone |  zitadel.user.v1.Phone | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| phone |  zitadel.user.v1.Phone | - |  |
 
 
 
 ### GetHumanProfileRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetHumanProfileResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| profile |  zitadel.user.v1.Profile | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| profile |  zitadel.user.v1.Profile | - |  |
 
 
 
 ### GetIAMRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetIAMResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| global_org_id |  string | - |
-| iam_project_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| global_org_id |  string | - |  |
+| iam_project_id |  string | - |  |
 
 
 
 ### GetLabelPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetLabelPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.LabelPolicy | - |
-| is_default |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
+| is_default |  bool | - |  |
 
 
 
 ### GetLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.LoginPolicy | - |
-| is_default |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LoginPolicy | - |  |
+| is_default |  bool | - |  |
 
 
 
 ### GetMachineKeyByIDsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| key_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetMachineKeyByIDsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| key |  zitadel.authn.v1.Key | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  zitadel.authn.v1.Key | - |  |
 
 
 
 ### GetMyOrgRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyOrgResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| org |  zitadel.org.v1.Org | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org |  zitadel.org.v1.Org | - |  |
 
 
 
 ### GetOIDCInformationRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetOIDCInformationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| issuer |  string | - |
-| discovery_endpoint |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| issuer |  string | - |  |
+| discovery_endpoint |  string | - |  |
 
 
 
 ### GetOrgByDomainGlobalRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| domain |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetOrgByDomainGlobalResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| org |  zitadel.org.v1.Org | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org |  zitadel.org.v1.Org | - |  |
 
 
 
 ### GetOrgIAMPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetOrgIAMPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.OrgIAMPolicy | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
 
 
 
 ### GetOrgIDPByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetOrgIDPByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp |  zitadel.idp.v1.IDP | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp |  zitadel.idp.v1.IDP | - |  |
 
 
 
 ### GetPasswordAgePolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetPasswordAgePolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordAgePolicy | - |
-| is_default |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
+| is_default |  bool | - |  |
 
 
 
 ### GetPasswordComplexityPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetPasswordComplexityPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |
-| is_default |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
+| is_default |  bool | - |  |
 
 
 
 ### GetPasswordLockoutPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetPasswordLockoutPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |
-| is_default |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
+| is_default |  bool | - |  |
 
 
 
 ### GetProjectByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetProjectByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project |  zitadel.project.v1.Project | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project |  zitadel.project.v1.Project | - |  |
 
 
 
 ### GetProjectGrantByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetProjectGrantByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_grant |  zitadel.project.v1.GrantedProject | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_grant |  zitadel.project.v1.GrantedProject | - |  |
 
 
 
 ### GetUserByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetUserByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user |  zitadel.user.v1.User | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user |  zitadel.user.v1.User | - |  |
 
 
 
 ### GetUserByLoginNameGlobalRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| login_name |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| login_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetUserByLoginNameGlobalResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user |  zitadel.user.v1.User | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user |  zitadel.user.v1.User | - |  |
 
 
 
 ### GetUserGrantByIDRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### GetUserGrantByIDResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_grant |  zitadel.user.v1.UserGrant | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_grant |  zitadel.user.v1.UserGrant | - |  |
 
 
 
 ### HealthzRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### HealthzResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### IDPQuery
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.owner_type_query |  zitadel.idp.v1.IDPOwnerTypeQuery | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.owner_type_query |  zitadel.idp.v1.IDPOwnerTypeQuery | - |  |
 
 
 
 ### ImportHumanUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_name |  string | - |
-| profile |  ImportHumanUserRequest.Profile | - |
-| email |  ImportHumanUserRequest.Email | - |
-| phone |  ImportHumanUserRequest.Phone | - |
-| password |  string | - |
-| password_change_required |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| profile |  ImportHumanUserRequest.Profile | - | message.required: true<br />  |
+| email |  ImportHumanUserRequest.Email | - | message.required: true<br />  |
+| phone |  ImportHumanUserRequest.Phone | - |  |
+| password |  string | - |  |
+| password_change_required |  bool | - |  |
 
 
 
 ### ImportHumanUserRequest.Email
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| email |  string | TODO: check if no value is allowed |
-| is_email_verified |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| is_email_verified |  bool | - |  |
 
 
 
 ### ImportHumanUserRequest.Phone
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| phone |  string | has to be a global number |
-| is_phone_verified |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| phone |  string | has to be a global number | string.min_len: 1<br /> string.max_len: 50<br /> string.prefix: +<br />  |
+| is_phone_verified |  bool | - |  |
 
 
 
 ### ImportHumanUserRequest.Profile
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| first_name |  string | - |
-| last_name |  string | - |
-| nick_name |  string | - |
-| display_name |  string | - |
-| preferred_language |  string | - |
-| gender |  zitadel.user.v1.Gender | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| nick_name |  string | - | string.max_len: 200<br />  |
+| display_name |  string | - | string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
+| gender |  zitadel.user.v1.Gender | - |  |
 
 
 
 ### ImportHumanUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### IsUserUniqueRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_name |  string | - |
-| email |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.pattern: ^[^[:space:]]{1,200}$<br />  |
+| email |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### IsUserUniqueResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| is_unique |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| is_unique |  bool | - |  |
 
 
 
 ### ListAppChangesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |  |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ListAppChangesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.change.v1.Change | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.change.v1.Change | - |  |
 
 
 
 ### ListAppKeysRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| app_id |  string | - |
-| project_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ListAppKeysResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.authn.v1.Key | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.authn.v1.Key | - |  |
 
 
 
 ### ListAppsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.app.v1.AppQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.app.v1.AppQuery | criterias the client is looking for |  |
 
 
 
 ### ListAppsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.app.v1.App | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.app.v1.App | - |  |
 
 
 
 ### ListGrantedProjectRolesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.project.v1.RoleQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.RoleQuery | criterias the client is looking for |  |
 
 
 
 ### ListGrantedProjectRolesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.project.v1.Role | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.Role | - |  |
 
 
 
 ### ListGrantedProjectsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.project.v1.ProjectQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.ProjectQuery | criterias the client is looking for |  |
 
 
 
 ### ListGrantedProjectsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.project.v1.GrantedProject | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.GrantedProject | - |  |
 
 
 
 ### ListHumanAuthFactorsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ListHumanAuthFactorsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated zitadel.user.v1.AuthFactor | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.user.v1.AuthFactor | - |  |
 
 
 
 ### ListHumanLinkedIDPsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
 
 
 
 ### ListHumanLinkedIDPsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.idp.v1.IDPUserLink | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.IDPUserLink | - |  |
 
 
 
 ### ListHumanPasswordlessRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ListHumanPasswordlessResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated zitadel.user.v1.WebAuthNToken | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.user.v1.WebAuthNToken | - |  |
 
 
 
 ### ListLoginPolicyIDPsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
 
 
 
 ### ListLoginPolicyIDPsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.idp.v1.IDPLoginPolicyLink | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.IDPLoginPolicyLink | - |  |
 
 
 
 ### ListLoginPolicyMultiFactorsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListLoginPolicyMultiFactorsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.policy.v1.MultiFactorType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.policy.v1.MultiFactorType | - |  |
 
 
 
 ### ListLoginPolicySecondFactorsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListLoginPolicySecondFactorsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.policy.v1.SecondFactorType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.policy.v1.SecondFactorType | - |  |
 
 
 
 ### ListMachineKeysRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
 
 
 
 ### ListMachineKeysResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.authn.v1.Key | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.authn.v1.Key | - |  |
 
 
 
 ### ListOrgChangesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |  |
 
 
 
 ### ListOrgChangesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.change.v1.Change | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.change.v1.Change | - |  |
 
 
 
 ### ListOrgDomainsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.org.v1.DomainSearchQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.org.v1.DomainSearchQuery | criterias the client is looking for |  |
 
 
 
 ### ListOrgDomainsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.org.v1.Domain | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.org.v1.Domain | - |  |
 
 
 
 ### ListOrgIDPsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| sorting_column |  zitadel.idp.v1.IDPFieldName | the field the result is sorted |
-| queries | repeated IDPQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| sorting_column |  zitadel.idp.v1.IDPFieldName | the field the result is sorted |  |
+| queries | repeated IDPQuery | criterias the client is looking for |  |
 
 
 
 ### ListOrgIDPsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| sorting_column |  zitadel.idp.v1.IDPFieldName | - |
-| result | repeated zitadel.idp.v1.IDP | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.idp.v1.IDPFieldName | - |  |
+| result | repeated zitadel.idp.v1.IDP | - |  |
 
 
 
 ### ListOrgMemberRolesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListOrgMemberRolesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated string | - |  |
 
 
 
 ### ListOrgMembersRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.member.v1.SearchQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.member.v1.SearchQuery | criterias the client is looking for |  |
 
 
 
 ### ListOrgMembersResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | list limitations and ordering |
-| result | repeated zitadel.member.v1.Member | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | list limitations and ordering |  |
+| result | repeated zitadel.member.v1.Member | criterias the client is looking for |  |
 
 
 
 ### ListProjectChangesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |
-| project_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |  |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ListProjectChangesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.change.v1.Change | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.change.v1.Change | - |  |
 
 
 
 ### ListProjectGrantMemberRolesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | - |
-| result | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| result | repeated string | - |  |
 
 
 
 ### ListProjectGrantMemberRolesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated string | - |  |
 
 
 
 ### ListProjectGrantMembersRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.member.v1.SearchQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.member.v1.SearchQuery | criterias the client is looking for |  |
 
 
 
 ### ListProjectGrantMembersResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.member.v1.Member | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.member.v1.Member | - |  |
 
 
 
 ### ListProjectGrantsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.project.v1.ProjectGrantQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.ProjectGrantQuery | criterias the client is looking for |  |
 
 
 
 ### ListProjectGrantsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.project.v1.GrantedProject | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.GrantedProject | - |  |
 
 
 
 ### ListProjectMemberRolesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListProjectMemberRolesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated string | - |  |
 
 
 
 ### ListProjectMembersRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.member.v1.SearchQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.member.v1.SearchQuery | criterias the client is looking for |  |
 
 
 
 ### ListProjectMembersResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.member.v1.Member | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.member.v1.Member | - |  |
 
 
 
 ### ListProjectRolesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.project.v1.RoleQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.RoleQuery | criterias the client is looking for |  |
 
 
 
 ### ListProjectRolesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.project.v1.Role | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.Role | - |  |
 
 
 
 ### ListProjectsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.project.v1.ProjectQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.ProjectQuery | criterias the client is looking for |  |
 
 
 
 ### ListProjectsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.project.v1.Project | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.Project | - |  |
 
 
 
 ### ListUserChangesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ListUserChangesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.change.v1.Change | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.change.v1.Change | - |  |
 
 
 
 ### ListUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.user.v1.UserGrantQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.user.v1.UserGrantQuery | criterias the client is looking for |  |
 
 
 
 ### ListUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.user.v1.UserGrant | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.UserGrant | - |  |
 
 
 
 ### ListUserMembershipsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | list limitations and ordering |
-| query |  zitadel.v1.ListQuery | the field the result is sorted |
-| queries | repeated zitadel.user.v1.MembershipQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | list limitations and ordering | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | the field the result is sorted |  |
+| queries | repeated zitadel.user.v1.MembershipQuery | criterias the client is looking for |  |
 
 
 
 ### ListUserMembershipsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.user.v1.Membership | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.Membership | - |  |
 
 
 
 ### ListUsersRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| sorting_column |  zitadel.user.v1.UserFieldName | the field the result is sorted |
-| queries | repeated zitadel.user.v1.SearchQuery | criterias the client is looking for |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| sorting_column |  zitadel.user.v1.UserFieldName | the field the result is sorted |  |
+| queries | repeated zitadel.user.v1.SearchQuery | criterias the client is looking for |  |
 
 
 
 ### ListUsersResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| sorting_column |  zitadel.user.v1.UserFieldName | - |
-| result | repeated zitadel.user.v1.User | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.user.v1.UserFieldName | - |  |
+| result | repeated zitadel.user.v1.User | - |  |
 
 
 
 ### LockUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### LockUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateAppRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ReactivateAppResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateOrgIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ReactivateOrgIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateOrgRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ReactivateOrgResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateProjectGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ReactivateProjectGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateProjectRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ReactivateProjectResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ReactivateUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ReactivateUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ReactivateUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RegenerateAPIClientSecretRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RegenerateAPIClientSecretResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| client_secret |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_secret |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RegenerateOIDCClientSecretRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RegenerateOIDCClientSecretResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| client_secret |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_secret |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveAppKeyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
-| key_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveAppKeyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveAppRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveAppResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveHumanAuthFactorOTPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveHumanAuthFactorOTPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveHumanAuthFactorU2FRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| token_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveHumanAuthFactorU2FResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveHumanLinkedIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| idp_id |  string | - |
-| linked_user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| linked_user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveHumanLinkedIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveHumanPasswordlessRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| token_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveHumanPasswordlessResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveHumanPhoneRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveHumanPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveIDPFromLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveIDPFromLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveMachineKeyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| key_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveMachineKeyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveMultiFactorFromLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| type |  zitadel.policy.v1.MultiFactorType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.policy.v1.MultiFactorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
 ### RemoveMultiFactorFromLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveOrgDomainRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| domain |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveOrgDomainResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveOrgIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveOrgIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### RemoveOrgMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveOrgMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveProjectGrantMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveProjectGrantMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveProjectGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveProjectGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveProjectMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveProjectMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveProjectRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveProjectResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveProjectRoleRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| role_key |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| role_key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveProjectRoleResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveSecondFactorFromLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| type |  zitadel.policy.v1.SecondFactorType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.policy.v1.SecondFactorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
 ### RemoveSecondFactorFromLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| grant_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### RemoveUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### RemoveUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResendHumanEmailVerificationRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ResendHumanEmailVerificationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResendHumanInitializationRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| email |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| email |  string | - | string.email: true<br />  |
 
 
 
 ### ResendHumanInitializationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResendHumanPhoneVerificationRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ResendHumanPhoneVerificationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResetLabelPolicyToDefaultRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetLabelPolicyToDefaultResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResetLoginPolicyToDefaultRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetLoginPolicyToDefaultResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResetPasswordAgePolicyToDefaultRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetPasswordAgePolicyToDefaultResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResetPasswordComplexityPolicyToDefaultRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetPasswordComplexityPolicyToDefaultResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ResetPasswordLockoutPolicyToDefaultRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetPasswordLockoutPolicyToDefaultResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### SendHumanResetPasswordNotificationRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| type |  SendHumanResetPasswordNotificationRequest.Type | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| type |  SendHumanResetPasswordNotificationRequest.Type | - | enum.defined_only: true<br />  |
 
 
 
 ### SendHumanResetPasswordNotificationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### SetHumanInitialPasswordRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| password |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| password |  string | - | string.min_len: 1<br /> string.max_len: 72<br />  |
 
 
 
 ### SetHumanInitialPasswordResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### SetPrimaryOrgDomainRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| domain |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### SetPrimaryOrgDomainResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UnlockUserRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### UnlockUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateAPIAppConfigRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
-| auth_method_type |  zitadel.app.v1.APIAuthMethodType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auth_method_type |  zitadel.app.v1.APIAuthMethodType | - | enum.defined_only: true<br />  |
 
 
 
 ### UpdateAPIAppConfigResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateAppRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
-| name |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### UpdateAppResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateCustomLabelPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| primary_color |  string | - |
-| secondary_color |  string | - |
-| hide_login_name_suffix |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| hide_login_name_suffix |  bool | - |  |
 
 
 
 ### UpdateCustomLabelPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateCustomLoginPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| allow_username_password |  bool | - |
-| allow_register |  bool | - |
-| allow_external_idp |  bool | - |
-| force_mfa |  bool | - |
-| passwordless_type |  zitadel.policy.v1.PasswordlessType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| allow_username_password |  bool | - |  |
+| allow_register |  bool | - |  |
+| allow_external_idp |  bool | - |  |
+| force_mfa |  bool | - |  |
+| passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 
 
 
 ### UpdateCustomLoginPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateCustomPasswordAgePolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| max_age_days |  uint32 | - |
-| expire_warn_days |  uint32 | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_age_days |  uint32 | - |  |
+| expire_warn_days |  uint32 | - |  |
 
 
 
 ### UpdateCustomPasswordAgePolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateCustomPasswordComplexityPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| min_length |  uint64 | - |
-| has_uppercase |  bool | - |
-| has_lowercase |  bool | - |
-| has_number |  bool | - |
-| has_symbol |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| min_length |  uint64 | - |  |
+| has_uppercase |  bool | - |  |
+| has_lowercase |  bool | - |  |
+| has_number |  bool | - |  |
+| has_symbol |  bool | - |  |
 
 
 
 ### UpdateCustomPasswordComplexityPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateCustomPasswordLockoutPolicyRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| max_attempts |  uint32 | - |
-| show_lockout_failure |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_attempts |  uint32 | - |  |
+| show_lockout_failure |  bool | - |  |
 
 
 
 ### UpdateCustomPasswordLockoutPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateHumanEmailRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| email |  string | - |
-| is_email_verified |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| email |  string | - | string.email: true<br />  |
+| is_email_verified |  bool | - |  |
 
 
 
 ### UpdateHumanEmailResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateHumanPhoneRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| phone |  string | - |
-| is_phone_verified |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| phone |  string | - | string.min_len: 1<br /> string.max_len: 50<br /> string.prefix: +<br />  |
+| is_phone_verified |  bool | - |  |
 
 
 
 ### UpdateHumanPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateHumanProfileRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| first_name |  string | - |
-| last_name |  string | - |
-| nick_name |  string | - |
-| display_name |  string | - |
-| preferred_language |  string | - |
-| gender |  zitadel.user.v1.Gender | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| nick_name |  string | - | string.max_len: 200<br />  |
+| display_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
+| gender |  zitadel.user.v1.Gender | - |  |
 
 
 
 ### UpdateHumanProfileResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateMachineRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| description |  string | - |
-| name |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| description |  string | - | string.max_len: 500<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### UpdateMachineResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateOIDCAppConfigRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| app_id |  string | - |
-| redirect_uris | repeated string | - |
-| response_types | repeated zitadel.app.v1.OIDCResponseType | - |
-| grant_types | repeated zitadel.app.v1.OIDCGrantType | - |
-| app_type |  zitadel.app.v1.OIDCAppType | - |
-| auth_method_type |  zitadel.app.v1.OIDCAuthMethodType | - |
-| post_logout_redirect_uris | repeated string | - |
-| dev_mode |  bool | - |
-| access_token_type |  zitadel.app.v1.OIDCTokenType | - |
-| access_token_role_assertion |  bool | - |
-| id_token_role_assertion |  bool | - |
-| id_token_userinfo_assertion |  bool | - |
-| clock_skew |  google.protobuf.Duration | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| redirect_uris | repeated string | - |  |
+| response_types | repeated zitadel.app.v1.OIDCResponseType | - |  |
+| grant_types | repeated zitadel.app.v1.OIDCGrantType | - |  |
+| app_type |  zitadel.app.v1.OIDCAppType | - | enum.defined_only: true<br />  |
+| auth_method_type |  zitadel.app.v1.OIDCAuthMethodType | - | enum.defined_only: true<br />  |
+| post_logout_redirect_uris | repeated string | - |  |
+| dev_mode |  bool | - |  |
+| access_token_type |  zitadel.app.v1.OIDCTokenType | - | enum.defined_only: true<br />  |
+| access_token_role_assertion |  bool | - |  |
+| id_token_role_assertion |  bool | - |  |
+| id_token_userinfo_assertion |  bool | - |  |
+| clock_skew |  google.protobuf.Duration | - | duration.lte.seconds: 5<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
 
 
 
 ### UpdateOIDCAppConfigResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateOrgIDPOIDCConfigRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
-| client_id |  string | - |
-| client_secret |  string | - |
-| issuer |  string | - |
-| scopes | repeated string | - |
-| display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - |
-| username_mapping |  zitadel.idp.v1.OIDCMappingField | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - |  |
+| display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 
 
 
 ### UpdateOrgIDPOIDCConfigResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateOrgIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
-| name |  string | - |
-| styling_type |  zitadel.idp.v1.IDPStylingType | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
 
 
 
 ### UpdateOrgIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateOrgMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| roles | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated string | - |  |
 
 
 
 ### UpdateOrgMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateProjectGrantMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
-| user_id |  string | - |
-| roles | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated string | - |  |
 
 
 
 ### UpdateProjectGrantMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateProjectGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| grant_id |  string | - |
-| role_keys | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| role_keys | repeated string | - |  |
 
 
 
 ### UpdateProjectGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateProjectMemberRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| user_id |  string | - |
-| roles | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| roles | repeated string | - |  |
 
 
 
 ### UpdateProjectMemberResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateProjectRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| id |  string | - |
-| name |  string | - |
-| project_role_assertion |  bool | - |
-| project_role_check |  bool | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| project_role_assertion |  bool | - |  |
+| project_role_check |  bool | - |  |
 
 
 
 ### UpdateProjectResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateProjectRoleRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| project_id |  string | - |
-| role_key |  string | - |
-| display_name |  string | - |
-| group |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| role_key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| display_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| group |  string | - | string.max_len: 200<br />  |
 
 
 
 ### UpdateProjectRoleResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateUserGrantRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| grant_id |  string | - |
-| role_keys | repeated string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| role_keys | repeated string | - |  |
 
 
 
 ### UpdateUserGrantResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### UpdateUserNameRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_id |  string | - |
-| user_name |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### UpdateUserNameResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
 ### ValidateOrgDomainRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| domain |  string | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 ### ValidateOrgDomainResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
