@@ -50,11 +50,6 @@ Maybe interesting to mention is that we are mostly concerned with choosing the r
 
 As mentioned in the beginning of this module, there are two main determinants for choosing the optimal authorization flow:
 
-<<<<<<< HEAD:docs/docs/guides/usage/oauth-recommended-flows.md
-As mentioned in the beginning of this module, there are two main determinants for choosing the optimal authorization flow:
-
-=======
->>>>>>> main:docs/docs/guides/oauth-recommended-flows.md
 1. Client’s ability to maintain the confidentiality of client credentials
 2. Technological limitations
 
