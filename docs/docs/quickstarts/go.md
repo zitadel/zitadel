@@ -120,10 +120,10 @@ This will output something similar to:
 You have successfully used the ZITADEL Go SDK to call the management API!
 
 If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
-ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role.
-and check the mentioned [guides](#prerequisites) at the start of this guide.
+ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
+and check the mentioned [guides](#prerequisites) at the beginning.
 
-If your run into any other problem, don't hesitate to contact us or raise an issue in the [SDK](https://github.com/caos/zitadel-go/issues) or on [ZITADEL](https://github.com/caos/zitadel/issues).
+If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
 
 ### Whats next?
 
@@ -137,6 +137,6 @@ Now you can proceed implementing our APIs by adding more calls or trying to over
     log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 }
 ```
-Checkout more [examples from the SDK](https://github.com/caos/zitadel-go/blob/main/example) or refer to our [Docs](introduction).
+Checkout more [examples from the SDK](https://github.com/caos/zitadel-go/blob/main/example) or refer to our [API Docs](../apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.
