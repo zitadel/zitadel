@@ -86,9 +86,6 @@ func TestHosts_AdaptFunc(t *testing.T) {
 						"hostname": ".",
 					},
 				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
-				},
 			},
 		}}
 
@@ -120,9 +117,6 @@ func TestHosts_AdaptFunc(t *testing.T) {
 					"matchLabels": map[string]interface{}{
 						"hostname": ".",
 					},
-				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
 				},
 			},
 		}}
@@ -156,9 +150,6 @@ func TestHosts_AdaptFunc(t *testing.T) {
 						"hostname": ".",
 					},
 				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
-				},
 			},
 		}}
 
@@ -190,9 +181,6 @@ func TestHosts_AdaptFunc(t *testing.T) {
 					"matchLabels": map[string]interface{}{
 						"hostname": ".",
 					},
-				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
 				},
 			},
 		}}
