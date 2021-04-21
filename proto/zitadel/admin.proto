@@ -23,13 +23,14 @@ option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
-        title: "Administrator API for ZITADEL";
-        description: "This API provides all functions to administrate ZITADEL.";
+        title: "Administration API aka Admin";
         version: "1.0";
-        contact: {
-            name: "file an issue",
-            url: "https://github.com/caos/zitadel";
-        };
+        description: "This API is intended to configure and manage the IAM itself.";
+        contact:{
+            name: "CAOS developers of ZITADEL"
+            url: "https://zitadel.ch"
+            email: "hi@zitadel.ch"
+        }
         license: {
             name: "Apache 2.0",
             url: "https://github.com/caos/zitadel/blob/main/LICENSE";
@@ -1679,7 +1680,7 @@ message HealthzRequest {}
 
 message HealthzResponse {}
 
-// parameters are ORed
+// if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -1883,11 +1884,8 @@ message SetUpOrgRequest {
         Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
         string password = 5 [
-            (validate.rules).string = {min_len: 1, max_len: 72},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 description: "the initial password of the user";
-                min_length: 1;
-                max_length: 72;
                 example: "\"my_53cr3t-P4$$w0rd\"";
             }
         ];
@@ -2188,6 +2186,7 @@ message SetDefaultFeaturesRequest {
     bool login_policy_passwordless = 10;
     bool password_complexity_policy = 11;
     bool label_policy = 12;
+    bool custom_domain = 13;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2217,6 +2216,7 @@ message SetOrgFeaturesRequest {
     bool login_policy_passwordless = 11;
     bool password_complexity_policy = 12;
     bool label_policy = 13;
+    bool custom_domain = 14;
 }
 
 message SetOrgFeaturesResponse {
@@ -2284,7 +2284,7 @@ message AddCustomOrgIAMPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the username has to end with the domain of it's organisation"
         }
-    ];
+    ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
 }
 
 message AddCustomOrgIAMPolicyResponse {
@@ -2442,7 +2442,7 @@ message AddIDPToLoginPolicyRequest {
             min_length: 1;
             max_length: 200;
         }
-    ];
+    ]; // Id of the predefined idp configuration
 }
 
 message AddIDPToLoginPolicyResponse {
@@ -2617,7 +2617,7 @@ message UpdatePasswordLockoutPolicyRequest {
             example: "\"10\""
         }
     ];
-    // TODO: how to describe?
+    // If an error should be displayed during a lockout or not
     bool show_lockout_failure = 2;
 }
 
@@ -2805,7 +2805,7 @@ message View {
             example: "\"2019-04-01T08:45:00.000000Z\"";
             description: "The timestamp the event occured";
         }
-    ];
+    ]; // The timestamp the event occured
     google.protobuf.Timestamp last_successful_spooler_run = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "The timestamp the event occured";

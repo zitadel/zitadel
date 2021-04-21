@@ -1,11 +1,15 @@
 module.exports = {
   manuals: [
+    'manuals/introduction',
     {
       type: 'category',
       label: 'User',
-      items: [
-          'manuals/user',
-      ],
+      items: ['manuals/user'],
+    },
+    {
+      type: 'category',
+      label: 'Administrator',
+      items: ['manuals/admin-managers'],
     },
   ],
   quickstarts: [
@@ -25,49 +29,75 @@ module.exports = {
     'guides/introduction',
     {
       type: 'category',
-      label: 'Get to know ZITADEL',
+      label: 'Installation',
       items: [
-          'guides/usage/organizations',
-          'guides/usage/projects',
-          'guides/usage/serviceusers',
-          'guides/usage/oauth-recommended-flows',
-          'guides/usage/identity-brokering'
+          {
+              type: 'category',
+              label: 'CAOS Managed',
+              items: [
+                  'guides/installation/shared-cloud',
+                  'guides/installation/managed-dedicated-instance'
+              ],
+          },
+          {
+              type: 'category',
+              label: 'Self Managed',
+              items: [
+                  'guides/installation/crd',
+                  'guides/installation/gitops',
+                  'guides/installation/orbos'
+              ],
+          },
       ],
     },
     {
       type: 'category',
-      label: 'Installation',
+      label: 'Get to know ZITADEL',
       items: [
-          {
-            type: 'category',
-            label: 'CAOS Managed',
-            items: [
-                'guides/installation/shared-cloud',
-                'guides/installation/managed-dedicated-instance'
-            ],
-          },
-        {
-          type: 'category',
-          label: 'Self Managed',
-          items: [
-              'guides/installation/crd',
-              'guides/installation/gitops',
-              'guides/installation/orbos'
-          ],
-        },
-      ],
-    },
+          'guides/usage/get-started',
+          'guides/usage/organizations',
+          'guides/usage/projects',
+          'guides/usage/oauth-recommended-flows',
+          'guides/usage/serviceusers',
+          'guides/usage/access-zitadel-apis',
+          'guides/usage/identity-brokering',
+      ]
+    }
   ],
   apis: [
     'apis/introduction',
     'apis/domains',
-    'apis/authn',
-    'apis/admin',
-    'apis/mgmt',
+    'apis/apis',
+    {
+      type: 'category',
+      label: 'Proto API Definition',
+      items: [
+        'apis/proto/auth',
+        'apis/proto/management',
+        'apis/proto/admin',
+        'apis/proto/org',
+        'apis/proto/user',
+        'apis/proto/app',
+        'apis/proto/policy',
+        'apis/proto/auth_n_key',
+        'apis/proto/change',
+        'apis/proto/idp',
+        'apis/proto/member',
+        'apis/proto/message',
+        'apis/proto/object',
+        'apis/proto/options',
+      ],
+    },
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
-      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims', 'apis/openidoauth/authn-methods', 'apis/openidoauth/grant-types'],
+      items: [
+          'apis/openidoauth/endpoints',
+          'apis/openidoauth/scopes',
+          'apis/openidoauth/claims',
+          'apis/openidoauth/authn-methods',
+          'apis/openidoauth/grant-types'
+      ],
     },
   ],
   concepts: [

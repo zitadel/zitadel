@@ -1,4 +1,4 @@
-<div class="max-width-container">
+<div class="enlarged-container">
     <h1>{{ 'ORG.PAGES.LIST' | translate }}</h1>
     <p class="top-desc">{{'ORG.PAGES.LISTDESCRIPTION' | translate}}</p>
 
@@ -38,6 +38,16 @@
                 </th>
                 <td mat-cell *matCellDef="let org"> {{org.name}} </td>
             </ng-container>
+
+            <ng-container matColumnDef="creationDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  [ngClass]="{'search-active': this.orgSearchKey == OrgListSearchKey.NAME}">
+                  {{ 'ORG.PAGES.CREATIONDATE' | translate }}
+              </th>
+              <td mat-cell *matCellDef="let org">
+                {{org.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+              </td>
+          </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

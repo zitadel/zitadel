@@ -10,7 +10,7 @@ const features = [
   {
     title: 'Manuals',
     imageUrl: 'img/zitadel-logo-solo-light.png',
-    link: 'docs/manuals/user',
+    link: 'docs/manuals/introduction',
     description: (
       <>
         Follow this guide to get started with ZITADEL as a user.
@@ -93,7 +93,7 @@ export default function Home() {
                 'button button--outline button--lg get-started',
                 styles.getStarted,
               )}
-              to={useBaseUrl('docs/quickstarts/quickstarts')}>
+              to={useBaseUrl('docs/guides/get-started')}>
               Get Started
             </Link>
           </div>

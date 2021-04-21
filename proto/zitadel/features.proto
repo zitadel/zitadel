@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
 package zitadel.features.v1;
@@ -21,6 +20,7 @@ message Features {
   bool login_policy_passwordless = 9;
   bool password_complexity_policy = 10;
   bool label_policy = 11;
+  bool custom_domain = 12;
 }
 
 message FeatureTier {

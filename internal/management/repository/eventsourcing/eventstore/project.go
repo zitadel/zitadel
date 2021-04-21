@@ -3,22 +3,19 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"strings"
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/golang/protobuf/ptypes"
-	"k8s.io/apimachinery/pkg/api/errors"
-
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -28,6 +25,7 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/golang/protobuf/ptypes"
 )
 
 type ProjectRepo struct {
@@ -534,7 +532,7 @@ func (repo *ProjectRepo) userByID(ctx context.Context, id string) (*usr_model.Us
 		user = new(usr_es_model.UserView)
 	}
 	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4n8Fs", "Errors.User.NotFound")
 	}
 	if esErr != nil {
@@ -674,7 +672,7 @@ func (u *ProjectRepo) GetIAMByID(ctx context.Context) (*iam_model.IAM, error) {
 		},
 	}
 	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
-	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
 		return nil, err
 	}
 	return iam_es_model.IAMToModel(iam), nil

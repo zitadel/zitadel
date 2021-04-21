@@ -80,7 +80,7 @@ export class IdpComponent implements OnInit, OnDestroy {
         })).subscribe((params) => {
             const { id } = params;
             if (id) {
-                if (this.serviceType == PolicyComponentServiceType.MGMT) {
+                if (this.serviceType === PolicyComponentServiceType.MGMT) {
                     (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
                         if (resp.idp) {
                             const idpObject = resp.idp;
@@ -90,7 +90,7 @@ export class IdpComponent implements OnInit, OnDestroy {
                             }
                         }
                     });
-                } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+                } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
                     (this.service as AdminService).getIDPByID(id).then(resp => {
                         if (resp.idp) {
                             const idpObject = resp.idp;
@@ -118,7 +118,7 @@ export class IdpComponent implements OnInit, OnDestroy {
     }
 
     public updateIdp(): void {
-        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
             const req = new UpdateOrgIDPRequest();
 
             req.setIdpId(this.id?.value);
@@ -131,7 +131,7 @@ export class IdpComponent implements OnInit, OnDestroy {
             }).catch(error => {
                 this.toast.showError(error);
             });
-        } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
             const req = new UpdateIDPRequest();
 
             req.setIdpId(this.id?.value);
@@ -148,7 +148,7 @@ export class IdpComponent implements OnInit, OnDestroy {
     }
 
     public updateOidcConfig(): void {
-        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
             const req = new UpdateOrgIDPOIDCConfigRequest();
 
             req.setIdpId(this.id?.value);
@@ -165,7 +165,7 @@ export class IdpComponent implements OnInit, OnDestroy {
             }).catch(error => {
                 this.toast.showError(error);
             });
-        } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
             const req = new UpdateIDPOIDCConfigRequest();
 
             req.setIdpId(this.id?.value);

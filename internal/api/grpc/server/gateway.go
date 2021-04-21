@@ -13,6 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const (
@@ -21,7 +22,11 @@ const (
 )
 
 var (
-	DefaultJSONMarshaler = &runtime.JSONPb{}
+	DefaultJSONMarshaler = &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	}
 
 	DefaultServeMuxOptions = func(customHeaders ...string) []runtime.ServeMuxOption {
 		return []runtime.ServeMuxOption{

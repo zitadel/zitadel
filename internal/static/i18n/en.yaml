@@ -317,6 +317,8 @@ Errors:
       AlreadyExists: Step started already exists
     Done:
       AlreadyExists: Step done already exists
+  Features:
+    NotChanged: Feature hat nicht geändert
 EventTypes:
   user:
     added: User added
@@ -500,6 +502,9 @@ EventTypes:
         set: Primary domain set
       reserved: Domain reserved
       released: Domain released
+    features:
+      set: Feature added
+      removed: Feature removed
     name:
       reserved: Organization name reserved
       released: Organization name released
@@ -554,6 +559,10 @@ EventTypes:
           added: Password lockout policy added
           changed: Password lockout policy changed
           removed: Password lockout policy removed
+      label:
+        added: Label Policy added
+        changed: Label Policy changed
+        removed: Label Policy removed
   project:
     added: Project added
     changed: Project changed

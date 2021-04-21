@@ -8,7 +8,7 @@ describe('RedirectUrisComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RedirectUrisComponent ]
+      declarations: [ RedirectUrisComponent ],
     })
     .compileComponents();
   });

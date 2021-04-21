@@ -9,26 +9,28 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { LinksModule } from '../../links/links.module';
 
+import { InfoSectionModule } from '../../info-section/info-section.module';
+import { LinksModule } from '../../links/links.module';
 import { LabelPolicyRoutingModule } from './label-policy-routing.module';
 import { LabelPolicyComponent } from './label-policy.component';
 
 @NgModule({
-    declarations: [LabelPolicyComponent],
-    imports: [
-        LabelPolicyRoutingModule,
-        CommonModule,
-        FormsModule,
-        InputModule,
-        MatButtonModule,
-        MatSlideToggleModule,
-        MatIconModule,
-        HasRoleModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-        LinksModule,
-    ],
+  declarations: [LabelPolicyComponent],
+  imports: [
+    LabelPolicyRoutingModule,
+    CommonModule,
+    FormsModule,
+    InputModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    MatIconModule,
+    HasRoleModule,
+    MatTooltipModule,
+    TranslateModule,
+    DetailLayoutModule,
+    LinksModule,
+    InfoSectionModule,
+  ],
 })
 export class LabelPolicyModule { }

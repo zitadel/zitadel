@@ -33,6 +33,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LoginPolicyUsernameLogin,
 		features.PasswordComplexityPolicy,
 		features.LabelPolicy,
+		features.CustomDomain,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -113,6 +114,15 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeLabelPolicyEvent)
 		}
 	}
+	if !features.CustomDomain {
+		removeCustomDomainsEvents, err := c.removeCustomDomains(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removeCustomDomainsEvents != nil {
+			events = append(events, removeCustomDomainsEvents...)
+		}
+	}
 	return events, nil
 }
 
@@ -168,8 +178,9 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 		return nil, err
 	}
 	events := make([]eventstore.EventPusher, 0)
-	for factor, state := range orgAuthFactors.SecondFactors {
-		if state.IAM == state.Org {
+	for _, factor := range domain.SecondFactorTypes() {
+		state := orgAuthFactors.SecondFactors[factor]
+		if state == nil || state.IAM == state.Org {
 			continue
 		}
 		secondFactorWriteModel := orgAuthFactors.ToSecondFactorWriteModel(factor)
@@ -191,8 +202,10 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 			events = append(events, event)
 		}
 	}
-	for factor, state := range orgAuthFactors.MultiFactors {
-		if state.IAM == state.Org {
+
+	for _, factor := range domain.MultiFactorTypes() {
+		state := orgAuthFactors.MultiFactors[factor]
+		if state == nil || state.IAM == state.Org {
 			continue
 		}
 		multiFactorWriteModel := orgAuthFactors.ToMultiFactorWriteModel(factor)

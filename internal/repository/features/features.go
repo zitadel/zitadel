@@ -31,6 +31,7 @@ type FeaturesSetEvent struct {
 	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsernameLogin,omitempty"`
 	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
 	LabelPolicy              *bool                 `json:"labelPolicy,omitempty"`
+	CustomDomain             *bool                 `json:"customDomain,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -128,6 +129,12 @@ func ChangePasswordComplexityPolicy(passwordComplexityPolicy bool) func(event *F
 func ChangeLabelPolicy(labelPolicy bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.LabelPolicy = &labelPolicy
+	}
+}
+
+func ChangeCustomDomain(customDomain bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.CustomDomain = &customDomain
 	}
 }
 

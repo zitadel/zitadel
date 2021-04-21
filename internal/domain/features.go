@@ -15,6 +15,7 @@ const (
 	FeatureLoginPolicyUsernameLogin = FeatureLoginPolicy + ".username_login"
 	FeaturePasswordComplexityPolicy = "password_complexity_policy"
 	FeatureLabelPolicy              = "label_policy"
+	FeatureCustomDomain             = "custom_domain"
 )
 
 type Features struct {
@@ -34,6 +35,7 @@ type Features struct {
 	LoginPolicyUsernameLogin bool
 	PasswordComplexityPolicy bool
 	LabelPolicy              bool
+	CustomDomain             bool
 }
 
 type FeaturesState int32

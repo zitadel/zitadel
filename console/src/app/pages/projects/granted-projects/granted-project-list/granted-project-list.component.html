@@ -74,8 +74,8 @@
                 <i class="las la-exclamation"></i>
                 <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
             </div>
-            <mat-paginator class="paginator" #paginator [length]="totalResult" [pageSize]="10"
-                [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+            <cnsl-paginator class="paginator" #paginator [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="10"
+                [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
         </div>
     </app-refresh-table>
 </div>

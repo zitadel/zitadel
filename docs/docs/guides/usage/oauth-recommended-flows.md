@@ -8,7 +8,7 @@ title: Recommended authorization flows
 | Learning Outcomes | In this module you will: <ul><li>Learn the basics of federated identities</li><li>Understand the basics of OAuth 2.x client profiles and their importance for authorization flows</li><li>Get a recommended flow for Web, Native, User-Agent, and API</li></ul> |
 | Prerequisites | Basic knowledge about federated identities. |
 
-### Introduction
+## Introduction
 
 Before we get into setting up our first application within ZITADEL, we need to go through some basics on how to obtain an authorization with OpenID Connect 1.x and OAuth 2.x.
 
@@ -18,7 +18,7 @@ We invite you to further explore the different authorization flows in the OAuth 
 
 So this module will only go over the basics and explain why we recommend the flow “Authorization Flow with PKCE” as default for most applications. We will also cover the case of machine-to-machine communication, ie. where there is no interactive login. Further we will guide you to further reading viable alternatives, if the default flow is not feasible.
 
-### Basics of Federated Identity
+## Basics of Federated Identity
 
 Although Federated Identities are not a new concept ([RFC 6749](https://tools.ietf.org/html/rfc6749), “The OAuth 2.0 Authorization Framework” was released in 2012) it is important to highlight the difference between the traditional client-server authentication model and the concept of delegated authorization and authentication.
 
@@ -46,10 +46,15 @@ This is where the so-called “flows” come into play: There are a number of di
 
 Maybe interesting to mention is that we are mostly concerned with choosing the right OAuth 2.x flows (alas “authorization”). OpenID Connect extends the OAuth 2.x flow with useful features like endpoint discovery (where to ask), ID Token (who is the user, when and how did she authenticate), and UserInfo Endpoint (getting additional information about the user).
 
-### Different client profiles
+## Different client profiles
 
 As mentioned in the beginning of this module, there are two main determinants for choosing the optimal authorization flow:
 
+<<<<<<< HEAD:docs/docs/guides/usage/oauth-recommended-flows.md
+As mentioned in the beginning of this module, there are two main determinants for choosing the optimal authorization flow:
+
+=======
+>>>>>>> main:docs/docs/guides/oauth-recommended-flows.md
 1. Client’s ability to maintain the confidentiality of client credentials
 2. Technological limitations
 
@@ -86,7 +91,7 @@ The following table gives you a brief overview of different client profiles.
 	</tr>
 </table>
 
-### Our recommended authorization flows
+## Our recommended authorization flows
 
 We recommend using the flow **“Authorization Code with Proof Key of Code Exchange (PKCE)”** ([RFC7636](https://tools.ietf.org/html/rfc7636)) for **User-Agent**, **Native**, and **Web** clients.
 
@@ -104,7 +109,7 @@ A JWT with a private key can also be used with client profile web to further enh
 
 In case you need alternative flows and their advantages and drawbacks, there will be a module to outline more methods and our recommended fallback strategy per client profile that are available in ZITADEL.
 
-### Knowledge Check (3)
+## Knowledge Check (3)
 
 * With federated identities the user sends credentials to the server holding the protected resource
     - [ ] yes
@@ -133,7 +138,7 @@ In case you need alternative flows and their advantages and drawbacks, there wil
 
 </details>
 
-### Summary (3)
+## Summary (3)
 
 * Federated Identities solve key problems and challenges with traditional server-client architecture
 * Use “Authorization Code with Proof Key of Code Exchange (PKCE)” for User-Agent, Native, and Web clients

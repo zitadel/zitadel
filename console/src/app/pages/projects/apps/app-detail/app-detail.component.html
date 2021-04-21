@@ -14,7 +14,7 @@
                 <ng-template appHasRole [appHasRole]="['project.app.write:'+projectId, 'project.app.write']">
 
                     <button *ngIf="!editState" matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button
-                    (click)="editState = !editState" aria-label="edit app name">
+                        (click)="editState = !editState" aria-label="edit app name">
                         <i class="las la-edit"></i>
                     </button>
                     <button *ngIf="editState" (click)="saveApp()" [disabled]="appNameForm.invalid || name?.disabled"
@@ -22,22 +22,24 @@
                         <i class="las la-save"></i>
                     </button>
 
+                    <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+                        <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
+                            (click)="deleteApp()" aria-label="delete app">
+                            <i class="las la-trash"></i>
+                        </button>
+                    </ng-template>
+
+                    <span class="fill-space"></span>
+
                     <button class="state-button" mat-stroked-button color="warn"
-                        *ngIf="app.state !== undefined && app?.state !== AppState.APP_STATE_INACTIVE"
+                        *ngIf="app && app.state !== undefined && app?.state !== AppState.APP_STATE_INACTIVE"
                         (click)="changeState(AppState.APP_STATE_INACTIVE)">
                         {{'ACTIONS.DEACTIVATE' | translate}}
                     </button>
                     <button class="state-button" mat-stroked-button
-                        *ngIf="app.state !== undefined && app?.state !== AppState.APP_STATE_ACTIVE"
+                        *ngIf="app && app.state !== undefined && app?.state !== AppState.APP_STATE_ACTIVE"
                         (click)="changeState(AppState.APP_STATE_ACTIVE)">
                         {{'ACTIONS.REACTIVATE' | translate}}
-                   </button>
-                </ng-template>
-
-                <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
-                    <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
-                        (click)="deleteApp()" aria-label="delete app">
-                        <i class="las la-trash"></i>
                     </button>
                 </ng-template>
             </ng-container>
@@ -112,7 +114,7 @@
             </cnsl-info-section>
 
             <cnsl-info-section class="step-description"
-                *ngIf="OIDCAppType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
+                *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
             </cnsl-info-section>
 
@@ -142,7 +144,7 @@
             <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
         </app-card>
 
-        <div *ngIf="oidcForm && app?.apiConfig" class="btn-container">
+        <div *ngIf="apiForm && app?.apiConfig" class="btn-container">
             <button class="submit-button" (click)="saveAPIApp()" color="primary"
                 [disabled]="apiForm.invalid || !canWrite" mat-raised-button>
                 {{ 'ACTIONS.SAVE' | translate }}

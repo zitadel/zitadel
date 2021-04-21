@@ -146,7 +146,11 @@ Content-Type: application/json
 }
 ```
 
+<<<<<<< HEAD:docs/docs/guides/usage/serviceusers.md
 ### 4. Verify that you have a valid access toaken
+=======
+### 4. Verify that you have a valid access token
+>>>>>>> main:docs/docs/guides/serviceusers.md
 
 For this example let's call the userinfo endpoint to verfiy that our access token works.
 

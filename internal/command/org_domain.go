@@ -2,13 +2,14 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -202,6 +203,38 @@ func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregat
 	}
 	if orgDomain.Primary {
 		events = append(events, org.NewDomainPrimarySetEvent(ctx, orgAgg, orgDomain.Domain))
+	}
+	return events, nil
+}
+
+func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+	orgDomains := NewOrgDomainsWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, orgDomains)
+	if err != nil {
+		return nil, err
+	}
+	hasDefault := false
+	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, c.iamDomain)
+	isPrimary := defaultDomain == orgDomains.PrimaryDomain
+	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
+	events := make([]eventstore.EventPusher, 0, len(orgDomains.Domains))
+	for _, orgDomain := range orgDomains.Domains {
+		if orgDomain.State == domain.OrgDomainStateActive {
+			if orgDomain.Domain == defaultDomain {
+				hasDefault = true
+				continue
+			}
+			events = append(events, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, orgDomain.Verified))
+		}
+	}
+	if !hasDefault {
+		return append([]eventstore.EventPusher{
+			org.NewDomainAddedEvent(ctx, orgAgg, defaultDomain),
+			org.NewDomainPrimarySetEvent(ctx, orgAgg, defaultDomain),
+		}, events...), nil
+	}
+	if !isPrimary {
+		return append([]eventstore.EventPusher{org.NewDomainPrimarySetEvent(ctx, orgAgg, defaultDomain)}, events...), nil
 	}
 	return events, nil
 }
