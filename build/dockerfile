@@ -133,6 +133,7 @@ COPY --from=go-gen /go/src/github.com/caos/zitadel/docs/apis/proto ./docs/docs/a
 ## Go test
 #######################
 FROM go-base as go-test
+RUN ls -latr
 COPY . .
 
 # Migrations for cockroach-secure
