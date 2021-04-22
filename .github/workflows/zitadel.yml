@@ -95,7 +95,7 @@ jobs:
   operator-image:
     needs: refs
     runs-on: ubuntu-18.04
-    name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
+    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
@@ -209,13 +209,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Docker Login
         run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-      - name: Docker Pull short-sha
+      - name: Docker Pull ZITADEL Image
         run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
-      - name: Docker Pull short-sha
+      - name: Docker Pull ZITADEL Operator Image
         run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-      - name: Docker Pull short-sha
+      - name: Docker Pull CockroachDB Image
         run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-      - name: Download all zitadelctl artifact
+      - name: Download zitadelctl Artifacts
         uses: actions/download-artifact@v2
         with:
           path: ${{ env.ARTIFACTS_FOLDER }}/
@@ -224,13 +224,13 @@ jobs:
           mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
           find ${ARTIFACTS_FOLDER}
 
-      - name: Semantic Release
+      - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
         with:
           dry_run: false
           semantic_version: 17.0.4
-      - name: Do something when a new release published
+      - name: Echo Semantic Release Versions
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           echo ${{ steps.semantic.outputs.new_release_version }}
@@ -274,7 +274,7 @@ jobs:
           docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
           docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
-      - name: Dev-Release
+      - name: Development Release
         id: create_release
         uses: ncipollo/release-action@v1.8.1
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
