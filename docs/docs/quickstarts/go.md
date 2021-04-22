@@ -12,9 +12,9 @@ At the end of the guide you should have an application able read the details of 
 The client [SDK](https://github.com/caos/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API using our [OIDC client library](https://github.com/caos/oidc).
 All that is required, is a service account with an Org Owner role assigned and its key JSON.
 
-However, we recommend you read the guide on [how to access ZITADEL API](../guides/access-zitadel-apis) and the associated guides for a basic knowledge of :
- - [Recommended Authorization Flows](../guides/oauth-recommended-flows)
- - [Service Users](../guides/serviceusers)
+However, we recommend you read the guide on [how to access ZITADEL API](../guides/usage/access-zitadel-apis) and the associated guides for a basic knowledge of :
+ - [Recommended Authorization Flows](../guides/usage/oauth-recommended-flows)
+ - [Service Users](../guides/usage/serviceusers)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
