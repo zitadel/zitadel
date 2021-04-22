@@ -41,6 +41,12 @@ module.exports = {
   apis: [
     'apis/introduction',
     'apis/domains',
+    {
+      type: 'category',
+      label: 'OpenID Connect & OAuth',
+      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims', 'apis/openidoauth/authn-methods', 'apis/openidoauth/grant-types'],
+      collapsed: false,
+    },
     'apis/apis',
     {
       type: 'category',
@@ -61,12 +67,6 @@ module.exports = {
         'apis/proto/object',
         'apis/proto/options',
       ],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'OpenID Connect & OAuth',
-      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims', 'apis/openidoauth/authn-methods', 'apis/openidoauth/grant-types'],
       collapsed: false,
     },
   ],
