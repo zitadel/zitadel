@@ -93,10 +93,9 @@ jobs:
           name: codecov-go
 
   operator-image:
-    name: Build ZITADEL Operator Image
     needs: refs
     runs-on: ubuntu-18.04
-    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
