@@ -12,4 +12,4 @@
 
 ## **Do you want to contribute to the ZITADEL documentation?**
 
-* Please read [Contributing to the ZITADEL Documentation](site/CONTRIBUTING.md).
+* Please read [Contributing to the ZITADEL Documentation](site/CONTRIBUTING.md) (Link currently broken).
