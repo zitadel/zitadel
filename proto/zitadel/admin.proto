@@ -173,6 +173,7 @@ service AdminService {
         };
     }
 
+    // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
             get: "/orgs/{id}";
@@ -199,7 +200,7 @@ service AdminService {
     }
 
     //Returns all organisations matching the request
-    // all queries need to match (ANDed)
+    // all queries need to match (AND)
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
@@ -276,6 +277,7 @@ service AdminService {
         };
     }
 
+    // Returns a identity provider configuration of the IAM
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}";
@@ -311,6 +313,7 @@ service AdminService {
         };
     }
 
+    // Returns all identity provider configurations of the IAM
     rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search";
@@ -347,6 +350,7 @@ service AdminService {
         };
     }
 
+    // Adds a new oidc identity provider configuration the IAM
     rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc";
