@@ -18,8 +18,18 @@
   --ifm-color-primary-lightest: #9aa8e4;
   --ifm-code-font-size: 95%;
   --ifm-font-family-base: 'Lato', sans-serif;
+  --ifm-hero-background-color: var(--ifm-color-primary);
+  --ifm-hero-text-color: var(--ifm-font-color-base-inverse);
+  --get-started: #FF2069;
+  --get-started-bg-hover: var(--ifm-hero-background-color);
 }
 
+:root[data-theme="dark"] {
+  --ifm-background-color: #141735;
+  --ifm-hero-background-color: #0F1022;
+  --ifm-hero-text-color: var(--ifm-font-color-base);
+  --get-started-bg: --ifm-font-color-base;
+}
 
 .docusaurus-highlight-code-line {
   background-color: rgb(72, 77, 91);
@@ -29,14 +39,14 @@
 }
 
 .get-started {
-  border: 1px solid;
-  background-color: var(--ifm-font-color-base-inverse);
-  color: var(--ifm-color-primary);
+  border: 2px solid var(--get-started);
+  background-color: var(--get-started);
+  color: var(--ifm-hero-text-color);
 }
 
 .get-started:hover {
-  background-color: var(--ifm-color-primary);
-  color: var(--ifm-font-color-base-inverse);
+  background-color: var(--get-started-bg-hover);
+  color: var(--ifm-hero-text-color);
 }
 
 .docs-link a {
