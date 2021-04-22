@@ -21,8 +21,8 @@ title: Access ZITADEL APIs
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/oauth-recommended-flows">Recommended Authorization Flows</a></li>
-                <li>Knowledge of <a href="/docs/guides/serviceusers">Service Users</a></li>
+                <li>Knowledge of <a href="/docs/guides/usage/oauth-recommended-flows">Recommended Authorization Flows</a></li>
+                <li>Knowledge of <a href="/docs/guides/usage/serviceusers">Service Users</a></li>
             </ul>
         </td>
     </tr>
@@ -37,7 +37,7 @@ ZITADEL Managers are Users who have permission to manage ZITADEL itself. There a
 - **Project Mangers**: In this level the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organisation.
 
-On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../manuals/admin-managers)
+On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../manuals/admin-managers)
 
 
 ## Exercise: Add ORG_OWNER to Service User
@@ -61,7 +61,7 @@ This is already described in the [Service User](serviceusers), so make sure you 
 With the encoded JWT from the prior step, you will need to craft a POST request to ZITADEL's token endpoint:
 
 To access the ZITADEL APIs you need the ZITADEL Project ID in the audience of your token.
-This is possible by sending a custom scope for the audience. More about [Custom Scopes](../apis/openidoauth/scopes)
+This is possible by sending a custom scope for the audience. More about [Custom Scopes](../../apis/openidoauth/scopes)
 
 Use the scope `urn:zitadel:iam:org:project:id:{projectid}:aud` to include the project id in your audience
 
@@ -77,7 +77,7 @@ curl --request POST \
 ```
 
 * `grant_type` must be set to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
-* `scope` should contain any [Scopes](../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
+* `scope` should contain any [Scopes](../../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
@@ -93,7 +93,7 @@ Content-Type: application/json
 }
 ```
 
-With this token you are allowed to access the [ZITADEL APIs](../apis/introduction) .
+With this token you are allowed to access the [ZITADEL APIs](../../apis/introduction) .
 ## Knowledge Check
 
 
@@ -129,4 +129,4 @@ With this token you are allowed to access the [ZITADEL APIs](../apis/introductio
 
 Where to go from here:
 
-* [ZITADEL API Documentation](../apis/introduction)
+* [ZITADEL API Documentation](../../apis/introduction)

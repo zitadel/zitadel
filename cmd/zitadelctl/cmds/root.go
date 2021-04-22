@@ -71,9 +71,9 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 	}
 
 	flags := cmd.PersistentFlags()
-	flags.BoolVar(&rv.Gitops, "gitops", false, "Run orbctl in gitops mode. Not specifying this flag is only supported for BOOM and Networking Operator")
+	flags.BoolVar(&rv.Gitops, "gitops", false, "Run zitadelctl in gitops mode")
 	flags.StringVarP(&orbConfigPath, "orbconfig", "f", "~/.orb/config", "Path to the file containing the orbs git repo URL, deploy key and the master key for encrypting and decrypting secrets")
-	flags.StringVarP(&rv.Kubeconfig, "kubeconfig", "k", "~/.kube/config", "Path to the kubeconfig file to the cluster orbctl should target")
+	flags.StringVarP(&rv.Kubeconfig, "kubeconfig", "k", "~/.kube/config", "Path to the kubeconfig file to the cluster zitadelctl should target")
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
 
 	return cmd, func() (*RootValues, error) {
@@ -84,18 +84,17 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 
 		rv.Monitor = monitor
 		rv.Kubeconfig = helpers.PruneHome(rv.Kubeconfig)
-		rv.GitClient = git.New(ctx, monitor, "orbos", "orbos@caos.ch")
+		rv.GitClient = git.New(ctx, monitor, "zitadel", "orbos@caos.ch")
 
+		var err error
 		if rv.Gitops {
 			prunedPath := helpers.PruneHome(orbConfigPath)
-			orbConfig, err := orb.ParseOrbConfig(prunedPath)
-			if err != nil {
-				orbConfig = &orb.Orb{Path: prunedPath}
-				return nil, err
+			rv.OrbConfig, err = orb.ParseOrbConfig(prunedPath)
+			if rv.OrbConfig == nil {
+				rv.OrbConfig = &orb.Orb{Path: prunedPath}
 			}
-			rv.OrbConfig = orbConfig
 		}
 
-		return rv, nil
+		return rv, err
 	}
 }

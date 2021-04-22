@@ -39,9 +39,43 @@ module.exports = {
     {
       type: 'category',
       label: 'Get to know ZITADEL',
-      items: ['guides/get-started', 'guides/organizations', 'guides/projects', 'guides/oauth-recommended-flows', 'guides/serviceusers', 'guides/access-zitadel-apis', 'guides/identity-brokering'],
       collapsed: false,
+      items: [
+          'guides/usage/get-started',
+          'guides/usage/organizations',
+          'guides/usage/projects',
+          'guides/usage/oauth-recommended-flows',
+          'guides/usage/serviceusers',
+          'guides/usage/access-zitadel-apis',
+          'guides/usage/identity-brokering',
+      ],
     },
+      {
+          type: 'category',
+          label: 'Installation',
+          collapsed: false,
+          items: [
+              {
+                  type: 'category',
+                  label: 'CAOS Managed',
+                  collapsed: true,
+                  items: [
+                      'guides/installation/shared-cloud',
+                      'guides/installation/managed-dedicated-instance'
+                  ],
+              },
+              {
+                  type: 'category',
+                  label: 'Self Managed',
+                  collapsed: true,
+                  items: [
+                      'guides/installation/crd',
+                      'guides/installation/gitops',
+                      'guides/installation/orbos'
+                  ],
+              },
+          ],
+      }
   ],
   apis: [
     'apis/introduction',
@@ -50,6 +84,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Proto API Definition',
+      collapsed: false,
       items: [
         'apis/proto/auth',
         'apis/proto/management',
@@ -66,13 +101,18 @@ module.exports = {
         'apis/proto/object',
         'apis/proto/options',
       ],
-      collapsed: false,
     },
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
-      items: ['apis/openidoauth/endpoints', 'apis/openidoauth/scopes', 'apis/openidoauth/claims', 'apis/openidoauth/authn-methods', 'apis/openidoauth/grant-types'],
       collapsed: false,
+      items: [
+          'apis/openidoauth/endpoints',
+          'apis/openidoauth/scopes',
+          'apis/openidoauth/claims',
+          'apis/openidoauth/authn-methods',
+          'apis/openidoauth/grant-types'
+      ],
     },
   ],
   concepts: [

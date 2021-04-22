@@ -24,8 +24,9 @@ func WriteSecretCommand(getRv GetRootValues) *cobra.Command {
 			Short: "Encrypt a secret and push it to the repository",
 			Long:  "Encrypt a secret and push it to the repository.\nIf no path is provided, a secret can interactively be chosen from a list of all possible secrets",
 			Args:  cobra.MaximumNArgs(1),
-			Example: `orbctl writesecret mystaticprovider.bootstrapkey --file ~/.ssh/my-orb-bootstrap
-orbctl writesecret mygceprovider.google_application_credentials_value --value "$(cat $GOOGLE_APPLICATION_CREDENTIALS)" `,
+			Example: `zitadelctl writesecret database.bucket.serviceaccountjson.encrypted --file ~/googlecloudstoragesa.json
+zitadelctl writesecret database.bucket.serviceaccountjson.encrypted --value "$(cat ~/googlecloudstoragesa.json)"
+cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.serviceaccountjson.encrypted --stdin`,
 		}
 	)
 
@@ -58,7 +59,7 @@ orbctl writesecret mygceprovider.google_application_credentials_value --value "$
 			path = args[0]
 		}
 
-		k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
 		if err != nil && !rv.Gitops {
 			return err
 		}
