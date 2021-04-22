@@ -725,7 +725,7 @@ failed event. You can find out if it worked on the `failure_count`
 
 
 ### ClearViewResponse
-This is an empty request
+This is an empty response
 
 
 
@@ -982,7 +982,7 @@ This is an empty request
 
 
 ### HealthzResponse
-This is an empty request
+This is an empty response
 
 
 
@@ -1245,7 +1245,7 @@ This is an empty request
 
 
 ### RemoveFailedEventResponse
-This is an empty request
+This is an empty response
 
 
 

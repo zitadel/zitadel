@@ -3170,7 +3170,7 @@ This is an empty request
 
 
 ### HealthzResponse
-This is an empty request
+This is an empty response
 
 
 

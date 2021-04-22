@@ -2799,7 +2799,7 @@ message RemoveFailedEventRequest {
     ];
 }
 
-//This is an empty request
+//This is an empty response
 message RemoveFailedEventResponse {}
 
 message View {
