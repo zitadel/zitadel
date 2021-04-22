@@ -63,7 +63,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum', 'console/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-zitadel-
       - name: Set up QEMU
@@ -163,7 +163,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-crdb-image-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-crdb-image-${{ hashFiles('build/cr-backup/Dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-crdb-image-
       - name: Set up QEMU
