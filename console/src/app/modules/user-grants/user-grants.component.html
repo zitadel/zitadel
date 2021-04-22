@@ -136,7 +136,7 @@
                         </ng-container>
 
                         <ng-container
-                            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedId && loadedId === grant.id && grantToEdit == grant.id">
+                            *ngIf="(context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && loadedId && loadedId === grant.projectId && grantToEdit == grant.id">
                             <cnsl-form-field class="form-field" appearance="outline">
                                 <mat-select [(ngModel)]="grant.roleKeysList" multiple
                                     [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
@@ -165,8 +165,9 @@
             <i class="las la-exclamation"></i>
             <span>{{'GRANTS.EMPTY' | translate}}</span>
         </div>
-        <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE"
-            [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
+        <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp"
+            [length]="dataSource.totalResult" [pageSize]="INITIAL_PAGE_SIZE" [length]="dataSource.totalResult"
+            [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
         </cnsl-paginator>
     </div>
 </app-refresh-table>
