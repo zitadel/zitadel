@@ -12,7 +12,7 @@ Now open a terminal and execute the following commands.
 
 ```bash
 # Download the zitadelctl binary
-curl -s https://api.github.com/repos/caos/zitadel/releases/tags/v1.0.0 | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
+curl -s https://api.github.com/repos/caos/zitadel/releases/latest | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 sudo chmod +x /usr/local/bin/zitadelctl
 sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 
@@ -41,7 +41,7 @@ ZITADEL needs [gRPC-Web](https://grpc.io/docs/platforms/web/basics/) for client-
 
 ```bash
 # Download the orbctl binary
-curl -s https://api.github.com/repos/caos/orbos/releases/tags/v4.0.0 | grep "browser_download_url.*orbctl.$(uname).$(uname -m)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/orbctl
+curl -s https://api.github.com/repos/caos/orbos/releases/latest | grep "browser_download_url.*orbctl.$(uname).$(uname -m)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/orbctl
 sudo chmod +x /usr/local/bin/orbctl
 sudo chown $(id -u):$(id -g) /usr/local/bin/orbctl
 
