@@ -33,32 +33,6 @@ module.exports = {
     'guides/introduction',
     {
       type: 'category',
-      label: 'Installation',
-      collapsed: false,
-      items: [
-          {
-              type: 'category',
-              label: 'CAOS Managed',
-              collapsed: false,
-              items: [
-                  'guides/installation/shared-cloud',
-                  'guides/installation/managed-dedicated-instance'
-              ],
-          },
-          {
-              type: 'category',
-              label: 'Self Managed',
-              collapsed: false,
-              items: [
-                  'guides/installation/crd',
-                  'guides/installation/gitops',
-                  'guides/installation/orbos'
-              ],
-          },
-      ],
-    },
-    {
-      type: 'category',
       label: 'Get to know ZITADEL',
       collapsed: false,
       items: [
@@ -70,7 +44,33 @@ module.exports = {
           'guides/usage/access-zitadel-apis',
           'guides/usage/identity-brokering',
       ],
-    }
+    },
+      {
+          type: 'category',
+          label: 'Installation',
+          collapsed: false,
+          items: [
+              {
+                  type: 'category',
+                  label: 'CAOS Managed',
+                  collapsed: true,
+                  items: [
+                      'guides/installation/shared-cloud',
+                      'guides/installation/managed-dedicated-instance'
+                  ],
+              },
+              {
+                  type: 'category',
+                  label: 'Self Managed',
+                  collapsed: true,
+                  items: [
+                      'guides/installation/crd',
+                      'guides/installation/gitops',
+                      'guides/installation/orbos'
+                  ],
+              },
+          ],
+      }
   ],
   apis: [
     'apis/introduction',

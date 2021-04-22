@@ -6,7 +6,7 @@ title: CRD Mode on an existing Kubernetes cluster
 I'd like to see an automatically operated ZITADEL instance running on my own [Kubernetes](https://kubernetes.io/) cluster
 :::
 
-First, download the template configuration files [database.yml](./templates/crd/database.yml) and [zitadel.yml](./templates/crd/zitadel.yml). Then adjust the values in database.yml and zitadel.yml to match your environment. Especially the values for the domain, cluster DNS and storage class are important.  
+First, download the template configuration files [database.yml](./templates/crd/database.yml) and [zitadel.yml](./templates/crd/zitadel.yml). Then adjust the values in database.yml and zitadel.yml to match your environment. Especially the values for the domain, cluster DNS, storage class, email and Twilio are important.  
 
 ```bash
 # Download the zitadelctl binary
@@ -20,8 +20,18 @@ zitadelctl takeoff
 # As soon as the configuration is applied, the operators start their work
 kubectl apply --filename ./database.yml,./zitadel.yml
 
-# Write the minimal Secrets
+# Write the encryption keys
 wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/example_keys && zitadelctl writesecret zitadel.keys.existing --file ./example_keys
+
+# Write the Twiilio sender ID and auth token so that ZITADEL is able to send your users SMS.
+TWILIO_SID=<My Twilio Sender ID>
+TWILIO_AUTH_TOKEN=<My Twilio auth token>
+zitadelctl writesecret zitadel.twiliosid.existing --value $SID
+zitadelctl writesecret zitadel.twilioauthtoken.existing --value $TWILIO_AUTH_TOKEN
+
+# Write your email relays app key so that ZITADEL is able to verify your users email addresses
+EMAIL_APP_KEY=<My email relays app key>
+zitadelctl writesecret zitadel.twilioauthtoken.existing --value $EMAIL_APP_KEY
 
 # Enjoy watching the zitadel pods becoming ready
 watch "kubectl --namespace caos-zitadel get pods"
@@ -46,3 +56,5 @@ kubectl apply --filename ./boom.yml
 # Enjoy watching the ambassador pod becoming ready
 watch "kubectl --namespace caos-system get pods"
 ```
+
+Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/domains) now.
