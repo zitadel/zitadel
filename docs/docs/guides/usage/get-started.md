@@ -7,15 +7,9 @@ Most applications need to know the identity of a user allowing to securely store
 ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users in your application. It supports authentication using passwords and applies additional security with the help of a second factor, for example OTP, to ensure a safe and secure access.
 It additionally leverages industry standards like OAuth 2.0 and OpenID Connect such that it can be easily integrated in your custom backend.
 
-This documentation demonstrates the different installation methods of ZITADEL and provides a quick start guide on how to register your organization as well as creating your first project.
+This provides a quick start guide on how to register your organization as well as creating your first project.
 
-## Trying out ZITADEL
-
-### Installation Types
-
-You can either use our cloud-instance [zitadel.ch](https://zitadel.ch) or deploy a dedicated **ZITADEL** instance. To get started, we recommend you to try out our free tier first.
-
-### Use cloud instance zitadel.ch
+## Trying out ZITADEL on zitadel.ch
 
 To create a ZITADEL project, you have to register as an organization first. Click [here](https://accounts.zitadel.ch/register/org) to register.
 You will receive an email prompting you to verify your mail.
