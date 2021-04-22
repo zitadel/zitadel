@@ -2,12 +2,12 @@
 .codecov
 .github
 build/dockerfile
-site
+docs
 console/node_modules
 console/src/app/proto/generated
 console/tmp
 .releaserc.js
-.typo-ci.yml
+changelog.config.js
 CONTRIBUTING.md
 LICENSE
 README.md
