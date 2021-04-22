@@ -1707,6 +1707,7 @@ Change OIDC identity provider configuration of the organisation
 ### AddAPIAppRequest
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
@@ -1715,7 +1716,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddAPIAppResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1727,7 +1730,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddAppKeyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1739,7 +1744,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddAppKeyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1750,7 +1757,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomLabelPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1761,7 +1770,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomLabelPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1770,7 +1781,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1783,7 +1796,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1792,7 +1807,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomPasswordAgePolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1802,7 +1819,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomPasswordAgePolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1811,7 +1830,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomPasswordComplexityPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1824,7 +1845,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomPasswordComplexityPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1833,7 +1856,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomPasswordLockoutPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1843,7 +1868,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddCustomPasswordLockoutPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1852,7 +1879,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddHumanUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1865,7 +1894,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddHumanUserRequest.Email
+
 
 
 | Field | Type | Description | Validation |
@@ -1875,7 +1906,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddHumanUserRequest.Phone
+
 
 
 | Field | Type | Description | Validation |
@@ -1885,7 +1918,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddHumanUserRequest.Profile
+
 
 
 | Field | Type | Description | Validation |
@@ -1899,7 +1934,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddHumanUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1909,7 +1946,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddIDPToLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1919,7 +1958,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddIDPToLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1928,7 +1969,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddMachineKeyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1939,7 +1982,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddMachineKeyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1950,7 +1995,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddMachineUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1961,7 +2008,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddMachineUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1971,7 +2020,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddMultiFactorToLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1980,7 +2031,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddMultiFactorToLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1989,7 +2042,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOIDCAppRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2012,7 +2067,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOIDCAppResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2026,7 +2083,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgDomainRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2035,7 +2094,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgDomainResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2044,7 +2105,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2054,7 +2117,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2063,7 +2128,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgOIDCIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2079,7 +2146,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgOIDCIDPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2089,7 +2158,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2098,7 +2169,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddOrgResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2108,7 +2181,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectGrantMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2120,7 +2195,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectGrantMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2129,7 +2206,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2140,7 +2219,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2150,7 +2231,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2161,7 +2244,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2170,7 +2255,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2181,7 +2268,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2191,7 +2280,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectRoleRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2203,7 +2294,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddProjectRoleResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2212,7 +2305,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddSecondFactorToLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2221,7 +2316,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddSecondFactorToLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2230,7 +2327,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2242,7 +2341,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### AddUserGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2252,7 +2353,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### BulkAddProjectRolesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2262,7 +2365,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### BulkAddProjectRolesRequest.Role
+
 
 
 | Field | Type | Description | Validation |
@@ -2273,7 +2378,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### BulkAddProjectRolesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2282,7 +2389,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### BulkRemoveUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2291,15 +2400,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### BulkRemoveUserGrantResponse
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### DeactivateAppRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2309,7 +2418,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateAppResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2318,7 +2429,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateOrgIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2327,7 +2440,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateOrgIDPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2336,24 +2451,26 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateOrgRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### DeactivateOrgResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### DeactivateProjectGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2363,7 +2480,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateProjectGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2372,7 +2491,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateProjectRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2381,7 +2502,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateProjectResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2390,7 +2513,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2400,7 +2525,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateUserGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2409,7 +2536,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2418,7 +2547,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### DeactivateUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2427,7 +2558,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GenerateOrgDomainValidationRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2437,7 +2570,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GenerateOrgDomainValidationResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2447,7 +2582,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetAppByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2457,7 +2594,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetAppByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2466,7 +2605,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetAppKeyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2477,7 +2618,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetAppKeyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2486,15 +2629,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetDefaultLabelPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultLabelPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2503,15 +2646,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetDefaultLoginPolicyRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2520,15 +2663,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetDefaultPasswordAgePolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultPasswordAgePolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2537,15 +2680,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetDefaultPasswordComplexityPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultPasswordComplexityPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2554,15 +2697,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetDefaultPasswordLockoutPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetDefaultPasswordLockoutPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2571,15 +2714,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetFeaturesRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetFeaturesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2588,7 +2731,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetGrantedProjectByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2598,7 +2743,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetGrantedProjectByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2607,7 +2754,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetHumanEmailRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2616,7 +2765,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetHumanEmailResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2626,7 +2777,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetHumanPhoneRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2635,7 +2788,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetHumanPhoneResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2645,7 +2800,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetHumanProfileRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2654,7 +2811,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetHumanProfileResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2664,15 +2823,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetIAMRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetIAMResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2682,15 +2841,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetLabelPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetLabelPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2700,15 +2859,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetLoginPolicyRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2718,7 +2877,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetMachineKeyByIDsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2728,7 +2889,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetMachineKeyByIDsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2737,15 +2900,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetMyOrgRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyOrgResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2754,15 +2917,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetOIDCInformationRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetOIDCInformationResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2772,7 +2935,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetOrgByDomainGlobalRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2781,7 +2946,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetOrgByDomainGlobalResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2790,15 +2957,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetOrgIAMPolicyRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetOrgIAMPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2807,7 +2974,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetOrgIDPByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2816,7 +2985,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetOrgIDPByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2825,15 +2996,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetPasswordAgePolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetPasswordAgePolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2843,15 +3014,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetPasswordComplexityPolicyRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetPasswordComplexityPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2861,15 +3032,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetPasswordLockoutPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetPasswordLockoutPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2879,7 +3050,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetProjectByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2888,7 +3061,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetProjectByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2897,7 +3072,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetProjectGrantByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2907,7 +3084,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetProjectGrantByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2916,7 +3095,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetUserByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2925,7 +3106,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetUserByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2934,7 +3117,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetUserByLoginNameGlobalRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2943,7 +3128,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetUserByLoginNameGlobalResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2952,7 +3139,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetUserGrantByIDRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -2962,7 +3151,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### GetUserGrantByIDResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -2971,23 +3162,21 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### HealthzRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### HealthzResponse
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### IDPQuery
+
 
 
 | Field | Type | Description | Validation |
@@ -2998,7 +3187,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ImportHumanUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3012,7 +3203,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ImportHumanUserRequest.Email
+
 
 
 | Field | Type | Description | Validation |
@@ -3022,7 +3215,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ImportHumanUserRequest.Phone
+
 
 
 | Field | Type | Description | Validation |
@@ -3032,7 +3227,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ImportHumanUserRequest.Profile
+
 
 
 | Field | Type | Description | Validation |
@@ -3046,7 +3243,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ImportHumanUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3056,7 +3255,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### IsUserUniqueRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3066,7 +3267,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### IsUserUniqueResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3075,7 +3278,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListAppChangesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3086,7 +3291,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListAppChangesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3096,7 +3303,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListAppKeysRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3107,7 +3316,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListAppKeysResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3117,7 +3328,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListAppsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3128,7 +3341,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListAppsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3138,7 +3353,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListGrantedProjectRolesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3150,7 +3367,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListGrantedProjectRolesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3160,7 +3379,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListGrantedProjectsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3170,7 +3391,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListGrantedProjectsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3180,7 +3403,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListHumanAuthFactorsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3189,7 +3414,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListHumanAuthFactorsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3198,7 +3425,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListHumanLinkedIDPsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3208,7 +3437,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListHumanLinkedIDPsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3218,7 +3449,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListHumanPasswordlessRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3227,7 +3460,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListHumanPasswordlessResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3236,7 +3471,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListLoginPolicyIDPsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3245,7 +3482,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListLoginPolicyIDPsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3255,15 +3494,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListLoginPolicyMultiFactorsRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListLoginPolicyMultiFactorsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3273,15 +3512,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListLoginPolicySecondFactorsRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListLoginPolicySecondFactorsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3291,7 +3530,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListMachineKeysRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3301,7 +3542,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListMachineKeysResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3311,7 +3554,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgChangesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3320,7 +3565,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgChangesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3330,7 +3577,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgDomainsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3340,7 +3589,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgDomainsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3350,7 +3601,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgIDPsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3361,7 +3614,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgIDPsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3372,15 +3627,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgMemberRolesRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListOrgMemberRolesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3389,7 +3644,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgMembersRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3399,7 +3656,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListOrgMembersResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3409,7 +3668,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectChangesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3419,7 +3680,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectChangesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3429,7 +3692,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectGrantMemberRolesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3439,7 +3704,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectGrantMemberRolesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3449,7 +3716,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectGrantMembersRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3461,7 +3730,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectGrantMembersResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3471,7 +3742,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectGrantsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3482,7 +3755,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectGrantsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3492,15 +3767,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectMemberRolesRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListProjectMemberRolesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3510,7 +3785,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectMembersRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3521,7 +3798,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectMembersResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3531,7 +3810,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectRolesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3542,7 +3823,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectRolesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3552,7 +3835,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3562,7 +3847,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListProjectsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3572,7 +3859,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUserChangesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3582,7 +3871,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUserChangesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3592,7 +3883,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3602,7 +3895,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUserGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3612,7 +3907,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUserMembershipsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3623,7 +3920,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUserMembershipsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3633,7 +3932,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUsersRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3644,7 +3945,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ListUsersResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3655,7 +3958,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### LockUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3664,7 +3969,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### LockUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3673,7 +3980,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateAppRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3683,7 +3992,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateAppResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3692,7 +4003,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateOrgIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3701,7 +4014,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateOrgIDPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3710,24 +4025,26 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateOrgRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ReactivateOrgResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### ReactivateProjectGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3737,7 +4054,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateProjectGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3746,7 +4065,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateProjectRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3755,7 +4076,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateProjectResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3764,7 +4087,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3774,7 +4099,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateUserGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3783,7 +4110,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3792,28 +4121,34 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ReactivateUserResponse
+
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### RegenerateAPIClientSecretRequest
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### RegenerateAPIClientSecretResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | client_secret |  string | - |  |
@@ -3821,7 +4156,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RegenerateOIDCClientSecretRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3831,7 +4168,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RegenerateOIDCClientSecretResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3841,7 +4180,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveAppKeyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3852,7 +4193,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveAppKeyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3861,7 +4204,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveAppRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3871,7 +4216,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveAppResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3880,7 +4227,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanAuthFactorOTPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3889,7 +4238,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanAuthFactorOTPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3898,7 +4249,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanAuthFactorU2FRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3908,7 +4261,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanAuthFactorU2FResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3917,7 +4272,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanLinkedIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3928,7 +4285,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanLinkedIDPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3937,7 +4296,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanPasswordlessRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3947,7 +4308,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanPasswordlessResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3956,7 +4319,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanPhoneRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3965,7 +4330,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveHumanPhoneResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3974,7 +4341,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveIDPFromLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -3983,7 +4352,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveIDPFromLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -3992,7 +4363,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveMachineKeyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4002,7 +4375,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveMachineKeyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4011,7 +4386,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveMultiFactorFromLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4020,7 +4397,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveMultiFactorFromLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4029,7 +4408,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveOrgDomainRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4038,7 +4419,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveOrgDomainResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4047,7 +4430,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveOrgIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4056,53 +4441,61 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveOrgIDPResponse
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### RemoveOrgMemberRequest
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### RemoveOrgMemberResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### RemoveProjectGrantMemberRequest
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### RemoveProjectGrantMemberResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### RemoveProjectGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4112,7 +4505,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4121,7 +4516,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4131,7 +4528,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4140,7 +4539,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4149,7 +4550,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4158,7 +4561,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectRoleRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4168,7 +4573,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveProjectRoleResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4177,7 +4584,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveSecondFactorFromLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4186,7 +4595,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveSecondFactorFromLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4195,7 +4606,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4205,7 +4618,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveUserGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4214,7 +4629,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4223,7 +4640,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### RemoveUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4232,7 +4651,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResendHumanEmailVerificationRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4241,7 +4662,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResendHumanEmailVerificationResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4250,7 +4673,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResendHumanInitializationRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4260,7 +4685,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResendHumanInitializationResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4269,7 +4696,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResendHumanPhoneVerificationRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4278,7 +4707,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResendHumanPhoneVerificationResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4287,92 +4718,94 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ResetLabelPolicyToDefaultRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetLabelPolicyToDefaultResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### ResetLoginPolicyToDefaultRequest
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetLoginPolicyToDefaultResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### ResetPasswordAgePolicyToDefaultRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetPasswordAgePolicyToDefaultResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### ResetPasswordComplexityPolicyToDefaultRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetPasswordComplexityPolicyToDefaultResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### ResetPasswordLockoutPolicyToDefaultRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResetPasswordLockoutPolicyToDefaultResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### SendHumanResetPasswordNotificationRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4382,7 +4815,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### SendHumanResetPasswordNotificationResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4391,7 +4826,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### SetHumanInitialPasswordRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4401,7 +4838,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### SetHumanInitialPasswordResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4410,7 +4849,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### SetPrimaryOrgDomainRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4419,7 +4860,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### SetPrimaryOrgDomainResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4428,7 +4871,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UnlockUserRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4437,7 +4882,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UnlockUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4446,7 +4893,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateAPIAppConfigRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4457,7 +4906,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateAPIAppConfigResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4466,7 +4917,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateAppRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4477,7 +4930,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateAppResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4486,7 +4941,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomLabelPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4497,7 +4954,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomLabelPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4506,7 +4965,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomLoginPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4519,7 +4980,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomLoginPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4528,7 +4991,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomPasswordAgePolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4538,7 +5003,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomPasswordAgePolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4547,7 +5014,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomPasswordComplexityPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4560,7 +5029,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomPasswordComplexityPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4569,7 +5040,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomPasswordLockoutPolicyRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4579,7 +5052,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateCustomPasswordLockoutPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4588,7 +5063,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateHumanEmailRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4599,7 +5076,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateHumanEmailResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4608,7 +5087,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateHumanPhoneRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4619,7 +5100,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateHumanPhoneResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4628,7 +5111,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateHumanProfileRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4643,7 +5128,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateHumanProfileResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4652,7 +5139,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateMachineRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4663,7 +5152,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateMachineResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4672,7 +5163,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOIDCAppConfigRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4694,7 +5187,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOIDCAppConfigResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4703,7 +5198,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOrgIDPOIDCConfigRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4718,7 +5215,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOrgIDPOIDCConfigResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4727,7 +5226,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOrgIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4738,7 +5239,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOrgIDPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4747,7 +5250,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOrgMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4757,7 +5262,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateOrgMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4766,7 +5273,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectGrantMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4778,7 +5287,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectGrantMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4787,7 +5298,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4798,7 +5311,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4807,7 +5322,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectMemberRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4818,7 +5335,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectMemberResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4827,7 +5346,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4839,7 +5360,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4848,7 +5371,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectRoleRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4860,7 +5385,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateProjectRoleResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4869,7 +5396,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateUserGrantRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4880,7 +5409,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateUserGrantResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4889,7 +5420,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateUserNameRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4899,7 +5432,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### UpdateUserNameResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -4908,7 +5443,9 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ValidateOrgDomainRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -4917,12 +5454,15 @@ Change OIDC identity provider configuration of the organisation
 
 
 
+
 ### ValidateOrgDomainResponse
+
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 

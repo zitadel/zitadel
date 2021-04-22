@@ -32,10 +32,12 @@ title: {{.Name}}
 ### {{.LongName}}
 {{.Description}}
 
+{{if .HasFields}}
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 {{range .Fields -}}
 | {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | {{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}} | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} | {{$validateOption := .Option "validate.rules"}}{{range $validateOption.Rules}}{{ .Name }}: {{ .Value }}<br /> {{end}} |
+{{end}}
 {{end}}
 {{end}}
 {{end}}

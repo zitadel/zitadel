@@ -382,14 +382,13 @@ Returns a list of roles for the authorized user and project
 
 
 ### AddMyAuthFactorOTPRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### AddMyAuthFactorOTPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -400,17 +399,17 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### AddMyAuthFactorU2FRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### AddMyAuthFactorU2FResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | key |  zitadel.user.v1.WebAuthNKey | - |  |
@@ -418,17 +417,17 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### AddMyPasswordlessRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### AddMyPasswordlessResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | key |  zitadel.user.v1.WebAuthNKey | - |  |
@@ -436,15 +435,15 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### GetMyEmailRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyEmailResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -454,15 +453,15 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### GetMyPasswordComplexityPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyPasswordComplexityPolicyResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -471,15 +470,15 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### GetMyPhoneRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyPhoneResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -489,15 +488,15 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### GetMyProfileRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyProfileResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -507,16 +506,16 @@ Returns a list of roles for the authorized user and project
 
 
 
+
 ### GetMyUserRequest
-GetMyUserRequest is an empty request
+This is an empty request
 the request parameters are read from the token-header
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### GetMyUserResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -526,31 +525,27 @@ the request parameters are read from the token-header
 
 
 
+
 ### HealthzRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### HealthzResponse
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyAuthFactorsRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyAuthFactorsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -559,7 +554,9 @@ the request parameters are read from the token-header
 
 
 
+
 ### ListMyLinkedIDPsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -570,7 +567,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyLinkedIDPsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -580,15 +579,15 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyPasswordlessRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyPasswordlessResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -597,7 +596,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyProjectOrgsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -607,7 +608,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyProjectOrgsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -617,15 +620,15 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyProjectPermissionsRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyProjectPermissionsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -634,7 +637,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyUserChangesRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -643,7 +648,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyUserChangesResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -653,7 +660,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyUserGrantsRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -662,7 +671,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyUserGrantsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -672,15 +683,15 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyUserSessionsRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyUserSessionsResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -689,49 +700,49 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### ListMyZitadelFeaturesRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyZitadelFeaturesResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated string | - |  |
 
 
 
+
 ### ListMyZitadelPermissionsRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ListMyZitadelPermissionsResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated string | - |  |
 
 
 
+
 ### RemoveMyAuthFactorOTPRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### RemoveMyAuthFactorOTPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -740,7 +751,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyAuthFactorU2FRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -749,7 +762,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyAuthFactorU2FResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -758,7 +773,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyLinkedIDPRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -768,7 +785,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyLinkedIDPResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -777,7 +796,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyPasswordlessRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -786,7 +807,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyPasswordlessResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -795,58 +818,60 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### RemoveMyPhoneRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### RemoveMyPhoneResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### ResendMyEmailVerificationRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResendMyEmailVerificationResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### ResendMyPhoneVerificationRequest
+This is an empty request
 
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
 
 
 
 ### ResendMyPhoneVerificationResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### SetMyEmailRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -855,7 +880,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### SetMyEmailResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -864,7 +891,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### SetMyPhoneRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -873,7 +902,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### SetMyPhoneResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -882,7 +913,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UpdateMyPasswordRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -892,7 +925,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UpdateMyPasswordResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -901,7 +936,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UpdateMyProfileRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -915,7 +952,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UpdateMyProfileResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -924,7 +963,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UpdateMyUserNameRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -933,7 +974,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UpdateMyUserNameResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -942,7 +985,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### UserGrant
+
 
 
 | Field | Type | Description | Validation |
@@ -956,43 +1001,53 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### VerifyMyAuthFactorOTPRequest
+
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | code |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### VerifyMyAuthFactorOTPResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### VerifyMyAuthFactorU2FRequest
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | verification |  zitadel.user.v1.WebAuthNVerification | - | message.required: true<br />  |
+
 
 
 
 ### VerifyMyAuthFactorU2FResponse
 
 
+
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
+
 ### VerifyMyEmailRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1001,7 +1056,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### VerifyMyEmailResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1010,7 +1067,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### VerifyMyPasswordlessRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1019,7 +1078,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### VerifyMyPasswordlessResponse
+
 
 
 | Field | Type | Description | Validation |
@@ -1028,7 +1089,9 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### VerifyMyPhoneRequest
+
 
 
 | Field | Type | Description | Validation |
@@ -1037,12 +1100,15 @@ PLANNED: queries for idp name and login name |  |
 
 
 
+
 ### VerifyMyPhoneResponse
+
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 

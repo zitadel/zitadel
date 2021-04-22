@@ -2062,10 +2062,13 @@ service ManagementService {
     }
 }
 
+//This is an empty request
 message HealthzRequest {}
 
+//This is an empty request
 message HealthzResponse {}
 
+//This is an empty request
 message GetOIDCInformationRequest {}
 
 message GetOIDCInformationResponse {
@@ -2073,6 +2076,7 @@ message GetOIDCInformationResponse {
     string discovery_endpoint = 2;
 }
 
+//This is an empty request
 message GetIAMRequest {}
 
 message GetIAMResponse {
@@ -2510,6 +2514,7 @@ message ListUserMembershipsResponse {
     repeated zitadel.user.v1.Membership result = 2;
 }
 
+//This is an empty request
 message GetMyOrgRequest {}
 
 message GetMyOrgResponse {
@@ -2543,12 +2548,14 @@ message AddOrgResponse {
     zitadel.v1.ObjectDetails details = 2;
 }
 
+//This is an empty request
 message DeactivateOrgRequest {}
 
 message DeactivateOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ReactivateOrgRequest {}
 
 message ReactivateOrgResponse {
@@ -2609,6 +2616,7 @@ message SetPrimaryOrgDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListOrgMemberRolesRequest {}
 
 message ListOrgMemberRolesResponse {
@@ -2752,6 +2760,7 @@ message RemoveProjectResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListProjectMemberRolesRequest {}
 
 message ListProjectMemberRolesResponse {
@@ -3444,6 +3453,7 @@ message GetPasswordComplexityPolicyResponse {
     bool is_default = 2;
 }
 
+//This is an empty request
 message GetDefaultPasswordComplexityPolicyRequest {}
 
 message GetDefaultPasswordComplexityPolicyResponse {
@@ -3474,12 +3484,14 @@ message UpdateCustomPasswordComplexityPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResetPasswordComplexityPolicyToDefaultRequest {}
 
 message ResetPasswordComplexityPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetPasswordAgePolicyRequest {}
 
 message GetPasswordAgePolicyResponse {
@@ -3487,6 +3499,7 @@ message GetPasswordAgePolicyResponse {
     bool is_default = 2;
 }
 
+//This is an empty request
 message GetDefaultPasswordAgePolicyRequest {}
 
 message GetDefaultPasswordAgePolicyResponse {
@@ -3511,12 +3524,14 @@ message UpdateCustomPasswordAgePolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResetPasswordAgePolicyToDefaultRequest {}
 
 message ResetPasswordAgePolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetPasswordLockoutPolicyRequest {}
 
 message GetPasswordLockoutPolicyResponse {
@@ -3524,6 +3539,7 @@ message GetPasswordLockoutPolicyResponse {
     bool is_default = 2;
 }
 
+//This is an empty request
 message GetDefaultPasswordLockoutPolicyRequest {}
 
 message GetDefaultPasswordLockoutPolicyResponse {
@@ -3548,12 +3564,14 @@ message UpdateCustomPasswordLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResetPasswordLockoutPolicyToDefaultRequest {}
 
 message ResetPasswordLockoutPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetLabelPolicyRequest {}
 
 message GetLabelPolicyResponse {
@@ -3561,6 +3579,7 @@ message GetLabelPolicyResponse {
     bool is_default = 2;
 }
 
+//This is an empty request
 message GetDefaultLabelPolicyRequest {}
 
 message GetDefaultLabelPolicyResponse {
@@ -3595,6 +3614,7 @@ message UpdateCustomLabelPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResetLabelPolicyToDefaultRequest {}
 
 message ResetLabelPolicyToDefaultResponse {
@@ -3712,6 +3732,7 @@ message RemoveOrgIDPRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
+//This is an empty request
 message RemoveOrgIDPResponse {}
 
 message UpdateOrgIDPRequest {

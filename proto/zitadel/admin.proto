@@ -1680,8 +1680,11 @@ service AdminService {
     }
 }
 
+
+//This is an empty request
 message HealthzRequest {}
 
+//This is an empty request
 message HealthzResponse {}
 
 // if name or domain is already in use, org is not unique
@@ -2342,6 +2345,7 @@ message ResetCustomOrgIAMPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetLabelPolicyRequest {}
 
 message GetLabelPolicyResponse {
@@ -2384,6 +2388,7 @@ message UpdateLabelPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetLoginPolicyRequest {}
 
 message GetLoginPolicyResponse {
@@ -2474,6 +2479,7 @@ message RemoveIDPFromLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListLoginPolicySecondFactorsRequest {}
 
 message ListLoginPolicySecondFactorsResponse {
@@ -2509,6 +2515,7 @@ message RemoveSecondFactorFromLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListLoginPolicyMultiFactorsRequest {}
 
 message ListLoginPolicyMultiFactorsResponse {
@@ -2582,6 +2589,7 @@ message UpdatePasswordComplexityPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetPasswordAgePolicyRequest {}
 
 message GetPasswordAgePolicyResponse {
@@ -2607,6 +2615,7 @@ message UpdatePasswordAgePolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetPasswordLockoutPolicyRequest {}
 
 message GetPasswordLockoutPolicyResponse {
@@ -2696,6 +2705,7 @@ message RemoveIAMMemberResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListIAMMemberRolesRequest {}
 
 message ListIAMMemberRolesResponse {
@@ -2715,6 +2725,7 @@ message ListIAMMembersResponse {
     repeated zitadel.member.v1.Member result = 2;
 }
 
+//This is an empty request
 message ListViewsRequest {}
 
 message ListViewsResponse {
@@ -2747,8 +2758,10 @@ message ClearViewRequest {
     ];
 }
 
+//This is an empty request
 message ClearViewResponse {}
 
+//This is an empty request
 message ListFailedEventsRequest {}
 
 message ListFailedEventsResponse {
@@ -2786,6 +2799,7 @@ message RemoveFailedEventRequest {
     ];
 }
 
+//This is an empty request
 message RemoveFailedEventResponse {}
 
 message View {

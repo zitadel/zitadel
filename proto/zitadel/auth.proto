@@ -454,11 +454,13 @@ service AuthService {
     }
 }
 
+//This is an empty request
 message HealthzRequest {}
 
+//This is an empty request
 message HealthzResponse {}
 
-//GetMyUserRequest is an empty request
+//This is an empty request
 // the request parameters are read from the token-header
 message GetMyUserRequest {}
 
@@ -480,6 +482,7 @@ message ListMyUserChangesResponse {
     repeated zitadel.change.v1.Change result = 2;
 }
 
+//This is an empty request
 message ListMyUserSessionsRequest {}
 
 message ListMyUserSessionsResponse {
@@ -494,6 +497,7 @@ message UpdateMyUserNameResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyPasswordComplexityPolicyRequest {}
 
 message GetMyPasswordComplexityPolicyResponse {
@@ -509,6 +513,7 @@ message UpdateMyPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyProfileRequest {}
 
 message GetMyProfileResponse {
@@ -529,6 +534,7 @@ message UpdateMyProfileResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyEmailRequest {}
 
 message GetMyEmailResponse {
@@ -552,12 +558,14 @@ message VerifyMyEmailResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResendMyEmailVerificationRequest {}
 
 message ResendMyEmailVerificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyPhoneRequest {}
 
 message GetMyPhoneResponse {
@@ -581,12 +589,14 @@ message VerifyMyPhoneResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResendMyPhoneVerificationRequest {}
 
 message ResendMyPhoneVerificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message RemoveMyPhoneRequest {}
 
 message RemoveMyPhoneResponse {
@@ -613,12 +623,14 @@ message RemoveMyLinkedIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListMyAuthFactorsRequest {}
 
 message ListMyAuthFactorsResponse {
     repeated zitadel.user.v1.AuthFactor result = 1;
 }
 
+//This is an empty request
 message AddMyAuthFactorU2FRequest {}
 
 message AddMyAuthFactorU2FResponse {
@@ -626,6 +638,7 @@ message AddMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 2;
 }
 
+//This is an empty request
 message AddMyAuthFactorOTPRequest {}
 
 message AddMyAuthFactorOTPResponse {
@@ -650,6 +663,7 @@ message VerifyMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message RemoveMyAuthFactorOTPRequest {}
 
 message RemoveMyAuthFactorOTPResponse {
@@ -664,12 +678,14 @@ message RemoveMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListMyPasswordlessRequest {}
 
 message ListMyPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1; 
 }
 
+//This is an empty request
 message AddMyPasswordlessRequest {}
 
 message AddMyPasswordlessResponse {
@@ -724,18 +740,21 @@ message ListMyProjectOrgsResponse {
     repeated zitadel.org.v1.Org result = 2;
 }
 
+//This is an empty request
 message ListMyZitadelFeaturesRequest {}
 
 message ListMyZitadelFeaturesResponse {
     repeated string result = 1;
 }
 
+//This is an empty request
 message ListMyZitadelPermissionsRequest {}
 
 message ListMyZitadelPermissionsResponse {
     repeated string result = 1;
 }
 
+//This is an empty request
 message ListMyProjectPermissionsRequest {}
 
 message ListMyProjectPermissionsResponse {
