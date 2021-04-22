@@ -2,13 +2,13 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
@@ -134,7 +134,7 @@ func (u *UserGrantRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, error) 
 		},
 	}
 	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
-	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
+	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
 		return nil, err
 	}
 	return iam_es_model.IAMToModel(iam), nil

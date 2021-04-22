@@ -143,6 +143,7 @@ Registration:
   Title: Registration
   Description: Enter your Userdata. Your email address will be used as loginname.
   Email: E-Mail
+  Username: Username
   Firstname: Firstname
   Lastname: Lastname
   Language: Language
@@ -154,16 +155,18 @@ Registration:
   Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
-  Tos: Terms and conditions
-  TosConfirm: I agree the
+  TosAndPrivacy: Terms and conditions
+  TosConfirm: I accept the
   TosLinkText: TOS
+  TosConfirmAnd: and the
   TosLink: https://zitadel.ch/pdf/tos.pdf
+  PrivacyLinkText: privacy policy
+  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   ExternalLogin: or register with an external user
 
 RegistrationOrg:
   Title: Organisation Registration
   Description: Enter your organisationname and userdata.
-  FreeTillEndOfYear: We are offering the premium tier FORTRESS free of charge during the introductory phase until the end of the first quarter 2021.
   OrgName: Organisationname
   OrgDomain: Domäne
   Email: E-Mail
@@ -179,10 +182,13 @@ RegistrationOrg:
   Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
-  Tos: Terms and conditions
-  TosConfirm: I agree the
+  TosAndPrivacy: Terms and conditions
+  TosConfirm: I accept the
   TosLinkText: TOS
+  TosConfirmAnd: and the
   TosLink: https://zitadel.ch/pdf/tos.pdf
+  PrivacyLinkText: privacy policy
+  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
 
 LogoutDone:
   Title: Logged out
@@ -214,8 +220,10 @@ Actions:
   PasswordLogin: Login with password
 
 Footer:
-  TosPrivacyPolicy: ToS and Privacy Policy
+  Tos: TOS
   TosLink: https://zitadel.ch/pdf/agb.pdf
+  Privacy: Privacy policy
+  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   Help: Help
 
 Errors:

@@ -44,13 +44,13 @@ export class AuthFactorDialogComponent {
     public selectType(type: AuthFactorType): void {
         this.selectedType = type;
 
-        if (type == AuthFactorType.OTP) {
+        if (type === AuthFactorType.OTP) {
             this.authService.addMyMultiFactorOTP().then((otpresp) => {
                 this.otpurl = otpresp.url;
             }, error => {
                 this.toast.showError(error);
             });
-        } else if (type == AuthFactorType.U2F) {
+        } else if (type === AuthFactorType.U2F) {
             this.authService.addMyMultiFactorU2F().then((u2fresp) => {
                 if (u2fresp.key) {
                     const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
@@ -73,10 +73,10 @@ export class AuthFactorDialogComponent {
         }
     }
 
-    public submitAuth() {
-        if (this.selectedType == AuthFactorType.OTP) {
+    public submitAuth(): void {
+        if (this.selectedType === AuthFactorType.OTP) {
             this.submitOTP();
-        } else if (this.selectedType == AuthFactorType.U2F) {
+        } else if (this.selectedType === AuthFactorType.U2F) {
             this.submitU2F();
         }
     }

@@ -26,15 +26,14 @@ package zitadel.management.v1;
 option go_package ="github.com/caos/zitadel/pkg/grpc/management";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-    swagger: "2.0",
     info: {
-        title: "management api of ZITADEL";
+        title: "Management API";
         version: "1.0";
-        description: "it's for managing organisation internal and extnernal objects.";
+        description: "The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.";
         contact:{
             name: "CAOS developers of ZITADEL"
             url: "https://zitadel.ch"
-            email: "hi@caos.ch" //TODO: is there a zitadel@caos.ch?
+            email: "hi@zitadel.ch"
         }
         license: {
             name: "Apache License 2.0",
@@ -597,6 +596,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -618,6 +618,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -629,6 +630,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -639,6 +641,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+            feature: "custom_domain"
         };
     }
 
@@ -3344,7 +3347,7 @@ message AddCustomLabelPolicyRequest {
     string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
 }
@@ -3358,7 +3361,7 @@ message UpdateCustomLabelPolicyRequest {
     string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/architecture#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
 }

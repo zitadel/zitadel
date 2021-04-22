@@ -7,8 +7,8 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum ProjectType {
-    PROJECTTYPE_OWNED = "OWNED",
-    PROJECTTYPE_GRANTED = "GRANTED"
+    PROJECTTYPE_OWNED = 'OWNED',
+    PROJECTTYPE_GRANTED = 'GRANTED',
 }
 
 /**
@@ -35,7 +35,10 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
 
         this.loadingSubject.next(true);
 
-        const promise: Promise<ListProjectMembersResponse.AsObject> | Promise<ListProjectGrantMembersResponse.AsObject> | undefined =
+        const promise:
+            Promise<ListProjectMembersResponse.AsObject> |
+            Promise<ListProjectGrantMembersResponse.AsObject>
+            | undefined =
             projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.mgmtService.listProjectMembers(projectId, pageSize, offset) :
                 projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?

@@ -1,16 +1,13 @@
 <app-detail-layout [backRouterLink]="['/iam/policies']" [title]="'POLICY.LABEL.TITLE' | translate"
     [description]="'POLICY.LABEL.DESCRIPTION' | translate">
 
-    <div class="content" *ngIf="labelData">
-        <cnsl-form-field class="form-field" appearance="outline">
-            <cnsl-label>{{'POLICY.LABEL.PRIMARYCOLOR' | translate}}</cnsl-label>
-            <input cnslInput [(ngModel)]="labelData.primaryColor" />
-        </cnsl-form-field>
+    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
-        <cnsl-form-field class="form-field" appearance="outline">
-            <cnsl-label>{{'POLICY.LABEL.SECONDARYCOLOR' | translate}}</cnsl-label>
-            <input cnslInput [(ngModel)]="labelData.secondaryColor" />
-        </cnsl-form-field>
+    <div class="content" *ngIf="labelData">
+        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
+            [(ngModel)]="labelData.hideLoginNameSuffix">
+            {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
+        </mat-slide-toggle>
     </div>
 
     <div class="btn-container">

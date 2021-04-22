@@ -23,6 +23,7 @@ type FeaturesWriteModel struct {
 	LoginPolicyUsernameLogin bool
 	PasswordComplexityPolicy bool
 	LabelPolicy              bool
+	CustomDomain             bool
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {
@@ -65,6 +66,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.LabelPolicy != nil {
 				wm.LabelPolicy = *e.LabelPolicy
+			}
+			if e.CustomDomain != nil {
+				wm.CustomDomain = *e.CustomDomain
 			}
 		case *features.FeaturesRemovedEvent:
 			wm.State = domain.FeaturesStateRemoved

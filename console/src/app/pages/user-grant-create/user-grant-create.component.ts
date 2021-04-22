@@ -43,8 +43,6 @@ export class UserGrantCreateComponent implements OnDestroy {
     public user!: User.AsObject;
     public UserTarget: any = UserTarget;
 
-    public ProjectGrantView: any = GrantedProject;
-    public ProjectView: any = Project;
     constructor(
         private userService: ManagementService,
         private toast: ToastService,

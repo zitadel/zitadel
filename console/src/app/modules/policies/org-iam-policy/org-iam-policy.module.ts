@@ -30,7 +30,7 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
         InfoSectionModule,
         TranslateModule,
         DetailLayoutModule,
-        LinksModule
+        LinksModule,
     ],
 })
 export class OrgIamPolicyModule { }

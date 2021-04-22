@@ -8,8 +8,8 @@ import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 // }
 
 export enum AppCreateType {
-    API = "API",
-    OIDC = "OIDC"
+    API = 'API',
+    OIDC = 'OIDC',
 }
 
 export interface RadioItemAppType {

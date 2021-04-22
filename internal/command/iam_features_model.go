@@ -62,7 +62,8 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
 	passwordComplexityPolicy,
-	labelPolicy bool,
+	labelPolicy,
+	customDomain bool,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -102,6 +103,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.LabelPolicy != labelPolicy {
 		changes = append(changes, features.ChangeLabelPolicy(labelPolicy))
+	}
+	if wm.CustomDomain != customDomain {
+		changes = append(changes, features.ChangeCustomDomain(customDomain))
 	}
 
 	if len(changes) == 0 {

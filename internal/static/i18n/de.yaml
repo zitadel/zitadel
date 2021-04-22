@@ -316,6 +316,8 @@ Errors:
       AlreadyExists: Schritt gestartet existiert bereits
     Done:
       AlreadyExists: Schritt ausgeführt existiert bereits
+  Features:
+    NotChanged: Feature hat nicht geändert
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -499,6 +501,9 @@ EventTypes:
         set: Primäre Domäne gesetzt
       reserved: Domäne reserviert
       released: Domäne freigegeben
+    features:
+      set: Feature hinzugefügt
+      removed: Feature entfernt
     name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
@@ -553,6 +558,10 @@ EventTypes:
           added: Passwort Sperrungs Richtlinie hinzugefügt
           changed: Passwort Sperrungs Richtlinie geändert
           removed: Passwort Sperrungs Richtlinie gelöscht
+      label:
+        added: Label Richtline hinzugefügt
+        changed: Label Richtline geändert
+        removed: Label Richtline entfernt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert

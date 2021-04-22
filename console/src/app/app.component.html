@@ -179,8 +179,12 @@
                         <span class="fill-space"></span>
 
                         <div class="toc-line">
-                            <a class="toc" href="https://zitadel.ch/pdf/agb.pdf" alt="Terms and Conditions"
-                                target="_blank">{{'MENU.TOC'
+                            <a class="toc" [href]="language == 'de' ? 'https://zitadel.ch/pdf/agb.pdf' : 'https://zitadel.ch/pdf/tos.pdf'" alt="Terms and Conditions"
+                                target="_blank">{{'MENU.TOS'
+                                | translate}}</a>
+                                <span class="slash">|</span>
+                            <a class="toc" [href]="language == 'de' ? 'https://zitadel.ch/pdf/datenschutz.pdf' : 'https://zitadel.ch/pdf/privacy.pdf'" alt="Terms and Conditions"
+                                target="_blank">{{'MENU.PRIVACY'
                                 | translate}}</a>
                             <span>&nbsp;&nbsp;&nbsp;</span>
                         </div>

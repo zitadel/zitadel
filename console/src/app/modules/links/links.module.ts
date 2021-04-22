@@ -19,6 +19,6 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
     ],
     exports: [
         LinksComponent,
-    ]
+    ],
 })
 export class LinksModule { }

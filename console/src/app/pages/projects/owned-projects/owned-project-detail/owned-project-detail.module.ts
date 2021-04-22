@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
@@ -20,6 +19,7 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
@@ -62,7 +62,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatTableModule,
         InputModule,
         CardModule,
-        MatPaginatorModule,
+        PaginatorModule,
         MatRippleModule,
         MatCheckboxModule,
         MatSelectModule,

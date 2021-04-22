@@ -1,13 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesDataSource } from './project-roles-datasource';
 
@@ -21,7 +21,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @Input() public actionsVisible: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatTable) public table!: MatTable<Role.AsObject>;
     public dataSource!: ProjectRolesDataSource;
     public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
@@ -62,6 +62,11 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );
+    }
+
+    public changePage(): void {
+        this.selection.clear();
+        this.loadRolesPage();
     }
 
     public isAllSelected(): boolean {
