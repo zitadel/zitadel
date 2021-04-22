@@ -55,7 +55,7 @@ jobs:
           echo "::set-output name=version::${VERSION}"
 
   zitadel-image:
-    name: Build ZITADEL Image
+    name: Build ZITADEL
     needs: refs
     runs-on: ubuntu-18.04
     steps:
@@ -87,6 +87,16 @@ jobs:
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          target: go-codecov
+          outputs: type=local,dest=/tmp/zitadel
       - uses: codecov/codecov-action@v1
         with:
           files: /tmp/zitadel/profile.cov
