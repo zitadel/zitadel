@@ -78,7 +78,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -110,7 +110,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -142,7 +142,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -174,7 +174,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -239,7 +239,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -274,7 +274,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -309,7 +309,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -344,7 +344,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
