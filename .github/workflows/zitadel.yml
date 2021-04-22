@@ -68,8 +68,6 @@ jobs:
           key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum', 'console/package-lock.json', 'build/dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-zitadel-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
