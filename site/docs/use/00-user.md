@@ -152,9 +152,19 @@ you can then either
 </div>
 
 
-#### Auto Register
+####  Self Register
 
-see Identity Linking above
+When self registration is enabled, users can register themselfes in the organanization without any administrative effort.
+
+<div class="zitadel-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="img/self-register.gif" itemprop="contentUrl" data-size="1100x906">
+            <img src="img/self-register.gif" itemprop="thumbnail" alt="self register" />
+        </a>
+        <figcaption itemprop="caption description">Self Register</figcaption>
+    </figure>
+</div>
+
 
 
 #### Manage Account Linking
@@ -167,7 +177,7 @@ You can manage the linked external IDP Providers within the "Personal Informatio
         <a href="img/manage-external-idp.png" itemprop="contentUrl" data-size="1710x747">
             <img src="img/manage-external-idp.png" itemprop="thumbnail" alt="manage external IDP" />
         </a>
-        <figcaption itemprop="caption description">Linking Accounts</figcaption>
+        <figcaption itemprop="caption description">Manage External IDP</figcaption>
     </figure>
 </div>
 
@@ -194,6 +204,6 @@ You can manage the linked external IDP Providers within the "Personal Informatio
         <a href="img/accounts_multifactor.png" itemprop="contentUrl" data-size="1715x598">
             <img src="img/accounts_multifactor.png" itemprop="thumbnail" alt="Login OTP" />
         </a>
-        <figcaption itemprop="caption description">Login mfa</figcaption>
+        <figcaption itemprop="caption description">Login OTP</figcaption>
     </figure>
 </div>
