@@ -83,8 +83,8 @@ function Feature({darkImageUrl, lightImageUrl, title, description, link}) {
                 />
               </div>
           )}
-          <h3>{title}</h3>
-          <p>{description}</p>
+          <h3 className="text--center">{title}</h3>
+          <p className="text--center">{description}</p>
           </Link>
         </div>
   );

@@ -6,7 +6,7 @@
  */
 
 /* You can override the default Infima variables here. */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat');
+@import url('https://fonts.googleapis.com/css2?family=Lato');
 
 :root {
   --ifm-color-primary: #556cd1;
@@ -17,7 +17,7 @@
   --ifm-color-primary-lighter: #788ada;
   --ifm-color-primary-lightest: #9aa8e4;
   --ifm-code-font-size: 95%;
-  --ifm-font-family-base: 'Montserrat', sans-serif;
+  --ifm-font-family-base: 'Lato', sans-serif;
 }
 
 
@@ -46,4 +46,8 @@
 
 .docs-link a:hover {
   color: var(--ifm-color-primary);
+}
+
+.docs-link img {
+  margin: 0 40px 40px 40px;
 }
