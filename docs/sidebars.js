@@ -24,6 +24,11 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Backends',
+      items: ['quickstarts/go'],
+    },
+    {
+      type: 'category',
       label: 'Identity Aware Proxy',
       items: ['quickstarts/oauth2-proxy'],
       collapsed: false,
