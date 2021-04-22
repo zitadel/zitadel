@@ -62,8 +62,8 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum', 'console/package-lock.json') }}
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum', 'console/package-lock.json', 'build/dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-zitadel-
       - name: Set up QEMU
@@ -100,8 +100,8 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
-          path: ~/go/pkg/mod
-          key: ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-${{ hashFiles('**/go.sum') }}
+          path: /tmp/.buildx-cache
+          key: ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-${{ hashFiles('**/go.sum', 'build/operator/Dockerfile') }}
           restore-keys: |
             ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-
       - name: Set up QEMU
@@ -162,7 +162,7 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
-          path: ~/go/pkg/mod
+          path: /tmp/.buildx-cache
           key: ${{ runner.os }}-crdb-image-${{ hashFiles('build/cr-backup/Dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-crdb-image-
