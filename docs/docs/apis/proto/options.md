@@ -6,5 +6,21 @@ title: zitadel/options.proto
 
 
 
+## Messages
+
+
+### AuthOption
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| permission |  string | - |  |
+| check_field_name |  string | - |  |
+| feature |  string | - |  |
+
+
+
+
 
 

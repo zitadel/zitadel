@@ -6,6 +6,99 @@ title: zitadel/policy.proto
 
 
 
+## Messages
+
+
+### LabelPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| primary_color |  string | - |  |
+| secondary_color |  string | - |  |
+| is_default |  bool | - |  |
+| hide_login_name_suffix |  bool | - |  |
+
+
+
+
+### LoginPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| allow_username_password |  bool | - |  |
+| allow_register |  bool | - |  |
+| allow_external_idp |  bool | - |  |
+| force_mfa |  bool | - |  |
+| passwordless_type |  PasswordlessType | - |  |
+| is_default |  bool | - |  |
+
+
+
+
+### OrgIAMPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| user_login_must_be_domain |  bool | - |  |
+| is_default |  bool | - |  |
+
+
+
+
+### PasswordAgePolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| max_age_days |  uint64 | - |  |
+| expire_warn_days |  uint64 | - |  |
+| is_default |  bool | - |  |
+
+
+
+
+### PasswordComplexityPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| min_length |  uint64 | - |  |
+| has_uppercase |  bool | - |  |
+| has_lowercase |  bool | - |  |
+| has_number |  bool | - |  |
+| has_symbol |  bool | - |  |
+| is_default |  bool | - |  |
+
+
+
+
+### PasswordLockoutPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| max_attempts |  uint64 | - |  |
+| show_lockout_failure |  bool | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 
 
 ## Enums

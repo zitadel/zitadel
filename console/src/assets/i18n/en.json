@@ -1208,6 +1208,7 @@
   "MEMBER": {
     "ADD": "Add a Manager",
     "CREATIONTYPE": "Creation Type",
+    "DOCSINFO":"For more info consider reading our docs",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organisation",

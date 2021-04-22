@@ -5,11 +5,13 @@ module.exports = {
       type: 'category',
       label: 'User',
       items: ['manuals/user'],
+      collapsed: false,
     },
     {
       type: 'category',
       label: 'Administrator',
       items: ['manuals/admin-managers'],
+      collapsed: false,
     },
   ],
   quickstarts: [
@@ -18,11 +20,13 @@ module.exports = {
       type: 'category',
       label: 'Single Page Applications',
       items: ['quickstarts/angular'],
+      collapsed: false,
     },
     {
       type: 'category',
       label: 'Identity Aware Proxy',
       items: ['quickstarts/oauth2-proxy'],
+      collapsed: false,
     }
   ],
   guides: [
@@ -30,10 +34,12 @@ module.exports = {
     {
       type: 'category',
       label: 'Installation',
+      collapsed: false,
       items: [
           {
               type: 'category',
               label: 'CAOS Managed',
+              collapsed: false,
               items: [
                   'guides/installation/shared-cloud',
                   'guides/installation/managed-dedicated-instance'
@@ -42,6 +48,7 @@ module.exports = {
           {
               type: 'category',
               label: 'Self Managed',
+              collapsed: false,
               items: [
                   'guides/installation/crd',
                   'guides/installation/gitops',
@@ -53,6 +60,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Get to know ZITADEL',
+      collapsed: false,
       items: [
           'guides/usage/get-started',
           'guides/usage/organizations',
@@ -61,7 +69,7 @@ module.exports = {
           'guides/usage/serviceusers',
           'guides/usage/access-zitadel-apis',
           'guides/usage/identity-brokering',
-      ]
+      ],
     }
   ],
   apis: [
@@ -71,6 +79,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Proto API Definition',
+      collapsed: false,
       items: [
         'apis/proto/auth',
         'apis/proto/management',
@@ -91,6 +100,7 @@ module.exports = {
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
+      collapsed: false,
       items: [
           'apis/openidoauth/endpoints',
           'apis/openidoauth/scopes',

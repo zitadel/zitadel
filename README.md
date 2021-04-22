@@ -60,11 +60,7 @@ If  our cloud service or running **ZITADEL** on your own infrastructure does not
 
 ## How To Contribute
 
-Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](##License) you are fine.
-
-We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
-
-How to develop **ZITADEL**: [contribute](./CONTRIBUTING.md)
+Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](./LICENSE) you are fine.
 
 ## Security
 

@@ -6,6 +6,104 @@ title: zitadel/idp.proto
 
 
 
+## Messages
+
+
+### IDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| state |  IDPState | - |  |
+| name |  string | - |  |
+| styling_type |  IDPStylingType | - |  |
+| owner |  IDPOwnerType | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
+
+
+
+
+### IDPIDQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### IDPLoginPolicyLink
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - |  |
+| idp_name |  string | - |  |
+| idp_type |  IDPType | - |  |
+
+
+
+
+### IDPNameQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### IDPOwnerTypeQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| owner_type |  IDPOwnerType | - | enum.defined_only: true<br />  |
+
+
+
+
+### IDPUserLink
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| idp_id |  string | - |  |
+| idp_name |  string | - |  |
+| provided_user_id |  string | - |  |
+| provided_user_name |  string | - |  |
+| idp_type |  IDPType | - |  |
+
+
+
+
+### OIDCConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| issuer |  string | - |  |
+| scopes | repeated string | - |  |
+| display_name_mapping |  OIDCMappingField | - |  |
+| username_mapping |  OIDCMappingField | - |  |
+
+
+
+
 
 
 ## Enums

@@ -170,7 +170,10 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	return result, err
 }
 
-func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) error {
+func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	app, err := c.getOIDCAppWriteModel(ctx, projectID, appID, "")
 	if err != nil {
 		return err

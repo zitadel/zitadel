@@ -14,6 +14,7 @@ The easiest way to have a look at them is, to import them in the [Swagger Editor
 ## Authentication API aka Auth
 
 The authentication API (aka Auth API) is used for all operations on the currently logged in user.
+The user id is taken from the sub claim in the token.
 
 | Service | URI                                                                                                                         |
 |:--------|:----------------------------------------------------------------------------------------------------------------------------|
@@ -29,6 +30,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 ## Management API
 
 The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.
+To identify the current organisation you can send a header `x-zitadel-orgid` or if no header is set, the organisation of the authenticated user is set.
 
 | Service | URI                                                                                                                                                 |
 |:--------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
