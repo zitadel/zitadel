@@ -1,6 +1,9 @@
-<app-detail-layout *ngIf="project" [backRouterLink]="[ '/projects', (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '']"
+<app-detail-layout *ngIf="project"
+    [backRouterLink]="[ '/projects', (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '']"
     title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
     description="{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}">
+    <p class="desc">{{'MEMBER.DOCSINFO' | translate}} <a href="https://docs.zitadel.ch/docs/manuals/admin-managers"
+            target="_blank">ZITADEL Managers</a>.</p>
     <app-members-table *ngIf="project" [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
         (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
         (changedSelection)="selection = $event" [refreshTrigger]="changePage"
