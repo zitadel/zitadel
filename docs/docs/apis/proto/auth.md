@@ -22,7 +22,7 @@ title: zitadel/auth.proto
 > **rpc** GetMyUser([GetMyUserRequest](#getmyuserrequest))
 [GetMyUserResponse](#getmyuserresponse)
 
-
+Returns my full blown user
 
 
 
@@ -32,7 +32,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyUserChanges([ListMyUserChangesRequest](#listmyuserchangesrequest))
 [ListMyUserChangesResponse](#listmyuserchangesresponse)
 
-
+Returns the history of the authorized user (each event)
 
 
 
@@ -42,7 +42,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyUserSessions([ListMyUserSessionsRequest](#listmyusersessionsrequest))
 [ListMyUserSessionsResponse](#listmyusersessionsresponse)
 
-
+Returns the user sessions of the authorized user of the current useragent
 
 
 
@@ -52,7 +52,7 @@ title: zitadel/auth.proto
 > **rpc** UpdateMyUserName([UpdateMyUserNameRequest](#updatemyusernamerequest))
 [UpdateMyUserNameResponse](#updatemyusernameresponse)
 
-
+Change the user name of the authorize user
 
 
 
@@ -62,7 +62,8 @@ title: zitadel/auth.proto
 > **rpc** GetMyPasswordComplexityPolicy([GetMyPasswordComplexityPolicyRequest](#getmypasswordcomplexitypolicyrequest))
 [GetMyPasswordComplexityPolicyResponse](#getmypasswordcomplexitypolicyresponse)
 
-
+Returns the password complexity policy of my organisation
+This policy defines how the password should look
 
 
 
@@ -72,7 +73,7 @@ title: zitadel/auth.proto
 > **rpc** UpdateMyPassword([UpdateMyPasswordRequest](#updatemypasswordrequest))
 [UpdateMyPasswordResponse](#updatemypasswordresponse)
 
-
+Change the password of the authorized user
 
 
 
@@ -82,7 +83,7 @@ title: zitadel/auth.proto
 > **rpc** GetMyProfile([GetMyProfileRequest](#getmyprofilerequest))
 [GetMyProfileResponse](#getmyprofileresponse)
 
-
+Returns the profile information of the authorized user
 
 
 
@@ -92,7 +93,7 @@ title: zitadel/auth.proto
 > **rpc** UpdateMyProfile([UpdateMyProfileRequest](#updatemyprofilerequest))
 [UpdateMyProfileResponse](#updatemyprofileresponse)
 
-
+Changes the profile information of the authorized user
 
 
 
@@ -102,7 +103,7 @@ title: zitadel/auth.proto
 > **rpc** GetMyEmail([GetMyEmailRequest](#getmyemailrequest))
 [GetMyEmailResponse](#getmyemailresponse)
 
-
+Returns the email address of the authorized user
 
 
 
@@ -112,7 +113,8 @@ title: zitadel/auth.proto
 > **rpc** SetMyEmail([SetMyEmailRequest](#setmyemailrequest))
 [SetMyEmailResponse](#setmyemailresponse)
 
-
+Changes the email address of the authorized user
+An email is sent to the given address, to verify it
 
 
 
@@ -122,7 +124,7 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyEmail([VerifyMyEmailRequest](#verifymyemailrequest))
 [VerifyMyEmailResponse](#verifymyemailresponse)
 
-
+Sets the email address to verified
 
 
 
@@ -132,7 +134,7 @@ title: zitadel/auth.proto
 > **rpc** ResendMyEmailVerification([ResendMyEmailVerificationRequest](#resendmyemailverificationrequest))
 [ResendMyEmailVerificationResponse](#resendmyemailverificationresponse)
 
-
+Sends a new email to the last given address to verify it
 
 
 
@@ -142,7 +144,7 @@ title: zitadel/auth.proto
 > **rpc** GetMyPhone([GetMyPhoneRequest](#getmyphonerequest))
 [GetMyPhoneResponse](#getmyphoneresponse)
 
-
+Returns the phone number of the authorized user
 
 
 
@@ -152,7 +154,8 @@ title: zitadel/auth.proto
 > **rpc** SetMyPhone([SetMyPhoneRequest](#setmyphonerequest))
 [SetMyPhoneResponse](#setmyphoneresponse)
 
-
+Sets the phone number of the authorized user
+An sms is sent to the number with a verification code
 
 
 
@@ -162,7 +165,7 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyPhone([VerifyMyPhoneRequest](#verifymyphonerequest))
 [VerifyMyPhoneResponse](#verifymyphoneresponse)
 
-
+Sets the phone number to verified
 
 
 
@@ -172,7 +175,7 @@ title: zitadel/auth.proto
 > **rpc** ResendMyPhoneVerification([ResendMyPhoneVerificationRequest](#resendmyphoneverificationrequest))
 [ResendMyPhoneVerificationResponse](#resendmyphoneverificationresponse)
 
-
+Resends a sms to the last given phone number, to verify it
 
 
 
@@ -182,7 +185,7 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyPhone([RemoveMyPhoneRequest](#removemyphonerequest))
 [RemoveMyPhoneResponse](#removemyphoneresponse)
 
-
+Removed the phone number of the authorized user
 
 
 
@@ -192,7 +195,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyLinkedIDPs([ListMyLinkedIDPsRequest](#listmylinkedidpsrequest))
 [ListMyLinkedIDPsResponse](#listmylinkedidpsresponse)
 
-
+Returns a list of all linked identity providers (social logins, eg. Google, Microsoft, AD, etc.)
 
 
 
@@ -202,7 +205,7 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyLinkedIDP([RemoveMyLinkedIDPRequest](#removemylinkedidprequest))
 [RemoveMyLinkedIDPResponse](#removemylinkedidpresponse)
 
-
+Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, etc.)
 
 
 
@@ -212,7 +215,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyAuthFactors([ListMyAuthFactorsRequest](#listmyauthfactorsrequest))
 [ListMyAuthFactorsResponse](#listmyauthfactorsresponse)
 
-
+Returns all configured authentication factors (second and multi)
 
 
 
@@ -222,7 +225,8 @@ title: zitadel/auth.proto
 > **rpc** AddMyAuthFactorOTP([AddMyAuthFactorOTPRequest](#addmyauthfactorotprequest))
 [AddMyAuthFactorOTPResponse](#addmyauthfactorotpresponse)
 
-
+Adds a new OTP (One Time Password) Second Factor to the authorized user
+Only one OTP can be configured per user
 
 
 
@@ -232,7 +236,7 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyAuthFactorOTP([VerifyMyAuthFactorOTPRequest](#verifymyauthfactorotprequest))
 [VerifyMyAuthFactorOTPResponse](#verifymyauthfactorotpresponse)
 
-
+Verify the last added OTP (One Time Password)
 
 
 
@@ -242,7 +246,7 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyAuthFactorOTP([RemoveMyAuthFactorOTPRequest](#removemyauthfactorotprequest))
 [RemoveMyAuthFactorOTPResponse](#removemyauthfactorotpresponse)
 
-
+Removed the configured OTP (One Time Password) Factor
 
 
 
@@ -252,7 +256,8 @@ title: zitadel/auth.proto
 > **rpc** AddMyAuthFactorU2F([AddMyAuthFactorU2FRequest](#addmyauthfactoru2frequest))
 [AddMyAuthFactorU2FResponse](#addmyauthfactoru2fresponse)
 
-
+Adds a new U2F (Universal Second Factor) to the authorized user
+Multiple U2Fs can be configured
 
 
 
@@ -262,7 +267,7 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyAuthFactorU2F([VerifyMyAuthFactorU2FRequest](#verifymyauthfactoru2frequest))
 [VerifyMyAuthFactorU2FResponse](#verifymyauthfactoru2fresponse)
 
-
+Verifies the last added U2F (Universal Second Factor) of the authorized user
 
 
 
@@ -272,7 +277,7 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyAuthFactorU2F([RemoveMyAuthFactorU2FRequest](#removemyauthfactoru2frequest))
 [RemoveMyAuthFactorU2FResponse](#removemyauthfactoru2fresponse)
 
-
+Removes the U2F Authentication from the authorized user
 
 
 
@@ -282,7 +287,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyPasswordless([ListMyPasswordlessRequest](#listmypasswordlessrequest))
 [ListMyPasswordlessResponse](#listmypasswordlessresponse)
 
-
+Returns all configured passwordless authentications of the authorized user
 
 
 
@@ -292,7 +297,8 @@ title: zitadel/auth.proto
 > **rpc** AddMyPasswordless([AddMyPasswordlessRequest](#addmypasswordlessrequest))
 [AddMyPasswordlessResponse](#addmypasswordlessresponse)
 
-
+Adds a new passwordless authentications to the authorized user
+Multiple passwordless authentications can be configured
 
 
 
@@ -302,7 +308,7 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyPasswordless([VerifyMyPasswordlessRequest](#verifymypasswordlessrequest))
 [VerifyMyPasswordlessResponse](#verifymypasswordlessresponse)
 
-
+Verifies the last added passwordless configuration
 
 
 
@@ -312,7 +318,7 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyPasswordless([RemoveMyPasswordlessRequest](#removemypasswordlessrequest))
 [RemoveMyPasswordlessResponse](#removemypasswordlessresponse)
 
-
+Removes the passwordless configuration from the authorized user
 
 
 
@@ -322,7 +328,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyUserGrants([ListMyUserGrantsRequest](#listmyusergrantsrequest))
 [ListMyUserGrantsResponse](#listmyusergrantsresponse)
 
-
+Returns all user grants (authorizations) of the authorized user
 
 
 
@@ -332,7 +338,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyProjectOrgs([ListMyProjectOrgsRequest](#listmyprojectorgsrequest))
 [ListMyProjectOrgsResponse](#listmyprojectorgsresponse)
 
-
+Returns a list of organisations where the authorized user has a user grant (authorization) in the context of the requested project
 
 
 
@@ -342,7 +348,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyZitadelFeatures([ListMyZitadelFeaturesRequest](#listmyzitadelfeaturesrequest))
 [ListMyZitadelFeaturesResponse](#listmyzitadelfeaturesresponse)
 
-
+Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
 
 
 
@@ -352,7 +358,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyZitadelPermissions([ListMyZitadelPermissionsRequest](#listmyzitadelpermissionsrequest))
 [ListMyZitadelPermissionsResponse](#listmyzitadelpermissionsresponse)
 
-
+Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
 
 
 
@@ -362,7 +368,7 @@ title: zitadel/auth.proto
 > **rpc** ListMyProjectPermissions([ListMyProjectPermissionsRequest](#listmyprojectpermissionsrequest))
 [ListMyProjectPermissionsResponse](#listmyprojectpermissionsresponse)
 
-
+Returns a list of roles for the authorized user and project
 
 
 

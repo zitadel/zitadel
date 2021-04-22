@@ -33,7 +33,7 @@ Checks whether an organisation exists by the given parameters
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
 [GetOrgByIDResponse](#getorgbyidresponse)
 
-
+Returns an organisation by id
 
 
 
@@ -44,7 +44,7 @@ Checks whether an organisation exists by the given parameters
 [ListOrgsResponse](#listorgsresponse)
 
 Returns all organisations matching the request
-all queries need to match (ANDed)
+all queries need to match (AND)
 
 
 
@@ -65,7 +65,7 @@ and adds the user to the orgs members as ORG_OWNER
 > **rpc** GetIDPByID([GetIDPByIDRequest](#getidpbyidrequest))
 [GetIDPByIDResponse](#getidpbyidresponse)
 
-
+Returns a identity provider configuration of the IAM
 
 
 
@@ -75,7 +75,7 @@ and adds the user to the orgs members as ORG_OWNER
 > **rpc** ListIDPs([ListIDPsRequest](#listidpsrequest))
 [ListIDPsResponse](#listidpsresponse)
 
-
+Returns all identity provider configurations of the IAM
 
 
 
@@ -85,7 +85,7 @@ and adds the user to the orgs members as ORG_OWNER
 > **rpc** AddOIDCIDP([AddOIDCIDPRequest](#addoidcidprequest))
 [AddOIDCIDPResponse](#addoidcidpresponse)
 
-
+Adds a new oidc identity provider configuration the IAM
 
 
 
