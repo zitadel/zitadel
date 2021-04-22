@@ -36,6 +36,4 @@ Enable Selfregister
 ![Enable Selfregister](/img/enable-selfregister.gif)
 
 
-Verify EMail
-![Verify EMail](/img/email-verify.gif)
 
