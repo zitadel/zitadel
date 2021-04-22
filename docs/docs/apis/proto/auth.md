@@ -561,9 +561,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering
-
-PLANNED: queries for idp name and login name |  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
 
 
 

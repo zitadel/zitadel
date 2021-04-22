@@ -606,6 +606,7 @@ message RemoveMyPhoneResponse {
 message ListMyLinkedIDPsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+
     //PLANNED: queries for idp name and login name
 }
 
