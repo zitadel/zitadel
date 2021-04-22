@@ -3732,7 +3732,7 @@ message RemoveOrgIDPRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-//This is an empty request
+//This is an empty response
 message RemoveOrgIDPResponse {}
 
 message UpdateOrgIDPRequest {
