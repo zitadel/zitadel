@@ -2,7 +2,7 @@
 title: Factors
 ---
 
-### Manage Multi Factor
+## Manage Multi Factor
 
 To enable multifactor authentication visit the "Personal Information" page of your account and scroll to the "multifactor authentication".
 You can either:

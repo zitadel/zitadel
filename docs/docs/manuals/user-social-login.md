@@ -2,7 +2,7 @@
 title: Social Login
 ---
 
-### Identity Linking
+## Identity Linking
 
 To link an external Identity Provider with a Zitadel Account you have to:
 
@@ -19,16 +19,8 @@ Linking Accounts
 ![Linking Accounts](/img/linking-accounts.gif)
 
 
-####  Self Register
 
-When self registration is enabled, users can register themselfes in the organanization without any administrative effort.
-
-
-Self Register
-![Self Register](/img/self-register.gif)
-
-
-#### Manage Account Linking
+## Manage Account Linking
 
 You can manage the linked external IDP Providers within the "Personal Information" Page.
 

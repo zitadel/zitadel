@@ -2,7 +2,7 @@
 title: User Register
 ---
 
-### Organization and user registration
+## Organization and user registration
 
 Zitadel allows users to register a organization and/or user with just a few steps.
 
@@ -36,4 +36,12 @@ Enable Selfregister
 ![Enable Selfregister](/img/enable-selfregister.gif)
 
 
+
+##  Self Register
+
+When self registration is enabled, users can register themselfes in the organanization without any administrative effort.
+
+
+Self Register
+![Self Register](/img/self-register.gif)
 
