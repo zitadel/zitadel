@@ -10,6 +10,3 @@
 
 * Please read [Security Policy](SECURITY.md).
 
-## **Do you want to contribute to the ZITADEL documentation?**
-
-* Please read [Contributing to the ZITADEL Documentation](site/CONTRIBUTING.md).
