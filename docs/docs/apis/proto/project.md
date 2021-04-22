@@ -6,6 +6,154 @@ title: zitadel/project.proto
 
 
 
+## Messages
+
+
+### GrantProjectNameQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### GrantRoleKeyQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| role_key |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### GrantedProject
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
+| granted_org_id |  string | - |  |
+| granted_org_name |  string | - |  |
+| granted_role_keys | repeated string | - |  |
+| state |  ProjectGrantState | - |  |
+| project_id |  string | - |  |
+| project_name |  string | - |  |
+| project_owner_id |  string | - |  |
+| project_owner_name |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### Project
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| name |  string | - |  |
+| state |  ProjectState | - |  |
+| project_role_assertion |  bool | describes if roles of user should be added in token |  |
+| project_role_check |  bool | ZITADEL checks if the user has at least one on this project |  |
+
+
+
+
+### ProjectGrantQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.project_name_query |  GrantProjectNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.role_key_query |  GrantRoleKeyQuery | - |  |
+
+
+
+
+### ProjectNameQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### ProjectQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.name_query |  ProjectNameQuery | - |  |
+
+
+
+
+### Role
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| display_name |  string | - |  |
+| group |  string | - |  |
+
+
+
+
+### RoleDisplayNameQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| display_name |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### RoleKeyQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### RoleQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.key_query |  RoleKeyQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.display_name_query |  RoleDisplayNameQuery | - |  |
+
+
+
+
 
 
 ## Enums
