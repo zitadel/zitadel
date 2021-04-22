@@ -62,10 +62,10 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-zitadel-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -100,10 +100,10 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-op-${{ github.sha }}
+          path: ~/go/pkg/mod
+          key: ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-op-
+            ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -162,10 +162,10 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-crdb-image-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-crdb-image-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
