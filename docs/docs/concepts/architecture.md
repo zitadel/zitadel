@@ -20,7 +20,7 @@ This information is then passed to **command validation** for processing of the 
 - Transaction safety is a MUST
 - Availability MUST be high
 
-> When we classify this with the CAP theorem we would choose **Consistent** and **Available** but leave **Performance** aside.
+> When we classify this with the CAP theorem we would choose **Consistent** and **Available** but leave **Partition Tolerance** aside.
 
 ### Component Spooler
 
