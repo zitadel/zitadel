@@ -1684,7 +1684,7 @@ service AdminService {
 //This is an empty request
 message HealthzRequest {}
 
-//This is an empty request
+//This is an empty response
 message HealthzResponse {}
 
 // if name or domain is already in use, org is not unique
@@ -2758,7 +2758,7 @@ message ClearViewRequest {
     ];
 }
 
-//This is an empty request
+//This is an empty response
 message ClearViewResponse {}
 
 //This is an empty request

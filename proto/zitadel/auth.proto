@@ -457,7 +457,7 @@ service AuthService {
 //This is an empty request
 message HealthzRequest {}
 
-//This is an empty request
+//This is an empty response
 message HealthzResponse {}
 
 //This is an empty request
