@@ -1,4 +1,4 @@
-name: Zitadel Release
+name: ZITADEL Release
 on:
   push:
     branches:
@@ -17,6 +17,7 @@ env:
 
 jobs:
   refs:
+    name: Prepare CI Vars
     runs-on: ubuntu-18.04
     outputs:
       sha_short: ${{ steps.refs.outputs.sha_short }}
@@ -54,6 +55,7 @@ jobs:
           echo "::set-output name=version::${VERSION}"
 
   zitadel-image:
+    name: Build ZITADEL Image
     needs: refs
     runs-on: ubuntu-18.04
     steps:
@@ -91,6 +93,7 @@ jobs:
           name: codecov-go
 
   operator-image:
+    name: Build ZITADEL Operator Image
     needs: refs
     runs-on: ubuntu-18.04
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
@@ -161,6 +164,7 @@ jobs:
           name: codecov-go
 
   crdb-image:
+    name: Build CockroachDB Image
     needs: refs
     runs-on: ubuntu-18.04
     steps:
@@ -195,6 +199,7 @@ jobs:
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
+    name: Semantic Release Images and Artifacts
     runs-on: ubuntu-18.04
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
     env:
