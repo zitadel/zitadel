@@ -19,6 +19,7 @@ type LabelPolicyAddedEvent struct {
 	PrimaryColor        string `json:"primaryColor,omitempty"`
 	SecondaryColor      string `json:"secondaryColor,omitempty"`
 	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix,omitempty"`
+	LogoDarkThemeID     string
 }
 
 func (e *LabelPolicyAddedEvent) Data() interface{} {

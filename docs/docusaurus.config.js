@@ -13,7 +13,8 @@ module.exports = {
       title: 'ZITADEL',
       logo: {
         alt: 'ZITADEL logo',
-        src: 'img/zitadel-logo-solo-darkdesign.svg',
+        src: 'img/zitadel-logo-solo-light.png',
+        srcDark: 'img/zitadel-logo-solo-darkdesign.svg',
       },
       items: [
         {

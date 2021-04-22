@@ -6,5 +6,37 @@ title: zitadel/change.proto
 
 
 
+## Messages
+
+
+### Change
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| change_date |  google.protobuf.Timestamp | - |  |
+| event_type |  zitadel.v1.LocalizedMessage | - |  |
+| sequence |  uint64 | - |  |
+| editor_id |  string | - |  |
+| editor_display_name |  string | - |  |
+| resource_owner_id |  string | - |  |
+
+
+
+
+### ChangeQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sequence |  uint64 | sequence represents the order of events. It's always upcounting |  |
+| limit |  uint32 | - |  |
+| asc |  bool | - |  |
+
+
+
+
 
 
