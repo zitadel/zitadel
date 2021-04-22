@@ -155,11 +155,10 @@ jobs:
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
             VERSION=${{ needs.refs.outputs.version }}
-        - uses: codecov/codecov-action@v1
-          with:
-            files: /tmp/operator/profile.cov
-            name: codecov-go
-
+      - uses: codecov/codecov-action@v1
+        with:
+          files: /tmp/zitadel/profile.cov
+          name: codecov-go
 
   crdb-image:
     needs: refs
