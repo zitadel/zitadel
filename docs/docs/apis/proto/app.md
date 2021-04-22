@@ -6,6 +6,88 @@ title: zitadel/app.proto
 
 
 
+## Messages
+
+
+### APIConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
+| auth_method_type |  APIAuthMethodType | - |  |
+
+
+
+
+### App
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| state |  AppState | - |  |
+| name |  string | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.api_config |  APIConfig | - |  |
+
+
+
+
+### AppNameQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### AppQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.name_query |  AppNameQuery | - |  |
+
+
+
+
+### OIDCConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| redirect_uris | repeated string | - |  |
+| response_types | repeated OIDCResponseType | - |  |
+| grant_types | repeated OIDCGrantType | - |  |
+| app_type |  OIDCAppType | - |  |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
+| auth_method_type |  OIDCAuthMethodType | - |  |
+| post_logout_redirect_uris | repeated string | - |  |
+| version |  OIDCVersion | - |  |
+| none_compliant |  bool | - |  |
+| compliance_problems | repeated zitadel.v1.LocalizedMessage | - |  |
+| dev_mode |  bool | - |  |
+| access_token_type |  OIDCTokenType | - |  |
+| access_token_role_assertion |  bool | - |  |
+| id_token_role_assertion |  bool | - |  |
+| id_token_userinfo_assertion |  bool | - |  |
+| clock_skew |  google.protobuf.Duration | - |  |
+
+
+
+
 
 
 ## Enums

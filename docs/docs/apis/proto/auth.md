@@ -16,19 +16,15 @@ title: zitadel/auth.proto
 
 
 
-    GET: /healthz
-
 
 ### GetMyUser
 
 > **rpc** GetMyUser([GetMyUserRequest](#getmyuserrequest))
 [GetMyUserResponse](#getmyuserresponse)
 
+Returns my full blown user
 
 
-
-
-    GET: /users/me
 
 
 ### ListMyUserChanges
@@ -36,11 +32,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyUserChanges([ListMyUserChangesRequest](#listmyuserchangesrequest))
 [ListMyUserChangesResponse](#listmyuserchangesresponse)
 
+Returns the history of the authorized user (each event)
 
 
-
-
-    POST: /users/me/changes/_search
 
 
 ### ListMyUserSessions
@@ -48,11 +42,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyUserSessions([ListMyUserSessionsRequest](#listmyusersessionsrequest))
 [ListMyUserSessionsResponse](#listmyusersessionsresponse)
 
+Returns the user sessions of the authorized user of the current useragent
 
 
-
-
-    POST: /users/me/sessions/_search
 
 
 ### UpdateMyUserName
@@ -60,11 +52,9 @@ title: zitadel/auth.proto
 > **rpc** UpdateMyUserName([UpdateMyUserNameRequest](#updatemyusernamerequest))
 [UpdateMyUserNameResponse](#updatemyusernameresponse)
 
+Change the user name of the authorize user
 
 
-
-
-    PUT: /users/me/username
 
 
 ### GetMyPasswordComplexityPolicy
@@ -72,11 +62,10 @@ title: zitadel/auth.proto
 > **rpc** GetMyPasswordComplexityPolicy([GetMyPasswordComplexityPolicyRequest](#getmypasswordcomplexitypolicyrequest))
 [GetMyPasswordComplexityPolicyResponse](#getmypasswordcomplexitypolicyresponse)
 
+Returns the password complexity policy of my organisation
+This policy defines how the password should look
 
 
-
-
-    GET: /policies/passwords/complexity
 
 
 ### UpdateMyPassword
@@ -84,11 +73,9 @@ title: zitadel/auth.proto
 > **rpc** UpdateMyPassword([UpdateMyPasswordRequest](#updatemypasswordrequest))
 [UpdateMyPasswordResponse](#updatemypasswordresponse)
 
+Change the password of the authorized user
 
 
-
-
-    PUT: /users/me/password
 
 
 ### GetMyProfile
@@ -96,11 +83,9 @@ title: zitadel/auth.proto
 > **rpc** GetMyProfile([GetMyProfileRequest](#getmyprofilerequest))
 [GetMyProfileResponse](#getmyprofileresponse)
 
+Returns the profile information of the authorized user
 
 
-
-
-    GET: /users/me/profile
 
 
 ### UpdateMyProfile
@@ -108,11 +93,9 @@ title: zitadel/auth.proto
 > **rpc** UpdateMyProfile([UpdateMyProfileRequest](#updatemyprofilerequest))
 [UpdateMyProfileResponse](#updatemyprofileresponse)
 
+Changes the profile information of the authorized user
 
 
-
-
-    PUT: /users/me/profile
 
 
 ### GetMyEmail
@@ -120,11 +103,9 @@ title: zitadel/auth.proto
 > **rpc** GetMyEmail([GetMyEmailRequest](#getmyemailrequest))
 [GetMyEmailResponse](#getmyemailresponse)
 
+Returns the email address of the authorized user
 
 
-
-
-    GET: /users/me/email
 
 
 ### SetMyEmail
@@ -132,11 +113,10 @@ title: zitadel/auth.proto
 > **rpc** SetMyEmail([SetMyEmailRequest](#setmyemailrequest))
 [SetMyEmailResponse](#setmyemailresponse)
 
+Changes the email address of the authorized user
+An email is sent to the given address, to verify it
 
 
-
-
-    PUT: /users/me/email
 
 
 ### VerifyMyEmail
@@ -144,11 +124,9 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyEmail([VerifyMyEmailRequest](#verifymyemailrequest))
 [VerifyMyEmailResponse](#verifymyemailresponse)
 
+Sets the email address to verified
 
 
-
-
-    POST: /users/me/email/_verify
 
 
 ### ResendMyEmailVerification
@@ -156,11 +134,9 @@ title: zitadel/auth.proto
 > **rpc** ResendMyEmailVerification([ResendMyEmailVerificationRequest](#resendmyemailverificationrequest))
 [ResendMyEmailVerificationResponse](#resendmyemailverificationresponse)
 
+Sends a new email to the last given address to verify it
 
 
-
-
-    POST: /users/me/email/_resend_verification
 
 
 ### GetMyPhone
@@ -168,11 +144,9 @@ title: zitadel/auth.proto
 > **rpc** GetMyPhone([GetMyPhoneRequest](#getmyphonerequest))
 [GetMyPhoneResponse](#getmyphoneresponse)
 
+Returns the phone number of the authorized user
 
 
-
-
-    GET: /users/me/phone
 
 
 ### SetMyPhone
@@ -180,11 +154,10 @@ title: zitadel/auth.proto
 > **rpc** SetMyPhone([SetMyPhoneRequest](#setmyphonerequest))
 [SetMyPhoneResponse](#setmyphoneresponse)
 
+Sets the phone number of the authorized user
+An sms is sent to the number with a verification code
 
 
-
-
-    PUT: /users/me/phone
 
 
 ### VerifyMyPhone
@@ -192,11 +165,9 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyPhone([VerifyMyPhoneRequest](#verifymyphonerequest))
 [VerifyMyPhoneResponse](#verifymyphoneresponse)
 
+Sets the phone number to verified
 
 
-
-
-    POST: /users/me/phone/_verify
 
 
 ### ResendMyPhoneVerification
@@ -204,11 +175,9 @@ title: zitadel/auth.proto
 > **rpc** ResendMyPhoneVerification([ResendMyPhoneVerificationRequest](#resendmyphoneverificationrequest))
 [ResendMyPhoneVerificationResponse](#resendmyphoneverificationresponse)
 
+Resends a sms to the last given phone number, to verify it
 
 
-
-
-    POST: /users/me/phone/_resend_verification
 
 
 ### RemoveMyPhone
@@ -216,11 +185,9 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyPhone([RemoveMyPhoneRequest](#removemyphonerequest))
 [RemoveMyPhoneResponse](#removemyphoneresponse)
 
+Removed the phone number of the authorized user
 
 
-
-
-    DELETE: /users/me/phone
 
 
 ### ListMyLinkedIDPs
@@ -228,11 +195,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyLinkedIDPs([ListMyLinkedIDPsRequest](#listmylinkedidpsrequest))
 [ListMyLinkedIDPsResponse](#listmylinkedidpsresponse)
 
+Returns a list of all linked identity providers (social logins, eg. Google, Microsoft, AD, etc.)
 
 
-
-
-    POST: /users/me/idps/_search
 
 
 ### RemoveMyLinkedIDP
@@ -240,11 +205,9 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyLinkedIDP([RemoveMyLinkedIDPRequest](#removemylinkedidprequest))
 [RemoveMyLinkedIDPResponse](#removemylinkedidpresponse)
 
+Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, etc.)
 
 
-
-
-    DELETE: /users/me/idps/{idp_id}/{linked_user_id}
 
 
 ### ListMyAuthFactors
@@ -252,11 +215,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyAuthFactors([ListMyAuthFactorsRequest](#listmyauthfactorsrequest))
 [ListMyAuthFactorsResponse](#listmyauthfactorsresponse)
 
+Returns all configured authentication factors (second and multi)
 
 
-
-
-    POST: /users/me/auth_factors/_search
 
 
 ### AddMyAuthFactorOTP
@@ -264,11 +225,10 @@ title: zitadel/auth.proto
 > **rpc** AddMyAuthFactorOTP([AddMyAuthFactorOTPRequest](#addmyauthfactorotprequest))
 [AddMyAuthFactorOTPResponse](#addmyauthfactorotpresponse)
 
+Adds a new OTP (One Time Password) Second Factor to the authorized user
+Only one OTP can be configured per user
 
 
-
-
-    POST: /users/me/auth_factors/otp
 
 
 ### VerifyMyAuthFactorOTP
@@ -276,11 +236,9 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyAuthFactorOTP([VerifyMyAuthFactorOTPRequest](#verifymyauthfactorotprequest))
 [VerifyMyAuthFactorOTPResponse](#verifymyauthfactorotpresponse)
 
+Verify the last added OTP (One Time Password)
 
 
-
-
-    POST: /users/me/auth_factors/otp/_verify
 
 
 ### RemoveMyAuthFactorOTP
@@ -288,11 +246,9 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyAuthFactorOTP([RemoveMyAuthFactorOTPRequest](#removemyauthfactorotprequest))
 [RemoveMyAuthFactorOTPResponse](#removemyauthfactorotpresponse)
 
+Removed the configured OTP (One Time Password) Factor
 
 
-
-
-    DELETE: /users/me/auth_factors/otp
 
 
 ### AddMyAuthFactorU2F
@@ -300,11 +256,10 @@ title: zitadel/auth.proto
 > **rpc** AddMyAuthFactorU2F([AddMyAuthFactorU2FRequest](#addmyauthfactoru2frequest))
 [AddMyAuthFactorU2FResponse](#addmyauthfactoru2fresponse)
 
+Adds a new U2F (Universal Second Factor) to the authorized user
+Multiple U2Fs can be configured
 
 
-
-
-    POST: /users/me/auth_factors/u2f
 
 
 ### VerifyMyAuthFactorU2F
@@ -312,11 +267,9 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyAuthFactorU2F([VerifyMyAuthFactorU2FRequest](#verifymyauthfactoru2frequest))
 [VerifyMyAuthFactorU2FResponse](#verifymyauthfactoru2fresponse)
 
+Verifies the last added U2F (Universal Second Factor) of the authorized user
 
 
-
-
-    POST: /users/me/auth_factors/u2f/_verify
 
 
 ### RemoveMyAuthFactorU2F
@@ -324,11 +277,9 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyAuthFactorU2F([RemoveMyAuthFactorU2FRequest](#removemyauthfactoru2frequest))
 [RemoveMyAuthFactorU2FResponse](#removemyauthfactoru2fresponse)
 
+Removes the U2F Authentication from the authorized user
 
 
-
-
-    DELETE: /users/me/auth_factors/u2f/{token_id}
 
 
 ### ListMyPasswordless
@@ -336,11 +287,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyPasswordless([ListMyPasswordlessRequest](#listmypasswordlessrequest))
 [ListMyPasswordlessResponse](#listmypasswordlessresponse)
 
+Returns all configured passwordless authentications of the authorized user
 
 
-
-
-    POST: /users/me/passwordless/_search
 
 
 ### AddMyPasswordless
@@ -348,11 +297,10 @@ title: zitadel/auth.proto
 > **rpc** AddMyPasswordless([AddMyPasswordlessRequest](#addmypasswordlessrequest))
 [AddMyPasswordlessResponse](#addmypasswordlessresponse)
 
+Adds a new passwordless authentications to the authorized user
+Multiple passwordless authentications can be configured
 
 
-
-
-    POST: /users/me/passwordless
 
 
 ### VerifyMyPasswordless
@@ -360,11 +308,9 @@ title: zitadel/auth.proto
 > **rpc** VerifyMyPasswordless([VerifyMyPasswordlessRequest](#verifymypasswordlessrequest))
 [VerifyMyPasswordlessResponse](#verifymypasswordlessresponse)
 
+Verifies the last added passwordless configuration
 
 
-
-
-    POST: /users/me/passwordless/_verify
 
 
 ### RemoveMyPasswordless
@@ -372,11 +318,9 @@ title: zitadel/auth.proto
 > **rpc** RemoveMyPasswordless([RemoveMyPasswordlessRequest](#removemypasswordlessrequest))
 [RemoveMyPasswordlessResponse](#removemypasswordlessresponse)
 
+Removes the passwordless configuration from the authorized user
 
 
-
-
-    DELETE: /users/me/passwordless/{token_id}
 
 
 ### ListMyUserGrants
@@ -384,11 +328,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyUserGrants([ListMyUserGrantsRequest](#listmyusergrantsrequest))
 [ListMyUserGrantsResponse](#listmyusergrantsresponse)
 
+Returns all user grants (authorizations) of the authorized user
 
 
-
-
-    POST: /usergrants/me/_search
 
 
 ### ListMyProjectOrgs
@@ -396,11 +338,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyProjectOrgs([ListMyProjectOrgsRequest](#listmyprojectorgsrequest))
 [ListMyProjectOrgsResponse](#listmyprojectorgsresponse)
 
+Returns a list of organisations where the authorized user has a user grant (authorization) in the context of the requested project
 
 
-
-
-    POST: /global/projectorgs/_search
 
 
 ### ListMyZitadelFeatures
@@ -408,11 +348,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyZitadelFeatures([ListMyZitadelFeaturesRequest](#listmyzitadelfeaturesrequest))
 [ListMyZitadelFeaturesResponse](#listmyzitadelfeaturesresponse)
 
+Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
 
 
-
-
-    POST: /features/zitadel/me/_search
 
 
 ### ListMyZitadelPermissions
@@ -420,11 +358,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyZitadelPermissions([ListMyZitadelPermissionsRequest](#listmyzitadelpermissionsrequest))
 [ListMyZitadelPermissionsResponse](#listmyzitadelpermissionsresponse)
 
+Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
 
 
-
-
-    POST: /permissions/zitadel/me/_search
 
 
 ### ListMyProjectPermissions
@@ -432,11 +368,9 @@ title: zitadel/auth.proto
 > **rpc** ListMyProjectPermissions([ListMyProjectPermissionsRequest](#listmyprojectpermissionsrequest))
 [ListMyProjectPermissionsResponse](#listmyprojectpermissionsresponse)
 
+Returns a list of roles for the authorized user and project
 
 
-
-
-    POST: /permissions/me/_search
 
 
 
@@ -448,667 +382,731 @@ title: zitadel/auth.proto
 
 
 ### AddMyAuthFactorOTPRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### AddMyAuthFactorOTPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| url |  string | - |
-| secret |  string | - |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| url |  string | - |  |
+| secret |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### AddMyAuthFactorU2FRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### AddMyAuthFactorU2FResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| key |  zitadel.user.v1.WebAuthNKey | - |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  zitadel.user.v1.WebAuthNKey | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### AddMyPasswordlessRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### AddMyPasswordlessResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| key |  zitadel.user.v1.WebAuthNKey | - |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  zitadel.user.v1.WebAuthNKey | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### GetMyEmailRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### GetMyEmailResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| email |  zitadel.user.v1.Email | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| email |  zitadel.user.v1.Email | - |  |
+
 
 
 
 ### GetMyPasswordComplexityPolicyRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### GetMyPasswordComplexityPolicyResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
+
 
 
 
 ### GetMyPhoneRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### GetMyPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| phone |  zitadel.user.v1.Phone | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| phone |  zitadel.user.v1.Phone | - |  |
+
 
 
 
 ### GetMyProfileRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### GetMyProfileResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
-| profile |  zitadel.user.v1.Profile | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| profile |  zitadel.user.v1.Profile | - |  |
+
 
 
 
 ### GetMyUserRequest
-GetMyUserRequest is an empty request
+This is an empty request
 the request parameters are read from the token-header
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### GetMyUserResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user |  zitadel.user.v1.User | - |
-| last_login |  google.protobuf.Timestamp | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user |  zitadel.user.v1.User | - |  |
+| last_login |  google.protobuf.Timestamp | - |  |
+
 
 
 
 ### HealthzRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### HealthzResponse
+This is an empty response
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyAuthFactorsRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyAuthFactorsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated zitadel.user.v1.AuthFactor | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.user.v1.AuthFactor | - |  |
+
 
 
 
 ### ListMyLinkedIDPsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering
 
-PLANNED: queries for idp name and login name |
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
 
 
 
 ### ListMyLinkedIDPsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.idp.v1.IDPUserLink | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.IDPUserLink | - |  |
+
 
 
 
 ### ListMyPasswordlessRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyPasswordlessResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated zitadel.user.v1.WebAuthNToken | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.user.v1.WebAuthNToken | - |  |
+
 
 
 
 ### ListMyProjectOrgsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
-| queries | repeated zitadel.org.v1.OrgQuery | criterias the client is looking for |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.org.v1.OrgQuery | criterias the client is looking for |  |
+
 
 
 
 ### ListMyProjectOrgsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.org.v1.Org | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.org.v1.Org | - |  |
+
 
 
 
 ### ListMyProjectPermissionsRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyProjectPermissionsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated string | - |  |
+
 
 
 
 ### ListMyUserChangesRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.change.v1.ChangeQuery | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | - |  |
+
 
 
 
 ### ListMyUserChangesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated zitadel.change.v1.Change | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.change.v1.Change | - |  |
+
 
 
 
 ### ListMyUserGrantsRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
 
 
 
 ### ListMyUserGrantsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ListDetails | - |
-| result | repeated UserGrant | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated UserGrant | - |  |
+
 
 
 
 ### ListMyUserSessionsRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyUserSessionsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated zitadel.user.v1.Session | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.user.v1.Session | - |  |
+
 
 
 
 ### ListMyZitadelFeaturesRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyZitadelFeaturesResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated string | - |  |
+
 
 
 
 ### ListMyZitadelPermissionsRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ListMyZitadelPermissionsResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| result | repeated string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated string | - |  |
+
 
 
 
 ### RemoveMyAuthFactorOTPRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### RemoveMyAuthFactorOTPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### RemoveMyAuthFactorU2FRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| token_id |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### RemoveMyAuthFactorU2FResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### RemoveMyLinkedIDPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| idp_id |  string | - |
-| linked_user_id |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| linked_user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### RemoveMyLinkedIDPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### RemoveMyPasswordlessRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| token_id |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### RemoveMyPasswordlessResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### RemoveMyPhoneRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### RemoveMyPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### ResendMyEmailVerificationRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ResendMyEmailVerificationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### ResendMyPhoneVerificationRequest
+This is an empty request
 
-
-| Field | Type | Description |
-| ----- | ---- | ----------- |
 
 
 
 ### ResendMyPhoneVerificationResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### SetMyEmailRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| email |  string | TODO: check if no value is allowed |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+
 
 
 
 ### SetMyEmailResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### SetMyPhoneRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| phone |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| phone |  string | - | string.min_len: 1<br /> string.max_len: 50<br /> string.prefix: +<br />  |
+
 
 
 
 ### SetMyPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### UpdateMyPasswordRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| old_password |  string | - |
-| new_password |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| old_password |  string | - | string.min_len: 1<br /> string.max_bytes: 70<br />  |
+| new_password |  string | - | string.min_len: 1<br /> string.max_bytes: 70<br />  |
+
 
 
 
 ### UpdateMyPasswordResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### UpdateMyProfileRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| first_name |  string | - |
-| last_name |  string | - |
-| nick_name |  string | - |
-| display_name |  string | - |
-| preferred_language |  string | - |
-| gender |  zitadel.user.v1.Gender | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| nick_name |  string | - | string.max_len: 200<br />  |
+| display_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
+| gender |  zitadel.user.v1.Gender | - |  |
+
 
 
 
 ### UpdateMyProfileResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### UpdateMyUserNameRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| user_name |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### UpdateMyUserNameResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### UserGrant
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| org_id |  string | - |
-| project_id |  string | - |
-| user_id |  string | - |
-| roles | repeated string | - |
-| org_name |  string | - |
-| grant_id |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
+| roles | repeated string | - |  |
+| org_name |  string | - |  |
+| grant_id |  string | - |  |
+
 
 
 
 ### VerifyMyAuthFactorOTPRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| code |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| code |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### VerifyMyAuthFactorOTPResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### VerifyMyAuthFactorU2FRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| verification |  zitadel.user.v1.WebAuthNVerification | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| verification |  zitadel.user.v1.WebAuthNVerification | - | message.required: true<br />  |
+
 
 
 
 ### VerifyMyAuthFactorU2FResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### VerifyMyEmailRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| code |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| code |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### VerifyMyEmailResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### VerifyMyPasswordlessRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| verification |  zitadel.user.v1.WebAuthNVerification | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| verification |  zitadel.user.v1.WebAuthNVerification | - | message.required: true<br />  |
+
 
 
 
 ### VerifyMyPasswordlessResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
 ### VerifyMyPhoneRequest
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| code |  string | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| code |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
 
 
 
 ### VerifyMyPhoneResponse
 
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
 
 
 
