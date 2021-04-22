@@ -2,6 +2,7 @@
 .codecov
 .github
 build/dockerfile
+k8s
 docs
 console/node_modules
 console/src/app/proto/generated
