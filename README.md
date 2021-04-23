@@ -46,12 +46,7 @@ We provide a cloud service [**ZITADEL.ch**](https://zitadel.ch) where people can
 
 **ZITADEL** is free open source software under [Apache 2.0](##License) managed by [CAOS](https://caos.ch). We provide our community access to ZITADEL releases at no cost and welcome all contributions.
 
-You can run **ZITADEL** in combination with [**ORBOS**](https://github.com/caos/orbos/) for easy and scalable operation on 
-* **[GCEProvider](https://cloud.google.com/compute)**
-* **[StaticProvider](https://github.com/caos/orbos/blob/master/docs/orbiter/static.md)**
-* Any CNCF conform Kubernetes
-
-> Stay tuned, we will soon publish a more detailed guide on how you can deploy a **hyperconverged** system on your own.
+You can run an automatically operated **ZITADEL** instance to a Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/start#CRD_Mode_on_an_existing_Kubernetes_cluster), [GitOps](https://docs.zitadel.ch/start#GitOps_Mode_on_an_existing_Kubernetes_cluster) or on a dedicated Kubernetes Cluster on various infrastructure providers using [ORBOS](https://docs.zitadel.ch/start#GitOps_Mode_on_dedicated_Kubernetes_Clusters_using_ORBOS)
 
 ### Let us run ZITADEL for you
 
@@ -65,11 +60,7 @@ If  our cloud service or running **ZITADEL** on your own infrastructure does not
 
 ## How To Contribute
 
-Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](##License) you are fine.
-
-We already have documentation specific [guidelines](./site/CONTRIBUTING.md).
-
-How to develop **ZITADEL**: [contribute](./CONTRIBUTING.md)
+Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](./LICENSE) you are fine.
 
 ## Security
 

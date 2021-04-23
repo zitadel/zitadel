@@ -5,11 +5,11 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-	"github.com/caos/zitadel/operator/api"
 	"github.com/caos/zitadel/operator/crtlcrd"
 	"github.com/caos/zitadel/operator/crtlgitops"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 	"github.com/spf13/cobra"
 )
 
@@ -59,15 +59,7 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 		version := rv.Version
 
-		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			return err
-		}
-
-		if err := gitClient.Clone(); err != nil {
-			return err
-		}
-
-		k8sClient, _, err := cli.Client(
+		k8sClient, err := cli.Client(
 			monitor,
 			orbConfig,
 			gitClient,
@@ -80,8 +72,29 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 
 		monitor.WithFields(map[string]interface{}{
 			"version": version,
-			"repoURL": orbConfig.URL,
 		}).Info("Destroying Orb")
+
+		if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
+			return err
+		}
+
+		if err := kubernetes2.ScaleDatabaseOperator(monitor, k8sClient, 0); err != nil {
+			return err
+		}
+
+		if rv.Gitops {
+			if err := crtlgitops.DestroyOperator(monitor, orbConfig.Path, k8sClient, &version, rv.Gitops); err != nil {
+				return err
+			}
+
+			if err := crtlgitops.DestroyDatabase(monitor, orbConfig.Path, k8sClient, &version, rv.Gitops); err != nil {
+				return err
+			}
+		} else {
+			if err := crtlcrd.Destroy(monitor, k8sClient, version, "zitadel", "database"); err != nil {
+				return err
+			}
+		}
 
 		if err := destroyOperator(monitor, gitClient, k8sClient, rv.Gitops); err != nil {
 			return err
@@ -91,25 +104,6 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
-		if rv.Gitops {
-			k8sClient, _, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops)
-			if err != nil {
-				return err
-			}
-
-			if err := crtlgitops.DestroyOperator(monitor, orbConfig.Path, k8sClient, &version, rv.Gitops); err != nil {
-				return err
-			}
-
-			if err := crtlgitops.DestroyDatabase(monitor, orbConfig.Path, k8sClient, &version, rv.Gitops); err != nil {
-				return err
-			}
-		} else {
-			if err := crtlcrd.Destroy(monitor, k8sClient, "zitadel", "database"); err != nil {
-				return err
-			}
-		}
-
 		return nil
 	}
 	return cmd
@@ -117,12 +111,8 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 
 func destroyOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, gitops bool) error {
 	if gitops {
-		found, err := api.ExistsZitadelYml(gitClient)
-		if err != nil {
-			return err
-		}
-		if found {
-			desiredTree, err := api.ReadZitadelYml(gitClient)
+		if gitClient.Exists(git.ZitadelFile) {
+			desiredTree, err := gitClient.ReadTree(git.ZitadelFile)
 			if err != nil {
 				return err
 			}
@@ -150,12 +140,8 @@ func destroyOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kube
 
 func destroyDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, gitops bool) error {
 	if gitops {
-		found, err := api.ExistsDatabaseYml(gitClient)
-		if err != nil {
-			return err
-		}
-		if found {
-			desiredTree, err := api.ReadDatabaseYml(gitClient)
+		if gitClient.Exists(git.DatabaseFile) {
+			desiredTree, err := gitClient.ReadTree(git.DatabaseFile)
 			if err != nil {
 				return err
 			}

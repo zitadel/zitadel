@@ -7,15 +7,15 @@ import (
 	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
 )
 
-func Destroy(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, features ...string) error {
+func Destroy(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, version string, features ...string) error {
 	for _, feature := range features {
 		switch feature {
 		case Zitadel:
-			if err := zitadel.Destroy(monitor, k8sClient); err != nil {
+			if err := zitadel.Destroy(monitor, k8sClient, version); err != nil {
 				return err
 			}
 		case Database:
-			if err := database.Destroy(monitor, k8sClient); err != nil {
+			if err := database.Destroy(monitor, k8sClient, version); err != nil {
 				return err
 			}
 		}

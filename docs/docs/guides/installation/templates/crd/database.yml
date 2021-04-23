@@ -1,0 +1,53 @@
+apiVersion: caos.ch/v1
+kind: Database
+metadata:
+  # This value must be database
+  name: database
+  # This value must be caos-system
+  namespace: caos-system
+spec:
+  kind: databases.caos.ch/Orb
+  version: v0
+  spec:
+    # Print debug logs
+    verbose: false
+    # This is the version of the database operator deployment
+    version: 1.0.0
+    # If true, the operator overwrites its own deployment using the version above
+    selfReconciling: true
+  database:
+    kind: databases.caos.ch/CockroachDB
+    version: v0
+    spec:
+      # Resources for the database pods
+      resources:
+        limits:
+          memory: 8Gi
+        requests:
+          cpu: 1
+          memory: 6Gi
+      # Print debug logs
+      verbose: false
+      # Number of database pods
+      replicaCount: 1
+      # PVC storage request
+      storageCapacity: 368Gi
+      # PVC storage class
+      storageClass: fast
+      # This value must match with your cluster DNS
+      clusterDNS: cluster.local
+      # If empty, the database isn't backuped
+      backups: {}
+    # bucket:
+    #   kind: databases.caos.ch/BucketBackup
+    #   version: v0
+    # spec:
+    #   # Print debug logs
+    #   verbose: true
+    #   # Schedule periodic backups
+    #   cron: 0 * * * *
+    #   # Specify the S3 bucket name
+    #   bucket: dummy
+    #   # The Google service accounts json key to use
+    #   # Use the zitadelctl writesecret command
+    #   serviceAccountJSON: {}

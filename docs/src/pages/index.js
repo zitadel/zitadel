@@ -5,11 +5,13 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
+import ThemedImage from '@theme/ThemedImage';
 
 const features = [
   {
     title: 'Manuals',
-    imageUrl: 'img/zitadel-logo-solo-light.png',
+    darkImageUrl: 'img/index/Manual-dark.svg',
+    lightImageUrl: 'img/index/Manual-light.svg',
     link: 'docs/manuals/introduction',
     description: (
       <>
@@ -19,7 +21,8 @@ const features = [
   },
   {
     title: 'Quickstarts',
-    imageUrl: 'img/zitadel-logo-solo-light.png',
+    darkImageUrl: 'img/index/Quickstarts-dark.svg',
+    lightImageUrl: 'img/index/Quickstarts-light.svg',
     link: 'docs/quickstarts/introduction',
     description: (
       <>
@@ -29,7 +32,8 @@ const features = [
   },
   {
     title: 'Guides',
-    imageUrl: 'img/zitadel-logo-solo-light.png',
+    darkImageUrl: 'img/index/Guides-dark.svg',
+    lightImageUrl: 'img/index/Guides-light.svg',
     link: 'docs/guides/introduction',
     description: (
       <>
@@ -39,7 +43,8 @@ const features = [
   },
   {
     title: 'APIs',
-    imageUrl: 'img/zitadel-logo-solo-light.png',
+    darkImageUrl: 'img/index/APIs-dark.svg',
+    lightImageUrl: 'img/index/APIs-light.svg',
     link: '/docs/apis/introduction',
     description: (
       <>
@@ -49,7 +54,8 @@ const features = [
   },
   {
     title: 'Concepts',
-    imageUrl: 'img/zitadel-logo-solo-light.png',
+    darkImageUrl: 'img/index/Concepts-dark.svg',
+    lightImageUrl: 'img/index/Concepts-light.svg',
     link: 'docs/concepts/introduction',
     description: (
       <>
@@ -59,18 +65,26 @@ const features = [
   },
 ];
 
-function Feature({imageUrl, title, description, link}) {
-  const imgUrl = useBaseUrl(imageUrl);
+function Feature({darkImageUrl, lightImageUrl, title, description, link}) {
+  const darkImgUrl = useBaseUrl(darkImageUrl);
+  const lightImgUrl = useBaseUrl(lightImageUrl);
   return (
         <div className={clsx('col col--4 docs-link', styles.feature)}>
           <Link to={useBaseUrl(link)}>
-          {imgUrl && (
+          {darkImgUrl && lightImgUrl && (
               <div className="text--center">
-                <img className={styles.featureImage} src={imgUrl} alt={title} />
+                <ThemedImage
+                    className={styles.featureImage}
+                    alt={title}
+                    sources={{
+                      light: lightImgUrl,
+                      dark: darkImgUrl,
+                    }}
+                />
               </div>
           )}
-          <h3>{title}</h3>
-          <p>{description}</p>
+          <h3 className="text--center">{title}</h3>
+          <p className="text--center">{description}</p>
           </Link>
         </div>
   );
@@ -83,7 +97,7 @@ export default function Home() {
     <Layout
       title={`${siteConfig.title}`}
       description="This site bundles ZITADELs Documentations">
-      <header className={clsx('hero hero--primary', styles.heroBanner)}>
+      <header className={clsx('hero', styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
@@ -93,7 +107,7 @@ export default function Home() {
                 'button button--outline button--lg get-started',
                 styles.getStarted,
               )}
-              to={useBaseUrl('docs/guides/get-started')}>
+              to={useBaseUrl('docs/guides/usage/get-started')}>
               Get Started
             </Link>
           </div>

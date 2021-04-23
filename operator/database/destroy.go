@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -25,12 +24,7 @@ func Destroy(
 		}
 		treeCurrent := &tree.Tree{}
 
-		if !k8sClient.Available() {
-			internalMonitor.Error(errors.New("kubeclient is not available"))
-			return err
-		}
-
-		_, destroy, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
+		_, destroy, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 		if err != nil {
 			internalMonitor.Error(err)
 			return err

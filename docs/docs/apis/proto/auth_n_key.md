@@ -6,6 +6,23 @@ title: zitadel/auth_n_key.proto
 
 
 
+## Messages
+
+
+### Key
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| type |  KeyType | - |  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
 
 
 ## Enums

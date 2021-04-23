@@ -4,8 +4,8 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/helper"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"github.com/pkg/errors"
@@ -26,7 +26,7 @@ func BackupList() core.BackupListFunc {
 			monitor.Verbose()
 		}
 
-		value, err := helper.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
+		value, err := read.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
 		if err != nil {
 			return nil, err
 		}

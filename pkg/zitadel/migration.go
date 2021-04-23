@@ -6,7 +6,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	orbconfig "github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api"
 	"github.com/caos/zitadel/operator/api/zitadel"
 	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
 )
@@ -34,7 +33,7 @@ func GitOpsMigrations(
 	k8sClient *kubernetes.Client,
 	version *string,
 ) error {
-	desired, err := api.ReadZitadelYml(gitClient)
+	desired, err := gitClient.ReadTree(git.ZitadelFile)
 	if err != nil {
 		monitor.Error(err)
 		return err
@@ -53,7 +52,7 @@ func migrations(
 	desired *tree.Tree,
 ) error {
 	current := &tree.Tree{}
-	query, _, _, _, _, err := orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"})(monitor, desired, current)
+	query, _, _, _, _, _, err := orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"})(monitor, desired, current)
 	if err != nil {
 		return err
 	}

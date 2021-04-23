@@ -39,7 +39,7 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 		version := rv.Version
 
-		k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
 		if err != nil {
 			return err
 		}
@@ -98,7 +98,6 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			}
 
 		}
-
 		return nil
 	}
 	return cmd

@@ -31,6 +31,7 @@ func AdaptFunc(
 	) (
 		queryFunc operator.QueryFunc,
 		destroyFunc operator.DestroyFunc,
+		configureFunc operator.ConfigureFunc,
 		allSecrets map[string]*secret.Secret,
 		allExisting map[string]*secret.Existing,
 		migrate bool,
@@ -47,7 +48,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
-			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -61,7 +62,7 @@ func AdaptFunc(
 			dbClientT, err := zitadeldb.NewGitOpsClient(monitor, orbconfig.URL, orbconfig.Repokey)
 			if err != nil {
 				monitor.Error(err)
-				return nil, nil, nil, nil, false, err
+				return nil, nil, nil, nil, nil, false, err
 			}
 			dbClient = dbClientT
 		} else {
@@ -72,7 +73,7 @@ func AdaptFunc(
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceName)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 		/*destroyNS, err := namespace.AdaptFuncToDestroy(namespaceName)
 		if err != nil {
@@ -80,7 +81,7 @@ func AdaptFunc(
 		}*/
 
 		iamCurrent := &tree.Tree{}
-		queryIAM, destroyIAM, zitadelSecrets, zitadelExisting, migrateIAM, err := iam.GetQueryAndDestroyFuncs(
+		queryIAM, destroyIAM, configureIAM, zitadelSecrets, zitadelExisting, migrateIAM, err := iam.Adapt(
 			orbMonitor,
 			operatorLabels,
 			desiredKind.IAM,
@@ -94,7 +95,7 @@ func AdaptFunc(
 			features,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 		migrate = migrate || migrateIAM
 		secret.AppendSecrets("", allSecrets, zitadelSecrets, allExisting, zitadelExisting)
@@ -135,6 +136,9 @@ func AdaptFunc(
 			func(k8sClient kubernetes.ClientInt) error {
 				monitor.WithField("destroyers", len(queriers)).Info("Destroy")
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
+			},
+			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+				return configureIAM(k8sClient, queried, gitops)
 			},
 			allSecrets,
 			allExisting,

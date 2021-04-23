@@ -234,7 +234,7 @@ status:
 	}
 
 	var (
-		cmd          = []string{"/zitadelctl", "operator"}
+		cmd          = []string{"/zitadelctl", "operator", "--kubeconfig", ""}
 		volumes      []core.Volume
 		volumeMounts []core.VolumeMount
 	)
@@ -254,8 +254,6 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
-	} else {
-		cmd = append(cmd, "--kubeconfig", "")
 	}
 
 	deployment := &apps.Deployment{
@@ -338,7 +336,7 @@ func DestroyZitadelOperator(
 	}
 
 	if !gitops {
-		if err := client.DeleteCRDResource("apiextensions.k8s.io", "v1beta1", "CustomResourceDefinition", "Zitadel"); err != nil {
+		if err := client.DeleteCRDResource("apiextensions.k8s.io", "v1beta1", "CustomResourceDefinition", "zitadels.caos.ch"); err != nil {
 			return err
 		}
 	}
@@ -357,6 +355,15 @@ func ScaleZitadelOperator(
 ) error {
 	monitor.Debug("Scaling zitadel-operator")
 	return client.ScaleDeployment(namespace, "zitadel-operator", replicaCount)
+}
+
+func ScaleDatabaseOperator(
+	monitor mntr.Monitor,
+	client *kubernetes.Client,
+	replicaCount int,
+) error {
+	monitor.Debug("Scaling database-operator")
+	return client.ScaleDeployment(namespace, "database-operator", replicaCount)
 }
 
 func int32Ptr(i int32) *int32 { return &i }
@@ -572,7 +579,7 @@ status:
 	}
 
 	var (
-		cmd          = []string{"/zitadelctl", "database"}
+		cmd          = []string{"/zitadelctl", "database", "--kubeconfig", ""}
 		volumes      []core.Volume
 		volumeMounts []core.VolumeMount
 	)
@@ -592,8 +599,6 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
-	} else {
-		cmd = append(cmd, "--kubeconfig", "")
 	}
 
 	deployment := &apps.Deployment{
@@ -678,7 +683,7 @@ func DestroyDatabaseOperator(
 	}
 
 	if !gitops {
-		if err := client.DeleteCRDResource("apiextensions.k8s.io", "v1beta1", "CustomResourceDefinition", "Database"); err != nil {
+		if err := client.DeleteCRDResource("apiextensions.k8s.io", "v1beta1", "CustomResourceDefinition", "databases.caos.ch"); err != nil {
 			return err
 		}
 	}

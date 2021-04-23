@@ -48,7 +48,8 @@ service AuthService {
             get: "/healthz"
         };
     }
-    
+
+    // Returns my full blown user
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
             get: "/users/me"
@@ -59,6 +60,7 @@ service AuthService {
         };
     }
 
+    // Returns the history of the authorized user (each event)
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/me/changes/_search"
@@ -69,6 +71,7 @@ service AuthService {
         };
     }
 
+    // Returns the user sessions of the authorized user of the current useragent
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
             post: "/users/me/sessions/_search"
@@ -79,6 +82,7 @@ service AuthService {
         };
     }
 
+    // Change the user name of the authorize user
     rpc UpdateMyUserName(UpdateMyUserNameRequest) returns (UpdateMyUserNameResponse) {
         option (google.api.http) = {
             put: "/users/me/username"
@@ -90,6 +94,8 @@ service AuthService {
         };
     }
 
+    // Returns the password complexity policy of my organisation
+    // This policy defines how the password should look
     rpc GetMyPasswordComplexityPolicy(GetMyPasswordComplexityPolicyRequest) returns (GetMyPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/passwords/complexity"
@@ -100,6 +106,7 @@ service AuthService {
         };
     }
 
+    // Change the password of the authorized user
     rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
         option (google.api.http) = {
             put: "/users/me/password"
@@ -111,6 +118,7 @@ service AuthService {
         };
     }
 
+    // Returns the profile information of the authorized user
     rpc GetMyProfile(GetMyProfileRequest) returns (GetMyProfileResponse) {
         option (google.api.http) = {
             get: "/users/me/profile"
@@ -121,6 +129,7 @@ service AuthService {
         };
     }
 
+    // Changes the profile information of the authorized user
     rpc UpdateMyProfile(UpdateMyProfileRequest) returns (UpdateMyProfileResponse) {
         option (google.api.http) = {
             put: "/users/me/profile"
@@ -132,6 +141,7 @@ service AuthService {
         };
     }
 
+    // Returns the email address of the authorized user
     rpc GetMyEmail(GetMyEmailRequest) returns (GetMyEmailResponse) {
         option (google.api.http) = {
             get: "/users/me/email"
@@ -142,6 +152,8 @@ service AuthService {
         };
     }
 
+    // Changes the email address of the authorized user
+    // An email is sent to the given address, to verify it
     rpc SetMyEmail(SetMyEmailRequest) returns (SetMyEmailResponse) {
         option (google.api.http) = {
             put: "/users/me/email"
@@ -153,6 +165,7 @@ service AuthService {
         };
     }
 
+    // Sets the email address to verified
     rpc VerifyMyEmail(VerifyMyEmailRequest) returns (VerifyMyEmailResponse) {
         option (google.api.http) = {
             post: "/users/me/email/_verify"
@@ -164,6 +177,7 @@ service AuthService {
         };
     }
 
+    // Sends a new email to the last given address to verify it
     rpc ResendMyEmailVerification(ResendMyEmailVerificationRequest) returns (ResendMyEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/me/email/_resend_verification"
@@ -175,6 +189,7 @@ service AuthService {
         };
     }
 
+    // Returns the phone number of the authorized user
     rpc GetMyPhone(GetMyPhoneRequest) returns (GetMyPhoneResponse) {
         option (google.api.http) = {
             get: "/users/me/phone"
@@ -185,6 +200,8 @@ service AuthService {
         };
     }
 
+    // Sets the phone number of the authorized user
+    // An sms is sent to the number with a verification code
     rpc SetMyPhone(SetMyPhoneRequest) returns (SetMyPhoneResponse) {
         option (google.api.http) = {
             put: "/users/me/phone"
@@ -196,6 +213,7 @@ service AuthService {
         };
     }
 
+    // Sets the phone number to verified
     rpc VerifyMyPhone(VerifyMyPhoneRequest) returns (VerifyMyPhoneResponse) {
         option (google.api.http) = {
             post: "/users/me/phone/_verify"
@@ -207,6 +225,7 @@ service AuthService {
         };
     }
 
+    // Resends a sms to the last given phone number, to verify it
     rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/me/phone/_resend_verification"
@@ -218,6 +237,7 @@ service AuthService {
         };
     }
 
+    // Removed the phone number of the authorized user
     rpc RemoveMyPhone(RemoveMyPhoneRequest) returns (RemoveMyPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/me/phone"
@@ -228,6 +248,7 @@ service AuthService {
         };
     }
 
+    // Returns a list of all linked identity providers (social logins, eg. Google, Microsoft, AD, etc.)
     rpc ListMyLinkedIDPs(ListMyLinkedIDPsRequest) returns (ListMyLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/me/idps/_search"
@@ -239,6 +260,7 @@ service AuthService {
         };
     }
 
+    // Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, etc.)
     rpc RemoveMyLinkedIDP(RemoveMyLinkedIDPRequest) returns (RemoveMyLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/me/idps/{idp_id}/{linked_user_id}"
@@ -249,6 +271,7 @@ service AuthService {
         };
     }
 
+    // Returns all configured authentication factors (second and multi)
     rpc ListMyAuthFactors(ListMyAuthFactorsRequest) returns (ListMyAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/me/auth_factors/_search"
@@ -259,6 +282,8 @@ service AuthService {
         };
     }
 
+    // Adds a new OTP (One Time Password) Second Factor to the authorized user
+    // Only one OTP can be configured per user
     rpc AddMyAuthFactorOTP(AddMyAuthFactorOTPRequest) returns (AddMyAuthFactorOTPResponse) {
         option (google.api.http) = {
             post: "/users/me/auth_factors/otp"
@@ -269,6 +294,7 @@ service AuthService {
         };
     }
 
+    // Verify the last added OTP (One Time Password)
     rpc VerifyMyAuthFactorOTP(VerifyMyAuthFactorOTPRequest) returns (VerifyMyAuthFactorOTPResponse) {
         option (google.api.http) = {
             post: "/users/me/auth_factors/otp/_verify"
@@ -280,6 +306,7 @@ service AuthService {
         };
     }
 
+    // Removed the configured OTP (One Time Password) Factor
     rpc RemoveMyAuthFactorOTP(RemoveMyAuthFactorOTPRequest) returns (RemoveMyAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/me/auth_factors/otp"
@@ -290,6 +317,8 @@ service AuthService {
         };
     }
 
+    // Adds a new U2F (Universal Second Factor) to the authorized user
+    // Multiple U2Fs can be configured
     rpc AddMyAuthFactorU2F(AddMyAuthFactorU2FRequest) returns (AddMyAuthFactorU2FResponse) {
         option (google.api.http) = {
             post: "/users/me/auth_factors/u2f"
@@ -300,6 +329,7 @@ service AuthService {
         };
     }
 
+    // Verifies the last added U2F (Universal Second Factor) of the authorized user
     rpc VerifyMyAuthFactorU2F(VerifyMyAuthFactorU2FRequest) returns (VerifyMyAuthFactorU2FResponse) {
         option (google.api.http) = {
             post: "/users/me/auth_factors/u2f/_verify"
@@ -311,6 +341,7 @@ service AuthService {
         };
     }
 
+    // Removes the U2F Authentication from the authorized user
     rpc RemoveMyAuthFactorU2F(RemoveMyAuthFactorU2FRequest) returns (RemoveMyAuthFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/me/auth_factors/u2f/{token_id}"
@@ -321,6 +352,7 @@ service AuthService {
         };
     }
 
+    // Returns all configured passwordless authentications of the authorized user
     rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless/_search"
@@ -330,6 +362,8 @@ service AuthService {
         };
     }
 
+    // Adds a new passwordless authentications to the authorized user
+    // Multiple passwordless authentications can be configured
     rpc AddMyPasswordless(AddMyPasswordlessRequest) returns (AddMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless"
@@ -340,6 +374,7 @@ service AuthService {
         };
     }
 
+    // Verifies the last added passwordless configuration
     rpc VerifyMyPasswordless(VerifyMyPasswordlessRequest) returns (VerifyMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless/_verify"
@@ -351,6 +386,7 @@ service AuthService {
         };
     }
 
+    // Removes the passwordless configuration from the authorized user
     rpc RemoveMyPasswordless(RemoveMyPasswordlessRequest) returns (RemoveMyPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/me/passwordless/{token_id}"
@@ -361,6 +397,7 @@ service AuthService {
         };
     }
 
+    // Returns all user grants (authorizations) of the authorized user
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -371,6 +408,7 @@ service AuthService {
         };
     }
 
+    // Returns a list of organisations where the authorized user has a user grant (authorization) in the context of the requested project
     rpc ListMyProjectOrgs(ListMyProjectOrgsRequest) returns (ListMyProjectOrgsResponse) {
         option (google.api.http) = {
             post: "/global/projectorgs/_search"
@@ -382,6 +420,7 @@ service AuthService {
         };
     }
 
+    // Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
     rpc ListMyZitadelFeatures(ListMyZitadelFeaturesRequest) returns (ListMyZitadelFeaturesResponse) {
         option (google.api.http) = {
             post: "/features/zitadel/me/_search"
@@ -392,6 +431,7 @@ service AuthService {
         };
     }
 
+    // Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
             post: "/permissions/zitadel/me/_search"
@@ -402,6 +442,7 @@ service AuthService {
         };
     }
 
+    // Returns a list of roles for the authorized user and project
     rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
         option (google.api.http) = {
             post: "/permissions/me/_search"
@@ -413,11 +454,13 @@ service AuthService {
     }
 }
 
+//This is an empty request
 message HealthzRequest {}
 
+//This is an empty response
 message HealthzResponse {}
 
-//GetMyUserRequest is an empty request
+//This is an empty request
 // the request parameters are read from the token-header
 message GetMyUserRequest {}
 
@@ -439,6 +482,7 @@ message ListMyUserChangesResponse {
     repeated zitadel.change.v1.Change result = 2;
 }
 
+//This is an empty request
 message ListMyUserSessionsRequest {}
 
 message ListMyUserSessionsResponse {
@@ -453,6 +497,7 @@ message UpdateMyUserNameResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyPasswordComplexityPolicyRequest {}
 
 message GetMyPasswordComplexityPolicyResponse {
@@ -468,6 +513,7 @@ message UpdateMyPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyProfileRequest {}
 
 message GetMyProfileResponse {
@@ -488,6 +534,7 @@ message UpdateMyProfileResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyEmailRequest {}
 
 message GetMyEmailResponse {
@@ -511,12 +558,14 @@ message VerifyMyEmailResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResendMyEmailVerificationRequest {}
 
 message ResendMyEmailVerificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message GetMyPhoneRequest {}
 
 message GetMyPhoneResponse {
@@ -540,12 +589,14 @@ message VerifyMyPhoneResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ResendMyPhoneVerificationRequest {}
 
 message ResendMyPhoneVerificationResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message RemoveMyPhoneRequest {}
 
 message RemoveMyPhoneResponse {
@@ -555,6 +606,7 @@ message RemoveMyPhoneResponse {
 message ListMyLinkedIDPsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+
     //PLANNED: queries for idp name and login name
 }
 
@@ -572,12 +624,14 @@ message RemoveMyLinkedIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListMyAuthFactorsRequest {}
 
 message ListMyAuthFactorsResponse {
     repeated zitadel.user.v1.AuthFactor result = 1;
 }
 
+//This is an empty request
 message AddMyAuthFactorU2FRequest {}
 
 message AddMyAuthFactorU2FResponse {
@@ -585,6 +639,7 @@ message AddMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 2;
 }
 
+//This is an empty request
 message AddMyAuthFactorOTPRequest {}
 
 message AddMyAuthFactorOTPResponse {
@@ -609,6 +664,7 @@ message VerifyMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message RemoveMyAuthFactorOTPRequest {}
 
 message RemoveMyAuthFactorOTPResponse {
@@ -623,12 +679,14 @@ message RemoveMyAuthFactorU2FResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//This is an empty request
 message ListMyPasswordlessRequest {}
 
 message ListMyPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1; 
 }
 
+//This is an empty request
 message AddMyPasswordlessRequest {}
 
 message AddMyPasswordlessResponse {
@@ -683,18 +741,21 @@ message ListMyProjectOrgsResponse {
     repeated zitadel.org.v1.Org result = 2;
 }
 
+//This is an empty request
 message ListMyZitadelFeaturesRequest {}
 
 message ListMyZitadelFeaturesResponse {
     repeated string result = 1;
 }
 
+//This is an empty request
 message ListMyZitadelPermissionsRequest {}
 
 message ListMyZitadelPermissionsResponse {
     repeated string result = 1;
 }
 
+//This is an empty request
 message ListMyProjectPermissionsRequest {}
 
 message ListMyProjectPermissionsResponse {

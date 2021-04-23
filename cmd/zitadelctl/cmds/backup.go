@@ -1,10 +1,11 @@
 package cmds
 
 import (
+	"github.com/caos/orbos/pkg/git"
+
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 	"github.com/caos/zitadel/pkg/databases"
 
-	"github.com/caos/zitadel/operator/api"
 	"github.com/spf13/cobra"
 )
 
@@ -34,33 +35,22 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
 
-		k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
 		if err != nil {
 			return err
 		}
 
-		if rv.Gitops {
-			found, err := api.ExistsDatabaseYml(gitClient)
-			if err != nil {
+		if gitClient.Exists(git.DatabaseFile) {
+			if err := databases.GitOpsInstantBackup(
+				monitor,
+				k8sClient,
+				gitClient,
+				backup,
+			); err != nil {
 				return err
 			}
-			if found {
 
-				if err := databases.GitOpsInstantBackup(
-					monitor,
-					k8sClient,
-					gitClient,
-					backup,
-				); err != nil {
-					return err
-				}
-			}
 		} else {
-			k8sClient, _, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops)
-			if err != nil {
-				return err
-			}
-
 			if err := databases.CrdInstantBackup(
 				monitor,
 				k8sClient,
@@ -68,7 +58,6 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 			); err != nil {
 				return err
 			}
-
 		}
 		return nil
 	}

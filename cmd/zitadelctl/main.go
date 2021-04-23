@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/cmd/zitadelctl/cmds"
 	"os"
+
+	"github.com/caos/zitadel/cmd/zitadelctl/cmds"
 )
 
 var (
-	Version = "unknown"
+	Version            = "unknown"
+	githubClientID     = "none"
+	githubClientSecret = "none"
 )
 
 func main() {
@@ -23,6 +26,7 @@ func main() {
 		cmds.WriteSecretCommand(rootValues),
 		cmds.BackupCommand(rootValues),
 		cmds.StartDatabase(rootValues),
+		cmds.ConfigCommand(rootValues, githubClientID, githubClientSecret),
 		cmds.TeardownCommand(rootValues),
 	)
 

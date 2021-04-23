@@ -14,7 +14,7 @@ func Restore(monitor mntr.Monitor, k8sClient *kubernetes.Client, backup string, 
 		return err
 	}
 
-	query, _, _, _, _, err := orbdb.AdaptFunc(backup, binaryVersion, false, "restore")(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := orbdb.AdaptFunc(backup, binaryVersion, false, "restore")(monitor, desired, &tree.Tree{})
 	if err != nil {
 		return err
 	}
