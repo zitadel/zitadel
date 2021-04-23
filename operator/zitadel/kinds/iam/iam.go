@@ -15,7 +15,7 @@ import (
 	core "k8s.io/api/core/v1"
 )
 
-func GetQueryAndDestroyFuncs(
+func Adapt(
 	monitor mntr.Monitor,
 	operatorLabels *labels.Operator,
 	desiredTree *tree.Tree,
@@ -30,6 +30,7 @@ func GetQueryAndDestroyFuncs(
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
+	configure operator.ConfigureFunc,
 	secrets map[string]*secret.Secret,
 	existing map[string]*secret.Existing,
 	migrate bool,
@@ -47,6 +48,6 @@ func GetQueryAndDestroyFuncs(
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
 		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, false, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}
 }

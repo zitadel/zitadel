@@ -84,7 +84,7 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 	bucket.SetBackup(k8sClient, namespace, labels, saJson)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
-	query, _, _, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
@@ -124,7 +124,7 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
-	query, _, _, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
@@ -165,7 +165,7 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
-	query, _, _, _, _, err := AdaptFunc(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}

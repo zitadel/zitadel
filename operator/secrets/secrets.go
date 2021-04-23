@@ -17,7 +17,6 @@ import (
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api"
 )
 
 const (
@@ -69,15 +68,14 @@ func getAllSecrets(
 		monitor,
 		printLogs,
 		gitops,
+		gitClient,
+		git.ZitadelFile,
 		allTrees,
 		allSecrets,
 		allExisting,
-		zitadel,
-		func() (bool, error) { return api.ExistsZitadelYml(gitClient) },
-		func() (t *tree.Tree, err error) { return api.ReadZitadelYml(gitClient) },
 		func() (t *tree.Tree, err error) { return crdzit.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, bool, error) {
-			_, _, secrets, existing, migrate, err := orbzit.AdaptFunc(orb, "secret", nil, gitops, []string{})(monitor, t, &tree.Tree{})
+			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc(orb, "secret", nil, gitops, []string{})(monitor, t, &tree.Tree{})
 			return secrets, existing, migrate, err
 		},
 	); err != nil {
@@ -88,15 +86,14 @@ func getAllSecrets(
 		monitor,
 		printLogs,
 		gitops,
+		gitClient,
+		git.DatabaseFile,
 		allTrees,
 		allSecrets,
 		allExisting,
-		database,
-		func() (bool, error) { return api.ExistsDatabaseYml(gitClient) },
-		func() (t *tree.Tree, err error) { return api.ReadDatabaseYml(gitClient) },
 		func() (t *tree.Tree, err error) { return crddb.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, bool, error) {
-			_, _, secrets, existing, migrate, err := orbdb.AdaptFunc("", nil, gitops, "database", "backup")(monitor, t, nil)
+			_, _, _, secrets, existing, migrate, err := orbdb.AdaptFunc("", nil, gitops, "database", "backup")(monitor, t, nil)
 			return secrets, existing, migrate, err
 		},
 	); err != nil {
@@ -141,24 +138,17 @@ func push(
 ) error {
 
 	var (
-		pushGitFunc  func(*tree.Tree) error
 		applyCRDFunc func(*tree.Tree) error
-		operator     string
+		desiredFile  git.DesiredFile
 	)
 
 	if strings.HasPrefix(path, zitadel) {
-		operator = zitadel
-		pushGitFunc = func(desired *tree.Tree) error {
-			return api.PushZitadelDesiredFunc(gitClient, desired)(monitor)
-		}
+		desiredFile = git.ZitadelFile
 		applyCRDFunc = func(t *tree.Tree) error {
 			return crdzit.WriteCrd(k8sClient, t)
 		}
 	} else if strings.HasPrefix(path, database) {
-		operator = database
-		pushGitFunc = func(desired *tree.Tree) error {
-			return api.PushDatabaseDesiredFunc(gitClient, desired)(monitor)
-		}
+		desiredFile = git.DatabaseFile
 		applyCRDFunc = func(t *tree.Tree) error {
 			return crddb.WriteCrd(k8sClient, t)
 		}
@@ -166,13 +156,13 @@ func push(
 		return errors.New("operator unknown")
 	}
 
-	desired, found := trees[operator]
+	desired, found := trees[desiredFile.WOExtension()]
 	if !found {
-		return fmt.Errorf("desired state for %s not found", operator)
+		return fmt.Errorf("desired state not found for %s", desiredFile.WOExtension())
 	}
 
 	if gitops {
-		return pushGitFunc(desired)
+		return gitClient.PushDesiredFunc(desiredFile, desired)(monitor)
 	}
 	return applyCRDFunc(desired)
 }

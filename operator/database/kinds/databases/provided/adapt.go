@@ -9,18 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func AdaptFunc() func(
-	monitor mntr.Monitor,
-	desired *tree.Tree,
-	current *tree.Tree,
-) (
-	operator.QueryFunc,
-	operator.DestroyFunc,
-	map[string]*secret.Secret,
-	map[string]*secret.Existing,
-	bool,
-	error,
-) {
+func Adapter() operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
 		desired *tree.Tree,
@@ -28,6 +17,7 @@ func AdaptFunc() func(
 	) (
 		operator.QueryFunc,
 		operator.DestroyFunc,
+		operator.ConfigureFunc,
 		map[string]*secret.Secret,
 		map[string]*secret.Existing,
 		bool,
@@ -35,7 +25,7 @@ func AdaptFunc() func(
 	) {
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -57,6 +47,7 @@ func AdaptFunc() func(
 			}, func(k8sClient kubernetes.ClientInt) error {
 				return nil
 			},
+			func(kubernetes.ClientInt, map[string]interface{}, bool) error { return nil },
 			make(map[string]*secret.Secret),
 			make(map[string]*secret.Existing),
 			false,

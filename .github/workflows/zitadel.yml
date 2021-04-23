@@ -152,6 +152,8 @@ jobs:
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
             VERSION=${{ needs.refs.outputs.version }}
+            GITHUBOAUTHCLIENTID=${{ secrets.GITHUBOAUTHCLIENTID }}
+            GITHUBOAUTHCLIENTSECRET=${{ secrets.GITHUBOAUTHCLIENTSECRET }}
       - shell: bash
         run: |
           mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
