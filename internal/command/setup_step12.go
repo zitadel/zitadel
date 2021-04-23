@@ -18,6 +18,8 @@ type Step12 struct {
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
 	PasswordComplexityPolicy bool
+	LabelPolicy              bool
+	CustomDomain             bool
 }
 
 func (s *Step12) Step() domain.Step {
@@ -42,6 +44,8 @@ func (c *Commands) SetupStep12(ctx context.Context, step *Step12) error {
 			LoginPolicyRegistration:  step.LoginPolicyRegistration,
 			LoginPolicyUsernameLogin: step.LoginPolicyUsernameLogin,
 			PasswordComplexityPolicy: step.PasswordComplexityPolicy,
+			LabelPolicy:              step.LabelPolicy,
+			CustomDomain:             step.CustomDomain,
 		})
 		if err != nil {
 			return nil, err
