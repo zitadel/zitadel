@@ -17,12 +17,10 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.14.6
-	github.com/caos/orbos v1.5.14-0.20210423104531-6cb6c27f258b // indirect
+	github.com/caos/orbos v1.5.14-0.20210423104531-6cb6c27f258b
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
-	github.com/envoyproxy/protoc-gen-validate v0.5.1
 	github.com/ghodss/yaml v1.0.0
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.5.0
 	github.com/golang/protobuf v1.5.2
@@ -60,17 +58,17 @@ require (
 	github.com/ttacon/libphonenumber v1.1.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.13.0
-	go.opentelemetry.io/otel v0.13.0
+	go.opentelemetry.io/otel v0.19.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.13.0
-	go.opentelemetry.io/otel/exporters/otlp v0.13.0
+	go.opentelemetry.io/otel/exporters/otlp v0.19.0
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
-	go.opentelemetry.io/otel/sdk v0.13.0
+	go.opentelemetry.io/otel/sdk v0.19.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/text v0.3.6
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.34.0
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46
+	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46 // indirect
 	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/square/go-jose.v2 v2.5.1
