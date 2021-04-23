@@ -62,9 +62,20 @@ export class UserGrantCreateComponent implements OnDestroy {
 
             if (this.projectId && !this.grantId) {
                 this.context = UserGrantContext.OWNED_PROJECT;
+
+                this.mgmtService.getProjectByID(this.projectId).then(resp => {
+                    if (resp.project) {
+                        this.project = resp.project;
+                    }
+                }).catch((error: any) => {
+                    this.toast.showError(error);
+                });
             } else if (this.projectId && this.grantId) {
                 this.context = UserGrantContext.GRANTED_PROJECT;
                 this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then(resp => {
+                    if (resp.grantedProject) {
+                        this.project = resp.grantedProject;
+                    }
                     if (resp.grantedProject?.grantedRoleKeysList) {
                         this.grantedRoleKeysList = resp.grantedProject?.grantedRoleKeysList;
                     }

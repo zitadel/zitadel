@@ -36,7 +36,7 @@ const (
 	image              = "cockroachdb/cockroach:v20.2.3"
 )
 
-func AdaptFunc(
+func Adapter(
 	componentLabels *labels.Component,
 	namespace string,
 	timestamp string,
@@ -44,18 +44,7 @@ func AdaptFunc(
 	tolerations []corev1.Toleration,
 	version string,
 	features []string,
-) func(
-	monitor mntr.Monitor,
-	desired *tree.Tree,
-	current *tree.Tree,
-) (
-	operator.QueryFunc,
-	operator.DestroyFunc,
-	map[string]*secret.Secret,
-	map[string]*secret.Existing,
-	bool,
-	error,
-) {
+) operator.AdaptFunc {
 
 	return func(
 		monitor mntr.Monitor,
@@ -64,6 +53,7 @@ func AdaptFunc(
 	) (
 		operator.QueryFunc,
 		operator.DestroyFunc,
+		operator.ConfigureFunc,
 		map[string]*secret.Secret,
 		map[string]*secret.Existing,
 		bool,
@@ -79,7 +69,7 @@ func AdaptFunc(
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
 		desired.Parsed = desiredKind
 
@@ -102,15 +92,15 @@ func AdaptFunc(
 
 		queryCert, destroyCert, addUser, deleteUser, listUsers, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 		addRoot, err := addUser("root")
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 		destroyRoot, err := deleteUser("root")
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryRBAC, destroyRBAC, err := rbac.AdaptFunc(internalMonitor, namespace, labels.MustForName(componentLabels, serviceAccountName))
@@ -136,7 +126,7 @@ func AdaptFunc(
 			desiredKind.Spec.Resources,
 		)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryS, destroyS, err := services.AdaptFunc(
@@ -157,12 +147,12 @@ func AdaptFunc(
 
 		queryPDB, err := pdb.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, pdbName), cockroachSelector, "1")
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		destroyPDB, err := pdb.AdaptFuncToDestroy(namespace, pdbName)
 		if err != nil {
-			return nil, nil, nil, nil, false, err
+			return nil, nil, nil, nil, nil, false, err
 		}
 
 		currentDB := &Current{
@@ -176,7 +166,11 @@ func AdaptFunc(
 		}
 		current.Parsed = currentDB
 
-		queriers := make([]operator.QueryFunc, 0)
+		var (
+			queriers    = make([]operator.QueryFunc, 0)
+			destroyers  = make([]operator.DestroyFunc, 0)
+			configurers = make([]operator.ConfigureFunc, 0)
+		)
 		if isFeatureDatabase {
 			queriers = append(queriers,
 				queryRBAC,
@@ -189,7 +183,6 @@ func AdaptFunc(
 			)
 		}
 
-		destroyers := make([]operator.DestroyFunc, 0)
 		if isFeatureDatabase {
 			destroyers = append(destroyers,
 				operator.ResourceDestroyToZitadelDestroy(destroyPDB),
@@ -213,7 +206,7 @@ func AdaptFunc(
 			for backupName, desiredBackup := range desiredKind.Spec.Backups {
 				currentBackup := &tree.Tree{}
 				if timestamp == "" || !oneBackup || (timestamp != "" && strings.HasPrefix(timestamp, backupName)) {
-					queryB, destroyB, secrets, existing, migrateB, err := backups.GetQueryAndDestroyFuncs(
+					queryB, destroyB, configureB, secrets, existing, migrateB, err := backups.Adapt(
 						internalMonitor,
 						desiredBackup,
 						currentBackup,
@@ -228,7 +221,7 @@ func AdaptFunc(
 						features,
 					)
 					if err != nil {
-						return nil, nil, nil, nil, false, err
+						return nil, nil, nil, nil, nil, false, err
 					}
 
 					migrate = migrate || migrateB
@@ -236,6 +229,7 @@ func AdaptFunc(
 					secret.AppendSecrets(backupName, allSecrets, secrets, allExisting, existing)
 					destroyers = append(destroyers, destroyB)
 					queriers = append(queriers, queryB)
+					configurers = append(configurers, configureB)
 				}
 			}
 		}
@@ -262,6 +256,14 @@ func AdaptFunc(
 				return ensure, err
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
+			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+				for i := range configurers {
+					if err := configurers[i](k8sClient, queried, gitops); err != nil {
+						return err
+					}
+				}
+				return nil
+			},
 			allSecrets,
 			allExisting,
 			migrate,
