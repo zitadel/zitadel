@@ -16,6 +16,7 @@ func GitOpsClear(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 	databases []string,
+	users []string,
 ) error {
 	desired, err := api.ReadDatabaseYml(gitClient)
 	if err != nil {
@@ -23,26 +24,28 @@ func GitOpsClear(
 		return err
 	}
 
-	return clear(monitor, k8sClient, databases, desired)
+	return clear(monitor, k8sClient, databases, users, desired)
 }
 
 func CrdClear(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	databases []string,
+	users []string,
 ) error {
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		return err
 	}
 
-	return clear(monitor, k8sClient, databases, desired)
+	return clear(monitor, k8sClient, databases, users, desired)
 }
 
 func clear(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	databases []string,
+	users []string,
 	desired *tree.Tree,
 ) error {
 	current := &tree.Tree{}
@@ -53,7 +56,7 @@ func clear(
 		return err
 	}
 	queried := map[string]interface{}{}
-	core.SetQueriedForDatabaseDBList(queried, databases)
+	core.SetQueriedForDatabaseDBList(queried, databases, users)
 
 	ensure, err := query(k8sClient, queried)
 	if err != nil {

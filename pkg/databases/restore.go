@@ -55,7 +55,7 @@ func restore(
 		return err
 	}
 	queried := map[string]interface{}{}
-	core.SetQueriedForDatabaseDBList(queried, databases)
+	core.SetQueriedForDatabaseDBList(queried, databases, []string{})
 
 	ensure, err := query(k8sClient, queried)
 	if err != nil {

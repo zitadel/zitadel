@@ -10,6 +10,26 @@ import (
 	"time"
 )
 
+var (
+	databasesList = []string{
+		"notification",
+		"adminapi",
+		"auth",
+		"authz",
+		"eventstore",
+		"management",
+	}
+	userList = []string{
+		"notification",
+		"adminapi",
+		"auth",
+		"authz",
+		"eventstore",
+		"management",
+		"queries",
+	}
+)
+
 func GitOpsClearMigrateRestore(
 	monitor mntr.Monitor,
 	gitClient *git.Client,
@@ -18,14 +38,6 @@ func GitOpsClearMigrateRestore(
 	backup string,
 	version *string,
 ) error {
-	databasesList := []string{
-		"notification",
-		"adminapi",
-		"auth",
-		"authz",
-		"eventstore",
-		"management",
-	}
 
 	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
 		return err
@@ -36,7 +48,7 @@ func GitOpsClearMigrateRestore(
 		return err
 	}
 
-	if err := databases.GitOpsClear(monitor, k8sClient, gitClient, databasesList); err != nil {
+	if err := databases.GitOpsClear(monitor, k8sClient, gitClient, databasesList, userList); err != nil {
 		return err
 	}
 
@@ -61,14 +73,6 @@ func CrdClearMigrateRestore(
 	backup string,
 	version *string,
 ) error {
-	databasesList := []string{
-		"notification",
-		"adminapi",
-		"auth",
-		"authz",
-		"eventstore",
-		"management",
-	}
 
 	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
 		return err
@@ -79,7 +83,7 @@ func CrdClearMigrateRestore(
 		return err
 	}
 
-	if err := databases.CrdClear(monitor, k8sClient, databasesList); err != nil {
+	if err := databases.CrdClear(monitor, k8sClient, databasesList, userList); err != nil {
 		return err
 	}
 
