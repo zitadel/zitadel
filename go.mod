@@ -16,8 +16,8 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
+	github.com/caos/oidc v0.14.6
 	github.com/caos/orbos v1.5.14-0.20210414100748-cbdd0a802d65
-	github.com/caos/oidc v0.14.5
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/envoyproxy/protoc-gen-validate v0.5.1
@@ -66,7 +66,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
-	golang.org/x/text v0.3.5
+	golang.org/x/text v0.3.6
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.34.0
 	google.golang.org/appengine v1.6.7 // indirect
