@@ -5,7 +5,6 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 )
 
@@ -15,14 +14,14 @@ func InstantBackup(
 	gitClient *git.Client,
 	name string,
 ) error {
-	desired, err := api.ReadDatabaseYml(gitClient)
+	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
 		return err
 	}
 	current := &tree.Tree{}
 
-	query, _, _, _, _, err := orbdb.AdaptFunc(name, nil, false, "instantbackup")(monitor, desired, current)
+	query, _, _, _, _, _, err := orbdb.AdaptFunc(name, nil, false, "instantbackup")(monitor, desired, current)
 	if err != nil {
 		monitor.Error(err)
 		return err
@@ -49,7 +48,7 @@ func ListBackups(
 	[]string,
 	error,
 ) {
-	desired, err := api.ReadDatabaseYml(gitClient)
+	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
 		return nil, err

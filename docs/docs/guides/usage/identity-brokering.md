@@ -22,7 +22,7 @@ title: Identity Brokering
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/organizations">Organizations</a></li>
+                <li>Knowledge of <a href="/docs/guides/usage/organizations">Organizations</a></li>
             </ul>
         </td>
     </tr>

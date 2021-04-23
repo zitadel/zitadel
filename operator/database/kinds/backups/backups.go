@@ -11,7 +11,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func GetQueryAndDestroyFuncs(
+func Adapt(
 	monitor mntr.Monitor,
 	desiredTree *tree.Tree,
 	currentTree *tree.Tree,
@@ -27,6 +27,7 @@ func GetQueryAndDestroyFuncs(
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
+	operator.ConfigureFunc,
 	map[string]*secret.Secret,
 	map[string]*secret.Existing,
 	bool,
@@ -52,7 +53,7 @@ func GetQueryAndDestroyFuncs(
 			features,
 		)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
 	}
 }
 

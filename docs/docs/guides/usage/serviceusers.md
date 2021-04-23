@@ -22,7 +22,7 @@ title: Service Users
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/oauth-recommended-flows">Recommended Authorization Flows</a></li>
+                <li>Knowledge of <a href="/docs/guides/usage/oauth-recommended-flows">Recommended Authorization Flows</a></li>
             </ul>
         </td>
     </tr>
@@ -110,7 +110,7 @@ Payload
 * `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now
 * `exp` is the unix timestamp of expiry of this assertion. Must be less than 1 hour from `iat`
 
-Please refer to [JWT_with_Private_Key](../apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
+Please refer to [JWT_with_Private_Key](../../apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
 
 > **Information:** The `exp` claim is currently not validated, but will be with a future release. Make sure that `exp` is less than 1 hour starting from `iat`.
 
@@ -130,7 +130,7 @@ curl --request POST \
 ```
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope` should contain any [Scopes](../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
+* `scope` should contain any [Scopes](../../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.

@@ -3,7 +3,8 @@ package zitadel
 import (
 	"sort"
 
-	"github.com/caos/orbos/pkg/helper"
+	"github.com/caos/orbos/pkg/secret/read"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/secret"
 
@@ -81,7 +82,7 @@ func fillInUserPassword(
 		return nil
 	}
 
-	pw, err := helper.GetSecretValue(k8sClient, secret, existing)
+	pw, err := read.GetSecretValue(k8sClient, secret, existing)
 	if err != nil {
 		return err
 	}
