@@ -9,10 +9,14 @@ import (
 )
 
 const (
-	http           = "http://"
-	httpLocalhost  = "http://localhost:"
-	httpLocalhost2 = "http://localhost/"
-	https          = "https://"
+	http                      = "http://"
+	httpLocalhostWithPort     = "http://localhost:"
+	httpLocalhostWithoutPort  = "http://localhost/"
+	httpLoopbackV4WithPort    = "http://127.0.0.1:"
+	httpLoopbackV4WithoutPort = "http://127.0.0.1/"
+	httpLoopbackV6WithPort    = "http://[::1]:"
+	httpLoopbackV6WithoutPort = "http://::1/"
+	https                     = "https://"
 )
 
 type OIDCApp struct {
@@ -214,9 +218,15 @@ func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, 
 	if urlsAreHttps(redirectUris) {
 		return
 	}
-	if urlContainsPrefix(redirectUris, http) && appType != OIDCApplicationTypeWeb {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	if urlContainsPrefix(redirectUris, http) {
+		if appType == OIDCApplicationTypeUserAgent {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+		}
+		if appType == OIDCApplicationTypeNative && !onlyLocalhostIsHttp(redirectUris) {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.NativeShouldBeHttpLocalhost")
+		}
 	}
 	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
 		compliance.NoneCompliant = true
@@ -253,13 +263,15 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplic
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if (urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeNative {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpLocalhostOnlyForNative")
-	}
-	if urlContainsPrefix(redirectUris, http) && !(urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeWeb {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	if urlContainsPrefix(redirectUris, http) {
+		if appType == OIDCApplicationTypeUserAgent {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+		}
+		if !onlyLocalhostIsHttp(redirectUris) && appType == OIDCApplicationTypeNative {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
+		}
 	}
 	if !compliance.NoneCompliant {
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.NotAllCombinationsAreAllowed")
@@ -295,11 +307,18 @@ func containsCustom(uris []string) bool {
 
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
-		if strings.HasPrefix(uri, http) {
-			if !strings.HasPrefix(uri, httpLocalhost) && !strings.HasPrefix(uri, httpLocalhost2) {
-				return false
-			}
+		if strings.HasPrefix(uri, http) && !isHTTPLoopbackLocalhost(uri) {
+			return false
 		}
 	}
 	return true
+}
+
+func isHTTPLoopbackLocalhost(uri string) bool {
+	return strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
+		strings.HasPrefix(uri, httpLocalhostWithPort) ||
+		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
+		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6WithPort)
 }
