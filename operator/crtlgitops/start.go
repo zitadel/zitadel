@@ -2,6 +2,7 @@ package crtlgitops
 
 import (
 	"context"
+	macherrs "k8s.io/apimachinery/pkg/api/errors"
 	"time"
 
 	"github.com/caos/zitadel/operator/database"
@@ -63,47 +64,66 @@ func Restore(
 	gitops bool,
 	version *string,
 ) error {
-	databasesList := []string{
-		"notification",
-		"adminapi",
-		"auth",
-		"authz",
-		"eventstore",
-		"management",
-	}
-
+	noOperator := false
 	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
-		return err
+		if macherrs.IsNotFound(err) {
+			noOperator = true
+		} else {
+			return err
+		}
 	}
 
+	noZitadel := false
 	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", version, gitops, []string{"scaledown"}), k8sClient)(); err != nil {
-		return err
+		if macherrs.IsNotFound(err) {
+			noZitadel = true
+		} else {
+			return err
+		}
 	}
 
-	if err := databases.Clear(monitor, k8sClient, gitClient, databasesList); err != nil {
-		return err
+	noDatabase := false
+	if err := kubernetes2.ScaleDatabaseOperator(monitor, k8sClient, 0); err != nil {
+		if macherrs.IsNotFound(err) {
+			noDatabase = true
+		} else {
+			return err
+		}
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"}), k8sClient)(); err != nil {
+	if err := databases.Clear(monitor, k8sClient, gitClient); err != nil {
 		return err
 	}
-
+	/*
+		if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"}), k8sClient)(); err != nil {
+			return err
+		}
+	*/
 	if err := databases.Restore(
 		monitor,
 		k8sClient,
 		gitClient,
 		backup,
-		databasesList,
 	); err != nil {
 		return err
 	}
 
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, gitops, []string{"scaleup"}), k8sClient)(); err != nil {
-		return err
+	if !noDatabase {
+		if err := kubernetes2.ScaleDatabaseOperator(monitor, k8sClient, 1); err != nil {
+			return err
+		}
 	}
 
-	if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 1); err != nil {
-		return err
+	if !noZitadel {
+		if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, gitops, []string{"scaleup"}), k8sClient)(); err != nil {
+			return err
+		}
+	}
+
+	if !noOperator {
+		if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 1); err != nil {
+			return err
+		}
 	}
 
 	return nil

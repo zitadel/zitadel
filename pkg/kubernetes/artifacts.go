@@ -315,6 +315,15 @@ func ScaleZitadelOperator(
 	return client.ScaleDeployment("caos-system", "zitadel-operator", replicaCount)
 }
 
+func ScaleDatabaseOperator(
+	monitor mntr.Monitor,
+	client *kubernetes.Client,
+	replicaCount int,
+) error {
+	monitor.Debug("Scaling database-operator")
+	return client.ScaleDeployment("caos-system", "database-operator", replicaCount)
+}
+
 func int32Ptr(i int32) *int32 { return &i }
 func int64Ptr(i int64) *int64 { return &i }
 

@@ -19,10 +19,11 @@ const (
 	secretPath         = "/secrets/sa.json"
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
-	image              = "ghcr.io/caos/zitadel-crbackup"
+	image              = "cockroachdb/cockroach"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
 	timeout            = 15 * time.Minute
+	saJsonBase64Env    = "SAJSON"
 )
 
 func AdaptFunc(
@@ -30,7 +31,6 @@ func AdaptFunc(
 	backupName string,
 	namespace string,
 	componentLabels *labels.Component,
-	databases []string,
 	bucketName string,
 	timestamp string,
 	nodeselector map[string]string,
@@ -38,6 +38,8 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	secretName string,
 	secretKey string,
+	dbURL string,
+	dbPort int32,
 	version string,
 ) (
 	queryFunc operator.QueryFunc,
@@ -48,9 +50,12 @@ func AdaptFunc(
 	jobName := jobPrefix + backupName + jobSuffix
 	command := getCommand(
 		timestamp,
-		databases,
 		bucketName,
 		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
 	)
 
 	jobdef := getJob(
@@ -61,7 +66,8 @@ func AdaptFunc(
 		secretName,
 		secretKey,
 		version,
-		command)
+		command,
+	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
 	if err != nil {

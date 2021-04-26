@@ -66,7 +66,6 @@ func TestManaged_Adapt1(t *testing.T) {
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{}
-	version := "testVersion"
 	features := []string{"database"}
 	masterkey := "testMk"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
@@ -133,7 +132,7 @@ func TestManaged_Adapt1(t *testing.T) {
 	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	ensure, err := query(k8sClient, queried)
@@ -178,7 +177,6 @@ func TestManaged_Adapt2(t *testing.T) {
 
 	nodeselector := map[string]string{"test2": "test2"}
 	var tolerations []corev1.Toleration
-	version := "testVersion2"
 	features := []string{"database"}
 	masterkey := "testMk2"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
@@ -245,7 +243,7 @@ func TestManaged_Adapt2(t *testing.T) {
 	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	ensure, err := query(k8sClient, queried)

@@ -21,7 +21,6 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
 
-	databases := []string{"testDb"}
 	bucketName := "testBucket"
 	cron := "testCron"
 	timestamp := "test"
@@ -32,6 +31,8 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 	version := "testVersion"
 	secretKey := "testKey"
 	secretName := "testSecretName"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
@@ -52,9 +53,12 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 			version,
 			getBackupCommand(
 				timestamp,
-				databases,
 				bucketName,
 				backupName,
+				certPath,
+				secretPath,
+				dbURL,
+				dbPort,
 			),
 		),
 	)
@@ -67,7 +71,6 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
 		checkDBReady,
 		bucketName,
 		cron,
@@ -76,6 +79,8 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		version,
 	)
@@ -93,7 +98,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 	features := []string{Instant}
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
-	databases := []string{"testDb2"}
+	dbURL := "testDB"
+	dbPort := int32(80)
 	bucketName := "testBucket2"
 	cron := "testCron2"
 	timestamp := "test2"
@@ -124,9 +130,12 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 			version,
 			getBackupCommand(
 				timestamp,
-				databases,
 				bucketName,
 				backupName,
+				certPath,
+				secretPath,
+				dbURL,
+				dbPort,
 			),
 		),
 	)
@@ -139,7 +148,6 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
 		checkDBReady,
 		bucketName,
 		cron,
@@ -148,6 +156,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		version,
 	)
@@ -165,10 +175,11 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 	features := []string{Normal}
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
-	databases := []string{"testDb"}
 	bucketName := "testBucket"
 	cron := "testCron"
 	timestamp := "test"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
@@ -197,9 +208,12 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 			version,
 			getBackupCommand(
 				timestamp,
-				databases,
 				bucketName,
 				backupName,
+				certPath,
+				secretPath,
+				dbURL,
+				dbPort,
 			),
 		),
 	)
@@ -211,7 +225,6 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
 		checkDBReady,
 		bucketName,
 		cron,
@@ -220,6 +233,8 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		version,
 	)
@@ -237,7 +252,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 	features := []string{Normal}
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
-	databases := []string{"testDb2"}
+	dbURL := "testDB"
+	dbPort := int32(80)
 	bucketName := "testBucket2"
 	cron := "testCron2"
 	timestamp := "test2"
@@ -269,9 +285,12 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 			version,
 			getBackupCommand(
 				timestamp,
-				databases,
 				bucketName,
 				backupName,
+				certPath,
+				secretPath,
+				dbURL,
+				dbPort,
 			),
 		),
 	)
@@ -283,7 +302,6 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
 		checkDBReady,
 		bucketName,
 		cron,
@@ -292,6 +310,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		version,
 	)

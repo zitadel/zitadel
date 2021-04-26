@@ -83,7 +83,6 @@ func AdaptFunc(
 			timestamp,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
-			desiredKind.Spec.Version,
 			features,
 		)
 		if err != nil {

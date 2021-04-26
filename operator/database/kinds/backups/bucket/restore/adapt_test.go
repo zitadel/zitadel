@@ -19,7 +19,6 @@ func TestBackup_Adapt1(t *testing.T) {
 
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
-	databases := []string{"testDb"}
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
@@ -29,6 +28,8 @@ func TestBackup_Adapt1(t *testing.T) {
 	version := "testVersion"
 	secretKey := "testKey"
 	secretName := "testSecretName"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "testVersion"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
@@ -47,9 +48,12 @@ func TestBackup_Adapt1(t *testing.T) {
 		version,
 		getCommand(
 			timestamp,
-			databases,
 			bucketName,
 			backupName,
+			certPath,
+			secretPath,
+			dbURL,
+			dbPort,
 		),
 	)
 
@@ -61,7 +65,6 @@ func TestBackup_Adapt1(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
 		bucketName,
 		timestamp,
 		nodeselector,
@@ -69,6 +72,8 @@ func TestBackup_Adapt1(t *testing.T) {
 		checkDBReady,
 		secretName,
 		secretKey,
+		dbURL,
+		dbPort,
 		version,
 	)
 
@@ -84,7 +89,6 @@ func TestBackup_Adapt2(t *testing.T) {
 
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
-	databases := []string{"testDb1", "testDb2"}
 	nodeselector := map[string]string{"test2": "test2"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
@@ -94,6 +98,8 @@ func TestBackup_Adapt2(t *testing.T) {
 	version := "testVersion2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent2")
 	nameLabels := labels.MustForName(componentLabels, jobName)
@@ -112,9 +118,12 @@ func TestBackup_Adapt2(t *testing.T) {
 		version,
 		getCommand(
 			timestamp,
-			databases,
 			bucketName,
 			backupName,
+			certPath,
+			secretPath,
+			dbURL,
+			dbPort,
 		),
 	)
 
@@ -126,7 +135,6 @@ func TestBackup_Adapt2(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
 		bucketName,
 		timestamp,
 		nodeselector,
@@ -134,6 +142,8 @@ func TestBackup_Adapt2(t *testing.T) {
 		checkDBReady,
 		secretName,
 		secretKey,
+		dbURL,
+		dbPort,
 		version,
 	)
 

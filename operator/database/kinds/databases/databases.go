@@ -29,7 +29,6 @@ func Adapt(
 	timestamp string,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	version string,
 	features []string,
 ) (
 	query operator.QueryFunc,
@@ -45,7 +44,7 @@ func Adapt(
 
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
-		return managed.Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(internalMonitor, desiredTree, currentTree)
+		return managed.Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(internalMonitor, desiredTree, currentTree)
 	case "databases.caos.ch/ProvidedDatabase":
 		return provided.Adapter()(internalMonitor, desiredTree, currentTree)
 	default:

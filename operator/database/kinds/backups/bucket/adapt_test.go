@@ -10,7 +10,6 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -27,6 +26,8 @@ func TestBucket_Secrets(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
 
+	dbURL := "testDB"
+	dbPort := int32(80)
 	kindVersion := "v0"
 	kind := "BucketBackup"
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "BucketBackup", kindVersion), "testComponent")
@@ -70,6 +71,8 @@ func TestBucket_Secrets(t *testing.T) {
 		nodeselector,
 		tolerations,
 		version,
+		dbURL,
+		dbPort,
 		features,
 	)(
 		monitor,
@@ -90,6 +93,8 @@ func TestBucket_AdaptBackup(t *testing.T) {
 	features := []string{backup.Normal}
 	saJson := "testSA"
 
+	dbURL := "testDB"
+	dbPort := int32(80)
 	bucketName := "testBucket2"
 	cron := "testCron2"
 	monitor := mntr.Monitor{}
@@ -142,6 +147,8 @@ func TestBucket_AdaptBackup(t *testing.T) {
 		nodeselector,
 		tolerations,
 		version,
+		dbURL,
+		dbPort,
 		features,
 	)(
 		monitor,
@@ -167,6 +174,8 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 	cron := "testCron"
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
+	dbURL := "testDB"
+	dbPort := int32(80)
 
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "BucketBackup", "v0"), "testComponent")
 	k8sLabels := map[string]string{
@@ -216,6 +225,8 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 		nodeselector,
 		tolerations,
 		version,
+		dbURL,
+		dbPort,
 		features,
 	)(
 		monitor,
@@ -260,6 +271,8 @@ func TestBucket_AdaptRestore(t *testing.T) {
 	backupName := "testName"
 	version := "testVersion"
 	saJson := "testSA"
+	dbURL := "testDB"
+	dbPort := int32(80)
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: &tree.Common{
@@ -291,6 +304,8 @@ func TestBucket_AdaptRestore(t *testing.T) {
 		nodeselector,
 		tolerations,
 		version,
+		dbURL,
+		dbPort,
 		features,
 	)(
 		monitor,
@@ -307,6 +322,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 	assert.NoError(t, ensure(client))
 }
 
+/*
 func TestBucket_AdaptClean(t *testing.T) {
 	masterkey := "testMk"
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
@@ -335,6 +351,8 @@ func TestBucket_AdaptClean(t *testing.T) {
 	backupName := "testName"
 	version := "testVersion"
 	saJson := "testSA"
+	dbURL := "testDB"
+	dbPort := int32(80)
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: &tree.Common{
@@ -366,6 +384,8 @@ func TestBucket_AdaptClean(t *testing.T) {
 		nodeselector,
 		tolerations,
 		version,
+		dbURL,
+		dbPort,
 		features,
 	)(
 		monitor,
@@ -380,4 +400,4 @@ func TestBucket_AdaptClean(t *testing.T) {
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(client))
-}
+}*/
