@@ -28,6 +28,10 @@ func (e *PasswordAgePolicyAddedEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
+func (e *PasswordAgePolicyAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewPasswordAgePolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	expireWarnDays,
@@ -66,6 +70,10 @@ func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
 }
 
 func (e *PasswordAgePolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *PasswordAgePolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -121,6 +129,10 @@ func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *PasswordAgePolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *PasswordAgePolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

@@ -37,6 +37,10 @@ func (e *MigrateUniqueConstraintEvent) UniqueConstraints() []*eventstore.EventUn
 	return constraints
 }
 
+func (e *MigrateUniqueConstraintEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewMigrateUniqueConstraintEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

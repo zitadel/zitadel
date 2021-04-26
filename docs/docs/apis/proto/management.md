@@ -4443,7 +4443,7 @@ This is an empty request
 
 
 ### RemoveOrgIDPResponse
-This is an empty request
+This is an empty response
 
 
 

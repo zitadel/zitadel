@@ -42,6 +42,10 @@ func (e *FeaturesSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return nil
 }
 
+func (e *FeaturesSetEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewFeaturesSetEvent(
 	base *eventstore.BaseEvent,
 	changes []FeaturesChanges,
@@ -160,6 +164,10 @@ func (e *FeaturesRemovedEvent) Data() interface{} {
 }
 
 func (e *FeaturesRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *FeaturesRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

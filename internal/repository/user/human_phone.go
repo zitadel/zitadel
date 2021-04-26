@@ -35,6 +35,10 @@ func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
+func (e *HumanPhoneChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, phone string) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -70,6 +74,10 @@ func (e *HumanPhoneRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
+func (e *HumanPhoneRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanPhoneRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneRemovedEvent {
 	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -97,6 +105,10 @@ func (e *HumanPhoneVerifiedEvent) Data() interface{} {
 }
 
 func (e *HumanPhoneVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanPhoneVerifiedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -129,6 +141,10 @@ func (e *HumanPhoneVerificationFailedEvent) UniqueConstraints() []*eventstore.Ev
 	return nil
 }
 
+func (e *HumanPhoneVerificationFailedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanPhoneVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneVerificationFailedEvent {
 	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -157,6 +173,10 @@ func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 }
 
 func (e *HumanPhoneCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanPhoneCodeAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -198,6 +218,10 @@ func (e *HumanPhoneCodeSentEvent) Data() interface{} {
 }
 
 func (e *HumanPhoneCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanPhoneCodeSentEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
