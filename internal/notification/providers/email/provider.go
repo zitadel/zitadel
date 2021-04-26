@@ -81,7 +81,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	} else {
 		client, err = smtpConfig.getSMPTClientWithTls(host)
 		if errors.As(err, &tls.RecordHeaderError{}) {
-			logging.Log("MAIN-xKIzT").OnError(err).Warn("could not connect using normal tls. Trying starttls instead.")
+			logging.Log("EMAIL-xKIzT").OnError(err).Warn("could not connect using normal tls. Trying starttls instead...")
 			client, err = smtpConfig.getSMPTClientWithStartTls(host)
 		}
 	}
