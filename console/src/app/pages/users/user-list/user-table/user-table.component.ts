@@ -181,7 +181,6 @@ export class UserTableComponent implements OnInit {
     }
 
     this.userService.listUsers(limit, offset, [query]).then(resp => {
-      console.log(resp);
       if (resp.details?.totalResult) {
         this.totalResult = resp.details?.totalResult;
       } else {
