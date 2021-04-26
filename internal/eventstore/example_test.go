@@ -66,6 +66,10 @@ func (e *UserAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint
 	return nil
 }
 
+func (e *UserAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 // ------------------------------------------------------------
 // User first name changed event start
 // ------------------------------------------------------------
@@ -107,6 +111,10 @@ func (e *UserFirstNameChangedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
+func (e *UserFirstNameChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 // ------------------------------------------------------------
 // User password checked event start
 // ------------------------------------------------------------
@@ -140,6 +148,10 @@ func (e *UserPasswordCheckedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
+func (e *UserPasswordCheckedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 // ------------------------------------------------------------
 // User deleted event
 // ------------------------------------------------------------
@@ -170,6 +182,10 @@ func (e *UserDeletedEvent) Data() interface{} {
 }
 
 func (e *UserDeletedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *UserDeletedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

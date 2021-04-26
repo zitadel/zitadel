@@ -5,9 +5,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 func TestCRDB_placeholder(t *testing.T) {
@@ -269,6 +270,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		ctx               context.Context
 		events            []*repository.Event
 		uniqueConstraints *repository.UniqueConstraint
+		assets            []*repository.Asset
 		uniqueDataType    string
 		uniqueDataField   string
 	}
@@ -389,7 +391,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					return
 				}
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
+			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.assets, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -423,6 +425,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	type args struct {
 		events []*repository.Event
+		assets []*repository.Asset
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -507,7 +510,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
+			if err := db.Push(context.Background(), tt.args.events, tt.args.assets); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -651,7 +654,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			for _, events := range tt.args.events {
 				wg.Add(1)
 				go func(events []*repository.Event) {
-					err := db.Push(context.Background(), events)
+					err := db.Push(context.Background(), events, nil)
 					if err != nil {
 						errsMu.Lock()
 						errs = append(errs, err)
@@ -698,6 +701,7 @@ func TestCRDB_Filter(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
+		assets         []*repository.Asset
 	}
 	type res struct {
 		eventCount int
@@ -763,7 +767,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents, tt.fields.assets); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -786,6 +790,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
+		existingAssets []*repository.Asset
 	}
 	type res struct {
 		sequence uint64
@@ -849,7 +854,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents, tt.fields.existingAssets); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -869,6 +874,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	type args struct {
 		events []*repository.Event
+		assets []*repository.Asset
 	}
 	type res struct {
 		resourceOwners []string
@@ -991,7 +997,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events); err != nil {
+			if err := db.Push(context.Background(), tt.args.events, tt.args.assets); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 
