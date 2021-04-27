@@ -33,6 +33,7 @@ const (
 	defaultMode         = int32(256)
 	nodeSecret          = "cockroachdb.node"
 	rootSecret          = "cockroachdb.client.root"
+	cleanTimeout        = time.Second * 30
 )
 
 type Affinity struct {

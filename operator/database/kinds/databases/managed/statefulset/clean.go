@@ -42,7 +42,7 @@ func CleanPVCs(
 
 			monitor.Info("Delete persistent volume claims")
 			for _, pvcName := range internalPvcs {
-				if err := k8sClient.DeletePersistentVolumeClaim(namespace, pvcName); err != nil {
+				if err := k8sClient.DeletePersistentVolumeClaim(namespace, pvcName, cleanTimeout); err != nil {
 					return err
 				}
 			}
