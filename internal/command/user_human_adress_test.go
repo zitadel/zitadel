@@ -143,6 +143,7 @@ func TestCommandSide_ChangeHumanAddress(t *testing.T) {
 								),
 							),
 						},
+						nil,
 					),
 				),
 			},
