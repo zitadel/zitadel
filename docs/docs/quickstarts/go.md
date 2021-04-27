@@ -5,12 +5,12 @@ title: Go
 This integration guide shows you how to integrate **ZITADEL** into your Go application.
 It demonstrates how to fetch some data from the ZITADEL management API.
 
-At the end of the guide you should have an application able read the details of your organisation.
+At the end of the guide you should have an application able to read the details of your organisation.
 
 ## Prerequisites
 
 The client [SDK](https://github.com/caos/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API using our [OIDC client library](https://github.com/caos/oidc).
-All that is required, is a service account with an Org Owner role assigned and its key JSON.
+All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
 However, we recommend you read the guide on [how to access ZITADEL API](../guides/usage/access-zitadel-apis) and the associated guides for a basic knowledge of :
  - [Recommended Authorization Flows](../guides/usage/oauth-recommended-flows)

@@ -50,6 +50,10 @@ func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID)}
 }
 
+func (e *GrantAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewGrantAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -94,6 +98,10 @@ func (e *GrantChangedEvent) Data() interface{} {
 }
 
 func (e *GrantChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *GrantChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -142,6 +150,10 @@ func (e *GrantCascadeChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
+func (e *GrantCascadeChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewGrantCascadeChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -183,6 +195,10 @@ func (e *GrantDeactivateEvent) Data() interface{} {
 }
 
 func (e *GrantDeactivateEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *GrantDeactivateEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -228,6 +244,10 @@ func (e *GrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
+func (e *GrantReactivatedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewGrantReactivatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -269,6 +289,10 @@ func (e *GrantRemovedEvent) Data() interface{} {
 
 func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
+}
+
+func (e *GrantRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
 }
 
 func NewGrantRemovedEvent(

@@ -32,6 +32,10 @@ func (e *HumanAddressChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
+func (e *HumanAddressChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewAddressChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

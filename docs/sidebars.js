@@ -25,7 +25,8 @@ module.exports = {
     {
       type: 'category',
       label: 'Backends',
-      items: ['quickstarts/go'],
+      items: ['quickstarts/go', 'quickstarts/dot-net'],
+      collapsed: false,
     },
     {
       type: 'category',

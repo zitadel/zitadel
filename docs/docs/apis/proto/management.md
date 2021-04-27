@@ -3262,8 +3262,8 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| user_name |  string | - | string.pattern: ^[^[:space:]]{1,200}$<br />  |
-| email |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_name |  string | - | string.max_len: 200<br />  |
+| email |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -4443,7 +4443,7 @@ This is an empty request
 
 
 ### RemoveOrgIDPResponse
-This is an empty request
+This is an empty response
 
 
 

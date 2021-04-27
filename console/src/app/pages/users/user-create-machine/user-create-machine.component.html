@@ -5,7 +5,7 @@
     <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
         <div class="content">
             <cnsl-form-field class="formfield">
-                <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
+                <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}*</cnsl-label>
                 <input cnslInput formControlName="userName" required />
                 <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
@@ -15,7 +15,7 @@
                 </span>
             </cnsl-form-field>
             <cnsl-form-field class="formfield">
-                <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>
+                <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}*</cnsl-label>
                 <input cnslInput formControlName="name" required />
                 <span cnsl-error *ngIf="name?.invalid && name?.errors?.required">
                     {{ 'USER.VALIDATION.REQUIRED' | translate }}

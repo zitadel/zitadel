@@ -55,6 +55,10 @@ func (e *SecondFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
+func (e *SecondFactorAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 type SecondFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	MFAType              domain.SecondFactorType `json:"mfaType"`
@@ -88,6 +92,10 @@ func (e *SecondFactorRemovedEvent) Data() interface{} {
 }
 
 func (e *SecondFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *SecondFactorRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -128,6 +136,10 @@ func (e *MultiFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
+func (e *MultiFactorAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 type MultiFactorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	MFAType              domain.MultiFactorType `json:"mfaType"`
@@ -161,5 +173,9 @@ func (e *MultiFactorRemovedEvent) Data() interface{} {
 }
 
 func (e *MultiFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *MultiFactorRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }

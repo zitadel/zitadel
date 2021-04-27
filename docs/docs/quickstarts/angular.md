@@ -302,10 +302,6 @@ If you get stuck consider checking out our [template](https://github.com/caos/zi
 
 ### Whats next?
 
-<<<<<<< HEAD:docs/docs/quickstarts/angular.md
 Now you can proceed implementing our APIs to include Authorization. Refer to our [Docs](../apis/apis) or checkout our Console Code on [Github](https://github.com/caos/zitadel) which is using GRPC to access data.
-=======
-Now you can proceed implementing our APIs to include Authorization. Refer to our [Docs](introduction) or checkout our Console Code on [Github](https://github.com/caos/zitadel) which is using GRPC to access data.
->>>>>>> main:site/docs/angular/02-code.md
 
 For more information about creating an angular application we refer to [Angular](https://angular.io/start) and for more information about the used oauth/oidc library consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).
