@@ -80,10 +80,6 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 		client, err = smtpConfig.getSMPTClient()
 	} else {
 		client, err = smtpConfig.getSMPTClientWithTls(host)
-		if errors.As(err, &tls.RecordHeaderError{}) {
-			logging.Log("EMAIL-xKIzT").OnError(err).Warn("could not connect using normal tls. Trying starttls instead...")
-			client, err = smtpConfig.getSMPTClientWithStartTls(host)
-		}
 	}
 	if err != nil {
 		return nil, err
@@ -99,20 +95,26 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 func (smtpConfig SMTP) getSMPTClient() (*smtp.Client, error) {
 	client, err := smtp.Dial(smtpConfig.Host)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwos", "Could not make smtp dial")
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwos", "could not make smtp dial")
 	}
 	return client, nil
 }
 
 func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
+
+	if errors.As(err, &tls.RecordHeaderError{}) {
+		logging.Log("MAIN-xKIzT").OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
+		return smtpConfig.getSMPTClientWithStartTls(host)
+	}
+
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-sl39s", "Could not make tls dial")
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-sl39s", "could not make tls dial")
 	}
 
 	client, err := smtp.NewClient(conn, host)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwi4", "Could not create smtp client")
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwi4", "could not create smtp client")
 	}
 	return client, err
 }
@@ -126,7 +128,7 @@ func (smtpConfig SMTP) getSMPTClientWithStartTls(host string) (*smtp.Client, err
 	if err := client.StartTLS(&tls.Config{
 		ServerName: host,
 	}); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-guvsQ", "Could not start tls")
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-guvsQ", "could not start tls")
 	}
 	return client, nil
 }
@@ -138,6 +140,6 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	// Auth
 	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
 	err := client.Auth(auth)
-	logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).OnError(err).Debug("Could not add smtp auth")
+	logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).OnError(err).Debug("could not add smtp auth")
 	return err
 }
