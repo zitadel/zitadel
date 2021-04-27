@@ -204,7 +204,10 @@ export class OrgDetailComponent implements OnInit {
       map(resp => {
         if (resp.details?.totalResult) {
           this.totalMemberResult = resp.details?.totalResult;
+        } else {
+          this.totalMemberResult = 0;
         }
+
         return resp.resultList;
       }),
       catchError(() => of([])),
