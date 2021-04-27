@@ -63,6 +63,7 @@ export class MembershipsComponent implements OnInit {
         } else {
             this.mgmtService.listUserMemberships(userId, 100, 0, []).then(resp => {
                 this.memberships = resp.resultList;
+                this.totalResult = resp.details?.totalResult || 0;
                 this.loading = false;
             });
         }

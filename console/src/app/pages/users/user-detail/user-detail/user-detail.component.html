@@ -19,7 +19,7 @@
                     (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
                     translate}}</button>
                 <button class="state-button" mat-stroked-button color="warn"
-                    *ngIf="user?.state !== UserState.USER_STATE_ACTIVE"
+                    *ngIf="user?.state == UserState.USER_STATE_INACTIVE"
                     (click)="changeState(UserState.USER_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
         </div>
