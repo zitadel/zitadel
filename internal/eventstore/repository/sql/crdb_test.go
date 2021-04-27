@@ -270,13 +270,16 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		ctx               context.Context
 		events            []*repository.Event
 		uniqueConstraints *repository.UniqueConstraint
-		assets            []*repository.Asset
+		assets            *repository.Asset
 		uniqueDataType    string
 		uniqueDataField   string
+		assetID           string
+		asset             []byte
 	}
 	type eventsRes struct {
 		pushedEventsCount int
 		uniqueCount       int
+		assetCount        int
 		aggType           repository.AggregateType
 		aggID             []string
 	}
@@ -378,6 +381,46 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
+		{
+			name: "push 1 event and add asset",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "12"),
+				},
+				assets:  generateAddAsset(t, "asset12", []byte{1}),
+				assetID: "asset12",
+				asset:   []byte{1},
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					assetCount:        1,
+					aggID:             []string{"12"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
+		{
+			name: "push 1 event and remove asset",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "13"),
+				},
+				assets:  generateRemoveAsset(t, "asset13"),
+				assetID: "asset13",
+				asset:   []byte{1},
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					assetCount:        0,
+					aggID:             []string{"13"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -391,7 +434,14 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					return
 				}
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.assets, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
+			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
+				err := fillAssets(tt.args.assetID, tt.args.asset)
+				if err != nil {
+					t.Error("unable to prefill insert unique data: ", err)
+					return
+				}
+			}
+			if err := db.Push(tt.args.ctx, tt.args.events, []*repository.Asset{tt.args.assets}, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -417,7 +467,18 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
 				}
 			}
-
+			if tt.args.assets != nil {
+				countAssetRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.assets where id = $1", tt.args.assets.ID)
+				var assetCount int
+				err := countAssetRow.Scan(&assetCount)
+				if err != nil {
+					t.Error("unable to query inserted rows: ", err)
+					return
+				}
+				if assetCount != tt.res.eventsRes.assetCount {
+					t.Errorf("expected asset count %d got %d", tt.res.eventsRes.assetCount, assetCount)
+				}
+			}
 		})
 	}
 }
@@ -1097,5 +1158,24 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 		Action:      repository.UniqueConstraintRemoved,
 	}
 
+	return e
+}
+
+func generateAddAsset(t *testing.T, id string, asset []byte) *repository.Asset {
+	t.Helper()
+	e := &repository.Asset{
+		ID:     id,
+		Asset:  asset,
+		Action: repository.AssetAdded,
+	}
+	return e
+}
+
+func generateRemoveAsset(t *testing.T, id string) *repository.Asset {
+	t.Helper()
+	e := &repository.Asset{
+		ID:     id,
+		Action: repository.AssetRemoved,
+	}
 	return e
 }
