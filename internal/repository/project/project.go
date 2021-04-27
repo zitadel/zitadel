@@ -48,6 +48,10 @@ func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
+func (e *ProjectAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewProjectAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -96,6 +100,10 @@ func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
 		}
 	}
+	return nil
+}
+
+func (e *ProjectChangeEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -167,6 +175,10 @@ func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
+func (e *ProjectDeactivatedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewProjectDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *ProjectDeactivatedEvent {
 	return &ProjectDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -192,6 +204,10 @@ func (e *ProjectReactivatedEvent) Data() interface{} {
 }
 
 func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *ProjectReactivatedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -223,6 +239,10 @@ func (e *ProjectRemovedEvent) Data() interface{} {
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+}
+
+func (e *ProjectRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
 }
 
 func NewProjectRemovedEvent(

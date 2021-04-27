@@ -20,6 +20,8 @@ type EventPusher interface {
 	// * struct which can be marshalled to json
 	// * pointer to struct which can be marshalled to json
 	Data() interface{}
+	//Assets contain assets in form of []byte, these will be stored to a separate table
+	Assets() []*Asset
 	//UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
 	UniqueConstraints() []*EventUniqueConstraint
 }

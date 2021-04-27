@@ -5,9 +5,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 func TestCRDB_placeholder(t *testing.T) {
@@ -269,12 +270,16 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		ctx               context.Context
 		events            []*repository.Event
 		uniqueConstraints *repository.UniqueConstraint
+		assets            *repository.Asset
 		uniqueDataType    string
 		uniqueDataField   string
+		assetID           string
+		asset             []byte
 	}
 	type eventsRes struct {
 		pushedEventsCount int
 		uniqueCount       int
+		assetCount        int
 		aggType           repository.AggregateType
 		aggID             []string
 	}
@@ -376,6 +381,46 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
+		{
+			name: "push 1 event and add asset",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "12"),
+				},
+				assets:  generateAddAsset(t, "asset12", []byte{1}),
+				assetID: "asset12",
+				asset:   []byte{1},
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					assetCount:        1,
+					aggID:             []string{"12"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
+		{
+			name: "push 1 event and remove asset",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "13"),
+				},
+				assets:  generateRemoveAsset(t, "asset13"),
+				assetID: "asset13",
+				asset:   []byte{1},
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					assetCount:        0,
+					aggID:             []string{"13"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -389,7 +434,14 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					return
 				}
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
+			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
+				err := fillAssets(tt.args.assetID, tt.args.asset)
+				if err != nil {
+					t.Error("unable to prefill insert unique data: ", err)
+					return
+				}
+			}
+			if err := db.Push(tt.args.ctx, tt.args.events, []*repository.Asset{tt.args.assets}, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -415,7 +467,18 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
 				}
 			}
-
+			if tt.args.assets != nil {
+				countAssetRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.assets where id = $1", tt.args.assets.ID)
+				var assetCount int
+				err := countAssetRow.Scan(&assetCount)
+				if err != nil {
+					t.Error("unable to query inserted rows: ", err)
+					return
+				}
+				if assetCount != tt.res.eventsRes.assetCount {
+					t.Errorf("expected asset count %d got %d", tt.res.eventsRes.assetCount, assetCount)
+				}
+			}
 		})
 	}
 }
@@ -423,6 +486,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	type args struct {
 		events []*repository.Event
+		assets []*repository.Asset
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -507,7 +571,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
+			if err := db.Push(context.Background(), tt.args.events, tt.args.assets); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -651,7 +715,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			for _, events := range tt.args.events {
 				wg.Add(1)
 				go func(events []*repository.Event) {
-					err := db.Push(context.Background(), events)
+					err := db.Push(context.Background(), events, nil)
 					if err != nil {
 						errsMu.Lock()
 						errs = append(errs, err)
@@ -698,6 +762,7 @@ func TestCRDB_Filter(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
+		assets         []*repository.Asset
 	}
 	type res struct {
 		eventCount int
@@ -763,7 +828,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents, tt.fields.assets); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -786,6 +851,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
+		existingAssets []*repository.Asset
 	}
 	type res struct {
 		sequence uint64
@@ -849,7 +915,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents, tt.fields.existingAssets); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -869,6 +935,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	type args struct {
 		events []*repository.Event
+		assets []*repository.Asset
 	}
 	type res struct {
 		resourceOwners []string
@@ -991,7 +1058,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events); err != nil {
+			if err := db.Push(context.Background(), tt.args.events, tt.args.assets); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 
@@ -1091,5 +1158,24 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 		Action:      repository.UniqueConstraintRemoved,
 	}
 
+	return e
+}
+
+func generateAddAsset(t *testing.T, id string, asset []byte) *repository.Asset {
+	t.Helper()
+	e := &repository.Asset{
+		ID:     id,
+		Asset:  asset,
+		Action: repository.AssetAdded,
+	}
+	return e
+}
+
+func generateRemoveAsset(t *testing.T, id string) *repository.Asset {
+	t.Helper()
+	e := &repository.Asset{
+		ID:     id,
+		Action: repository.AssetRemoved,
+	}
 	return e
 }

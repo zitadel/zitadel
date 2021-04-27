@@ -68,6 +68,10 @@ func (e *testEvent) UniqueConstraints() []*EventUniqueConstraint {
 	return nil
 }
 
+func (e *testEvent) Assets() []*Asset {
+	return nil
+}
+
 func testFilterMapper(event *repository.Event) (EventReader, error) {
 	if event == nil {
 		return newTestEvent("testID", "hodor", nil, false), nil
@@ -538,7 +542,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			events, _, err := eventsToRepository(tt.args.events)
+			events, _, _, err := eventsToRepository(tt.args.events)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
@@ -571,7 +575,7 @@ func (repo *testRepo) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testRepo) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+func (repo *testRepo) Push(ctx context.Context, events []*repository.Event, assets []*repository.Asset, uniqueConstraints ...*repository.UniqueConstraint) error {
 	if repo.err != nil {
 		return repo.err
 	}

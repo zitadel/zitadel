@@ -44,6 +44,10 @@ func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return []*eventstore.EventUniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
 }
 
+func (e *MemberAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewMemberAddedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
@@ -85,6 +89,10 @@ func (e *MemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	return nil
 }
 
+func (e *MemberChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewMemberChangedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
@@ -122,6 +130,10 @@ func (e *MemberRemovedEvent) Data() interface{} {
 
 func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+}
+
+func (e *MemberRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
 }
 
 func NewRemovedEvent(

@@ -57,6 +57,10 @@ func (e *UserLockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return nil
 }
 
+func (e *UserLockedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewUserLockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *UserLockedEvent {
 	return &UserLockedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -82,6 +86,10 @@ func (e *UserUnlockedEvent) Data() interface{} {
 }
 
 func (e *UserUnlockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *UserUnlockedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -113,6 +121,10 @@ func (e *UserDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
+func (e *UserDeactivatedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewUserDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *UserDeactivatedEvent {
 	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -138,6 +150,10 @@ func (e *UserReactivatedEvent) Data() interface{} {
 }
 
 func (e *UserReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *UserReactivatedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -170,6 +186,10 @@ func (e *UserRemovedEvent) Data() interface{} {
 
 func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain)}
+}
+
+func (e *UserRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
 }
 
 func NewUserRemovedEvent(
@@ -212,6 +232,10 @@ func (e *UserTokenAddedEvent) Data() interface{} {
 }
 
 func (e *UserTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *UserTokenAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -273,6 +297,10 @@ func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	}
 }
 
+func (e *DomainClaimedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewDomainClaimedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -316,6 +344,10 @@ func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
+func (e *DomainClaimedSentEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewDomainClaimedSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -352,6 +384,10 @@ func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
+}
+
+func (e *UsernameChangedEvent) Assets() []*eventstore.Asset {
+	return nil
 }
 
 func NewUsernameChangedEvent(
