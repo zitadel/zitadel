@@ -4,6 +4,7 @@ updates:
   directory: "/console"
   schedule:
     interval: weekly
+    time: "02:00"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
@@ -12,6 +13,7 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
+    time: "02:00"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
@@ -20,6 +22,7 @@ updates:
   directory: "/build"
   schedule:
     interval: "weekly"
+    time: "02:00"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
@@ -28,6 +31,7 @@ updates:
   directory: "/build/operator"
   schedule:
     interval: "weekly"
+    time: "02:00"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
