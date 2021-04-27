@@ -24,28 +24,37 @@ func (m *MockRepository) ExpectFilterEvents(events ...*repository.Event) *MockRe
 	return m
 }
 
-func (m *MockRepository) ExpectPush(expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
+func (m *MockRepository) ExpectPush(expectedEvents []*repository.Event, expectedAssets []*repository.Asset, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
 	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+		func(ctx context.Context, events []*repository.Event, assets []*repository.Asset, uniqueConstraints ...*repository.UniqueConstraint) error {
 			assert.Equal(m.ctrl.T, expectedEvents, events)
 			if expectedUniqueConstraints == nil {
 				expectedUniqueConstraints = []*repository.UniqueConstraint{}
 			}
 			assert.Equal(m.ctrl.T, expectedUniqueConstraints, uniqueConstraints)
+			if expectedAssets == nil {
+				expectedAssets = []*repository.Asset{}
+			}
+			assert.Equal(m.ctrl.T, expectedAssets, assets)
 			return nil
 		},
 	)
 	return m
 }
 
-func (m *MockRepository) ExpectPushFailed(err error, expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
+func (m *MockRepository) ExpectPushFailed(err error, expectedEvents []*repository.Event, expectedAssets []*repository.Asset, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
 	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+		func(ctx context.Context, events []*repository.Event, assets []*repository.Asset, uniqueConstraints ...*repository.UniqueConstraint) error {
 			assert.Equal(m.ctrl.T, expectedEvents, events)
 			if expectedUniqueConstraints == nil {
 				expectedUniqueConstraints = []*repository.UniqueConstraint{}
 			}
 			assert.Equal(m.ctrl.T, expectedUniqueConstraints, uniqueConstraints)
+
+			if expectedAssets == nil {
+				expectedAssets = []*repository.Asset{}
+			}
+			assert.Equal(m.ctrl.T, expectedAssets, assets)
 			return err
 		},
 	)
