@@ -39,7 +39,7 @@ dotnet add package Zitadel.Api
 
 ### Create example client
 
-Create a new go file with the content below. This will create a client for the management api and call its `GetMyOrg` function.
+Change the program.cs file to the content below. This will create a client for the management api and call its `GetMyOrg` function.
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
 
 ```csharp
