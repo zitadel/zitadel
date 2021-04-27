@@ -43,6 +43,11 @@ Create a new go file with the content below. This will create a client for the m
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
 
 ```csharp
+using System;
+using Zitadel.Api;
+using Zitadel.Authentication;
+using Zitadel.Authentication.Credentials;
+
 // no.. this key is not activated anymore ;-)
 var sa = await ServiceAccount.LoadFromJsonFileAsync("./service-account.json");
 var api = Clients.ManagementService(
@@ -51,7 +56,7 @@ var api = Clients.ManagementService(
         // Which api endpoint (self hosted or public)
         Endpoint = ZitadelDefaults.ZitadelApiEndpoint,
         // The organization context (where the api calls are executed)
-        Organization = "69234230193872955",
+        Organization = "74161146763996133",
         // Service account authentication
         ServiceAccountAuthentication = (sa, new()
         {
@@ -59,13 +64,13 @@ var api = Clients.ManagementService(
         }),
     });
 
-var roles = await api.SearchProjectRolesAsync(
-    new() { ProjectId = "84856448403694484" });
+var myOrg = await api.GetMyOrgAsync(
+    new() {}
+);
 
-foreach (var r in roles.Result)
-{
-    Console.WriteLine($"{r.Key} : {r.DisplayName} : {r.Group}");
-}
+Console.WriteLine($"{myOrg.Org.Name} was created on: {myOrg.Org.Details.CreationDate} ");
+
+
 ```
 
 #### Custom ZITADEL instance
