@@ -5,7 +5,7 @@ title: .NET
 This integration guide shows you how to integrate **ZITADEL** into your .NET application.
 It demonstrates how to fetch some data from the ZITADEL management API.
 
-At the end of the guide you should have an application able read the details of your organisation.
+At the end of the guide you should have an application able to read the details of your organisation.
 
 If you need any other information about the .NET SDK go to the [documentation](https://caos.github.io/zitadel-net/) of the SDK itself.
 ## Prerequisites
