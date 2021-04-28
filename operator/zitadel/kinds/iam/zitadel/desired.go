@@ -1,6 +1,8 @@
 package zitadel
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
@@ -22,6 +24,16 @@ type Spec struct {
 	Tolerations   []corev1.Toleration          `yaml:"tolerations,omitempty"`
 	Affinity      *k8s.Affinity                `yaml:"affinity,omitempty"`
 	Resources     *k8s.Resources               `yaml:"resources,omitempty"`
+}
+
+func (s *Spec) validate() (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("validating spec failed: %w", err)
+		}
+	}()
+
+	return s.Configuration.Validate()
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {

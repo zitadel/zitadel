@@ -59,7 +59,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			path = args[0]
 		}
 
-		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
 		if err != nil && !rv.Gitops {
 			return err
 		}

@@ -1,10 +1,11 @@
 package hosts
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/stretchr/testify/assert"
-	"testing"
 
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"
@@ -46,6 +47,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			Console:  "",
 			Issuer:   "",
 		},
+		ACMEAuthority: "none",
 	}
 
 	componentLabels := mocklabels.Component
@@ -66,7 +68,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      issuerHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(issuerHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(issuerHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -76,16 +78,13 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
 					"matchLabels": map[string]interface{}{
 						"hostname": ".",
 					},
-				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
 				},
 			},
 		}}
@@ -101,7 +100,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      consoleHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(consoleHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(consoleHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -111,16 +110,13 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
 					"matchLabels": map[string]interface{}{
 						"hostname": ".",
 					},
-				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
 				},
 			},
 		}}
@@ -136,7 +132,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      apiHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(apiHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(apiHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -146,16 +142,13 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
 					"matchLabels": map[string]interface{}{
 						"hostname": ".",
 					},
-				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
 				},
 			},
 		}}
@@ -171,7 +164,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      accountsHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(accountsHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(accountsHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -181,16 +174,13 @@ func TestHosts_AdaptFunc(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
 					"matchLabels": map[string]interface{}{
 						"hostname": ".",
 					},
-				},
-				"tlsSecret": map[string]interface{}{
-					"name": "",
 				},
 			},
 		}}
@@ -218,6 +208,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			Console:  "console",
 			Issuer:   "issuer",
 		},
+		ACMEAuthority: "none",
 	}
 
 	componentLabels := mocklabels.Component
@@ -238,7 +229,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      issuerHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(issuerHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(issuerHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -248,7 +239,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -273,7 +264,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      consoleHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(consoleHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(consoleHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -283,7 +274,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -308,7 +299,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      apiHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(apiHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(apiHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -318,7 +309,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -343,7 +334,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 			"metadata": map[string]interface{}{
 				"name":      accountsHostName.Name(),
 				"namespace": namespace,
-				"labels":    labels.MustK8sMap(accountsHostName),
+				"labels":    toMapOfInterfaces(labels.MustK8sMap(accountsHostName)),
 				"annotations": map[string]interface{}{
 					"aes_res_changed": "true",
 				},
@@ -353,7 +344,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 				"acmeProvider": map[string]interface{}{
 					"authority": "none",
 				},
-				"ambassador_id": []string{
+				"ambassador_id": []interface{}{
 					"default",
 				},
 				"selector": map[string]interface{}{
@@ -376,4 +367,12 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(k8sClient))
+}
+
+func toMapOfInterfaces(m map[string]string) map[string]interface{} {
+	interfaces := make(map[string]interface{})
+	for k, v := range m {
+		interfaces[k] = v
+	}
+	return interfaces
 }

@@ -58,6 +58,10 @@ func AdaptFunc(
 		}
 		desired.Parsed = desiredKind
 
+		if err := desiredKind.Spec.validate(); err != nil {
+			return nil, nil, nil, nil, nil, false, err
+		}
+
 		allSecrets, allExisting := getSecretsMap(desiredKind)
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
