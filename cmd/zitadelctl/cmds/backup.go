@@ -42,7 +42,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 			return errors.New("backup command is only supported with the --gitops flag yet")
 		}
 
-		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
 		if err != nil {
 			return err
 		}
