@@ -160,6 +160,7 @@ func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder
 			project.ProjectAddedType,
 			project.ProjectRemovedType,
 			project.GrantAddedType,
+			project.GrantChangedType,
 			project.GrantRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType)

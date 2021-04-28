@@ -16,7 +16,7 @@ title: {{.Name}}
 
 {{ .Description}}
 
-{{$httpOption := .Option "google.api.http"}}
+{{$httpOption := .Option "validate.rules"}}
 {{range $httpOption.Rules}}
     {{ .Method }}: {{ .Pattern }}
 {{end}}
@@ -25,17 +25,19 @@ title: {{.Name}}
 {{end}}
 {{end}}
 
-{{if .HasServices}}
+{{if .HasMessages}}
 ## Messages
 {{range .Messages}}
 
 ### {{.LongName}}
 {{.Description}}
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
+{{if .HasFields}}
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 {{range .Fields -}}
-| {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | {{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}} | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} |
+| {{if .IsOneof}}[**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) {{.OneofDecl}}.{{end}}{{.Name}} | {{if .IsMap}}map {{else}}{{.Label}} {{end}}{{.LongType}} | {{if .Description}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}{{else}}-{{end}} | {{$validateOption := .Option "validate.rules"}}{{range $validateOption.Rules}}{{ .Name }}: {{ .Value }}<br /> {{end}} |
+{{end}}
 {{end}}
 {{end}}
 {{end}}

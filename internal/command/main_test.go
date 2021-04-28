@@ -103,15 +103,15 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 	return repo.sequence, nil
 }
 
-func expectPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+func expectPush(events []*repository.Event, assets []*repository.Asset, uniqueConstraints ...*repository.UniqueConstraint) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPush(events, uniqueConstraints...)
+		m.ExpectPush(events, assets, uniqueConstraints...)
 	}
 }
 
-func expectPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+func expectPushFailed(err error, events []*repository.Event, assets []*repository.Asset, uniqueConstraints ...*repository.UniqueConstraint) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPushFailed(err, events, uniqueConstraints...)
+		m.ExpectPushFailed(err, events, assets, uniqueConstraints...)
 	}
 }
 

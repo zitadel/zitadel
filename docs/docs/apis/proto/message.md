@@ -6,5 +6,32 @@ title: zitadel/message.proto
 
 
 
+## Messages
+
+
+### ErrorDetail
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| message |  string | - |  |
+
+
+
+
+### LocalizedMessage
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - |  |
+| localized_message |  string | - |  |
+
+
+
+
 
 

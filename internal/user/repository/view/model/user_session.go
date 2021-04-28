@@ -120,8 +120,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		if v.UserAgentID != data.UserAgentID {
 			v.PasswordVerification = time.Time{}
 		}
-	case es_model.MFAOTPVerified,
-		es_model.HumanMFAOTPVerified:
+	case es_model.HumanMFAOTPVerified:
 		data := new(es_model.OTPVerified)
 		err := data.SetData(event)
 		if err != nil {

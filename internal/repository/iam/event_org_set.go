@@ -27,6 +27,10 @@ func (e *GlobalOrgSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return nil
 }
 
+func (e *GlobalOrgSetEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewGlobalOrgSetEventEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

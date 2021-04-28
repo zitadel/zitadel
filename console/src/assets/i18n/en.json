@@ -1079,6 +1079,7 @@
       "TITLE": "OIDC Configuration",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_NOSECRET":"With your chosen authentication flow, no secret is required and is therefore not available.",
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
@@ -1208,6 +1209,7 @@
   "MEMBER": {
     "ADD": "Add a Manager",
     "CREATIONTYPE": "Creation Type",
+    "DOCSINFO":"For more info consider reading our docs",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organisation",

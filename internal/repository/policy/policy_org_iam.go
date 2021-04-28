@@ -28,6 +28,10 @@ func (e *OrgIAMPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
+func (e *OrgIAMPolicyAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewOrgIAMPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	userLoginMustBeDomain bool,
@@ -63,6 +67,10 @@ func (e *OrgIAMPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *OrgIAMPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OrgIAMPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -112,6 +120,10 @@ func (e *OrgIAMPolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *OrgIAMPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OrgIAMPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

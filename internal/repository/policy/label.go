@@ -19,6 +19,7 @@ type LabelPolicyAddedEvent struct {
 	PrimaryColor        string `json:"primaryColor,omitempty"`
 	SecondaryColor      string `json:"secondaryColor,omitempty"`
 	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix,omitempty"`
+	LogoDarkThemeID     string
 }
 
 func (e *LabelPolicyAddedEvent) Data() interface{} {
@@ -26,6 +27,10 @@ func (e *LabelPolicyAddedEvent) Data() interface{} {
 }
 
 func (e *LabelPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *LabelPolicyAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -70,6 +75,10 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *LabelPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *LabelPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -131,6 +140,10 @@ func (e *LabelPolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *LabelPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *LabelPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

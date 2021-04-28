@@ -13,7 +13,8 @@ module.exports = {
       title: 'ZITADEL',
       logo: {
         alt: 'ZITADEL logo',
-        src: 'img/zitadel-logo-solo-darkdesign.svg',
+        src: 'img/zitadel-logo-solo-light.png',
+        srcDark: 'img/zitadel-logo-solo-darkdesign.svg',
       },
       items: [
         {
@@ -112,6 +113,9 @@ module.exports = {
     algolia: {
       apiKey: 'bff480bce03126c2d348345647854e91',
       indexName: 'zitadel'
+    },
+    prism: {
+      additionalLanguages: ['csharp'],
     },
   },
   presets: [

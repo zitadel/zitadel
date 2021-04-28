@@ -59,6 +59,10 @@ func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
+func (e *HumanAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func (e *HumanAddedEvent) AddAddressData(
 	country,
 	locality,
@@ -166,6 +170,10 @@ func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
+func (e *HumanRegisteredEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func (e *HumanRegisteredEvent) AddAddressData(
 	country,
 	locality,
@@ -252,6 +260,10 @@ func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return nil
 }
 
+func (e *HumanInitialCodeAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanInitialCodeAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -293,6 +305,10 @@ func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
+func (e *HumanInitialCodeSentEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -318,6 +334,10 @@ func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
 }
 
 func (e *HumanInitializedCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanInitializedCheckSucceededEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -349,6 +369,10 @@ func (e *HumanInitializedCheckFailedEvent) UniqueConstraints() []*eventstore.Eve
 	return nil
 }
 
+func (e *HumanInitializedCheckFailedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanInitializedCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitializedCheckFailedEvent {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -376,6 +400,10 @@ func (e *HumanSignedOutEvent) Data() interface{} {
 }
 
 func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanSignedOutEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

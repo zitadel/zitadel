@@ -119,7 +119,7 @@ func TestAppendEvent(t *testing.T) {
 			args: args{
 				event: &es_models.Event{
 					CreationDate: now(),
-					Type:         es_model.MFAOTPVerified,
+					Type:         es_model.HumanMFAOTPVerified,
 					Data:         nil,
 				},
 				userView: &UserSessionView{UserAgentID: "id"},
@@ -131,7 +131,7 @@ func TestAppendEvent(t *testing.T) {
 			args: args{
 				event: &es_models.Event{
 					CreationDate: now(),
-					Type:         es_model.MFAOTPVerified,
+					Type:         es_model.HumanMFAOTPVerified,
 					Data: func() []byte {
 						d, _ := json.Marshal(&es_model.OTPVerified{
 							UserAgentID: "id",
