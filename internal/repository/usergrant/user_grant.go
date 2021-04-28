@@ -52,10 +52,6 @@ func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return []*eventstore.EventUniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
 }
 
-func (e *UserGrantAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewUserGrantAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -102,10 +98,6 @@ func (e *UserGrantChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func (e *UserGrantChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewUserGrantChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -143,10 +135,6 @@ func (e *UserGrantCascadeChangedEvent) Data() interface{} {
 }
 
 func (e *UserGrantCascadeChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *UserGrantCascadeChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -192,10 +180,6 @@ func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
 }
 
-func (e *UserGrantRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewUserGrantRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -236,10 +220,6 @@ func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUn
 	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
 }
 
-func (e *UserGrantCascadeRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewUserGrantCascadeRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -277,10 +257,6 @@ func (e *UserGrantDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func (e *UserGrantDeactivatedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewUserGrantDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *UserGrantDeactivatedEvent {
 	return &UserGrantDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -306,10 +282,6 @@ func (e *UserGrantReactivatedEvent) Data() interface{} {
 }
 
 func (e *UserGrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *UserGrantReactivatedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
