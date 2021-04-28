@@ -45,7 +45,7 @@ func (d *DNS) validate() (err error) {
 		}
 	}()
 
-	if d.TlsSecret != "" && d.ACMEAuthority != "none" {
+	if d.TlsSecret != "" && d.ACMEAuthority != "none" && d.ACMEAuthority != "" {
 		return errors.New("if tls secret is provided, acme authority must be 'none'")
 	}
 	return nil

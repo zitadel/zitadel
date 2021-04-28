@@ -67,6 +67,9 @@ func AdaptFunc(
 			issuerDomain := dns.Subdomains.Issuer + "." + dns.Domain
 			originCASecretName := dns.TlsSecret
 			authority := dns.ACMEAuthority
+			if authority == "" {
+				authority = "none"
+			}
 
 			accountsSelector := map[string]string{
 				"hostname": accountsDomain,
