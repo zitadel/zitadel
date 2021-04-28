@@ -114,6 +114,9 @@ module.exports = {
       apiKey: 'bff480bce03126c2d348345647854e91',
       indexName: 'zitadel'
     },
+    prism: {
+      additionalLanguages: ['csharp'],
+    },
   },
   presets: [
     [

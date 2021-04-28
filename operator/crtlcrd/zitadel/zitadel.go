@@ -3,6 +3,7 @@ package zitadel
 import (
 	"context"
 	"fmt"
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -35,29 +36,38 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 
-	desired, err := zitadel.ReadCrd(r.ClientInt)
-	if err != nil {
-		return res, err
-	}
-
-	query, _, _, _, _, _, err := orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})(internalMonitor, desired, &tree.Tree{})
-	if err != nil {
-		internalMonitor.Error(err)
-		return res, err
-	}
-
-	ensure, err := query(r.ClientInt, map[string]interface{}{})
-	if err != nil {
-		internalMonitor.Error(err)
-		return res, err
-	}
-
-	if err := ensure(r.ClientInt); err != nil {
-		internalMonitor.Error(err)
+	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})); err != nil {
 		return res, err
 	}
 
 	return res, nil
+}
+
+func Takeoff(
+	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
+	adaptFunc operator.AdaptFunc,
+) error {
+	desired, err := zitadel.ReadCrd(k8sClient)
+	if err != nil {
+		return err
+	}
+
+	query, _, _, _, _, _, err := adaptFunc(monitor, desired, &tree.Tree{})
+	if err != nil {
+		return err
+	}
+
+	ensure, err := query(k8sClient, map[string]interface{}{})
+	if err != nil {
+		return err
+	}
+
+	if err := ensure(k8sClient); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *Reconciler) SetupWithManager(mgr ctrl.Manager) error {

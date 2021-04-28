@@ -2,10 +2,10 @@ package cmds
 
 import (
 	"errors"
-
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-
+	"github.com/caos/zitadel/operator/crtlcrd"
 	"github.com/caos/zitadel/operator/crtlgitops"
+
 	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -39,19 +39,26 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 		version := rv.Version
 
-		if !rv.Gitops {
-			return errors.New("restore command is only supported with the --gitops flag yet")
-		}
-
 		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
 		if err != nil {
 			return err
 		}
 
-		list, err := databases.ListBackups(monitor, gitClient)
-		if err != nil {
-			monitor.Error(err)
-			return nil
+		list := make([]string, 0)
+		if rv.Gitops {
+			listT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
+			if err != nil {
+				monitor.Error(err)
+				return nil
+			}
+			list = listT
+		} else {
+			listT, err := databases.CrdListBackups(monitor, k8sClient)
+			if err != nil {
+				monitor.Error(err)
+				return nil
+			}
+			list = listT
 		}
 
 		if backup == "" {
@@ -79,10 +86,17 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			return nil
 		}
 
-		if err := crtlgitops.Restore(monitor, gitClient, orbConfig, k8sClient, backup, rv.Gitops, &version); err != nil {
-			monitor.Error(err)
+		ensure := func() error { return nil }
+		if rv.Gitops {
+			ensure = func() error {
+				return crtlgitops.Restore(monitor, gitClient, k8sClient, backup)
+			}
+		} else {
+			ensure = func() error {
+				return crtlcrd.Restore(monitor, k8sClient, backup)
+			}
 		}
-		return nil
+		return scaleForFunction(monitor, gitClient, orbConfig, k8sClient, &version, rv.Gitops, ensure)
 	}
 	return cmd
 }

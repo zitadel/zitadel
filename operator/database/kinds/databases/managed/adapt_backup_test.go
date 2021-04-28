@@ -87,7 +87,7 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
-	queried := bucket.SetQueriedForDatabases(databases)
+	queried := bucket.SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
@@ -126,7 +126,7 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
-	queried := bucket.SetQueriedForDatabases(databases)
+	queried := bucket.SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
@@ -166,7 +166,8 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
-	queried := bucket.SetQueriedForDatabases(databases)
+	users := []string{"test1", "test2"}
+	queried := bucket.SetQueriedForDatabases(databases, users)
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)

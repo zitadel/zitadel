@@ -39,11 +39,11 @@ func (es *Eventstore) Health(ctx context.Context) error {
 //PushEvents pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher) ([]EventReader, error) {
-	events, constraints, err := eventsToRepository(pushEvents)
+	events, assets, constraints, err := eventsToRepository(pushEvents)
 	if err != nil {
 		return nil, err
 	}
-	err = es.repo.Push(ctx, events, constraints...)
+	err = es.repo.Push(ctx, events, assets, constraints...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,12 +57,12 @@ func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher)
 	return eventReaders, nil
 }
 
-func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
+func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, assets []*repository.Asset, constraints []*repository.UniqueConstraint, err error) {
 	events = make([]*repository.Event, len(pushEvents))
 	for i, event := range pushEvents {
 		data, err := EventData(event)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
@@ -77,9 +77,12 @@ func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, c
 		if len(event.UniqueConstraints()) > 0 {
 			constraints = append(constraints, uniqueConstraintsToRepository(event.UniqueConstraints())...)
 		}
+		if len(event.Assets()) > 0 {
+			assets = append(assets, assetsToRepository(event.Assets())...)
+		}
 	}
 
-	return events, constraints, nil
+	return events, assets, constraints, nil
 }
 
 func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
@@ -93,6 +96,18 @@ func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (unique
 		}
 	}
 	return uniqueConstraints
+}
+
+func assetsToRepository(assets []*Asset) (result []*repository.Asset) {
+	result = make([]*repository.Asset, len(assets))
+	for i, asset := range assets {
+		result[i] = &repository.Asset{
+			ID:     asset.ID,
+			Asset:  asset.Asset,
+			Action: assetActionToRepository(asset.Action),
+		}
+	}
+	return result
 }
 
 //FilterEvents filters the stored events based on the searchQuery
@@ -227,5 +242,16 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 		return repository.UniqueConstraintRemoved
 	default:
 		return repository.UniqueConstraintAdd
+	}
+}
+
+func assetActionToRepository(action AssetAction) repository.AssetAction {
+	switch action {
+	case AssetAdd:
+		return repository.AssetAdded
+	case AssetRemove:
+		return repository.AssetRemoved
+	default:
+		return repository.AssetAdded
 	}
 }

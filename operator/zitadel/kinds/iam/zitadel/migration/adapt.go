@@ -62,7 +62,7 @@ func AdaptFunc(
 		return nil, nil, err
 	}
 
-	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
+	destroyJ, err := job.AdaptFuncToDestroy(namespace, jobName)
 	if err != nil {
 		return nil, nil, err
 	}

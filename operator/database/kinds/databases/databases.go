@@ -2,6 +2,7 @@ package databases
 
 import (
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
@@ -54,6 +55,7 @@ func Adapt(
 
 func GetBackupList(
 	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
 	desiredTree *tree.Tree,
 ) (
 	[]string,
@@ -61,7 +63,7 @@ func GetBackupList(
 ) {
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
-		return managed.BackupList()(monitor, desiredTree)
+		return managed.BackupList()(monitor, k8sClient, desiredTree)
 	case "databases.caos.ch/ProvidedDatabse":
 		return nil, errors.Errorf("no backups supported for database kind %s", desiredTree.Common.Kind)
 	default:

@@ -20,6 +20,7 @@ func TestBackup_Adapt1(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
 	databases := []string{"testDb"}
+	users := []string{"testUser"}
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
@@ -45,6 +46,7 @@ func TestBackup_Adapt1(t *testing.T) {
 		version,
 		getCommand(
 			databases,
+			users,
 		),
 	)
 
@@ -57,6 +59,7 @@ func TestBackup_Adapt1(t *testing.T) {
 		namespace,
 		componentLabels,
 		databases,
+		users,
 		nodeselector,
 		tolerations,
 		checkDBReady,
@@ -78,6 +81,7 @@ func TestBackup_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
 	databases := []string{"testDb1", "testDb2"}
+	users := []string{"testUser1", "testUser2"}
 	nodeselector := map[string]string{"test2": "test2"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
@@ -103,6 +107,7 @@ func TestBackup_Adapt2(t *testing.T) {
 		version,
 		getCommand(
 			databases,
+			users,
 		),
 	)
 
@@ -115,6 +120,7 @@ func TestBackup_Adapt2(t *testing.T) {
 		namespace,
 		componentLabels,
 		databases,
+		users,
 		nodeselector,
 		tolerations,
 		checkDBReady,

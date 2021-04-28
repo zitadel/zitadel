@@ -226,6 +226,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								),
 							),
 						},
+						nil,
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),

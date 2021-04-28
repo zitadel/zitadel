@@ -16,6 +16,7 @@ type CurrentDBList struct {
 
 type DatabaseCurrentDBList struct {
 	Databases []string
+	Users     []string
 }
 
 func (c *CurrentDBList) GetURL() string {
@@ -53,7 +54,9 @@ func (c *CurrentDBList) GetListDatabasesFunc() func(k8sClient kubernetes.ClientI
 }
 
 func (c *CurrentDBList) GetListUsersFunc() func(k8sClient kubernetes.ClientInt) ([]string, error) {
-	return nil
+	return func(k8sClient kubernetes.ClientInt) ([]string, error) {
+		return c.Current.Users, nil
+	}
 }
 
 func (c *CurrentDBList) GetAddUserFunc() func(user string) (operator.QueryFunc, error) {

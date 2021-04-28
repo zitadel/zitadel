@@ -141,18 +141,7 @@ func Adapter(
 			cockroachHTTPPort,
 		)
 
-		//externalName := "cockroachdb-public." + namespaceStr + ".svc.cluster.local"
-		//queryES, destroyES, err := service.AdaptFunc("cockroachdb-public", "default", labels, []service.Port{}, "ExternalName", map[string]string{}, false, "", externalName)
-		//if err != nil {
-		//	return nil, nil, err
-		//}
-
 		queryPDB, err := pdb.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, pdbName), cockroachSelector, "1")
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
-		destroyPDB, err := pdb.AdaptFuncToDestroy(namespace, pdbName)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
@@ -184,7 +173,6 @@ func Adapter(
 				operator.EnsureFuncToQueryFunc(ensureInit),
 			)
 			destroyers = append(destroyers,
-				operator.ResourceDestroyToZitadelDestroy(destroyPDB),
 				destroyS,
 				operator.ResourceDestroyToZitadelDestroy(destroySFS),
 				destroyRBAC,

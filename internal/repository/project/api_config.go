@@ -36,6 +36,10 @@ func (e *APIConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return nil
 }
 
+func (e *APIConfigAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewAPIConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -83,6 +87,10 @@ func (e *APIConfigChangedEvent) Data() interface{} {
 }
 
 func (e *APIConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *APIConfigChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -146,6 +154,10 @@ func (e *APIConfigSecretChangedEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
+func (e *APIConfigSecretChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewAPIConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -190,6 +202,10 @@ func (e *APIConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.E
 	return nil
 }
 
+func (e *APIConfigSecretCheckSucceededEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewAPIConfigSecretCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -229,6 +245,10 @@ func (e *APIConfigSecretCheckFailedEvent) Data() interface{} {
 }
 
 func (e *APIConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *APIConfigSecretCheckFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
