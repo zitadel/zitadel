@@ -611,7 +611,7 @@
       "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
       "LABELPOLICY": "Label Richtlinie - benutzerdefiniert",
-      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar" 
+      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -1070,7 +1070,7 @@
       "TYPETITLE": "Welche Art von Anwendung möchtest Du erstellen?",
       "REDIRECTTITLE": "Wohin soll nach dem Log-in weitergeleitet werden?",
       "REDIRECTDESCRIPTIONWEB": "Die Weiterleitung muss mit https:// beginnen. http:// ist nur im Entwicklermodus zulässig.",
-      "REDIRECTDESCRIPTIONNATIVE": "Die Weiterleitung muss mit einem eigenen Protokoll oder http://localhost beginnen.",
+      "REDIRECTDESCRIPTIONNATIVE": "Die Weiterleitung muss mit einem eigenen Protokoll, http://127.0.0.1, http://[::1] oder http://localhost beginnen.",
       "REDIRECTNOTVALID": "Diese Weiterleitung ist nicht zulässig.",
       "COMMAORENTERSEPERATION": "mit ↵ trennen",
       "POSTREDIRECTTITLE": "Das ist die Weiterleitung nach einem Log-out.",
