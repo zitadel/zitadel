@@ -107,6 +107,14 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 	return scopes
 }
 
+func (o *OPStorage) CreateTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
+	return "", "", time.Time{}, err
+}
+
+func (o *OPStorage) RefreshTokenRequestByRefreshToken(context.Context, string) (op.RefreshTokenRequest, error) {
+	return nil, nil
+}
+
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
