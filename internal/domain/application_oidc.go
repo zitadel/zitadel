@@ -9,14 +9,16 @@ import (
 )
 
 const (
-	http                      = "http://"
-	httpLocalhostWithPort     = "http://localhost:"
-	httpLocalhostWithoutPort  = "http://localhost/"
-	httpLoopbackV4WithPort    = "http://127.0.0.1:"
-	httpLoopbackV4WithoutPort = "http://127.0.0.1/"
-	httpLoopbackV6WithPort    = "http://[::1]:"
-	httpLoopbackV6WithoutPort = "http://::1/"
-	https                     = "https://"
+	http                          = "http://"
+	httpLocalhostWithPort         = "http://localhost:"
+	httpLocalhostWithoutPort      = "http://localhost/"
+	httpLoopbackV4WithPort        = "http://127.0.0.1:"
+	httpLoopbackV4WithoutPort     = "http://127.0.0.1/"
+	httpLoopbackV6WithPort        = "http://[::1]:"
+	httpLoopbackV6WithoutPort     = "http://[::1]/"
+	httpLoopbackV6LongWithPort    = "http://[0:0:0:0:0:0:0:1]:"
+	httpLoopbackV6LongWithoutPort = "http://[0:0:0:0:0:0:0:1]/"
+	https                         = "https://"
 )
 
 type OIDCApp struct {
@@ -320,5 +322,7 @@ func isHTTPLoopbackLocalhost(uri string) bool {
 		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
 		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
 		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithPort)
+		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
 }
