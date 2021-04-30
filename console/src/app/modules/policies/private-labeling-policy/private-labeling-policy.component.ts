@@ -34,12 +34,61 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public data!: any;
   public panelOpenState = false;
+  public isHoveringOverLogo: boolean = false;
+  public isHoveringOverIcon: boolean = false;
 
   private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
   public nextLinks: CnslLinks[] = [];
+
+  public primaryColorDark: string = '';
+  public secondaryColorDark: string = '';
+  public warnColorDark: string = '#f44336';
+
+  public primaryColorLight: string = '';
+  public secondaryColorLight: string = '';
+  public warnColorLight: string = '#f44336';
+
+  public font: string = 'Lato';
+  public fontCssRule: string = "'Lato', sans-serif";
+  public fonts: Array<{ name: string; css: string; }> = [
+    { name: 'Lato', css: "'Lato', sans-serif" },
+    { name: 'Merriweather', css: "'Merriweather', sans-serif" },
+    { name: 'System', css: "ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;" },
+  ];
+
+  public colors: Array<{ name: string; color: string; }> = [
+    { name: 'red', color: '#f44336' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' },
+    { name: 'deeppurple', color: '#673ab7' },
+    { name: 'indigo', color: '#3f51b5' },
+    { name: 'blue', color: '#2196f3' },
+    { name: 'lightblue', color: '#03a9f4' },
+    { name: 'cyan', color: '#00bcd4' },
+    { name: 'teal', color: '#009688' },
+    { name: 'green', color: '#4caf50' },
+    { name: 'lightgreen', color: '#8bc34a' },
+    { name: 'lime', color: '#cddc39' },
+    { name: 'yellow', color: '#ffeb3b' },
+    { name: 'amber', color: '#ffc107' },
+    { name: 'orange', color: '#fb8c00' },
+    { name: 'deeporange', color: '#ff5722' },
+    { name: 'brown', color: '#795548' },
+    { name: 'grey', color: '#9e9e9e' },
+    { name: 'bluegrey', color: '#607d8b' },
+    { name: 'white', color: '#ffffff' }
+  ];
+
+  public warncolors: Array<{ name: string; color: string; }> = [
+    { name: 'red', color: '#f44336' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' },
+    { name: 'deeppurple', color: '#673ab7' }
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
@@ -70,6 +119,28 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     })).subscribe(() => {
       this.fetchData();
     });
+  }
+
+  public toggleHoverLogo(isHovering: boolean) {
+    console.log('hover logo');
+    this.isHoveringOverLogo = isHovering;
+    console.log(event);
+  }
+
+  public onDropLogo(event: boolean) {
+    console.log('drop logo');
+    console.log(event);
+  }
+
+  public toggleHoverIcon(isHovering: boolean) {
+    console.log('hover icon');
+    this.isHoveringOverIcon = isHovering;
+    console.log(event);
+  }
+
+  public onDropIcon(event: any) {
+    console.log('drop icon');
+    console.log(event);
   }
 
   public fetchData(): void {

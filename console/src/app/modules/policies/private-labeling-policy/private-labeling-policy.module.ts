@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
+import { DropzoneModule } from '../../../directives/dropzone/dropzone.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
 import { InputModule } from '../../input/input.module';
 import { LinksModule } from '../../links/links.module';
@@ -30,6 +31,7 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     MatTooltipModule,
     TranslateModule,
     DetailLayoutModule,
+    DropzoneModule,
     MatProgressSpinnerModule,
     LinksModule,
     MatExpansionModule,

@@ -1,5 +1,5 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'POLICY.PWD_COMPLEXITY.TITLE' | translate" [description]="'POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate">
+    [title]="'POLICY.PRIVATELABELING.TITLE' | translate" [description]="'POLICY.PRIVATELABELING.DESCRIPTION' | translate">
 
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
@@ -16,44 +16,235 @@
 
     <div *ngIf="data" class="content">
       <mat-accordion class="settings">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              This is the expansion title
+              <div class="panel-title"><mat-icon class="icon">branding_watermark</mat-icon>Logo</div>
             </mat-panel-title>
             <mat-panel-description>
-              This is a summary of the content
+              
             </mat-panel-description>
           </mat-expansion-panel-header>
-          <p>This is the primary content of the panel.</p>
+
+          <p class="description">Your Logo will be used in the Login itself, while the icon is used for smaller UI elements like in the organisation switcher in console</p>
+          
+          <span class="title">Dark Design</span>
+          <div class="logo-setup-wrapper">
+            <div class="part">
+              <span class="label">Logo</span>
+              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo($event)"
+              (dropped)="onDropLogo($event)"
+              [class.hovering]="isHoveringOverLogo">
+                <i class="icon las la-cloud-upload-alt"></i>
+                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+              </div>
+            </div>
+
+            <div class="part">
+              <span class="label">Icon</span>
+              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon($event)"
+              (dropped)="onDropIcon($event)"
+              [class.hovering]="isHoveringOverIcon">
+                <i class="icon las la-cloud-upload-alt"></i>
+                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+              </div>
+            </div>
+          </div>
+
+          <span class="title">Light Design</span>
+
+          <div class="logo-setup-wrapper">
+            <div class="part">
+              <span class="label">Logo</span>
+              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo($event)"
+              (dropped)="onDropLogo($event)"
+              [class.hovering]="isHoveringOverLogo">
+                <i class="icon las la-cloud-upload-alt"></i>
+                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+              </div>
+            </div>
+
+            <div class="part">
+              <span class="label">Icon</span>
+              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon($event)"
+              (dropped)="onDropIcon($event)"
+              [class.hovering]="isHoveringOverIcon">
+                <i class="icon las la-cloud-upload-alt"></i>
+                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+              </div>
+            </div>
+          </div>
         </mat-expansion-panel>
-        <mat-expansion-panel (opened)="panelOpenState = true"
-                             (closed)="panelOpenState = false">
+
+        <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              Self aware panel
+              <div class="panel-title"><mat-icon class="icon">palette</mat-icon>Colors</div>
             </mat-panel-title>
-            <mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <span>Dark Design</span>
+
+          <div class="colors">
+            <div class="color">
+              <!-- <span class="title">Primary Color</span> -->
+              <cnsl-form-field class="formfield">
+                <cnsl-label>Primary Color Hexcode</cnsl-label>
+                <input cnslInput [(ngModel)]="primaryColorDark" />
+              </cnsl-form-field>
+              <div class="color-selector">
+                <div *ngFor="let color of colors" class="circle mat-elevation-z3"
+                    [ngClass]="{'active': primaryColorDark == color.color}"
+                    (click)="primaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
+                    <mat-icon *ngIf="primaryColorDark == color.color">check</mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <div class="color">
+              <!-- <span class="title">Secondary Color</span> -->
+              <cnsl-form-field class="formfield">
+                <cnsl-label>Secondary Color Hexcode</cnsl-label>
+                <input cnslInput [(ngModel)]="secondaryColorDark" />
+              </cnsl-form-field>
+              <div class="color-selector">
+                <div *ngFor="let color of colors" class="circle mat-elevation-z3"
+                  [ngClass]="{'active': secondaryColorDark == color.color}"
+                  (click)="secondaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
+                  <mat-icon *ngIf="secondaryColorDark == color.color">check</mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <div class="color">
+              <!-- <span class="title">Warn Color</span> -->
+              <cnsl-form-field class="formfield">
+                <cnsl-label>Warn Color Hexcode</cnsl-label>
+                <input cnslInput [(ngModel)]="warnColorDark" />
+              </cnsl-form-field>
+              <div class="color-selector">
+                <div *ngFor="let color of warncolors" class="circle mat-elevation-z3"
+                  [ngClass]="{'active': warnColorDark == color.color}"
+                  (click)="warnColorDark= color.color" [ngStyle]="{'background-color': color.color}">
+                  <mat-icon *ngIf="warnColorDark == color.color">check</mat-icon>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <span>Light Design</span>
+
+        <div class="colors">
+          <div class="color">
+            <!-- <span class="title">Primary Color</span> -->
+            <cnsl-form-field class="formfield">
+              <cnsl-label>Primary Color Hexcode</cnsl-label>
+              <input cnslInput [(ngModel)]="primaryColorLight" />
+            </cnsl-form-field>
+            <div class="color-selector">
+              <div *ngFor="let color of colors" class="circle mat-elevation-z3"
+                  [ngClass]="{'active': primaryColorLight == color.color}"
+                  (click)="primaryColorLight= color.color" [ngStyle]="{'background-color': color.color}">
+                  <mat-icon *ngIf="primaryColorLight == color.color">check</mat-icon>
+              </div>
+            </div>
+          </div>
+
+          <div class="color">
+            <!-- <span class="title">Secondary Color</span> -->
+            <cnsl-form-field class="formfield">
+              <cnsl-label>Secondary Color Hexcode</cnsl-label>
+              <input cnslInput [(ngModel)]="secondaryColorLight" />
+            </cnsl-form-field>
+            <div class="color-selector">
+              <div *ngFor="let color of colors" class="circle mat-elevation-z3"
+                [ngClass]="{'active': secondaryColorLight == color.color}"
+                (click)="secondaryColorLight= color.color" [ngStyle]="{'background-color': color.color}">
+                <mat-icon *ngIf="secondaryColorLight == color.color">check</mat-icon>
+              </div>
+            </div>
+          </div>
+
+          <div class="color">
+            <!-- <span class="title">Warn Color</span> -->
+            <cnsl-form-field class="formfield">
+              <cnsl-label>Warn Color Hexcode</cnsl-label>
+              <input cnslInput [(ngModel)]="warnColorLight" />
+            </cnsl-form-field>
+            <div class="color-selector">
+              <div *ngFor="let color of warncolors" class="circle mat-elevation-z3"
+                [ngClass]="{'active': warnColorLight == color.color}"
+                (click)="warnColorLight= color.color" [ngStyle]="{'background-color': color.color}">
+                <mat-icon *ngIf="warnColorLight == color.color">check</mat-icon>
+              </div>
+            </div>
+          </div>
+      </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel class="expansion">
+          <mat-expansion-panel-header class="header">
+            <mat-panel-title>
+              <div class="panel-title"><mat-icon class="icon">text_fields</mat-icon>Font</div>
+            </mat-panel-title>
+            <!-- <mat-panel-description>
+              {{fontCssRule}}
+            </mat-panel-description> -->
+          </mat-expansion-panel-header>
+          <div class="fonts">
+            <div class="font-preview" [style.font-family]="fontCssRule">
+              <mat-icon>text_fields</mat-icon>
+              <span>ABC • abc • 123</span>
+              <span>_</span>
+              <span>Select your favorite font for the UI</span>
+            </div>
+            <cnsl-form-field class="formfield">
+              <cnsl-label>CSS Rule for font-family</cnsl-label>
+              <input cnslInput [(ngModel)]="fontCssRule" />
+            </cnsl-form-field>
+            <div class="font-selector">
+              <button matTooltip="{{f.name}}" *ngFor="let f of fonts" class="font"
+                [ngClass]="{'active': fontCssRule == f.css}" [style.font-family]="f.css"
+                (click)="fontCssRule = f.css">
+                Aa
+            </button>
+            </div>
+        </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel class="expansion">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <div class="panel-title">
+              <mat-icon class="icon">accessibility_new</mat-icon>Advanced Behavior
+            </div>
+            </mat-panel-title>
+            <!-- <mat-panel-description>
               Currently I am {{panelOpenState ? 'open' : 'closed'}}
-            </mat-panel-description>
+            </mat-panel-description> -->
           </mat-expansion-panel-header>
           <p>I'm visible because I am open</p>
         </mat-expansion-panel>
       </mat-accordion>
 
       <div class="preview">
-        <div class="login-wrapper">
-          <img src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
-          <h1>Anmeldung</h1>
-          <p class="desc">mit ZITADEL Konto anmelden</p>
-          <cnsl-form-field class="formfield">
-            <cnsl-label>Loginname</cnsl-label>
-            <input cnslInput />
-          </cnsl-form-field>
+        <span class="label">PREVIEW</span>
+        <div class="dashed" [style.font-family]="fontCssRule">
+          <div class="login-wrapper">
+            <img class="light" src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
+            <img class="dark" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
+            <h1>Anmeldung</h1>
+            <p class="desc">mit ZITADEL Konto anmelden</p>
+            <cnsl-form-field class="formfield">
+              <cnsl-label>Loginname</cnsl-label>
+              <input cnslInput />
+            </cnsl-form-field>
 
-          <div class="btn-wrapper">
-            <button mat-stroked-button>cancel</button>
-            <button mat-raised-button >Login</button>
+            <div class="btn-wrapper">
+              <button mat-stroked-button>cancel</button>
+              <button class="dark" mat-raised-button [style.background]="primaryColorDark" [style.color]="primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+              <button class="light" mat-raised-button [style.background]="primaryColorLight" [style.color]="primaryColorLight == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+            </div>
           </div>
         </div>
       </div>
