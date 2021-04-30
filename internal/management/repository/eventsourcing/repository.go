@@ -1,15 +1,14 @@
 package eventsourcing
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/query"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type Config struct {

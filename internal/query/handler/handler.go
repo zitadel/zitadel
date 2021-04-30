@@ -1,4 +1,4 @@
-package query
+package handler
 
 import (
 	"context"
@@ -7,6 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-func StartHandlers(ctx context.Context, es *eventstore.Eventstore, client *sql.DB) {
+func Start(ctx context.Context, es *eventstore.Eventstore, client *sql.DB) {
 	NewOrgHandler(ctx, es, client)
 }
