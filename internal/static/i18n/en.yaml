@@ -93,6 +93,8 @@ Errors:
       BeginLoginFailed: WebAuthN begin login failed
       ValidateLoginFailed: Error on validate login credentials
       CloneWarning: Credentials may be cloned
+    RefreshToken:
+      Invalid: Refresh Token is invalid
   Org:
     AlreadyExist: Organisationname already taken
     Invalid: Organisation is invalid

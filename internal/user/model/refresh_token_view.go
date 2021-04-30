@@ -8,18 +8,21 @@ import (
 )
 
 type RefreshTokenView struct {
-	ID                string
-	CreationDate      time.Time
-	ChangeDate        time.Time
-	ResourceOwner     string
-	UserID            string
-	ApplicationID     string
-	UserAgentID       string
-	Audience          []string
-	Expiration        time.Time
-	Scopes            []string
-	Sequence          uint64
-	PreferredLanguage string
+	ID                    string
+	CreationDate          time.Time
+	ChangeDate            time.Time
+	ResourceOwner         string
+	UserID                string
+	ApplicationID         string
+	UserAgentID           string
+	AuthMethodsReferences []string
+	Audience              []string
+	AuthTime              time.Time
+	IdleExpiration        time.Time
+	Expiration            time.Time
+	Scopes                []string
+	Sequence              uint64
+	Token                 string
 }
 
 type RefreshTokenSearchRequest struct {

@@ -108,11 +108,33 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 }
 
 func (o *OPStorage) CreateTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
-	return "", "", time.Time{}, err
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	var userAgentID, applicationID, userOrgID string
+	var authTime time.Time
+	var authMethodsReferences []string
+	authReq, ok := req.(*AuthRequest)
+	if ok {
+		userAgentID = authReq.AgentID
+		applicationID = authReq.ApplicationID
+		userOrgID = authReq.UserOrgID
+		authTime = authReq.AuthTime
+		authMethodsReferences = authReq.GetAMR()
+	}
+	resp, token, err := o.command.AddUserAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
+		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime, authTime) //PLANNED: lifetime from client
+	if err != nil {
+		return "", "", time.Time{}, err
+	}
+	return resp.TokenID, token, resp.Expiration, nil
 }
 
-func (o *OPStorage) RefreshTokenRequestByRefreshToken(context.Context, string) (op.RefreshTokenRequest, error) {
-	return nil, nil
+func (o *OPStorage) RefreshTokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
+	tokenView, err := o.repo.RefreshTokenByID(ctx, refreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return RefreshTokenRequestFromBusiness(tokenView), nil
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {

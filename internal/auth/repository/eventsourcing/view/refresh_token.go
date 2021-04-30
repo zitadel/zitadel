@@ -12,44 +12,44 @@ const (
 	refreshTokenTable = "auth.refresh_tokens"
 )
 
-func (v *View) RefreshTokenByID(tokenID string) (*model.TokenView, error) {
-	return usr_view.TokenByID(v.Db, refreshTokenTable, tokenID)
+func (v *View) RefreshTokenByID(tokenID string) (*model.RefreshTokenView, error) {
+	return usr_view.RefreshTokenByID(v.Db, refreshTokenTable, tokenID)
 }
 
-func (v *View) RefreshTokensByUserID(userID string) ([]*model.TokenView, error) {
-	return usr_view.TokensByUserID(v.Db, refreshTokenTable, userID)
+func (v *View) RefreshTokensByUserID(userID string) ([]*model.RefreshTokenView, error) {
+	return usr_view.RefreshTokensByUserID(v.Db, refreshTokenTable, userID)
 }
 
-func (v *View) PutRefreshToken(token *model.TokenView, event *models.Event) error {
-	err := usr_view.PutToken(v.Db, refreshTokenTable, token)
+func (v *View) PutRefreshToken(token *model.RefreshTokenView, event *models.Event) error {
+	err := usr_view.PutRefreshToken(v.Db, refreshTokenTable, token)
 	if err != nil {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) PutRefreshTokens(token []*model.TokenView, event *models.Event) error {
-	err := usr_view.PutTokens(v.Db, refreshTokenTable, token...)
+func (v *View) PutRefreshTokens(token []*model.RefreshTokenView, event *models.Event) error {
+	err := usr_view.PutRefreshTokens(v.Db, refreshTokenTable, token...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedTokenSequence(event)
+	return v.ProcessedRefreshTokenSequence(event)
 }
 
 func (v *View) DeleteRefreshToken(tokenID string, event *models.Event) error {
-	err := usr_view.DeleteToken(v.Db, refreshTokenTable, tokenID)
+	err := usr_view.DeleteRefreshToken(v.Db, refreshTokenTable, tokenID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedTokenSequence(event)
+	return v.ProcessedRefreshTokenSequence(event)
 }
 
 func (v *View) DeleteUserRefreshTokens(userID string, event *models.Event) error {
-	err := usr_view.DeleteUserTokens(v.Db, refreshTokenTable, userID)
+	err := usr_view.DeleteUserRefreshTokens(v.Db, refreshTokenTable, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedTokenSequence(event)
+	return v.ProcessedRefreshTokenSequence(event)
 }
 
 func (v *View) DeleteApplicationRefreshTokens(event *models.Event, ids ...string) error {
@@ -57,7 +57,7 @@ func (v *View) DeleteApplicationRefreshTokens(event *models.Event, ids ...string
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedTokenSequence(event)
+	return v.ProcessedRefreshTokenSequence(event)
 }
 
 func (v *View) GetLatestRefreshTokenSequence() (*repository.CurrentSequence, error) {

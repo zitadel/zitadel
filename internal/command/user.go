@@ -211,7 +211,8 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 }
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
-	event, err := c.addUserToken(ctx, orgID, agentID, clientID, userID, audience, scopes, lifetime)
+	userWriteModel := NewUserWriteModel(userID, orgID)
+	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, lifetime)
 	if err != nil {
 		return nil, err
 	}
@@ -219,105 +220,45 @@ func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, u
 	if err != nil {
 		return nil, err
 	}
-	return &domain.Token{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: userID,
-		},
-		TokenID:       "tokenID",
-		UserAgentID:   agentID,
-		ApplicationID: clientID,
-		Audience:      audience,
-		Scopes:        scopes,
-		//Expiration:        "expiration",
-		PreferredLanguage: "preferredLanguage",
-	}, nil
+	return accessToken, nil
 }
 
-func (c *Commands) AddUserAndRefreshToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
-	accessTokenEvent, err := c.addUserToken(ctx, orgID, agentID, clientID, userID, audience, scopes, lifetime)
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	refreshTokenEvent, err := c.addRefreshToken(ctx, orgID, agentID, clientID, userID, "refreshToken", audience, scopes, lifetime)
-	if err != nil {
-		return nil, err
-	}
-	_, err = c.eventstore.PushEvents(ctx, accessTokenEvent, refreshTokenEvent)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.Token{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: userID,
-		},
-		//TokenID:           tokenID,
-		UserAgentID:   agentID,
-		ApplicationID: clientID,
-		Audience:      audience,
-		Scopes:        scopes,
-		//Expiration:        expiration,
-		//PreferredLanguage: preferredLanguage,
-	}, nil
-}
-
-func (c *Commands) addUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-55n8M", "Errors.IDMissing")
-	}
-
-	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
-	if err != nil {
-		return nil, err
-	}
-	if !isUserStateExists(existingUser.UserState) {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
+	if !isUserStateExists(userWriteModel.UserState) {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
 	audience = domain.AddAudScopeToAudience(audience, scopes)
 
 	preferredLanguage := ""
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
+	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
 	if existingHuman != nil {
 		preferredLanguage = existingHuman.PreferredLanguage.String()
 	}
 	expiration := time.Now().UTC().Add(lifetime)
 	tokenID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, audience, scopes, expiration), nil
-}
-
-func (c *Commands) addRefreshToken(ctx context.Context, orgID, agentID, clientID, userID, refreshToken string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GVDg2", "Errors.IDMissing")
-	}
-
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
-	if err != nil {
-		return nil, err
-	}
-	if !isUserStateExists(existingHuman.UserState) {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgf2w", "Errors.User.NotFound")
-	}
-
-	//audience = domain.AddAudScopeToAudience(audience, scopes)
-
-	//preferredLanguage := ""
-	//existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
-	//if existingHuman != nil {
-	//	preferredLanguage = existingHuman.PreferredLanguage.String()
-	//}
-	expiration := time.Now().UTC().Add(lifetime)
-	tokenID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, "preferredLanguage", audience, scopes, expiration), nil
+	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
+	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, audience, scopes, expiration),
+		&domain.Token{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID: userWriteModel.AggregateID,
+			},
+			TokenID:           tokenID,
+			UserAgentID:       agentID,
+			ApplicationID:     clientID,
+			Audience:          audience,
+			Scopes:            scopes,
+			Expiration:        expiration,
+			PreferredLanguage: preferredLanguage,
+		}, nil
 }
 
 func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.EventPusher, _ *UserWriteModel, err error) {

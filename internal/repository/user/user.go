@@ -12,20 +12,17 @@ import (
 )
 
 const (
-	UniqueUsername              = "usernames"
-	userEventTypePrefix         = eventstore.EventType("user.")
-	UserLockedType              = userEventTypePrefix + "locked"
-	UserUnlockedType            = userEventTypePrefix + "unlocked"
-	UserDeactivatedType         = userEventTypePrefix + "deactivated"
-	UserReactivatedType         = userEventTypePrefix + "reactivated"
-	UserRemovedType             = userEventTypePrefix + "removed"
-	UserTokenAddedType          = userEventTypePrefix + "token.added"
-	UserRefreshTokenAddedType   = userEventTypePrefix + "refresh.token.added"
-	UserRefreshTokenRenewedType = userEventTypePrefix + "refresh.token.renewed"
-	UserRefreshTokenRemovedType = userEventTypePrefix + "refresh.token.removed"
-	UserDomainClaimedType       = userEventTypePrefix + "domain.claimed"
-	UserDomainClaimedSentType   = userEventTypePrefix + "domain.claimed.sent"
-	UserUserNameChangedType     = userEventTypePrefix + "username.changed"
+	UniqueUsername            = "usernames"
+	userEventTypePrefix       = eventstore.EventType("user.")
+	UserLockedType            = userEventTypePrefix + "locked"
+	UserUnlockedType          = userEventTypePrefix + "unlocked"
+	UserDeactivatedType       = userEventTypePrefix + "deactivated"
+	UserReactivatedType       = userEventTypePrefix + "reactivated"
+	UserRemovedType           = userEventTypePrefix + "removed"
+	UserTokenAddedType        = userEventTypePrefix + "token.added"
+	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
+	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
+	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
 func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
@@ -277,165 +274,6 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 	err := json.Unmarshal(event.Data, tokenAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
-	}
-
-	return tokenAdded, nil
-}
-
-type UserRefreshTokenAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	TokenID           string        `json:"tokenId"`
-	ApplicationID     string        `json:"applicationId"`
-	UserAgentID       string        `json:"userAgentId"`
-	Audience          []string      `json:"audience"`
-	Scopes            []string      `json:"scopes"`
-	IdleExpiration    time.Duration `json:"idle_expiration"`
-	Expiration        time.Duration `json:"expiration"`
-	PreferredLanguage string        `json:"preferredLanguage"`
-}
-
-func (e *UserRefreshTokenAddedEvent) Data() interface{} {
-	return e
-}
-
-func (e *UserRefreshTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *UserRefreshTokenAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
-func NewUserRefreshTokenAddedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	tokenID,
-	applicationID,
-	userAgentID,
-	preferredLanguage string,
-	audience,
-	scopes []string,
-	idleExpiration,
-	expiration time.Duration,
-) *UserRefreshTokenAddedEvent {
-	return &UserRefreshTokenAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			UserRefreshTokenAddedType,
-		),
-		TokenID:           tokenID,
-		ApplicationID:     applicationID,
-		UserAgentID:       userAgentID,
-		Audience:          audience,
-		Scopes:            scopes,
-		IdleExpiration:    idleExpiration,
-		Expiration:        expiration,
-		PreferredLanguage: preferredLanguage,
-	}
-}
-
-func UserRefreshTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	refreshTokenAdded := &UserRefreshTokenAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, refreshTokenAdded)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-DGr14", "unable to unmarshal refresh token added")
-	}
-
-	return refreshTokenAdded, nil
-}
-
-type UserRefreshTokenRenewedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	TokenID        string        `json:"tokenId"`
-	IdleExpiration time.Duration `json:"idle_expiration"`
-}
-
-func (e *UserRefreshTokenRenewedEvent) Data() interface{} {
-	return e
-}
-
-func (e *UserRefreshTokenRenewedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *UserRefreshTokenRenewedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
-func NewUserRefreshTokenRenewedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	tokenID string,
-	idleExpiration time.Duration,
-) *UserRefreshTokenRenewedEvent {
-	return &UserRefreshTokenRenewedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			UserRefreshTokenRenewedType,
-		),
-		TokenID:        tokenID,
-		IdleExpiration: idleExpiration,
-	}
-}
-
-func UserRefreshTokenRenewedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	tokenAdded := &UserRefreshTokenRenewedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, tokenAdded)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-GBt21", "unable to unmarshal refresh token renewed")
-	}
-
-	return tokenAdded, nil
-}
-
-type UserRefreshTokenRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	TokenID string `json:"tokenId"`
-}
-
-func (e *UserRefreshTokenRemovedEvent) Data() interface{} {
-	return e
-}
-
-func (e *UserRefreshTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *UserRefreshTokenRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
-func NewUserRefreshTokenRemovedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	tokenID string,
-) *UserRefreshTokenRemovedEvent {
-	return &UserRefreshTokenRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			UserRefreshTokenRemovedType,
-		),
-		TokenID: tokenID,
-	}
-}
-
-func UserRefreshTokenRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	tokenAdded := &UserRefreshTokenRemovedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, tokenAdded)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Dggs2", "unable to unmarshal refresh token removed")
 	}
 
 	return tokenAdded, nil

@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/domain"
 	"net"
 	"time"
 
@@ -11,7 +10,9 @@ import (
 	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -254,4 +255,36 @@ func AMRFromMFAType(mfaType domain.MFAType) string {
 	default:
 		return ""
 	}
+}
+
+func RefreshTokenRequestFromBusiness(tokenView *model.RefreshTokenView) op.RefreshTokenRequest {
+	return &RefreshTokenRequest{tokenView}
+}
+
+type RefreshTokenRequest struct {
+	*model.RefreshTokenView
+}
+
+func (r *RefreshTokenRequest) GetAMR() []string {
+	return r.AuthMethodsReferences
+}
+
+func (r *RefreshTokenRequest) GetAudience() []string {
+	return r.Audience
+}
+
+func (r *RefreshTokenRequest) GetAuthTime() time.Time {
+	return r.AuthTime
+}
+
+func (r *RefreshTokenRequest) GetClientID() string {
+	return r.ApplicationID
+}
+
+func (r *RefreshTokenRequest) GetScopes() []string {
+	return r.Scopes
+}
+
+func (r *RefreshTokenRequest) GetSubject() string {
+	return r.UserID
 }
