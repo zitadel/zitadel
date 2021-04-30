@@ -85,7 +85,7 @@ const (
 
 func main() {
 	flag.Var(configPaths, "config-files", "paths to the config files")
-	flag.Var(configPaths, "setup-files", "paths to the setup files")
+	flag.Var(setupPaths, "setup-files", "paths to the setup files")
 	flag.Parse()
 	arg := flag.Arg(0)
 	switch arg {
