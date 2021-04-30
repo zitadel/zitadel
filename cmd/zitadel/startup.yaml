@@ -11,6 +11,15 @@ Tracing:
     Fraction: $ZITADEL_TRACING_FRACTION
     Endpoint: $ZITADEL_TRACING_ENDPOINT
 
+AssetStorage:
+  Type: $ZITADEL_ASSET_STORAGE_TYPE
+  Config:
+    Endpoint: 'play.min.io'
+    AccessKeyID: 'Q3AM3UQ867SPQQA43P2F'
+    SecretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
+    SSL: TRUE
+    Location: 'us-east-1'
+
 Metrics:
   Type: 'otel'
   Config:

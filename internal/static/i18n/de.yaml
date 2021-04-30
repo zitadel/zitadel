@@ -4,6 +4,9 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
+  Assets:
+    Bucket:
+      AlreadyExists: Bucket existiert bereits
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
   User:
