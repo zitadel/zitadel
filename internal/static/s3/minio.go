@@ -99,11 +99,11 @@ func (m *Minio) GetObjectInfo(ctx context.Context, bucketName, objectName string
 func (m *Minio) GetObjectPresignedURL(ctx context.Context, bucketName, objectName string, expiration time.Duration) (*url.URL, error) {
 	reqParams := make(url.Values)
 	reqParams.Set("response-content-disposition", fmt.Sprintf("attachment; filename=\"%s\"", objectName))
-	url, err := m.Client.PresignedGetObject(ctx, bucketName, objectName, expiration, reqParams)
+	presignedURL, err := m.Client.PresignedGetObject(ctx, bucketName, objectName, expiration, reqParams)
 	if err != nil {
 		return nil, err
 	}
-	return url, err
+	return presignedURL, err
 }
 
 func (m *Minio) ListObjectInfos(ctx context.Context, bucketName, prefix string) ([]*domain.AssetInfo, error) {
