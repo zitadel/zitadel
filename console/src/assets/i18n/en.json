@@ -645,6 +645,10 @@
       "TITLE": "IAM Access Preferences",
       "DESCRIPTION": "Define access properties of your users."
     },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "DESCRIPTION": "Customize the appearance of the Login"
+    },
     "LOGIN_POLICY": {
       "TITLE": "Login Policy",
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",

@@ -1,0 +1,63 @@
+.default {
+  color: var(--color-main);
+  margin-top: 0;
+}
+
+.spinner-wr {
+  margin: .5rem 0;
+}
+
+.content {
+  padding-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: row dense;
+  grid-column-gap: 2rem;
+  grid-row-gap: 1rem;
+  width: 100%;
+
+  .preview {
+    padding: 50px;
+
+    .login-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 360px;
+
+      img {
+        max-width: 170px;
+        margin-bottom: 1rem;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .formfield {
+        width: 100%;
+      }
+
+      .btn-wrapper {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+
+  button {
+    margin-top: 3rem;
+    display: block;
+  }
+}
+
+::ng-deep .max-width-container {
+  max-width: none !important;
+}

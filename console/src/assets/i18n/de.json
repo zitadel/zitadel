@@ -645,6 +645,10 @@
       "TITLE": "Zugangseinstellungen IAM",
       "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
     },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins."
+    },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
