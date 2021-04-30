@@ -27,10 +27,13 @@
                 <ng-container matColumnDef="memberType">
                     <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.TYPE' | translate }} </th>
                     <td class="pointer" mat-cell *matCellDef="let member">
-                       <span *ngIf="member.orgId && !member.projectGrantId && !member.projectId"> {{'USER.MEMBERSHIPS.TYPES.ORG' | translate }}</span>
-                       <span *ngIf="member.projectId && !member.projectGrantId"> {{'USER.MEMBERSHIPS.TYPES.PROJECT' | translate }}</span>
-                       <span *ngIf="member.projectId && member.projectGrantId"> {{'USER.MEMBERSHIPS.TYPES.GRANTEDPROJECT' | translate }}</span>
-                     </td>
+                        <span *ngIf="member.orgId && !member.projectGrantId && !member.projectId">
+                            {{'USER.MEMBERSHIPS.TYPES.ORG' | translate }}</span>
+                        <span *ngIf="member.projectId && !member.projectGrantId"> {{'USER.MEMBERSHIPS.TYPES.PROJECT' |
+                            translate }}</span>
+                        <span *ngIf="member.projectId && member.projectGrantId">
+                            {{'USER.MEMBERSHIPS.TYPES.GRANTEDPROJECT' | translate }}</span>
+                    </td>
                 </ng-container>
 
                 <ng-container matColumnDef="displayName">
@@ -59,13 +62,24 @@
                     </td>
                 </ng-container>
 
+                <ng-container matColumnDef="actions" stickyEnd>
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let member">
+                        <button [disabled]="member.projectId && member.projectGrantId ? (['project.grant.member.delete:' + member.projectGrantId, 'project.grant.member.delete'] | hasRole | async) == false : member.projectId ? (['project.member.delete:' + member.projectGrantId, 'project.member.delete'] | hasRole | async) == false : member.orgId ? (['org.member.delete:' + member.orgId, 'org.member.delete'] | hasRole | async) == false : (['iam.member.delete'] | hasRole | async) == false"
+                            mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}"
+                            (click)="removeMembership(member)">
+                            <i class="las la-minus-circle"></i>
+                        </button>
+                    </td>
+                </ng-container>
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
                 </tr>
             </table>
 
-            <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
-            </mat-paginator>
+            <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
+            </cnsl-paginator>
         </div>
     </app-refresh-table>
 </app-detail-layout>

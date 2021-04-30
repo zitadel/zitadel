@@ -25,6 +25,7 @@ import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { OnboardingModule } from 'src/app/modules/onboarding/onboarding.module';
 import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
+import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -38,6 +39,7 @@ import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
+import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -175,7 +177,9 @@ const authConfig: AuthConfig = {
         SeoService,
         RefreshService,
         GrpcService,
+        AuthenticationService,
         GrpcAuthService,
+        SubscriptionService,
         { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],

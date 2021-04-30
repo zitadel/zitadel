@@ -63,7 +63,7 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 		}
 	}
 	if req.InitialPassword != "" {
-		h.Password = &domain.Password{SecretString: req.InitialPassword}
+		h.Password = &domain.Password{SecretString: req.InitialPassword, ChangeRequired: true}
 	}
 
 	return h
@@ -95,7 +95,7 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) *domain
 	}
 	if req.Password != "" {
 		h.Password = &domain.Password{SecretString: req.Password}
-		h.Password.ChangeRequired = true
+		h.Password.ChangeRequired = req.PasswordChangeRequired
 	}
 
 	return h

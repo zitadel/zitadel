@@ -1,7 +1,7 @@
-<div class="max-width-container">
+<div class="enlarged-container">
     <h1>{{ 'GRANTS.TITLE' | translate }}</h1>
     <p class="desc">{{'GRANTS.DESC' | translate }}</p>
-    <app-user-grants [displayedColumns]="['select', 'user', 'org', 'projectId', 'dates', 'roleNamesList']"
+    <app-user-grants [displayedColumns]="['select', 'user', 'org', 'projectId', 'creationDate','changeDate', 'roleNamesList']"
         [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
         [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false"
         [refreshOnPreviousRoutes]="['/grant-create']">

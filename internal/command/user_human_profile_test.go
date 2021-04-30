@@ -138,6 +138,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 								),
 							),
 						},
+						nil,
 					),
 				),
 			},

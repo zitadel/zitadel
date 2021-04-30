@@ -24,13 +24,13 @@ export class PolicyGridComponent implements OnInit {
     constructor(private mgmtService: ManagementService, private adminService: AdminService) { }
 
     public ngOnInit(): void {
-        if (this.type == PolicyGridType.ORG) {
+        if (this.type === PolicyGridType.ORG) {
             this.mgmtService.getPasswordComplexityPolicy().then((resp) => {
                 if (resp.policy) {
                     this.complexityPolicy = resp.policy;
                 }
             });
-        } else if (this.type == PolicyGridType.IAM) {
+        } else if (this.type === PolicyGridType.IAM) {
             this.adminService.getPasswordComplexityPolicy().then((resp) => {
                 if (resp.policy) {
                     this.complexityPolicy = resp.policy;

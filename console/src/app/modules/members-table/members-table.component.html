@@ -91,7 +91,7 @@
             </tr>
         </table>
     </div>
-    <mat-paginator *ngIf="dataSource" class="paginator" #paginator [pageSize]="INITIALPAGESIZE"
+    <cnsl-paginator *ngIf="dataSource" class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [pageSize]="INITIALPAGESIZE"
         [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
-    </mat-paginator>
+    </cnsl-paginator>
 </app-refresh-table>

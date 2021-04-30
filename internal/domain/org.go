@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"strings"
-
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -29,11 +27,7 @@ func (o *Org) IsValid() bool {
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {
-	o.Domains = append(o.Domains, &OrgDomain{Domain: o.nameForDomain(iamDomain), Verified: true, Primary: true})
-}
-
-func (o *Org) nameForDomain(iamDomain string) string {
-	return strings.ToLower(strings.ReplaceAll(o.Name, " ", "-") + "." + iamDomain)
+	o.Domains = append(o.Domains, &OrgDomain{Domain: NewIAMDomainName(o.Name, iamDomain), Verified: true, Primary: true})
 }
 
 type OrgState int32

@@ -8,7 +8,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.13.0
-	github.com/Masterminds/goutils v1.1.0 // indirect
+	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/VictoriaMetrics/fastcache v1.5.7
@@ -16,15 +16,16 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.14.3
-	github.com/caos/orbos v1.5.14-0.20210323181340-093f4c8a30f9
+	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
+	github.com/caos/oidc v0.14.6
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
-	github.com/envoyproxy/protoc-gen-validate v0.4.1
+	github.com/envoyproxy/protoc-gen-validate v0.5.1
 	github.com/ghodss/yaml v1.0.0
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.5.0
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.5.2
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
@@ -34,7 +35,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/huandu/xstrings v1.3.2 // indirect
-	github.com/imdario/mergo v0.3.11 // indirect
+	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/go-types v0.0.0-20200309064045-f2d4aea18a7a // indirect
@@ -44,8 +45,7 @@ require (
 	github.com/lib/pq v1.9.0
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/mitchellh/reflectwalk v1.0.1 // indirect
+	github.com/mitchellh/copystructure v1.1.2 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
@@ -65,15 +65,14 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp v0.13.0
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
-	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
-	golang.org/x/text v0.3.5
-	golang.org/x/tools v0.0.0-20201103235415-b653051172e4
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/text v0.3.6
+	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.34.0
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
-	google.golang.org/grpc v1.35.0
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46
+	google.golang.org/grpc v1.36.1
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 	gotest.tools v2.2.0+incompatible

@@ -104,12 +104,12 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -226,7 +226,7 @@ status:
 	}
 
 	var (
-		cmd          = []string{"/zitadelctl", "operator"}
+		cmd          = []string{"/zitadelctl", "operator", "--kubeconfig", ""}
 		volumes      []core.Volume
 		volumeMounts []core.VolumeMount
 	)
@@ -246,8 +246,6 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
-	} else {
-		cmd = append(cmd, "--kubeconfig", "")
 	}
 
 	deployment := &apps.Deployment{
@@ -411,12 +409,12 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -526,7 +524,7 @@ status:
 	}
 
 	var (
-		cmd          = []string{"/zitadelctl", "database"}
+		cmd          = []string{"/zitadelctl", "database", "--kubeconfig", ""}
 		volumes      []core.Volume
 		volumeMounts []core.VolumeMount
 	)
@@ -546,8 +544,6 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
-	} else {
-		cmd = append(cmd, "--kubeconfig", "")
 	}
 
 	deployment := &apps.Deployment{

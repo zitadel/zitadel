@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
@@ -18,6 +17,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { InputModule } from '../../modules/input/input.module';
 import { AvatarModule } from '../avatar/avatar.module';
+import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { UserGrantsComponent } from './user-grants.component';
 
@@ -31,7 +31,7 @@ import { UserGrantsComponent } from './user-grants.component';
         MatButtonModule,
         HasRoleModule,
         MatTableModule,
-        MatPaginatorModule,
+        PaginatorModule,
         MatIconModule,
         RouterModule,
         MatProgressSpinnerModule,

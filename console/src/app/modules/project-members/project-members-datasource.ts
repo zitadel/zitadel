@@ -7,8 +7,8 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum ProjectType {
-    PROJECTTYPE_OWNED = "OWNED",
-    PROJECTTYPE_GRANTED = "GRANTED"
+  PROJECTTYPE_OWNED = 'OWNED',
+  PROJECTTYPE_GRANTED = 'GRANTED',
 }
 
 /**
@@ -17,65 +17,70 @@ export enum ProjectType {
  * (including sorting, pagination, and filtering).
  */
 export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
-    public totalResult: number = 0;
-    public viewTimestamp!: Timestamp.AsObject;
+  public totalResult: number = 0;
+  public viewTimestamp!: Timestamp.AsObject;
 
-    public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
-    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+  public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
+  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private mgmtService: ManagementService) {
-        super();
+  constructor(private mgmtService: ManagementService) {
+    super();
+  }
+
+  public loadMembers(projectId: string,
+    projectType: ProjectType,
+    pageIndex: number, pageSize: number, grantId?: string): void {
+    const offset = pageIndex * pageSize;
+
+    this.loadingSubject.next(true);
+
+    const promise:
+      Promise<ListProjectMembersResponse.AsObject> |
+      Promise<ListProjectGrantMembersResponse.AsObject>
+      | undefined =
+      projectType === ProjectType.PROJECTTYPE_OWNED ?
+        this.mgmtService.listProjectMembers(projectId, pageSize, offset) :
+        projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
+          this.mgmtService.listProjectGrantMembers(projectId,
+            grantId, pageSize, offset) : undefined;
+    if (promise) {
+      from(promise).pipe(
+        map(resp => {
+          if (resp.details?.totalResult) {
+            this.totalResult = resp.details?.totalResult;
+          } else {
+            this.totalResult = 0;
+          }
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details.viewTimestamp;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      ).subscribe(members => {
+        this.membersSubject.next(members);
+      });
     }
-
-    public loadMembers(projectId: string,
-        projectType: ProjectType,
-        pageIndex: number, pageSize: number, grantId?: string): void {
-        const offset = pageIndex * pageSize;
-
-        this.loadingSubject.next(true);
-
-        const promise: Promise<ListProjectMembersResponse.AsObject> | Promise<ListProjectGrantMembersResponse.AsObject> | undefined =
-            projectType === ProjectType.PROJECTTYPE_OWNED ?
-                this.mgmtService.listProjectMembers(projectId, pageSize, offset) :
-                projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
-                    this.mgmtService.listProjectGrantMembers(projectId,
-                        grantId, pageSize, offset) : undefined;
-        if (promise) {
-            from(promise).pipe(
-                map(resp => {
-                    if (resp.details?.totalResult) {
-                        this.totalResult = resp.details?.totalResult;
-                    }
-                    if (resp.details?.viewTimestamp) {
-                        this.viewTimestamp = resp.details.viewTimestamp;
-                    }
-                    return resp.resultList;
-                }),
-                catchError(() => of([])),
-                finalize(() => this.loadingSubject.next(false)),
-            ).subscribe(members => {
-                this.membersSubject.next(members);
-            });
-        }
-    }
+  }
 
 
-    /**
-     * Connect this data source to the table. The table will only update when
-     * the returned stream emits new items.
-     * @returns A stream of the items to be rendered.
-     */
-    public connect(): Observable<Member.AsObject[]> {
-        return this.membersSubject.asObservable();
-    }
+  /**
+   * Connect this data source to the table. The table will only update when
+   * the returned stream emits new items.
+   * @returns A stream of the items to be rendered.
+   */
+  public connect(): Observable<Member.AsObject[]> {
+    return this.membersSubject.asObservable();
+  }
 
-    /**
-     *  Called when the table is being destroyed. Use this function, to clean up
-     * any open connections or free any held resources that were set up during connect.
-     */
-    public disconnect(): void {
-        this.membersSubject.complete();
-        this.loadingSubject.complete();
-    }
+  /**
+   *  Called when the table is being destroyed. Use this function, to clean up
+   * any open connections or free any held resources that were set up during connect.
+   */
+  public disconnect(): void {
+    this.membersSubject.complete();
+    this.loadingSubject.complete();
+  }
 }

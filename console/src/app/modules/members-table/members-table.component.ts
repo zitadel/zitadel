@@ -1,6 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
@@ -9,6 +8,7 @@ import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 
+import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
 
 type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | IamMembersDataSource;
@@ -22,7 +22,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     public INITIALPAGESIZE: number = 25;
     @Input() public canDelete: boolean = false;
     @Input() public canWrite: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
     @Input() public dataSource!: MemberDatasource;
     public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
@@ -70,7 +70,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
             this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
     }
 
-    public changePage(event?: PageEvent | MatPaginator): any {
+    public changePage(event?: PageEvent): any {
         this.selection.clear();
         return this.factoryLoadFunc(event ?? this.paginator);
     }

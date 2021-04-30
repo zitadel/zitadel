@@ -2,6 +2,7 @@ h2 {
   font-size: 1.2rem;
   letter-spacing: .05em;
   text-transform: uppercase;
+  margin-top: 2rem;
 }
 
 .top-desc {
@@ -67,14 +68,15 @@ h2 {
     }
 
     .warn {
-        margin-bottom: .5rem;
+      margin-bottom: .5rem;
     }
-    
+
     .icons {
-        margin-bottom: 1rem;
-        .icon {
-            margin-right: .5rem;
-        }
+      margin-bottom: 1rem;
+
+      .icon {
+        margin-right: .5rem;
+      }
     }
 
     .fill-space {

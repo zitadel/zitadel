@@ -80,8 +80,8 @@
             <span>{{'PROJECT.GRANT.EMPTY' | translate}}</span>
         </div>
 
-        <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]"
+        <cnsl-paginator class="paginator" #paginator [pageSize]="50" [timestamp]="dataSource?.viewTimestamp" [pageSizeOptions]="[25, 50, 100, 250]"
             [length]="dataSource.totalResult" (page)="loadGrantsPage($event.pageIndex, $event.pageSize)">
-        </mat-paginator>
+        </cnsl-paginator>
     </div>
 </app-refresh-table>

@@ -10,7 +10,7 @@ export interface RadioItemAuthType {
     key: string;
     titleI18nKey: string;
     descI18nKey: string;
-    disabled: boolean,
+    disabled: boolean;
     prefix: string;
     background: string;
     responseType?: OIDCResponseType;

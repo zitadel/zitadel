@@ -139,6 +139,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 									domain.APIAuthMethodTypeBasic),
 							),
 						},
+						nil,
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
 					),
 				),
@@ -201,6 +202,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 									domain.APIAuthMethodTypePrivateKeyJWT),
 							),
 						},
+						nil,
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
 					),
 				),
@@ -272,27 +274,6 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			name: "invalid app, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				apiApp: &domain.APIApp{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
-					},
-					AppID: "app1",
-				},
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
@@ -439,6 +420,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 									domain.APIAuthMethodTypePrivateKeyJWT),
 							),
 						},
+						nil,
 					),
 				),
 			},
@@ -601,6 +583,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 									}),
 							),
 						},
+						nil,
 					),
 				),
 				secretGenerator: GetMockSecretGenerator(t),

@@ -31,6 +31,7 @@ type FeaturesSetEvent struct {
 	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsernameLogin,omitempty"`
 	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
 	LabelPolicy              *bool                 `json:"labelPolicy,omitempty"`
+	CustomDomain             *bool                 `json:"customDomain,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -38,6 +39,10 @@ func (e *FeaturesSetEvent) Data() interface{} {
 }
 
 func (e *FeaturesSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *FeaturesSetEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -131,6 +136,12 @@ func ChangeLabelPolicy(labelPolicy bool) func(event *FeaturesSetEvent) {
 	}
 }
 
+func ChangeCustomDomain(customDomain bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.CustomDomain = &customDomain
+	}
+}
+
 func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -153,6 +164,10 @@ func (e *FeaturesRemovedEvent) Data() interface{} {
 }
 
 func (e *FeaturesRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *FeaturesRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

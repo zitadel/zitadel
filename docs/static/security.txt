@@ -1,0 +1,4 @@
+Contact: mailto:security@zitadel.ch
+Expires: Fri, 31 Dec 2021 23:00 +0200
+Preferred-Languages: en, de
+Canonical: https://docs.zitadel.ch/security.txt

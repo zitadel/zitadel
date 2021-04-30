@@ -16,11 +16,13 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { FeaturesModule } from 'src/app/modules/features/features.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
+import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
@@ -30,35 +32,37 @@ import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
 
 @NgModule({
-    declarations: [OrgDetailComponent, DomainVerificationComponent],
-    imports: [
-        CommonModule,
-        HasRolePipeModule,
-        OrgsRoutingModule,
-        FormsModule,
-        HasRoleModule,
-        InputModule,
-        MatButtonModule,
-        MatDialogModule,
-        CardModule,
-        MatIconModule,
-        ReactiveFormsModule,
-        MatButtonToggleModule,
-        MetaLayoutModule,
-        MatTabsModule,
-        MatTooltipModule,
-        WarnDialogModule,
-        MemberCreateDialogModule,
-        MatMenuModule,
-        ChangesModule,
-        MatProgressSpinnerModule,
-        AddDomainDialogModule,
-        TranslateModule,
-        SharedModule,
-        ContributorsModule,
-        CopyToClipboardModule,
-        PolicyGridModule,
-        FeaturesModule,
-    ],
+  declarations: [OrgDetailComponent, DomainVerificationComponent],
+  imports: [
+    CommonModule,
+    HasRolePipeModule,
+    OrgsRoutingModule,
+    FormsModule,
+    HasRoleModule,
+    InputModule,
+    InfoSectionModule,
+    MatButtonModule,
+    MatDialogModule,
+    CardModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatButtonToggleModule,
+    MetaLayoutModule,
+    MatTabsModule,
+    MatTooltipModule,
+    WarnDialogModule,
+    MemberCreateDialogModule,
+    HasFeaturePipeModule,
+    MatMenuModule,
+    ChangesModule,
+    MatProgressSpinnerModule,
+    AddDomainDialogModule,
+    TranslateModule,
+    SharedModule,
+    ContributorsModule,
+    CopyToClipboardModule,
+    PolicyGridModule,
+    FeaturesModule,
+  ],
 })
 export class OrgsModule { }

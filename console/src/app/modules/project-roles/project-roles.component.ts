@@ -1,13 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesDataSource } from './project-roles-datasource';
 
@@ -21,14 +21,14 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @Input() public actionsVisible: boolean = false;
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatTable) public table!: MatTable<Role.AsObject>;
     public dataSource!: ProjectRolesDataSource;
     public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
     @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
+    public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate', 'actions'];
 
     constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
         this.dataSource = new ProjectRolesDataSource(this.mgmtService);
@@ -64,6 +64,11 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         );
     }
 
+    public changePage(): void {
+        this.selection.clear();
+        this.loadRolesPage();
+    }
+
     public isAllSelected(): boolean {
         const numSelected = this.selection.selected.length;
         const numRows = this.dataSource.rolesSubject.value.length;
@@ -76,25 +81,16 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
     }
 
-    public deleteSelectedRoles(): Promise<any> {
-        const oldState = this.dataSource.rolesSubject.value;
-        const indexes = this.selection.selected.map(sel => {
-            return oldState.findIndex(iter => iter.key === sel.key);
-        });
+    public deleteRole(role: Role.AsObject): Promise<any> {
+        const index = this.dataSource.rolesSubject.value.findIndex(iter => iter.key === role.key);
 
-        return Promise.all(this.selection.selected.map(role => {
-            return this.mgmtService.removeProjectRole(this.projectId, role.key);
-        })).then(() => {
+        return this.mgmtService.removeProjectRole(this.projectId, role.key).then(() => {
             this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
-            indexes.forEach(index => {
-                if (index > -1) {
-                    oldState.splice(index, 1);
-                    this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
-                }
-            });
-            this.selection.clear();
-        }).catch(error => {
-            this.toast.showError(error);
+
+            if (index > -1) {
+                this.dataSource.rolesSubject.value.splice(index, 1);
+                this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
+            }
         });
     }
 

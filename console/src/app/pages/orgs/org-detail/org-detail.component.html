@@ -6,14 +6,22 @@
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
+                <button (click)="loadDomains()" card-actions mat-icon-button>
+                    <mat-icon>refresh</mat-icon>
+                </button>
+
                 <div *ngFor="let domain of domains" class="domain">
-                    <span *ngIf="canwrite$ | async" (click)="verifyDomain(domain)"
+                    <span *ngIf="(canwrite$ | async) && (['custom_domain'] | hasFeature | async); else noCustom" (click)="verifyDomain(domain)"
                         class="title">{{domain.domainName}}</span>
+
+                    <ng-template #noCustom>
+                      <span class="title disabled">{{domain.domainName}}</span>
+                    </ng-template>
                     <span *ngIf="(canwrite$ | async) == false" class="title disabled">{{domain?.domainName}}</span>
 
                     <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
                     <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
-                    <a *ngIf="!domain.isPrimary && (canwrite$ | async)" class="primaryset"
+                    <a *ngIf="domain.isVerified && !domain.isPrimary && (canwrite$ | async)" class="primaryset"
                         (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>
@@ -22,28 +30,35 @@
                             class="las la-trash"></i></button>
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
-                <button [disabled]="(canwrite$ | async) == false" matTooltip="Add domain" mat-raised-button
+
+                <cnsl-info-section type="WARN" *ngIf="(['custom_domain'] | hasFeature | async) == false" class="custom-domain-deactivated">
+                    {{'ORG.PAGES.CUSTOMDOMAINFEATUREMISSING' | translate}}
+                </cnsl-info-section>
+            
+                <button [disabled]="(canwrite$ | async) == false || (['custom_domain'] | hasFeature | async) == false" matTooltip="Add domain" mat-raised-button
                     color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
                 </button>
             </app-card>
         </ng-container>
 
-        <h2>{{'FEATURES.TITLE' | translate}}</h2>
-        <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
-        <div *ngIf="features" class="tier">
-            <mat-icon>stars</mat-icon>
-            <div class="text" *ngIf="features.tier">
-                <p class="title"><strong>ZITADEL {{features.tier.name}}</strong></p>
-                <p>{{features.tier?.description}}</p>
-                <p>{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
-                <p>{{features.tier?.statusInfo}}</p>
-            </div>
-            <span class="fill-space"></span>
-            <a class="ext" href="https://zitadel.ch/pricing" target="_blank"><i
-                    class="las la-external-link-alt"></i></a>
+        <ng-container *ngIf="['features.read'] | hasRole | async">
+            <h2>{{'FEATURES.TITLE' | translate}}</h2>
+            <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+            <div *ngIf="features" class="tier">
+                <mat-icon class="icon">stars</mat-icon>
+                <div class="text" *ngIf="features.tier">
+                    <p class="title"><strong>{{features.tier.name}}</strong></p>
+                    <p>{{features.tier?.description}}</p>
+                    <p>{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
+                    <p>{{features.tier?.statusInfo}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <a *ngIf="['features.write'] | hasRole | async" class="ext" href="https://zitadel.ch/pricing"
+                    target="_blank"><i class="las la-external-link-alt"></i></a>
 
-            <button mat-raised-button [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
-        </div>
+                <button mat-raised-button [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
+            </div>
+        </ng-container>
 
         <ng-template appHasRole [appHasRole]="['policy.read']">
             <app-policy-grid [type]="PolicyGridType.ORG"></app-policy-grid>

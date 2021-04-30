@@ -1,12 +1,12 @@
 package repository
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
 
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/view/model"
 )
@@ -16,7 +16,6 @@ type CurrentSequence struct {
 	CurrentSequence          uint64    `gorm:"column:current_sequence"`
 	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
 	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
-	AggregateType            string    `gorm:"column:aggregate_type;primary_key"`
 }
 
 type currentSequenceViewWithSequence struct {
@@ -76,12 +75,11 @@ func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
 		CurrentSequence:          sequence.CurrentSequence,
 		EventTimestamp:           sequence.EventTimestamp,
 		LastSuccessfulSpoolerRun: sequence.LastSuccessfulSpoolerRun,
-		AggregateType:            sequence.AggregateType,
 	}
 }
 
 func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64, eventTimestamp time.Time) error {
-	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now(), ""})
+	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now()})
 }
 
 func UpdateCurrentSequence(db *gorm.DB, table string, currentSequence *CurrentSequence) (err error) {

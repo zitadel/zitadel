@@ -9,7 +9,6 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/api"
 	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -19,7 +18,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	var (
 		cmd = &cobra.Command{
 			Use:   "takeoff",
-			Short: "Launch a ZITADEL operator on the orb",
+			Short: "Launch a ZITADEL operator and database operator on the orb",
 			Long:  "Ensures a desired state of the resources on the orb",
 		}
 	)
@@ -37,12 +36,13 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
 
-		k8sClient, _, err := cli.Client(
+		k8sClient, err := cli.Client(
 			monitor,
 			orbConfig,
 			gitClient,
 			rv.Kubeconfig,
 			rv.Gitops,
+			true,
 		)
 		if err != nil {
 			return err
@@ -92,13 +92,9 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 
 func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
 	if gitops {
-		found, err := api.ExistsZitadelYml(gitClient)
-		if err != nil {
-			return err
-		}
-		if found {
+		if gitClient.Exists(git.ZitadelFile) {
 
-			desiredTree, err := api.ReadZitadelYml(gitClient)
+			desiredTree, err := gitClient.ReadTree(git.ZitadelFile)
 			if err != nil {
 				return err
 			}
@@ -131,12 +127,8 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 
 func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
 	if gitops {
-		found, err := api.ExistsDatabaseYml(gitClient)
-		if err != nil {
-			return err
-		}
-		if found {
-			desiredTree, err := api.ReadDatabaseYml(gitClient)
+		if gitClient.Exists(git.DatabaseFile) {
+			desiredTree, err := gitClient.ReadTree(git.DatabaseFile)
 			if err != nil {
 				return err
 			}

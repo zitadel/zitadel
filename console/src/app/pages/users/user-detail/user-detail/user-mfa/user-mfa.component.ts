@@ -20,7 +20,7 @@ export interface MFAItem {
     styleUrls: ['./user-mfa.component.scss'],
 })
 export class UserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
+    public displayedColumns: string[] = ['type', 'name', 'state', 'actions'];
     @Input() private user!: User.AsObject;
     public mfaSubject: BehaviorSubject<AuthFactor.AsObject[]> = new BehaviorSubject<AuthFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -79,7 +79,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
                         this.toast.showError(error);
                     });
                 } else if (factor.u2f) {
-                    this.mgmtUserService.removeHumanAuthFactorU2F(this.user.id).then(() => {
+                    this.mgmtUserService.removeHumanAuthFactorU2F(this.user.id, factor.u2f.id).then(() => {
                         this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
                         const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);

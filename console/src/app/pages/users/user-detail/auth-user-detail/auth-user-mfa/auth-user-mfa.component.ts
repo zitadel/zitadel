@@ -26,7 +26,7 @@ export interface WebAuthNOptions {
     styleUrls: ['./auth-user-mfa.component.scss'],
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'attr', 'state', 'actions'];
+    public displayedColumns: string[] = ['type', 'name', 'state', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -42,7 +42,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     constructor(
         private service: GrpcAuthService,
         private toast: ToastService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
     ) { }
 
     public ngOnInit(): void {
@@ -56,8 +56,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     public addAuthFactor(): void {
         const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
             data: {
-                otpDisabled: !this.otpAvailable
-            }
+                otpDisabled: !this.otpAvailable,
+            },
         });
 
         dialogRef.afterClosed().subscribe((code) => {

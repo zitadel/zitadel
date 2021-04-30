@@ -79,10 +79,10 @@ func (mr *MockRepositoryMockRecorder) LatestSequence(arg0, arg1 interface{}) *go
 }
 
 // Push mocks base method
-func (m *MockRepository) Push(arg0 context.Context, arg1 []*repository.Event, arg2 ...*repository.UniqueConstraint) error {
+func (m *MockRepository) Push(arg0 context.Context, arg1 []*repository.Event, arg2 []*repository.Asset, arg3 ...*repository.UniqueConstraint) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []interface{}{arg0, arg1, arg2}
+	for _, a := range arg3 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Push", varargs...)
@@ -91,8 +91,8 @@ func (m *MockRepository) Push(arg0 context.Context, arg1 []*repository.Event, ar
 }
 
 // Push indicates an expected call of Push
-func (mr *MockRepositoryMockRecorder) Push(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) Push(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockRepository)(nil).Push), varargs...)
 }

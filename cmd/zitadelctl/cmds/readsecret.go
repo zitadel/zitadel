@@ -17,7 +17,7 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 		Short:   "Print a secrets decrypted value to stdout",
 		Long:    "Print a secrets decrypted value to stdout.\nIf no path is provided, a secret can interactively be chosen from a list of all possible secrets",
 		Args:    cobra.MaximumNArgs(1),
-		Example: `zitadelctl readsecret zitadel.emailappkey > ~/emailappkey`,
+		Example: `zitadelctl readsecret database.bucket.serviceaccountjson.encrypted > ~/googlecloudstoragesa.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			rv, err := getRv()
 			if err != nil {
@@ -36,7 +36,7 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 				path = args[0]
 			}
 
-			k8sClient, _, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops)
+			k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
 			if err != nil && !rv.Gitops {
 				return err
 			}

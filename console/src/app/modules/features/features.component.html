@@ -1,6 +1,39 @@
 <app-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'FEATURES.TITLE' | translate" [description]="'FEATURES.DESCRIPTION' | translate">
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    [title]="('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
+
+    <h2>{{'FEATURES.TIER.TITLE' | translate}}</h2>
+    <p *ngIf="serviceType === FeatureServiceType.MGMT" class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}}
+        {{'FEATURES.TIER.QUESTIONS' | translate}} <a href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
+
+    <div class="detail">
+        <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
+        <p>{{features?.tier?.name}}</p>
+    </div>
+
+    <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
+        <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
+        <div class="detail" *ngIf="stripeCustomer || stripeCustomer == null">
+            <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
+                <a (click)="setCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
+            </p>
+            <p>{{stripeCustomer?.contact}}</p>
+            <p *ngIf="stripeCustomer?.company">{{stripeCustomer?.company}}</p>
+            <p>{{stripeCustomer?.address}}</p>
+            <p *ngIf="stripeCustomer?.postal_code || stripeCustomer?.city || stripeCustomer?.country">
+                {{stripeCustomer?.postal_code}} {{stripeCustomer?.city}} {{stripeCustomer?.country}}
+                <img *ngIf="customerCountry" height="20px" width="30px"
+                    style="margin-right: 1rem; border-radius: 2px; vertical-align: middle;"
+                    src="../../../assets/flags/{{customerCountry.isoCode.toLowerCase()}}.png" />
+            </p>
+        </div>
+
+        <p class="error" *ngIf="(stripeCustomer || stripeCustomer == null) && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
+
+        <div class="current-tier">
+            <a [disabled]="!org.id || !customerValid" mat-raised-button [href]="stripeURL" target="_blank"
+                alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</a>
+        </div>
+    </ng-container>
 
     <ng-template appHasRole [appHasRole]="['iam.features.delete']">
         <button *ngIf="serviceType === FeatureServiceType.MGMT && !isDefault"
@@ -9,12 +42,15 @@
         </button>
     </ng-template>
 
-    <div class="content" *ngIf="features">
+    <div class="divider"></div>
 
+    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    <div class="content" *ngIf="features">
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
             <span class="fill-space"></span>
-            <span>{{features.auditLogRetention | json }}</span>
+            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONDAYS' |
+                translate}}</span>
         </div>
         <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>
@@ -76,6 +112,14 @@
                 [disabled]="(['iam.features.write'] | hasRole | async) == false">
             </mat-slide-toggle>
         </div>
+
+        <div class="row">
+          <span class="left-desc">{{'FEATURES.DATA.CUSTOMDOMAIN' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.customDomain"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+      </div>
     </div>
 
     <div class="btn-container">

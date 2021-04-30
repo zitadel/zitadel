@@ -1,6 +1,11 @@
 package configuration
 
-import "github.com/caos/orbos/pkg/secret"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/caos/orbos/pkg/secret"
+)
 
 type Configuration struct {
 	Tracing             *Tracing       `yaml:"tracing,omitempty"`
@@ -15,17 +20,43 @@ type Configuration struct {
 	ClusterDNS          string         `yaml:"clusterdns"`
 }
 
+func (c *Configuration) Validate() (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("validating configuration failed: %w", err)
+		}
+	}()
+
+	return c.DNS.validate()
+}
+
 type DNS struct {
-	Domain     string      `yaml:"domain"`
-	TlsSecret  string      `yaml:"tlsSecret"`
-	Subdomains *Subdomains `yaml:"subdomains"`
+	Domain        string      `yaml:"domain"`
+	TlsSecret     string      `yaml:"tlsSecret"`
+	ACMEAuthority string      `yaml:"acmeAuthority"`
+	Subdomains    *Subdomains `yaml:"subdomains"`
+}
+
+func (d *DNS) validate() (err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("validating dns failed: %w", err)
+		}
+	}()
+
+	if d.TlsSecret != "" && d.ACMEAuthority != "none" && d.ACMEAuthority != "" {
+		return errors.New("if tls secret is provided, acme authority must be 'none'")
+	}
+	return nil
 }
 
 type Subdomains struct {
-	Accounts string `yaml:"accounts"`
-	API      string `yaml:"api"`
-	Console  string `yaml:"console"`
-	Issuer   string `yaml:"issuer"`
+	Accounts     string `yaml:"accounts"`
+	API          string `yaml:"api"`
+	Console      string `yaml:"console"`
+	Issuer       string `yaml:"issuer"`
+	Subscription string `yaml:"subscription"`
 }
 type Passwords struct {
 	Migration            *secret.Secret   `yaml:"migration"`

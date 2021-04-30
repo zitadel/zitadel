@@ -44,24 +44,10 @@ func (c *Commands) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstor
 }
 
 func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
-	}
-	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx)
+	existingPolicy, changedEvent, err := c.changeDefaultMailTemplate(ctx, policy)
 	if err != nil {
 		return nil, err
 	}
-
-	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-2N8fs", "Errors.IAM.MailTemplate.NotFound")
-	}
-
-	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.Template)
-	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3nfsG", "Errors.IAM.MailTemplate.NotChanged")
-	}
-
 	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
 	if err != nil {
 		return nil, err
@@ -71,6 +57,28 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 		return nil, err
 	}
 	return writeModelToMailTemplatePolicy(&existingPolicy.MailTemplateWriteModel), nil
+}
+
+func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*IAMMailTemplateWriteModel, eventstore.EventPusher, error) {
+	if !policy.IsValid() {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
+	}
+	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "IAM-2N8fs", "Errors.IAM.MailTemplate.NotFound")
+	}
+
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.Template)
+	if !hasChanged {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3nfsG", "Errors.IAM.MailTemplate.NotChanged")
+	}
+
+	return existingPolicy, changedEvent, nil
 }
 
 func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context) (policy *IAMMailTemplateWriteModel, err error) {

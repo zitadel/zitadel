@@ -1,11 +1,11 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { Membership, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -21,7 +21,7 @@ import { MembershipDetailDataSource } from './membership-detail-datasource';
 export class MembershipDetailComponent implements AfterViewInit {
     public user!: User.AsObject;
 
-    @ViewChild(MatPaginator) public paginator!: MatPaginator;
+    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
     @ViewChild(MatTable) public table!: MatTable<Membership.AsObject>;
     public dataSource!: MembershipDetailDataSource;
     public selection: SelectionModel<Membership.AsObject>
@@ -30,7 +30,7 @@ export class MembershipDetailComponent implements AfterViewInit {
     public memberRoleOptions: string[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles'];
+    public displayedColumns: string[] = ['select', 'memberType', 'displayName', 'creationDate', 'changeDate', 'roles', 'actions'];
 
     public loading: boolean = false;
     public memberships!: Membership.AsObject[];
@@ -200,6 +200,31 @@ export class MembershipDetailComponent implements AfterViewInit {
                         this.toast.showError(error);
                     });
             });
+        }
+    }
+
+    public removeMembership(membership: Membership.AsObject): void {
+        let prom;
+
+        if (membership.projectId && membership.projectGrantId && membership.userId) {
+            prom = this.mgmtService.removeProjectGrantMember(
+                membership.projectId,
+                membership.projectGrantId,
+                membership.userId,
+            );
+        } else if (membership.projectId && membership.userId) {
+            prom = this.mgmtService.removeProjectMember(membership.projectId, membership.userId);
+        } else if (membership.orgId && membership.userId) {
+            prom = this.mgmtService.removeOrgMember(membership.userId);
+        } else if (membership.userId) {
+            prom = this.adminService.removeIAMMember(membership.userId);
+        }
+
+        if (prom) {
+            prom.then(() => {
+                this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+                this.refreshPage();
+            }).catch(error => this.toast.showError(error));
         }
     }
 

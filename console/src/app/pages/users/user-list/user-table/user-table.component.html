@@ -1,7 +1,7 @@
 <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
     [timestamp]="viewTimestamp" [selection]="selection" [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
     <cnsl-form-field @appearfade *ngIf="userSearchKey != undefined" actions class="filtername">
-        <input cnslInput (keyup)="applyFilter($event)"
+        <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 
@@ -48,10 +48,10 @@
 
             <ng-container matColumnDef="displayName">
                 <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}">
+                    [ngClass]="{'search-active': this.userSearchKey == UserListSearchKey.DISPLAY_NAME}">
                     {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.USERSEARCHKEY_DISPLAY_NAME}"></template>
+                        [ngTemplateOutletContext]="{key: UserListSearchKey.DISPLAY_NAME}"></template>
                 </th>
                 <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
                     {{user.human?.profile?.displayName}}
@@ -128,8 +128,8 @@
             <i class="las la-exclamation"></i>
             <span>{{'USER.TABLE.EMPTY' | translate}}</span>
         </div>
-        <mat-paginator #paginator class="paginator" [length]="totalResult || 0" [pageSize]="10"
-            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+        <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0" [pageSize]="10" [timestamp]="viewTimestamp"
+            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
     </div>
 </app-refresh-table>
 

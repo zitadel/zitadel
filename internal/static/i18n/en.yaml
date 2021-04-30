@@ -194,7 +194,7 @@ Errors:
       NotActive:: Application is not active
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
-      APIConfigInvalid: OIDC configuration is invalid
+      APIConfigInvalid: API configuration is invalid
       IsNotOIDC: Application is not type oidc
       IsNotAPI: Application is not type API
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
@@ -317,6 +317,8 @@ Errors:
       AlreadyExists: Step started already exists
     Done:
       AlreadyExists: Step done already exists
+  Features:
+    NotChanged: Feature hat nicht geändert
 EventTypes:
   user:
     added: User added
@@ -329,7 +331,7 @@ EventTypes:
         succeeded: Initialisation check succeded
         failed: Initialisation check failed
     token:
-      added: Access Token ausgestellt
+      added: Access Token created
     username:
       reserved: Username reserved
       released: Username released
@@ -500,6 +502,9 @@ EventTypes:
         set: Primary domain set
       reserved: Domain reserved
       released: Domain released
+    features:
+      set: Feature added
+      removed: Feature removed
     name:
       reserved: Organization name reserved
       released: Organization name released
@@ -554,6 +559,10 @@ EventTypes:
           added: Password lockout policy added
           changed: Password lockout policy changed
           removed: Password lockout policy removed
+      label:
+        added: Label Policy added
+        changed: Label Policy changed
+        removed: Label Policy removed
   project:
     added: Project added
     changed: Project changed

@@ -2,27 +2,24 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
-	"k8s.io/apimachinery/pkg/api/errors"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	proj_view "github.com/caos/zitadel/internal/project/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
@@ -297,7 +294,7 @@ func (u *UserGrant) getProjectByID(ctx context.Context, projID string) (*proj_mo
 		},
 	}
 	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esProject.AppendEvents, query)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 	if esProject.Sequence == 0 {

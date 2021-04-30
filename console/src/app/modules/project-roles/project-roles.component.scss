@@ -41,3 +41,17 @@
   outline: none;
   cursor: pointer;
 }
+
+tr {
+  outline: none;
+
+  button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
+  }
+}

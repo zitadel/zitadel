@@ -8,7 +8,7 @@ describe('LinksComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LinksComponent ]
+      declarations: [ LinksComponent ],
     })
     .compileComponents();
   });

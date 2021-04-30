@@ -9,6 +9,7 @@ import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/p
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageKey, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -42,8 +43,6 @@ export class UserGrantCreateComponent implements OnDestroy {
     public user!: User.AsObject;
     public UserTarget: any = UserTarget;
 
-    public ProjectGrantView: any = GrantedProject;
-    public ProjectView: any = Project;
     constructor(
         private userService: ManagementService,
         private toast: ToastService,
@@ -51,6 +50,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         private route: ActivatedRoute,
         private authService: GrpcAuthService,
         private mgmtService: ManagementService,
+        private storage: StorageService,
     ) {
         this.subscription = this.route.params.subscribe((params: Params) => {
             const { projectid, grantid, userid } = params;
@@ -62,9 +62,20 @@ export class UserGrantCreateComponent implements OnDestroy {
 
             if (this.projectId && !this.grantId) {
                 this.context = UserGrantContext.OWNED_PROJECT;
+
+                this.mgmtService.getProjectByID(this.projectId).then(resp => {
+                    if (resp.project) {
+                        this.project = resp.project;
+                    }
+                }).catch((error: any) => {
+                    this.toast.showError(error);
+                });
             } else if (this.projectId && this.grantId) {
                 this.context = UserGrantContext.GRANTED_PROJECT;
                 this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then(resp => {
+                    if (resp.grantedProject) {
+                        this.project = resp.grantedProject;
+                    }
                     if (resp.grantedProject?.grantedRoleKeysList) {
                         this.grantedRoleKeysList = resp.grantedProject?.grantedRoleKeysList;
                     }
@@ -83,9 +94,10 @@ export class UserGrantCreateComponent implements OnDestroy {
             }
         });
 
-        this.authService.getActiveOrg().then(org => {
-            this.org = org;
-        });
+        const temporg = this.storage.getItem<Org.AsObject>(StorageKey.organization);
+        if (temporg) {
+            this.org = temporg;
+        }
     }
 
     public close(): void {

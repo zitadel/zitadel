@@ -1,4 +1,4 @@
-name: Zitadel Release
+name: ZITADEL Release
 on:
   push:
     branches:
@@ -17,6 +17,7 @@ env:
 
 jobs:
   refs:
+    name: Prepare CI Vars
     runs-on: ubuntu-18.04
     outputs:
       sha_short: ${{ steps.refs.outputs.sha_short }}
@@ -54,6 +55,7 @@ jobs:
           echo "::set-output name=version::${VERSION}"
 
   zitadel-image:
+    name: Build ZITADEL
     needs: refs
     runs-on: ubuntu-18.04
     steps:
@@ -63,11 +65,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum', 'console/package-lock.json', 'build/dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+            ${{ runner.os }}-zitadel-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
@@ -76,6 +76,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
           registry: ${{ env.REGISTRY }}
+      - run: ls -la
       - uses: docker/build-push-action@v2
         with:
           context: .
@@ -84,12 +85,34 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache-new
+          target: go-codecov
+          outputs: type=local,dest=/tmp/zitadel
+      - uses: codecov/codecov-action@v1
+        with:
+          files: /tmp/zitadel/profile.cov
+          name: codecov-go
+      -
+        # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   operator-image:
     needs: refs
     runs-on: ubuntu-18.04
-    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
@@ -101,9 +124,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-op-${{ github.sha }}
+          key: ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-${{ hashFiles('**/go.sum', 'build/operator/Dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-op-
+            ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -123,12 +146,14 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: false
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
           outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
             VERSION=${{ needs.refs.outputs.version }}
+            GITHUBOAUTHCLIENTID=${{ secrets.GITHUBOAUTHCLIENTID }}
+            GITHUBOAUTHCLIENTSECRET=${{ secrets.GITHUBOAUTHCLIENTSECRET }}
       - shell: bash
         run: |
           mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
@@ -145,15 +170,36 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          cache-from: type=local,src=/tmp/.buildx-cache-new
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
             VERSION=${{ needs.refs.outputs.version }}
-
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/operator/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache-new
+          target: go-codecov
+          outputs: type=local,dest=/tmp/operator
+      - uses: codecov/codecov-action@v1
+        with:
+          files: /tmp/operator/profile.cov
+          name: codecov-go
+      -
+        # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   crdb-image:
+    name: Build CockroachDB Image
     needs: refs
     runs-on: ubuntu-18.04
     steps:
@@ -163,9 +209,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-crdb-image-${{ hashFiles('build/cr-backup/Dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-crdb-image-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -188,6 +234,7 @@ jobs:
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
   release:
+    name: Semantic Release Images and Artifacts
     runs-on: ubuntu-18.04
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
     env:
@@ -198,13 +245,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Docker Login
         run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-      - name: Docker Pull short-sha
+      - name: Docker Pull ZITADEL Image
         run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
-      - name: Docker Pull short-sha
+      - name: Docker Pull ZITADEL Operator Image
         run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-      - name: Docker Pull short-sha
+      - name: Docker Pull CockroachDB Image
         run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-      - name: Download all zitadelctl artifact
+      - name: Download zitadelctl Artifacts
         uses: actions/download-artifact@v2
         with:
           path: ${{ env.ARTIFACTS_FOLDER }}/
@@ -213,13 +260,13 @@ jobs:
           mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
           find ${ARTIFACTS_FOLDER}
 
-      - name: Semantic Release
+      - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
         with:
           dry_run: false
           semantic_version: 17.0.4
-      - name: Do something when a new release published
+      - name: Echo Semantic Release Versions
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           echo ${{ steps.semantic.outputs.new_release_version }}
@@ -256,17 +303,17 @@ jobs:
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
           docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
           docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
       - name: Docker Push Version
         run: |
           docker push $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
           docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
           docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
-      - name: Dev-Release
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
+      - name: Development Release
         id: create_release
         uses: ncipollo/release-action@v1.8.1
-        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'master' && needs.refs.outputs.short_ref != ''
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
         with:
           artifacts: "${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe"
           body: |

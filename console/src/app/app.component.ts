@@ -58,6 +58,7 @@ export class AppComponent implements OnDestroy {
     private orgSub: Subscription = new Subscription();
 
     public hideAdminWarn: boolean = true;
+    public language: string = 'en';
     constructor(
         public viewPortScroller: ViewportScroller,
         @Inject('windowObject') public window: Window,
@@ -196,6 +197,7 @@ export class AppComponent implements OnDestroy {
 
         this.translate.onLangChange.subscribe((language: LangChangeEvent) => {
             this.document.documentElement.lang = language.lang;
+            this.language = language.lang;
         });
 
         this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe(value => {
@@ -266,8 +268,12 @@ export class AppComponent implements OnDestroy {
                 const cropped = navigator.language.split('-')[0] ?? 'en';
                 const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
 
-                const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ? userprofile.human.profile?.preferredLanguage : fallbackLang;
+                const lang =
+                    userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ?
+                        userprofile.human.profile?.preferredLanguage :
+                        fallbackLang;
                 this.translate.use(lang);
+                this.language = lang;
                 this.document.documentElement.lang = lang;
             }
         });

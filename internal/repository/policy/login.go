@@ -33,6 +33,10 @@ func (e *LoginPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
+func (e *LoginPolicyAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewLoginPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	allowUserNamePassword,
@@ -82,6 +86,10 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *LoginPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *LoginPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -155,6 +163,10 @@ func (e *LoginPolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *LoginPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *LoginPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
