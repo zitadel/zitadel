@@ -43,6 +43,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public loading: boolean = false;
   public nextLinks: CnslLinks[] = [];
 
+  public logoFile!: File;
+  public logoURL: any = '';
+
   public primaryColorDark: string = '';
   public secondaryColorDark: string = '';
   public warnColorDark: string = '#f44336';
@@ -122,20 +125,27 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public toggleHoverLogo(isHovering: boolean) {
-    console.log('hover logo');
     this.isHoveringOverLogo = isHovering;
-    console.log(event);
   }
 
-  public onDropLogo(event: boolean) {
+  public onDropLogo(filelist: FileList) {
     console.log('drop logo');
-    console.log(event);
+    const file = filelist.item(0);
+    if (file) {
+      console.log(filelist.item(0));
+      this.logoFile = file;
+
+      var reader = new FileReader();
+      reader.readAsDataURL(this.logoFile);
+      reader.onload = (event) => { // called once readAsDataURL is completed
+        console.log(event.target?.result);
+        this.logoURL = event.target?.result;
+      };
+    }
   }
 
   public toggleHoverIcon(isHovering: boolean) {
-    console.log('hover icon');
     this.isHoveringOverIcon = isHovering;
-    console.log(event);
   }
 
   public onDropIcon(event: any) {
