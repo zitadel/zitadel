@@ -16,8 +16,8 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
 	github.com/caos/oidc v0.14.6
+	github.com/caos/orbos v1.5.14-0.20210430222710-8c39fa7e0e30
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/envoyproxy/protoc-gen-validate v0.5.1
