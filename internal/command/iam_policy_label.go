@@ -116,6 +116,190 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
+func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save Logo to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-Qw0pd", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoAddedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save Logo to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-Xc8Kf", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoRemovedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save Icon to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-1yMx0", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconAddedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save Icon to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M0qw", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconRemovedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save LogoDark to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-ZR9fs", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoDarkAddedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save LogoDark to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-3FGds", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoDarkRemovedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save IconDark to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-vMsf9", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconDarkAddedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	//TODO: Save IconDark to bucket
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-2nc7F", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	// TODO: Add Storage Key to event
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconDarkRemovedEvent(ctx, iamAgg, ""))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
 func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *IAMLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
