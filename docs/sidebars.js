@@ -19,7 +19,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Single Page Applications',
-      items: ['quickstarts/angular'],
+      items: ['quickstarts/angular', 'quickstarts/react'],
       collapsed: false,
     },
     {
