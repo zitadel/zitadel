@@ -97,6 +97,13 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 			return err
 		}
 		return t.view.PutRefreshToken(token, event)
+	case user_repo.HumanRefreshTokenRemovedType:
+		e := new(user_repo.HumanRefreshTokenRemovedEvent)
+		if err := json.Unmarshal(event.Data, e); err != nil {
+			logging.Log("EVEN-BDbh3").WithError(err).Error("could not unmarshal event data")
+			return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
+		}
+		return t.view.DeleteRefreshToken(e.TokenID, event)
 	//case user_es_model.UserProfileChanged,
 	//	user_es_model.HumanProfileChanged:
 	//	user := new(view_model.UserView)
