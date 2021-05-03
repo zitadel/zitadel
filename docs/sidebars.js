@@ -88,8 +88,7 @@ module.exports = {
       items: [
         'apis/ratelimits/overview',
         'apis/ratelimits/accounts',
-        'apis/ratelimits/management',
-        'apis/ratelimits/openid-oauth',
+        'apis/ratelimits/api',
       ],
     },
     'apis/apis',

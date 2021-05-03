@@ -16,7 +16,7 @@ This helps us garuantee the perfomance and availabilty of ZITADEL Cloud to all i
 ZITADEL Clouds rate limit is built around a `IP` oriented model. Please be aware that we also utilize a service for DDoS mitigation.
 So if you simply change your `IP` address and run the same request again and again you might be get blocked at some point.
 
-If you are blocked you will recieve a `http status 429`
+If you are blocked you will recieve a `http status 429`.
 
 ## What rate limits do apply
 
