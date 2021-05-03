@@ -11,7 +11,7 @@ At the end of the guide you should have an application able to login a user and 
 
 Before we can start building our application we have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your [Project](https://console.zitadel.ch/projects) and add a new application at the top of the page.
-Select User Agent and continue. More about the different app types you can finde [here](https://docs.zitadel.ch/docs/guides/usage/oauth-recommended-flows#different-client-profiles)
+Select User Agent and continue. More about the different app types can you find [here](https://docs.zitadel.ch/docs/guides/usage/oauth-recommended-flows#different-client-profiles).
 We recommend that you use [Authorization Code](../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange](../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
 
 ### Redirect URLs
@@ -110,6 +110,6 @@ You have successfully integrated ZITADEL in your React Application!
 
 ### Whats next?
 
-Now you can proceed implementing our APIs to include Authorization. You can findour API Docs [here](../apis/apis)
+Now you can proceed implementing our APIs to include Authorization. You can find our API Docs [here](../apis/apis)
 
 For more information about creating a React application we refer to [React](https://reactjs.org/docs/getting-started.html) and for more information about the used oauth/oidc library consider reading their docs at [oidc-react](https://www.npmjs.com/package/oidc-react).
