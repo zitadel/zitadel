@@ -35,8 +35,18 @@ const (
 	LoginPolicyMultiFactorAdded          models.EventType = "iam.policy.login.multifactor.added"
 	LoginPolicyMultiFactorRemoved        models.EventType = "iam.policy.login.multifactor.removed"
 
-	LabelPolicyAdded   models.EventType = "iam.policy.label.added"
-	LabelPolicyChanged models.EventType = "iam.policy.label.changed"
+	LabelPolicyAdded     models.EventType = "iam.policy.label.added"
+	LabelPolicyChanged   models.EventType = "iam.policy.label.changed"
+	LabelPolicyActivated models.EventType = "iam.policy.label.activated"
+
+	LabelPolicyLogoAdded       models.EventType = "iam.policy.label.logo.added"
+	LabelPolicyLogoRemoved     models.EventType = "iam.policy.label.logo.removed"
+	LabelPolicyIconAdded       models.EventType = "iam.policy.label.icon.added"
+	LabelPolicyIconRemoved     models.EventType = "iam.policy.label.icon.removed"
+	LabelPolicyLogoDarkAdded   models.EventType = "iam.policy.label.logo.dark.added"
+	LabelPolicyLogoDarkRemoved models.EventType = "iam.policy.label.logo.dark.removed"
+	LabelPolicyIconDarkAdded   models.EventType = "iam.policy.label.icon.dark.added"
+	LabelPolicyIconDarkRemoved models.EventType = "iam.policy.label.icon.dark.removed"
 
 	MailTemplateAdded   models.EventType = "iam.mail.template.added"
 	MailTemplateChanged models.EventType = "iam.mail.template.changed"

@@ -2445,7 +2445,7 @@ message UpdateLabelPolicyResponse {
 message ActivateLabelPolicyRequest {}
 
 message ActivateLabelPolicyResponse {
-    zitadel.policy.v1.LabelPolicy policy = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request

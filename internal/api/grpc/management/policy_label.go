@@ -18,7 +18,11 @@ func (s *Server) GetLabelPolicy(ctx context.Context, req *mgmt_pb.GetLabelPolicy
 }
 
 func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *mgmt_pb.GetPreviewLabelPolicyRequest) (*mgmt_pb.GetPreviewLabelPolicyResponse, error) {
-	return nil, nil
+	policy, err := s.org.GetPreviewLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
 }
 
 func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLabelPolicyRequest) (*mgmt_pb.GetDefaultLabelPolicyResponse, error) {
@@ -58,7 +62,17 @@ func (s *Server) UpdateCustomLabelPolicy(ctx context.Context, req *mgmt_pb.Updat
 }
 
 func (s *Server) ActivateCustomLabelPolicy(ctx context.Context, req *mgmt_pb.ActivateCustomLabelPolicyRequest) (*mgmt_pb.ActivateCustomLabelPolicyResponse, error) {
-	return nil, nil
+	policy, err := s.command.ActivateLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ActivateCustomLabelPolicyResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) ResetLabelPolicyToDefault(ctx context.Context, req *mgmt_pb.ResetLabelPolicyToDefaultRequest) (*mgmt_pb.ResetLabelPolicyToDefaultResponse, error) {

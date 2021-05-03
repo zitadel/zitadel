@@ -83,6 +83,7 @@ SetUp:
     DefaultLabelPolicy:
       PrimaryColor: '#222324'
       SecondaryColor: '#ffffff'
+      WarnColor: '#ff0000'
   Step7:
     OTP: true
   Step8:

@@ -602,7 +602,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.LabelPolicy | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 

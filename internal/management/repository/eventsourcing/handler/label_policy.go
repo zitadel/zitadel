@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -78,8 +79,17 @@ func (m *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.LabelPolicyAdded, model.LabelPolicyAdded:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LabelPolicyChanged, model.LabelPolicyChanged:
-		policy, err = m.view.LabelPolicyByAggregateID(event.AggregateID)
+	case iam_es_model.LabelPolicyChanged, model.LabelPolicyChanged,
+		iam_es_model.LabelPolicyActivated, model.LabelPolicyActivated,
+		iam_es_model.LabelPolicyLogoAdded, model.LabelPolicyLogoAdded,
+		iam_es_model.LabelPolicyLogoRemoved, model.LabelPolicyLogoRemoved,
+		iam_es_model.LabelPolicyIconAdded, model.LabelPolicyIconAdded,
+		iam_es_model.LabelPolicyIconRemoved, model.LabelPolicyIconRemoved,
+		iam_es_model.LabelPolicyLogoDarkAdded, model.LabelPolicyLogoDarkAdded,
+		iam_es_model.LabelPolicyLogoDarkRemoved, model.LabelPolicyLogoDarkRemoved,
+		iam_es_model.LabelPolicyIconDarkAdded, model.LabelPolicyIconDarkAdded,
+		iam_es_model.LabelPolicyIconDarkRemoved, model.LabelPolicyIconDarkRemoved:
+		policy, err = m.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}

@@ -2,15 +2,16 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
 type Step5 struct {
-	DefaultOrgIAMPolicy iam_model.OrgIAMPolicy
+	DefaultOrgIAMPolicy domain.OrgIAMPolicy
 }
 
 func (s *Step5) Step() domain.Step {

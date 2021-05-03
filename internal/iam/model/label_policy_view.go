@@ -17,8 +17,8 @@ type LabelPolicyView struct {
 	PrimaryColorDark   string
 	SecondaryColorDark string
 	WarnColorDark      string
-	LogoURLDark        string
-	IconURLDark        string
+	LogoDarkURL        string
+	IconDarkURL        string
 
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool
@@ -44,6 +44,7 @@ type LabelPolicySearchKey int32
 const (
 	LabelPolicySearchKeyUnspecified LabelPolicySearchKey = iota
 	LabelPolicySearchKeyAggregateID
+	LabelPolicySearchKeyState
 )
 
 type LabelPolicySearchQuery struct {
