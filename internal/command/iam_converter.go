@@ -49,7 +49,13 @@ func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
 		PrimaryColor:        wm.PrimaryColor,
 		SecondaryColor:      wm.SecondaryColor,
+		WarnColor:           wm.WarnColor,
+		PrimaryColorDark:    wm.PrimaryColorDark,
+		SecondaryColorDark:  wm.SecondaryColorDark,
+		WarnColorDark:       wm.WarnColorDark,
 		HideLoginNameSuffix: wm.HideLoginNameSuffix,
+		ErrorMsgPopup:       wm.ErrorMsgPopup,
+		DisableWatermark:    wm.DisableWatermark,
 	}
 }
 

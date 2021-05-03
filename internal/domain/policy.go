@@ -6,6 +6,7 @@ const (
 	PolicyStateUnspecified PolicyState = iota
 	PolicyStateActive
 	PolicyStateRemoved
+	PolicyStatePreview
 
 	policyStateCount
 )

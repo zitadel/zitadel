@@ -40,7 +40,18 @@ func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
 	}
 
-	return iam_repo.NewLabelPolicyAddedEvent(ctx, iamAgg, policy.PrimaryColor, policy.SecondaryColor, policy.HideLoginNameSuffix), nil
+	return iam_repo.NewLabelPolicyAddedEvent(
+		ctx,
+		iamAgg,
+		policy.PrimaryColor,
+		policy.SecondaryColor,
+		policy.WarnColor,
+		policy.PrimaryColorDark,
+		policy.SecondaryColorDark,
+		policy.WarnColorDark,
+		policy.HideLoginNameSuffix,
+		policy.ErrorMsgPopup,
+		policy.DisableWatermark), nil
 
 }
 
@@ -57,7 +68,18 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.PrimaryColor, policy.SecondaryColor, policy.HideLoginNameSuffix)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
+		ctx,
+		iamAgg,
+		policy.PrimaryColor,
+		policy.SecondaryColor,
+		policy.WarnColor,
+		policy.PrimaryColorDark,
+		policy.SecondaryColorDark,
+		policy.WarnColorDark,
+		policy.HideLoginNameSuffix,
+		policy.ErrorMsgPopup,
+		policy.DisableWatermark)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
@@ -71,6 +93,27 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 		return nil, err
 	}
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
+}
+
+func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-6M23e", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyActivatedEvent(ctx, iamAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
 func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *IAMLabelPolicyWriteModel, err error) {

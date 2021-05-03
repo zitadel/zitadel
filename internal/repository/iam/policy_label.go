@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	LabelPolicyAddedEventType   = iamEventTypePrefix + policy.LabelPolicyAddedEventType
-	LabelPolicyChangedEventType = iamEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyAddedEventType     = iamEventTypePrefix + policy.LabelPolicyAddedEventType
+	LabelPolicyChangedEventType   = iamEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyActivatedEventType = iamEventTypePrefix + policy.LabelPolicyActivatedEventType
 )
 
 type LabelPolicyAddedEvent struct {
@@ -21,8 +22,14 @@ func NewLabelPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	primaryColor,
-	secondaryColor string,
-	hideLoginNameSuffix bool,
+	secondaryColor,
+	warnColor,
+	primaryColorDark,
+	secondaryColorDark,
+	warnColorDark string,
+	hideLoginNameSuffix,
+	errorMsgPopup,
+	disableWatermark bool,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
@@ -32,7 +39,13 @@ func NewLabelPolicyAddedEvent(
 				LabelPolicyAddedEventType),
 			primaryColor,
 			secondaryColor,
-			hideLoginNameSuffix),
+			warnColor,
+			primaryColorDark,
+			secondaryColorDark,
+			warnColorDark,
+			hideLoginNameSuffix,
+			errorMsgPopup,
+			disableWatermark),
 	}
 }
 
@@ -74,4 +87,31 @@ func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventRea
 	}
 
 	return &LabelPolicyChangedEvent{LabelPolicyChangedEvent: *e.(*policy.LabelPolicyChangedEvent)}, nil
+}
+
+type LabelPolicyActivatedEvent struct {
+	policy.LabelPolicyActivatedEvent
+}
+
+func NewLabelPolicyActivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *LabelPolicyActivatedEvent {
+	return &LabelPolicyActivatedEvent{
+		LabelPolicyActivatedEvent: *policy.NewLabelPolicyActivatedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyActivatedEventType),
+		),
+	}
+}
+
+func LabelPolicyActivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LabelPolicyActivatedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyActivatedEvent{LabelPolicyActivatedEvent: *e.(*policy.LabelPolicyActivatedEvent)}, nil
 }

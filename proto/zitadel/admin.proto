@@ -2424,6 +2424,17 @@ message UpdateLabelPolicyRequest {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
+    string warn_color = 4 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string primary_color_dark = 5 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color_dark = 6 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string warn_color_dark = 7 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    // Shows error messages as popup instead of inline
+    bool error_msg_popup = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Shows error messages as popup instead of inline.";
+        }
+    ];
+    bool disable_watermark = 9;
 }
 
 message UpdateLabelPolicyResponse {

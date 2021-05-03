@@ -9,6 +9,12 @@ func updateLabelPolicyToDomain(policy *admin_pb.UpdateLabelPolicyRequest) *domai
 	return &domain.LabelPolicy{
 		PrimaryColor:        policy.PrimaryColor,
 		SecondaryColor:      policy.SecondaryColor,
+		WarnColor:           policy.WarnColor,
+		PrimaryColorDark:    policy.PrimaryColorDark,
+		SecondaryColorDark:  policy.SecondaryColorDark,
+		WarnColorDark:       policy.WarnColorDark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
+		ErrorMsgPopup:       policy.ErrorMsgPopup,
+		DisableWatermark:    policy.DisableWatermark,
 	}
 }

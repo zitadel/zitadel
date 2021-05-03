@@ -1724,6 +1724,12 @@ This is an empty response
 | primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
 | secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
 | hide_login_name_suffix |  bool | - |  |
+| warn_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| primary_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| secondary_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| warn_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| error_msg_popup |  bool | Shows error messages as popup instead of inline |  |
+| disable_watermark |  bool | - |  |
 
 
 

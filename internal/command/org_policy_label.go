@@ -25,7 +25,18 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyAddedEvent(ctx, orgAgg, policy.PrimaryColor, policy.SecondaryColor, policy.HideLoginNameSuffix))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyAddedEvent(
+		ctx,
+		orgAgg,
+		policy.PrimaryColor,
+		policy.SecondaryColor,
+		policy.WarnColor,
+		policy.PrimaryColorDark,
+		policy.SecondaryColorDark,
+		policy.WarnColorDark,
+		policy.HideLoginNameSuffix,
+		policy.ErrorMsgPopup,
+		policy.DisableWatermark))
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +64,18 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.PrimaryColor, policy.SecondaryColor, policy.HideLoginNameSuffix)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
+		ctx,
+		orgAgg,
+		policy.PrimaryColor,
+		policy.SecondaryColor,
+		policy.WarnColor,
+		policy.PrimaryColorDark,
+		policy.SecondaryColorDark,
+		policy.WarnColorDark,
+		policy.HideLoginNameSuffix,
+		policy.ErrorMsgPopup,
+		policy.DisableWatermark)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
@@ -67,6 +89,30 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		return nil, err
 	}
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
+}
+
+func (c *Commands) ActivateLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-KKd4X", "Errors.ResourceOwnerMissing")
+	}
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-34mSE", "Errors.Org.LabelPolicy.NotFound")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyActivatedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
 func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {

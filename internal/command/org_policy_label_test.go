@@ -82,6 +82,12 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
 								true,
 							),
 						),
@@ -94,7 +100,13 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color",
 					SecondaryColor:      "secondary-color",
+					WarnColor:           "warn-color",
+					PrimaryColorDark:    "primary-color-dark",
+					SecondaryColorDark:  "secondary-color-dark",
+					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
 				},
 			},
 			res: res{
@@ -114,6 +126,12 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 									&org.NewAggregate("org1", "org1").Aggregate,
 									"primary-color",
 									"secondary-color",
+									"warn-color",
+									"primary-color-dark",
+									"secondary-color-dark",
+									"warn-color-dark",
+									true,
+									true,
 									true,
 								),
 							),
@@ -127,7 +145,13 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color",
 					SecondaryColor:      "secondary-color",
+					WarnColor:           "warn-color",
+					PrimaryColorDark:    "primary-color-dark",
+					SecondaryColorDark:  "secondary-color-dark",
+					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
 				},
 			},
 			res: res{
@@ -138,7 +162,13 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					},
 					PrimaryColor:        "primary-color",
 					SecondaryColor:      "secondary-color",
+					WarnColor:           "warn-color",
+					PrimaryColorDark:    "primary-color-dark",
+					SecondaryColorDark:  "secondary-color-dark",
+					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
 				},
 			},
 		},
@@ -232,6 +262,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				policy: &domain.LabelPolicy{
 					PrimaryColor:   "primary-color",
 					SecondaryColor: "secondary-color",
+					WarnColor:      "warn-color",
 				},
 			},
 			res: res{
@@ -249,6 +280,12 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
 								true,
 							),
 						),
@@ -261,7 +298,13 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color",
 					SecondaryColor:      "secondary-color",
+					WarnColor:           "warn-color",
+					PrimaryColorDark:    "primary-color-dark",
+					SecondaryColorDark:  "secondary-color-dark",
+					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
 				},
 			},
 			res: res{
@@ -279,6 +322,12 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
 								true,
 							),
 						),
@@ -286,7 +335,18 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newLabelPolicyChangedEvent(context.Background(), "org1", "primary-color-change", "secondary-color-change", false),
+								newLabelPolicyChangedEvent(
+									context.Background(),
+									"org1",
+									"primary-color-change",
+									"secondary-color-change",
+									"warn-color-change",
+									"primary-color-dark-change",
+									"secondary-color-dark-change",
+									"warn-color-dark-change",
+									false,
+									false,
+									false),
 							),
 						},
 					),
@@ -298,7 +358,13 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color-change",
 					SecondaryColor:      "secondary-color-change",
+					WarnColor:           "warn-color-change",
+					PrimaryColorDark:    "primary-color-dark-change",
+					SecondaryColorDark:  "secondary-color-dark-change",
+					WarnColorDark:       "warn-color-dark-change",
 					HideLoginNameSuffix: false,
+					ErrorMsgPopup:       false,
+					DisableWatermark:    false,
 				},
 			},
 			res: res{
@@ -309,7 +375,13 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					},
 					PrimaryColor:        "primary-color-change",
 					SecondaryColor:      "secondary-color-change",
+					WarnColor:           "warn-color-change",
+					PrimaryColorDark:    "primary-color-dark-change",
+					SecondaryColorDark:  "secondary-color-dark-change",
+					WarnColorDark:       "warn-color-dark-change",
 					HideLoginNameSuffix: false,
+					ErrorMsgPopup:       false,
+					DisableWatermark:    false,
 				},
 			},
 		},
@@ -328,6 +400,107 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx   context.Context
+		orgID string
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "org id missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "activate, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyActivatedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			_, err := r.ActivateLabelPolicy(tt.args.ctx, tt.args.orgID)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}
@@ -391,6 +564,12 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"primary-color",
 								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
 								true,
 							),
 						),
@@ -428,13 +607,19 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 	}
 }
 
-func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, secondaryColor string, hideLoginNameSuffix bool) *org.LabelPolicyChangedEvent {
+func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, secondaryColor, warnColor, primaryColorDark, secondaryColorDark, warnColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *org.LabelPolicyChangedEvent {
 	event, _ := org.NewLabelPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
 			policy.ChangeSecondaryColor(secondaryColor),
+			policy.ChangeWarnColor(warnColor),
+			policy.ChangePrimaryColorDark(primaryColorDark),
+			policy.ChangeSecondaryColorDark(secondaryColorDark),
+			policy.ChangeWarnColorDark(warnColorDark),
 			policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix),
+			policy.ChangeErrorMsgPopup(errMsgPopup),
+			policy.ChangeDisableWatermark(disableWatermark),
 		},
 	)
 	return event
