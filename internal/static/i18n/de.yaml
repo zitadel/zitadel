@@ -5,8 +5,20 @@ Errors:
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
   Assets:
+    Store:
+      NotInitialized: Assets Speicher konnte nicht initialisiert werden
     Bucket:
+      Internal: Interner Fehler beim erstellen eines Buckets
       AlreadyExists: Bucket existiert bereits
+      CreateFailed: Bucket konnte nicht erstellt werden
+      ListFailed: Buckets konnten nicht gelesen werden
+      RemoveFailed: Bucket konnte nicht gelöscht werden
+    Object:
+      PutFailed: Objekt konnte nicht erstellt werden
+      GetFaieled: Objekt konnte nicht gelesen werden
+      PresignedTokenFailed: Signiertes Token konnte nicht erstellt werden
+      ListFailed: Objektliste konnte nicht gelesen werden
+      RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
   User:
