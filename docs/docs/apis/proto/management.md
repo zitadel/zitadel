@@ -1560,7 +1560,18 @@ The password lockout policy is not used at the moment
 > **rpc** GetLabelPolicy([GetLabelPolicyRequest](#getlabelpolicyrequest))
 [GetLabelPolicyResponse](#getlabelpolicyresponse)
 
-Returns the label policy of the organisation
+Returns the active label policy of the organisation
+With this policy the private labeling can be configured (colors, etc.)
+
+
+
+
+### GetPreviewLabelPolicy
+
+> **rpc** GetPreviewLabelPolicy([GetPreviewLabelPolicyRequest](#getpreviewlabelpolicyrequest))
+[GetPreviewLabelPolicyResponse](#getpreviewlabelpolicyresponse)
+
+Returns the preview label policy of the organisation
 With this policy the private labeling can be configured (colors, etc.)
 
 
@@ -1595,6 +1606,16 @@ With this policy the private labeling can be configured (colors, etc.)
 
 Changes the custom label policy for the organisation
 With this policy the private labeling can be configured (colors, etc.)
+
+
+
+
+### ActivateCustomLabelPolicy
+
+> **rpc** ActivateCustomLabelPolicy([ActivateCustomLabelPolicyRequest](#activatecustomlabelpolicyrequest))
+[ActivateCustomLabelPolicyResponse](#activatecustomlabelpolicyresponse)
+
+Activates all changes of the label policy
 
 
 
@@ -1704,6 +1725,23 @@ Change OIDC identity provider configuration of the organisation
 ## Messages
 
 
+### ActivateCustomLabelPolicyRequest
+This is an empty request
+
+
+
+
+### ActivateCustomLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddAPIAppRequest
 
 
@@ -1766,7 +1804,13 @@ Change OIDC identity provider configuration of the organisation
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
 | secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | - |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| warn_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| primary_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| secondary_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| warn_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| error_msg_popup |  bool | Shows error messages as popup instead of inline |  |
+| disable_watermark |  bool | - |  |
 
 
 
@@ -3046,6 +3090,24 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
+| is_default |  bool | - |  |
+
+
+
+
+### GetPreviewLabelPolicyRequest
+This is an empty request
+
+
+
+
+### GetPreviewLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
 | is_default |  bool | - |  |
 
 
@@ -4951,6 +5013,12 @@ This is an empty request
 | primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
 | secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
 | hide_login_name_suffix |  bool | - |  |
+| warn_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| primary_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| secondary_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| warn_color_dark |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| error_msg_popup |  bool | Shows error messages as popup instead of inline |  |
+| disable_watermark |  bool | - |  |
 
 
 

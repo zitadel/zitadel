@@ -1,16 +1,30 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"time"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type LabelPolicyView struct {
-	AggregateID         string
-	PrimaryColor        string
-	SecondaryColor      string
+	AggregateID    string
+	PrimaryColor   string
+	SecondaryColor string
+	WarnColor      string
+	LogoURL        string
+	IconURL        string
+
+	PrimaryColorDark   string
+	SecondaryColorDark string
+	WarnColorDark      string
+	LogoURLDark        string
+	IconURLDark        string
+
 	HideLoginNameSuffix bool
-	Default             bool
+	ErrorMsgPopup       bool
+	DisableWatermark    bool
+
+	Default bool
 
 	CreationDate time.Time
 	ChangeDate   time.Time

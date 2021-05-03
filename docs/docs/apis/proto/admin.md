@@ -266,6 +266,16 @@ Returns the label policy defined by the administrators of ZITADEL
 
 
 
+### GetPreviewLabelPolicy
+
+> **rpc** GetPreviewLabelPolicy([GetPreviewLabelPolicyRequest](#getpreviewlabelpolicyrequest))
+[GetPreviewLabelPolicyResponse](#getpreviewlabelpolicyresponse)
+
+Returns the preview label policy defined by the administrators of ZITADEL
+
+
+
+
 ### UpdateLabelPolicy
 
 > **rpc** UpdateLabelPolicy([UpdateLabelPolicyRequest](#updatelabelpolicyrequest))
@@ -273,6 +283,16 @@ Returns the label policy defined by the administrators of ZITADEL
 
 Updates the default label policy of ZITADEL
 it impacts all organisations without a customised policy
+
+
+
+
+### ActivateCustomLabelPolicy
+
+> **rpc** ActivateCustomLabelPolicy([ActivateLabelPolicyRequest](#activatelabelpolicyrequest))
+[ActivateLabelPolicyResponse](#activatelabelpolicyresponse)
+
+Activates all changes of the label policy
 
 
 
@@ -568,6 +588,23 @@ failed event. You can find out if it worked on the `failure_count`
 
 
 ## Messages
+
+
+### ActivateLabelPolicyRequest
+This is an empty request
+
+
+
+
+### ActivateLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
 
 
 ### AddCustomOrgIAMPolicyRequest
@@ -971,6 +1008,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
+
+
+
+
+### GetPreviewLabelPolicyRequest
+This is an empty request
+
+
+
+
+### GetPreviewLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
 
 
 

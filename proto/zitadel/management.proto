@@ -1891,11 +1891,23 @@ service ManagementService {
         };
     }
 
-    // Returns the label policy of the organisation
+    // Returns the active label policy of the organisation
     // With this policy the private labeling can be configured (colors, etc.)
     rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Returns the preview label policy of the organisation
+    // With this policy the private labeling can be configured (colors, etc.)
+    rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label/_preview"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1912,6 +1924,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
+            feature: "label_policy"
         };
     }
 
@@ -1935,6 +1948,20 @@ service ManagementService {
         option (google.api.http) = {
             put: "/policies/label"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
+        };
+    }
+
+    // Activates all changes of the label policy
+    rpc ActivateCustomLabelPolicy(ActivateCustomLabelPolicyRequest) returns (ActivateCustomLabelPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/label/_activate"
+            body: "*"
+
         };
 
         option (zitadel.v1.auth_option) = {
@@ -3580,6 +3607,14 @@ message GetLabelPolicyResponse {
 }
 
 //This is an empty request
+message GetPreviewLabelPolicyRequest {}
+
+message GetPreviewLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+    bool is_default = 2;
+}
+
+//This is an empty request
 message GetDefaultLabelPolicyRequest {}
 
 message GetDefaultLabelPolicyResponse {
@@ -3589,11 +3624,23 @@ message GetDefaultLabelPolicyResponse {
 message AddCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {min_len: 1, max_len: 50}];
     string secondary_color = 2 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
+    string warn_color = 4 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string primary_color_dark = 5 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color_dark = 6 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string warn_color_dark = 7 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    // Shows error messages as popup instead of inline
+    bool error_msg_popup = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Shows error messages as popup instead of inline.";
+        }
+    ];
+    bool disable_watermark = 9;
 }
 
 message AddCustomLabelPolicyResponse {
@@ -3608,9 +3655,27 @@ message UpdateCustomLabelPolicyRequest {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
+    string warn_color = 4 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string primary_color_dark = 5 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string secondary_color_dark = 6 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    string warn_color_dark = 7 [(validate.rules).string = {min_len: 1, max_len: 50}];
+    // Shows error messages as popup instead of inline
+    bool error_msg_popup = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Shows error messages as popup instead of inline.";
+        }
+    ];
+    bool disable_watermark = 9;
 }
 
 message UpdateCustomLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ActivateCustomLabelPolicyRequest {}
+
+message ActivateCustomLabelPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

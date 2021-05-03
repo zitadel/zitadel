@@ -822,6 +822,28 @@ service AdminService {
         };
     }
 
+    //Returns the preview label policy defined by the administrators of ZITADEL
+    rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label/_preview";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "label policy";
+            tags: "policy";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default label policy";
+                };
+            };
+        };
+    }
+
     //Updates the default label policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
@@ -843,6 +865,19 @@ service AdminService {
                     description: "default label policy updated";
                 };
             };
+        };
+    }
+
+    // Activates all changes of the label policy
+    rpc ActivateCustomLabelPolicy(ActivateLabelPolicyRequest) returns (ActivateLabelPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/label/_activate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
         };
     }
 
@@ -2352,6 +2387,13 @@ message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
 }
 
+//This is an empty request
+message GetPreviewLabelPolicyRequest {}
+
+message GetPreviewLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
 message UpdateLabelPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -2386,6 +2428,13 @@ message UpdateLabelPolicyRequest {
 
 message UpdateLabelPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ActivateLabelPolicyRequest {}
+
+message ActivateLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
 }
 
 //This is an empty request

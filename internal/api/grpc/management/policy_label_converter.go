@@ -9,7 +9,13 @@ func addLabelPolicyToDomain(p *mgmt_pb.AddCustomLabelPolicyRequest) *domain.Labe
 	return &domain.LabelPolicy{
 		PrimaryColor:        p.PrimaryColor,
 		SecondaryColor:      p.SecondaryColor,
+		WarnColor:           p.WarnColor,
+		PrimaryColorDark:    p.PrimaryColorDark,
+		SecondaryColorDark:  p.SecondaryColorDark,
+		WarnColorDark:       p.WarnColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
+		ErrorMsgPopup:       p.ErrorMsgPopup,
+		DisableWatermark:    p.DisableWatermark,
 	}
 }
 
@@ -17,6 +23,12 @@ func updateLabelPolicyToDomain(p *mgmt_pb.UpdateCustomLabelPolicyRequest) *domai
 	return &domain.LabelPolicy{
 		PrimaryColor:        p.PrimaryColor,
 		SecondaryColor:      p.SecondaryColor,
+		WarnColor:           p.WarnColor,
+		PrimaryColorDark:    p.PrimaryColorDark,
+		SecondaryColorDark:  p.SecondaryColorDark,
+		WarnColorDark:       p.WarnColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
+		ErrorMsgPopup:       p.ErrorMsgPopup,
+		DisableWatermark:    p.DisableWatermark,
 	}
 }

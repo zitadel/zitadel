@@ -7,12 +7,21 @@ import (
 type LabelPolicy struct {
 	models.ObjectRoot
 
-	Default             bool
-	PrimaryColor        string
-	SecondaryColor      string
+	Default bool
+
+	PrimaryColor   string
+	SecondaryColor string
+	WarnColor      string
+
+	PrimaryColorDark   string
+	SecondaryColorDark string
+	WarnColorDark      string
+
 	HideLoginNameSuffix bool
+	ErrorMsgPopup       bool
+	DisableWatermark    bool
 }
 
 func (p *LabelPolicy) IsValid() bool {
-	return p.PrimaryColor != "" && p.SecondaryColor != ""
+	return p.PrimaryColor != "" && p.SecondaryColor != "" && p.WarnColor != ""
 }

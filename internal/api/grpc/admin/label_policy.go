@@ -16,6 +16,10 @@ func (s *Server) GetLabelPolicy(ctx context.Context, req *admin_pb.GetLabelPolic
 	return &admin_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
 }
 
+func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *admin_pb.GetPreviewLabelPolicyRequest) (*admin_pb.GetPreviewLabelPolicyResponse, error) {
+	return nil, nil
+}
+
 func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabelPolicyRequest) (*admin_pb.UpdateLabelPolicyResponse, error) {
 	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, updateLabelPolicyToDomain(req))
 	if err != nil {
@@ -28,4 +32,8 @@ func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabe
 			policy.ResourceOwner,
 		),
 	}, nil
+}
+
+func (s *Server) ActivateLabelPolicy(ctx context.Context, req *admin_pb.ActivateLabelPolicyRequest) (*admin_pb.ActivateLabelPolicyResponse, error) {
+	return nil, nil
 }
