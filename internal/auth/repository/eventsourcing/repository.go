@@ -114,6 +114,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		eventstore.RefreshTokenRepo{
 			View:         view,
 			Eventstore:   es,
+			SearchLimit:  conf.SearchLimit,
 			KeyAlgorithm: keyAlgorithm,
 		},
 		eventstore.KeyRepository{

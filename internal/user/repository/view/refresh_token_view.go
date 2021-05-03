@@ -48,6 +48,13 @@ func PutRefreshTokens(db *gorm.DB, table string, tokens ...*usr_model.RefreshTok
 	return save(db, t...)
 }
 
+func SearchRefreshTokens(db *gorm.DB, table string, req *model.RefreshTokenSearchRequest) ([]*usr_model.RefreshTokenView, uint64, error) {
+	tokens := make([]*usr_model.RefreshTokenView, 0)
+	query := repository.PrepareSearchQuery(table, usr_model.RefreshTokenSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+	count, err := query(db, &tokens)
+	return tokens, count, err
+}
+
 func DeleteRefreshToken(db *gorm.DB, table, tokenID string) error {
 	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyRefreshTokenID), tokenID)
 	return delete(db)

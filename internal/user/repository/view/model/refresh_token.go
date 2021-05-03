@@ -43,6 +43,14 @@ type RefreshTokenView struct {
 	//PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
 }
 
+func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {
+	result := make([]*usr_model.RefreshTokenView, len(tokens))
+	for i, g := range tokens {
+		result[i] = RefreshTokenViewToModel(g)
+	}
+	return result
+}
+
 func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenView {
 	return &usr_model.RefreshTokenView{
 		ID:                    token.ID,

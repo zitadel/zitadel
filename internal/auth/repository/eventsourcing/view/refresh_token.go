@@ -3,6 +3,7 @@ package view
 import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	user_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -18,6 +19,10 @@ func (v *View) RefreshTokenByID(tokenID string) (*model.RefreshTokenView, error)
 
 func (v *View) RefreshTokensByUserID(userID string) ([]*model.RefreshTokenView, error) {
 	return usr_view.RefreshTokensByUserID(v.Db, refreshTokenTable, userID)
+}
+
+func (v *View) SearchRefreshTokens(request *user_model.RefreshTokenSearchRequest) ([]*model.RefreshTokenView, uint64, error) {
+	return usr_view.SearchRefreshTokens(v.Db, refreshTokenTable, request)
 }
 
 func (v *View) PutRefreshToken(token *model.RefreshTokenView, event *models.Event) error {

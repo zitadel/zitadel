@@ -95,6 +95,7 @@ Errors:
       CloneWarning: Credentials may be cloned
     RefreshToken:
       Invalid: Refresh Token is invalid
+      NotFound: Refresh Token not foundw
   Org:
     AlreadyExist: Organisationname already taken
     Invalid: Organisation is invalid

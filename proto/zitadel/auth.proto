@@ -82,6 +82,39 @@ service AuthService {
         };
     }
 
+    // Returns the user sessions of the authorized user of the current useragent
+    rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/me/tokens/refresh/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user sessions of the authorized user of the current useragent
+    rpc RevokeMyRefreshToken(RevokeMyRefreshTokenRequest) returns (RevokeMyRefreshTokenResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/tokens/refresh/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user sessions of the authorized user of the current useragent
+    rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/me/tokens/refresh/_revoke_all"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     // Change the user name of the authorize user
     rpc UpdateMyUserName(UpdateMyUserNameRequest) returns (UpdateMyUserNameResponse) {
         option (google.api.http) = {
@@ -488,6 +521,28 @@ message ListMyUserSessionsRequest {}
 message ListMyUserSessionsResponse {
     repeated zitadel.user.v1.Session result = 1;
 }
+
+//This is an empty request
+message ListMyRefreshTokensRequest {}
+
+message ListMyRefreshTokensResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.RefreshToken result = 2;
+}
+
+message RevokeMyRefreshTokenRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RevokeMyRefreshTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RevokeAllMyRefreshTokensRequest {}
+
+//This is an empty response
+message RevokeAllMyRefreshTokensResponse {}
 
 message UpdateMyUserNameRequest {
     string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];

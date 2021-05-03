@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
-	usr_model "github.com/caos/zitadel/internal/user/model"
+
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 type RefreshTokenRepository interface {
 	//IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error)
-	RefreshTokenByID(ctx context.Context, refreshToken string) (*usr_model.RefreshTokenView, error)
+	RefreshTokenByID(ctx context.Context, refreshToken string) (*model.RefreshTokenView, error)
+	SearchMyRefreshTokens(ctx context.Context, userID string, request *model.RefreshTokenSearchRequest) (*model.RefreshTokenSearchResponse, error)
 }

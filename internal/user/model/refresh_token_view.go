@@ -55,7 +55,9 @@ type RefreshTokenSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*RefreshToken
+	Sequence    uint64
+	Timestamp   time.Time
+	Result      []*RefreshTokenView
 }
 
 func (r *RefreshTokenSearchRequest) EnsureLimit(limit uint64) error {

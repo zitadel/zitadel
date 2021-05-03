@@ -95,6 +95,7 @@ Errors:
       CloneWarning: Authentifizierungsdaten wurden möglicherweise geklont
     RefreshToken:
       Invalid: Refresh Token ist ungültig
+      NotFound: Refresh Token nicht gefunden
   Org:
     AlreadyExist: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
