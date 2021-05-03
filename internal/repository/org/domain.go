@@ -49,10 +49,6 @@ func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return nil
 }
 
-func (e *DomainAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainAddedEvent {
 	return &DomainAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -89,10 +85,6 @@ func (e *DomainVerificationAddedEvent) Data() interface{} {
 }
 
 func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *DomainVerificationAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -140,10 +132,6 @@ func (e *DomainVerificationFailedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
-func (e *DomainVerificationFailedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewDomainVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerificationFailedEvent {
 	return &DomainVerificationFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -181,10 +169,6 @@ func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
-func (e *DomainVerifiedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerifiedEvent {
 	return &DomainVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -219,10 +203,6 @@ func (e *DomainPrimarySetEvent) Data() interface{} {
 }
 
 func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *DomainPrimarySetEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -265,10 +245,6 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 		return nil
 	}
 	return []*eventstore.EventUniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
-}
-
-func (e *DomainRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string, verified bool) *DomainRemovedEvent {

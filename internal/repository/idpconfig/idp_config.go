@@ -59,10 +59,6 @@ func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
-func (e *IDPConfigAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -97,10 +93,6 @@ func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
 	}
-}
-
-func (e *IDPConfigChangedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func NewIDPConfigChangedEvent(
@@ -175,10 +167,6 @@ func (e *IDPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func (e *IDPConfigDeactivatedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &IDPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -214,10 +202,6 @@ func (e *IDPConfigReactivatedEvent) Data() interface{} {
 }
 
 func (e *IDPConfigReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *IDPConfigReactivatedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -260,10 +244,6 @@ func (e *IDPConfigRemovedEvent) Data() interface{} {
 
 func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
-}
-
-func (e *IDPConfigRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

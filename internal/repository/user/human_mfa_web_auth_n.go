@@ -24,10 +24,6 @@ func (e *HumanWebAuthNAddedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func (e *HumanWebAuthNAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanWebAuthNAddedEvent(
 	base *eventstore.BaseEvent,
 	webAuthNTokenID,
@@ -69,10 +65,6 @@ func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
 }
 
 func (e *HumanWebAuthNVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanWebAuthNVerifiedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -126,10 +118,6 @@ func (e *HumanWebAuthNSignCountChangedEvent) UniqueConstraints() []*eventstore.E
 	return nil
 }
 
-func (e *HumanWebAuthNSignCountChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanWebAuthNSignCountChangedEvent(
 	base *eventstore.BaseEvent,
 	webAuthNTokenID string,
@@ -165,10 +153,6 @@ func (e *HumanWebAuthNRemovedEvent) Data() interface{} {
 }
 
 func (e *HumanWebAuthNRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanWebAuthNRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -210,10 +194,6 @@ func (e *HumanWebAuthNBeginLoginEvent) UniqueConstraints() []*eventstore.EventUn
 	return nil
 }
 
-func (e *HumanWebAuthNBeginLoginEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanWebAuthNBeginLoginEvent(base *eventstore.BaseEvent, challenge string, allowedCredentialIDs [][]byte, userVerification domain.UserVerificationRequirement, info *AuthRequestInfo) *HumanWebAuthNBeginLoginEvent {
 	return &HumanWebAuthNBeginLoginEvent{
 		BaseEvent:            *base,
@@ -248,10 +228,6 @@ func (e *HumanWebAuthNCheckSucceededEvent) UniqueConstraints() []*eventstore.Eve
 	return nil
 }
 
-func (e *HumanWebAuthNCheckSucceededEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanWebAuthNCheckSucceededEvent(
 	base *eventstore.BaseEvent,
 	info *AuthRequestInfo) *HumanWebAuthNCheckSucceededEvent {
@@ -282,10 +258,6 @@ func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
 }
 
 func (e *HumanWebAuthNCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanWebAuthNCheckFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
