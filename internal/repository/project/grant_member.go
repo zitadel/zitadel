@@ -48,10 +48,6 @@ func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
-func (e *GrantMemberAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewProjectGrantMemberAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -100,10 +96,6 @@ func (e *GrantMemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func (e *GrantMemberChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewProjectGrantMemberChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -149,10 +141,6 @@ func (e *GrantMemberRemovedEvent) Data() interface{} {
 
 func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
-}
-
-func (e *GrantMemberRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func NewProjectGrantMemberRemovedEvent(

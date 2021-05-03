@@ -47,10 +47,6 @@ func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint
 	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
-func (e *RoleAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewRoleAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -96,10 +92,6 @@ func (e *RoleChangedEvent) Data() interface{} {
 }
 
 func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *RoleChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -170,10 +162,6 @@ func (e *RoleRemovedEvent) Data() interface{} {
 
 func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
-}
-
-func (e *RoleRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func NewRoleRemovedEvent(

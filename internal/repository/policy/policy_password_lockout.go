@@ -29,10 +29,6 @@ func (e *PasswordLockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.Even
 	return nil
 }
 
-func (e *PasswordLockoutPolicyAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewPasswordLockoutPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	maxAttempts uint64,
@@ -71,10 +67,6 @@ func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *PasswordLockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *PasswordLockoutPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -130,10 +122,6 @@ func (e *PasswordLockoutPolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *PasswordLockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *PasswordLockoutPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

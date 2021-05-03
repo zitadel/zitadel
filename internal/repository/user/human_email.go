@@ -34,10 +34,6 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func (e *HumanEmailChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress string) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -75,10 +71,6 @@ func (e *HumanEmailVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	return nil
 }
 
-func (e *HumanEmailVerifiedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanEmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailVerifiedEvent {
 	return &HumanEmailVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -106,10 +98,6 @@ func (e *HumanEmailVerificationFailedEvent) Data() interface{} {
 }
 
 func (e *HumanEmailVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanEmailVerificationFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -141,10 +129,6 @@ func (e *HumanEmailCodeAddedEvent) Data() interface{} {
 }
 
 func (e *HumanEmailCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanEmailCodeAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -185,10 +169,6 @@ func (e *HumanEmailCodeSentEvent) Data() interface{} {
 }
 
 func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanEmailCodeSentEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

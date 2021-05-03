@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static/s3"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	"github.com/caos/zitadel/openapi"
 
@@ -38,6 +39,7 @@ type Config struct {
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
 	Metrics        metrics.MetricsConfig
+	AssetStorage   s3.AssetStorage
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 

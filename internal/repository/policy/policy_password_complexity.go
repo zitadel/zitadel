@@ -32,10 +32,6 @@ func (e *PasswordComplexityPolicyAddedEvent) UniqueConstraints() []*eventstore.E
 	return nil
 }
 
-func (e *PasswordComplexityPolicyAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewPasswordComplexityPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	minLength uint64,
@@ -82,10 +78,6 @@ func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *PasswordComplexityPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -159,10 +151,6 @@ func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *PasswordComplexityPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *PasswordComplexityPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
