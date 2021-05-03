@@ -2,11 +2,17 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-func Start(ctx context.Context, es *eventstore.Eventstore, client *sql.DB) {
-	NewOrgHandler(ctx, es, client)
+func StartWithUser(ctx context.Context, es *eventstore.Eventstore, baseConfig types.SQLBase, userConfig types.SQLUser) error {
+	sqlClient, err := userConfig.Start(baseConfig)
+	if err != nil {
+		return err
+	}
+
+	NewOrgHandler(ctx, es, sqlClient)
+	return nil
 }

@@ -2,6 +2,8 @@
 
 ## **Did you find a bug?**
 
+Please file an issue [here](https://github.com/caos/zitadel/issues/new/choose).
+
 ## **Want to contribute code?**
 
 * Check out our [Dev Build Guide](build/README.md).

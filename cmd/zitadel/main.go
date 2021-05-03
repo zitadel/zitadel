@@ -23,6 +23,7 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/handler"
 	"github.com/caos/zitadel/internal/setup"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
@@ -83,7 +84,7 @@ const (
 
 func main() {
 	flag.Var(configPaths, "config-files", "paths to the config files")
-	flag.Var(configPaths, "setup-files", "paths to the setup files")
+	flag.Var(setupPaths, "setup-files", "paths to the setup files")
 	flag.Parse()
 	arg := flag.Arg(0)
 	switch arg {
@@ -106,20 +107,24 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
+
 	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
-	if err != nil {
-		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
-	}
+	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
+
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
-	if err != nil {
-		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
-	}
+	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
+
+	err = handler.StartWithUser(ctx, esCommands, conf.EventstoreBase, conf.Commands.Eventstore)
+	logging.Log("ZITAD-HkUX4").OnError(err).Fatal("unable to start handlers")
+
 	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, authZRepo)
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start commands")
 	}
+
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
 		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
