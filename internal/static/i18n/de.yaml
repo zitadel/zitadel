@@ -5,6 +5,7 @@ Errors:
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
   Assets:
+    EmptyKey: Asset Key ist leer
     Store:
       NotInitialized: Assets Speicher konnte nicht initialisiert werden
     Bucket:

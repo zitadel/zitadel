@@ -119,6 +119,9 @@ func (c *Commands) AddLogoLabelPolicy(ctx context.Context, orgID, storageKey str
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-KKd4X", "Errors.ResourceOwnerMissing")
 	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4N3nf", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -142,6 +145,9 @@ func (c *Commands) AddLogoLabelPolicy(ctx context.Context, orgID, storageKey str
 func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2FN8s", "Errors.ResourceOwnerMissing")
+	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-vDe6s", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -167,6 +173,9 @@ func (c *Commands) AddIconLabelPolicy(ctx context.Context, orgID, storageKey str
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-hMDs3", "Errors.ResourceOwnerMissing")
 	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4BS7f", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -190,6 +199,9 @@ func (c *Commands) AddIconLabelPolicy(ctx context.Context, orgID, storageKey str
 func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-1nd0d", "Errors.ResourceOwnerMissing")
+	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4Nc8s", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -215,6 +227,9 @@ func (c *Commands) AddLogoDarkLabelPolicy(ctx context.Context, orgID, storageKey
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-67Ms2", "Errors.ResourceOwnerMissing")
 	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3S7fN", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -238,6 +253,9 @@ func (c *Commands) AddLogoDarkLabelPolicy(ctx context.Context, orgID, storageKey
 func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4NF0d", "Errors.ResourceOwnerMissing")
+	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1N8fs", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -263,6 +281,9 @@ func (c *Commands) AddIconDarkLabelPolicy(ctx context.Context, orgID, storageKey
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-tzBfs", "Errors.ResourceOwnerMissing")
 	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4B7cs", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -286,6 +307,9 @@ func (c *Commands) AddIconDarkLabelPolicy(ctx context.Context, orgID, storageKey
 func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mv9ds", "Errors.ResourceOwnerMissing")
+	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1B7d2", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {

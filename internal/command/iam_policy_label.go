@@ -117,6 +117,9 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 }
 
 func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3m20c", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -138,6 +141,9 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey str
 }
 
 func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-BMS2a", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -159,6 +165,9 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context, storageKey 
 }
 
 func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-yxE4f", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -180,6 +189,9 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey str
 }
 
 func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-5sfQD", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -201,6 +213,9 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context, storageKey 
 }
 
 func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4fMs9", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -222,6 +237,9 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey
 }
 
 func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-csM8f", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -243,6 +261,9 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context, storage
 }
 
 func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1cxM3", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -264,6 +285,9 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey
 }
 
 func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Ljs2F", "Errors.Assets.EmptyKey")
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
