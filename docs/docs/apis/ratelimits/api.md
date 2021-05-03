@@ -10,7 +10,7 @@ This is subject to change
 
 | Path                                                | Description            | Effectiv Limit         |
 |-----------------------------------------------------|------------------------|------------------------|
-| /*                                                  | Sum of all API request | 1000 Request per 1 min |
+| /*                                                  | Sum of all API request | 1000 request per 1 min |
 | /oauth/v2                                           |                        |                        |
 | /auth/v1/*                                          |                        |                        |
 | /caos.zitadel.auth.api.v1.AuthService/*             |                        |                        |
@@ -19,6 +19,6 @@ This is subject to change
 
 ## issuer.zitadel.ch
 
-| Path | Description      | Effectiv Limit |
-|------|------------------|----------------|
-| /*   | Global API Limit | none           |
+| Path | Description                             | Effectiv Limit |
+|------|-----------------------------------------|----------------|
+| /*   | Sum of all request to the issuer domain | none           |
