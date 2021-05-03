@@ -131,20 +131,31 @@ func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.User
 
 func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	user := new(model.UserView)
-	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
-	err := query(db, user)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return false, err
+
+	emailUnique := email == ""
+	userNameUnique := userName == ""
+	if email != "" {
+		query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
+		err := query(db, user)
+		if err != nil && !caos_errs.IsNotFound(err) {
+			return false, err
+		}
+		if caos_errs.IsNotFound(err) {
+			emailUnique = true
+		}
 	}
-	if user.UserName != "" {
-		return false, nil
+	if userName != "" {
+		query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
+		err := query(db, user)
+		if err != nil && !caos_errs.IsNotFound(err) {
+			return false, err
+		}
+		if caos_errs.IsNotFound(err) {
+			userNameUnique = true
+		}
 	}
-	query = repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
-	err = query(db, user)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return false, err
-	}
-	return user.UserName == "", nil
+
+	return emailUnique && userNameUnique, nil
 }
 
 func UserMFAs(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {

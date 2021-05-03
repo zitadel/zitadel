@@ -91,7 +91,7 @@
 
                         <div *ngIf="org" [@navAnimation]="org">
                             <ng-template appHasRole
-                                [appHasRole]="['org.read', 'project.read(:[0-9]*)?', 'user.read(:[0-9]*)?', 'user.grant.read(:[0-9]*)?']">
+                                [appHasRole]="['org.read']">
                                 <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span>{{org?.name ? org.name : ('MENU.ORGSECTION' | translate)}}</span>

@@ -2127,8 +2127,8 @@ message ListUserChangesResponse {
 }
 
 message IsUserUniqueRequest {
-    string user_name = 1 [(validate.rules).string.pattern = "^[^[:space:]]{1,200}$"];
-    string email = 2  [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    string email = 2 [(validate.rules).string = {max_len: 200}];
 }
 
 message IsUserUniqueResponse {

@@ -30,6 +30,10 @@ func (e *IdentityProviderAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return nil
 }
 
+func (e *IdentityProviderAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewIdentityProviderAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
@@ -70,6 +74,10 @@ func (e *IdentityProviderRemovedEvent) UniqueConstraints() []*eventstore.EventUn
 	return nil
 }
 
+func (e *IdentityProviderRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewIdentityProviderRemovedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID string,
@@ -104,6 +112,10 @@ func (e *IdentityProviderCascadeRemovedEvent) Data() interface{} {
 }
 
 func (e *IdentityProviderCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *IdentityProviderCascadeRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

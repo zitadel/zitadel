@@ -50,6 +50,10 @@ func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniq
 	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
+func (e *HumanExternalIDPAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanExternalIDPAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -97,6 +101,10 @@ func (e *HumanExternalIDPRemovedEvent) UniqueConstraints() []*eventstore.EventUn
 	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
+func (e *HumanExternalIDPRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanExternalIDPRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -142,6 +150,10 @@ func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraints() []*eventstore.
 	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
+func (e *HumanExternalIDPCascadeRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewHumanExternalIDPCascadeRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -182,6 +194,10 @@ func (e *HumanExternalIDPCheckSucceededEvent) Data() interface{} {
 }
 
 func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanExternalIDPCheckSucceededEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

@@ -36,6 +36,10 @@ func (e *ApplicationKeyAddedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
+func (e *ApplicationKeyAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewApplicationKeyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -85,6 +89,10 @@ func (e *ApplicationKeyRemovedEvent) Data() interface{} {
 }
 
 func (e *ApplicationKeyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *ApplicationKeyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

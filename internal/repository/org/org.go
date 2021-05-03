@@ -45,6 +45,10 @@ func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint 
 	return []*eventstore.EventUniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
+func (e *OrgAddedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgAddedEvent {
 	return &OrgAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -86,6 +90,10 @@ func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	}
 }
 
+func (e *OrgChangedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, oldName, newName string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -119,6 +127,10 @@ func (e *OrgDeactivatedEvent) Data() interface{} {
 }
 
 func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OrgDeactivatedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -156,6 +168,10 @@ func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return nil
 }
 
+func (e *OrgReactivatedEvent) Assets() []*eventstore.Asset {
+	return nil
+}
+
 func NewOrgReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrgReactivatedEvent {
 	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -189,6 +205,10 @@ func (e *OrgRemovedEvent) Data() interface{} {
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.name)}
+}
+
+func (e *OrgRemovedEvent) Assets() []*eventstore.Asset {
+	return nil
 }
 
 func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgRemovedEvent {

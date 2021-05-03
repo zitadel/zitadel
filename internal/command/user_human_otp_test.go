@@ -304,6 +304,7 @@ func TestCommandSide_RemoveHumanOTP(t *testing.T) {
 								),
 							),
 						},
+						nil,
 					),
 				),
 			},
