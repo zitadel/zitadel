@@ -81,11 +81,22 @@ module.exports = {
   apis: [
     'apis/introduction',
     'apis/domains',
+    {
+      type: 'category',
+      label: 'Rate Limits',
+      collapsed: true,
+      items: [
+        'apis/ratelimits/overview',
+        'apis/ratelimits/accounts',
+        'apis/ratelimits/management',
+        'apis/ratelimits/openid-oauth',
+      ],
+    },
     'apis/apis',
     {
       type: 'category',
       label: 'Proto API Definition',
-      collapsed: false,
+      collapsed: true,
       items: [
         'apis/proto/auth',
         'apis/proto/management',
@@ -106,7 +117,7 @@ module.exports = {
     {
       type: 'category',
       label: 'OpenID Connect & OAuth',
-      collapsed: false,
+      collapsed: true,
       items: [
           'apis/openidoauth/endpoints',
           'apis/openidoauth/scopes',
