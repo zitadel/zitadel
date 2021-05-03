@@ -607,6 +607,1046 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 	}
 }
 
+func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "logo added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyLogoAddedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.AddLogoLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "logo added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyLogoRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveLogoLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "icon added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyIconAddedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.AddIconLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "icon added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyIconRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveIconLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "logo dark added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.AddLogoDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "logo dark added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveLogoDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "icon dark added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.AddIconDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		orgID      string
+		storageKey string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "orgID empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "storage key empty, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "label policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "icon dark added, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"key",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				orgID:      "org1",
+				storageKey: "key",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveIconDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, secondaryColor, warnColor, primaryColorDark, secondaryColorDark, warnColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *org.LabelPolicyChangedEvent {
 	event, _ := org.NewLabelPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
