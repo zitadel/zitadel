@@ -16,8 +16,8 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.14.6
-	github.com/caos/orbos v1.5.14-0.20210423104531-6cb6c27f258b
+	github.com/caos/oidc v0.14.7
+	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/envoyproxy/protoc-gen-validate v0.5.1
@@ -45,6 +45,7 @@ require (
 	github.com/lib/pq v1.9.0
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
+	github.com/minio/minio-go/v7 v7.0.10
 	github.com/mitchellh/copystructure v1.1.2 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pkg/errors v0.9.1

@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static/s3"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	"github.com/caos/zitadel/openapi"
 
@@ -38,6 +39,7 @@ type Config struct {
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
 	Metrics        metrics.MetricsConfig
+	AssetStorage   s3.AssetStorage
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 
@@ -85,7 +87,7 @@ const (
 
 func main() {
 	flag.Var(configPaths, "config-files", "paths to the config files")
-	flag.Var(configPaths, "setup-files", "paths to the setup files")
+	flag.Var(setupPaths, "setup-files", "paths to the setup files")
 	flag.Parse()
 	arg := flag.Arg(0)
 	switch arg {
@@ -164,7 +166,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
 	}
 	if *managementEnabled {
 		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query)

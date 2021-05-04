@@ -90,6 +90,7 @@ const (
 	UserSearchKeyResourceOwner
 	UserSearchKeyLoginNames
 	UserSearchKeyType
+	UserSearchKeyPreferredLoginName
 )
 
 type UserSearchQuery struct {

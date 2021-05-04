@@ -8,17 +8,11 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/id"
 	key_model "github.com/caos/zitadel/internal/key/model"
-)
-
-const (
-	http           = "http://"
-	httpLocalhost  = "http://localhost:"
-	httpLocalhost2 = "http://localhost/"
-	https          = "https://"
 )
 
 type OIDCConfig struct {
@@ -162,108 +156,17 @@ func (c *OIDCConfig) FillCompliance() {
 func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	switch version {
 	case OIDCVersionV1:
-		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
+		domainGrantTypes := make([]domain.OIDCGrantType, len(grantTypes))
+		for i, grantType := range grantTypes {
+			domainGrantTypes[i] = domain.OIDCGrantType(grantType)
+		}
+		compliance := domain.GetOIDCV1Compliance(domain.OIDCApplicationType(appType), domainGrantTypes, domain.OIDCAuthMethodType(authMethod), redirectUris)
+		return &Compliance{
+			NoneCompliant: compliance.NoneCompliant,
+			Problems:      compliance.Problems,
+		}
 	}
 	return nil
-}
-
-func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
-	compliance := &Compliance{NoneCompliant: false}
-	if redirectUris == nil || len(redirectUris) == 0 {
-		compliance.NoneCompliant = true
-		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
-	}
-	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
-		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
-	} else {
-		if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
-			CheckRedirectUrisImplicit(compliance, appType, redirectUris)
-		}
-		if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
-			CheckRedirectUrisCode(compliance, appType, redirectUris)
-		}
-	}
-
-	switch appType {
-	case OIDCApplicationTypeNative:
-		GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
-	case OIDCApplicationTypeUserAgent:
-		GetOIDCV1UserAgentApplicationCompliance(compliance, authMethod)
-	}
-	if compliance.NoneCompliant {
-		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
-	}
-	return compliance
-}
-
-func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
-	if authMethod != OIDCAuthMethodTypeNone {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.AuthMethodType.NotNone")
-	}
-}
-
-func GetOIDCV1UserAgentApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
-	if authMethod != OIDCAuthMethodTypeNone {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.AuthMethodType.NotNone")
-	}
-}
-
-func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
-	if urlsAreHttps(redirectUris) {
-		return
-	}
-	if urlContainsPrefix(redirectUris, http) && appType != OIDCApplicationTypeWeb {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
-	}
-	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.CustomOnlyForNative")
-	}
-}
-
-func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
-	if urlsAreHttps(redirectUris) {
-		return
-	}
-	if containsCustom(redirectUris) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
-	}
-	if urlContainsPrefix(redirectUris, http) {
-		if appType == OIDCApplicationTypeNative {
-			if !onlyLocalhostIsHttp(redirectUris) {
-				compliance.NoneCompliant = true
-				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
-			}
-			return
-		}
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpNotAllowed")
-	}
-}
-
-func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
-	if urlsAreHttps(redirectUris) {
-		return
-	}
-	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
-	}
-	if (urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeNative {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpLocalhostOnlyForNative")
-	}
-	if urlContainsPrefix(redirectUris, http) && !(urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeWeb {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
-	}
-	if !compliance.NoneCompliant {
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.NotAllCombinationsAreAllowed")
-	}
 }
 
 func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
@@ -290,42 +193,4 @@ func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) 
 		}
 	}
 	return false
-}
-
-func urlsAreHttps(uris []string) bool {
-	for _, uri := range uris {
-		if !strings.HasPrefix(uri, https) {
-			return false
-		}
-	}
-	return true
-}
-
-func urlContainsPrefix(uris []string, prefix string) bool {
-	for _, uri := range uris {
-		if strings.HasPrefix(uri, prefix) {
-			return true
-		}
-	}
-	return false
-}
-
-func containsCustom(uris []string) bool {
-	for _, uri := range uris {
-		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
-			return true
-		}
-	}
-	return false
-}
-
-func onlyLocalhostIsHttp(uris []string) bool {
-	for _, uri := range uris {
-		if strings.HasPrefix(uri, http) {
-			if !strings.HasPrefix(uri, httpLocalhost) && !strings.HasPrefix(uri, httpLocalhost2) {
-				return false
-			}
-		}
-	}
-	return true
 }

@@ -42,6 +42,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			gitClient,
 			rv.Kubeconfig,
 			rv.Gitops,
+			true,
 		)
 		if err != nil {
 			return err

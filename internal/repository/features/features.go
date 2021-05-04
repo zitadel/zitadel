@@ -42,10 +42,6 @@ func (e *FeaturesSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return nil
 }
 
-func (e *FeaturesSetEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewFeaturesSetEvent(
 	base *eventstore.BaseEvent,
 	changes []FeaturesChanges,
