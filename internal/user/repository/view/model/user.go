@@ -274,10 +274,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		es_model.MachineChanged:
 		err = u.setData(event)
 	case es_model.DomainClaimed:
-		u.UsernameChangeRequired = true
+		if u.HumanView != nil {
+			u.HumanView.UsernameChangeRequired = true
+		}
 		err = u.setData(event)
 	case es_model.UserUserNameChanged:
-		u.UsernameChangeRequired = false
+		if u.HumanView != nil {
+			u.HumanView.UsernameChangeRequired = false
+		}
 		err = u.setData(event)
 	case es_model.UserEmailChanged,
 		es_model.HumanEmailChanged:
