@@ -14,6 +14,7 @@ type Config struct {
 	SecretAccessKey string
 	SSL             bool
 	Location        string
+	BucketPrefix    string
 }
 
 func (c *Config) NewStorage() (static.Storage, error) {
@@ -26,7 +27,8 @@ func (c *Config) NewStorage() (static.Storage, error) {
 		return nil, caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Store.NotInitialized")
 	}
 	return &Minio{
-		Client:   minioClient,
-		Location: c.Location,
+		Client:       minioClient,
+		Location:     c.Location,
+		BucketPrefix: c.BucketPrefix,
 	}, nil
 }

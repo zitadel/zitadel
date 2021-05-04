@@ -25,7 +25,7 @@ type Handler struct {
 
 type Uploader interface {
 	Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error
-	ObjectName() (string, error)
+	ObjectName(data authz.CtxData) (string, error)
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error)
@@ -34,11 +34,13 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
-func NewHandler(storage static.Storage,
+func NewHandler(
+	storage static.Storage,
 	commands *command.Commands,
 	verifier *authz.TokenVerifier,
 	authConfig authz.Config,
-	idGenerator id.Generator) http.Handler {
+	idGenerator id.Generator,
+) http.Handler {
 	h := &Handler{
 		storage:         storage,
 		commands:        commands,
@@ -47,19 +49,21 @@ func NewHandler(storage static.Storage,
 		idGenerator:     idGenerator,
 	}
 	h.router = http.NewServeMux()
-	h.router.HandleFunc(labelPolicyLogoPrefix, h.UploadHandleFunc("file", &labelPolicyLogo{idGenerator})) //TODO: key?
+	h.router.HandleFunc("/"+labelPolicyLogoPrefix, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false}))
+	h.router.HandleFunc("/"+labelPolicyLogoPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true}))
 	return h.router
 }
 
 const maxMemory = 10 << 20
+const paramFile = "file"
 
-func (h *Handler) UploadHandleFunc(key string, uploader Uploader) func(http.ResponseWriter, *http.Request) {
+func (h *Handler) UploadHandleFunc(uploader Uploader) func(http.ResponseWriter, *http.Request) {
 	return h.authInterceptor.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			ctxData := authz.GetCtxData(ctx)
 			err := r.ParseMultipartForm(maxMemory)
-			file, handler, err := r.FormFile(key)
+			file, handler, err := r.FormFile(paramFile)
 			if err != nil {
 				h.errorHandler(w, r, err)
 				return
@@ -69,7 +73,7 @@ func (h *Handler) UploadHandleFunc(key string, uploader Uploader) func(http.Resp
 				logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
 			}()
 
-			objectName, err := uploader.ObjectName()
+			objectName, err := uploader.ObjectName(ctxData)
 			if err != nil {
 				h.errorHandler(w, r, err)
 				return
