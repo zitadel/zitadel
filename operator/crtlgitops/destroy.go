@@ -2,6 +2,7 @@ package crtlgitops
 
 import (
 	"context"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -26,7 +27,7 @@ func DestroyOperator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 		return err
 	}
 
-	return zitadel.Destroy(monitor, gitClient, orbz.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"zitadel", "iam"}), k8sClient)()
+	return zitadel.Destroy(monitor, gitClient, orbz.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"zitadel", "iam"}), k8sClient)
 }
 
 func DestroyDatabase(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string, gitops bool) error {
@@ -43,5 +44,5 @@ func DestroyDatabase(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 		return err
 	}
 
-	return database.Destroy(monitor, gitClient, orbdb.AdaptFunc("", version, gitops, "operator", "database", "backup"), k8sClient)()
+	return database.Destroy(monitor, gitClient, orbdb.AdaptFunc("", version, gitops, "operator", "database", "backup"), k8sClient)
 }
