@@ -115,6 +115,7 @@ Errors:
     AlreadyActive: Organisation ist bereits aktiv
     Empty: Organisation ist leer
     NotFound: Organisation konnte nicht gefunden werden
+    NotChanged: Organisation wurde nicht verändert
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation

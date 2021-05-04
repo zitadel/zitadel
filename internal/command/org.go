@@ -80,6 +80,38 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 	return orgWriteModelToOrg(addedOrg), nil
 }
 
+func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
+	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
+	}
+	if orgWriteModel.Name == name {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
+	events := make([]eventstore.EventPusher, 0)
+	events = append(events, org.NewOrgChangedEvent(ctx, orgAgg, orgWriteModel.Name, name))
+	changeDomainEvents, err := c.changeDefaultDomain(ctx, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	if len(changeDomainEvents) > 0 {
+		events = append(events, changeDomainEvents...)
+	}
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+}
+
 func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {

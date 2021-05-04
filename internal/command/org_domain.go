@@ -207,6 +207,34 @@ func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregat
 	return events, nil
 }
 
+func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName string) ([]eventstore.EventPusher, error) {
+	orgDomains := NewOrgDomainsWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, orgDomains)
+	if err != nil {
+		return nil, err
+	}
+	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, c.iamDomain)
+	isPrimary := defaultDomain == orgDomains.PrimaryDomain
+	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
+	for _, orgDomain := range orgDomains.Domains {
+		if orgDomain.State == domain.OrgDomainStateActive {
+			if orgDomain.Domain == defaultDomain {
+				newDefaultDomain := domain.NewIAMDomainName(newName, c.iamDomain)
+				events := []eventstore.EventPusher{
+					org.NewDomainAddedEvent(ctx, orgAgg, newDefaultDomain),
+					org.NewDomainVerifiedEvent(ctx, orgAgg, newDefaultDomain),
+				}
+				if isPrimary {
+					events = append(events, org.NewDomainPrimarySetEvent(ctx, orgAgg, newDefaultDomain))
+				}
+				events = append(events, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, orgDomain.Verified))
+				return events, nil
+			}
+		}
+	}
+	return nil, nil
+}
+
 func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
 	orgDomains := NewOrgDomainsWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, orgDomains)
