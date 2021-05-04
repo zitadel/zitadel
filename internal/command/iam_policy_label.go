@@ -308,6 +308,54 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context, storage
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
+func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1N8fs", "Errors.Assets.EmptyKey")
+	}
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-1N8fE", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyFontAddedEvent(ctx, iamAgg, storageKey))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-2J0sF", "Errors.Assets.EmptyKey")
+	}
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-Tk0gw", "Errors.IAM.LabelPolicy.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyFontRemovedEvent(ctx, iamAgg, storageKey))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
 func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *IAMLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
