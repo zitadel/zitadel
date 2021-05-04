@@ -4,14 +4,6 @@ import (
 	"context"
 	"flag"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/static/s3"
-	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
-	"github.com/caos/zitadel/openapi"
-
 	"github.com/caos/logging"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
@@ -21,25 +13,34 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/auth"
 	"github.com/caos/zitadel/internal/api/grpc/management"
 	"github.com/caos/zitadel/internal/api/oidc"
+	"github.com/caos/zitadel/internal/api/upload"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/id"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/setup"
+	static_config "github.com/caos/zitadel/internal/static/config"
+	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
 	"github.com/caos/zitadel/internal/ui/login"
+	"github.com/caos/zitadel/openapi"
 )
 
 type Config struct {
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
 	Metrics        metrics.MetricsConfig
-	AssetStorage   s3.AssetStorage
+	AssetStorage   static_config.AssetStorageConfig
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 
@@ -74,6 +75,7 @@ var (
 	managementEnabled   = flag.Bool("management", true, "enable management api")
 	authEnabled         = flag.Bool("auth", true, "enable auth api")
 	oidcEnabled         = flag.Bool("oidc", true, "enable oidc api")
+	uploadEnabled       = flag.Bool("upload", true, "enable upload api")
 	loginEnabled        = flag.Bool("login", true, "enable login ui")
 	consoleEnabled      = flag.Bool("console", true, "enable console ui")
 	notificationEnabled = flag.Bool("notification", true, "enable notification handler")
@@ -116,6 +118,7 @@ func startZitadel(configPaths []string) {
 	}
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+	verifier := internal_authz.Start(authZRepo)
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
@@ -130,7 +133,7 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
-	startAPI(ctx, conf, authZRepo, authRepo, commands, queries)
+	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries)
 	startUI(ctx, conf, authRepo, commands, queries)
 
 	if *notificationEnabled {
@@ -155,7 +158,7 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries) {
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries) {
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
@@ -179,6 +182,13 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
+	}
+	if *uploadEnabled {
+		verifier.RegisterServer("Management-API", "upload", nil)
+		store, err := conf.AssetStorage.Config.NewStorage()
+		logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
+		uploadHandler := upload.NewHandler(store, command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator)
+		apis.RegisterHandler("/upload/v1", uploadHandler)
 	}
 
 	openAPIHandler, err := openapi.Start()

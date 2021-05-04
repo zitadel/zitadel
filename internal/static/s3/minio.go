@@ -9,7 +9,6 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -18,21 +17,6 @@ import (
 type Minio struct {
 	Client   *minio.Client
 	Location string
-}
-
-func NewMinio(config S3Config) (*Minio, error) {
-	minioClient, err := minio.New(config.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
-		Secure: config.SSL,
-		Region: config.Location,
-	})
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Store.NotInitialized")
-	}
-	return &Minio{
-		Client:   minioClient,
-		Location: config.Location,
-	}, nil
 }
 
 func (m *Minio) CreateBucket(ctx context.Context, name, location string) error {

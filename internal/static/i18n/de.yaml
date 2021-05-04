@@ -8,6 +8,7 @@ Errors:
     EmptyKey: Asset Key ist leer
     Store:
       NotInitialized: Assets Speicher konnte nicht initialisiert werden
+      NotConfigured: Assets Speicher wurde nicht konfiguriert
     Bucket:
       Internal: Interner Fehler beim erstellen eines Buckets
       AlreadyExists: Bucket existiert bereits
