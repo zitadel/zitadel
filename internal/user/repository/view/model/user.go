@@ -18,17 +18,18 @@ import (
 )
 
 const (
-	UserKeyUserID        = "id"
-	UserKeyUserName      = "user_name"
-	UserKeyFirstName     = "first_name"
-	UserKeyLastName      = "last_name"
-	UserKeyNickName      = "nick_name"
-	UserKeyDisplayName   = "display_name"
-	UserKeyEmail         = "email"
-	UserKeyState         = "user_state"
-	UserKeyResourceOwner = "resource_owner"
-	UserKeyLoginNames    = "login_names"
-	UserKeyType          = "user_type"
+	UserKeyUserID             = "id"
+	UserKeyUserName           = "user_name"
+	UserKeyFirstName          = "first_name"
+	UserKeyLastName           = "last_name"
+	UserKeyNickName           = "nick_name"
+	UserKeyDisplayName        = "display_name"
+	UserKeyEmail              = "email"
+	UserKeyState              = "user_state"
+	UserKeyResourceOwner      = "resource_owner"
+	UserKeyLoginNames         = "login_names"
+	UserKeyPreferredLoginName = "preferred_login_name"
+	UserKeyType               = "user_type"
 )
 
 type userType string
