@@ -13,13 +13,13 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.OrgDomain, error) {
+func (c *Commands) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.OrgDomain, error) {
 	if !orgDomain.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
 	domainWriteModel := NewOrgDomainWriteModel(orgDomain.AggregateID, orgDomain.Domain)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	events, err := c.addOrgDomain(ctx, orgAgg, domainWriteModel, orgDomain)
+	events, err := c.addOrgDomain(ctx, orgAgg, domainWriteModel, orgDomain, claimedUserIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *d
 	return token, url, nil
 }
 
-func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
@@ -177,7 +177,7 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 	return writeModelToObjectDetails(&domainWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain, claimedUserIDs ...string) ([]eventstore.EventPusher, error) {
+func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain, claimedUserIDs []string) ([]eventstore.EventPusher, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedDomain)
 	if err != nil {
 		return nil, err
