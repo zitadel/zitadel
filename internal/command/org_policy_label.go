@@ -331,6 +331,60 @@ func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID, storage
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
+func (c *Commands) AddFontLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-1Nf9s", "Errors.ResourceOwnerMissing")
+	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2f9fw", "Errors.Assets.EmptyKey")
+	}
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-2M9fs", "Errors.Org.LabelPolicy.NotFound")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyFontAddedEvent(ctx, orgAgg, storageKey))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2n0fW", "Errors.ResourceOwnerMissing")
+	}
+	if storageKey == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-ah3QQ", "Errors.Assets.EmptyKey")
+	}
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-4n9SD", "Errors.Org.LabelPolicy.NotFound")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyFontRemovedEvent(ctx, orgAgg, storageKey))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
 func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
