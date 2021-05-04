@@ -76,7 +76,13 @@ func (m *Minio) RemoveBucket(ctx context.Context, name string) error {
 	return nil
 }
 
-func (m *Minio) PutObject(ctx context.Context, bucketName, objectName, contentType string, object io.Reader, objectSize int64) (*domain.AssetInfo, error) {
+func (m *Minio) PutObject(ctx context.Context, bucketName, objectName, contentType string, object io.Reader, objectSize int64, createBucketIfNotExisting bool) (*domain.AssetInfo, error) {
+	if createBucketIfNotExisting {
+		err := m.CreateBucket(ctx, bucketName, "")
+		if err != nil && !caos_errs.IsErrorAlreadyExists(err) {
+			return nil, err
+		}
+	}
 	info, err := m.Client.PutObject(ctx, bucketName, objectName, object, objectSize, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "MINIO-590sw", "Errors.Assets.Object.PutFailed")
