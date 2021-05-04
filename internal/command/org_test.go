@@ -28,10 +28,11 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx           context.Context
-		name          string
-		userID        string
-		resourceOwner string
+		ctx            context.Context
+		name           string
+		userID         string
+		resourceOwner  string
+		claimedUserIDs []string
 	}
 	type res struct {
 		want *domain.Org
@@ -326,7 +327,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				iamDomain:    tt.fields.iamDomain,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner)
+			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
