@@ -365,7 +365,6 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
 				),
 			},
 			args: args{
@@ -406,26 +405,15 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 								"org"),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								"org.zitadel.ch"),
-						),
-						eventFromEventPusher(
-							org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								"org.zitadel.ch"),
-						),
-					),
+					expectFilter(),
 					expectPushFailed(
 						caos_errs.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
-							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
-							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
 						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
 					),
 				),
 			},
