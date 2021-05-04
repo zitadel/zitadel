@@ -619,7 +619,7 @@ service ManagementService {
     // Changes my organisation
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
         option (google.api.http) = {
-            post: "/orgs/me"
+            put: "/orgs/me"
             body: "*"
         };
 
