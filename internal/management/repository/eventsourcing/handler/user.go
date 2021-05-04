@@ -120,6 +120,8 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		es_model.HumanProfileChanged,
 		es_model.HumanEmailChanged,
 		es_model.HumanEmailVerified,
+		es_model.HumanAvatarAdded,
+		es_model.HumanAvatarRemoved,
 		es_model.HumanPhoneChanged,
 		es_model.HumanPhoneVerified,
 		es_model.HumanPhoneRemoved,

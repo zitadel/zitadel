@@ -39,3 +39,6 @@ ALTER TABLE auth.label_policies ADD COLUMN icon_dark_url STRING;
 ALTER TABLE auth.label_policies ADD COLUMN err_msg_popup BOOLEAN;
 ALTER TABLE auth.label_policies ADD COLUMN disable_watermark BOOLEAN;
 ALTER TABLE auth.label_policies ALTER PRIMARY KEY USING COLUMNS (aggregate_id, label_policy_state);
+
+ALTER TABLE management.users ADD COLUMN avatar STRING;
+ALTER TABLE auth.users ADD COLUMN avatar STRING;
