@@ -62,6 +62,21 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 	}, err
 }
 
+func (s *Server) UpdateOrg(ctx context.Context, req *mgmt_pb.UpdateOrgRequest) (*mgmt_pb.UpdateOrgResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	org, err := s.command.ChangeOrg(ctx, ctxData.ResourceOwner, req.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateOrgResponse{
+		Details: object.AddToDetailsPb(
+			org.Sequence,
+			org.EventDate,
+			org.ResourceOwner,
+		),
+	}, err
+}
+
 func (s *Server) DeactivateOrg(ctx context.Context, req *mgmt_pb.DeactivateOrgRequest) (*mgmt_pb.DeactivateOrgResponse, error) {
 	objectDetails, err := s.command.DeactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {

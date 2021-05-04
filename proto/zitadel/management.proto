@@ -616,6 +616,18 @@ service ManagementService {
         };
     }
 
+    // Changes my organisation
+    rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
     // Sets the state of my organisation to deactivated
     // Users of this organisation will not be able login
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
@@ -2546,6 +2558,14 @@ message AddOrgRequest {
 message AddOrgResponse {
     string id = 1;
     zitadel.v1.ObjectDetails details = 2;
+}
+
+message UpdateOrgRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request
