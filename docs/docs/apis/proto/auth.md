@@ -190,6 +190,16 @@ Removed the phone number of the authorized user
 
 
 
+### RemoveMyAvatar
+
+> **rpc** RemoveMyAvatar([RemoveMyAvatarRequest](#removemyavatarrequest))
+[RemoveMyAvatarResponse](#removemyavatarresponse)
+
+Remove my avatar
+
+
+
+
 ### ListMyLinkedIDPs
 
 > **rpc** ListMyLinkedIDPs([ListMyLinkedIDPsRequest](#listmylinkedidpsrequest))
@@ -762,6 +772,28 @@ This is an empty request
 
 
 ### RemoveMyAuthFactorU2FResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveMyAvatarRequest
+This is an empty request
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### RemoveMyAvatarResponse
 
 
 

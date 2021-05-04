@@ -248,6 +248,17 @@ service AuthService {
         };
     }
 
+    // Remove my avatar
+    rpc RemoveMyAvatar(RemoveMyAvatarRequest) returns (RemoveMyAvatarResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/avatar/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     // Returns a list of all linked identity providers (social logins, eg. Google, Microsoft, AD, etc.)
     rpc ListMyLinkedIDPs(ListMyLinkedIDPsRequest) returns (ListMyLinkedIDPsResponse) {
         option (google.api.http) = {
@@ -600,6 +611,15 @@ message ResendMyPhoneVerificationResponse {
 message RemoveMyPhoneRequest {}
 
 message RemoveMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveMyAvatarRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1}];
+}
+
+message RemoveMyAvatarResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

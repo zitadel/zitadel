@@ -51,6 +51,7 @@ func NewHandler(
 	h.router = http.NewServeMux()
 	h.router.HandleFunc("/"+labelPolicyLogoPrefix, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false}))
 	h.router.HandleFunc("/"+labelPolicyLogoPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true}))
+	h.router.HandleFunc("/"+userAvatarURL, h.UploadHandleFunc(&humanAvatar{}))
 	return h.router
 }
 
