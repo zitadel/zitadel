@@ -123,7 +123,10 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
 	}
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, authZRepo)
+	store, err := conf.AssetStorage.Config.NewStorage()
+	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
+
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start commands")
 	}
@@ -185,9 +188,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	}
 	if *uploadEnabled {
 		verifier.RegisterServer("Management-API", "upload", nil)
-		store, err := conf.AssetStorage.Config.NewStorage()
-		logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
-		uploadHandler := upload.NewHandler(store, command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator)
+		uploadHandler := upload.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator)
 		apis.RegisterHandler("/upload/v1", uploadHandler)
 	}
 
@@ -208,7 +209,7 @@ func startSetup(configPaths []string, localDevMode bool) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
-	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil)
+	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil, nil)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
 	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)

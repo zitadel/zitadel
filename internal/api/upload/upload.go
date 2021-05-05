@@ -35,14 +35,12 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 }
 
 func NewHandler(
-	storage static.Storage,
 	commands *command.Commands,
 	verifier *authz.TokenVerifier,
 	authConfig authz.Config,
 	idGenerator id.Generator,
 ) http.Handler {
 	h := &Handler{
-		storage:         storage,
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
@@ -88,14 +86,7 @@ func (h *Handler) UploadHandleFunc(uploader Uploader) func(http.ResponseWriter, 
 				h.errorHandler(w, r, err)
 				return
 			}
-			info, err := h.storage.PutObject(ctx,
-				ctxData.OrgID,
-				objectName,
-				handler.Header.Get("content-type"),
-				file,
-				handler.Size,
-				true,
-			)
+			info, err := h.commands.UploadAsset(ctx, objectName, handler.Header.Get("content-type"), file, handler.Size)
 			if err != nil {
 				h.errorHandler(w, r, err)
 				return

@@ -23,7 +23,7 @@ func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (
 
 func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-XYFk9", "Errors.ResourceOwnerMissing")
 	}
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
@@ -81,7 +81,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 
 func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if orgID == "" || !human.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-67Ms8", "Errors.User.Invalid")
 	}
 	if human.Password != nil && human.SecretString != "" {
 		human.ChangeRequired = true
@@ -91,7 +91,7 @@ func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Hum
 
 func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if orgID == "" || !human.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M90d", "Errors.User.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
 	}
 	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
 }

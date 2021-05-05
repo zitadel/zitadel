@@ -27,7 +27,7 @@ func (m *Minio) CreateBucket(ctx context.Context, name, location string) error {
 	name = m.prefixBucketName(name)
 	exists, err := m.Client.BucketExists(ctx, name)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Bucket.Internal")
+		return caos_errs.ThrowInternal(err, "MINIO-1b8fs", "Errors.Assets.Bucket.Internal")
 	}
 	if exists {
 		return caos_errs.ThrowAlreadyExists(nil, "MINIO-9n3MK", "Errors.Assets.Bucket.AlreadyExists")

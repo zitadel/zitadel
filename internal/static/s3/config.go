@@ -24,7 +24,7 @@ func (c *Config) NewStorage() (static.Storage, error) {
 		Region: c.Location,
 	})
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Store.NotInitialized")
+		return nil, caos_errs.ThrowInternal(err, "MINIO-2n9fs", "Errors.Assets.Store.NotInitialized")
 	}
 	return &Minio{
 		Client:       minioClient,

@@ -10,7 +10,7 @@ import (
 
 const (
 	userAvatarURL = "users/me/avatar"
-	usersPath     = "/users"
+	usersPath     = "users"
 	avatarFile    = "/avatar"
 )
 
