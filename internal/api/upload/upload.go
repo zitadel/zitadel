@@ -47,18 +47,18 @@ func NewHandler(
 		idGenerator:     idGenerator,
 	}
 	h.router = http.NewServeMux()
-	h.router.HandleFunc("/"+defaultLabelPolicyLogoPrefix, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, true}))
-	h.router.HandleFunc("/"+defaultLabelPolicyLogoPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, true}))
-	h.router.HandleFunc("/"+defaultLabelPolicyIconPrefix, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, true}))
-	h.router.HandleFunc("/"+defaultLabelPolicyIconPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, true}))
-	h.router.HandleFunc("/"+defaultLabelPolicyFontPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyFont{idGenerator, true}))
+	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, true}))
+	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, true}))
+	h.router.HandleFunc(defaultLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, true}))
+	h.router.HandleFunc(defaultLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, true}))
+	h.router.HandleFunc(defaultLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, true}))
 
-	h.router.HandleFunc("/"+orgLabelPolicyLogoPrefix, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, false}))
-	h.router.HandleFunc("/"+orgLabelPolicyLogoPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, false}))
-	h.router.HandleFunc("/"+orgLabelPolicyIconPrefix, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, false}))
-	h.router.HandleFunc("/"+orgLabelPolicyIconPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, false}))
-	h.router.HandleFunc("/"+orgLabelPolicyFontPrefix+"/"+dark, h.UploadHandleFunc(&labelPolicyFont{idGenerator, false}))
-	h.router.HandleFunc("/"+userAvatarURL, h.UploadHandleFunc(&humanAvatar{}))
+	h.router.HandleFunc(orgLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, false}))
+	h.router.HandleFunc(orgLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, false}))
+	h.router.HandleFunc(orgLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, false}))
+	h.router.HandleFunc(orgLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, false}))
+	h.router.HandleFunc(orgLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, false}))
+	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatar{}))
 	return h.router
 }
 

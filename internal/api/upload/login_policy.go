@@ -10,22 +10,17 @@ import (
 )
 
 const (
-	dark                  = "dark"
-	orgPrefix             = "org"
-	iamPrefix             = "iam"
-	policyPrefix          = "/policy"
-	labelPolicyPrefix     = policyPrefix + "/label"
-	labelPolicyLogoPrefix = labelPolicyPrefix + "/logo"
-	labelPolicyIconPrefix = labelPolicyPrefix + "/icon"
-	labelPolicyFontPrefix = labelPolicyPrefix + "/font"
+	defaultLabelPolicyLogoURL     = "/" + domain.DefaultLabelPolicyLogoPath
+	defaultLabelPolicyLogoDarkURL = "/" + domain.DefaultLabelPolicyLogoPath + domain.Dark
+	defaultLabelPolicyIconURL     = "/" + domain.DefaultLabelPolicyIconPath
+	defaultLabelPolicyIconDarkURL = "/" + domain.DefaultLabelPolicyIconPath + domain.Dark
+	defaultLabelPolicyFontURL     = "/" + domain.DefaultLabelPolicyFontPath
 
-	defaultLabelPolicyLogoPrefix = iamPrefix + labelPolicyLogoPrefix
-	defaultLabelPolicyIconPrefix = iamPrefix + labelPolicyIconPrefix
-	defaultLabelPolicyFontPrefix = iamPrefix + labelPolicyFontPrefix
-
-	orgLabelPolicyLogoPrefix = orgPrefix + labelPolicyLogoPrefix
-	orgLabelPolicyIconPrefix = orgPrefix + labelPolicyIconPrefix
-	orgLabelPolicyFontPrefix = orgPrefix + labelPolicyFontPrefix
+	orgLabelPolicyLogoURL     = "/" + domain.OrgLabelPolicyLogoPath
+	orgLabelPolicyLogoDarkURL = "/" + domain.OrgLabelPolicyLogoPath + domain.Dark
+	orgLabelPolicyIconURL     = "/" + domain.OrgLabelPolicyIconPath
+	orgLabelPolicyIconDarkURL = "/" + domain.OrgLabelPolicyIconPath + domain.Dark
+	orgLabelPolicyFontURL     = "/" + domain.OrgLabelPolicyFontPath
 )
 
 type labelPolicyLogo struct {
@@ -39,12 +34,12 @@ func (l *labelPolicyLogo) ObjectName(_ authz.CtxData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := orgLabelPolicyLogoPrefix
+	prefix := domain.OrgLabelPolicyLogoPath
 	if l.defaultPolicy {
-		prefix = defaultLabelPolicyLogoPrefix
+		prefix = domain.DefaultLabelPolicyLogoPath
 	}
 	if l.darkMode {
-		return prefix + "-" + dark + "-" + suffixID, nil
+		return prefix + "-" + domain.Dark + "-" + suffixID, nil
 	}
 	return prefix + "-" + suffixID, nil
 }
@@ -77,12 +72,12 @@ func (l *labelPolicyIcon) ObjectName(_ authz.CtxData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := orgLabelPolicyIconPrefix
+	prefix := domain.OrgLabelPolicyIconPath
 	if l.defaultPolicy {
-		prefix = defaultLabelPolicyIconPrefix
+		prefix = domain.DefaultLabelPolicyIconPath
 	}
 	if l.darkMode {
-		return prefix + "-" + dark + "-" + suffixID, nil
+		return prefix + "-" + domain.Dark + "-" + suffixID, nil
 	}
 	return prefix + "-" + suffixID, nil
 }
@@ -115,9 +110,9 @@ func (l *labelPolicyFont) ObjectName(_ authz.CtxData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := orgLabelPolicyFontPrefix
+	prefix := domain.OrgLabelPolicyFontPath
 	if l.defaultPolicy {
-		prefix = defaultLabelPolicyFontPrefix
+		prefix = domain.DefaultLabelPolicyFontPath
 	}
 	return prefix + "-" + suffixID, nil
 }

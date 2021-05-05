@@ -9,15 +9,13 @@ import (
 )
 
 const (
-	userAvatarURL = "users/me/avatar"
-	usersPath     = "users"
-	avatarFile    = "/avatar"
+	userAvatarURL = "/users/me/avatar"
 )
 
 type humanAvatar struct{}
 
 func (l *humanAvatar) ObjectName(ctxData authz.CtxData) (string, error) {
-	return usersPath + "/" + ctxData.UserID + avatarFile, nil
+	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil
 }
 
 func (l *humanAvatar) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {

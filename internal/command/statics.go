@@ -22,3 +22,7 @@ func (c *Commands) UploadAsset(ctx context.Context, objectName, contentType stri
 		true,
 	)
 }
+
+func (c *Commands) RemoveAsset(ctx context.Context, bucketName, storeKey string) error {
+	return c.static.RemoveObject(ctx, bucketName, storeKey)
+}
