@@ -104,6 +104,8 @@
     }
   },
   "ACTIONS": {
+    "SHOW":"Show",
+    "HIDE":"Hide",
     "SAVE": "Save",
     "SAVENOW": "Save now",
     "NEW": "New",
@@ -1057,6 +1059,10 @@
     "AUTHMETHOD": "Authentication Method",
     "AUTHMETHODSECTION": "Authentication Method",
     "GRANT": "Grant Types",
+    "ADDITIONALORIGINS":"Additional Origins",
+    "ADDITIONALORIGINSDESC":"If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
+    "ORIGINS":"Origins",
+    "NOTANORIGIN":"The entered value is not an origin",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",

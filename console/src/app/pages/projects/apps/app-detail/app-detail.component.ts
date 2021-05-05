@@ -61,6 +61,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public errorMessage: string = '';
     public removable: boolean = true;
     public addOnBlur: boolean = true;
+    public showAdditionalOrigins: boolean = false;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
     public authMethods: RadioItemAuthType[] = [];
@@ -102,6 +103,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public redirectUrisList: string[] = [];
     public postLogoutRedirectUrisList: string[] = [];
+    public additionalOriginsList: string[] = [];
 
     public isZitadel: boolean = false;
     public docs!: GetOIDCInformationResponse.AsObject;
@@ -252,6 +254,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                         if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
                             this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
                         }
+                        if (this.app.oidcConfig?.additionalOriginsList) {
+                            this.additionalOriginsList = this.app.oidcConfig.additionalOriginsList;
+                        }
+
                         if (this.app.oidcConfig?.clockSkew) {
                             const inSecs = this.app.oidcConfig?.clockSkew.seconds +
                                 this.app.oidcConfig?.clockSkew.nanos / 100000;
@@ -445,6 +451,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.authMethodType = this.authMethodType?.value;
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
+                this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
                 this.app.oidcConfig.devMode = this.devMode?.value;
                 this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
                 this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
