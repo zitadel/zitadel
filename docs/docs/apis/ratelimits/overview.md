@@ -18,6 +18,21 @@ So if you simply change your `IP` address and run the same request again and aga
 
 If you are blocked you will recieve a `http status 429`.
 
+:::tip
+You should consider to implement [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) into your application to prevent a blocking loop.
+:::
+
 ## What rate limits do apply
 
-Please check to corresponding page.
+### Login, Register, Reset Limits
+
+For the rate limits of the Login, Register and Reset features please visit [Login Rate Limits](accounts)
+
+### API Rate Limits
+
+For our API rate limits please check the [API Endpoint Rate Limits](api)
+
+## Load Testing
+
+If you would like to conduct load testing of ZITADEL Cloud or a managed instance, you MUST request to do so with a minimum of 2 weeks notice before the test by contacting us at support@zitadel.ch.
+You MUST NOT conduct load testing without prior approval by us. Without prior approval and setup there is a high risk of beeing flaged by our (D)DOS solution als malicous traffic. This can have a severy impact on your service qualtiy.
