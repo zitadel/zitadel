@@ -45,6 +45,7 @@ type ApplicationView struct {
 	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
 	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
 	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
+	AdditionalOrigins          pq.StringArray `json:"additionalOrigins" gorm:"column:additional_origins"`
 	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
 	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
 	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
@@ -79,6 +80,7 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 		ComplianceProblems:         app.ComplianceProblems,
 		DevMode:                    app.DevMode,
 		OriginAllowList:            app.OriginAllowList,
+		AdditionalOrigins:          app.AdditionalOrigins,
 		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
 		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
@@ -209,6 +211,11 @@ func (a *ApplicationView) setOriginAllowList() error {
 		if err != nil {
 			return err
 		}
+		if !http_util.IsOriginAllowed(allowList, origin) {
+			allowList = append(allowList, origin)
+		}
+	}
+	for _, origin := range a.AdditionalOrigins {
 		if !http_util.IsOriginAllowed(allowList, origin) {
 			allowList = append(allowList, origin)
 		}

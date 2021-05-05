@@ -55,6 +55,8 @@ func AppOIDCConfigToPb(app *proj_model.ApplicationView) *app_pb.App_OidcConfig {
 			IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
 			IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
 			ClockSkew:                durationpb.New(app.ClockSkew),
+			AdditionalOrigins:        app.AdditionalOrigins,
+			AllowedOrigins:           app.OriginAllowList,
 		},
 	}
 }

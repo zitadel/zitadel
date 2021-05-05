@@ -84,6 +84,8 @@ title: zitadel/app.proto
 | id_token_role_assertion |  bool | - |  |
 | id_token_userinfo_assertion |  bool | - |  |
 | clock_skew |  google.protobuf.Duration | - |  |
+| additional_origins | repeated string | - |  |
+| allowed_origins | repeated string | - |  |
 
 
 
