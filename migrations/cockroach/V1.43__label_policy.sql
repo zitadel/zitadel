@@ -42,3 +42,4 @@ ALTER TABLE auth.label_policies ALTER PRIMARY KEY USING COLUMNS (aggregate_id, l
 
 ALTER TABLE management.users ADD COLUMN avatar STRING;
 ALTER TABLE auth.users ADD COLUMN avatar STRING;
+ALTER TABLE adminapi.users ADD COLUMN avatar STRING;
