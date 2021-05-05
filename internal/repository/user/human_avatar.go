@@ -10,8 +10,8 @@ import (
 
 const (
 	avatarEventPrefix      = humanEventPrefix + "avatar."
-	HumanAvatarAddedType   = phoneEventPrefix + "added"
-	HumanAvatarRemovedType = phoneEventPrefix + "removed"
+	HumanAvatarAddedType   = avatarEventPrefix + "added"
+	HumanAvatarRemovedType = avatarEventPrefix + "removed"
 )
 
 type HumanAvatarAddedEvent struct {
