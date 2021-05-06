@@ -392,6 +392,17 @@ service ManagementService {
         };
     }
 
+    // Removes the avatar number of the human
+    rpc RemoveMyAvatar(RemoveHumanAvatarRequest) returns (RemoveHumanAvatarResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/avatar"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     // A Manager is only allowed to set an initial password, on the next login the user has to change his password
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
@@ -2383,6 +2394,14 @@ message ResendHumanPhoneVerificationRequest {
 }
 
 message ResendHumanPhoneVerificationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveHumanAvatarRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveHumanAvatarResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

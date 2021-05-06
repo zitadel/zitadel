@@ -786,11 +786,6 @@ This is an empty request
 This is an empty request
 
 
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| key |  string | - | string.min_len: 1<br />  |
-
-
 
 
 ### RemoveMyAvatarResponse

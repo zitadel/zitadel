@@ -293,6 +293,16 @@ An sms will be sent to the given phone number to finish the phone verification p
 
 
 
+### RemoveMyAvatar
+
+> **rpc** RemoveMyAvatar([RemoveHumanAvatarRequest](#removehumanavatarrequest))
+[RemoveHumanAvatarResponse](#removehumanavatarresponse)
+
+Removes the avatar number of the human
+
+
+
+
 ### SetHumanInitialPassword
 
 > **rpc** SetHumanInitialPassword([SetHumanInitialPasswordRequest](#sethumaninitialpasswordrequest))
@@ -4325,6 +4335,28 @@ This is an empty request
 
 
 ### RemoveHumanAuthFactorU2FResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveHumanAvatarRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveHumanAvatarResponse
 
 
 

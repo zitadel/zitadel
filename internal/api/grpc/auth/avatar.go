@@ -10,11 +10,7 @@ import (
 
 func (s *Server) RemoveMyAvatar(ctx context.Context, req *auth_pb.RemoveMyAvatarRequest) (*auth_pb.RemoveMyAvatarResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	err := s.command.RemoveAsset(ctx, ctxData.ResourceOwner, req.Key)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.RemoveHumanAvatar(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Key)
+	objectDetails, err := s.command.RemoveHumanAvatar(ctx, ctxData.ResourceOwner, ctxData.UserID)
 	if err != nil {
 		return nil, err
 	}

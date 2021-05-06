@@ -251,7 +251,7 @@ service AuthService {
     // Remove my avatar
     rpc RemoveMyAvatar(RemoveMyAvatarRequest) returns (RemoveMyAvatarResponse) {
         option (google.api.http) = {
-            delete: "/users/me/avatar/{key}"
+            delete: "/users/me/avatar"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -615,9 +615,7 @@ message RemoveMyPhoneResponse {
 }
 
 //This is an empty request
-message RemoveMyAvatarRequest {
-    string key = 1 [(validate.rules).string = {min_len: 1}];
-}
+message RemoveMyAvatarRequest {}
 
 message RemoveMyAvatarResponse {
     zitadel.v1.ObjectDetails details = 1;
