@@ -1981,6 +1981,66 @@ service ManagementService {
         };
     }
 
+    // Removes the logo of the label policy
+    rpc RemoveCustomLabelPolicyLogo(RemoveCustomLabelPolicyLogoRequest) returns (RemoveCustomLabelPolicyLogoResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveCustomLabelPolicyLogoDark(RemoveCustomLabelPolicyLogoDarkRequest) returns (RemoveCustomLabelPolicyLogoDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
+        };
+    }
+
+    // Removes the icon of the label policy
+    rpc RemoveCustomLabelPolicyIcon(RemoveCustomLabelPolicyIconRequest) returns (RemoveCustomLabelPolicyIconResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveCustomLabelPolicyIconDark(RemoveCustomLabelPolicyIconDarkRequest) returns (RemoveCustomLabelPolicyIconDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
+        };
+    }
+
+    // Removes the font of the label policy
+    rpc RemoveCustomLabelPolicyFont(RemoveCustomLabelPolicyFontRequest) returns (RemoveCustomLabelPolicyFontResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/font"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "label_policy"
+        };
+    }
+
     // Removes the custom label policy of the organisation
     // The default policy of the IAM will trigger after
     rpc ResetLabelPolicyToDefault(ResetLabelPolicyToDefaultRequest) returns (ResetLabelPolicyToDefaultResponse) {
@@ -3695,6 +3755,41 @@ message UpdateCustomLabelPolicyResponse {
 message ActivateCustomLabelPolicyRequest {}
 
 message ActivateCustomLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveCustomLabelPolicyLogoRequest {}
+
+message RemoveCustomLabelPolicyLogoResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveCustomLabelPolicyLogoDarkRequest {}
+
+message RemoveCustomLabelPolicyLogoDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveCustomLabelPolicyIconRequest {}
+
+message RemoveCustomLabelPolicyIconResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveCustomLabelPolicyIconDarkRequest {}
+
+message RemoveCustomLabelPolicyIconDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveCustomLabelPolicyFontRequest {}
+
+message RemoveCustomLabelPolicyFontResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

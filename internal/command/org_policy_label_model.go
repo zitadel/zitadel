@@ -30,6 +30,26 @@ func (wm *OrgLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReade
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyAddedEvent)
 		case *org.LabelPolicyChangedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
+		case *org.LabelPolicyLogoAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoAddedEvent)
+		case *org.LabelPolicyLogoRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoRemovedEvent)
+		case *org.LabelPolicyLogoDarkAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoDarkAddedEvent)
+		case *org.LabelPolicyLogoDarkRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoDarkRemovedEvent)
+		case *org.LabelPolicyIconAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconAddedEvent)
+		case *org.LabelPolicyIconRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconRemovedEvent)
+		case *org.LabelPolicyIconDarkAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconDarkAddedEvent)
+		case *org.LabelPolicyIconDarkRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconDarkRemovedEvent)
+		case *org.LabelPolicyFontAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyFontAddedEvent)
+		case *org.LabelPolicyFontRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyFontRemovedEvent)
 		}
 	}
 }
@@ -44,7 +64,18 @@ func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		EventTypes(
 			org.LabelPolicyAddedEventType,
-			org.LabelPolicyChangedEventType)
+			org.LabelPolicyChangedEventType,
+			org.LabelPolicyLogoAddedEventType,
+			org.LabelPolicyLogoRemovedEventType,
+			org.LabelPolicyIconAddedEventType,
+			org.LabelPolicyIconRemovedEventType,
+			org.LabelPolicyLogoDarkAddedEventType,
+			org.LabelPolicyLogoDarkRemovedEventType,
+			org.LabelPolicyIconDarkAddedEventType,
+			org.LabelPolicyIconDarkRemovedEventType,
+			org.LabelPolicyFontAddedEventType,
+			org.LabelPolicyFontRemovedEventType,
+		)
 }
 
 func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(

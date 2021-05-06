@@ -51,3 +51,23 @@ func (s *Server) ActivateLabelPolicy(ctx context.Context, req *admin_pb.Activate
 		),
 	}, nil
 }
+
+func (s *Server) RemoveLabelPolicyLogo(ctx context.Context, req *admin_pb.RemoveLabelPolicyLogoRequest) (*admin_pb.RemoveLabelPolicyLogoResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveLabelPolicyLogoDark(ctx context.Context, req *admin_pb.RemoveLabelPolicyLogoDarkRequest) (*admin_pb.RemoveLabelPolicyLogoDarkResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveLabelPolicyIcon(ctx context.Context, req *admin_pb.RemoveLabelPolicyIconRequest) (*admin_pb.RemoveLabelPolicyIconResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveLabelPolicyIconDark(ctx context.Context, req *admin_pb.RemoveLabelPolicyIconDarkRequest) (*admin_pb.RemoveLabelPolicyIconDarkResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveLabelPolicyFont(ctx context.Context, req *admin_pb.RemoveLabelPolicyFontRequest) (*admin_pb.RemoveLabelPolicyFontResponse, error) {
+	return nil, nil
+}

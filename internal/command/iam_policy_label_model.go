@@ -2,9 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -33,6 +33,26 @@ func (wm *IAMLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReade
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
 		case *iam.LabelPolicyActivatedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyActivatedEvent)
+		case *iam.LabelPolicyLogoAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoAddedEvent)
+		case *iam.LabelPolicyLogoRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoRemovedEvent)
+		case *iam.LabelPolicyLogoDarkAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoDarkAddedEvent)
+		case *iam.LabelPolicyLogoDarkRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoDarkRemovedEvent)
+		case *iam.LabelPolicyIconAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconAddedEvent)
+		case *iam.LabelPolicyIconRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconRemovedEvent)
+		case *iam.LabelPolicyIconDarkAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconDarkAddedEvent)
+		case *iam.LabelPolicyIconDarkRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyIconDarkRemovedEvent)
+		case *iam.LabelPolicyFontAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyFontAddedEvent)
+		case *iam.LabelPolicyFontRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyFontRemovedEvent)
 		}
 	}
 }
@@ -47,7 +67,18 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		EventTypes(
 			iam.LabelPolicyAddedEventType,
-			iam.LabelPolicyChangedEventType)
+			iam.LabelPolicyChangedEventType,
+			iam.LabelPolicyLogoAddedEventType,
+			iam.LabelPolicyLogoRemovedEventType,
+			iam.LabelPolicyIconAddedEventType,
+			iam.LabelPolicyIconRemovedEventType,
+			iam.LabelPolicyLogoDarkAddedEventType,
+			iam.LabelPolicyLogoDarkRemovedEventType,
+			iam.LabelPolicyIconDarkAddedEventType,
+			iam.LabelPolicyIconDarkRemovedEventType,
+			iam.LabelPolicyFontAddedEventType,
+			iam.LabelPolicyFontRemovedEventType,
+		)
 }
 
 func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(

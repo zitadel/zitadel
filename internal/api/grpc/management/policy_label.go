@@ -84,3 +84,23 @@ func (s *Server) ResetLabelPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
+
+func (s *Server) RemoveCustomLabelPolicyLogo(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLogoRequest) (*mgmt_pb.RemoveCustomLabelPolicyLogoResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveCustomLabelPolicyLogoDark(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLogoDarkRequest) (*mgmt_pb.RemoveCustomLabelPolicyLogoDarkResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveCustomLabelPolicyIcon(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyIconRequest) (*mgmt_pb.RemoveCustomLabelPolicyIconResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveCustomLabelPolicyIconDark(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyIconDarkRequest) (*mgmt_pb.RemoveCustomLabelPolicyIconDarkResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveCustomLabelPolicyFont(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyFontRequest) (*mgmt_pb.RemoveCustomLabelPolicyFontResponse, error) {
+	return nil, nil
+}

@@ -1630,6 +1630,56 @@ Activates all changes of the label policy
 
 
 
+### RemoveCustomLabelPolicyLogo
+
+> **rpc** RemoveCustomLabelPolicyLogo([RemoveCustomLabelPolicyLogoRequest](#removecustomlabelpolicylogorequest))
+[RemoveCustomLabelPolicyLogoResponse](#removecustomlabelpolicylogoresponse)
+
+Removes the logo of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyLogoDark
+
+> **rpc** RemoveCustomLabelPolicyLogoDark([RemoveCustomLabelPolicyLogoDarkRequest](#removecustomlabelpolicylogodarkrequest))
+[RemoveCustomLabelPolicyLogoDarkResponse](#removecustomlabelpolicylogodarkresponse)
+
+Removes the logo dark of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyIcon
+
+> **rpc** RemoveCustomLabelPolicyIcon([RemoveCustomLabelPolicyIconRequest](#removecustomlabelpolicyiconrequest))
+[RemoveCustomLabelPolicyIconResponse](#removecustomlabelpolicyiconresponse)
+
+Removes the icon of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyIconDark
+
+> **rpc** RemoveCustomLabelPolicyIconDark([RemoveCustomLabelPolicyIconDarkRequest](#removecustomlabelpolicyicondarkrequest))
+[RemoveCustomLabelPolicyIconDarkResponse](#removecustomlabelpolicyicondarkresponse)
+
+Removes the logo dark of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyFont
+
+> **rpc** RemoveCustomLabelPolicyFont([RemoveCustomLabelPolicyFontRequest](#removecustomlabelpolicyfontrequest))
+[RemoveCustomLabelPolicyFontResponse](#removecustomlabelpolicyfontresponse)
+
+Removes the font of the label policy
+
+
+
+
 ### ResetLabelPolicyToDefault
 
 > **rpc** ResetLabelPolicyToDefault([ResetLabelPolicyToDefaultRequest](#resetlabelpolicytodefaultrequest))
@@ -4290,6 +4340,91 @@ This is an empty request
 
 
 ### RemoveAppResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyFontRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyFontResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyIconDarkRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyIconDarkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyIconRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyIconResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyLogoDarkRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyLogoDarkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyLogoRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyLogoResponse
 
 
 

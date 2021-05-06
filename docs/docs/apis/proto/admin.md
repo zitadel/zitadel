@@ -287,12 +287,62 @@ it impacts all organisations without a customised policy
 
 
 
-### ActivateCustomLabelPolicy
+### ActivateLabelPolicy
 
-> **rpc** ActivateCustomLabelPolicy([ActivateLabelPolicyRequest](#activatelabelpolicyrequest))
+> **rpc** ActivateLabelPolicy([ActivateLabelPolicyRequest](#activatelabelpolicyrequest))
 [ActivateLabelPolicyResponse](#activatelabelpolicyresponse)
 
 Activates all changes of the label policy
+
+
+
+
+### RemoveLabelPolicyLogo
+
+> **rpc** RemoveLabelPolicyLogo([RemoveLabelPolicyLogoRequest](#removelabelpolicylogorequest))
+[RemoveLabelPolicyLogoResponse](#removelabelpolicylogoresponse)
+
+Removes the logo of the label policy
+
+
+
+
+### RemoveLabelPolicyLogoDark
+
+> **rpc** RemoveLabelPolicyLogoDark([RemoveLabelPolicyLogoDarkRequest](#removelabelpolicylogodarkrequest))
+[RemoveLabelPolicyLogoDarkResponse](#removelabelpolicylogodarkresponse)
+
+Removes the logo dark of the label policy
+
+
+
+
+### RemoveLabelPolicyIcon
+
+> **rpc** RemoveLabelPolicyIcon([RemoveLabelPolicyIconRequest](#removelabelpolicyiconrequest))
+[RemoveLabelPolicyIconResponse](#removelabelpolicyiconresponse)
+
+Removes the icon of the label policy
+
+
+
+
+### RemoveLabelPolicyIconDark
+
+> **rpc** RemoveLabelPolicyIconDark([RemoveLabelPolicyIconDarkRequest](#removelabelpolicyicondarkrequest))
+[RemoveLabelPolicyIconDarkResponse](#removelabelpolicyicondarkresponse)
+
+Removes the logo dark of the label policy
+
+
+
+
+### RemoveLabelPolicyFont
+
+> **rpc** RemoveLabelPolicyFont([RemoveLabelPolicyFontRequest](#removelabelpolicyfontrequest))
+[RemoveLabelPolicyFontResponse](#removelabelpolicyfontresponse)
+
+Removes the font of the label policy
 
 
 
@@ -1360,6 +1410,91 @@ This is an empty response
 
 
 ### RemoveIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveLabelPolicyFontRequest
+This is an empty request
+
+
+
+
+### RemoveLabelPolicyFontResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveLabelPolicyIconDarkRequest
+This is an empty request
+
+
+
+
+### RemoveLabelPolicyIconDarkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveLabelPolicyIconRequest
+This is an empty request
+
+
+
+
+### RemoveLabelPolicyIconResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveLabelPolicyLogoDarkRequest
+This is an empty request
+
+
+
+
+### RemoveLabelPolicyLogoDarkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveLabelPolicyLogoRequest
+This is an empty request
+
+
+
+
+### RemoveLabelPolicyLogoResponse
 
 
 

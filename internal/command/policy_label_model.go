@@ -12,10 +12,16 @@ type LabelPolicyWriteModel struct {
 	PrimaryColor   string
 	SecondaryColor string
 	WarnColor      string
+	LogoKey        string
+	IconKey        string
 
 	PrimaryColorDark   string
 	SecondaryColorDark string
 	WarnColorDark      string
+	LogoDarkKey        string
+	IconDarkKey        string
+
+	FontKey string
 
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool
@@ -66,6 +72,26 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			if e.DisableWatermark != nil {
 				wm.DisableWatermark = *e.DisableWatermark
 			}
+		case *policy.LabelPolicyLogoAddedEvent:
+			wm.LogoKey = e.StoreKey
+		case *policy.LabelPolicyLogoRemovedEvent:
+			wm.LogoKey = ""
+		case *policy.LabelPolicyLogoDarkAddedEvent:
+			wm.LogoDarkKey = e.StoreKey
+		case *policy.LabelPolicyLogoDarkRemovedEvent:
+			wm.LogoDarkKey = ""
+		case *policy.LabelPolicyIconAddedEvent:
+			wm.IconKey = e.StoreKey
+		case *policy.LabelPolicyIconRemovedEvent:
+			wm.IconKey = ""
+		case *policy.LabelPolicyIconDarkAddedEvent:
+			wm.IconDarkKey = e.StoreKey
+		case *policy.LabelPolicyIconDarkRemovedEvent:
+			wm.IconDarkKey = ""
+		case *policy.LabelPolicyFontAddedEvent:
+			wm.FontKey = e.StoreKey
+		case *policy.LabelPolicyFontRemovedEvent:
+			wm.FontKey = ""
 		case *policy.LabelPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved
 		}

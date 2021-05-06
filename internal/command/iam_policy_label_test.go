@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -13,6 +14,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/caos/zitadel/internal/static"
+	"github.com/caos/zitadel/internal/static/mock"
 )
 
 func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
@@ -455,6 +458,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
 		ctx        context.Context
@@ -566,10 +570,10 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -582,20 +586,6 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -604,16 +594,17 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
+
 		{
-			name: "logo added, ok",
+			name: "asset remove error, internal error",
 			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -631,6 +622,49 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyLogoAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			res: res{
+				err: caos_errs.IsInternal,
+			},
+		},
+		{
+			name: "logo added, ok",
+			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyLogoAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -645,8 +679,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -659,8 +692,9 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveLogoDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.RemoveLogoDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -788,10 +822,10 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -804,20 +838,6 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -826,16 +846,16 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "icon added, ok",
+			name: "icon removed, ok",
 			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -853,6 +873,12 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyIconAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -867,8 +893,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -881,8 +906,9 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveIconDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.RemoveIconDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1010,10 +1036,10 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1026,20 +1052,6 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1048,16 +1060,16 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "logo dark added, ok",
+			name: "logo dark removed, not ok",
 			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -1075,6 +1087,49 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			res: res{
+				err: caos_errs.IsInternal,
+			},
+		},
+		{
+			name: "logo dark removed, ok",
+			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -1089,8 +1144,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1103,8 +1157,9 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.RemoveLogoDarkDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1232,10 +1287,10 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1248,20 +1303,6 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1270,16 +1311,16 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "icon dark added, ok",
+			name: "icon dark removed, not ok",
 			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -1297,6 +1338,49 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyIconDarkAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			res: res{
+				err: caos_errs.IsInternal,
+			},
+		},
+		{
+			name: "icon dark removed, ok",
+			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyIconDarkAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -1311,8 +1395,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1325,8 +1408,9 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.RemoveIconDarkDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1454,10 +1538,10 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1470,20 +1554,6 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1492,16 +1562,16 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "font added, ok",
+			name: "font remove from storage not possible, internla error",
 			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -1519,6 +1589,49 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 								true,
 							),
 						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyFontAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			res: res{
+				err: caos_errs.IsInternal,
+			},
+		},
+		{
+			name: "font added, ok",
+			fields: fields{
+				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"primary-color",
+								"secondary-color",
+								"warn-color",
+								"primary-color-dark",
+								"secondary-color-dark",
+								"warn-color-dark",
+								true,
+								true,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewLabelPolicyFontAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"key",
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -1533,8 +1646,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1547,8 +1659,9 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveFontDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.RemoveFontDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
