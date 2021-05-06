@@ -37,7 +37,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 
 func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (*mgmt_pb.ListUsersResponse, error) {
 	r := ListUsersRequestToModel(ctx, req)
-	res, err := s.user.SearchUsers(ctx, r)
+	res, err := s.user.SearchUsers(ctx, r, true)
 	if err != nil {
 		return nil, err
 	}

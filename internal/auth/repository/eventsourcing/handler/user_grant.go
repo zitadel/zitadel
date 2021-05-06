@@ -204,6 +204,22 @@ func (u *UserGrant) processOrg(event *es_models.Event) (err error) {
 		member := new(org_es_model.OrgMember)
 		member.SetData(event)
 		return u.processMember(event, "ORG", "", member.UserID, member.Roles)
+	case org_es_model.OrgChanged:
+		grants, err := u.view.UserGrantsByProjectID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		if len(grants) == 0 {
+			return u.view.ProcessedUserGrantSequence(event)
+		}
+		org, err := u.getOrgByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, grant := range grants {
+			u.fillOrgData(grant, org)
+		}
+		return u.view.PutUserGrants(grants, event)
 	default:
 		return u.view.ProcessedUserGrantSequence(event)
 	}

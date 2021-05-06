@@ -26,8 +26,9 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		domain *domain.OrgDomain
+		ctx            context.Context
+		domain         *domain.OrgDomain
+		claimedUserIDs []string
 	}
 	type res struct {
 		want *domain.OrgDomain
@@ -129,7 +130,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain)
+			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -864,7 +865,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				iamDomain:                   "zitadel.ch",
 				idGenerator:                 tt.fields.idGenerator,
 			}
-			got, err := r.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs...)
+			got, err := r.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
