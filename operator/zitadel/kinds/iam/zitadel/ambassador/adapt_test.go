@@ -64,6 +64,8 @@ func SetMappingsHTTP(
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AdminRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AdminRName, gomock.Any()).MinTimes(1).MaxTimes(1)
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.Upload, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.Upload, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AuthorizeName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AuthorizeName, gomock.Any()).MinTimes(1).MaxTimes(1)
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AuthRName, "")

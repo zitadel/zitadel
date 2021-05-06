@@ -69,6 +69,17 @@ var (
 				Subscription: "",
 			},
 		},
+		AssetStorage: &AssetStorage{
+			Type:                    "",
+			Endpoint:                "",
+			AccessKeyID:             &secret.Secret{Value: ""},
+			ExistingAccessKeyID:     nil,
+			SecretAccessKey:         &secret.Secret{Value: ""},
+			ExistingSecretAccessKey: nil,
+			SSL:                     false,
+			Location:                "",
+			BucketPrefix:            "",
+		},
 		ClusterDNS: "",
 	}
 
@@ -128,6 +139,15 @@ var (
 			},
 		},
 		ClusterDNS: "cluster",
+		AssetStorage: &AssetStorage{
+			Type:            "type",
+			Endpoint:        "endpoint",
+			AccessKeyID:     &secret.Secret{Value: "accesskeyid"},
+			SecretAccessKey: &secret.Secret{Value: "secretaccesskey"},
+			SSL:             true,
+			Location:        "location",
+			BucketPrefix:    "bucketprefix",
+		},
 	}
 	desiredFullExisting = &Configuration{
 		Tracing: &Tracing{
@@ -185,6 +205,15 @@ var (
 			},
 		},
 		ClusterDNS: "cluster",
+		AssetStorage: &AssetStorage{
+			Type:                    "type",
+			Endpoint:                "endpoint",
+			ExistingAccessKeyID:     &secret.Existing{"accesskeyid", "accesskeyid", "accesskeyid"},
+			ExistingSecretAccessKey: &secret.Existing{"secretaccesskey", "secretaccesskey", "secretaccesskey"},
+			SSL:                     true,
+			Location:                "location",
+			BucketPrefix:            "bucketprefix",
+		},
 	}
 )
 
@@ -259,6 +288,11 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"CR_MANAGEMENT_KEY":                   "test/client.management.key",
 		"ZITADEL_TRACING_TYPE":                "",
 		"ZITADEL_AUTHORIZE":                   "https://./oauth/v2",
+		"ZITADEL_ASSET_STORAGE_TYPE":          "",
+		"ZITADEL_ASSET_STORAGE_ENDPOINT":      "",
+		"ZITADEL_ASSET_STORAGE_SSL":           "false",
+		"ZITADEL_ASSET_STORAGE_LOCATION":      "",
+		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "",
 	}
 
 	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
@@ -337,6 +371,11 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_TRACING_PROJECT_ID":          "projectid",
 		"ZITADEL_TRACING_TYPE":                "type",
 		"ZITADEL_USER_VERIFICATION_KEY":       "userid",
+		"ZITADEL_ASSET_STORAGE_TYPE":          "type",
+		"ZITADEL_ASSET_STORAGE_ENDPOINT":      "endpoint",
+		"ZITADEL_ASSET_STORAGE_SSL":           "true",
+		"ZITADEL_ASSET_STORAGE_LOCATION":      "location",
+		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "bucketprefix",
 	}
 	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
 
@@ -410,10 +449,12 @@ func TestConfiguration_LiteralsSecretsExisting(t *testing.T) {
 func TestConfiguration_LiteralsSecretVars(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	equals := map[string]string{
-		"ZITADEL_EMAILAPPKEY":       "",
-		"ZITADEL_GOOGLE_CHAT_URL":   "",
-		"ZITADEL_TWILIO_AUTH_TOKEN": "",
-		"ZITADEL_TWILIO_SID":        "",
+		"ZITADEL_EMAILAPPKEY":                     "",
+		"ZITADEL_GOOGLE_CHAT_URL":                 "",
+		"ZITADEL_TWILIO_AUTH_TOKEN":               "",
+		"ZITADEL_TWILIO_SID":                      "",
+		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "",
+		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "",
 	}
 	literals, err := literalsSecretVars(client, desiredEmpty)
 	assert.NoError(t, err)
@@ -424,10 +465,12 @@ func TestConfiguration_LiteralsSecretVars(t *testing.T) {
 func TestConfiguration_LiteralsSecretVarsFull(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	equals := map[string]string{
-		"ZITADEL_EMAILAPPKEY":       "appkey",
-		"ZITADEL_GOOGLE_CHAT_URL":   "chat",
-		"ZITADEL_TWILIO_AUTH_TOKEN": "authtoken",
-		"ZITADEL_TWILIO_SID":        "sid",
+		"ZITADEL_EMAILAPPKEY":                     "appkey",
+		"ZITADEL_GOOGLE_CHAT_URL":                 "chat",
+		"ZITADEL_TWILIO_AUTH_TOKEN":               "authtoken",
+		"ZITADEL_TWILIO_SID":                      "sid",
+		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "accesskeyid",
+		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "secretaccesskey",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 
@@ -442,6 +485,8 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 	chat := "chat"
 	authtoken := "authtoken"
 	sid := "sid"
+	akid := "accesskeyid"
+	sak := "secretaccesskey"
 	/* TODO: incomment!!!
 	client.EXPECT().GetSecret(namespace, desiredFullExisting.Notifications.Email.ExistingAppKey.Name).Return(&corev1.Secret{
 			StringData: map[string]string{
@@ -477,10 +522,12 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 		}, nil)
 	*/
 	equals := map[string]string{
-		"ZITADEL_EMAILAPPKEY":       appkey,
-		"ZITADEL_GOOGLE_CHAT_URL":   chat,
-		"ZITADEL_TWILIO_AUTH_TOKEN": authtoken,
-		"ZITADEL_TWILIO_SID":        sid,
+		"ZITADEL_EMAILAPPKEY":                     appkey,
+		"ZITADEL_GOOGLE_CHAT_URL":                 chat,
+		"ZITADEL_TWILIO_AUTH_TOKEN":               authtoken,
+		"ZITADEL_TWILIO_SID":                      sid,
+		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     akid,
+		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": sak,
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 
@@ -502,7 +549,7 @@ func TestConfiguration_LiteralsConsoleCM(t *testing.T) {
 		Data: map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://.\"}"},
 	}
 
-	equals := map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://.\"}"}
+	equals := map[string]string{"environment.json": "{\"authServiceUrl\":\"https://.\",\"mgmtServiceUrl\":\"https://.\",\"issuer\":\"https://.\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://.\",\"uploadServiceUrl\":\"https://.\"}"}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
 	literals := literalsConsoleCM(clientID, desiredEmpty.DNS, k8sClient, namespace, cmName)
@@ -524,7 +571,7 @@ func TestConfiguration_LiteralsConsoleCMFull(t *testing.T) {
 	}
 
 	equals := map[string]string{
-		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
+		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\",\"uploadServiceUrl\":\"https://api.domain\"}",
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
@@ -544,12 +591,12 @@ func TestConfiguration_LiteralsConsoleCMWithCM(t *testing.T) {
 			Name:      cmName,
 		},
 		Data: map[string]string{
-			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
+			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"\",\"subscriptionServiceUrl\":\"https://sub.domain\",\"uploadServiceUrl\":\"https://api.domain\"}",
 		},
 	}
 
 	equals := map[string]string{
-		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
+		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\",\"uploadServiceUrl\":\"https://api.domain\"}",
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
@@ -569,12 +616,12 @@ func TestConfiguration_LiteralsConsoleCMWithCMFull(t *testing.T) {
 			Name:      cmName,
 		},
 		Data: map[string]string{
-			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
+			"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\",\"uploadServiceUrl\":\"https://api.domain\"}",
 		},
 	}
 
 	equals := map[string]string{
-		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\"}",
+		"environment.json": "{\"authServiceUrl\":\"https://api.domain\",\"mgmtServiceUrl\":\"https://api.domain\",\"issuer\":\"https://issuer.domain\",\"clientid\":\"test\",\"subscriptionServiceUrl\":\"https://sub.domain\",\"uploadServiceUrl\":\"https://api.domain\"}",
 	}
 	k8sClient.EXPECT().GetConfigMap(namespace, cmName).Times(1).Return(cm, nil)
 
