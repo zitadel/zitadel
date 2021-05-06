@@ -172,7 +172,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
 	}
 	if *managementEnabled {
 		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query)

@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/domain"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
@@ -58,7 +59,13 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = l.command.SetUpOrg(setContext(r.Context(), ""), data.toOrgDomain(), data.toUserDomain())
+	ctx := setContext(r.Context(), "")
+	userIDs, err := l.getClaimedUserIDsOfOrgDomain(ctx, data.RegisterOrgName)
+	if err != nil {
+		l.renderRegisterOrg(w, r, authRequest, data, err)
+		return
+	}
+	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), userIDs)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return

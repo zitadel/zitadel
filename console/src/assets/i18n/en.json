@@ -633,6 +633,10 @@
       "NUMBERERROR": "The password must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
+    "PRIVATELABELING": {
+      "TITLE":"Private Labeling",
+      "DESCRIPTION":"Give the login your personalized style and modify its behavior."
+    },
     "PWD_AGE": {
       "TITLE": "Password Aging",
       "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
@@ -644,6 +648,10 @@
     "IAM_POLICY": {
       "TITLE": "IAM Access Preferences",
       "DESCRIPTION": "Define access properties of your users."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "DESCRIPTION": "Customize the appearance of the Login"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Policy",

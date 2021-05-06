@@ -869,7 +869,7 @@ service AdminService {
     }
 
     // Activates all changes of the label policy
-    rpc ActivateCustomLabelPolicy(ActivateLabelPolicyRequest) returns (ActivateLabelPolicyResponse) {
+    rpc ActivateLabelPolicy(ActivateLabelPolicyRequest) returns (ActivateLabelPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/label/_activate"
             body: "*"
@@ -877,7 +877,61 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
+        };
+    }
+
+    // Removes the logo of the label policy
+    rpc RemoveLabelPolicyLogo(RemoveLabelPolicyLogoRequest) returns (RemoveLabelPolicyLogoResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveLabelPolicyLogoDark(RemoveLabelPolicyLogoDarkRequest) returns (RemoveLabelPolicyLogoDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the icon of the label policy
+    rpc RemoveLabelPolicyIcon(RemoveLabelPolicyIconRequest) returns (RemoveLabelPolicyIconResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveLabelPolicyIconDark(RemoveLabelPolicyIconDarkRequest) returns (RemoveLabelPolicyIconDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the font of the label policy
+    rpc RemoveLabelPolicyFont(RemoveLabelPolicyFontRequest) returns (RemoveLabelPolicyFontResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/font"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
         };
     }
 
@@ -2445,6 +2499,41 @@ message UpdateLabelPolicyResponse {
 message ActivateLabelPolicyRequest {}
 
 message ActivateLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLogoRequest {}
+
+message RemoveLabelPolicyLogoResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLogoDarkRequest {}
+
+message RemoveLabelPolicyLogoDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyIconRequest {}
+
+message RemoveLabelPolicyIconResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyIconDarkRequest {}
+
+message RemoveLabelPolicyIconDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyFontRequest {}
+
+message RemoveLabelPolicyFontResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

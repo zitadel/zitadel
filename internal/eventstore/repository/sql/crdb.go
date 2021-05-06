@@ -6,6 +6,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -167,6 +168,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 	}
 
 	for _, uniqueConstraint := range uniqueConstraints {
+		uniqueConstraint.UniqueField = strings.ToLower(uniqueConstraint.UniqueField)
 		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
 			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 			if err != nil {

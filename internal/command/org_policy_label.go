@@ -142,12 +142,9 @@ func (c *Commands) AddLogoLabelPolicy(ctx context.Context, orgID, storageKey str
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2FN8s", "Errors.ResourceOwnerMissing")
-	}
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-vDe6s", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -157,8 +154,12 @@ func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID, storageKey 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-4MVsf", "Errors.Org.LabelPolicy.NotFound")
 	}
+	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.LogoKey)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyLogoRemovedEvent(ctx, orgAgg, storageKey))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyLogoRemovedEvent(ctx, orgAgg, existingPolicy.LogoKey))
 	if err != nil {
 		return nil, err
 	}
@@ -196,12 +197,9 @@ func (c *Commands) AddIconLabelPolicy(ctx context.Context, orgID, storageKey str
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-1nd0d", "Errors.ResourceOwnerMissing")
-	}
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4Nc8s", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -211,8 +209,13 @@ func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID, storageKey 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-1nd9f", "Errors.Org.LabelPolicy.NotFound")
 	}
+
+	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.IconKey)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyIconRemovedEvent(ctx, orgAgg, storageKey))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyIconRemovedEvent(ctx, orgAgg, existingPolicy.IconKey))
 	if err != nil {
 		return nil, err
 	}
@@ -250,12 +253,9 @@ func (c *Commands) AddLogoDarkLabelPolicy(ctx context.Context, orgID, storageKey
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4NF0d", "Errors.ResourceOwnerMissing")
-	}
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1N8fs", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -265,8 +265,12 @@ func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID, storage
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-0peQw", "Errors.Org.LabelPolicy.NotFound")
 	}
+	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.LogoDarkKey)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyLogoDarkRemovedEvent(ctx, orgAgg, storageKey))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyLogoDarkRemovedEvent(ctx, orgAgg, existingPolicy.LogoDarkKey))
 	if err != nil {
 		return nil, err
 	}
@@ -304,12 +308,9 @@ func (c *Commands) AddIconDarkLabelPolicy(ctx context.Context, orgID, storageKey
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mv9ds", "Errors.ResourceOwnerMissing")
-	}
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1B7d2", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -319,8 +320,12 @@ func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID, storage
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-3NFos", "Errors.Org.LabelPolicy.NotFound")
 	}
+	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.IconDarkKey)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyIconDarkRemovedEvent(ctx, orgAgg, storageKey))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyIconDarkRemovedEvent(ctx, orgAgg, existingPolicy.IconDarkKey))
 	if err != nil {
 		return nil, err
 	}
@@ -358,12 +363,9 @@ func (c *Commands) AddFontLabelPolicy(ctx context.Context, orgID, storageKey str
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2n0fW", "Errors.ResourceOwnerMissing")
-	}
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-ah3QQ", "Errors.Assets.EmptyKey")
 	}
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -373,8 +375,12 @@ func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID, storageKey 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-4n9SD", "Errors.Org.LabelPolicy.NotFound")
 	}
+	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.FontKey)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyFontRemovedEvent(ctx, orgAgg, storageKey))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyFontRemovedEvent(ctx, orgAgg, existingPolicy.FontKey))
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,7 @@ const (
 	labelPolicyLogoPrefix = labelPolicyPrefix + "/logo"
 	labelPolicyIconPrefix = labelPolicyPrefix + "/icon"
 	labelPolicyFontPrefix = labelPolicyPrefix + "/font"
-	Dark                  = "/Dark"
+	Dark                  = "/dark"
 
 	DefaultLabelPolicyLogoPath = iamPrefix + labelPolicyLogoPrefix
 	DefaultLabelPolicyIconPath = iamPrefix + labelPolicyIconPrefix

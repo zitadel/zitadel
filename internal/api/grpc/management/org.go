@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -47,8 +48,12 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 }
 
 func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_pb.AddOrgResponse, error) {
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, s.systemDefaults.Domain))
+	if err != nil {
+		return nil, err
+	}
 	ctxData := authz.GetCtxData(ctx)
-	org, err := s.command.AddOrg(ctx, req.Name, ctxData.UserID, ctxData.ResourceOwner)
+	org, err := s.command.AddOrg(ctx, req.Name, ctxData.UserID, ctxData.ResourceOwner, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +62,21 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 		Details: object.AddToDetailsPb(
 			org.Sequence,
 			org.ChangeDate,
+			org.ResourceOwner,
+		),
+	}, err
+}
+
+func (s *Server) UpdateOrg(ctx context.Context, req *mgmt_pb.UpdateOrgRequest) (*mgmt_pb.UpdateOrgResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	org, err := s.command.ChangeOrg(ctx, ctxData.OrgID, req.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateOrgResponse{
+		Details: object.AddToDetailsPb(
+			org.Sequence,
+			org.EventDate,
 			org.ResourceOwner,
 		),
 	}, err
@@ -112,7 +132,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 }
 
 func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequest) (*mgmt_pb.AddOrgDomainResponse, error) {
-	domain, err := s.command.AddOrgDomain(ctx, AddOrgDomainRequestToDomain(ctx, req))
+	domain, err := s.command.AddOrgDomain(ctx, AddOrgDomainRequestToDomain(ctx, req), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +177,11 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *mgmt_p
 }
 
 func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrgDomainRequest) (*mgmt_pb.ValidateOrgDomainResponse, error) {
-	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, req))
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, req), userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -250,4 +274,29 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 	return &mgmt_pb.RemoveOrgMemberResponse{
 		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
+}
+
+func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain string) ([]string, error) {
+	users, err := s.user.SearchUsers(ctx, &usr_model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{
+			{
+				Key:    usr_model.UserSearchKeyPreferredLoginName,
+				Method: domain.SearchMethodEndsWithIgnoreCase,
+				Value:  orgDomain,
+			},
+			{
+				Key:    usr_model.UserSearchKeyResourceOwner,
+				Method: domain.SearchMethodNotEquals,
+				Value:  authz.GetCtxData(ctx).OrgID,
+			},
+		},
+	}, false)
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Result))
+	for i, user := range users.Result {
+		userIDs[i] = user.ID
+	}
+	return userIDs, nil
 }
