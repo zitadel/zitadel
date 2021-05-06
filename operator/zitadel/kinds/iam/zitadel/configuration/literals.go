@@ -99,6 +99,13 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_COOKIE_DOMAIN"] = accountsDomain
 			literalsConfigMap["ZITADEL_DEFAULT_DOMAIN"] = defaultDomain
 		}
+		if desired.AssetStorage != nil {
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_TYPE"] = desired.AssetStorage.Type
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_ENDPOINT"] = desired.AssetStorage.Endpoint
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_SSL"] = strconv.FormatBool(desired.AssetStorage.SSL)
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_LOCATION"] = desired.AssetStorage.Location
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
+		}
 	}
 
 	db, err := database.GetDatabaseInQueried(queried)
@@ -162,6 +169,23 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 					return nil, err
 				}
 				literalsSecretVars["ZITADEL_TWILIO_SID"] = value
+			}
+		}
+		if desired.AssetStorage != nil {
+			as := desired.AssetStorage
+			if as.AccessKeyID != nil || as.ExistingAccessKeyID != nil {
+				value, err := read.GetSecretValue(k8sClient, as.AccessKeyID, as.ExistingAccessKeyID)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID"] = value
+			}
+			if as.SecretAccessKey != nil || as.ExistingSecretAccessKey != nil {
+				value, err := read.GetSecretValue(k8sClient, as.SecretAccessKey, as.ExistingSecretAccessKey)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
 			}
 		}
 	}
