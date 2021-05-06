@@ -270,11 +270,8 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		ctx               context.Context
 		events            []*repository.Event
 		uniqueConstraints *repository.UniqueConstraint
-		assets            *repository.Asset
 		uniqueDataType    string
 		uniqueDataField   string
-		assetID           string
-		asset             []byte
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -388,9 +385,6 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				events: []*repository.Event{
 					generateEvent(t, "12"),
 				},
-				assets:  generateAddAsset(t, "asset12", []byte{1}),
-				assetID: "asset12",
-				asset:   []byte{1},
 			},
 			res: res{
 				wantErr: false,
@@ -408,9 +402,6 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				events: []*repository.Event{
 					generateEvent(t, "13"),
 				},
-				assets:  generateRemoveAsset(t, "asset13"),
-				assetID: "asset13",
-				asset:   []byte{1},
 			},
 			res: res{
 				wantErr: false,
@@ -434,14 +425,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					return
 				}
 			}
-			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
-				err := fillAssets(tt.args.assetID, tt.args.asset)
-				if err != nil {
-					t.Error("unable to prefill insert unique data: ", err)
-					return
-				}
-			}
-			if err := db.Push(tt.args.ctx, tt.args.events, []*repository.Asset{tt.args.assets}, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
+			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -467,18 +451,6 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
 				}
 			}
-			if tt.args.assets != nil {
-				countAssetRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.assets where id = $1", tt.args.assets.ID)
-				var assetCount int
-				err := countAssetRow.Scan(&assetCount)
-				if err != nil {
-					t.Error("unable to query inserted rows: ", err)
-					return
-				}
-				if assetCount != tt.res.eventsRes.assetCount {
-					t.Errorf("expected asset count %d got %d", tt.res.eventsRes.assetCount, assetCount)
-				}
-			}
 		})
 	}
 }
@@ -486,7 +458,6 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	type args struct {
 		events []*repository.Event
-		assets []*repository.Asset
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -571,7 +542,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events, tt.args.assets); (err != nil) != tt.res.wantErr {
+			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -762,7 +733,6 @@ func TestCRDB_Filter(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
-		assets         []*repository.Asset
 	}
 	type res struct {
 		eventCount int
@@ -828,7 +798,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents, tt.fields.assets); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -851,7 +821,6 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
-		existingAssets []*repository.Asset
 	}
 	type res struct {
 		sequence uint64
@@ -915,7 +884,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents, tt.fields.existingAssets); err != nil {
+			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -935,7 +904,6 @@ func TestCRDB_LatestSequence(t *testing.T) {
 func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	type args struct {
 		events []*repository.Event
-		assets []*repository.Asset
 	}
 	type res struct {
 		resourceOwners []string
@@ -1058,7 +1026,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			db := &CRDB{
 				client: testCRDBClient,
 			}
-			if err := db.Push(context.Background(), tt.args.events, tt.args.assets); err != nil {
+			if err := db.Push(context.Background(), tt.args.events); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 

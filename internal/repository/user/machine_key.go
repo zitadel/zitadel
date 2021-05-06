@@ -34,10 +34,6 @@ func (e *MachineKeyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func (e *MachineKeyAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewMachineKeyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -82,10 +78,6 @@ func (e *MachineKeyRemovedEvent) Data() interface{} {
 }
 
 func (e *MachineKeyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *MachineKeyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

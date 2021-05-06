@@ -6,6 +6,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -99,17 +100,6 @@ const (
 					)`
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
 					WHERE unique_type = $1 and unique_field = $2`
-	assetInsert = `INSERT INTO eventstore.assets
-					(
-						id,
-						asset
-					) 
-					VALUES (  
-						$1,
-						$2
-					)`
-	assetDelete = `DELETE FROM eventstore.assets
-					WHERE id = $1`
 )
 
 type CRDB struct {
@@ -124,7 +114,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) Push(ctx context.Context, events []*repository.Event, assets []*repository.Asset, uniqueConstraints ...*repository.UniqueConstraint) error {
+func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.PrepareContext(ctx, crdbInsert)
 		if err != nil {
@@ -162,11 +152,6 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, assets []*
 		if err != nil {
 			return err
 		}
-
-		err = db.handleAssets(ctx, tx, assets...)
-		if err != nil {
-			return err
-		}
 		return nil
 	})
 	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
@@ -183,6 +168,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 	}
 
 	for _, uniqueConstraint := range uniqueConstraints {
+		uniqueConstraint.UniqueField = strings.ToLower(uniqueConstraint.UniqueField)
 		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
 			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 			if err != nil {
@@ -203,32 +189,6 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
 				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint ")
-			}
-		}
-	}
-	return nil
-}
-
-// handleAssets adds or removes an asset
-func (db *CRDB) handleAssets(ctx context.Context, tx *sql.Tx, assets ...*repository.Asset) (err error) {
-	if assets == nil || len(assets) == 0 || (len(assets) == 1 && assets[0] == nil) {
-		return nil
-	}
-
-	for _, asset := range assets {
-		if asset.Action == repository.AssetAdded {
-			_, err := tx.ExecContext(ctx, assetInsert, asset.ID, asset.Asset)
-			if err != nil {
-				logging.LogWithFields("SQL-M39fs",
-					"asset-id", asset.ID).WithError(err).Info("insert asset failed")
-				return caos_errs.ThrowInternal(err, "SQL-4M0gs", "unable to create asset")
-			}
-		} else if asset.Action == repository.AssetRemoved {
-			_, err := tx.ExecContext(ctx, assetDelete, asset.ID)
-			if err != nil {
-				logging.LogWithFields("SQL-3M9fs",
-					"asset-id", asset.ID).WithError(err).Info("delete asset failed")
-				return caos_errs.ThrowInternal(err, "SQL-Md9ds", "unable to remove unique constraint ")
 			}
 		}
 	}
