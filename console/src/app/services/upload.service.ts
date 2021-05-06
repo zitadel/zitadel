@@ -1,86 +1,59 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { Org } from '../proto/generated/zitadel/org_pb';
 import { StorageService } from './storage.service';
 
+const ORG_STORAGE_KEY = 'organization';
 const authorizationKey = 'Authorization';
+const orgKey = 'x-zitadel-orgid';
+
 const bearerPrefix = 'Bearer';
 const accessTokenStorageKey = 'access_token';
 
-export interface StripeCustomer {
-  contact: string;
-  company?: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  country: string;
+export enum UploadEndpoint {
+  DARKLOGO = 'iam/policy/label/logo/dark',
+  LIGHTLOGO = 'iam/policy/label/logo/light',
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class UploadService {
-  constructor(private http: HttpClient, private storageService: StorageService) { }
+  private serviceUrl: string = '';
+  private accessToken: string = '';
+  private org!: Org.AsObject;
+  constructor(private http: HttpClient, private storageService: StorageService) {
 
-  public getLink(orgId: string, redirectURI: string): Promise<any> {
-    return this.http.get('./assets/environment.json')
+    http.get('./assets/environment.json')
       .toPromise().then((data: any) => {
-        if (data && data.subscriptionServiceUrl) {
-          const serviceUrl = data.subscriptionServiceUrl;
-          const accessToken = this.storageService.getItem(accessTokenStorageKey);
-          return this.http.get(`${serviceUrl}/redirect`, {
-            headers: {
-              [authorizationKey]: `${bearerPrefix} ${accessToken}`,
-            },
-            params: {
-              'org': orgId,
-              'return_url': encodeURI(redirectURI),
-              'country': 'ch',
-            },
-          }).toPromise();
-        } else {
-          return Promise.reject('Could not load environment');
+        if (data && data.uploadServiceUrl) {
+          this.serviceUrl = data.uploadServiceUrl;
+          const aT = this.storageService.getItem(accessTokenStorageKey);
+
+          if (aT) {
+            this.accessToken = aT;
+          }
+
+          const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
+
+          if (org) {
+            this.org = org;
+          }
         }
+      }).catch(error => {
+        console.error(error);
       });
   }
 
-  public getCustomer(orgId: string): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
-        // if (data && data.subscriptionServiceUrl) {
-        //   const serviceUrl = data.subscriptionServiceUrl;
-        //   const accessToken = this.storageService.getItem(accessTokenStorageKey);
-        //   return this.http.get(`${serviceUrl}/customer`, {
-        //     headers: {
-        //       [authorizationKey]: `${bearerPrefix} ${accessToken}`,
-        //     },
-        //     params: {
-        //       'org': orgId,
-        //     },
-        //   }).toPromise();
-        // } else {
-        //   return Promise.reject('Could not load environment');
-        // }
-      });
-  }
-
-  public setCustomer(orgId: string, body: StripeCustomer): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
-        // if (data && data.subscriptionServiceUrl) {
-        //   const serviceUrl = data.subscriptionServiceUrl;
-        //   const accessToken = this.storageService.getItem(accessTokenStorageKey);
-        //   return this.http.post(`${serviceUrl}/customer`, body, {
-        //     headers: {
-        //       [authorizationKey]: `${bearerPrefix} ${accessToken}`,
-        //     },
-        //     params: {
-        //       'org': orgId,
-        //     },
-        //   }).toPromise();
-        // } else {
-        //   return Promise.reject('Could not load environment');
-        // }
-      });
+  public upload(endpoint: UploadEndpoint, body: any): Promise<any> {
+    return this.http.post(`${this.serviceUrl}/upload/v1/${endpoint}`,
+      body,
+      {
+        headers: {
+          [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
+          [orgKey]: `${this.org.id}`,
+        },
+      }).toPromise();
   }
 }

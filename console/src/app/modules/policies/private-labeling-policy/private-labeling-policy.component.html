@@ -32,21 +32,21 @@
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
-              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo($event)"
-              (dropped)="onDropLogo($event)"
-              [class.hovering]="isHoveringOverLogo">
+              <button class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.DARK, $event)"
+              (dropped)="onDropLogo(Theme.DARK, $event)"
+              [class.hovering]="isHoveringOverDarkLogo">
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
-              </div>
+                <span class="desc">{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
+            </button>
             </div>
 
             <div class="part">
               <span class="label">Icon</span>
-              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon($event)"
+              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(Theme.DARK, $event)"
               (dropped)="onDropIcon($event)"
-              [class.hovering]="isHoveringOverIcon">
+              [class.hovering]="isHoveringOverDarkIcon">
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+                <span class="desc">{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
               </div>
             </div>
           </div>
@@ -56,21 +56,21 @@
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
-              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo($event)"
-              (dropped)="onDropLogo($event)"
-              [class.hovering]="isHoveringOverLogo">
+              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.LIGHT, $event)"
+              (dropped)="onDropLogo(Theme.LIGHT, $event)"
+              [class.hovering]="isHoveringOverLightLogo">
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+                <span class="desc">{{isHoveringOverLightLogo ? 'Release': 'Drop your Logo here'}}</span>
               </div>
             </div>
 
             <div class="part">
               <span class="label">Icon</span>
-              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon($event)"
+              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(Theme.LIGHT,$event)"
               (dropped)="onDropIcon($event)"
-              [class.hovering]="isHoveringOverIcon">
+              [class.hovering]="isHoveringOverLightIcon">
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLogo ? 'Release': 'Drop your Logo here'}}</span>
+                <span class="desc">{{isHoveringOverLightLogo ? 'Release': 'Drop your Logo here'}}</span>
               </div>
             </div>
           </div>

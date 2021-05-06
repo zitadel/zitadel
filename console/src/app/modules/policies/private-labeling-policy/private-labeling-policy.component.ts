@@ -12,6 +12,7 @@ import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { UploadEndpoint, UploadService } from 'src/app/services/upload.service';
 
 import { CnslLinks } from '../../links/links.component';
 import {
@@ -22,6 +23,11 @@ import {
   ORG_LOGIN_POLICY_LINK,
 } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
+
+enum Theme {
+  DARK,
+  LIGHT
+}
 
 @Component({
   selector: 'app-private-labeling-policy',
@@ -34,8 +40,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public data!: any;
   public panelOpenState = false;
-  public isHoveringOverLogo: boolean = false;
-  public isHoveringOverIcon: boolean = false;
+  public isHoveringOverDarkLogo: boolean = false;
+  public isHoveringOverDarkIcon: boolean = false;
+  public isHoveringOverLightLogo: boolean = false;
+  public isHoveringOverLightIcon: boolean = false;
 
   private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -92,10 +100,13 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     { name: 'deeppurple', color: '#673ab7' }
   ];
 
+  public Theme: any = Theme;
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
+    private uploadService: UploadService,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
@@ -124,11 +135,16 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     });
   }
 
-  public toggleHoverLogo(isHovering: boolean) {
-    this.isHoveringOverLogo = isHovering;
+  public toggleHoverLogo(theme: Theme, isHovering: boolean) {
+    if (theme == Theme.DARK) {
+      this.isHoveringOverDarkLogo = isHovering;
+    }
+    if (theme == Theme.LIGHT) {
+      this.isHoveringOverLightLogo = isHovering;
+    }
   }
 
-  public onDropLogo(filelist: FileList) {
+  public onDropLogo(theme: Theme, filelist: FileList) {
     console.log('drop logo');
     const file = filelist.item(0);
     if (file) {
@@ -140,12 +156,26 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       reader.onload = (event) => { // called once readAsDataURL is completed
         console.log(event.target?.result);
         this.logoURL = event.target?.result;
+
+        const formData = new FormData();
+        formData.append('file', this.logoURL);
+        if (theme == Theme.DARK) {
+          this.uploadService.upload(UploadEndpoint.DARKLOGO, formData);
+        }
+        if (theme == Theme.LIGHT) {
+          this.uploadService.upload(UploadEndpoint.LIGHTLOGO, formData);
+        }
       };
     }
   }
 
-  public toggleHoverIcon(isHovering: boolean) {
-    this.isHoveringOverIcon = isHovering;
+  public toggleHoverIcon(theme: Theme, isHovering: boolean) {
+    if (theme == Theme.DARK) {
+      this.isHoveringOverDarkIcon = isHovering;
+    }
+    if (theme == Theme.LIGHT) {
+      this.isHoveringOverLightIcon = isHovering;
+    }
   }
 
   public onDropIcon(event: any) {
