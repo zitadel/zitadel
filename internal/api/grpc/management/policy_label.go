@@ -86,21 +86,71 @@ func (s *Server) ResetLabelPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) RemoveCustomLabelPolicyLogo(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLogoRequest) (*mgmt_pb.RemoveCustomLabelPolicyLogoResponse, error) {
-	return nil, nil
+	policy, err := s.command.RemoveLogoDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveCustomLabelPolicyLogoResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) RemoveCustomLabelPolicyLogoDark(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLogoDarkRequest) (*mgmt_pb.RemoveCustomLabelPolicyLogoDarkResponse, error) {
-	return nil, nil
+	policy, err := s.command.RemoveLogoDarkDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveCustomLabelPolicyLogoDarkResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) RemoveCustomLabelPolicyIcon(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyIconRequest) (*mgmt_pb.RemoveCustomLabelPolicyIconResponse, error) {
-	return nil, nil
+	policy, err := s.command.RemoveIconDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveCustomLabelPolicyIconResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) RemoveCustomLabelPolicyIconDark(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyIconDarkRequest) (*mgmt_pb.RemoveCustomLabelPolicyIconDarkResponse, error) {
-	return nil, nil
+	policy, err := s.command.RemoveIconDarkDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveCustomLabelPolicyIconDarkResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) RemoveCustomLabelPolicyFont(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyFontRequest) (*mgmt_pb.RemoveCustomLabelPolicyFontResponse, error) {
-	return nil, nil
+	policy, err := s.command.RemoveFontDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveCustomLabelPolicyFontResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
 }
