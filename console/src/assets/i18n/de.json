@@ -633,6 +633,10 @@
       "NUMBERERROR": "Das Password muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
+    "PRIVATELABELING": {
+      "TITLE":"Private Labeling",
+      "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an."
+    },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",
       "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
@@ -644,6 +648,10 @@
     "IAM_POLICY": {
       "TITLE": "Zugangseinstellungen IAM",
       "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins."
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
