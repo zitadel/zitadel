@@ -62,14 +62,14 @@ func GetContainer(
 					Key:                  "ZITADEL_EMAILAPPKEY",
 				},
 			}},
-		{Name: "ASSET_STORAGE_ACCESS_KEY_ID",
+		{Name: "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
 					Key:                  "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
 				},
 			}},
-		{Name: "ASSET_STORAGE_SECRET_ACCESS_KEY",
+		{Name: "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
