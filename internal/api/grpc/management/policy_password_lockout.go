@@ -13,7 +13,7 @@ func (s *Server) GetPasswordLockoutPolicy(ctx context.Context, req *mgmt_pb.GetP
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetPasswordLockoutPolicyResponse{Policy: policy_grpc.ModelPasswordLockoutPolicyToPb(policy)}, nil
+	return &mgmt_pb.GetPasswordLockoutPolicyResponse{Policy: policy_grpc.ModelPasswordLockoutPolicyToPb(policy), IsDefault: policy.Default}, nil
 }
 
 func (s *Server) GetDefaultPasswordLockoutPolicy(ctx context.Context, req *mgmt_pb.GetDefaultPasswordLockoutPolicyRequest) (*mgmt_pb.GetDefaultPasswordLockoutPolicyResponse, error) {

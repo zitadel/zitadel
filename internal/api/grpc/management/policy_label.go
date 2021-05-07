@@ -14,7 +14,7 @@ func (s *Server) GetLabelPolicy(ctx context.Context, req *mgmt_pb.GetLabelPolicy
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
+	return &mgmt_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy), IsDefault: policy.Default}, nil
 }
 
 func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *mgmt_pb.GetPreviewLabelPolicyRequest) (*mgmt_pb.GetPreviewLabelPolicyResponse, error) {
