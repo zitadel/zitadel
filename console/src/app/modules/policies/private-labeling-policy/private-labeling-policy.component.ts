@@ -1,27 +1,25 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-  GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse,
+  GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
+  UpdateLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
+  AddCustomLabelPolicyRequest,
+  GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
+  UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { UploadEndpoint, UploadService } from 'src/app/services/upload.service';
 
 import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_LABEL_LINK,
-  IAM_LOGIN_POLICY_LINK,
-  IAM_POLICY_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_LOGIN_POLICY_LINK,
-} from '../../policy-grid/policy-links';
+import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 enum Theme {
@@ -38,7 +36,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
-  public data!: any;
+  public data!: LabelPolicy.AsObject;
   public panelOpenState: boolean = false;
   public isHoveringOverDarkLogo: boolean = false;
   public isHoveringOverDarkIcon: boolean = false;
@@ -49,7 +47,11 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
-  public nextLinks: CnslLinks[] = [];
+  public nextLinks: CnslLinks[] = [
+    IAM_COMPLEXITY_LINK,
+    IAM_POLICY_LINK,
+    IAM_LOGIN_POLICY_LINK,
+  ];
 
   public logoFile!: File;
   public logoURL: any = '';
@@ -114,18 +116,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.nextLinks = [
-            ORG_IAM_POLICY_LINK,
-            ORG_LOGIN_POLICY_LINK,
-          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.nextLinks = [
-            IAM_POLICY_LINK,
-            IAM_LOGIN_POLICY_LINK,
-            IAM_LABEL_LINK,
-          ];
           break;
       }
 
@@ -187,6 +180,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     this.loading = true;
 
     this.getData().then(data => {
+      console.log(data);
+
       if (data.policy) {
         this.data = data.policy;
         this.loading = false;
@@ -199,12 +194,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private async getData():
-    Promise<MgmtGetPasswordComplexityPolicyResponse.AsObject | AdminGetPasswordComplexityPolicyResponse.AsObject> {
+    Promise<MgmtGetLabelPolicyResponse.AsObject | AdminGetLabelPolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).getPasswordComplexityPolicy();
+        return (this.service as ManagementService).getLabelPolicy();
       case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).getPasswordComplexityPolicy();
+        return (this.service as AdminService).getLabelPolicy();
     }
   }
 
@@ -224,27 +219,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public savePolicy(): void {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        if ((this.data as PasswordComplexityPolicy.AsObject).isDefault) {
-          (this.service as ManagementService).addCustomPasswordComplexityPolicy(
+        if ((this.data as LabelPolicy.AsObject).isDefault) {
+          const req = new AddCustomLabelPolicyRequest();
+          this.overwriteValues(req);
 
-            this.data.hasLowercase,
-            this.data.hasUppercase,
-            this.data.hasNumber,
-            this.data.hasSymbol,
-            this.data.minLength,
-          ).then(() => {
+          (this.service as ManagementService).addCustomLabelPolicy(req).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
+          }).catch((error: HttpErrorResponse) => {
             this.toast.showError(error);
           });
         } else {
-          (this.service as ManagementService).updateCustomPasswordComplexityPolicy(
-            this.data.hasLowercase,
-            this.data.hasUppercase,
-            this.data.hasNumber,
-            this.data.hasSymbol,
-            this.data.minLength,
-          ).then(() => {
+          const req = new AddCustomLabelPolicyRequest();
+          this.overwriteValues(req);
+          (this.service as ManagementService).updateCustomLabelPolicy(req).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch(error => {
             this.toast.showError(error);
@@ -252,13 +239,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         }
         break;
       case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).updatePasswordComplexityPolicy(
-          this.data.hasLowercase,
-          this.data.hasUppercase,
-          this.data.hasNumber,
-          this.data.hasSymbol,
-          this.data.minLength,
-        ).then(() => {
+        const req = new UpdateLabelPolicyRequest();
+        this.overwriteValues(req);
+        (this.service as AdminService).updateLabelPolicy(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
           this.toast.showError(error);
@@ -269,9 +252,22 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public get isDefault(): boolean {
     if (this.data && this.serviceType === PolicyComponentServiceType.MGMT) {
-      return (this.data as PasswordComplexityPolicy.AsObject).isDefault;
+      return (this.data as LabelPolicy.AsObject).isDefault;
     } else {
       return false;
     }
+  }
+
+  public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
+    req.setPrimaryColorDark(this.primaryColorDark);
+    req.setPrimaryColor(this.primaryColorLight);
+    req.setSecondaryColorDark(this.secondaryColorDark);
+    req.setSecondaryColor(this.secondaryColorLight);
+    req.setWarnColorDark(this.warnColorDark);
+    req.setWarnColor(this.warnColorLight);
+
+    req.setDisableWatermark(this.data.disableWatermark);
+    req.setHideLoginNameSuffix(this.data.hideLoginNameSuffix);
+    req.setErrorMsgPopup(this.data.errorMsgPopup);
   }
 }
