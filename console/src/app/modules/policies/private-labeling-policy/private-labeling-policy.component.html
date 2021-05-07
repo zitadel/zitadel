@@ -32,21 +32,31 @@
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
-              <button class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.DARK, $event)"
+              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.DARK, $event)"
               (dropped)="onDropLogo(Theme.DARK, $event)"
               [class.hovering]="isHoveringOverDarkLogo">
-                <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
-            </button>
+                <label class="file-label">
+                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(Theme.DARK, $event.target.files)">
+                  <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+
+                  <i class="icon las la-cloud-upload-alt"></i>
+                  <span class="desc">{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
+                </label>
+            </div>
             </div>
 
             <div class="part">
               <span class="label">Icon</span>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(Theme.DARK, $event)"
-              (dropped)="onDropIcon($event)"
+              (dropped)="onDropIcon(Theme.DARK, $event)"
               [class.hovering]="isHoveringOverDarkIcon">
+              <label class="file-label">
+                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropIcon(Theme.DARK, $event.target.files)">
+                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
+                <span class="desc">{{isHoveringOverDarkIcon ? 'Release': 'Drop your Logo here'}}</span>
+              </label>
               </div>
             </div>
           </div>
@@ -59,18 +69,28 @@
               <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.LIGHT, $event)"
               (dropped)="onDropLogo(Theme.LIGHT, $event)"
               [class.hovering]="isHoveringOverLightLogo">
+              <label class="file-label">
+                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(Theme.LIGHT, $event.target.files)">
+                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+
                 <i class="icon las la-cloud-upload-alt"></i>
                 <span class="desc">{{isHoveringOverLightLogo ? 'Release': 'Drop your Logo here'}}</span>
+              </label>
               </div>
             </div>
 
             <div class="part">
               <span class="label">Icon</span>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(Theme.LIGHT,$event)"
-              (dropped)="onDropIcon($event)"
+              (dropped)="onDropIcon(Theme.LIGHT, $event)"
               [class.hovering]="isHoveringOverLightIcon">
+              <label class="file-label">
+                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropIcon(Theme.LIGHT, $event.target.files)">
+                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLightLogo ? 'Release': 'Drop your Logo here'}}</span>
+                <span class="desc">{{isHoveringOverLightIcon ? 'Release': 'Drop your Logo here'}}</span>
+              </label>
               </div>
             </div>
           </div>
@@ -90,13 +110,13 @@
               <!-- <span class="title">Primary Color</span> -->
               <cnsl-form-field class="formfield">
                 <cnsl-label>Primary Color Hexcode</cnsl-label>
-                <input cnslInput [(ngModel)]="primaryColorDark" />
+                <input cnslInput [(ngModel)]="data.primaryColorDark" />
               </cnsl-form-field>
               <div class="color-selector">
                 <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                    [ngClass]="{'active': primaryColorDark == color.color}"
-                    (click)="primaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
-                    <mat-icon *ngIf="primaryColorDark == color.color">check</mat-icon>
+                    [ngClass]="{'active': data.primaryColorDark == color.color}"
+                    (click)="data.primaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
+                    <mat-icon *ngIf="data.primaryColorDark == color.color">check</mat-icon>
                 </div>
               </div>
             </div>
@@ -105,13 +125,13 @@
               <!-- <span class="title">Secondary Color</span> -->
               <cnsl-form-field class="formfield">
                 <cnsl-label>Secondary Color Hexcode</cnsl-label>
-                <input cnslInput [(ngModel)]="secondaryColorDark" />
+                <input cnslInput [(ngModel)]="data.secondaryColorDark" />
               </cnsl-form-field>
               <div class="color-selector">
                 <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                  [ngClass]="{'active': secondaryColorDark == color.color}"
-                  (click)="secondaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
-                  <mat-icon *ngIf="secondaryColorDark == color.color">check</mat-icon>
+                  [ngClass]="{'active': data.secondaryColorDark == color.color}"
+                  (click)="data.secondaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
+                  <mat-icon *ngIf="data.secondaryColorDark == color.color">check</mat-icon>
                 </div>
               </div>
             </div>
@@ -120,13 +140,13 @@
               <!-- <span class="title">Warn Color</span> -->
               <cnsl-form-field class="formfield">
                 <cnsl-label>Warn Color Hexcode</cnsl-label>
-                <input cnslInput [(ngModel)]="warnColorDark" />
+                <input cnslInput [(ngModel)]="data.warnColorDark" />
               </cnsl-form-field>
               <div class="color-selector">
                 <div *ngFor="let color of warncolors" class="circle mat-elevation-z3"
-                  [ngClass]="{'active': warnColorDark == color.color}"
-                  (click)="warnColorDark= color.color" [ngStyle]="{'background-color': color.color}">
-                  <mat-icon *ngIf="warnColorDark == color.color">check</mat-icon>
+                  [ngClass]="{'active': data.warnColorDark == color.color}"
+                  (click)="data.warnColorDark= color.color" [ngStyle]="{'background-color': color.color}">
+                  <mat-icon *ngIf="data.warnColorDark == color.color">check</mat-icon>
                 </div>
               </div>
             </div>
@@ -139,13 +159,13 @@
             <!-- <span class="title">Primary Color</span> -->
             <cnsl-form-field class="formfield">
               <cnsl-label>Primary Color Hexcode</cnsl-label>
-              <input cnslInput [(ngModel)]="primaryColorLight" />
+              <input cnslInput [(ngModel)]="data.primaryColor" />
             </cnsl-form-field>
             <div class="color-selector">
               <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                  [ngClass]="{'active': primaryColorLight == color.color}"
-                  (click)="primaryColorLight= color.color" [ngStyle]="{'background-color': color.color}">
-                  <mat-icon *ngIf="primaryColorLight == color.color">check</mat-icon>
+                  [ngClass]="{'active': data.primaryColor == color.color}"
+                  (click)="data.primaryColor= color.color" [ngStyle]="{'background-color': color.color}">
+                  <mat-icon *ngIf="data.primaryColor == color.color">check</mat-icon>
               </div>
             </div>
           </div>
@@ -154,13 +174,13 @@
             <!-- <span class="title">Secondary Color</span> -->
             <cnsl-form-field class="formfield">
               <cnsl-label>Secondary Color Hexcode</cnsl-label>
-              <input cnslInput [(ngModel)]="secondaryColorLight" />
+              <input cnslInput [(ngModel)]="data.secondaryColor" />
             </cnsl-form-field>
             <div class="color-selector">
               <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                [ngClass]="{'active': secondaryColorLight == color.color}"
-                (click)="secondaryColorLight= color.color" [ngStyle]="{'background-color': color.color}">
-                <mat-icon *ngIf="secondaryColorLight == color.color">check</mat-icon>
+                [ngClass]="{'active': data.secondaryColor == color.color}"
+                (click)="data.secondaryColor= color.color" [ngStyle]="{'background-color': color.color}">
+                <mat-icon *ngIf="data.secondaryColor == color.color">check</mat-icon>
               </div>
             </div>
           </div>
@@ -169,13 +189,13 @@
             <!-- <span class="title">Warn Color</span> -->
             <cnsl-form-field class="formfield">
               <cnsl-label>Warn Color Hexcode</cnsl-label>
-              <input cnslInput [(ngModel)]="warnColorLight" />
+              <input cnslInput [(ngModel)]="data.warnColor" />
             </cnsl-form-field>
             <div class="color-selector">
               <div *ngFor="let color of warncolors" class="circle mat-elevation-z3"
-                [ngClass]="{'active': warnColorLight == color.color}"
-                (click)="warnColorLight= color.color" [ngStyle]="{'background-color': color.color}">
-                <mat-icon *ngIf="warnColorLight == color.color">check</mat-icon>
+                [ngClass]="{'active': data.warnColor == color.color}"
+                (click)="data.warnColor= color.color" [ngStyle]="{'background-color': color.color}">
+                <mat-icon *ngIf="data.warnColor == color.color">check</mat-icon>
               </div>
             </div>
           </div>
@@ -223,7 +243,20 @@
               Currently I am {{panelOpenState ? 'open' : 'closed'}}
             </mat-panel-description> -->
           </mat-expansion-panel-header>
-          <p>I'm visible because I am open</p>
+          <div class="adv-container" *ngIf="data">
+          <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
+            [(ngModel)]="data.hideLoginNameSuffix">
+            {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
+        </mat-slide-toggle>
+        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
+            [(ngModel)]="data.errorMsgPopup">
+            {{'POLICY.DATA.ERRORMSGPOPUP' | translate}}
+        </mat-slide-toggle>
+        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
+            [(ngModel)]="data.disableWatermark">
+            {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
+        </mat-slide-toggle>
+      </div>
         </mat-expansion-panel>
       </mat-accordion>
 
@@ -249,8 +282,8 @@
 
             <div class="btn-wrapper">
               <button mat-stroked-button>cancel</button>
-              <button class="dark" mat-raised-button [style.background]="primaryColorDark" [style.color]="primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
-              <button class="light" mat-raised-button [style.background]="primaryColorLight" [style.color]="primaryColorLight == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+              <button class="dark" mat-raised-button [style.background]="data.primaryColorDark" [style.color]="data.primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+              <button class="light" mat-raised-button [style.background]="data.primaryColor" [style.color]="data.primaryColor == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
             </div>
           </div>
         </div>

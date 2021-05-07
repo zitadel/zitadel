@@ -635,7 +635,8 @@
     },
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
-      "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an."
+      "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "BTN":"Datei auswählen"
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",
@@ -660,13 +661,6 @@
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "SAVED": "Erfolgreich gespeichert."
     },
-    "LABEL": {
-      "TITLE": "Email Labelling Einstellungen",
-      "DESCRIPTION": "Definieren Sie das Erscheinungsbild Ihrer Benachrichtigungs-Mails",
-      "PRIMARYCOLOR": "Hintergrundfarbe",
-      "SECONDARYCOLOR": "Schriftfarbe",
-      "SAVED": "Erfolgreich gespeichert."
-    },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
     "BTN_INSTALL": "Installieren",
     "BTN_EDIT": "Modifizieren",
@@ -689,7 +683,10 @@
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identity Provider erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "Mfa erzwingen",
-      "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden."
+      "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
+      "HIDELOGINNAMESUFFIX":"Loginname Suffix ausblenden",
+      "ERRORMSGPOPUP":"Fehler als Dialog Fenster",
+      "DISABLEWATERMARK":"Wasserzeichen ausblenden"
     },
     "RESET": "Richtlinie zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
