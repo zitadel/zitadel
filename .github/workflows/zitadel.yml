@@ -10,7 +10,6 @@ on:
       - '**'
 
 env:
-  GITHUB_TOKEN: ${{ GITHUB_TOKEN }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
   GO_VERSION: '1.15'
@@ -77,7 +76,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ env.GITHUB_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - run: ls -la
       - uses: docker/build-push-action@v2
@@ -138,7 +137,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ env.GITHUB_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
         name: onlybuild
@@ -223,7 +222,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ env.GITHUB_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
         name: buildandpush
@@ -242,7 +241,7 @@ jobs:
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
-      DOCKER_PASSWORD: ${{ env.GITHUB_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -325,7 +324,7 @@ jobs:
           tag: ${{ needs.refs.outputs.short_ref }}-dev
           commit: ${{ needs.refs.outputs.short_ref }}
           name: Branch ${{ needs.refs.outputs.short_ref }}
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           replacesArtifacts: true
           prerelease: true
           draft: false
