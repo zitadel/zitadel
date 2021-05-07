@@ -30,6 +30,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Frameworks',
+      items: ['quickstarts/flutter'],
+      collapsed: false,
+    },
+    {
+      type: 'category',
       label: 'Identity Aware Proxy',
       items: ['quickstarts/oauth2-proxy'],
       collapsed: false,
