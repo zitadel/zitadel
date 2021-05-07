@@ -30,6 +30,8 @@ type AuthRequest struct {
 	UserName               string
 	LoginName              string
 	DisplayName            string
+	AvatarKey              string
+	PresignedAvatar        string
 	UserOrgID              string
 	RequestedOrgID         string
 	RequestedOrgName       string
