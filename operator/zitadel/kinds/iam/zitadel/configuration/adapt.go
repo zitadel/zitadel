@@ -13,11 +13,12 @@ import (
 )
 
 type ConsoleEnv struct {
-	AuthServiceURL string `json:"authServiceUrl"`
-	MgmtServiceURL string `json:"mgmtServiceUrl"`
-	Issuer         string `json:"issuer"`
-	ClientID       string `json:"clientid"`
-	SubServiceURL  string `json:"subscriptionServiceUrl"`
+	AuthServiceURL   string `json:"authServiceUrl"`
+	MgmtServiceURL   string `json:"mgmtServiceUrl"`
+	Issuer           string `json:"issuer"`
+	ClientID         string `json:"clientid"`
+	SubServiceURL    string `json:"subscriptionServiceUrl"`
+	UploadServiceURL string `json:"uploadServiceUrl"`
 }
 
 const (

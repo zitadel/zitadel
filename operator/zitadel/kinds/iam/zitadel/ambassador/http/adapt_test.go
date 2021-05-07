@@ -89,6 +89,30 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, EndsessionName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).MinTimes(1).MaxTimes(1)
 
+	uploadName := labels.MustForName(componentLabels, Upload)
+	upload := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": group + "/" + version,
+			"kind":       kind,
+			"metadata": map[string]interface{}{
+				"labels":    labels.MustK8sMap(uploadName),
+				"name":      uploadName.Name(),
+				"namespace": namespace,
+			},
+			"spec": map[string]interface{}{
+				"connect_timeout_ms": 30000,
+				"host":               ".",
+				"prefix":             "/upload/v1",
+				"rewrite":            "",
+				"service":            url,
+				"timeout_ms":         30000,
+				"cors":               cors,
+			},
+		},
+	}
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, Upload, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, Upload, upload).MinTimes(1).MaxTimes(1)
+
 	issuerName := labels.MustForName(componentLabels, IssuerName)
 	issuer := &unstructured.Unstructured{
 		Object: map[string]interface{}{
@@ -320,6 +344,30 @@ func TestHttp_Adapt2(t *testing.T) {
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, EndsessionName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, EndsessionName, endsession).MinTimes(1).MaxTimes(1)
+
+	uploadName := labels.MustForName(componentLabels, Upload)
+	upload := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": group + "/" + version,
+			"kind":       kind,
+			"metadata": map[string]interface{}{
+				"labels":    labels.MustK8sMap(uploadName),
+				"name":      uploadName.Name(),
+				"namespace": namespace,
+			},
+			"spec": map[string]interface{}{
+				"connect_timeout_ms": 30000,
+				"host":               "api.domain",
+				"prefix":             "/upload/v1",
+				"rewrite":            "",
+				"service":            url,
+				"timeout_ms":         30000,
+				"cors":               cors,
+			},
+		},
+	}
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, Upload, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, Upload, upload).MinTimes(1).MaxTimes(1)
 
 	issuerName := labels.MustForName(componentLabels, IssuerName)
 	issuer := &unstructured.Unstructured{
