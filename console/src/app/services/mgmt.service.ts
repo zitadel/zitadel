@@ -753,7 +753,8 @@ export class ManagementService {
     return this.grpcService.mgmt.getDefaultLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public getPreviewLabelPolicy(req: GetPreviewLabelPolicyRequest): Promise<GetPreviewLabelPolicyResponse.AsObject> {
+  public getPreviewLabelPolicy(): Promise<GetPreviewLabelPolicyResponse.AsObject> {
+    const req = new GetPreviewLabelPolicyRequest();
     return this.grpcService.mgmt.getPreviewLabelPolicy(req, null).then(resp => resp.toObject());
   }
 

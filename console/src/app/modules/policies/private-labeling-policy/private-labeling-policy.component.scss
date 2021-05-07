@@ -85,6 +85,22 @@
             flex-direction: column;
             transition: all .2s ease-in-out;
 
+            .file-label {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+
+              .btn {
+                cursor: pointer;
+                border-radius: 6px;
+                padding: .5rem 1rem;
+                background-color: inherit;
+                border: 1px solid if($is-dark-theme, #ffffff20, #000000);
+                color: if($is-dark-theme, white, #000000);
+                margin-bottom: .5rem;
+              }
+            }
+
             .icon {
               font-size: 1.5rem;
               color: var(--grey);
@@ -204,12 +220,21 @@
           }
         }
       }
+
+      .adv-container {
+        display: flex;
+        flex-direction: column;
+
+        .toggle {
+          margin-bottom: .5rem;
+        }
+      }
     }
 
     .preview {
       width: calc(100px + 360px);
       pointer-events: none;
-      margin: 1rem auto;
+      margin: 1rem 0;
 
       * {
         pointer-events: none;

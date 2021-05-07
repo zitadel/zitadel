@@ -5,11 +5,13 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
   GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
+  GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
   UpdateLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
   AddCustomLabelPolicyRequest,
   GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
+  GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
   UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -55,14 +57,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public logoFile!: File;
   public logoURL: any = '';
-
-  public primaryColorDark: string = '';
-  public secondaryColorDark: string = '';
-  public warnColorDark: string = '#f44336';
-
-  public primaryColorLight: string = '';
-  public secondaryColorLight: string = '';
-  public warnColorLight: string = '#f44336';
 
   public font: string = 'Lato';
   public fontCssRule: string = '\'Lato\', sans-serif';
@@ -138,7 +132,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public onDropLogo(theme: Theme, filelist: FileList): void {
-    console.log('drop logo');
     const file = filelist.item(0);
     if (file) {
       console.log(filelist.item(0));
@@ -171,9 +164,29 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public onDropIcon(event: any): void {
-    console.log('drop icon');
-    console.log(event);
+  public onDropIcon(theme: Theme, filelist: FileList): void {
+    console.log(filelist);
+    const file = filelist.item(0);
+    if (file) {
+      console.log(filelist.item(0));
+      this.logoFile = file;
+
+      const reader = new FileReader();
+      reader.readAsDataURL(this.logoFile);
+      reader.onload = (event) => { // called once readAsDataURL is completed
+        console.log(event.target?.result);
+        this.logoURL = event.target?.result;
+
+        const formData = new FormData();
+        formData.append('file', this.logoURL);
+        if (theme === Theme.DARK) {
+          this.uploadService.upload(UploadEndpoint.DARKLOGO, formData);
+        }
+        if (theme === Theme.LIGHT) {
+          this.uploadService.upload(UploadEndpoint.LIGHTLOGO, formData);
+        }
+      };
+    }
   }
 
   public fetchData(): void {
@@ -194,10 +207,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private async getData():
-    Promise<MgmtGetLabelPolicyResponse.AsObject | AdminGetLabelPolicyResponse.AsObject> {
+    Promise<MgmtGetPreviewLabelPolicyResponse.AsObject | AdminGetPreviewLabelPolicyResponse.AsObject | MgmtGetLabelPolicyResponse.AsObject | AdminGetLabelPolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).getLabelPolicy();
+        return (this.service as ManagementService).getPreviewLabelPolicy();//.getLabelPolicy();
       case PolicyComponentServiceType.ADMIN:
         return (this.service as AdminService).getLabelPolicy();
     }
@@ -222,6 +235,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         if ((this.data as LabelPolicy.AsObject).isDefault) {
           const req = new AddCustomLabelPolicyRequest();
           this.overwriteValues(req);
+          console.log(req.toObject());
+
 
           (this.service as ManagementService).addCustomLabelPolicy(req).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -229,8 +244,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
             this.toast.showError(error);
           });
         } else {
-          const req = new AddCustomLabelPolicyRequest();
+          const req = new UpdateCustomLabelPolicyRequest();
           this.overwriteValues(req);
+          console.log(req.toObject());
+
           (this.service as ManagementService).updateCustomLabelPolicy(req).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch(error => {
@@ -241,6 +258,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       case PolicyComponentServiceType.ADMIN:
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
+        console.log(req.toObject());
         (this.service as AdminService).updateLabelPolicy(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
@@ -259,12 +277,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setPrimaryColorDark(this.primaryColorDark);
-    req.setPrimaryColor(this.primaryColorLight);
-    req.setSecondaryColorDark(this.secondaryColorDark);
-    req.setSecondaryColor(this.secondaryColorLight);
-    req.setWarnColorDark(this.warnColorDark);
-    req.setWarnColor(this.warnColorLight);
+    req.setPrimaryColorDark(this.data.primaryColorDark);
+    req.setPrimaryColor(this.data.primaryColor);
+    req.setSecondaryColorDark(this.data.secondaryColorDark);
+    req.setSecondaryColor(this.data.secondaryColor);
+    req.setWarnColorDark(this.data.warnColorDark);
+    req.setWarnColor(this.data.warnColor);
 
     req.setDisableWatermark(this.data.disableWatermark);
     req.setHideLoginNameSuffix(this.data.hideLoginNameSuffix);

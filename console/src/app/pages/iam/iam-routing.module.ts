@@ -116,14 +116,6 @@ const routes: Routes = [
         loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
           .then(m => m.LoginPolicyModule),
       },
-      {
-        path: PolicyComponentType.LABEL,
-        data: {
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
-        loadChildren: () => import('src/app/modules/policies/label-policy/label-policy.module')
-          .then(m => m.LabelPolicyModule),
-      },
     ],
   },
 ];
