@@ -2,12 +2,14 @@ name: ZITADEL Release
 on:
   push:
     branches:
-      - '**'
+      - main
     tags-ignore:
+      - '**'
+  pull_request:
+    branches:
       - '**'
 
 env:
-  GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
   GO_VERSION: '1.15'
@@ -74,7 +76,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ env.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - run: ls -la
       - uses: docker/build-push-action@v2
@@ -135,7 +137,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ env.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
         name: onlybuild
@@ -220,7 +222,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ env.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
         name: buildandpush
@@ -239,7 +241,7 @@ jobs:
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
-      DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
+      DOCKER_PASSWORD: ${{ env.GITHUB_TOKEN }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
