@@ -737,15 +737,18 @@ export class ManagementService {
     return this.grpcService.mgmt.getLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public updateCustomLabelPolicy(req: UpdateCustomLabelPolicyRequest): Promise<UpdateCustomLabelPolicyResponse.AsObject> {
+  public updateCustomLabelPolicy(req: UpdateCustomLabelPolicyRequest):
+    Promise<UpdateCustomLabelPolicyResponse.AsObject> {
     return this.grpcService.mgmt.updateCustomLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public resetLabelPolicyToDefault(req: ResetLabelPolicyToDefaultRequest): Promise<ResetLabelPolicyToDefaultResponse.AsObject> {
+  public resetLabelPolicyToDefault(req: ResetLabelPolicyToDefaultRequest):
+    Promise<ResetLabelPolicyToDefaultResponse.AsObject> {
     return this.grpcService.mgmt.resetLabelPolicyToDefault(req, null).then(resp => resp.toObject());
   }
 
-  public addCustomLabelPolicy(req: AddCustomLabelPolicyRequest): Promise<AddCustomLabelPolicyResponse.AsObject> {
+  public addCustomLabelPolicy(req: AddCustomLabelPolicyRequest):
+    Promise<AddCustomLabelPolicyResponse.AsObject> {
     return this.grpcService.mgmt.addCustomLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
@@ -758,11 +761,10 @@ export class ManagementService {
     return this.grpcService.mgmt.getPreviewLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public activateCustomLabelPolicy(req: ActivateCustomLabelPolicyRequest): Promise<ActivateCustomLabelPolicyResponse.AsObject> {
+  public activateCustomLabelPolicy(req: ActivateCustomLabelPolicyRequest):
+    Promise<ActivateCustomLabelPolicyResponse.AsObject> {
     return this.grpcService.mgmt.activateCustomLabelPolicy(req, null).then(resp => resp.toObject());
   }
-
-  // 
 
   public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
     const req = new GetOrgIAMPolicyRequest();

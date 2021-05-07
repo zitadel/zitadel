@@ -207,10 +207,13 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private async getData():
-    Promise<MgmtGetPreviewLabelPolicyResponse.AsObject | AdminGetPreviewLabelPolicyResponse.AsObject | MgmtGetLabelPolicyResponse.AsObject | AdminGetLabelPolicyResponse.AsObject> {
+    Promise<MgmtGetPreviewLabelPolicyResponse.AsObject |
+      AdminGetPreviewLabelPolicyResponse.AsObject |
+      MgmtGetLabelPolicyResponse.AsObject |
+      AdminGetLabelPolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).getPreviewLabelPolicy();//.getLabelPolicy();
+        return (this.service as ManagementService).getPreviewLabelPolicy(); // .getLabelPolicy();
       case PolicyComponentServiceType.ADMIN:
         return (this.service as AdminService).getLabelPolicy();
     }
@@ -233,22 +236,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.data as LabelPolicy.AsObject).isDefault) {
-          const req = new AddCustomLabelPolicyRequest();
-          this.overwriteValues(req);
-          console.log(req.toObject());
+          const req0 = new AddCustomLabelPolicyRequest();
+          this.overwriteValues(req0);
 
-
-          (this.service as ManagementService).addCustomLabelPolicy(req).then(() => {
+          (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch((error: HttpErrorResponse) => {
             this.toast.showError(error);
           });
         } else {
-          const req = new UpdateCustomLabelPolicyRequest();
-          this.overwriteValues(req);
-          console.log(req.toObject());
+          const req1 = new UpdateCustomLabelPolicyRequest();
+          this.overwriteValues(req1);
 
-          (this.service as ManagementService).updateCustomLabelPolicy(req).then(() => {
+          (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch(error => {
             this.toast.showError(error);
