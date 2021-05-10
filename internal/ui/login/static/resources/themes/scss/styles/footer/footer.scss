@@ -18,6 +18,7 @@ footer {
     a {
         font-size: 12px;
         margin-left: 1rem;
+        display: block;
     }
 
     @media only screen and (min-width: 600px) {
@@ -26,4 +27,22 @@ footer {
         left: 0;
         right: 0;
     }
+
+    .watermark {
+        display: flex;
+        position: relative;
+        width: 100%;
+
+        .powered {
+            font-size: 12px;
+            margin: auto 2px;
+        }
+
+        .lgn-logo {
+            height: 34px;
+            width: 160px;
+            margin: 2px;
+        }
+    }
+
 }

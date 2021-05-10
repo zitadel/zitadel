@@ -86,19 +86,13 @@ func (p *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 		model.LabelPolicyLogoDarkAdded,
 		model.LabelPolicyLogoDarkRemoved,
 		model.LabelPolicyIconDarkAdded,
-		model.LabelPolicyIconDarkRemoved:
+		model.LabelPolicyIconDarkRemoved,
+		model.LabelPolicyActivated:
 		policy, err = p.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
-	case model.LabelPolicyActivated:
-		existingPolicy, err := p.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
-		if err != nil {
-			return err
-		}
-		*policy = *existingPolicy
-		policy.AppendEvent(event)
 	default:
 		return p.view.ProcessedLabelPolicySequence(event)
 	}

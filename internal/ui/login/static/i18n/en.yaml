@@ -220,6 +220,7 @@ Actions:
   PasswordLogin: Login with password
 
 Footer:
+  PoweredBy: Powered By
   Tos: TOS
   TosLink: https://zitadel.ch/pdf/agb.pdf
   Privacy: Privacy policy

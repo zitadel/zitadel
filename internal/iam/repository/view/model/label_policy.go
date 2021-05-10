@@ -23,9 +23,9 @@ const (
 
 type LabelPolicyView struct {
 	AggregateID  string    `json:"-" gorm:"column:aggregate_id;primary_key"`
+	State        int32     `json:"-" gorm:"column:label_policy_state;primary_key"`
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-	State        int32     `json:"-" gorm:"column:label_policy_state"`
 
 	PrimaryColor        string `json:"primaryColor" gorm:"column:primary_color"`
 	SecondaryColor      string `json:"secondaryColor" gorm:"column:secondary_color"`

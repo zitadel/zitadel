@@ -14,6 +14,7 @@ footer .fill-space {
 footer a {
   font-size: 12px;
   margin-left: 1rem;
+  display: block;
 }
 @media only screen and (min-width: 600px) {
   footer {
@@ -22,6 +23,20 @@ footer a {
     left: 0;
     right: 0;
   }
+}
+footer .watermark {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+footer .watermark .powered {
+  font-size: 12px;
+  margin: auto 2px;
+}
+footer .watermark .lgn-logo {
+  height: 34px;
+  width: 160px;
+  margin: 2px;
 }
 
 .lgn-header {
