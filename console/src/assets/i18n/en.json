@@ -635,7 +635,8 @@
     },
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
-      "DESCRIPTION":"Give the login your personalized style and modify its behavior."
+      "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
+      "BTN":"Select File"
     },
     "PWD_AGE": {
       "TITLE": "Password Aging",
@@ -660,13 +661,6 @@
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
       "SAVED": "Saved successfully!"
     },
-    "LABEL": {
-      "TITLE": "Email Labelling Settings",
-      "DESCRIPTION": "Change the look of your emails.",
-      "PRIMARYCOLOR": "Background color",
-      "SECONDARYCOLOR": "Font color",
-      "SAVED": "Saved successfully"
-    },
     "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
     "BTN_INSTALL": "Setup",
     "BTN_EDIT": "Modify",
@@ -689,7 +683,10 @@
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
-      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login."
+      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
+      "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
+      "ERRORMSGPOPUP":"Show Error in Dialog",
+      "DISABLEWATERMARK":"Disable Watermark"
     },
     "RESET": "Reset Policy",
     "CREATECUSTOM": "Create Custom Policy",
