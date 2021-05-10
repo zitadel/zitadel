@@ -13,7 +13,7 @@ type RefreshTokenView struct {
 	ChangeDate            time.Time
 	ResourceOwner         string
 	UserID                string
-	ApplicationID         string
+	ClientID              string
 	UserAgentID           string
 	AuthMethodsReferences []string
 	Audience              []string

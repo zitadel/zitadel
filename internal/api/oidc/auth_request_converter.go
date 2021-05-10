@@ -278,7 +278,7 @@ func (r *RefreshTokenRequest) GetAuthTime() time.Time {
 }
 
 func (r *RefreshTokenRequest) GetClientID() string {
-	return r.ApplicationID
+	return r.ClientID
 }
 
 func (r *RefreshTokenRequest) GetScopes() []string {

@@ -10,19 +10,19 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func (c *Commands) AddUserAndRefreshToken(ctx context.Context, orgID, agentID, clientID, userID, refreshToken string, audience, scopes, authMethodsReferences []string, lifetime time.Duration, authTime time.Time) (*domain.Token, string, error) {
+func (c *Commands) AddUserAndRefreshToken(ctx context.Context, orgID, agentID, clientID, userID, refreshToken string, audience, scopes, authMethodsReferences []string, accessLifetime, refreshIdleExpiration, refreshExpiration time.Duration, authTime time.Time) (*domain.Token, string, error) {
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, lifetime)
+	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, accessLifetime)
 	if err != nil {
 		return nil, "", err
 	}
 
 	creator := func() (eventstore.EventPusher, string, error) {
-		return c.addRefreshToken(ctx, accessToken, authMethodsReferences, authTime, c.refreshTokenIdleExpiration, c.refreshTokenIdleExpiration)
+		return c.addRefreshToken(ctx, accessToken, authMethodsReferences, authTime, refreshIdleExpiration, refreshExpiration)
 	}
 	if refreshToken != "" {
 		creator = func() (eventstore.EventPusher, string, error) {
-			return c.renewRefreshToken(ctx, userID, orgID, refreshToken, c.refreshTokenIdleExpiration)
+			return c.renewRefreshToken(ctx, userID, orgID, refreshToken, refreshIdleExpiration)
 		}
 	}
 	refreshTokenEvent, token, err := creator()

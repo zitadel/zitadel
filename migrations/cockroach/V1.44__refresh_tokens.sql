@@ -6,7 +6,7 @@ CREATE TABLE auth.refresh_tokens (
 
      resource_owner TEXT,
      token TEXT,
-     application_id TEXT,
+     client_id TEXT,
      user_agent_id TEXT,
      user_id TEXT,
      auth_time TIMESTAMPTZ,
@@ -17,5 +17,5 @@ CREATE TABLE auth.refresh_tokens (
      audience TEXT ARRAY,
      amr TEXT ARRAY,
 
-     PRIMARY KEY (id)
+     PRIMARY KEY (client_id, user_agent_id, user_id)
 );

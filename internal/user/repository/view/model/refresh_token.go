@@ -24,14 +24,14 @@ const (
 )
 
 type RefreshTokenView struct {
-	ID                    string         `json:"tokenId" gorm:"column:id;primary_key"`
+	ID                    string         `json:"tokenId" gorm:"column:id"`
 	CreationDate          time.Time      `json:"-" gorm:"column:creation_date"`
 	ChangeDate            time.Time      `json:"-" gorm:"column:change_date"`
 	ResourceOwner         string         `json:"-" gorm:"column:resource_owner"`
 	Token                 string         `json:"-" gorm:"column:token"`
-	UserID                string         `json:"-" gorm:"column:user_id"`
-	ApplicationID         string         `json:"applicationId" gorm:"column:application_id"`
-	UserAgentID           string         `json:"userAgentId" gorm:"column:user_agent_id"`
+	UserID                string         `json:"-" gorm:"column:user_id;primary_key"`
+	ClientID              string         `json:"clientID" gorm:"column:client_id;primary_key"`
+	UserAgentID           string         `json:"userAgentId" gorm:"column:user_agent_id;primary_key"`
 	Audience              pq.StringArray `json:"audience" gorm:"column:audience"`
 	Scopes                pq.StringArray `json:"scopes" gorm:"column:scopes"`
 	AuthMethodsReferences pq.StringArray `json:"authMethodsReference" gorm:"column:amr"`
@@ -59,7 +59,7 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 		ResourceOwner:         token.ResourceOwner,
 		Token:                 token.Token,
 		UserID:                token.UserID,
-		ApplicationID:         token.ApplicationID,
+		ClientID:              token.ClientID,
 		UserAgentID:           token.UserAgentID,
 		Audience:              token.Audience,
 		Scopes:                token.Scopes,
@@ -137,11 +137,12 @@ func (t *RefreshTokenView) appendAddedEvent(event *es_models.Event) error {
 	t.AuthMethodsReferences = e.AuthMethodsReferences
 	t.AuthTime = e.AuthTime
 	t.Audience = e.Audience
-	t.ApplicationID = e.ApplicationID
+	t.ClientID = e.ClientID
 	t.Expiration = event.CreationDate.Add(e.Expiration)
 	t.IdleExpiration = event.CreationDate.Add(e.IdleExpiration)
 	t.Scopes = e.Scopes
 	t.Token = e.TokenID
+	t.UserAgentID = e.UserAgentID
 	return nil
 }
 

@@ -22,7 +22,7 @@ type HumanRefreshTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	TokenID               string        `json:"tokenId"`
-	ApplicationID         string        `json:"applicationId"`
+	ClientID              string        `json:"clientId"`
 	UserAgentID           string        `json:"userAgentId"`
 	Audience              []string      `json:"audience"`
 	Scopes                []string      `json:"scopes"`
@@ -49,7 +49,7 @@ func NewHumanRefreshTokenAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tokenID,
-	applicationID,
+	clientID,
 	userAgentID,
 	preferredLanguage string,
 	audience,
@@ -66,7 +66,7 @@ func NewHumanRefreshTokenAddedEvent(
 			HumanRefreshTokenAddedType,
 		),
 		TokenID:               tokenID,
-		ApplicationID:         applicationID,
+		ClientID:              clientID,
 		UserAgentID:           userAgentID,
 		Audience:              audience,
 		Scopes:                scopes,

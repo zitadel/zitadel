@@ -46,14 +46,12 @@ type Commands struct {
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 	multifactors                domain.MultifactorConfigs
 
-	webauthn                   *webauthn_helper.WebAuthN
-	keySize                    int
-	keyAlgorithm               crypto.EncryptionAlgorithm
-	privateKeyLifetime         time.Duration
-	publicKeyLifetime          time.Duration
-	tokenVerifier              *authz.TokenVerifier
-	refreshTokenIdleExpiration time.Duration
-	refreshTokenExpiration     time.Duration
+	webauthn           *webauthn_helper.WebAuthN
+	keySize            int
+	keyAlgorithm       crypto.EncryptionAlgorithm
+	privateKeyLifetime time.Duration
+	publicKeyLifetime  time.Duration
+	tokenVerifier      *authz.TokenVerifier
 }
 
 type Config struct {

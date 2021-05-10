@@ -20,7 +20,7 @@ func RefreshTokenToPb(token *model.RefreshTokenView) *user.RefreshToken {
 	return &user.RefreshToken{
 		Id:             token.ID,
 		Details:        object.ToViewDetailsPb(token.Sequence, token.CreationDate, token.ChangeDate, token.ResourceOwner),
-		ClientId:       token.ApplicationID,
+		ClientId:       token.ClientID,
 		AuthTime:       timestamppb.New(token.AuthTime),
 		IdleExpiration: timestamppb.New(token.IdleExpiration),
 		Expiration:     timestamppb.New(token.Expiration),
