@@ -52,7 +52,7 @@
     "@angular/language-service": "~11.2.9",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.14.37",
-    "codelyzer": "^6.0.0",
+    "codelyzer": "^6.0.2",
     "jasmine-core": "~3.7.1",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "~6.3.2",
