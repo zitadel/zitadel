@@ -211,6 +211,9 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 }
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
+	if orgID == "" || userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
+	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
 	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, lifetime)
 	if err != nil {

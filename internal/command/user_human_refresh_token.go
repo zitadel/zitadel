@@ -18,11 +18,11 @@ func (c *Commands) AddUserAndRefreshToken(ctx context.Context, orgID, agentID, c
 	}
 
 	creator := func() (eventstore.EventPusher, string, error) {
-		return c.addRefreshToken(ctx, accessToken, authMethodsReferences, authTime, 5*time.Minute, 20*time.Minute)
-	} //TODO: duration
+		return c.addRefreshToken(ctx, accessToken, authMethodsReferences, authTime, c.refreshTokenIdleExpiration, c.refreshTokenIdleExpiration)
+	}
 	if refreshToken != "" {
 		creator = func() (eventstore.EventPusher, string, error) {
-			return c.renewRefreshToken(ctx, userID, orgID, refreshToken, 5*time.Minute)
+			return c.renewRefreshToken(ctx, userID, orgID, refreshToken, c.refreshTokenIdleExpiration)
 		}
 	}
 	refreshTokenEvent, token, err := creator()
@@ -49,13 +49,6 @@ func (c *Commands) addRefreshToken(ctx context.Context, accessToken *domain.Toke
 	//	return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgf2w", "Errors.User.NotFound")
 	//}
 	//
-	////audience = domain.AddAudScopeToAudience(audience, scopes)
-	//
-	////preferredLanguage := ""
-	////existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
-	////if existingHuman != nil {
-	////	preferredLanguage = existingHuman.PreferredLanguage.String()
-	////}
 	tokenID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, "", err
@@ -78,10 +71,10 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 
 	tokenUserID, tokenID, token, err := domain.FromRefreshToken(refreshToken, c.keyAlgorithm)
 	if err != nil {
-		return nil, "", err
+		return nil, "", caos_errs.ThrowInvalidArgument(err, "COMMAND-Dbfe4", "Errors.User.RefreshToken.Invalid")
 	}
 	if tokenUserID != userID {
-		return nil, "", caos_errs.ThrowNotFound(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
+		return nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
 	}
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(userID, orgID, tokenID)
 	err = c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
@@ -89,7 +82,7 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 		return nil, "", err
 	}
 	if refreshTokenWriteModel.UserState != domain.UserStateActive {
-		return nil, "", caos_errs.ThrowNotFound(nil, "COMMAND-BHnhs", "Errors.User.RefreshToken.Invalid")
+		return nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-BHnhs", "Errors.User.RefreshToken.Invalid")
 	}
 	if refreshTokenWriteModel.RefreshToken != token ||
 		refreshTokenWriteModel.IdleExpiration.Before(time.Now()) ||
