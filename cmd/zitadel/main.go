@@ -25,6 +25,7 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/query/handler"
 	"github.com/caos/zitadel/internal/setup"
+	"github.com/caos/zitadel/internal/static/s3"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
@@ -37,6 +38,7 @@ type Config struct {
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
 	Metrics        metrics.MetricsConfig
+	AssetStorage   s3.AssetStorage
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 
@@ -168,7 +170,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
 	}
 	if *managementEnabled {
 		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query)

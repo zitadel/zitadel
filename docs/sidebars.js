@@ -19,13 +19,19 @@ module.exports = {
     {
       type: 'category',
       label: 'Single Page Applications',
-      items: ['quickstarts/angular'],
+      items: ['quickstarts/angular', 'quickstarts/react'],
       collapsed: false,
     },
     {
       type: 'category',
       label: 'Backends',
       items: ['quickstarts/go', 'quickstarts/dot-net'],
+      collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Frameworks',
+      items: ['quickstarts/flutter'],
       collapsed: false,
     },
     {

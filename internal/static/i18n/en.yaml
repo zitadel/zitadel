@@ -4,6 +4,21 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
   ResourceOwnerMissing: Resource Owner Organisation missing
+  Assets:
+    Store:
+      NotInitialized: Assets storage not initialized
+    Bucket:
+      Internal: Internal error on create bucket
+      AlreadyExists: Bucket already exists
+      CreateFailed: Bucket not created
+      ListFailed: Buckets could not be read
+      RemoveFailed: Bucket not deleted
+    Object:
+      PutFailed: Objekt not created
+      GetFaieled: Objekt could not be read
+      PresignedTokenFailed: Signed token could not be created
+      ListFailed: Objectlist could not be read
+      RemoveFailed: Object could not be removed
   Limit:
     ExceedsDefault: Limit exceeds default limit
   User:
@@ -100,6 +115,7 @@ Errors:
     AlreadyActive: Organisation is already ative
     Empty: Organisation is empty
     NotFound: Organisation not found
+    NotChanged: Organisation not changed
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organisation

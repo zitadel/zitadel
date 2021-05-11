@@ -26,8 +26,9 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		domain *domain.OrgDomain
+		ctx            context.Context
+		domain         *domain.OrgDomain
+		claimedUserIDs []string
 	}
 	type res struct {
 		want *domain.OrgDomain
@@ -108,7 +109,6 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 								"domain.ch",
 							)),
 						},
-						nil,
 					),
 				),
 			},
@@ -130,7 +130,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain)
+			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -323,7 +323,6 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 								},
 							)),
 						},
-						nil,
 					),
 				),
 				secretGenerator: GetMockSecretGenerator(t),
@@ -376,7 +375,6 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 								},
 							)),
 						},
-						nil,
 					),
 				),
 				secretGenerator: GetMockSecretGenerator(t),
@@ -621,7 +619,6 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 								"domain.ch",
 							)),
 						},
-						nil,
 					),
 				),
 				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -680,7 +677,6 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 								"domain.ch",
 							)),
 						},
-						nil,
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("domain.ch")),
 					),
 				),
@@ -743,7 +739,6 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 								"domain.ch",
 							)),
 						},
-						nil,
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("domain.ch")),
 					),
 				),
@@ -833,7 +828,6 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 								false,
 							)),
 						},
-						nil,
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("domain.ch")),
 						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username@domain.ch", "org2", false)),
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("tempid@temporary.zitadel.ch", "org2", false)),
@@ -871,7 +865,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				iamDomain:                   "zitadel.ch",
 				idGenerator:                 tt.fields.idGenerator,
 			}
-			got, err := r.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs...)
+			got, err := r.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1034,7 +1028,6 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 								"domain.ch",
 							)),
 						},
-						nil,
 					),
 				),
 			},
@@ -1228,7 +1221,6 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 								"domain.ch", false,
 							)),
 						},
-						nil,
 					),
 				),
 			},
@@ -1279,7 +1271,6 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 								"domain.ch", true,
 							)),
 						},
-						nil,
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("domain.ch")),
 					),
 				),

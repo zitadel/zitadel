@@ -27,13 +27,15 @@ type Server struct {
 	administrator repository.AdministratorRepository
 	repo          repository.Repository
 	features      repository.FeaturesRepository
+	users         repository.UserRepository
+	iamDomain     string
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, iamDomain string) *Server {
 	return &Server{
 		command:       command,
 		query:         query,
@@ -42,6 +44,8 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		administrator: repo,
 		repo:          repo,
 		features:      repo,
+		users:         repo,
+		iamDomain:     iamDomain,
 	}
 }
 

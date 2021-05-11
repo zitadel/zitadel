@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	UserByID(ctx context.Context, id string) (*model.UserView, error)
-	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
+	SearchUsers(ctx context.Context, request *model.UserSearchRequest, ensureLimit bool) (*model.UserSearchResponse, error)
 	UserIDsByDomain(ctx context.Context, domain string) ([]string, error)
 
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)

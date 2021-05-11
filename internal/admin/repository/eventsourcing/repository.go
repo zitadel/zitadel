@@ -25,6 +25,7 @@ type EsRepository struct {
 	eventstore.IAMRepository
 	eventstore.AdministratorRepo
 	eventstore.FeaturesRepo
+	eventstore.UserRepo
 }
 
 func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -62,6 +63,12 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			View: view,
 		},
 		FeaturesRepo: eventstore.FeaturesRepo{
+			Eventstore:     es,
+			View:           view,
+			SearchLimit:    conf.SearchLimit,
+			SystemDefaults: systemDefaults,
+		},
+		UserRepo: eventstore.UserRepo{
 			Eventstore:     es,
 			View:           view,
 			SearchLimit:    conf.SearchLimit,

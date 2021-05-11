@@ -33,10 +33,6 @@ func (e *HumanOTPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	return nil
 }
 
-func (e *HumanOTPAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanOTPAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -76,10 +72,6 @@ func (e *HumanOTPVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func (e *HumanOTPVerifiedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanOTPVerifiedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -113,10 +105,6 @@ func (e *HumanOTPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func (e *HumanOTPRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanOTPRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -146,10 +134,6 @@ func (e *HumanOTPCheckSucceededEvent) Data() interface{} {
 }
 
 func (e *HumanOTPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanOTPCheckSucceededEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -189,10 +173,6 @@ func (e *HumanOTPCheckFailedEvent) Data() interface{} {
 }
 
 func (e *HumanOTPCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanOTPCheckFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

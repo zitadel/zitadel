@@ -37,10 +37,6 @@ func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func (e *HumanPasswordChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -88,10 +84,6 @@ func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
-func (e *HumanPasswordCodeAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanPasswordCodeAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -135,10 +127,6 @@ func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.EventUniq
 	return nil
 }
 
-func (e *HumanPasswordCodeSentEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -165,10 +153,6 @@ func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
 }
 
 func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanPasswordCheckSucceededEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -209,10 +193,6 @@ func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
 }
 
 func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *HumanPasswordCheckFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

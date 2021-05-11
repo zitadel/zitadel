@@ -38,10 +38,6 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func (e *AddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

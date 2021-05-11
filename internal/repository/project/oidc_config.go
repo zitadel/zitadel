@@ -49,10 +49,6 @@ func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func (e *OIDCConfigAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewOIDCConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -135,10 +131,6 @@ func (e *OIDCConfigChangedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -274,10 +266,6 @@ func (e *OIDCConfigSecretChangedEvent) UniqueConstraints() []*eventstore.EventUn
 	return nil
 }
 
-func (e *OIDCConfigSecretChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewOIDCConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -322,10 +310,6 @@ func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.
 	return nil
 }
 
-func (e *OIDCConfigSecretCheckSucceededEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewOIDCConfigSecretCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -365,10 +349,6 @@ func (e *OIDCConfigSecretCheckFailedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigSecretCheckFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

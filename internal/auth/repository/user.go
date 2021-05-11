@@ -18,6 +18,8 @@ type UserRepository interface {
 	UserByLoginName(ctx context.Context, loginName string) (*model.UserView, error)
 
 	MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error)
+
+	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 }
 
 type myUserRepo interface {
