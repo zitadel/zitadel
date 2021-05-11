@@ -3,11 +3,17 @@ package handler
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/caos/logging"
+	"github.com/rakyll/statik/fs"
+	"github.com/wellington/go-libsass"
 
 	"github.com/caos/zitadel/internal/domain"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -26,12 +32,17 @@ type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
+	dir          http.FileSystem
 }
 
 func newStyling(handler handler, static static.Storage) *Styling {
+	statikFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start listener")
+
 	h := &Styling{
 		handler: handler,
 		static:  static,
+		dir:     statikFS,
 	}
 
 	h.subscribe()
@@ -135,46 +146,37 @@ func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
 	if err != nil {
 		return err
 	}
-	return m.uploadFilesToBucket(policy.AggregateID, "binary/octet-stream", reader, size)
+	return m.uploadFilesToBucket(policy.AggregateID, "text/css", reader, size)
 }
 
 func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64, error) {
-	data := []byte("AggregateID: " + policy.AggregateID)
-	buffer := bytes.NewReader(data)
-	return buffer, int64(buffer.Len()), nil
-	//f, err := os.Create("zitadel.css")
-	//if err != nil {
-	//	logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-	//	return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
-	//}
-	//
-	//_, err = f.WriteString("PrimaryColor: " + policy.PrimaryColor)
-	//_, err = f.WriteString("SecondaryColor: " + policy.SecondaryColor)
-	//_, err = f.WriteString("WarnColor: " + policy.WarnColor)
-	//_, err = f.WriteString("PrimaryColorDark: " + policy.PrimaryColorDark)
-	//_, err = f.WriteString("SecondaryColorDark: " + policy.SecondaryColorDark)
-	//_, err = f.WriteString("LogoURL: " + policy.LogoURL)
-	//_, err = f.WriteString("IconURL: " + policy.IconURL)
-	//_, err = f.WriteString("LogoURLDark: " + policy.LogoDarkURL)
-	//_, err = f.WriteString("IconURLDark: " + policy.IconDarkURL)
-	//_, err = f.WriteString("FontURL: " + policy.FontURL)
-	//if err != nil {
-	//	logging.LogWithFields("SPOOL-2j9fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-	//	return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
-	//}
-	//err = f.Sync()
-	//if err != nil {
-	//	logging.LogWithFields("SPOOL-2n8ds", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-	//	return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
-	//}
-	//
-	//fileStat, err := f.Stat()
-	//if err != nil {
-	//	logging.LogWithFields("SPOOL-2h8sd", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-	//	return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
-	//
-	//}
-	//return f, fileStat.Size(), nil
+	r, err := m.dir.Open("/resources/themes/scss/zitadel-alternative.scss")
+	if err != nil {
+		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
+		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
+	}
+	defer r.Close()
+	contents, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-2n8fs", "error create file")
+	}
+
+	fmt.Println(string(contents))
+
+	input := bytes.NewBufferString("div { p { color: red; } }")
+
+	output := bytes.NewBuffer(nil)
+	comp, err := libsass.New(output, input)
+	if err != nil {
+		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
+		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
+	}
+
+	if err := comp.Run(); err != nil {
+		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
+		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
+	}
+	return output, int64(output.Len()), nil
 }
 
 func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
