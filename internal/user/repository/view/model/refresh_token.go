@@ -39,8 +39,6 @@ type RefreshTokenView struct {
 	IdleExpiration        time.Time      `json:"-" gorm:"column:idle_expiration"`
 	Expiration            time.Time      `json:"-" gorm:"column:expiration"`
 	Sequence              uint64         `json:"-" gorm:"column:sequence"`
-
-	//PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
 }
 
 func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {
@@ -68,7 +66,6 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 		IdleExpiration:        token.IdleExpiration,
 		Expiration:            token.Expiration,
 		Sequence:              token.Sequence,
-		//PreferredLanguage: token.PreferredLanguage,
 	}
 }
 
@@ -87,17 +84,11 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event *es_models.Event) (
 		if err != nil {
 			return err
 		}
-	//case usr_es_model.UserRemoved,
-	//	usr_es_model.UserDeactivated,
-	//	usr_es_model.UserLocked:
-	//	t.Deactivated = true
-	//	return nil
-	//case usr_es_model.UserUnlocked,
-	//	usr_es_model.UserReactivated:
-	//	if t.ID != "" && event.CreationDate.Before(t.CreationDate) {
-	//		t.Deactivated = false
-	//	}
-	//	return nil
+	case user_repo.HumanRefreshTokenRemovedType,
+		user_repo.UserRemovedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserLockedType:
+		view.appendRemovedEvent(event)
 	default:
 		return nil
 	}
@@ -156,4 +147,8 @@ func (t *RefreshTokenView) appendRenewedEvent(event *es_models.Event) error {
 	t.IdleExpiration = event.CreationDate.Add(e.IdleExpiration)
 	t.Token = e.RefreshToken
 	return nil
+}
+
+func (t *RefreshTokenView) appendRemovedEvent(event *es_models.Event) {
+	t.Expiration = event.CreationDate
 }

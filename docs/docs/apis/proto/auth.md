@@ -52,7 +52,7 @@ Returns the user sessions of the authorized user of the current useragent
 > **rpc** ListMyRefreshTokens([ListMyRefreshTokensRequest](#listmyrefreshtokensrequest))
 [ListMyRefreshTokensResponse](#listmyrefreshtokensresponse)
 
-Returns the user sessions of the authorized user of the current useragent
+Returns the refresh tokens of the authorized user
 
 
 
@@ -62,7 +62,7 @@ Returns the user sessions of the authorized user of the current useragent
 > **rpc** RevokeMyRefreshToken([RevokeMyRefreshTokenRequest](#revokemyrefreshtokenrequest))
 [RevokeMyRefreshTokenResponse](#revokemyrefreshtokenresponse)
 
-Returns the user sessions of the authorized user of the current useragent
+Revokes a single refresh token of the authorized user by its (token) id
 
 
 
@@ -72,7 +72,7 @@ Returns the user sessions of the authorized user of the current useragent
 > **rpc** RevokeAllMyRefreshTokens([RevokeAllMyRefreshTokensRequest](#revokeallmyrefreshtokensrequest))
 [RevokeAllMyRefreshTokensResponse](#revokeallmyrefreshtokensresponse)
 
-Returns the user sessions of the authorized user of the current useragent
+Revokes all refresh tokens of the authorized user
 
 
 

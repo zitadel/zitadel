@@ -82,7 +82,7 @@ service AuthService {
         };
     }
 
-    // Returns the user sessions of the authorized user of the current useragent
+    // Returns the refresh tokens of the authorized user
     rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_search"
@@ -93,7 +93,7 @@ service AuthService {
         };
     }
 
-    // Returns the user sessions of the authorized user of the current useragent
+    // Revokes a single refresh token of the authorized user by its (token) id
     rpc RevokeMyRefreshToken(RevokeMyRefreshTokenRequest) returns (RevokeMyRefreshTokenResponse) {
         option (google.api.http) = {
             delete: "/users/me/tokens/refresh/{id}"
@@ -104,7 +104,7 @@ service AuthService {
         };
     }
 
-    // Returns the user sessions of the authorized user of the current useragent
+    // Revokes all refresh tokens of the authorized user
     rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_revoke_all"

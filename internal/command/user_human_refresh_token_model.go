@@ -14,11 +14,6 @@ type HumanRefreshTokenWriteModel struct {
 
 	TokenID      string
 	RefreshToken string
-	//IsRefreshTokenVerified bool
-	//
-	//Code             *crypto.CryptoValue
-	//CodeCreationDate time.Time
-	//CodeExpiry       time.Duration
 
 	UserState      domain.UserState
 	IdleExpiration time.Time
@@ -74,21 +69,6 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
 		case *user.HumanRefreshTokenRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
-			//case *user.HumanInitializedCheckSucceededEvent:
-			//	wm.UserState = domain.UserStateActive
-			//case *user.HumanRefreshTokenChangedEvent:
-			//	wm.RefreshToken = e.RefreshTokenAddress
-			//	wm.IsRefreshTokenVerified = false
-			//	wm.Code = nil
-			//case *user.HumanRefreshTokenCodeAddedEvent:
-			//	wm.Code = e.Code
-			//	wm.CodeCreationDate = e.CreationDate()
-			//	wm.CodeExpiry = e.Expiry
-			//case *user.HumanRefreshTokenVerifiedEvent:
-			//	wm.IsRefreshTokenVerified = true
-			//	wm.Code = nil
-			//case *user.UserRemovedEvent:
-			//	wm.UserState = domain.UserStateDeleted
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -97,20 +77,7 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.UserV1AddedType,
-			//user.HumanAddedType,
-			//user.UserV1RegisteredType,
-			//user.HumanRegisteredType,
-			//user.UserV1InitialCodeAddedType,
-			//user.HumanInitialCodeAddedType,
-			//user.UserV1InitializedCheckSucceededType,
-			//user.HumanInitializedCheckSucceededType,
-			//user.UserV1RefreshTokenChangedType,
-			//user.HumanRefreshTokenChangedType,
-			//user.UserV1RefreshTokenCodeAddedType,
-			//user.HumanRefreshTokenCodeAddedType,
-			//user.UserV1RefreshTokenVerifiedType,
-			//user.HumanRefreshTokenVerifiedType,
+		EventTypes(
 			user.HumanRefreshTokenAddedType,
 			user.HumanRefreshTokenRenewedType,
 			user.HumanRefreshTokenRemovedType,

@@ -37,18 +37,6 @@ func (c *Commands) AddUserAndRefreshToken(ctx context.Context, orgID, agentID, c
 }
 
 func (c *Commands) addRefreshToken(ctx context.Context, accessToken *domain.Token, authMethodsReferences []string, authTime time.Time, idleExpiration, expiration time.Duration) (*user.HumanRefreshTokenAddedEvent, string, error) {
-	//if userID == "" {
-	//	return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GVDg2", "Errors.IDMissing")
-	//}
-	//
-	//existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//if !isUserStateExists(existingHuman.UserState) {
-	//	return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgf2w", "Errors.User.NotFound")
-	//}
-	//
 	tokenID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, "", err

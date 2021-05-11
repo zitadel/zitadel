@@ -104,47 +104,10 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 			return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}
 		return t.view.DeleteRefreshToken(e.TokenID, event)
-	//case user_es_model.UserProfileChanged,
-	//	user_es_model.HumanProfileChanged:
-	//	user := new(view_model.UserView)
-	//	user.AppendEvent(event)
-	//	tokens, err := t.view.RefreshTokensByUserID(event.AggregateID)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	for _, token := range tokens {
-	//		token.PreferredLanguage = user.PreferredLanguage
-	//	}
-	//	return t.view.PutRefreshTokens(tokens, event)
-	//case user_es_model.SignedOut,
-	//	user_es_model.HumanSignedOut:
-	//	id, err := agentIDFromSession(event)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	return t.view.DeleteSessionRefreshTokens(id, event.AggregateID, event)
-	//case user_es_model.UserLocked,
-	//	user_es_model.UserDeactivated,
-	//	user_es_model.UserRemoved:
-	//	return t.view.DeleteUserRefreshTokens(event.AggregateID, event)
-	//case project_es_model.ApplicationDeactivated,
-	//	project_es_model.ApplicationRemoved:
-	//	application, err := applicationFromSession(event)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	return t.view.DeleteApplicationRefreshTokens(event, application.AppID)
-	//case project_es_model.ProjectDeactivated,
-	//	project_es_model.ProjectRemoved:
-	//	project, err := t.getProjectByID(context.Background(), event.AggregateID)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	applicationsIDs := make([]string, 0, len(project.Applications))
-	//	for _, app := range project.Applications {
-	//		applicationsIDs = append(applicationsIDs, app.AppID)
-	//	}
-	//	return t.view.DeleteApplicationRefreshTokens(event, applicationsIDs...)
+	case user_repo.UserLockedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserRemovedType:
+		return t.view.DeleteUserRefreshTokens(event.AggregateID, event)
 	default:
 		return t.view.ProcessedRefreshTokenSequence(event)
 	}

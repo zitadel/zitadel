@@ -26,17 +26,6 @@ type RefreshTokenRepo struct {
 	KeyAlgorithm crypto.EncryptionAlgorithm
 }
 
-//func (repo *RefreshTokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
-//	token, err := repo.TokenByID(ctx, userID, tokenID)
-//	if err == nil {
-//		return token.Expiration.After(time.Now().UTC()), nil
-//	}
-//	if errors.IsNotFound(err) {
-//		return false, nil
-//	}
-//	return false, err
-//}
-
 func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken string) (*usr_model.RefreshTokenView, error) {
 	userID, tokenID, token, err := domain.FromRefreshToken(refreshToken, r.KeyAlgorithm)
 	if err != nil {
