@@ -118,6 +118,7 @@ Errors:
     AlreadyActive: Organisation is already ative
     Empty: Organisation is empty
     NotFound: Organisation not found
+    NotChanged: Organisation not changed
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organisation

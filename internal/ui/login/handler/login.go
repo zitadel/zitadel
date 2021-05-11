@@ -2,10 +2,13 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/query"
 	"net"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
@@ -36,6 +39,7 @@ type Login struct {
 	zitadelURL          string
 	oidcAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
+	iamDomain           string
 }
 
 type Config struct {
@@ -73,6 +77,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		query:               query,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
+		iamDomain:           systemDefaults.Domain,
 	}
 	prefix := ""
 	if localDevMode {
@@ -146,6 +151,31 @@ func (l *Login) Listen(ctx context.Context) {
 		err := httpServer.Serve(httpListener)
 		logging.Log("APP-oSklt").OnError(err).Panic("unable to start listener")
 	}()
+}
+
+func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
+	users, err := l.authRepo.SearchUsers(ctx, &usr_model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{
+			{
+				Key:    usr_model.UserSearchKeyPreferredLoginName,
+				Method: domain.SearchMethodEndsWithIgnoreCase,
+				Value:  domain.NewIAMDomainName(orgName, l.iamDomain),
+			},
+			{
+				Key:    usr_model.UserSearchKeyResourceOwner,
+				Method: domain.SearchMethodNotEquals,
+				Value:  authz.GetCtxData(ctx).OrgID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Result))
+	for i, user := range users.Result {
+		userIDs[i] = user.ID
+	}
+	return userIDs, nil
 }
 
 func setContext(ctx context.Context, resourceOwner string) context.Context {

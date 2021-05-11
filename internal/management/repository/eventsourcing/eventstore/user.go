@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/logging"
 
@@ -59,10 +60,13 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 	return model.UserToModel(&userCopy), nil
 }
 
-func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
+func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest, ensureLimit bool) (*usr_model.UserSearchResponse, error) {
+	if ensureLimit {
+		err := request.EnsureLimit(repo.SearchLimit)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 	sequence, sequenceErr := repo.View.GetLatestUserSequence()
 	logging.Log("EVENT-Lcn7d").OnError(sequenceErr).Warn("could not read latest user sequence")

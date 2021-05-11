@@ -28,10 +28,11 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx           context.Context
-		name          string
-		userID        string
-		resourceOwner string
+		ctx            context.Context
+		name           string
+		userID         string
+		resourceOwner  string
+		claimedUserIDs []string
 	}
 	type res struct {
 		want *domain.Org
@@ -326,7 +327,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				iamDomain:    tt.fields.iamDomain,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner)
+			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -335,6 +336,227 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ChangeOrg(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+		iamDomain  string
+	}
+	type args struct {
+		ctx   context.Context
+		orgID string
+		name  string
+	}
+	type res struct {
+		want *domain.Org
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "empty name, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "org not found, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				name:  "org",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "push failed, error",
+			fields: fields{
+				iamDomain: "zitadel.ch",
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(),
+					expectPushFailed(
+						caos_errs.ThrowInternal(nil, "id", "message"),
+						[]*repository.Event{
+							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				name:  "neworg",
+			},
+			res: res{
+				err: caos_errs.IsInternal,
+			},
+		},
+		{
+			name: "change org name verified, not primary",
+			fields: fields{
+				iamDomain: "zitadel.ch",
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
+							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+							eventFromEventPusher(org.NewDomainRemovedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "org.zitadel.ch", true)),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("neworg.zitadel.ch")),
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("org.zitadel.ch")),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				name:  "neworg",
+			},
+			res: res{},
+		},
+		{
+			name: "change org name verified, with primary",
+			fields: fields{
+				iamDomain: "zitadel.ch",
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
+							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+							eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+							eventFromEventPusher(org.NewDomainRemovedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, "org.zitadel.ch", true)),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("neworg.zitadel.ch")),
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("org.zitadel.ch")),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				name:  "neworg",
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+				iamDomain:  tt.fields.iamDomain,
+			}
+			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}

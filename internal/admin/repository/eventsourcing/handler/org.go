@@ -74,11 +74,7 @@ func (o *Org) Reduce(event *es_models.Event) error {
 			return err
 		}
 	case model.OrgChanged:
-		err := org.SetData(event)
-		if err != nil {
-			return err
-		}
-		org, err = o.view.OrgByID(org.ID)
+		org, err := o.view.OrgByID(event.ResourceOwner)
 		if err != nil {
 			return err
 		}
