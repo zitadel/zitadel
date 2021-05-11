@@ -15,6 +15,9 @@ const (
 	labelPolicyFontPrefix = labelPolicyPrefix + "/font"
 	Dark                  = "/dark"
 
+	OrgCssPath = orgPrefix + labelPolicyPrefix + "/css"
+	IAMCssPath = iamPrefix + labelPolicyPrefix + "/css"
+
 	DefaultLabelPolicyLogoPath = iamPrefix + labelPolicyLogoPrefix
 	DefaultLabelPolicyIconPath = iamPrefix + labelPolicyIconPrefix
 	DefaultLabelPolicyFontPath = iamPrefix + labelPolicyFontPrefix

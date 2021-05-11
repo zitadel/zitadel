@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
+	"github.com/caos/zitadel/internal/static"
 )
 
 type Config struct {
@@ -28,7 +29,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, static static.Storage, roles []string) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, static)
 
 	return &EsRepository{
 		spooler: spool,

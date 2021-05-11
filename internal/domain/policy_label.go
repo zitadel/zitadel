@@ -22,6 +22,8 @@ type LabelPolicy struct {
 	LogoDarkURL        string
 	IconDarkURL        string
 
+	Font string
+
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool
 	DisableWatermark    bool

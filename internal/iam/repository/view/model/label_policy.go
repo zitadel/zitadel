@@ -37,6 +37,7 @@ type LabelPolicyView struct {
 	IconURL             string `json:"-" gorm:"column:icon_url"`
 	LogoDarkURL         string `json:"-" gorm:"column:logo_dark_url"`
 	IconDarkURL         string `json:"-" gorm:"column:icon_dark_url"`
+	FontURL             string `json:"-" gorm:"column:font_url"`
 	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix" gorm:"column:hide_login_name_suffix"`
 	ErrorMsgPopup       bool   `json:"errorMsgPopup" gorm:"column:err_msg_popup"`
 	DisableWatermark    bool   `json:"disableWatermark" gorm:"column:disable_watermark"`
@@ -69,6 +70,7 @@ func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
 		WarnColorDark:      p.WarnColorDark,
 		LogoDarkURL:        p.LogoDarkURL,
 		IconDarkURL:        p.IconDarkURL,
+		Font:               p.FontURL,
 
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ErrorMsgPopup,
@@ -94,6 +96,8 @@ func LabelPolicyViewToModel(policy *LabelPolicyView) *model.LabelPolicyView {
 		WarnColorDark:      policy.WarnColorDark,
 		LogoDarkURL:        policy.LogoDarkURL,
 		IconDarkURL:        policy.IconDarkURL,
+
+		FontURL: policy.FontURL,
 
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		ErrorMsgPopup:       policy.ErrorMsgPopup,

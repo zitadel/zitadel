@@ -15,6 +15,7 @@ func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy 
 		PrimaryColorDark:   policy.PrimaryColorDark,
 		SecondaryColorDark: policy.SecondaryColorDark,
 		WarnColorDark:      policy.WarnColorDark,
+		FontUrl:            policy.FontURL,
 
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		Details: object.ToViewDetailsPb(

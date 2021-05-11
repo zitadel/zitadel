@@ -19,6 +19,7 @@ type LabelPolicyView struct {
 	WarnColorDark      string
 	LogoDarkURL        string
 	IconDarkURL        string
+	FontURL            string
 
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool

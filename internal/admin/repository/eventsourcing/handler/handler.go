@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -30,7 +31,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage) []query.Handler {
 	return []query.Handler{
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
@@ -65,6 +66,9 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount, es}),
 		newFeatures(
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
+		newStyling(
+			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
+			static),
 	}
 }
 

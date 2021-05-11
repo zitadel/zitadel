@@ -82,6 +82,7 @@ message LabelPolicy {
     string icon_url = 13;
     string logo_url_dark = 14;
     string icon_url_dark = 15;
+    string font_url = 16;
 }
 
 message LoginPolicy {

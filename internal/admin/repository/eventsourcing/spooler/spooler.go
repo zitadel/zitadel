@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
@@ -17,12 +18,12 @@ type SpoolerConfig struct {
 	Handlers              handler.Configs
 }
 
-func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, defaults systemdefaults.SystemDefaults) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, defaults systemdefaults.SystemDefaults, static static.Storage) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, defaults),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, defaults, static),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

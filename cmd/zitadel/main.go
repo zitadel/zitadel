@@ -27,6 +27,7 @@ import (
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/setup"
+	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
@@ -136,7 +137,7 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
-	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries)
+	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store)
 	startUI(ctx, conf, authRepo, commands, queries)
 
 	if *notificationEnabled {
@@ -161,12 +162,12 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries) {
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage) {
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
-	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, static, roles)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)

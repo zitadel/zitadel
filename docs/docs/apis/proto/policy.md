@@ -30,6 +30,7 @@ title: zitadel/policy.proto
 | icon_url |  string | - |  |
 | logo_url_dark |  string | - |  |
 | icon_url_dark |  string | - |  |
+| font_url |  string | - |  |
 
 
 
