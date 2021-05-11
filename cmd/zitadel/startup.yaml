@@ -34,11 +34,25 @@ Commands:
 
 Queries:
   Eventstore:
-    User: 'queries'
-    Password: $CR_QUERIES_PASSWORD
+    User: 'eventstore'
+    Password: $CR_EVENTSTORE_PASSWORD
     SSL:
-      Cert: $CR_QUERIES_CERT
-      Key: $CR_QUERIES_KEY
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
+
+ReadModels:
+  SQL:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'authz'
+    Database: 'zitadel'
+    Schema: 'read_models'
+    Password: $CR_AUTHZ_PASSWORD
+    SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
+      Cert: $CR_AUTHZ_CERT
+      Key: $CR_AUTHZ_KEY
 
 AuthZ:
   Repository:

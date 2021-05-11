@@ -8,7 +8,7 @@ import (
 )
 
 type StatementHandler struct {
-	tableName     string
+	viewName      string
 	sequenceTable string
 	lockTable     string
 	client        *sql.DB
@@ -16,27 +16,27 @@ type StatementHandler struct {
 
 func NewStatementHandler(
 	client *sql.DB,
-	tableName,
+	viewName,
 	sequenceTable,
 	lockTable string,
 ) StatementHandler {
 	return StatementHandler{
 		client:        client,
-		tableName:     tableName,
+		viewName:      viewName,
 		sequenceTable: sequenceTable,
 		lockTable:     lockTable,
 	}
 }
 
 func (h *StatementHandler) Lock() error {
-	query := "INSERT INTO " + h.lockTable + " (table_name) VALUES ($1)"
-	_, err := h.client.Exec(query, h.tableName)
+	query := "INSERT INTO " + h.lockTable + " (view_name) VALUES ($1)"
+	_, err := h.client.Exec(query, h.viewName)
 	return err
 }
 
 func (h *StatementHandler) Unlock() error {
-	query := "DELETE FROM " + h.lockTable + " WHERE table_name = $1"
-	_, err := h.client.Exec(query, h.tableName)
+	query := "DELETE FROM " + h.lockTable + " WHERE view_name = $1"
+	_, err := h.client.Exec(query, h.viewName)
 	return err
 }
 

@@ -43,6 +43,7 @@ type Config struct {
 	EventstoreBase types.SQLBase
 	Commands       command.Config
 	Queries        query.Config
+	ReadModels     types.SQL
 
 	AuthZ authz.Config
 	Auth  auth_es.Config
@@ -108,7 +109,7 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
 
-	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
+	queries, err := query.StartQueries(ctx, esQueries, conf.ReadModels, conf.SystemDefaults)
 	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
 
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
@@ -117,7 +118,7 @@ func startZitadel(configPaths []string) {
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
 
-	err = handler.StartWithUser(ctx, esCommands, conf.EventstoreBase, conf.Commands.Eventstore)
+	err = handler.Start(ctx, esCommands, conf.EventstoreBase, conf.Commands.Eventstore)
 	logging.Log("ZITAD-HkUX4").OnError(err).Fatal("unable to start handlers")
 
 	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, authZRepo)

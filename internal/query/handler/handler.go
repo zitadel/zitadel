@@ -7,8 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-func StartWithUser(ctx context.Context, es *eventstore.Eventstore, baseConfig types.SQLBase, userConfig types.SQLUser) error {
-	sqlClient, err := userConfig.Start(baseConfig)
+func Start(ctx context.Context, es *eventstore.Eventstore, dbConf types.SQL) error {
+	sqlClient, err := dbConf.Start()
 	if err != nil {
 		return err
 	}

@@ -39,11 +39,11 @@ func NewOrgHandler(
 		ReadModelHandler: *handler.NewReadModelHandler(es, 1*time.Minute),
 		StatementHandler: crdb.NewStatementHandler(
 			client,
-			"management.orgs",
-			"management.current_sequences",
-			"management.locks",
+			"read_models.orgs",
+			"read_models.current_sequences",
+			"read_models.locks",
 		),
-		TableName: "orgs",
+		TableName: "read_models.orgs",
 	}
 	go h.ReadModelHandler.Process(
 		ctx,

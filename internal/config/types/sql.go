@@ -19,6 +19,7 @@ type SQL struct {
 	User     string
 	Password string
 	Database string
+	Schema   string
 	SSL      *ssl
 }
 
@@ -26,6 +27,7 @@ type SQLBase struct {
 	Host     string
 	Port     string
 	Database string
+	Schema   string
 	SSL      sslBase
 }
 
