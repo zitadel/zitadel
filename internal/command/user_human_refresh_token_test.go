@@ -24,12 +24,10 @@ import (
 
 func TestCommands_AddUserAndRefreshToken(t *testing.T) {
 	type fields struct {
-		eventstore                 *eventstore.Eventstore
-		idGenerator                id.Generator
-		iamDomain                  string
-		keyAlgorithm               crypto.EncryptionAlgorithm
-		refreshTokenIdleExpiration time.Duration
-		refreshTokenExpiration     time.Duration
+		eventstore   *eventstore.Eventstore
+		idGenerator  id.Generator
+		iamDomain    string
+		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
 		ctx                   context.Context
@@ -43,6 +41,8 @@ func TestCommands_AddUserAndRefreshToken(t *testing.T) {
 		authMethodsReferences []string
 		lifetime              time.Duration
 		authTime              time.Time
+		refreshIdleExpiration time.Duration
+		refreshExpiration     time.Duration
 	}
 	type res struct {
 		token        *domain.Token
@@ -410,7 +410,8 @@ func TestCommands_AddUserAndRefreshToken(t *testing.T) {
 				iamDomain:    tt.fields.iamDomain,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, gotRefresh, err := c.AddUserAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken, tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.authTime)
+			got, gotRefresh, err := c.AddUserAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,
+				tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.refreshIdleExpiration, tt.args.refreshExpiration, tt.args.authTime)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

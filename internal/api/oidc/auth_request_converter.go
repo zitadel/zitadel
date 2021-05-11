@@ -288,3 +288,7 @@ func (r *RefreshTokenRequest) GetScopes() []string {
 func (r *RefreshTokenRequest) GetSubject() string {
 	return r.UserID
 }
+
+func (r *RefreshTokenRequest) SetCurrentScopes(scopes oidc.Scopes) {
+	r.Scopes = scopes
+}

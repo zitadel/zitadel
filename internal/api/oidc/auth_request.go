@@ -80,7 +80,7 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
-func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
+func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	var userAgentID, applicationID, userOrgID string
@@ -107,7 +107,7 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 	return scopes
 }
 
-func (o *OPStorage) CreateTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
+func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	var userAgentID, applicationID, userOrgID string
@@ -130,7 +130,7 @@ func (o *OPStorage) CreateTokens(ctx context.Context, req op.TokenRequest, refre
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
-func (o *OPStorage) RefreshTokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
+func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
 	tokenView, err := o.repo.RefreshTokenByID(ctx, refreshToken)
 	if err != nil {
 		return nil, err
