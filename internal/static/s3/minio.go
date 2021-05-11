@@ -26,7 +26,6 @@ func (m *Minio) CreateBucket(ctx context.Context, name, location string) error {
 		location = m.Location
 	}
 	name = m.prefixBucketName(name)
-	name = strings.ToLower(name)
 	exists, err := m.Client.BucketExists(ctx, name)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "MINIO-1b8fs", "Errors.Assets.Bucket.Internal")
@@ -155,5 +154,5 @@ func (m *Minio) objectToAssetInfo(bucketName string, object minio.ObjectInfo) *d
 }
 
 func (m *Minio) prefixBucketName(name string) string {
-	return m.BucketPrefix + "-" + name
+	return strings.ToLower(m.BucketPrefix + "-" + name)
 }
