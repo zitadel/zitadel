@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func (c *Commands) AddUserAndRefreshToken(ctx context.Context, orgID, agentID, clientID, userID, refreshToken string, audience, scopes, authMethodsReferences []string, accessLifetime, refreshIdleExpiration, refreshExpiration time.Duration, authTime time.Time) (*domain.Token, string, error) {
+func (c *Commands) AddAccessAndRefreshToken(ctx context.Context, orgID, agentID, clientID, userID, refreshToken string, audience, scopes, authMethodsReferences []string, accessLifetime, refreshIdleExpiration, refreshExpiration time.Duration, authTime time.Time) (*domain.Token, string, error) {
 	userWriteModel := NewUserWriteModel(userID, orgID)
 	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, accessLifetime)
 	if err != nil {

@@ -121,7 +121,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		authTime = authReq.AuthTime
 		authMethodsReferences = authReq.GetAMR()
 	}
-	resp, token, err := o.command.AddUserAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
+	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {

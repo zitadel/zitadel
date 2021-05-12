@@ -22,7 +22,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func TestCommands_AddUserAndRefreshToken(t *testing.T) {
+func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
@@ -410,7 +410,7 @@ func TestCommands_AddUserAndRefreshToken(t *testing.T) {
 				iamDomain:    tt.fields.iamDomain,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, gotRefresh, err := c.AddUserAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,
+			got, gotRefresh, err := c.AddAccessAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,
 				tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.refreshIdleExpiration, tt.args.refreshExpiration, tt.args.authTime)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
