@@ -39,11 +39,11 @@ func NewOrgHandler(
 		ProjectionHandler: *handler.NewProjectionHandler(es, 1*time.Minute),
 		StatementHandler: crdb.NewStatementHandler(
 			client,
-			"read_models.orgs",
-			"read_models.current_sequences",
-			"read_models.locks",
+			"projections.orgs",
+			"projections.current_sequences",
+			"projections.locks",
 		),
-		TableName: "read_models.orgs",
+		TableName: "projections.orgs",
 	}
 	go h.ProjectionHandler.Process(
 		ctx,

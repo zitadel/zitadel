@@ -54,7 +54,7 @@ ReadModels:
   Port: $ZITADEL_EVENTSTORE_PORT
   User: 'authz'
   Database: 'zitadel'
-  Schema: 'read_models'
+  Schema: 'projections'
   Password: $CR_AUTHZ_PASSWORD
   SSL:
     Mode: $CR_SSL_MODE
