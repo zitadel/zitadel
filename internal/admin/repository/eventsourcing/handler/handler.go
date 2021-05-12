@@ -32,7 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage) []query.Handler {
-	return []query.Handler{
+	handlers := []query.Handler{
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newIAMMember(
@@ -66,10 +66,13 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount, es}),
 		newFeatures(
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
-		newStyling(
-			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
-			static),
 	}
+	if static != nil {
+		handlers = append(handlers, newStyling(
+			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
+			static))
+	}
+	return handlers
 }
 
 func (configs Configs) cycleDuration(viewModel string) time.Duration {

@@ -5,15 +5,10 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/caos/logging"
-	"github.com/rakyll/statik/fs"
-	"github.com/wellington/go-libsass"
 
 	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -24,25 +19,81 @@ import (
 	"github.com/caos/zitadel/internal/static"
 )
 
+var (
+	includePaths = []string{
+		"/resources/themes/scss/main.scss",
+		"/resources/themes/scss/bundle.scss",
+		"/resources/themes/scss/styles/a/a.scss",
+		"/resources/themes/scss/styles/a/a_theme.scss",
+		"/resources/themes/scss/styles/account_selection/account_selection.scss",
+		"/resources/themes/scss/styles/account_selection/account_selection_theme.scss",
+		"/resources/themes/scss/styles/avatar/avatar.scss",
+		"/resources/themes/scss/styles/avatar/avatar_theme.scss",
+		"/resources/themes/scss/styles/button/button.scss",
+		"/resources/themes/scss/styles/button/button_base.scss",
+		"/resources/themes/scss/styles/button/button_theme.scss",
+		"/resources/themes/scss/styles/checkbox/checkbox.scss",
+		"/resources/themes/scss/styles/checkbox/checkbox_base.scss",
+		"/resources/themes/scss/styles/checkbox/checkbox_theme.scss",
+		"/resources/themes/scss/styles/color/all_color.scss",
+		"/resources/themes/scss/styles/container/container.scss",
+		"/resources/themes/scss/styles/container/container_theme.scss",
+		"/resources/themes/scss/styles/core/core.scss",
+		"/resources/themes/scss/styles/elevation/elevation.scss",
+		"/resources/themes/scss/styles/error/error.scss",
+		"/resources/themes/scss/styles/error/error_theme.scss",
+		"/resources/themes/scss/styles/footer/footer.scss",
+		"/resources/themes/scss/styles/footer/footer_theme.scss",
+		"/resources/themes/scss/styles/header/header.scss",
+		"/resources/themes/scss/styles/header/header_theme.scss",
+		"/resources/themes/scss/styles/identity_provider/identity_provider.scss",
+		"/resources/themes/scss/styles/identity_provider/identity_provider_base.scss",
+		"/resources/themes/scss/styles/identity_provider/identity_provider_theme.scss",
+		"/resources/themes/scss/styles/input/input.scss",
+		"/resources/themes/scss/styles/input/input_base.scss",
+		"/resources/themes/scss/styles/input/input_theme.scss",
+		"/resources/themes/scss/styles/label/label.scss",
+		"/resources/themes/scss/styles/label/label_base.scss",
+		"/resources/themes/scss/styles/label/label_theme.scss",
+		"/resources/themes/scss/styles/list/list.scss",
+		"/resources/themes/scss/styles/list/list_base.scss",
+		"/resources/themes/scss/styles/list/list_theme.scss",
+		"/resources/themes/scss/styles/progress_bar/progress_bar.scss",
+		"/resources/themes/scss/styles/progress_bar/progress_bar_base.scss",
+		"/resources/themes/scss/styles/progress_bar/progress_bar_theme.scss",
+		"/resources/themes/scss/styles/qrcode/qrcode.scss",
+		"/resources/themes/scss/styles/qrcode/qrcode_theme.scss",
+		"/resources/themes/scss/styles/radio/radio.scss",
+		"/resources/themes/scss/styles/radio/radio_base.scss",
+		"/resources/themes/scss/styles/radio/radio_theme.scss",
+		"/resources/themes/scss/styles/register/register.scss",
+		"/resources/themes/scss/styles/select/select.scss",
+		"/resources/themes/scss/styles/select/select_base.scss",
+		"/resources/themes/scss/styles/select/select_theme.scss",
+		"/resources/themes/scss/styles/success_label/success_label.scss",
+		"/resources/themes/scss/styles/success_label/success_label_base.scss",
+		"/resources/themes/scss/styles/success_label/success_label_theme.scss",
+		"/resources/themes/scss/styles/theming/all.scss",
+		"/resources/themes/scss/styles/theming/palette.scss",
+		"/resources/themes/scss/styles/theming/theming.scss",
+	}
+)
+
 const (
 	stylingTable = "adminapi.styling"
+	fileName     = "variables.css"
 )
 
 type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
-	dir          http.FileSystem
 }
 
 func newStyling(handler handler, static static.Storage) *Styling {
-	statikFS, err := fs.NewWithNamespace("login")
-	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start listener")
-
 	h := &Styling{
 		handler: handler,
 		static:  static,
-		dir:     statikFS,
 	}
 
 	h.subscribe()
@@ -150,37 +201,52 @@ func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
 }
 
 func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64, error) {
-	r, err := m.dir.Open("/resources/themes/scss/zitadel-alternative.scss")
-	if err != nil {
-		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
+	cssContent := ""
+	cssContent += fmt.Sprint(":root {")
+	if policy.PrimaryColor != "" {
+		cssContent += fmt.Sprintf("--primary-color: %s;", policy.PrimaryColor)
 	}
-	defer r.Close()
-	contents, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-2n8fs", "error create file")
+	if policy.SecondaryColor != "" {
+		cssContent += fmt.Sprintf("--secondary-color: %s;", policy.SecondaryColor)
 	}
+	if policy.PrimaryColor != "" {
+		cssContent += fmt.Sprintf("--warn-color: %s;", policy.SecondaryColor)
+	}
+	if policy.SecondaryColorDark != "" {
+		cssContent += fmt.Sprintf("--primary-color-dark: %s;", policy.PrimaryColorDark)
+	}
+	if policy.SecondaryColorDark != "" {
+		cssContent += fmt.Sprintf("--secondary-color-dark: %s;", policy.SecondaryColorDark)
+	}
+	if policy.WarnColorDark != "" {
+		cssContent += fmt.Sprintf("--warn-color-dark: %s;", policy.WarnColorDark)
+	}
+	if policy.LogoURL != "" {
+		cssContent += fmt.Sprintf("--logo-url: %s;", policy.LogoURL)
+	}
+	if policy.LogoDarkURL != "" {
+		cssContent += fmt.Sprintf("--logo-url-dark: %s;", policy.LogoDarkURL)
+	}
+	if policy.IconURL != "" {
+		cssContent += fmt.Sprintf("--icon-url: %s;", policy.IconURL)
+	}
+	if policy.IconDarkURL != "" {
+		cssContent += fmt.Sprintf("--icon-url-dark: %s;", policy.IconDarkURL)
+	}
+	if policy.FontURL != "" {
+		cssContent += fmt.Sprintf("--font-url: %s;", policy.FontURL)
+	}
+	cssContent += fmt.Sprint("}")
 
-	fmt.Println(string(contents))
-
-	output := bytes.NewBuffer(nil)
-	comp, err := libsass.New(output, r)
-	if err != nil {
-		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
-	}
-
-	if err := comp.Run(); err != nil {
-		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
-		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")
-	}
-	return output, int64(output.Len()), nil
+	data := []byte(cssContent)
+	buffer := bytes.NewBuffer(data)
+	return buffer, int64(buffer.Len()), nil
 }
 
 func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
-	fileName := domain.OrgCssPath + "/" + "main"
+	fileName := domain.OrgCssPath + "/" + fileName
 	if aggregateID == domain.IAMID {
-		fileName = domain.IAMCssPath + "/" + "main"
+		fileName = domain.IAMCssPath + "/" + fileName
 	}
 	_, err := m.static.PutObject(context.Background(), aggregateID, fileName, contentType, reader, size, true)
 	return err
