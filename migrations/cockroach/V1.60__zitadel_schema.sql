@@ -2,9 +2,9 @@ CREATE DATABASE zitadel;
 GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE zitadel TO authz;
 use zitadel;
 
-CREATE SCHEMA read_models AUTHORIZATION authz;
+CREATE SCHEMA projections AUTHORIZATION authz;
 
-CREATE TABLE read_models.locks (
+CREATE TABLE projections.locks (
     locker_id TEXT,
     locked_until TIMESTAMPTZ(3),
     view_name TEXT,
@@ -12,7 +12,7 @@ CREATE TABLE read_models.locks (
     PRIMARY KEY (view_name)
 );
 
-CREATE TABLE read_models.current_sequences (
+CREATE TABLE projections.current_sequences (
     view_name TEXT,
     current_sequence BIGINT,
     timestamp TIMESTAMPTZ,
@@ -20,7 +20,7 @@ CREATE TABLE read_models.current_sequences (
     PRIMARY KEY (view_name)
 );
 
-CREATE TABLE read_models.orgs (
+CREATE TABLE projections.orgs (
     id TEXT,
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
