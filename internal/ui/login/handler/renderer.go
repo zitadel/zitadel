@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/static"
@@ -82,17 +83,17 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			}
 
 			if orgID != "" {
-				objectInfo, err := r.staticStorage.GetObjectInfo(context.TODO(), orgID, domain.OrgCssPath+"/"+domain.CssVariablesFileName)
+				presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.OrgCssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
 				if err == nil {
-					return objectInfo.AutheticatedURL
+					return presignedURL.String()
 				}
 			}
 
-			objectInfo, err := r.staticStorage.GetObjectInfo(context.TODO(), domain.IAMID, domain.IAMCssPath+"/"+domain.CssVariablesFileName)
+			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), domain.IAMID, domain.IAMCssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
 			if err != nil {
 				return defaultURL
 			}
-			return objectInfo.AutheticatedURL
+			return presignedURL.String()
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)

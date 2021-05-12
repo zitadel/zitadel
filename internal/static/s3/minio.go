@@ -149,7 +149,7 @@ func (m *Minio) objectToAssetInfo(bucketName string, object minio.ObjectInfo) *d
 		LastModified:    object.LastModified,
 		VersionID:       object.VersionID,
 		Expiration:      object.Expiration,
-		AutheticatedURL: m.Client.EndpointURL().String() + "/" + object.Key,
+		AutheticatedURL: m.Client.EndpointURL().String() + "/" + bucketName + "/" + object.Key,
 	}
 }
 
