@@ -163,10 +163,8 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 
 	fmt.Println(string(contents))
 
-	input := bytes.NewBufferString("div { p { color: red; } }")
-
 	output := bytes.NewBuffer(nil)
-	comp, err := libsass.New(output, input)
+	comp, err := libsass.New(output, r)
 	if err != nil {
 		logging.LogWithFields("SPOOL-2n8fs", "policy", policy.AggregateID).WithError(err).Warn("something went wrong create file")
 		return nil, 0, caos_errors.ThrowInternal(err, "SPOOL-f83nf", "error create file")

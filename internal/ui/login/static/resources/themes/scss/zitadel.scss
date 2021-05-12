@@ -1,4 +1,5 @@
-@import './styles/theming/all';
+@import 'main.scss';
+@import 'bundle.scss';
 
 // Include non-theme styles for core. -> mainly background of the login
 @include lgn-core();
