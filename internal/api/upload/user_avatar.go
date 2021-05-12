@@ -18,6 +18,10 @@ func (l *humanAvatar) ObjectName(ctxData authz.CtxData) (string, error) {
 	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil
 }
 
+func (l *humanAvatar) BucketName(ctxData authz.CtxData) string {
+	return ctxData.OrgID
+}
+
 func (l *humanAvatar) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
 	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Key)
 	return err

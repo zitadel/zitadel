@@ -15,6 +15,7 @@ Errors:
       CreateFailed: Bucket konnte nicht erstellt werden
       ListFailed: Buckets konnten nicht gelesen werden
       RemoveFailed: Bucket konnte nicht gelöscht werden
+      SetPublicFailed: Bucket konnte nicht auf public gesetzt werden
     Object:
       PutFailed: Objekt konnte nicht erstellt werden
       GetFaieled: Objekt konnte nicht gelesen werden

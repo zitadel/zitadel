@@ -75,23 +75,28 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"resourceThemeUrl": func(file, theme string) string {
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
 		},
-		"variablesCssFileUrl": func(orgID, theme string) string {
-			defaultURL := path.Join(r.pathPrefix, EndpointResources, "themes", theme, "variables.css")
-
-			if r.staticStorage == nil {
-				return defaultURL
+		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
+			if policy != nil {
+				return true
 			}
-
-			if orgID != "" {
-				presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.OrgCssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
-				if err == nil {
-					return presignedURL.String()
-				}
+			return false
+		},
+		"variablesCssFileUrl": func(orgID, theme string, policy *domain.LabelPolicy) string {
+			bucketName := domain.IAMID
+			if orgID != "" && !policy.Default {
+				bucketName = orgID
 			}
-
-			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), domain.IAMID, domain.IAMCssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
+			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
 			if err != nil {
-				return defaultURL
+				return ""
+			}
+			return presignedURL.String()
+
+		},
+		"avatarUrl": func(orgID, userID string) string {
+			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.GetHumanAvatarAssetPath(userID), time.Hour*1)
+			if err != nil {
+				return ""
 			}
 			return presignedURL.String()
 		},
@@ -305,7 +310,10 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
+		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+	} else {
+		//TODO: How to handle LabelPolicy if no auth req (eg Register)
 	}
 	return baseData
 }
@@ -411,6 +419,7 @@ type baseData struct {
 	Nonce                  string
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
+	LabelPolicy            *domain.LabelPolicy
 }
 
 type errorData struct {

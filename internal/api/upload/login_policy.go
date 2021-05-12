@@ -10,17 +10,17 @@ import (
 )
 
 const (
-	defaultLabelPolicyLogoURL     = "/" + domain.DefaultLabelPolicyLogoPath
-	defaultLabelPolicyLogoDarkURL = "/" + domain.DefaultLabelPolicyLogoPath + domain.Dark
-	defaultLabelPolicyIconURL     = "/" + domain.DefaultLabelPolicyIconPath
-	defaultLabelPolicyIconDarkURL = "/" + domain.DefaultLabelPolicyIconPath + domain.Dark
-	defaultLabelPolicyFontURL     = "/" + domain.DefaultLabelPolicyFontPath
+	defaultLabelPolicyLogoURL     = "/iam/" + domain.LabelPolicyLogoPath
+	defaultLabelPolicyLogoDarkURL = "/iam/" + domain.LabelPolicyLogoPath + domain.Dark
+	defaultLabelPolicyIconURL     = "/iam/" + domain.LabelPolicyIconPath
+	defaultLabelPolicyIconDarkURL = "/iam/" + domain.LabelPolicyIconPath + domain.Dark
+	defaultLabelPolicyFontURL     = "/iam/" + domain.LabelPolicyFontPath
 
-	orgLabelPolicyLogoURL     = "/" + domain.OrgLabelPolicyLogoPath
-	orgLabelPolicyLogoDarkURL = "/" + domain.OrgLabelPolicyLogoPath + domain.Dark
-	orgLabelPolicyIconURL     = "/" + domain.OrgLabelPolicyIconPath
-	orgLabelPolicyIconDarkURL = "/" + domain.OrgLabelPolicyIconPath + domain.Dark
-	orgLabelPolicyFontURL     = "/" + domain.OrgLabelPolicyFontPath
+	orgLabelPolicyLogoURL     = "/org/" + domain.LabelPolicyLogoPath
+	orgLabelPolicyLogoDarkURL = "/org/" + domain.LabelPolicyLogoPath + domain.Dark
+	orgLabelPolicyIconURL     = "/org/" + domain.LabelPolicyIconPath
+	orgLabelPolicyIconDarkURL = "/org/" + domain.LabelPolicyIconPath + domain.Dark
+	orgLabelPolicyFontURL     = "/org/" + domain.LabelPolicyFontPath
 )
 
 type labelPolicyLogo struct {
@@ -34,14 +34,18 @@ func (l *labelPolicyLogo) ObjectName(_ authz.CtxData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := domain.OrgLabelPolicyLogoPath
-	if l.defaultPolicy {
-		prefix = domain.DefaultLabelPolicyLogoPath
-	}
+	prefix := domain.LabelPolicyLogoPath
 	if l.darkMode {
 		return prefix + "-" + domain.Dark + "-" + suffixID, nil
 	}
 	return prefix + "-" + suffixID, nil
+}
+
+func (l *labelPolicyLogo) BucketName(ctxData authz.CtxData) string {
+	if l.defaultPolicy {
+		return domain.IAMID
+	}
+	return ctxData.OrgID
 }
 
 func (l *labelPolicyLogo) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
@@ -72,14 +76,18 @@ func (l *labelPolicyIcon) ObjectName(_ authz.CtxData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := domain.OrgLabelPolicyIconPath
-	if l.defaultPolicy {
-		prefix = domain.DefaultLabelPolicyIconPath
-	}
+	prefix := domain.LabelPolicyIconPath
 	if l.darkMode {
 		return prefix + "-" + domain.Dark + "-" + suffixID, nil
 	}
 	return prefix + "-" + suffixID, nil
+}
+
+func (l *labelPolicyIcon) BucketName(ctxData authz.CtxData) string {
+	if l.defaultPolicy {
+		return domain.IAMID
+	}
+	return ctxData.OrgID
 }
 
 func (l *labelPolicyIcon) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
@@ -110,11 +118,15 @@ func (l *labelPolicyFont) ObjectName(_ authz.CtxData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := domain.OrgLabelPolicyFontPath
-	if l.defaultPolicy {
-		prefix = domain.DefaultLabelPolicyFontPath
-	}
+	prefix := domain.LabelPolicyFontPath
 	return prefix + "-" + suffixID, nil
+}
+
+func (l *labelPolicyFont) BucketName(ctxData authz.CtxData) string {
+	if l.defaultPolicy {
+		return domain.IAMID
+	}
+	return ctxData.OrgID
 }
 
 func (l *labelPolicyFont) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {

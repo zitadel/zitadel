@@ -26,6 +26,7 @@ type Handler struct {
 type Uploader interface {
 	Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
+	BucketName(data authz.CtxData) string
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error)
@@ -81,12 +82,13 @@ func (h *Handler) UploadHandleFunc(uploader Uploader) func(http.ResponseWriter, 
 				logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
 			}()
 
+			bucketName := uploader.BucketName(ctxData)
 			objectName, err := uploader.ObjectName(ctxData)
 			if err != nil {
 				h.errorHandler(w, r, err)
 				return
 			}
-			info, err := h.commands.UploadAsset(ctx, objectName, handler.Header.Get("content-type"), file, handler.Size)
+			info, err := h.commands.UploadAsset(ctx, bucketName, objectName, handler.Header.Get("content-type"), file, handler.Size)
 			if err != nil {
 				h.errorHandler(w, r, err)
 				return
