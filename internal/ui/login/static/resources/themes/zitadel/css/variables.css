@@ -1,0 +1,13 @@
+:root {
+    --primary-color: #222324;
+    --secondary-color: #ffffff;
+    --warn-color: #ffffff;
+    --primary-color-dark: #222324;
+    --secondary-color-dark: #ffffff;
+    --warn-color-dark: #ffffff;
+    --logo-url: 'logo-light.svg';
+    --logo-url-dark: 'logo-dark.svg';
+    --icon-url: 'logo-light.svg';
+    --icon-url-dark: 'logo-dark.svg';
+    --font-url: '';
+}

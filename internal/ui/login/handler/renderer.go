@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 	"html/template"
 	"net/http"
 	"path"
+
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
@@ -25,12 +28,14 @@ const (
 
 type Renderer struct {
 	*renderer.Renderer
-	pathPrefix string
+	pathPrefix    string
+	staticStorage static.Storage
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
+func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string, defaultLanguage language.Tag) *Renderer {
 	r := &Renderer{
-		pathPrefix: pathPrefix,
+		pathPrefix:    pathPrefix,
+		staticStorage: staticStorage,
 	}
 	tmplMapping := map[string]string{
 		tmplError:                    "error.html",
@@ -68,6 +73,26 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"resourceThemeUrl": func(file, theme string) string {
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
+		},
+		"variablesCssFileUrl": func(orgID, theme string) string {
+			defaultURL := path.Join(r.pathPrefix, EndpointResources, "themes", theme, "variables.css")
+
+			if r.staticStorage == nil {
+				return defaultURL
+			}
+
+			if orgID != "" {
+				objectInfo, err := r.staticStorage.GetObjectInfo(context.TODO(), orgID, domain.OrgCssPath+"/"+domain.CssVariablesFileName)
+				if err == nil {
+					return objectInfo.AutheticatedURL
+				}
+			}
+
+			objectInfo, err := r.staticStorage.GetObjectInfo(context.TODO(), domain.IAMID, domain.IAMCssPath+"/"+domain.CssVariablesFileName)
+			if err != nil {
+				return defaultURL
+			}
+			return objectInfo.AutheticatedURL
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)

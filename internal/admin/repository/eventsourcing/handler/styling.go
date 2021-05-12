@@ -81,7 +81,6 @@ var (
 
 const (
 	stylingTable = "adminapi.styling"
-	fileName     = "variables.css"
 )
 
 type Styling struct {
@@ -244,9 +243,9 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 }
 
 func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
-	fileName := domain.OrgCssPath + "/" + fileName
+	fileName := domain.OrgCssPath + "/" + domain.CssVariablesFileName
 	if aggregateID == domain.IAMID {
-		fileName = domain.IAMCssPath + "/" + fileName
+		fileName = domain.IAMCssPath + "/" + domain.CssVariablesFileName
 	}
 	_, err := m.static.PutObject(context.Background(), aggregateID, fileName, contentType, reader, size, true)
 	return err
