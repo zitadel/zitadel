@@ -19,11 +19,11 @@
 
     label {
         &::before {
-            border-color: lgn-color($foreground, radio-border);
+            border-color: var(--zitadel-color-input-border);
         }
 
         &::after {
-            background: lgn-color($primary, default);
+            background: var(--zitadel-color-primary);
         }
     }
 
@@ -31,7 +31,7 @@
         opacity: 0;
 
         &:checked + label::before {
-            border-color: lgn-color($primary, default);
+            border-color: var(--zitadel-color-primary);
         }
 
         &:focus + label {
@@ -41,16 +41,16 @@
 
         &:disabled {
             + label::before {
-                border-color: lgn-color($background, disabled-button);
+                border-color: var(--zitadel-color-button-disabled-background);
             }
 
             &:checked {
                 + label::before {
-                    color: lgn-color($background, disabled-selected-button);;
+                    color: var(--zitadel-color-button-selected-background);
                 }
 
                 + label::after {
-                    background:  lgn-color($background, disabled-selected-button);;
+                    background:  var(--zitadel-color-button-disabled-selected-background);
                 }
             }
 

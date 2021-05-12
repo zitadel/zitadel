@@ -19,40 +19,42 @@
 
     .lgn-input:not([disabled]),
     select:not([disabled]), .lgn-select:not([disabled]) {
-      border-color: lgn-color($foreground, input-border);
+      border-color: var(--zitadel-color-input-border);
     }
   
     .lgn-input,
     select, .lgn-select {
-      color: lgn-color($foreground, text);
-      background-color: lgn-color($background, input);
+      color: var(--zitadel-color-text);
+      background-color: var(--zitadel-color-input-background);
 
       &:hover {
-        border-color: lgn-color($foreground, input-border-hover);
+        border-color: var(--zitadel-color-input-boder-hover);
       }
 
       &:active {
-        @include _lgn-input-theme-property($config, 'border-color', default);
+        border-color: var(--zitadel-color-input-border);
+        //@include _lgn-input-theme-property($config, 'border-color', default);
       }
 
       &:focus {
-        @include _lgn-input-theme-property($config, 'border-color', default);
+        border-color: var(--zitadel-color-input-border);
+        //@include _lgn-input-theme-property($config, 'border-color', default);
       }
 
       // overwrite if state is warn
       &[color='warn'] {
-        border-color: lgn-color($warn, default);
+        border-color: var(--zitadel-color-warn);
       }
     }
 
     .lgn-input::placeholder,
     select::placeholder,
     .lgn-select::placeholder {
-        color: lgn-color($foreground, input-placeholder);
+        color: var(--zitadel-color-input-placeholder);
     }    
   }
-  
-  @mixin _lgn-input-theme-property($theme, $property, $hue) {
-    $primary: map-get($theme, primary);
-    #{$property}: lgn-color($primary, $hue);
-  }
+  //
+  //@mixin _lgn-input-theme-property($theme, $property, $hue) {
+  //  $primary: map-get($theme, primary);
+  //  #{$property}: lgn-color($primary, $hue);
+  //}

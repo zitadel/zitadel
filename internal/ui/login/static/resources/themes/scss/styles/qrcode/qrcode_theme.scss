@@ -16,15 +16,15 @@
 
     .lgn-qrcode {
         svg {
-            background: lgn-color($background, qrcode);
+            background: var(--zitadel-color-qr-background);
         }
 
         svg rect.color {
-            fill: lgn-color($foreground, qrcode);
+            fill: var(--zitadel-color-qr);
         }
 
         svg rect.bg-color {
-            fill: lgn-color($background, qrcode);
+            fill: var(--zitadel-color-qr-background);
         }
     }
 }

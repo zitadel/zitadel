@@ -24,8 +24,8 @@
         }
 
         &.google {
-            color: lgn-color($foreground, google-text);
-            background-color: lgn-color($background, google);
+            color: var(--zitadel-color-google-text);
+            background-color: var(--zitadel-color-google-background);
         }
     }
 }

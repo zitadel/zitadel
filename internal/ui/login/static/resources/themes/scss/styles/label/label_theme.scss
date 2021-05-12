@@ -20,6 +20,6 @@
     $foreground: map-get($config, foreground);
 
     .lgn-label {
-      color: lgn-color($foreground, label);
+      color: var(--zitadel-color-label);
     }
 }

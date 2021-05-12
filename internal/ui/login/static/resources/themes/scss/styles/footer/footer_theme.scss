@@ -17,11 +17,11 @@
     $foreground: map-get($config, foreground);
   
     footer {
-      background-color: lgn-color($background, footer);
-      border-top: 1px solid lgn-color($foreground, footer-line);
+      background-color: var(--zitadel-color-background);
+      border-top: 1px solid var(--zitadel-color-footer-line);
 
       a {
-        color: lgn-color($background, footer-links);
+        color: var(--zitadel-color-primary);
       }
     }
 }

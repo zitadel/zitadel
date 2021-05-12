@@ -11,11 +11,14 @@
 }
 
 @mixin lgn-success-label-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $is-dark-theme: map-get($config, is-dark);
+    //$config: lgn-get-color-config($config-or-theme);
+    //$is-dark-theme: map-get($config, is-dark);
 
     .lgn-success-label {
-        color: if($is-dark-theme, #cbf4c9, #0e6245);
-        background-color: if($is-dark-theme, #4f566b, #cbf4c9);
+        //color: if($is-dark-theme, #cbf4c9, #0e6245);
+        color: var(--zitadel-color-success);
+        background-color: var(--zitadel-color-success-background);
     }
+
+
 }

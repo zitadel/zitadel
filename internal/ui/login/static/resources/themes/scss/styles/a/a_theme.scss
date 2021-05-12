@@ -10,15 +10,12 @@
 }
 
 @mixin lgn-a-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $primary: map-get($config, primary);
-  
     a {
-      color: lgn-color($primary, default);
-    
+      color: var(--zitadel-color-primary);
+
       &:hover,
       &:active {
-          color: lgn-color($primary, 400);
+          color: var(--zitadel-color-primary-400);
       }
     }
 }

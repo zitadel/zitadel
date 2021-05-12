@@ -18,6 +18,6 @@
     $foreground: map-get($config, foreground);
 
     .lgn-progress-bar {
-      border-color: lgn-color($foreground, input-border);
+      border-color: var(--zitadel-color-input-border);
     }  
 }

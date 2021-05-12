@@ -8,11 +8,11 @@
 
     // Wrapper element that provides the theme background
     .lgn-app-background#{if(&, ', &.lgn-app-background', '')} {
-      $background: map-get($config, background);
+      $background: var(--zitadel-background);
       $foreground: map-get($config, foreground);
   
-      background-color: lgn-color($background, background);
-      color: lgn-color($foreground, text);
+      background-color: var(--zitadel-color-background);
+      color: var(--zitadel-color-text);
     }
   
     // Marker that is used to determine whether the user has added a theme to their page.

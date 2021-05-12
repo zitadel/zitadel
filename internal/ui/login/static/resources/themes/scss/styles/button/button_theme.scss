@@ -25,7 +25,7 @@
     color: inherit;
     background: transparent;
 
-    @include _lgn-button-theme-property($config, "color", text);
+    @include _lgn-button-theme-color();
   }
 
   .lgn-button:focus,
@@ -89,6 +89,48 @@
   }
 }
 
+@mixin _lgn-button-theme-color() {
+  &.lgn-primary {
+    color: var(--zitadel-color-primary);
+  }
+  &.lgn-accent {
+    color: var(--zitadel-color-secondary);
+  }
+  &.lgn-warn {
+    color: var(--zitadel-color-warn);
+  }
+
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+        &[disabled] {
+            color: var(--zitadel-color-button-disabled);
+        }
+  }
+}
+
+@mixin _lgn-button-theme-background-color() {
+  &.lgn-primary {
+    background-color: var(--zitadel-color-primary);
+  }
+  &.lgn-accent {
+    background-color: var(--zitadel-color-secondary);
+  }
+  &.lgn-warn {
+    background-color: var(--zitadel-color-warn);
+  }
+
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+        &[disabled] {
+            background-color: var(--zitadel-color-button-disabled-background);
+        }
+  }
+}
+
 @mixin _lgn-button-theme-property($theme, $property, $hue) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
@@ -124,15 +166,15 @@
   $warn: map-get($config, warn);
 
   &.lgn-primary:focus {
-    background-color: lgn-color($primary);
+    background-color: var(--zitadel-color-primary);
   }
 
   &.lgn-accent:focus {
-    background-color: lgn-color($accent);
+    background-color: var(--zitadel-color-secondary);
   }
 
   &.lgn-warn:focus {
-    background-color: lgn-color($warn);
+    background-color: var(--zitadel-color-warn);
   }
 }
 

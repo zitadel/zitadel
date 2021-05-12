@@ -16,14 +16,13 @@
   
     .lgn-error {
         .lgn-error-message {
-            color: lgn-color($warn, default);
+            color: var(--zitadel-color-warn);
         }
     }
 
     .lgn-login-profile {
         .lgn-names {
-            $foreground: map-get($config, foreground);
-            border-color: lgn-color($foreground, divider);
+            border-color: var(--zitadel-color-divider);
         }
     }
 }

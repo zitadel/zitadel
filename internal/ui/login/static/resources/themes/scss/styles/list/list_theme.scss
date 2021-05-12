@@ -18,12 +18,12 @@
     $is-dark-theme: map-get($config, is-dark);
     .lgn-list, ul {
         li::before {
-            color: lgn-color($primary, default);
+            color: var(--zitadel-color-primary);
         }
     
        li i {
             &.lgn-warn {
-                color: lgn-color($warn, default);
+                color: var(--zitadel-color-warn);
             }
     
             &.lgn-valid {

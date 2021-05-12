@@ -31,7 +31,7 @@
     .lgn-checkbox label {            
         &:before {
             background-color: transparent;
-            border: 2px solid lgn-color($foreground, input-border);
+            border: 2px solid var(--zitadel-color-input-boder);
         }
         
         &:after {
@@ -44,8 +44,8 @@
     // Checked
     input[type='checkbox']:checked + label {
         &:before {
-            background-color: lgn-color($primary, default);
-            border-color: lgn-color($primary, default);
+            background-color: var(--zitadel-color-primary);
+            border-color: var(--zitadel-color-primary);
         }
         
         &:after {
