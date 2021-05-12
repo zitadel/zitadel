@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query/handler"
+	"github.com/caos/zitadel/internal/repository/org"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -35,6 +36,7 @@ func StartQueries(ctx context.Context, eventstore *eventstore.Eventstore, db typ
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
+	org.RegisterEventMappers(repo.eventstore)
 
 	repo.secretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {

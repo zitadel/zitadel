@@ -29,7 +29,8 @@ func NewReadModelHandler(
 		Handler:      *NewHandler(eventstore),
 		RequeueAfter: requeueAfter,
 		// first requeue is instant on startup
-		Timer: time.NewTimer(0),
+		Timer:      time.NewTimer(0),
+		shouldPush: make(chan *struct{}, 1),
 	}
 }
 
@@ -84,7 +85,7 @@ func (h *ReadModelHandler) Process(
 func (h *ReadModelHandler) processEvent(ctx context.Context, event eventstore.EventReader, reduce Reduce) {
 	stmts, err := reduce(event)
 	if err != nil {
-		logging.Log("EVENT-PTr4j").OnError(err).Warn("unable to process event")
+		logging.Log("EVENT-PTr4j").WithError(err).Warn("unable to process event")
 		return
 	}
 
@@ -92,6 +93,7 @@ func (h *ReadModelHandler) processEvent(ctx context.Context, event eventstore.Ev
 	defer h.lock.Unlock()
 
 	h.stmts = append(h.stmts, stmts...)
+
 	if !h.pushSet {
 		h.pushSet = true
 		h.shouldPush <- nil
@@ -99,8 +101,10 @@ func (h *ReadModelHandler) processEvent(ctx context.Context, event eventstore.Ev
 }
 
 func (h *ReadModelHandler) bulk(ctx context.Context, lock Lock, query *eventstore.SearchQueryBuilder, reduce Reduce, update Update, unlock Unlock) {
+	start := time.Now()
 	if err := lock(); err != nil {
 		logging.Log("EVENT-G76ye").WithError(err).Info("unable to lock")
+		return
 	}
 
 	events, err := h.Eventstore.FilterEvents(ctx, query)
@@ -111,11 +115,12 @@ func (h *ReadModelHandler) bulk(ctx context.Context, lock Lock, query *eventstor
 	for _, event := range events {
 		h.processEvent(ctx, event, reduce)
 	}
-
+	<-h.shouldPush
 	h.push(ctx, update)
 
 	err = unlock()
 	logging.Log("EVENT-boPv1").OnError(err).Warn("unable to unlock")
+	logging.LogWithFields("HANDL-MDgQc", "start", start, "end", time.Now(), "diff", time.Now().Sub(start)).Warn("bulk")
 }
 
 func (h *ReadModelHandler) push(ctx context.Context, update Update) {
@@ -123,10 +128,12 @@ func (h *ReadModelHandler) push(ctx context.Context, update Update) {
 	defer h.lock.Unlock()
 
 	h.pushSet = false
+	start := time.Now()
 	if err := update(ctx, h.stmts); err != nil {
 		logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
 		return
 	}
+	logging.LogWithFields("HANDL-j5vuD", "start", start, "end", time.Now(), "diff", time.Now().Sub(start)).Warn("update")
 
 	h.stmts = nil
 }

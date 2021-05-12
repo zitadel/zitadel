@@ -23,7 +23,6 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/query/handler"
 	"github.com/caos/zitadel/internal/setup"
 	"github.com/caos/zitadel/internal/static/s3"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
@@ -119,9 +118,6 @@ func startZitadel(configPaths []string) {
 
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
-
-	err = handler.Start(ctx, esCommands, conf.EventstoreBase, conf.Commands.Eventstore)
-	logging.Log("ZITAD-HkUX4").OnError(err).Fatal("unable to start handlers")
 
 	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, authZRepo)
 	if err != nil {

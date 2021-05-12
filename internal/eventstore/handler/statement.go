@@ -8,59 +8,64 @@ import (
 )
 
 type Statement struct {
+	Sequence         uint64
 	PreviousSequence uint64
-	tableName        string
+	TableName        string
 
 	execute func(*sql.Tx) error
 }
 
-func NewCreateStatement(table string, values []Column, previousSequence uint64) Statement {
+func NewCreateStatement(table string, values []Column, sequence, previousSequence uint64) Statement {
 	cols, params, args := columnsToQuery(values)
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, strings.Join(cols, ", "), strings.Join(params, ", "))
 
 	return Statement{
-		tableName:        table,
+		TableName:        table,
+		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		execute: func(tx *sql.Tx) error {
-			_, err := tx.Exec(query, args)
+			_, err := tx.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewUpdateStatement(table string, pk []Column, values []Column, previousSequence uint64) Statement {
+func NewUpdateStatement(table string, pk []Column, values []Column, sequence, previousSequence uint64) Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(pk, len(params))
-	args = append(args, whereArgs)
+	args = append(args, whereArgs...)
 	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE %s", table, strings.Join(cols, ", "), strings.Join(params, ", "), strings.Join(wheres, " AND "))
 
 	return Statement{
-		tableName:        table,
+		TableName:        table,
+		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		execute: func(tx *sql.Tx) error {
-			_, err := tx.Exec(query, args)
+			_, err := tx.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewDeleteStatement(table string, conditions []Column, previousSequence uint64) Statement {
+func NewDeleteStatement(table string, conditions []Column, sequence, previousSequence uint64) Statement {
 	wheres, args := columnsToWhere(conditions, 0)
 	query := fmt.Sprintf("DELETE FROM %s WHERE %s", table, strings.Join(wheres, " AND "))
 
 	return Statement{
-		tableName:        table,
+		TableName:        table,
+		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		execute: func(tx *sql.Tx) error {
-			_, err := tx.Exec(query, args)
+			_, err := tx.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewNoOpStatement(table string, previousSequence uint64) Statement {
+func NewNoOpStatement(table string, sequence, previousSequence uint64) Statement {
 	return Statement{
-		tableName:        table,
+		TableName:        table,
+		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 	}
 }
@@ -70,19 +75,6 @@ func (stmt *Statement) Execute(tx *sql.Tx) error {
 		return nil
 	}
 	return stmt.execute(tx)
-}
-
-func (stmt *Statement) CurrentSequence(tx *sql.Tx, seqTable string) (seq uint64, _ error) {
-	row := tx.QueryRow(fmt.Sprintf("SELECT current_sequence FROM %s WHERE table_name = $1", seqTable), stmt.tableName)
-	if row.Err() != nil {
-		return 0, row.Err()
-	}
-
-	if err := row.Scan(&seq); err != nil {
-		return 0, err
-	}
-
-	return seq, nil
 }
 
 type Column struct {
@@ -108,7 +100,7 @@ func columnsToWhere(cols []Column, paramOffset int) (wheres []string, values []i
 	values = make([]interface{}, len(cols))
 
 	for i, col := range cols {
-		wheres[i] = "(" + col.Name + " = " + strconv.Itoa(i+1+paramOffset) + ")"
+		wheres[i] = "(" + col.Name + " = $" + strconv.Itoa(i+1+paramOffset) + ")"
 		values[i] = col.Value
 	}
 

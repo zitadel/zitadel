@@ -51,7 +51,7 @@ func NewOrgHandler(
 		h.StatementHandler.Update,
 		h.StatementHandler.Lock,
 		h.StatementHandler.Unlock,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "orgs"),
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "org"),
 	)
 
 	h.ReadModelHandler.Handler.Subscribe("orgs")
@@ -73,6 +73,8 @@ func (h *OrgHandler) reduce(event eventstore.EventReader) ([]handler.Statement, 
 		stmts = append(stmts, h.orgReactivatedStmts(e)...)
 	case *org.DomainPrimarySetEvent:
 		stmts = append(stmts, h.orgPrimaryDomainStmts(e)...)
+	default:
+		stmts = append(stmts, handler.NewNoOpStatement(h.TableName, e.Sequence(), e.PreviousSequence()))
 	}
 
 	return stmts, nil
@@ -109,7 +111,10 @@ func (h *OrgHandler) orgAddedStmts(event *org.OrgAddedEvent) []handler.Statement
 				Name:  stateColName,
 				Value: domain.OrgStateActive,
 			},
-		}, event.PreviousSequence()),
+		},
+			event.Sequence(),
+			event.PreviousSequence(),
+		),
 	}
 }
 
@@ -140,6 +145,7 @@ func (h *OrgHandler) orgChangedStmts(event *org.OrgChangedEvent) []handler.State
 				},
 			},
 			values,
+			event.Sequence(),
 			event.PreviousSequence(),
 		),
 	}
@@ -169,6 +175,7 @@ func (h *OrgHandler) orgReactivatedStmts(event *org.OrgReactivatedEvent) []handl
 					Value: domain.OrgStateActive,
 				},
 			},
+			event.Sequence(),
 			event.PreviousSequence(),
 		),
 	}
@@ -198,6 +205,7 @@ func (h *OrgHandler) orgDeactivatedStmts(event *org.OrgDeactivatedEvent) []handl
 					Value: domain.OrgStateInactive,
 				},
 			},
+			event.Sequence(),
 			event.PreviousSequence(),
 		),
 	}
@@ -227,6 +235,7 @@ func (h *OrgHandler) orgPrimaryDomainStmts(event *org.DomainPrimarySetEvent) []h
 					Value: event.Domain,
 				},
 			},
+			event.Sequence(),
 			event.PreviousSequence(),
 		),
 	}

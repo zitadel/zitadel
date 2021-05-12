@@ -3,7 +3,10 @@ package crdb
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
 
@@ -41,24 +44,43 @@ func (h *StatementHandler) Unlock() error {
 }
 
 func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement) error {
+	if len(stmts) == 0 {
+		return nil
+	}
+
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, stmt := range stmts {
-		currentSeq, err := stmt.CurrentSequence(tx, h.sequenceTable)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		if stmt.PreviousSequence < currentSeq {
+	currentSeq, err := h.currentSequence(tx, stmts[0])
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	lastSuccessfulIdx := -1
+
+	for i, stmt := range stmts {
+		start := time.Now()
+		if stmt.PreviousSequence > 0 && stmt.PreviousSequence < currentSeq {
 			continue
 		}
 		if stmt.PreviousSequence > currentSeq {
 			break
 		}
-		if err := executeStmt(tx, stmt); err != nil {
+		if err = executeStmt(tx, stmt); err != nil {
+			break
+		}
+		currentSeq = stmt.Sequence
+		lastSuccessfulIdx = i
+		logging.LogWithFields("HANDL-j5vuD", "start", start, "end", time.Now(), "diff", time.Now().Sub(start), "iter", i).Warn("stmt")
+	}
+
+	if lastSuccessfulIdx >= 0 {
+		err = h.updateCurrentSequence(tx, stmts[lastSuccessfulIdx])
+		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
@@ -67,29 +89,49 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 }
 
 //executeStmt handles sql statements
-// the transaction is closed properly if an error occurres
+//an error is returned if the statement could not be inserted properly
 func executeStmt(tx *sql.Tx, stmt handler.Statement) error {
-	_, err := tx.Query("SAVEPOINT push_stmts")
+	_, err := tx.Query("SAVEPOINT push_stmt")
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 	err = stmt.Execute(tx)
 	if err != nil {
-		_, err = tx.Query("ROLLBACK TO SAVEPOINT push_stmts")
-		if err != nil {
-			tx.Rollback()
-			return err
+		_, rollbackErr := tx.Query("ROLLBACK TO SAVEPOINT push_stmt")
+		if rollbackErr != nil {
+			return rollbackErr
 		}
-		err = tx.Commit()
-		if err != nil {
-			return err
-		}
-	}
-	_, err = tx.Query("RELEASE push_stmt")
-	if err != nil {
-		tx.Rollback()
 		return err
 	}
-	return nil
+	_, err = tx.Query("RELEASE push_stmt")
+	return err
+}
+
+const currentSequenceFormat = `with seq as (select current_sequence from %s where view_name = $1 FOR UPDATE)
+select 
+    if(
+        count(current_sequence) > 0, 
+        (select current_sequence from seq),
+        0
+    ) 
+from seq`
+
+func (h *StatementHandler) currentSequence(tx *sql.Tx, stmt handler.Statement) (seq uint64, _ error) {
+	row := tx.QueryRow(fmt.Sprintf(currentSequenceFormat, h.sequenceTable), stmt.TableName)
+	if row.Err() != nil {
+		return 0, row.Err()
+	}
+
+	if err := row.Scan(&seq); err != nil {
+		return 0, err
+	}
+
+	return seq, nil
+}
+
+const upsertCurrentSequenceFormat = `UPSERT INTO %s (view_name, current_sequence, timestamp) VALUES ($1, $2, NOW())`
+
+func (h *StatementHandler) updateCurrentSequence(tx *sql.Tx, stmt handler.Statement) error {
+	_, err := tx.Exec(fmt.Sprintf(upsertCurrentSequenceFormat, h.sequenceTable), stmt.TableName, stmt.Sequence)
+	return err
 }

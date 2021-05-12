@@ -50,18 +50,17 @@ Queries:
       Key: $CR_EVENTSTORE_KEY
 
 ReadModels:
-  SQL:
-    Host: $ZITADEL_EVENTSTORE_HOST
-    Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'authz'
-    Database: 'zitadel'
-    Schema: 'read_models'
-    Password: $CR_AUTHZ_PASSWORD
-    SSL:
-      Mode: $CR_SSL_MODE
-      RootCert: $CR_ROOT_CERT
-      Cert: $CR_AUTHZ_CERT
-      Key: $CR_AUTHZ_KEY
+  Host: $ZITADEL_EVENTSTORE_HOST
+  Port: $ZITADEL_EVENTSTORE_PORT
+  User: 'authz'
+  Database: 'zitadel'
+  Schema: 'read_models'
+  Password: $CR_AUTHZ_PASSWORD
+  SSL:
+    Mode: $CR_SSL_MODE
+    RootCert: $CR_ROOT_CERT
+    Cert: $CR_AUTHZ_CERT
+    Key: $CR_AUTHZ_KEY
 
 AuthZ:
   Repository:
