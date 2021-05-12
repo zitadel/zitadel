@@ -10,13 +10,11 @@ type Handler struct {
 	EventQueue chan eventstore.EventReader
 }
 
-func NewHandler(es *eventstore.Eventstore) *Handler {
-	h := Handler{
+func NewHandler(es *eventstore.Eventstore) Handler {
+	return Handler{
 		Eventstore: es,
 		EventQueue: make(chan eventstore.EventReader, 100),
 	}
-
-	return &h
 }
 
 func (h Handler) Subscribe(aggregates ...eventstore.AggregateType) {

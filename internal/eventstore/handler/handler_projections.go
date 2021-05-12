@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-type ReadModelHandler struct {
+type ProjectionHandler struct {
 	Handler
 	RequeueAfter  time.Duration
 	Timer         *time.Timer
@@ -21,29 +21,42 @@ type ReadModelHandler struct {
 	shouldPush chan *struct{}
 }
 
-func NewReadModelHandler(
+func NewProjectionHandler(
 	eventstore *eventstore.Eventstore,
 	requeueAfter time.Duration,
-) *ReadModelHandler {
-	return &ReadModelHandler{
-		Handler:      *NewHandler(eventstore),
+) *ProjectionHandler {
+	return &ProjectionHandler{
+		Handler:      NewHandler(eventstore),
 		RequeueAfter: requeueAfter,
-		// first requeue is instant on startup
+		// first bulk is instant on startup
 		Timer:      time.NewTimer(0),
 		shouldPush: make(chan *struct{}, 1),
 	}
 }
 
-func (h *ReadModelHandler) ResetTimer() {
+func (h *ProjectionHandler) ResetTimer() {
 	h.Timer.Reset(h.RequeueAfter)
 }
 
+//Update updates the projection with the given statements
 type Update func(context.Context, []Statement) error
+
+//Reduce reduces the given event to a statement
+//which is used to update the projection
 type Reduce func(eventstore.EventReader) ([]Statement, error)
+
+//Lock is used for mutex handling if needed on the projection
 type Lock func() error
+
+//Unlock releases the mutex of the projection
 type Unlock func() error
 
-func (h *ReadModelHandler) Process(
+//Process waits for several conditions:
+// if context is canceled the function gracefully shuts down
+// if an event occures it reduces the event
+// if the internal timer expires the handler will check
+// 	for unprocessed events on eventstore
+func (h *ProjectionHandler) Process(
 	ctx context.Context,
 	reduce Reduce,
 	update Update,
@@ -54,6 +67,9 @@ func (h *ReadModelHandler) Process(
 	for {
 		select {
 		case <-ctx.Done():
+			if h.pushSet {
+				h.push(context.Background(), update)
+			}
 			h.shutdown()
 			return
 		case event := <-h.Handler.EventQueue:
@@ -68,6 +84,9 @@ func (h *ReadModelHandler) Process(
 		// allow push
 		select {
 		case <-ctx.Done():
+			if h.pushSet {
+				h.push(context.Background(), update)
+			}
 			h.shutdown()
 			return
 		case event := <-h.Handler.EventQueue:
@@ -82,7 +101,7 @@ func (h *ReadModelHandler) Process(
 	}
 }
 
-func (h *ReadModelHandler) processEvent(ctx context.Context, event eventstore.EventReader, reduce Reduce) {
+func (h *ProjectionHandler) processEvent(ctx context.Context, event eventstore.EventReader, reduce Reduce) {
 	stmts, err := reduce(event)
 	if err != nil {
 		logging.Log("EVENT-PTr4j").WithError(err).Warn("unable to process event")
@@ -100,7 +119,7 @@ func (h *ReadModelHandler) processEvent(ctx context.Context, event eventstore.Ev
 	}
 }
 
-func (h *ReadModelHandler) bulk(ctx context.Context, lock Lock, query *eventstore.SearchQueryBuilder, reduce Reduce, update Update, unlock Unlock) {
+func (h *ProjectionHandler) bulk(ctx context.Context, lock Lock, query *eventstore.SearchQueryBuilder, reduce Reduce, update Update, unlock Unlock) {
 	start := time.Now()
 	if err := lock(); err != nil {
 		logging.Log("EVENT-G76ye").WithError(err).Info("unable to lock")
@@ -123,7 +142,7 @@ func (h *ReadModelHandler) bulk(ctx context.Context, lock Lock, query *eventstor
 	logging.LogWithFields("HANDL-MDgQc", "start", start, "end", time.Now(), "diff", time.Now().Sub(start)).Warn("bulk")
 }
 
-func (h *ReadModelHandler) push(ctx context.Context, update Update) {
+func (h *ProjectionHandler) push(ctx context.Context, update Update) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 
@@ -138,7 +157,7 @@ func (h *ReadModelHandler) push(ctx context.Context, update Update) {
 	h.stmts = nil
 }
 
-func (h *ReadModelHandler) shutdown() {
+func (h *ProjectionHandler) shutdown() {
 	h.Sub.Unsubscribe()
 	logging.Log("EVENT-XG5Og").Info("stop processing")
 }
