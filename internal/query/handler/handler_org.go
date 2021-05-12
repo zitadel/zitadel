@@ -24,7 +24,7 @@ const (
 )
 
 type OrgHandler struct {
-	handler.ReadModelHandler
+	handler.ProjectionHandler
 	crdb.StatementHandler
 
 	TableName string
@@ -36,7 +36,7 @@ func NewOrgHandler(
 	client *sql.DB,
 ) *OrgHandler {
 	h := &OrgHandler{
-		ReadModelHandler: *handler.NewReadModelHandler(es, 1*time.Minute),
+		ProjectionHandler: *handler.NewProjectionHandler(es, 1*time.Minute),
 		StatementHandler: crdb.NewStatementHandler(
 			client,
 			"read_models.orgs",
@@ -45,7 +45,7 @@ func NewOrgHandler(
 		),
 		TableName: "read_models.orgs",
 	}
-	go h.ReadModelHandler.Process(
+	go h.ProjectionHandler.Process(
 		ctx,
 		h.reduce,
 		h.StatementHandler.Update,
@@ -54,7 +54,7 @@ func NewOrgHandler(
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "org"),
 	)
 
-	h.ReadModelHandler.Handler.Subscribe("orgs")
+	h.ProjectionHandler.Handler.Subscribe("orgs")
 
 	return h
 }
