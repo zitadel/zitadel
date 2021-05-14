@@ -36,12 +36,17 @@ func NewOrgHandler(
 	client *sql.DB,
 ) *OrgHandler {
 	h := &OrgHandler{
-		ProjectionHandler: *handler.NewProjectionHandler(es, 1*time.Minute),
+		ProjectionHandler: *handler.NewProjectionHandler(
+			es,
+			30*time.Second,
+		),
 		StatementHandler: crdb.NewStatementHandler(
 			client,
 			"projections.orgs",
 			"projections.current_sequences",
 			"projections.locks",
+			10,
+			"org",
 		),
 		TableName: "projections.orgs",
 	}
@@ -51,10 +56,11 @@ func NewOrgHandler(
 		h.StatementHandler.Update,
 		h.StatementHandler.Lock,
 		h.StatementHandler.Unlock,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "org"),
+		//TODO: build query as function
+		h.StatementHandler.SearchQuery,
 	)
 
-	h.ProjectionHandler.Handler.Subscribe("orgs")
+	h.ProjectionHandler.Handler.Subscribe("org")
 
 	return h
 }
