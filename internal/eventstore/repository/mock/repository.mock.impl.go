@@ -24,6 +24,11 @@ func (m *MockRepository) ExpectFilterEvents(events ...*repository.Event) *MockRe
 	return m
 }
 
+func (m *MockRepository) ExpectFilterEventsError(err error) *MockRepository {
+	m.EXPECT().Filter(gomock.Any(), gomock.Any()).Return(nil, err)
+	return m
+}
+
 func (m *MockRepository) ExpectPush(expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
 	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
 		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {

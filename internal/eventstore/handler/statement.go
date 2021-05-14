@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,8 +13,19 @@ type Statement struct {
 	PreviousSequence uint64
 	TableName        string
 
-	execute func(*sql.Tx) error
+	execute func(executer) error
 }
+
+type executer interface {
+	Exec(string, ...interface{}) (sql.Result, error)
+}
+
+var (
+	ErrNoTable      = errors.New("no table")
+	ErrPrevSeqGtSeq = errors.New("prev seq >= seq")
+	ErrNoValues     = errors.New("no values")
+	ErrNoCondition  = errors.New("no condition")
+)
 
 func NewCreateStatement(table string, values []Column, sequence, previousSequence uint64) Statement {
 	cols, params, args := columnsToQuery(values)
@@ -23,16 +35,25 @@ func NewCreateStatement(table string, values []Column, sequence, previousSequenc
 		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(tx *sql.Tx) error {
+		execute: func(tx executer) error {
+			if table == "" {
+				return ErrNoTable
+			}
+			if previousSequence >= sequence {
+				return ErrPrevSeqGtSeq
+			}
+			if len(values) == 0 {
+				return ErrNoValues
+			}
 			_, err := tx.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewUpdateStatement(table string, pk []Column, values []Column, sequence, previousSequence uint64) Statement {
+func NewUpdateStatement(table string, conditions []Column, values []Column, sequence, previousSequence uint64) Statement {
 	cols, params, args := columnsToQuery(values)
-	wheres, whereArgs := columnsToWhere(pk, len(params))
+	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
 	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE %s", table, strings.Join(cols, ", "), strings.Join(params, ", "), strings.Join(wheres, " AND "))
 
@@ -40,7 +61,19 @@ func NewUpdateStatement(table string, pk []Column, values []Column, sequence, pr
 		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(tx *sql.Tx) error {
+		execute: func(tx executer) error {
+			if table == "" {
+				return ErrNoTable
+			}
+			if previousSequence >= sequence {
+				return ErrPrevSeqGtSeq
+			}
+			if len(values) == 0 {
+				return ErrNoValues
+			}
+			if len(conditions) == 0 {
+				return ErrNoCondition
+			}
 			_, err := tx.Exec(query, args...)
 			return err
 		},
@@ -55,7 +88,16 @@ func NewDeleteStatement(table string, conditions []Column, sequence, previousSeq
 		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(tx *sql.Tx) error {
+		execute: func(tx executer) error {
+			if table == "" {
+				return ErrNoTable
+			}
+			if previousSequence >= sequence {
+				return ErrPrevSeqGtSeq
+			}
+			if len(conditions) == 0 {
+				return ErrNoCondition
+			}
 			_, err := tx.Exec(query, args...)
 			return err
 		},
@@ -70,7 +112,7 @@ func NewNoOpStatement(table string, sequence, previousSequence uint64) Statement
 	}
 }
 
-func (stmt *Statement) Execute(tx *sql.Tx) error {
+func (stmt *Statement) Execute(tx executer) error {
 	if stmt.execute == nil {
 		return nil
 	}
