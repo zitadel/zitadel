@@ -9,60 +9,67 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
-func testSetColumns(columns Columns) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-		factory = factory.Columns(columns)
-		return factory
+func testSetColumns(columns Columns) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.Columns(columns)
+		return builder
 	}
 }
 
-func testSetLimit(limit uint64) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-		factory = factory.Limit(limit)
-		return factory
+func testSetLimit(limit uint64) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.Limit(limit)
+		return builder
 	}
 }
 
-func testSetSequence(sequence uint64) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-		factory = factory.SequenceGreater(sequence)
-		return factory
+func testSetSequenceGreater(sequence uint64) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.SequenceGreater(sequence)
+		return builder
 	}
 }
 
-func testSetAggregateIDs(aggregateIDs ...string) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-		factory = factory.AggregateIDs(aggregateIDs...)
-		return factory
+func testSetSequenceLess(sequence uint64) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.SequenceLess(sequence)
+		return builder
 	}
 }
 
-func testSetEventTypes(eventTypes ...EventType) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-		factory = factory.EventTypes(eventTypes...)
-		return factory
+func testSetAggregateIDs(aggregateIDs ...string) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.AggregateIDs(aggregateIDs...)
+		return builder
 	}
 }
 
-func testSetResourceOwner(resourceOwner string) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-		factory = factory.ResourceOwner(resourceOwner)
-		return factory
+func testSetEventTypes(eventTypes ...EventType) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.EventTypes(eventTypes...)
+		return builder
 	}
 }
 
-func testSetSortOrder(asc bool) func(factory *SearchQueryBuilder) *SearchQueryBuilder {
-	return func(factory *SearchQueryBuilder) *SearchQueryBuilder {
+func testSetResourceOwner(resourceOwner string) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.ResourceOwner(resourceOwner)
+		return builder
+	}
+}
+
+func testSetSortOrder(asc bool) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 		if asc {
-			factory = factory.OrderAsc()
+			builder = builder.OrderAsc()
 		} else {
-			factory = factory.OrderDesc()
+			builder = builder.OrderDesc()
 		}
-		return factory
+		return builder
 	}
 }
 
-func TestSearchQueryFactorySetters(t *testing.T) {
+func TestSearchQuerybuilderSetters(t *testing.T) {
 	type args struct {
 		columns        Columns
 		aggregateTypes []AggregateType
@@ -74,7 +81,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 		res  *SearchQueryBuilder
 	}{
 		{
-			name: "New factory",
+			name: "New builder",
 			args: args{
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user", "org"},
@@ -103,12 +110,21 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 			},
 		},
 		{
-			name: "set sequence",
+			name: "set sequence greater",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetSequence(90)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetSequenceGreater(90)},
 			},
 			res: &SearchQueryBuilder{
-				eventSequence: 90,
+				eventSequenceGreater: 90,
+			},
+		},
+		{
+			name: "set sequence less",
+			args: args{
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetSequenceLess(90)},
+			},
+			res: &SearchQueryBuilder{
+				eventSequenceLess: 90,
 			},
 		},
 		{
@@ -153,18 +169,18 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryBuilder(tt.args.columns, tt.args.aggregateTypes...)
+			builder := NewSearchQueryBuilder(tt.args.columns, tt.args.aggregateTypes...)
 			for _, setter := range tt.args.setters {
-				factory = setter(factory)
+				builder = setter(builder)
 			}
-			if !reflect.DeepEqual(factory, tt.res) {
-				t.Errorf("NewSearchQueryFactory() = %v, want %v", factory, tt.res)
+			if !reflect.DeepEqual(builder, tt.res) {
+				t.Errorf("NewSearchQuerybuilder() = %v, want %v", builder, tt.res)
 			}
 		})
 	}
 }
 
-func TestSearchQueryFactoryBuild(t *testing.T) {
+func TestSearchQuerybuilderBuild(t *testing.T) {
 	type args struct {
 		columns        Columns
 		aggregateTypes []AggregateType
@@ -263,7 +279,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetLimit(5),
 					testSetSortOrder(false),
-					testSetSequence(100),
+					testSetSequenceGreater(100),
 				},
 			},
 			res: res{
@@ -287,7 +303,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetLimit(5),
 					testSetSortOrder(true),
-					testSetSequence(100),
+					testSetSequenceGreater(100),
 				},
 			},
 			res: res{
@@ -311,7 +327,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testSetLimit(5),
 					testSetSortOrder(false),
-					testSetSequence(100),
+					testSetSequenceGreater(100),
 					testSetColumns(repository.ColumnsMaxSequence),
 				},
 			},
@@ -378,7 +394,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				columns:        ColumnsEvent,
 				aggregateTypes: []AggregateType{"user"},
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testSetSequence(8),
+					testSetSequenceGreater(8),
 				},
 			},
 			res: res{
@@ -461,6 +477,30 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			},
 		},
 		{
+			name: "filter aggregate type and sequence between",
+			args: args{
+				columns:        ColumnsEvent,
+				aggregateTypes: []AggregateType{"user"},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+					testSetSequenceGreater(8),
+					testSetSequenceLess(16),
+				},
+			},
+			res: res{
+				isErr: nil,
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    false,
+					Limit:   0,
+					Filters: []*repository.Filter{
+						repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+						repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
+						repository.NewFilter(repository.FieldSequence, uint64(16), repository.OperationLess),
+					},
+				},
+			},
+		},
+		{
 			name: "column invalid",
 			args: args{
 				columns:        Columns(-1),
@@ -473,11 +513,11 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryBuilder(tt.args.columns, tt.args.aggregateTypes...)
+			builder := NewSearchQueryBuilder(tt.args.columns, tt.args.aggregateTypes...)
 			for _, f := range tt.args.setters {
-				factory = f(factory)
+				builder = f(builder)
 			}
-			query, err := factory.build()
+			query, err := builder.build()
 			if tt.res.isErr != nil && !tt.res.isErr(err) {
 				t.Errorf("wrong error(%T): %v", err, err)
 				return
@@ -488,7 +528,7 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(query, tt.res.query) {
-				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", factory, tt.res.query)
+				t.Errorf("NewSearchQuerybuilder() = %+v, want %+v", builder, tt.res.query)
 			}
 		})
 	}
