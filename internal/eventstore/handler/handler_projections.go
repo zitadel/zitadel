@@ -123,10 +123,8 @@ func (h *ProjectionHandler) processEvent(ctx context.Context, event eventstore.E
 func (h *ProjectionHandler) bulk(ctx context.Context, lock Lock, query SearchQuery, reduce Reduce, update Update, unlock Unlock) {
 	ctx, cancel := context.WithCancel(ctx)
 	errs := make(chan error)
-	moreEvents := make(chan *struct{}, 1)
 	defer func() {
 		cancel()
-		close(moreEvents)
 		close(errs)
 	}()
 
@@ -149,48 +147,50 @@ func (h *ProjectionHandler) bulk(ctx context.Context, lock Lock, query SearchQue
 		}
 	}()
 
-	moreEvents <- nil
-
 	//TODO: find solution without label
 eventHandling:
 	for {
 		select {
 		case <-ctx.Done():
 			break eventHandling
-		case <-moreEvents:
-			eventQuery, maxEvents, err := query()
-			if err != nil {
-				logging.Log("HANDL-x6qvs").WithError(err).Warn("unable to create event query")
-				return
-			}
-			events, err := h.Eventstore.FilterEvents(ctx, eventQuery)
-			if err != nil {
-				logging.Log("EVENT-ACMMS").WithError(err).Info("Unable to filter events in batch job")
+		default:
+			hasLimitExeeded, err := h.prepareBulkStmts(ctx, query, reduce)
+			if err != nil || len(h.stmts) == 0 {
 				break eventHandling
-			}
-			for _, event := range events {
-				h.processEvent(ctx, event, reduce)
 			}
 
-			if len(h.stmts) == 0 {
-				break eventHandling
-			}
 			<-h.shouldPush
 			if err = h.push(ctx, update, reduce); err != nil {
 				logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
 				break eventHandling
 			}
 
-			if len(events) < int(maxEvents) {
+			if !hasLimitExeeded {
 				break eventHandling
 			}
-			moreEvents <- nil
-		default:
-			break eventHandling
 		}
 	}
 	err := unlock()
 	logging.Log("EVENT-boPv1").OnError(err).Warn("unable to unlock")
+}
+
+func (h *ProjectionHandler) prepareBulkStmts(ctx context.Context, query SearchQuery, reduce Reduce) (limitExeeded bool, err error) {
+	eventQuery, eventsLimit, err := query()
+	if err != nil {
+		logging.Log("HANDL-x6qvs").WithError(err).Warn("unable to create event query")
+		return false, err
+	}
+
+	events, err := h.Eventstore.FilterEvents(ctx, eventQuery)
+	if err != nil {
+		logging.Log("EVENT-ACMMS").WithError(err).Info("Unable to filter events in batch job")
+		return false, err
+	}
+	for _, event := range events {
+		h.processEvent(ctx, event, reduce)
+	}
+
+	return len(events) == int(eventsLimit), nil
 }
 
 func (h *ProjectionHandler) push(ctx context.Context, update Update, reduce Reduce) error {

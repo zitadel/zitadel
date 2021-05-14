@@ -65,10 +65,6 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 // }
 
 func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement, reduce handler.Reduce) error {
-	if len(stmts) == 0 {
-		return nil
-	}
-
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -81,7 +77,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 	}
 
 	//checks for events between create statement and current sequence
-	// because there could be events between current sequence and the creation event
+	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
 	if stmts[0].PreviousSequence == 0 {
 		previousStmts, err := h.preparePreviousStmts(ctx, stmts[0].Sequence, currentSeq, reduce)
@@ -91,23 +87,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		stmts = append(previousStmts, stmts...)
 	}
 
-	lastSuccessfulIdx := -1
-	for i, stmt := range stmts {
-		if stmt.PreviousSequence > 0 && stmt.PreviousSequence < currentSeq {
-			continue
-		}
-		if stmt.PreviousSequence > currentSeq {
-			break
-		}
-		if err = executeStmt(tx, stmt); err != nil {
-			//TODO: insert into error view
-			//TODO: should we retry because nothing will change
-			logging.LogWithFields("CRDB-wS8Ns", "seq", stmt.Sequence, "projection", stmt.TableName).WithError(err).Warn("unable to execute statement")
-			break
-		}
-		currentSeq = stmt.Sequence
-		lastSuccessfulIdx = i
-	}
+	lastSuccessfulIdx := executeStmts(tx, stmts, currentSeq)
 
 	if lastSuccessfulIdx >= 0 {
 		seqErr := h.updateCurrentSequence(tx, stmts[lastSuccessfulIdx])
@@ -138,6 +118,27 @@ func (h *StatementHandler) preparePreviousStmts(ctx context.Context, stmtSeq, cu
 		}
 	}
 	return previousStmts, nil
+}
+
+func executeStmts(tx *sql.Tx, stmts []handler.Statement, currentSeq uint64) int {
+	lastSuccessfulIdx := -1
+	for i, stmt := range stmts {
+		if stmt.PreviousSequence > 0 && stmt.PreviousSequence < currentSeq {
+			continue
+		}
+		if stmt.PreviousSequence > currentSeq {
+			break
+		}
+		if err := executeStmt(tx, stmt); err != nil {
+			//TODO: insert into error view
+			//TODO: should we retry because nothing will change
+			logging.LogWithFields("CRDB-wS8Ns", "seq", stmt.Sequence, "projection", stmt.TableName).WithError(err).Warn("unable to execute statement")
+			break
+		}
+		currentSeq = stmt.Sequence
+		lastSuccessfulIdx = i
+	}
+	return lastSuccessfulIdx
 }
 
 //executeStmt handles sql statements
