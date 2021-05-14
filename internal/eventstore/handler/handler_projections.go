@@ -39,7 +39,7 @@ func (h *ProjectionHandler) ResetTimer() {
 }
 
 //Update updates the projection with the given statements
-type Update func(context.Context, []Statement) error
+type Update func(context.Context, []Statement, Reduce) error
 
 //Reduce reduces the given event to a statement
 //which is used to update the projection
@@ -52,7 +52,7 @@ type Lock func(context.Context, chan error, time.Duration)
 type Unlock func() error
 
 //SearchQuery generates the search query to lookup for events
-type SearchQuery func() (query *eventstore.SearchQueryBuilder, maxEvents uint64, err error)
+type SearchQuery func() (query *eventstore.SearchQueryBuilder, queryLimit uint64, err error)
 
 //Process waits for several conditions:
 // if context is canceled the function gracefully shuts down
@@ -71,7 +71,7 @@ func (h *ProjectionHandler) Process(
 		select {
 		case <-ctx.Done():
 			if h.pushSet {
-				h.push(context.Background(), update)
+				h.push(context.Background(), update, reduce)
 			}
 			h.shutdown()
 			return
@@ -85,7 +85,7 @@ func (h *ProjectionHandler) Process(
 			select {
 			case <-ctx.Done():
 				if h.pushSet {
-					h.push(context.Background(), update)
+					h.push(context.Background(), update, reduce)
 				}
 				h.shutdown()
 				return
@@ -95,7 +95,7 @@ func (h *ProjectionHandler) Process(
 				h.bulk(ctx, lock, query, reduce, update, unlock)
 				h.ResetTimer()
 			case <-h.shouldPush:
-				h.push(ctx, update)
+				h.push(ctx, update, reduce)
 				h.ResetTimer()
 			}
 		}
@@ -142,7 +142,7 @@ func (h *ProjectionHandler) bulk(ctx context.Context, lock Lock, query SearchQue
 		case err := <-errs:
 			if err != nil {
 				logging.Log("HANDL-cVop2").WithError(err).Warn("bulk canceled")
-				cancel()
+				return
 			}
 		case <-ctx.Done():
 			return
@@ -176,7 +176,7 @@ eventHandling:
 				break eventHandling
 			}
 			<-h.shouldPush
-			if err = h.push(ctx, update); err != nil {
+			if err = h.push(ctx, update, reduce); err != nil {
 				logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
 				break eventHandling
 			}
@@ -193,12 +193,12 @@ eventHandling:
 	logging.Log("EVENT-boPv1").OnError(err).Warn("unable to unlock")
 }
 
-func (h *ProjectionHandler) push(ctx context.Context, update Update) error {
+func (h *ProjectionHandler) push(ctx context.Context, update Update, reduce Reduce) error {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 
 	h.pushSet = false
-	err := update(ctx, h.stmts)
+	err := update(ctx, h.stmts, reduce)
 	h.stmts = nil
 	if err != nil {
 		return err

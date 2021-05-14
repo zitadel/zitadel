@@ -42,6 +42,7 @@ func NewOrgHandler(
 		),
 		StatementHandler: crdb.NewStatementHandler(
 			client,
+			es,
 			"projections.orgs",
 			"projections.current_sequences",
 			"projections.locks",

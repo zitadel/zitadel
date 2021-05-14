@@ -18,6 +18,7 @@ type StatementHandler struct {
 	viewName      string
 	sequenceTable string
 	client        *sql.DB
+	eventstore    *eventstore.Eventstore
 	aggregates    []eventstore.AggregateType
 
 	workerName string
@@ -40,6 +41,7 @@ const (
 
 func NewStatementHandler(
 	client *sql.DB,
+	es *eventstore.Eventstore,
 	viewName,
 	sequenceTable,
 	lockTable string,
@@ -54,6 +56,7 @@ func NewStatementHandler(
 
 	return StatementHandler{
 		client:        client,
+		eventstore:    es,
 		viewName:      viewName,
 		sequenceTable: sequenceTable,
 		workerName:    workerName,
@@ -115,7 +118,7 @@ func (h *StatementHandler) Unlock() error {
 	return err
 }
 
-func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement) error {
+func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement, reduce handler.Reduce) error {
 	if len(stmts) == 0 {
 		return nil
 	}
@@ -133,7 +136,23 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 
 	lastSuccessfulIdx := -1
 
-	//TODO: if stmts[0].PreviousSequence == 0 add stmts for for events beween currentSeq and stmts[0].Sequence before first
+	//checks for events between create statement and current sequence
+	// because there could be events between current sequence and the creation event
+	// and we cannot check via stmt.PreviousSequence
+	if stmts[0].PreviousSequence == 0 {
+		query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(currentSeq).SequenceLess(stmts[0].Sequence)
+		events, err := h.eventstore.FilterEvents(ctx, query)
+		if err != nil {
+			return err
+		}
+		for _, event := range events {
+			additionalStmts, err := reduce(event)
+			if err != nil {
+				return err
+			}
+			stmts = append(additionalStmts, stmts...)
+		}
+	}
 
 	for i, stmt := range stmts {
 		if stmt.PreviousSequence > 0 && stmt.PreviousSequence < currentSeq {
