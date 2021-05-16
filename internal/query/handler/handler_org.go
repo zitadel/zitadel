@@ -57,7 +57,6 @@ func NewOrgHandler(
 		h.StatementHandler.Update,
 		h.StatementHandler.Lock,
 		h.StatementHandler.Unlock,
-		//TODO: build query as function
 		h.StatementHandler.SearchQuery,
 	)
 
