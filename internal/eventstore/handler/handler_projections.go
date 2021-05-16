@@ -17,7 +17,7 @@ type Update func(context.Context, []Statement, Reduce) error
 type Reduce func(eventstore.EventReader) ([]Statement, error)
 
 //Lock is used for mutex handling if needed on the projection
-type Lock func(context.Context, chan error, time.Duration)
+type Lock func(context.Context, time.Duration) <-chan error
 
 //Unlock releases the mutex of the projection
 type Unlock func() error
@@ -35,22 +35,11 @@ type ProjectionHandler struct {
 	stmts      []Statement
 	pushSet    bool
 	shouldPush chan *struct{}
-
-	reduce Reduce
-	update Update
-	lock   Lock
-	unlock Unlock
-	query  SearchQuery
 }
 
 func NewProjectionHandler(
 	eventstore *eventstore.Eventstore,
 	requeueAfter time.Duration,
-	reduce Reduce,
-	update Update,
-	lock Lock,
-	unlock Unlock,
-	query SearchQuery,
 ) *ProjectionHandler {
 	return &ProjectionHandler{
 		Handler:      NewHandler(eventstore),
@@ -70,45 +59,57 @@ func (h *ProjectionHandler) ResetTimer() {
 // if an event occures it reduces the event
 // if the internal timer expires the handler will check
 // for unprocessed events on eventstore
-func (h *ProjectionHandler) Process(ctx context.Context) {
+func (h *ProjectionHandler) Process(
+	ctx context.Context,
+	reduce Reduce,
+	update Update,
+	lock Lock,
+	unlock Unlock,
+	query SearchQuery,
+) {
+	execBulk := h.prepareExecuteBulk(query, reduce, update)
 	for {
 		select {
 		case <-ctx.Done():
 			if h.pushSet {
-				h.push(context.Background())
+				h.push(context.Background(), update, reduce)
 			}
 			h.shutdown()
 			return
 		case event := <-h.Handler.EventQueue:
-			h.processEvent(ctx, event)
+			h.processEvent(ctx, event, reduce)
 		case <-h.Timer.C:
-			h.bulk(ctx)
+			h.bulk(ctx, lock, execBulk, unlock)
 			h.ResetTimer()
 		default:
 			//lower prio select with push
 			select {
 			case <-ctx.Done():
 				if h.pushSet {
-					h.push(context.Background())
+					h.push(context.Background(), update, reduce)
 				}
 				h.shutdown()
 				return
 			case event := <-h.Handler.EventQueue:
-				h.processEvent(ctx, event)
+				h.processEvent(ctx, event, reduce)
 			case <-h.Timer.C:
 				// lock, h.prepareBulk(query, reduce, update), unlock
-				h.bulk(ctx)
+				h.bulk(ctx, lock, execBulk, unlock)
 				h.ResetTimer()
 			case <-h.shouldPush:
-				h.push(ctx)
+				h.push(ctx, update, reduce)
 				h.ResetTimer()
 			}
 		}
 	}
 }
 
-func (h *ProjectionHandler) processEvent(ctx context.Context, event eventstore.EventReader) error {
-	stmts, err := h.reduce(event)
+func (h *ProjectionHandler) processEvent(
+	ctx context.Context,
+	event eventstore.EventReader,
+	reduce Reduce,
+) error {
+	stmts, err := reduce(event)
 	if err != nil {
 		logging.Log("EVENT-PTr4j").WithError(err).Warn("unable to process event")
 		return err
@@ -126,68 +127,90 @@ func (h *ProjectionHandler) processEvent(ctx context.Context, event eventstore.E
 	return nil
 }
 
-func (h *ProjectionHandler) bulk(ctx context.Context) {
+func (h *ProjectionHandler) bulk(
+	ctx context.Context,
+	lock Lock,
+	executeBulk executeBulk,
+	unlock Unlock,
+) error {
 	ctx, cancel := context.WithCancel(ctx)
-	errs := make(chan error)
-	defer func() {
-		cancel()
-		close(errs)
-	}()
+	defer cancel()
 
-	h.lock(ctx, errs, h.RequeueAfter)
-	//wait until projection is locked
-	if err := <-errs; err != nil {
-		logging.Log("HANDL-XDJ4i").WithError(err).Warn("initial lock failed")
-		return
+	errs := lock(ctx, h.RequeueAfter)
+	//wait until projection is locked or ctx canceled
+	if err, ok := <-errs; err != nil || !ok {
+		logging.Log("HANDL-XDJ4i").OnError(err).Warn("initial lock failed")
+		return err
 	}
-
 	go cancelOnErr(ctx, errs, cancel)
 
-	h.executeBulk(ctx)
+	execErr := executeBulk(ctx)
 
-	err := h.unlock()
-	logging.Log("EVENT-boPv1").OnError(err).Warn("unable to unlock")
+	unlockErr := unlock()
+	logging.Log("EVENT-boPv1").OnError(unlockErr).Warn("unable to unlock")
+
+	if execErr != nil {
+		return execErr
+	}
+
+	return unlockErr
 }
 
-func cancelOnErr(ctx context.Context, errs chan error, cancel func()) {
-	select {
-	case err := <-errs:
-		if err != nil {
-			logging.Log("HANDL-cVop2").WithError(err).Warn("bulk canceled")
+func cancelOnErr(ctx context.Context, errs <-chan error, cancel func()) {
+	for {
+		select {
+		case err := <-errs:
+			if err != nil {
+				logging.Log("HANDL-cVop2").WithError(err).Warn("bulk canceled")
+				cancel()
+				return
+			}
+		case <-ctx.Done():
 			cancel()
 			return
 		}
-	case <-ctx.Done():
-		return
+
 	}
 }
 
-func (h *ProjectionHandler) executeBulk(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			hasLimitExeeded, err := h.prepareBulkStmts(ctx)
-			if err != nil || len(h.stmts) == 0 {
-				return
-			}
+type executeBulk func(ctx context.Context) error
 
-			<-h.shouldPush
-			if err = h.push(ctx); err != nil {
-				logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
-				return
-			}
+func (h *ProjectionHandler) prepareExecuteBulk(
+	query SearchQuery,
+	reduce Reduce,
+	update Update,
+) executeBulk {
+	return func(ctx context.Context) error {
+		for {
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+				hasLimitExeeded, err := h.fetchBulkStmts(ctx, query, reduce)
+				if err != nil || len(h.stmts) == 0 {
+					return err
+				}
 
-			if !hasLimitExeeded {
-				return
+				<-h.shouldPush
+				if err = h.push(ctx, update, reduce); err != nil {
+					logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
+					return err
+				}
+
+				if !hasLimitExeeded {
+					return nil
+				}
 			}
 		}
 	}
 }
 
-func (h *ProjectionHandler) prepareBulkStmts(ctx context.Context) (limitExeeded bool, err error) {
-	eventQuery, eventsLimit, err := h.query()
+func (h *ProjectionHandler) fetchBulkStmts(
+	ctx context.Context,
+	query SearchQuery,
+	reduce Reduce,
+) (limitExeeded bool, err error) {
+	eventQuery, eventsLimit, err := query()
 	if err != nil {
 		logging.Log("HANDL-x6qvs").WithError(err).Warn("unable to create event query")
 		return false, err
@@ -199,18 +222,22 @@ func (h *ProjectionHandler) prepareBulkStmts(ctx context.Context) (limitExeeded 
 		return false, err
 	}
 	for _, event := range events {
-		h.processEvent(ctx, event)
+		h.processEvent(ctx, event, reduce)
 	}
 
 	return len(events) == int(eventsLimit), nil
 }
 
-func (h *ProjectionHandler) push(ctx context.Context) error {
+func (h *ProjectionHandler) push(
+	ctx context.Context,
+	update Update,
+	reduce Reduce,
+) error {
 	h.lockMu.Lock()
 	defer h.lockMu.Unlock()
 
 	h.pushSet = false
-	err := h.update(ctx, h.stmts, h.reduce)
+	err := update(ctx, h.stmts, reduce)
 	h.stmts = nil
 
 	return err
