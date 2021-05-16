@@ -11,9 +11,8 @@ import (
 type Statement struct {
 	Sequence         uint64
 	PreviousSequence uint64
-	TableName        string
 
-	execute func(executer) error
+	execute func(ex executer, projectionName string) error
 }
 
 type executer interface {
@@ -27,16 +26,16 @@ var (
 	ErrNoCondition  = errors.New("no condition")
 )
 
-func NewCreateStatement(table string, values []Column, sequence, previousSequence uint64) Statement {
+func NewCreateStatement(values []Column, sequence, previousSequence uint64) Statement {
 	cols, params, args := columnsToQuery(values)
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, strings.Join(cols, ", "), strings.Join(params, ", "))
+	columnNames := strings.Join(cols, ", ")
+	valuesPlaceholder := strings.Join(params, ", ")
 
 	return Statement{
-		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(tx executer) error {
-			if table == "" {
+		execute: func(ex executer, projectionName string) error {
+			if projectionName == "" {
 				return ErrNoTable
 			}
 			if previousSequence >= sequence {
@@ -45,24 +44,27 @@ func NewCreateStatement(table string, values []Column, sequence, previousSequenc
 			if len(values) == 0 {
 				return ErrNoValues
 			}
-			_, err := tx.Exec(query, args...)
+			query := "INSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
+			_, err := ex.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewUpdateStatement(table string, conditions []Column, values []Column, sequence, previousSequence uint64) Statement {
+func NewUpdateStatement(conditions []Column, values []Column, sequence, previousSequence uint64) Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
-	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE %s", table, strings.Join(cols, ", "), strings.Join(params, ", "), strings.Join(wheres, " AND "))
+
+	columnNames := strings.Join(cols, ", ")
+	valuesPlaceholder := strings.Join(params, ", ")
+	wheresPlaceholders := strings.Join(wheres, " AND ")
 
 	return Statement{
-		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(tx executer) error {
-			if table == "" {
+		execute: func(ex executer, projectionName string) error {
+			if projectionName == "" {
 				return ErrNoTable
 			}
 			if previousSequence >= sequence {
@@ -74,22 +76,23 @@ func NewUpdateStatement(table string, conditions []Column, values []Column, sequ
 			if len(conditions) == 0 {
 				return ErrNoCondition
 			}
-			_, err := tx.Exec(query, args...)
+			query := "UPDATE " + projectionName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
+			_, err := ex.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewDeleteStatement(table string, conditions []Column, sequence, previousSequence uint64) Statement {
+func NewDeleteStatement(conditions []Column, sequence, previousSequence uint64) Statement {
 	wheres, args := columnsToWhere(conditions, 0)
-	query := fmt.Sprintf("DELETE FROM %s WHERE %s", table, strings.Join(wheres, " AND "))
+
+	wheresPlaceholders := strings.Join(wheres, " AND ")
 
 	return Statement{
-		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(tx executer) error {
-			if table == "" {
+		execute: func(ex executer, projectionName string) error {
+			if projectionName == "" {
 				return ErrNoTable
 			}
 			if previousSequence >= sequence {
@@ -98,25 +101,25 @@ func NewDeleteStatement(table string, conditions []Column, sequence, previousSeq
 			if len(conditions) == 0 {
 				return ErrNoCondition
 			}
-			_, err := tx.Exec(query, args...)
+			query := fmt.Sprintf("DELETE FROM " + projectionName + " WHERE " + wheresPlaceholders)
+			_, err := ex.Exec(query, args...)
 			return err
 		},
 	}
 }
 
-func NewNoOpStatement(table string, sequence, previousSequence uint64) Statement {
+func NewNoOpStatement(sequence, previousSequence uint64) Statement {
 	return Statement{
-		TableName:        table,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 	}
 }
 
-func (stmt *Statement) Execute(tx executer) error {
+func (stmt *Statement) Execute(ex executer, projectionName string) error {
 	if stmt.execute == nil {
 		return nil
 	}
-	return stmt.execute(tx)
+	return stmt.execute(ex, projectionName)
 }
 
 type Column struct {

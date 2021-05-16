@@ -93,7 +93,6 @@ func (h *ProjectionHandler) Process(
 			case event := <-h.Handler.EventQueue:
 				h.processEvent(ctx, event, reduce)
 			case <-h.Timer.C:
-				// lock, h.prepareBulk(query, reduce, update), unlock
 				h.bulk(ctx, lock, execBulk, unlock)
 				h.ResetTimer()
 			case <-h.shouldPush:

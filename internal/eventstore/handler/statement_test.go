@@ -184,9 +184,9 @@ func TestNewCreateStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewCreateStatement(tt.args.table, tt.args.values, tt.args.sequence, tt.args.previousSequence)
+			stmt := NewCreateStatement(tt.args.values, tt.args.sequence, tt.args.previousSequence)
 
-			err := stmt.execute(tt.want.executer)
+			err := stmt.execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -397,9 +397,9 @@ func TestNewUpdateStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewUpdateStatement(tt.args.table, tt.args.conditions, tt.args.values, tt.args.sequence, tt.args.previousSequence)
+			stmt := NewUpdateStatement(tt.args.conditions, tt.args.values, tt.args.sequence, tt.args.previousSequence)
 
-			err := stmt.execute(tt.want.executer)
+			err := stmt.execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -554,9 +554,9 @@ func TestNewDeleteStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewDeleteStatement(tt.args.table, tt.args.conditions, tt.args.sequence, tt.args.previousSequence)
+			stmt := NewDeleteStatement(tt.args.conditions, tt.args.sequence, tt.args.previousSequence)
 
-			err := stmt.execute(tt.want.executer)
+			err := stmt.execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -567,7 +567,6 @@ func TestNewDeleteStatement(t *testing.T) {
 
 func TestNewNoOpStatement(t *testing.T) {
 	type args struct {
-		table            string
 		sequence         uint64
 		previousSequence uint64
 	}
@@ -579,7 +578,6 @@ func TestNewNoOpStatement(t *testing.T) {
 		{
 			name: "generate correctly",
 			args: args{
-				table:            "my_table",
 				sequence:         5,
 				previousSequence: 3,
 			},
@@ -587,13 +585,12 @@ func TestNewNoOpStatement(t *testing.T) {
 				execute:          nil,
 				Sequence:         5,
 				PreviousSequence: 3,
-				TableName:        "my_table",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewNoOpStatement(tt.args.table, tt.args.sequence, tt.args.previousSequence); !reflect.DeepEqual(got, tt.want) {
+			if got := NewNoOpStatement(tt.args.sequence, tt.args.previousSequence); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewNoOpStatement() = %v, want %v", got, tt.want)
 			}
 		})
@@ -602,13 +599,17 @@ func TestNewNoOpStatement(t *testing.T) {
 
 func TestStatement_Execute(t *testing.T) {
 	type fields struct {
-		execute func(executer) error
+		execute func(ex executer, projectionName string) error
 	}
 	type want struct {
 		isErr func(error) bool
 	}
+	type args struct {
+		projectionName string
+	}
 	tests := []struct {
 		name   string
+		args   args
 		fields fields
 		want   want
 	}{
@@ -624,7 +625,10 @@ func TestStatement_Execute(t *testing.T) {
 		{
 			name: "execute returns no error",
 			fields: fields{
-				execute: func(executer) error { return nil },
+				execute: func(ex executer, projectionName string) error { return nil },
+			},
+			args: args{
+				projectionName: "my_projection",
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -634,8 +638,11 @@ func TestStatement_Execute(t *testing.T) {
 		},
 		{
 			name: "execute returns error",
+			args: args{
+				projectionName: "my_projection",
+			},
 			fields: fields{
-				execute: func(executer) error { return testErr },
+				execute: func(ex executer, projectionName string) error { return testErr },
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -649,7 +656,7 @@ func TestStatement_Execute(t *testing.T) {
 			stmt := &Statement{
 				execute: tt.fields.execute,
 			}
-			if err := stmt.Execute(nil); !tt.want.isErr(err) {
+			if err := stmt.Execute(nil, tt.args.projectionName); !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
 		})

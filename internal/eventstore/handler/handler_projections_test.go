@@ -83,21 +83,21 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 			name: "existing stmts",
 			fields: fields{
 				stmts: []Statement{
-					NewNoOpStatement("my_table", 1, 0),
+					NewNoOpStatement(1, 0),
 				},
 				pushSet:    false,
 				shouldPush: make(chan *struct{}, 1),
 			},
 			args: args{
-				reduce: testReduce(NewNoOpStatement("my_table", 2, 1)),
+				reduce: testReduce(NewNoOpStatement(2, 1)),
 			},
 			want: want{
 				isErr: func(err error) bool {
 					return err == nil
 				},
 				stmts: []Statement{
-					NewNoOpStatement("my_table", 1, 0),
-					NewNoOpStatement("my_table", 2, 1),
+					NewNoOpStatement(1, 0),
+					NewNoOpStatement(2, 1),
 				},
 			},
 		},
@@ -320,8 +320,8 @@ func TestProjectionHandler_push(t *testing.T) {
 			name: "previous lock",
 			fields: fields{
 				stmts: []Statement{
-					NewNoOpStatement("my_table", 1, 0),
-					NewNoOpStatement("my_table", 2, 1),
+					NewNoOpStatement(1, 0),
+					NewNoOpStatement(2, 1),
 				},
 				pushSet: true,
 			},
@@ -340,8 +340,8 @@ func TestProjectionHandler_push(t *testing.T) {
 			name: "error in update",
 			fields: fields{
 				stmts: []Statement{
-					NewNoOpStatement("my_table", 1, 0),
-					NewNoOpStatement("my_table", 2, 1),
+					NewNoOpStatement(1, 0),
+					NewNoOpStatement(2, 1),
 				},
 				pushSet: true,
 			},
@@ -697,7 +697,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 				update: testUpdate(t, 2, updateErr),
 				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
 				reduce: testReduce(
-					NewNoOpStatement("my_table", 2, 1),
+					NewNoOpStatement(2, 1),
 				),
 				ctx: context.Background(),
 			},
@@ -742,8 +742,8 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 				update: testUpdate(t, 4, nil),
 				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
 				reduce: testReduce(
-					NewNoOpStatement("my_table", 1, 0),
-					NewNoOpStatement("my_table", 2, 1),
+					NewNoOpStatement(1, 0),
+					NewNoOpStatement(2, 1),
 				),
 				ctx: context.Background(),
 			},
