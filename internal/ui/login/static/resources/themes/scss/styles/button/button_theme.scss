@@ -181,14 +181,3 @@
 @mixin lgn-button-elevation($zValue, $opacity: $lgn-elevation-opacity) {
   @include lgn-elevation($zValue, rgb(0, 0, 0), $opacity);
 }
-
-@mixin lgn-button-typography($config-or-theme) {
-    $config: lgn-get-typography-config($config-or-theme);
-    .lgn-button, .lgn-raised-button, .lgn-icon-button, .lgn-stroked-button {
-      font: {
-        family: lgn-font-family($config, button);
-        size: lgn-font-size($config, button);
-        weight: lgn-font-weight($config, button);
-      }
-    }
-  }

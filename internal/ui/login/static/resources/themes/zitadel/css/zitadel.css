@@ -36,6 +36,7 @@
   --zitadel-color-warn-700: #d32f2f;
   --zitadel-color-warn-800: #c62828;
   --zitadel-color-warn-900: #b71c1c;
+  --zitadel-font-family: "Lato";
   --zitadel-color-background: var(--zitadel-color-grey-50);
   --zitadel-color-footer-line: #e3e8ee;
   --zitadel-color-input-background: #fafafa50;
@@ -106,6 +107,7 @@
   --zitadel-color-warn-700: #d32f2f;
   --zitadel-color-warn-800: #c62828;
   --zitadel-color-warn-900: #b71c1c;
+  --zitadel-font-family: "Lato";
   --zitadel-color-background: var(--zitadel-color-grey-900);
   --zitadel-color-footer-line: #303131;
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
@@ -2318,36 +2320,42 @@ i {
 }
 
 h1, .lgn-headline, .lgn-typography h1 {
-  font: 400 24px/32px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 24px/32px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 h2, .lgn-title, .lgn-typography h2 {
-  font: 500 20px/32px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 500 20px/32px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 h3, .lgn-subheading-2, .lgn-typography h3 {
-  font: 400 16px/28px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 16px/28px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 h4, .lgn-subheading-1, .lgn-typography h4 {
-  font: 400 15px/24px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 15px/24px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 .lgn-body-strong, .lgn-body-2 {
-  font: 500 14px/24px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 500 14px/24px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
 }
 
 p, .lgn-body, .lgn-body-1, .lgn-typography {
-  font: 400 14px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 14px/20px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
 }
 p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
@@ -2355,51 +2363,60 @@ p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
 }
 
 button, .lgn-button, .lgn-raised-button, .lgn-stroked-button {
-  font: 500 14px/36px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 500 14px/36px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
 }
 
 span {
-  font: 400 14px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 14px/20px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
 }
 
 a, .lgn-a {
-  font: 400 14px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 14px/20px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
 }
 
 small .lgn-small, .lgn-caption {
-  font: 400 12px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 12px/20px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
 }
 
 label, .lgn-label, .lgn-typography .lgn-label, .lgn-typography label {
-  font: 400 12px/20px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 12px/20px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
   margin: 0 0 2px 0;
 }
 
 .lgn-display-4, .lgn-typography .lgn-display-4 {
-  font: 300 112px/112px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 300 112px/112px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: -0.05em;
   margin: 0 0 56px;
 }
 
 .lgn-display-3, .lgn-typography .lgn-display-3 {
-  font: 400 56px/56px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 56px/56px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: -0.02em;
   margin: 0 0 64px;
 }
 
 .lgn-display-2, .lgn-typography .lgn-display-2 {
-  font: 400 45px/48px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 45px/48px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: -0.005em;
   margin: 0 0 64px;
 }
 
 .lgn-display-1, .lgn-typography .lgn-display-1 {
-  font: 400 34px/40px Lato, -apple-system, BlinkMacSystemFont, sans-serif;
+  font: 400 34px/40px serif;
+  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
   letter-spacing: normal;
   margin: 0 0 64px;
 }
@@ -2705,13 +2722,13 @@ a:hover, a:active {
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
 .lgn-avatar:not(.transparent).lgn-primary {
-  background-color: var(--zitadel-color-primary-contrast);
+  background-color: var(--zitadel-color-primary);
 }
 .lgn-avatar:not(.transparent).lgn-accent {
-  background-color: var(--zitadel-color-primary-contrast);
+  background-color: var(--zitadel-color-primary);
 }
 .lgn-avatar:not(.transparent).lgn-warn {
-  background-color: var(--zitadel-color-primary-contrast);
+  background-color: var(--zitadel-color-primary);
 }
 .lgn-avatar:not(.transparent).lgn-primary[disabled], .lgn-avatar:not(.transparent).lgn-accent[disabled], .lgn-avatar:not(.transparent).lgn-warn[disabled], .lgn-avatar:not(.transparent)[disabled][disabled] {
   background-color: var(--itadel-color-button-disabled-background);

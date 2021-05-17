@@ -16,7 +16,7 @@
 }
 
 @function lgn-typography-config(
-  $font-family:   'Lato, -apple-system, BlinkMacSystemFont, sans-serif',
+  $font-family:   var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif),
   $display-4:     lgn-typography-level(112px, 112px, 300, $letter-spacing: -0.05em),
   $display-3:     lgn-typography-level(56px, 56px, 400, $letter-spacing: -0.02em),
   $display-2:     lgn-typography-level(45px, 48px, 400, $letter-spacing: -0.005em),
@@ -145,7 +145,8 @@
       // Otherwise use the shorthand `font`, because it's the least amount of bytes. Note
       // that we need to use interpolation for `font-size/line-height` in order to prevent
       // Sass from dividing the two values.
-      font: $font-weight #{$font-size}/#{$line-height} $font-family;
+      font: $font-weight #{$font-size}/#{$line-height} serif;
+      font-family: $font-family;
     }
 }
 
