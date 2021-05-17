@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "prodbuild": "ng build --prod",
+    "prodbuild": "ng build --configuration production",
     "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
   },
   "private": true,
