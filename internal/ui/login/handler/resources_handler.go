@@ -3,6 +3,7 @@ package handler
 import (
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/caos/zitadel/internal/domain"
 )
@@ -24,10 +25,12 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}
-	reader, _, _ := l.staticStorage.GetObject(r.Context(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName)
+	reader, info, _ := l.staticStorage.GetObject(r.Context(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName)
 	if err != nil {
 
 	}
 	bytes, _ := io.ReadAll(reader)
+	w.Header().Set("content-length", strconv.Itoa(int(info.Size)))
+	w.Header().Set("content-type", "text/css")
 	w.Write(bytes)
 }
