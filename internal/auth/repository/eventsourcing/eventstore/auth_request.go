@@ -614,6 +614,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 			DisplayName:       session.DisplayName,
 			UserName:          session.UserName,
 			LoginName:         session.LoginName,
+			AvatarKey:         session.AvatarKey,
 			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 		}

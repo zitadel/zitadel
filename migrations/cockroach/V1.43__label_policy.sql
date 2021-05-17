@@ -51,9 +51,11 @@ ALTER TABLE auth.label_policies ADD CONSTRAINT "primary" PRIMARY KEY (aggregate_
 COMMIT;
 
 
-ALTER TABLE management.users ADD COLUMN avatar TEXT;
-ALTER TABLE auth.users ADD COLUMN avatar TEXT;
-ALTER TABLE adminapi.users ADD COLUMN avatar TEXT;
+ALTER TABLE management.users ADD COLUMN avatar_key TEXT;
+ALTER TABLE auth.users ADD COLUMN avatar_key TEXT;
+ALTER TABLE adminapi.users ADD COLUMN avatar_key TEXT;
+
+ALTER TABLE auth.user_sessions ADD COLUMN avatar_key TEXT;
 
 CREATE TABLE adminapi.styling (
      aggregate_id TEXT,

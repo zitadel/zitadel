@@ -5,12 +5,17 @@
     <div class="lgn-names">
         <div class="inline-block">
             <div class="lgn-avatar lgn-primary" displayname="{{.DisplayName}}">
-                <span class="initials lgn-primary">A</span>
+                {{if .AvatarKey}}
+                    <img class="avatar-img" src="{{ avatarResource .OrgID .AvatarKey }}" alt="user-avatar">
+                {{else}}
+                    <span class="initials lgn-primary">A</span>
+                {{end}}
             </div>
         </div>
         <div class="lgn-loginname">
             <p>{{if .DisplayLoginNameSuffix}}{{.LoginName}}{{else}}{{.UserName}}{{end}}</p>
         </div>
+
     </div>
 </div>
 {{end}}

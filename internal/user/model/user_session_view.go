@@ -19,6 +19,7 @@ type UserSessionView struct {
 	UserName                     string
 	LoginName                    string
 	DisplayName                  string
+	AvatarKey                    string
 	SelectedIDPConfigID          string
 	PasswordVerification         time.Time
 	PasswordlessVerification     time.Time
