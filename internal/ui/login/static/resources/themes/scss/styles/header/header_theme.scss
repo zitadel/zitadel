@@ -7,15 +7,8 @@
 @mixin lgn-header-color() {
   
     .lgn-logo {
-        background: _lgn-get-logo-src($config);
+        background: var(--zitadel-logo);
         background-position: auto;
         background-size: contain;
     }
-}
-
-
-@function _lgn-get-logo-src($config) {
-    $is-dark-theme: map-get($config, is-dark);
-    @return if($is-dark-theme, url('../logo-light.svg') no-repeat, url('../logo-dark.svg') no-repeat);
-    // @return if($is-dark-theme, url('../'+attr(sourcelight))/*url('../logo-light.svg')*/ no-repeat, url('../'+attr(sourcedark))/*url('../logo-dark.svg')*/ no-repeat);
 }
