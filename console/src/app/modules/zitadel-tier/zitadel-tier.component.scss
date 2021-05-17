@@ -1,0 +1,78 @@
+@import '~@angular/material/theming';
+
+@mixin tier-theme($theme) {
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .tier {
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+    border-radius: .5rem;
+    margin-bottom: .5rem;
+
+    .ext {
+      margin-right: .5rem;
+      align-self: center;
+      color: inherit;
+    }
+
+    .logo {
+      margin-right: 1rem;
+      max-height: 40px;
+      object-fit: contain;
+      filter: grayscale(1);
+      transition: filter .3s ease;
+
+      &.dark {
+        display: if($is-dark-theme, inline-block, none);
+      }
+
+      &.light {
+        display: if($is-dark-theme, none, inline-block);
+      }
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+
+      p:not(.state) {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .title {
+        font-size: 16px;
+        margin-bottom: .5rem;
+      }
+
+      .state {
+        align-self: flex-start;
+        border-radius: 50vw;
+        padding: 2px .5rem;
+        letter-spacing: .05em;
+        font-size: 12px;
+        background-color: if($is-dark-theme, #4f566b, #e4e7e4);
+
+        &.active {
+          background-color: if($is-dark-theme, #4f566b, #cbf4c9);
+          color: if($is-dark-theme, #cbf4c9, #0e6245);
+        }
+
+        &.inactive {
+          color: if($is-dark-theme, #ffc1c1, #620e0e);
+          background-color: if($is-dark-theme, #4f566b, #ffc1c1);
+        }
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    button {
+      // min-width: 200px;
+      align-self: center;
+    }
+  }
+}

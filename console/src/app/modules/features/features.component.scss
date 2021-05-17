@@ -30,6 +30,15 @@
     }
   }
 
+  .center {
+    display: flex;
+    align-items: center;
+
+    a {
+      margin-left: .5rem;
+    }
+  }
+
   img {
     height: 15px;
     width: auto;

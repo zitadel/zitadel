@@ -25,6 +25,15 @@
     }
 
     &.info {
+      background-color: if($is-dark-theme, #6d6f7382, #e4e4e4);
+      color: if($is-dark-theme, #f0f0f0, #4a4a4a);
+
+      .icon {
+        color: $primary-color;
+      }
+    }
+
+    &.success {
       background-color: if($is-dark-theme, #4f566b, #cbf4c9);
       color: if($is-dark-theme, #cbf4c9, #0e6245);
 
