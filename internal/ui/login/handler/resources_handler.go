@@ -27,9 +27,12 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	}
 	reader, info, _ := l.staticStorage.GetObject(r.Context(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName)
 	if err != nil {
-
+		return
 	}
-	bytes, _ := io.ReadAll(reader)
+	bytes, err := io.ReadAll(reader)
+	if err != nil {
+		return
+	}
 	w.Header().Set("content-length", strconv.Itoa(int(info.Size)))
 	w.Header().Set("content-type", "text/css")
 	w.Write(bytes)
