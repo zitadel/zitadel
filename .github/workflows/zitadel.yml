@@ -246,8 +246,12 @@ jobs:
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Docker Login
-        run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
       - name: Docker Pull ZITADEL Image
         run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
       - name: Docker Pull ZITADEL Operator Image
