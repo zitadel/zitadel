@@ -87,6 +87,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 	if stmts[0].PreviousSequence == 0 {
 		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, currentSeq, reduce)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 		stmts = append(previousStmts, stmts...)
@@ -106,7 +107,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		return commitErr
 	}
 
-	return err
+	return nil
 }
 
 func (h *StatementHandler) fetchPreviousStmts(
@@ -161,6 +162,9 @@ func (h *StatementHandler) executeStmts(
 //executeStmt handles sql statements
 //an error is returned if the statement could not be inserted properly
 func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt handler.Statement) error {
+	if stmt.IsNoop() {
+		return nil
+	}
 	_, err := tx.Exec("SAVEPOINT push_stmt")
 	if err != nil {
 		return err

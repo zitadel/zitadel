@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -22,6 +23,394 @@ var (
 )
 
 type mockExpectation func(sqlmock.Sqlmock)
+
+func TestProjectionHandler_SearchQuery(t *testing.T) {
+	type want struct {
+		SearchQueryBuilder *eventstore.SearchQueryBuilder
+		limit              uint64
+		isErr              func(error) bool
+		expectations       []mockExpectation
+	}
+	type fields struct {
+		sequenceTable  string
+		projectionName string
+		aggregates     []eventstore.AggregateType
+		bulkLimit      uint64
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "error in current sequence",
+			fields: fields{
+				sequenceTable:  "my_sequences",
+				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"testAgg"},
+				bulkLimit:      5,
+			},
+			want: want{
+				limit: 0,
+				isErr: func(err error) bool {
+					return errors.Is(err, sql.ErrTxDone)
+				},
+				expectations: []mockExpectation{
+					expectCurrentSequenceErr("my_sequences", "my_projection", sql.ErrTxDone),
+				},
+				SearchQueryBuilder: nil,
+			},
+		},
+		{
+			name: "correct",
+			fields: fields{
+				sequenceTable:  "my_sequences",
+				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"testAgg"},
+				bulkLimit:      5,
+			},
+			want: want{
+				limit: 5,
+				isErr: func(err error) bool {
+					return err == nil
+				},
+				expectations: []mockExpectation{
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+				},
+				SearchQueryBuilder: eventstore.
+					NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg").
+					SequenceGreater(5).
+					Limit(5),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatal(err)
+			}
+			h := &StatementHandler{
+				sequenceTable:  tt.fields.sequenceTable,
+				projectionName: tt.fields.projectionName,
+				bulkLimit:      tt.fields.bulkLimit,
+				aggregates:     tt.fields.aggregates,
+				client:         client,
+			}
+
+			for _, expectation := range tt.want.expectations {
+				expectation(mock)
+			}
+
+			query, limit, err := h.SearchQuery()
+			if !tt.want.isErr(err) {
+				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(query, tt.want.SearchQueryBuilder) {
+				t.Errorf("unexpected query: expected %v, got %v", tt.want.SearchQueryBuilder, query)
+			}
+			if tt.want.limit != limit {
+				t.Errorf("unexpected limit: got: %d want %d", limit, tt.want.limit)
+			}
+
+			mock.MatchExpectationsInOrder(true)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("expectations not met: %v", err)
+			}
+		})
+	}
+}
+
+func TestStatementHandler_Update(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+		aggregates []eventstore.AggregateType
+	}
+	type want struct {
+		expectations []mockExpectation
+		isErr        func(error) bool
+	}
+	type args struct {
+		ctx    context.Context
+		stmts  []handler.Statement
+		reduce handler.Reduce
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+		args   args
+	}{
+		{
+			name: "begin fails",
+			args: args{
+				ctx: context.Background(),
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBeginErr(sql.ErrConnDone),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, sql.ErrConnDone)
+				},
+			},
+		},
+		{
+			name: "current sequence fails",
+			args: args{
+				ctx: context.Background(),
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequenceErr("my_sequences", "my_projection", sql.ErrTxDone),
+					expectRollback(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, sql.ErrTxDone)
+				},
+			},
+		},
+		{
+			name: "fetch previous fails",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t).
+						ExpectFilterEventsError(filterErr),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewNoOpStatement(6, 0),
+				},
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectRollback(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, filterErr)
+				},
+			},
+		},
+		{
+			name: "no successful stmts",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 7, 6),
+				},
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectCommit(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, nil)
+				},
+			},
+		},
+		{
+			name: "update current sequence fails",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 7, 5),
+				},
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
+					expectUpdateCurrentSequenceNoRows("my_sequences", "my_projection", 7),
+					expectRollback(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, errSeqNotUpdated)
+				},
+			},
+		},
+		{
+			name: "commit fails",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 7, 5),
+				},
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCommitErr(sql.ErrConnDone),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, sql.ErrConnDone)
+				},
+			},
+		},
+		{
+			name: "correct",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewNoOpStatement(7, 5),
+				},
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCommit(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, nil)
+				},
+			},
+		},
+		{
+			name: "fetch previous stmts no additional stmts",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewNoOpStatement(7, 0),
+				},
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCommit(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, nil)
+				},
+			},
+		},
+		{
+			name: "fetch previous stmts additional events",
+			fields: fields{
+				eventstore: eventstore.NewEventstore(
+					es_repo_mock.NewRepo(t).ExpectFilterEvents(
+						&repository.Event{
+							Sequence:         6,
+							PreviousSequence: 5,
+						},
+					),
+				),
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			args: args{
+				ctx: context.Background(),
+				stmts: []handler.Statement{
+					handler.NewNoOpStatement(7, 0),
+				},
+				reduce: testReduce(),
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectBegin(),
+					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCommit(),
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, nil)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatal(err)
+			}
+			h := &StatementHandler{
+				projectionName: "my_projection",
+				sequenceTable:  "my_sequences",
+				client:         client,
+				eventstore:     tt.fields.eventstore,
+				aggregates:     tt.fields.aggregates,
+			}
+
+			for _, expectation := range tt.want.expectations {
+				expectation(mock)
+			}
+
+			err = h.Update(tt.args.ctx, tt.args.stmts, tt.args.reduce)
+			if !tt.want.isErr(err) {
+				t.Errorf("StatementHandler.Update() error = %v", err)
+			}
+
+			mock.MatchExpectationsInOrder(true)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("expectations not met: %v", err)
+			}
+		})
+	}
+}
 
 func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 	type args struct {
@@ -404,7 +793,12 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: handler.Statement{},
+				stmt: handler.NewCreateStatement([]handler.Column{
+					{
+						Name:  "col",
+						Value: "val",
+					},
+				}, 1, 0),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -475,10 +869,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				isErr: func(err error) bool {
 					return err == nil
 				},
-				expectations: []mockExpectation{
-					expectSavePoint(),
-					expectSavePointRelease(),
-				},
+				expectations: []mockExpectation{},
 			},
 		},
 		{
@@ -575,7 +966,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, sql.ErrConnDone)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceWithErr("my_table", "my_projection", sql.ErrConnDone),
+					expectCurrentSequenceErr("my_table", "my_projection", sql.ErrConnDone),
 				},
 			},
 		},
@@ -810,6 +1201,42 @@ func expectCreateErr(projectionName string, columnNames, placeholders []string, 
 	}
 }
 
+func expectBegin() func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+	}
+}
+
+func expectBeginErr(err error) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin().WillReturnError(err)
+	}
+}
+
+func expectCommit() func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectCommit()
+	}
+}
+
+func expectCommitErr(err error) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectCommit().WillReturnError(err)
+	}
+}
+
+func expectRollback() func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectRollback()
+	}
+}
+
+func expectRollbackErr(err error) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectRollback().WillReturnError(err)
+	}
+}
+
 func expectSavePoint() func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
 		m.ExpectExec("SAVEPOINT push_stmt").
@@ -865,7 +1292,7 @@ FROM seq`).
 	}
 }
 
-func expectCurrentSequenceWithErr(tableName, projection string, err error) func(sqlmock.Sqlmock) {
+func expectCurrentSequenceErr(tableName, projection string, err error) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
 		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
 SELECT 

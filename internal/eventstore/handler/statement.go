@@ -12,7 +12,11 @@ type Statement struct {
 	Sequence         uint64
 	PreviousSequence uint64
 
-	execute func(ex executer, projectionName string) error
+	Execute func(ex executer, projectionName string) error
+}
+
+func (s *Statement) IsNoop() bool {
+	return s.Execute == nil
 }
 
 type executer interface {
@@ -34,7 +38,7 @@ func NewCreateStatement(values []Column, sequence, previousSequence uint64) Stat
 	return Statement{
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(ex executer, projectionName string) error {
+		Execute: func(ex executer, projectionName string) error {
 			if projectionName == "" {
 				return ErrNoTable
 			}
@@ -63,7 +67,7 @@ func NewUpdateStatement(conditions []Column, values []Column, sequence, previous
 	return Statement{
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(ex executer, projectionName string) error {
+		Execute: func(ex executer, projectionName string) error {
 			if projectionName == "" {
 				return ErrNoTable
 			}
@@ -91,7 +95,7 @@ func NewDeleteStatement(conditions []Column, sequence, previousSequence uint64) 
 	return Statement{
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
-		execute: func(ex executer, projectionName string) error {
+		Execute: func(ex executer, projectionName string) error {
 			if projectionName == "" {
 				return ErrNoTable
 			}
@@ -113,13 +117,6 @@ func NewNoOpStatement(sequence, previousSequence uint64) Statement {
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 	}
-}
-
-func (stmt *Statement) Execute(ex executer, projectionName string) error {
-	if stmt.execute == nil {
-		return nil
-	}
-	return stmt.execute(ex, projectionName)
 }
 
 type Column struct {

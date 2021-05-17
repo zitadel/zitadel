@@ -186,7 +186,7 @@ func TestNewCreateStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewCreateStatement(tt.args.values, tt.args.sequence, tt.args.previousSequence)
 
-			err := stmt.execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -399,7 +399,7 @@ func TestNewUpdateStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewUpdateStatement(tt.args.conditions, tt.args.values, tt.args.sequence, tt.args.previousSequence)
 
-			err := stmt.execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -556,7 +556,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewDeleteStatement(tt.args.conditions, tt.args.sequence, tt.args.previousSequence)
 
-			err := stmt.execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -582,7 +582,7 @@ func TestNewNoOpStatement(t *testing.T) {
 				previousSequence: 3,
 			},
 			want: Statement{
-				execute:          nil,
+				Execute:          nil,
 				Sequence:         5,
 				PreviousSequence: 3,
 			},
@@ -613,15 +613,6 @@ func TestStatement_Execute(t *testing.T) {
 		fields fields
 		want   want
 	}{
-		{
-			name:   "no execute",
-			fields: fields{},
-			want: want{
-				isErr: func(err error) bool {
-					return err == nil
-				},
-			},
-		},
 		{
 			name: "execute returns no error",
 			fields: fields{
@@ -654,7 +645,7 @@ func TestStatement_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			stmt := &Statement{
-				execute: tt.fields.execute,
+				Execute: tt.fields.execute,
 			}
 			if err := stmt.Execute(nil, tt.args.projectionName); !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)

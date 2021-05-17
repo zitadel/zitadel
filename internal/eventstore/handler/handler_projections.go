@@ -243,6 +243,10 @@ func (h *ProjectionHandler) push(
 }
 
 func (h *ProjectionHandler) shutdown() {
+	h.lockMu.Lock()
+	defer h.lockMu.Unlock()
 	h.Sub.Unsubscribe()
+	h.Timer.Stop()
+	close(h.shouldPush)
 	logging.Log("EVENT-XG5Og").Info("stop processing")
 }
