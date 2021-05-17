@@ -50,7 +50,7 @@ func NewStatementHandler(
 		projectionName: projectionName,
 		sequenceTable:  sequenceTable,
 		workerName:     workerName,
-		lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable, lockTable, lockTable, lockTable),
+		lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
 		bulkLimit:      bulkLimit,
 		aggregates:     aggregates,
 	}
