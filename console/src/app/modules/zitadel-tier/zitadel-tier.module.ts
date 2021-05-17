@@ -13,7 +13,7 @@ import { ZitadelTierComponent } from './zitadel-tier.component';
 
 @NgModule({
   declarations: [
-    ZitadelTierComponent
+    ZitadelTierComponent,
   ],
   imports: [
     CommonModule,
@@ -22,10 +22,10 @@ import { ZitadelTierComponent } from './zitadel-tier.component';
     MatIconModule,
     HasRoleModule,
     HasRolePipeModule,
-    TranslateModule
+    TranslateModule,
   ],
   exports: [
     ZitadelTierComponent,
-  ]
+  ],
 })
 export class ZitadelTierModule { }

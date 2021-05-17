@@ -4,11 +4,10 @@ import { Features, FeaturesState } from 'src/app/proto/generated/zitadel/feature
 @Component({
   selector: 'cnsl-zitadel-tier',
   templateUrl: './zitadel-tier.component.html',
-  styleUrls: ['./zitadel-tier.component.scss']
+  styleUrls: ['./zitadel-tier.component.scss'],
 })
 export class ZitadelTierComponent implements OnInit {
   @Input() public features!: Features.AsObject;
-  // @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
   FeaturesState: any = FeaturesState;
   constructor() { }

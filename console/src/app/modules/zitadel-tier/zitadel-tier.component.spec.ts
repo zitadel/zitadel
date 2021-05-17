@@ -8,9 +8,9 @@ describe('ZitadelTierComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ZitadelTierComponent ]
+      declarations: [ZitadelTierComponent],
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
