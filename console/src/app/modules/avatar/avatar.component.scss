@@ -1,6 +1,5 @@
 @use '~@angular/material' as mat;
 
-
 @mixin avatar-theme($theme) {
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);

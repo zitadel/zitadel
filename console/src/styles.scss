@@ -2,6 +2,7 @@
 // For more information: https://material.angular.io/guide/theming
 
 @use '~@angular/material' as mat;
+
 @import './component-themes';
 
 // Plus imports for other components in your app.
@@ -42,22 +43,22 @@ $caos-dark-brand: (
   A800: #2d2e30,
   A900: #212224,
   contrast:
-    (
-      50: rgba(black, 0.87),
-      100: rgba(black, 0.87),
-      200: rgba(black, 0.87),
-      300: rgba(black, 0.87),
-      400: rgba(black, 0.87),
-      500: white,
-      600: white,
-      700: white,
-      800: white,
-      900: white,
-      A100: rgba(black, 0.87),
-      A200: rgba(black, 0.87),
-      A400: rgba(black, 0.87),
-      A700: white
-    )
+  (
+    50: rgba(black, .87),
+    100: rgba(black, .87),
+    200: rgba(black, .87),
+    300: rgba(black, .87),
+    400: rgba(black, .87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, .87),
+    A200: rgba(black, .87),
+    A400: rgba(black, .87),
+    A700: white
+  )
 );
 
 $caos-light-brand: (
@@ -81,22 +82,22 @@ $caos-light-brand: (
   A800: white,
   A900: #fafafa,
   contrast:
-    (
-      50: #3d4852,
-      100: #3d4852,
-      200: #3d4852,
-      300: #3d4852,
-      400: #3d4852,
-      500: white,
-      600: white,
-      700: white,
-      800: white,
-      900: white,
-      A100: #3d4852,
-      A200: #3d4852,
-      A400: #3d4852,
-      A700: white
-    )
+  (
+    50: #3d4852,
+    100: #3d4852,
+    200: #3d4852,
+    300: #3d4852,
+    400: #3d4852,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: #3d4852,
+    A200: #3d4852,
+    A400: #3d4852,
+    A700: white
+  )
 );
 
 $caos-accent-color: (
@@ -115,22 +116,22 @@ $caos-accent-color: (
   A400: #58ffd0,
   A700: #3effc9,
   contrast:
-    (
-      50: rgba(black, 0.87),
-      100: rgba(black, 0.87),
-      200: rgba(black, 0.87),
-      300: rgba(black, 0.87),
-      400: rgba(black, 0.87),
-      500: white,
-      600: white,
-      700: white,
-      800: white,
-      900: white,
-      A100: rgba(black, 0.87),
-      A200: rgba(black, 0.87),
-      A400: rgba(black, 0.87),
-      A700: white
-    )
+  (
+    50: rgba(black, .87),
+    100: rgba(black, .87),
+    200: rgba(black, .87),
+    300: rgba(black, .87),
+    400: rgba(black, .87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, .87),
+    A200: rgba(black, .87),
+    A400: rgba(black, .87),
+    A700: white
+  )
 );
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
@@ -250,8 +251,19 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
-    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family:
+    'Lato',
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
 }
 
 h1 {
