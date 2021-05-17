@@ -81,17 +81,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			}
 			return false
 		},
-		"variablesCssFileUrl": func(orgID, theme string, policy *domain.LabelPolicy) string {
-			bucketName := domain.IAMID
-			if orgID != "" && !policy.Default {
-				bucketName = orgID
-			}
-			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
-			if err != nil {
-				return ""
-			}
-			return presignedURL.String()
-
+		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default))
 		},
 		"avatarUrl": func(orgID, userID string) string {
 			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.GetHumanAvatarAssetPath(userID), time.Hour*1)

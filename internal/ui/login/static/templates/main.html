@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     {{ if hasCustomPolicy .LabelPolicy }}
-        <link rel="stylesheet" href="{{ variablesCssFileUrl .OrgID .Theme .LabelPolicy}}" type="text/css">
+        <link rel="stylesheet" href="{{ variablesCssFileUrl .OrgID .LabelPolicy}}" type="text/css">
     {{ end}}
     <link rel="stylesheet" href="{{ resourceThemeUrl "css/zitadel.css" .Theme }}" type="text/css">
     <link rel="icon" type="image/x-icon" href="{{ resourceThemeUrl "favicon.ico" .Theme }}">

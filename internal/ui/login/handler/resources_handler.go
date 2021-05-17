@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"io"
 	"net/http"
-	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 )
@@ -24,10 +24,10 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}
-	presignedURL, err := l.staticStorage.GetObjectPresignedURL(r.Context(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName, time.Hour*1)
+	reader, _, _ := l.staticStorage.GetObject(r.Context(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName)
 	if err != nil {
-		return ""
-	}
-	return presignedURL.String()
 
+	}
+	bytes, _ := io.ReadAll(reader)
+	w.Write(bytes)
 }
