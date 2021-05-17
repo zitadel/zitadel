@@ -1,9 +1,9 @@
 {
-  "authServiceUrl": "https://api.zitadel.io",
-  "mgmtServiceUrl": "https://api.zitadel.io",
-  "adminServiceUrl":"https://api.zitadel.io",
-  "subscriptionServiceUrl":"https://sub.zitadel.io",
-  "uploadServiceUrl":"https://api.zitadel.io",
-  "issuer": "https://issuer.zitadel.io",
+  "authServiceUrl": "https://api.zitadel.app",
+  "mgmtServiceUrl": "https://api.zitadel.app",
+  "adminServiceUrl":"https://api.zitadel.app",
+  "subscriptionServiceUrl":"https://sub.zitadel.app",
+  "uploadServiceUrl":"https://api.zitadel.app",
+  "issuer": "https://issuer.zitadel.app",
   "clientid": "69234247558357051@zitadel"
 }
