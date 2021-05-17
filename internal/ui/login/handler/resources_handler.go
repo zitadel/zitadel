@@ -11,7 +11,7 @@ import (
 type dynamicResourceData struct {
 	OrgID         string `schema:"orgId"`
 	DefaultPolicy bool   `schema:"default-policy"`
-	FileName      string `schema:"file"`
+	FileName      string `schema:"filename"`
 }
 
 func (l *Login) handleResources(staticDir http.FileSystem) http.Handler {

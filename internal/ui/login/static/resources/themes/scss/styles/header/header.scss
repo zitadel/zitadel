@@ -9,8 +9,8 @@ $lgn-header-margin: 1rem auto .5rem auto;
     width: 100%;
 
     .lgn-logo {
-        height: 43px;
-        width: 160px;
+        display: block;
+        max-height: 100px;
         margin: 0 auto;
     }
 }

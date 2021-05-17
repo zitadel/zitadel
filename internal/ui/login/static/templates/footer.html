@@ -1,9 +1,11 @@
 {{define "footer"}}
 <footer>
+    {{ if hasWatermark .LabelPolicy }}
     <span class="watermark" >
         <span class="powered">{{t "Footer.PoweredBy"}}</span>
-        <span class="lgn-logo" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo"></span>
+        <span class="lgn-logo-watermark" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo"></span>
     </span>
+    {{end}}
     <span class="fill-space"></span>
     <a href="{{t "Footer.TosLink"}}" rel="noopener noreferrer" target="_blank" alt="TOS">{{t "Footer.Tos"}}</a>
     <a href="{{t "Footer.PrivacyLink"}}" rel="noopener noreferrer" target="_blank" alt="Privacy Policy">{{t "Footer.Privacy"}}</a>

@@ -16,5 +16,11 @@
       a {
         color: var(--zitadel-color-primary);
       }
+
+      .lgn-logo-watermark {
+          background: var(--zitadel-logo);
+          background-position: auto;
+          background-size: contain;
+      }
     }
 }

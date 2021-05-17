@@ -81,6 +81,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			}
 			return false
 		},
+		"hasWatermark": func(policy *domain.LabelPolicy) bool {
+			if policy != nil && policy.DisableWatermark {
+				return false
+			}
+			return true
+		},
 		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
 			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
@@ -90,7 +96,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			if darkMode && policy.LogoDarkURL != "" {
 				fileName = policy.LogoDarkURL
 			}
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default), "filename", fileName)
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
 		},
 		"avatarUrl": func(orgID, userID string) string {
 			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.GetHumanAvatarAssetPath(userID), time.Hour*1)

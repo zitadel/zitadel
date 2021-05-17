@@ -186,9 +186,9 @@ footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
-footer .watermark .lgn-logo {
+footer .watermark .lgn-logo-watermark {
   height: 34px;
-  width: 160px;
+  width: 125px;
   margin: 2px;
 }
 
@@ -199,11 +199,9 @@ footer .watermark .lgn-logo {
   padding: 0;
   width: 100%;
 }
-
 .lgn-header .lgn-logo {
   display: block;
-  max-width: 400px;
-  max-height: 60px;
+  max-height: 100px;
   margin: 0 auto;
 }
 
@@ -1065,9 +1063,9 @@ footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
-footer .watermark .lgn-logo {
+footer .watermark .lgn-logo-watermark {
   height: 34px;
-  width: 160px;
+  width: 125px;
   margin: 2px;
 }
 
@@ -1079,8 +1077,8 @@ footer .watermark .lgn-logo {
   width: 100%;
 }
 .lgn-header .lgn-logo {
-  height: 43px;
-  width: 160px;
+  display: block;
+  max-height: 100px;
   margin: 0 auto;
 }
 
@@ -2295,8 +2293,8 @@ i {
   width: 100%;
 }
 .lgn-header .lgn-logo {
-  height: 43px;
-  width: 160px;
+  display: block;
+  max-height: 100px;
   margin: 0 auto;
 }
 
@@ -2416,7 +2414,6 @@ label, .lgn-label, .lgn-typography .lgn-label, .lgn-typography label {
 }
 
 .lgn-logo {
-  background: var(--zitadel-logo);
   background-position: auto;
   background-size: contain;
 }
@@ -2635,6 +2632,11 @@ footer {
 }
 footer a {
   color: var(--zitadel-color-primary);
+}
+footer .lgn-logo-watermark {
+  background: var(--zitadel-logo);
+  background-position: auto;
+  background-size: contain;
 }
 
 a {

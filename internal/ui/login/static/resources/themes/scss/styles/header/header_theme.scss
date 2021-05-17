@@ -5,9 +5,7 @@
 }
 
 @mixin lgn-header-color() {
-  
     .lgn-logo {
-        background: var(--zitadel-logo);
         background-position: auto;
         background-size: contain;
     }
