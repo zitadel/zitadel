@@ -48,6 +48,12 @@ module.exports = {
           position: 'left'
         },
         {
+          type: 'doc',
+          docId: 'legal/introduction',
+          label: 'Legal',
+          position: 'left'
+        },
+        {
           href: 'https://github.com/caos/zitadel',
           label: 'GitHub',
           position: 'right',

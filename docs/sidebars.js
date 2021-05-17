@@ -126,5 +126,15 @@ module.exports = {
     'concepts/introduction',
     'concepts/architecture',
     'concepts/principles',
-  ]
+  ],
+  legal: [
+    'legal/introduction',
+    'legal/terms-of-service',
+    'legal/privacy-policy',
+    'legal/data-processing-agreement',
+    'legal/support-services',
+    'legal/service-level-description',
+    'legal/acceptable-use-policy', 
+    'legal/rate-limit-policy'
+  ],
 };
