@@ -1,12 +1,12 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin app-card-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, A900);
+  $primary-dark: mat.get-color-from-palette($primary, A900);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: mat-color($primary, 500);
+  $accent-color: mat.get-color-from-palette($primary, 500);
   /* stylelint-enable */
 
   .cnsl-app-card {
