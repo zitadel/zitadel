@@ -36,7 +36,7 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 * APIs for Management, Administration, and Authentication
 * Policy configuration and enforcement
 
-## How To Use It
+## How To Use It 
 
 ### ZITADEL Cloud
 
