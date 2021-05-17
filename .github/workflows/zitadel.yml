@@ -75,7 +75,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - run: ls -la
@@ -136,7 +136,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
@@ -221,7 +221,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
@@ -240,7 +240,7 @@ jobs:
     runs-on: ubuntu-18.04
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
     env:
-      DOCKER_USERNAME: ${{ github.actor }}
+      DOCKER_USERNAME: ${{ github.repository_owner }}
       DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Source checkout
