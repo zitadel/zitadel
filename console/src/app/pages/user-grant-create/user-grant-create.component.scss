@@ -1,4 +1,3 @@
-
 .container {
   padding: 4rem 4rem 2rem 4rem;
 
@@ -32,23 +31,6 @@
   display: block;
 }
 
-.column {
-  display: flex;
-  flex-direction: column;
-
-  .formfield {
-    width: 400px;
-
-    input {
-      font-size: 1.5rem;
-    }
-
-    &.autocomplete {
-      margin-top: 1rem;
-    }
-  }
-}
-
 .btn-container {
   display: flex;
   justify-content: space-between;
@@ -73,4 +55,10 @@
   i {
     margin: auto;
   }
+}
+
+h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-size: 2rem;
 }

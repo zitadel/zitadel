@@ -3,7 +3,7 @@
         <button (click)="close()" mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
-        <span class="abort">{{ 'GRANTS.CREATE.TITLE' | translate }}</span><span class="abort-2">Step
+        <h1 class="abort">{{ 'GRANTS.CREATE.TITLE' | translate }}</h1><span class="abort-2">Step
             {{ currentCreateStep }} of
             {{ STEPS }}</span>
     </div>
@@ -17,7 +17,7 @@
         </p>
 
         <ng-container>
-            <h1>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h1>
+            <h2>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h2>
 
             <app-search-user-autocomplete class="block" singleOutput="true" [users]="user ? [user] : []"
                 (selectionChanged)="selectUser($event)"
@@ -26,7 +26,7 @@
         </ng-container>
 
         <ng-container *ngIf="context && (context == UserGrantContext.USER || context == UserGrantContext.NONE)">
-            <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
+            <h2>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
 
             <app-search-project-autocomplete class="block" singleOutput="true"
                 (selectionChanged)="selectProject($event)">
