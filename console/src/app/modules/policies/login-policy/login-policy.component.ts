@@ -98,7 +98,7 @@ export class LoginPolicyComponent implements OnDestroy {
       if (resp.policy) {
         this.loginData = resp.policy;
         this.loading = false;
-        this.disabled = ((this.loginData as LoginPolicy.AsObject)?.isDefault) ?? false;
+        this.disabled = this.isDefault ?? false;
       }
     });
     this.getIdps().then(resp => {
