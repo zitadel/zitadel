@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -353,11 +354,18 @@ func (l *Login) getTheme(r *http.Request) string {
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
-	return "lgn-dark-theme" //TODO: impl
+	if l.isDarkMode(r) {
+		return "lgn-dark-theme"
+	}
+	return "lgn-light-theme"
 }
 
 func (l *Login) isDarkMode(r *http.Request) bool {
-	return true
+	cookie, err := r.Cookie("mode")
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(cookie.Value, "dark")
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
