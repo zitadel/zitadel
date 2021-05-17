@@ -2,12 +2,13 @@ name: ZITADEL Release
 on:
   push:
     branches:
-      - main
+      - '**'
     tags-ignore:
       - '**'
-  pull_request:
-    branches:
-      - '**'
+  # disabled due to a bug -> https://github.community/t/403-error-on-container-registry-push-from-github-action/173071/2
+  # pull_request:
+  #   branches:
+  #     - '**'
 
 env:
   REGISTRY: ghcr.io
