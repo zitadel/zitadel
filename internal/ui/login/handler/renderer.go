@@ -82,7 +82,15 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return false
 		},
 		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default))
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
+		},
+		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.LogoURL
+			if darkMode && policy.LogoDarkURL != "" {
+				fileName = policy.LogoDarkURL
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default), "filename", fileName)
 		},
 		"avatarUrl": func(orgID, userID string) string {
 			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.GetHumanAvatarAssetPath(userID), time.Hour*1)
@@ -343,7 +351,7 @@ func (l *Login) getThemeMode(r *http.Request) string {
 }
 
 func (l *Login) isDarkMode(r *http.Request) bool {
-	return false
+	return true
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {

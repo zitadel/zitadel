@@ -11,6 +11,7 @@ import (
 type dynamicResourceData struct {
 	OrgID         string `schema:"orgId"`
 	DefaultPolicy bool   `schema:"default-policy"`
+	FileName      string `schema:"file"`
 }
 
 func (l *Login) handleResources(staticDir http.FileSystem) http.Handler {
@@ -25,7 +26,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}
-	reader, info, _ := l.staticStorage.GetObject(r.Context(), bucketName, domain.CssPath+"/"+domain.CssVariablesFileName)
+	reader, info, _ := l.staticStorage.GetObject(r.Context(), bucketName, data.FileName)
 	if err != nil {
 		return
 	}

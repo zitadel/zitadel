@@ -11,7 +11,7 @@ const (
 	labelPolicyLogoPrefix = labelPolicyPrefix + "/logo"
 	labelPolicyIconPrefix = labelPolicyPrefix + "/icon"
 	labelPolicyFontPrefix = labelPolicyPrefix + "/font"
-	Dark                  = "/dark"
+	Dark                  = "dark"
 
 	CssPath              = labelPolicyPrefix + "/css"
 	CssVariablesFileName = "variables.css"

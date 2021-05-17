@@ -11,15 +11,15 @@ import (
 
 const (
 	defaultLabelPolicyLogoURL     = "/iam/" + domain.LabelPolicyLogoPath
-	defaultLabelPolicyLogoDarkURL = "/iam/" + domain.LabelPolicyLogoPath + domain.Dark
+	defaultLabelPolicyLogoDarkURL = "/iam/" + domain.LabelPolicyLogoPath + "/" + domain.Dark
 	defaultLabelPolicyIconURL     = "/iam/" + domain.LabelPolicyIconPath
-	defaultLabelPolicyIconDarkURL = "/iam/" + domain.LabelPolicyIconPath + domain.Dark
+	defaultLabelPolicyIconDarkURL = "/iam/" + domain.LabelPolicyIconPath + "/" + domain.Dark
 	defaultLabelPolicyFontURL     = "/iam/" + domain.LabelPolicyFontPath
 
 	orgLabelPolicyLogoURL     = "/org/" + domain.LabelPolicyLogoPath
-	orgLabelPolicyLogoDarkURL = "/org/" + domain.LabelPolicyLogoPath + domain.Dark
+	orgLabelPolicyLogoDarkURL = "/org/" + domain.LabelPolicyLogoPath + "/" + domain.Dark
 	orgLabelPolicyIconURL     = "/org/" + domain.LabelPolicyIconPath
-	orgLabelPolicyIconDarkURL = "/org/" + domain.LabelPolicyIconPath + domain.Dark
+	orgLabelPolicyIconDarkURL = "/org/" + domain.LabelPolicyIconPath + "/" + domain.Dark
 	orgLabelPolicyFontURL     = "/org/" + domain.LabelPolicyFontPath
 )
 
