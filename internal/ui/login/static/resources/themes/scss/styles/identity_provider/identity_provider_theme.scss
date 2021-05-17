@@ -1,27 +1,27 @@
 @import './identity_provider.scss';
 
 @mixin lgn-idp-theme() {
-    @include lgn-idp-color();
+  @include lgn-idp-color();
 }
 
 @mixin lgn-idp-color() {
-  
-    .lgn-idp {
-        border-color: var(--zitadel-color-divider);
 
-        @include lgn-idp-elevation(1);
+  .lgn-idp {
+    border-color: var(--zitadel-color-divider);
 
-        &:not([disabled]):active {
-            @include lgn-idp-elevation(8);
-        }
+    @include lgn-idp-elevation(1);
 
-        &.google {
-            color: var(--zitadel-color-google-text);
-            background-color: var(--zitadel-color-google-background);
-        }
+    &:not([disabled]):active {
+      @include lgn-idp-elevation(8);
     }
+
+    &.google {
+      color: var(--zitadel-color-google-text);
+      background-color: var(--zitadel-color-google-background);
+    }
+  }
 }
 
 @mixin lgn-idp-elevation($zValue, $opacity: $lgn-elevation-opacity) {
-    @include lgn-elevation($zValue, var(--zitadel-color-elevation), $opacity);
-  }
+  @include lgn-elevation($zValue, rgb(0, 0, 0), $opacity);
+}

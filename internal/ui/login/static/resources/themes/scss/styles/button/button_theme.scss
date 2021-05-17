@@ -179,7 +179,7 @@
 }
 
 @mixin lgn-button-elevation($zValue, $opacity: $lgn-elevation-opacity) {
-  @include lgn-elevation($zValue, var(--zitadel-color-elevation), $opacity);
+  @include lgn-elevation($zValue, rgb(0, 0, 0), $opacity);
 }
 
 @mixin lgn-button-typography($config-or-theme) {
