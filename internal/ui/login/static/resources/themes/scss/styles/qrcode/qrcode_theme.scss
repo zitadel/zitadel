@@ -1,18 +1,10 @@
 @import './qrcode.scss';
 
-@mixin lgn-qrcode-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-      @include lgn-qrcode-color($color);
-    }
+@mixin lgn-qrcode-theme() {
+    @include lgn-qrcode-color();
 }
 
-@mixin lgn-qrcode-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $background: map-get($config, background);
-    $foreground: map-get($config, foreground);
+@mixin lgn-qrcode-color() {
 
     .lgn-qrcode {
         svg {

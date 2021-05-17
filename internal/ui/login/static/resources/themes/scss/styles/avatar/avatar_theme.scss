@@ -1,45 +1,32 @@
 @import './avatar.scss';
 @import "../elevation/elevation.scss";
 
-@mixin lgn-avatar-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-avatar-color($color);
-    }
+@mixin lgn-avatar-theme() {
+    @include lgn-avatar-color();
 }
 
-@mixin lgn-avatar-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $warn: map-get($config, warn);
-    $primary: map-get($config, primary);
-
+@mixin lgn-avatar-color() {
     .lgn-avatar:not(.transparent) {
-        @include _lgn-avatar-theme-property($config, "background-color", default);
-        @include lgn-button-elevation(2, $config);
+        @include _lgn-avatar-theme-property("background-color", default);
+        @include lgn-avatar-elevation(2);
     }
 
     .lgn-avatar .initials{
-        @include _lgn-avatar-theme-property($config, "color", default-contrast);
+        @include _lgn-avatar-theme-property("color", default-contrast);
     }
 }
 
-@mixin _lgn-avatar-theme-property($theme, $property, $hue) {
-    $primary: map-get($theme, primary);
-    $accent: map-get($theme, accent);
-    $warn: map-get($theme, warn);
-    $background: map-get($theme, background);
-    $foreground: map-get($theme, foreground);
-  
+@mixin _lgn-avatar-theme-property($property, $contrast) {
+    $color: if($contrast, var(--zitadel-color-primary-contrast), var(--zitadel-color-primary));
+
     &.lgn-primary {
-      #{$property}: lgn-color($primary, $hue);
+      #{$property}: $color;
     }
     &.lgn-accent {
-      #{$property}: lgn-color($accent, $hue);
+      #{$property}: $color;
     }
     &.lgn-warn {
-      #{$property}: lgn-color($warn, $hue);
+      #{$property}: $color;
     }
   
     &.lgn-primary,
@@ -47,20 +34,12 @@
     &.lgn-warn,
     &[disabled] {
         &[disabled] {
-            $palette: if($property == "color", $foreground, $background);
-            #{$property}: lgn-color($palette, disabled-button);
+            $btn-color: if($property == "color", var(--zitadel-color-button-disabled), var(--itadel-color-button-disabled-background));
+            #{$property}: $btn-color;
         }
     }
 }
 
-@mixin lgn-avatar-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
-    $foreground: map-get($config, foreground);
-    $elevation-color: map-get($foreground, elevation);
-    $elevation-color-or-default: if(
-      $elevation-color == null,
-      $lgn-elevation-color,
-      $elevation-color
-    );
-  
-    @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
+@mixin lgn-avatar-elevation($zValue, $opacity: $lgn-elevation-opacity) {
+    @include lgn-elevation($zValue, var(--zitadel-color-elevation), $opacity);
   }

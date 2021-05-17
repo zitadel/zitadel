@@ -1,15 +1,12 @@
 @import './a.scss';
 
-@mixin lgn-a-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
+@mixin lgn-a-theme() {
 
-    @if $color != null {
-    @include lgn-a-color($color);
-    }
+    @include lgn-a-color();
+
 }
 
-@mixin lgn-a-color($config-or-theme) {
+@mixin lgn-a-color() {
     a {
       color: var(--zitadel-color-primary);
 

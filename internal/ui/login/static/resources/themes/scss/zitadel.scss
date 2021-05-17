@@ -16,7 +16,7 @@ $light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
 $dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 // Include all theme styles for the components.
-@include zitadel-lgn-theme($dark-theme);
+@include zitadel-lgn-theme();
 
 //.lgn-dark-theme {
 //    @include zitadel-lgn-theme($dark-theme);

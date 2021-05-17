@@ -1,22 +1,11 @@
 @import '../theming/theming.scss';
 @import './progress_bar.scss';
 
-@mixin lgn-progress-bar-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-progress-bar-color($color);
-    }
+@mixin lgn-progress-bar-theme() {
+    @include lgn-progress-bar-color();
 }
 
-@mixin lgn-progress-bar-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $primary: map-get($config, primary);
-    $warn: map-get($config, warn);
-    $background: map-get($config, background);
-    $foreground: map-get($config, foreground);
-
+@mixin lgn-progress-bar-color() {
     .lgn-progress-bar {
       border-color: var(--zitadel-color-input-border);
     }  

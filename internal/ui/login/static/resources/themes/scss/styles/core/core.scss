@@ -3,14 +3,10 @@
     @include zitadel-lgn-typography($typography-config);
   }
   
-  @mixin lgn-core-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
+  @mixin lgn-core-color() {
 
     // Wrapper element that provides the theme background
     .lgn-app-background#{if(&, ', &.lgn-app-background', '')} {
-      $background: var(--zitadel-background);
-      $foreground: map-get($config, foreground);
-  
       background-color: var(--zitadel-color-background);
       color: var(--zitadel-color-text);
     }
@@ -24,10 +20,6 @@
   }
 
   // Mixin that renders all of the core styles that depend on the theme.
-  @mixin lgn-core-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-    @if $color != null {
-        @include lgn-core-color($color);
-    }
+  @mixin lgn-core-theme() {
+    @include lgn-core-color();
   }

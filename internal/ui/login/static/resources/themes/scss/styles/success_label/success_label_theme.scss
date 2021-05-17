@@ -1,21 +1,13 @@
 @import '../theming/theming.scss';
 @import './success_label.scss';
 
-@mixin lgn-success-label-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-success-label-color($color);
-    }
+@mixin lgn-success-label-theme() {
+    @include lgn-success-label-color();
 }
 
-@mixin lgn-success-label-color($config-or-theme) {
-    //$config: lgn-get-color-config($config-or-theme);
-    //$is-dark-theme: map-get($config, is-dark);
+@mixin lgn-success-label-color() {
 
     .lgn-success-label {
-        //color: if($is-dark-theme, #cbf4c9, #0e6245);
         color: var(--zitadel-color-success);
         background-color: var(--zitadel-color-success-background);
     }

@@ -13,6 +13,8 @@
     --zitadel-color-primary-700: #4356c9;
     --zitadel-color-primary-800: #3a4cc3;
     --zitadel-color-primary-900: #293bb9;
+    --zitadel-color-primary-rgb: rgb(84,105,212);
+    --zitadel-color-primary-contrast: var(--zitadel-color-white);
 
     --zitadel-color-secondary-50: #eaedfa;
     --zitadel-color-secondary-100: #ccd2f2;
@@ -24,6 +26,7 @@
     --zitadel-color-secondary-700: #4356c9;
     --zitadel-color-secondary-800: #3a4cc3;
     --zitadel-color-secondary-900: #293bb9;
+    --zitadel-color-secondary-contrast: var(--zitadel-color-white);
 
     --zitadel-color-warn-50: #ffebee;
     --zitadel-color-warn-100: #ffcdd2;
@@ -44,7 +47,7 @@
     --zitadel-color-input-border-hover: #1a1b1b;
     --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
 
-    --zitadel-color-text: rgba(0,0,0, 0.87);
+    --zitadel-color-text: rgba(0, 0, 0, 0.87);
     --zitadel-color-label: var(--zitadel-color-grey-600);
 
 
@@ -54,13 +57,15 @@
     --zitadel-color-success: #0e6245;
     --zitadel-color-success-background: #cbf4c9;
 
+    --zitadel-color-elevation: var(--zitadel-color-black);
 
     --zitadel-color-divider: rgba(0, 0, 0, 0.12);
 
     /*--zitadel-color-button-disabled: rgba(0,0,0, 0.26);*/
-    --zitadel-color-button-disabled-background: rgba(0,0,0, 0.26);
+    --zitadel-color-button-disabled-background: rgba(0, 0, 0, 0.26);
     --zitadel-color-button-selected-background: var(--zitadel-color-grey-900);
     --zitadel-color-button-disabled-selected-background: var(--zitadel-color-grey-800);
+    --zitadel-color-raised-button-background: var(--zitadel-color-white);
 
 
     --zitadel-color-white: #ffffff;
@@ -162,7 +167,7 @@
     --zitadel-color-background: var(--zitadel-color-grey-900);
     --zitadel-color-footer-line: #303131;
 
-    --zitadel-color-input-background: rgba(0,0,0, .2);
+    --zitadel-color-input-background: rgba(0, 0, 0, .2);
     --zitadel-color-input-border: #403e3e;
     --zitadel-color-input-border-hover: #aeafb1;
     --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
@@ -173,13 +178,13 @@
     --zitadel-color-account-selector-hover: rgba(255, 255, 255, 0.02);
     --zitadel-color-account-selector-active: rgba(255, 255, 255, 0.05);
 
+    --zitadel-color-raised-button-background: var(--zitadel-color-grey-800);
 
-
+    --zitadel-color-elevation: var(--zitadel-color-black);
 
 
     --zitadel-color-success: #cbf4c9;
     --zitadel-color-success-background: #4f566b;
-
 
 
     /*--zitadel-color-label: var(--zitadel-color-grey-600); same */
