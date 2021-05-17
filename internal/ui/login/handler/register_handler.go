@@ -156,12 +156,8 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 }
 
 func (d registerFormData) toHumanDomain() *domain.Human {
-	username := d.Username
-	if username == "" {
-		username = d.Email
-	}
 	return &domain.Human{
-		Username: username,
+		Username: d.Username,
 		Profile: &domain.Profile{
 			FirstName:         d.Firstname,
 			LastName:          d.Lastname,
