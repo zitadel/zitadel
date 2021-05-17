@@ -1,14 +1,12 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/static"
@@ -99,12 +97,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			}
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
 		},
-		"avatarUrl": func(orgID, userID string) string {
-			presignedURL, err := r.staticStorage.GetObjectPresignedURL(context.TODO(), orgID, domain.GetHumanAvatarAssetPath(userID), time.Hour*1)
-			if err != nil {
-				return ""
-			}
-			return presignedURL.String()
+		"avatarResource": func(orgID, avatar string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", false, "filename", avatar))
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
@@ -326,16 +320,18 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 }
 
 func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
-	var userName, loginName, displayName string
+	var userName, loginName, displayName, avatar string
 	if authReq != nil {
 		userName = authReq.UserName
 		loginName = authReq.LoginName
 		displayName = authReq.DisplayName
+		avatar = authReq.AvatarKey
 	}
 	return profileData{
 		UserName:    userName,
 		LoginName:   loginName,
 		DisplayName: displayName,
+		AvatarKey:   avatar,
 	}
 }
 
@@ -459,6 +455,7 @@ type profileData struct {
 	LoginName   string
 	UserName    string
 	DisplayName string
+	AvatarKey   string
 }
 
 type passwordData struct {

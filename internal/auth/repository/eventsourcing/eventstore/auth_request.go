@@ -248,7 +248,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if request.RequestedOrgID == "" {
 		username = user.PreferredLoginName
 	}
-	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -466,7 +466,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return err
 	}
 
-	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", user.ResourceOwner)
+	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
 	return nil
 }
 
@@ -509,7 +509,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest,
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(externalIDP.UserID, "", "", "", externalIDP.ResourceOwner)
+	request.SetUserInfo(externalIDP.UserID, "", "", "", "", externalIDP.ResourceOwner)
 	return nil
 }
 
