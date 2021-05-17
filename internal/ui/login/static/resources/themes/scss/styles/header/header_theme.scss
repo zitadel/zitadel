@@ -1,16 +1,10 @@
 @import './header.scss';
 
-@mixin lgn-header-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-    @include lgn-header-color($color);
-    }
+@mixin lgn-header-theme() {
+    @include lgn-header-color();
 }
 
-@mixin lgn-header-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
+@mixin lgn-header-color() {
   
     .lgn-logo {
         background: _lgn-get-logo-src($config);

@@ -1,21 +1,11 @@
 @import '../theming/theming.scss';
 @import './checkbox.scss';
 
-@mixin lgn-checkbox-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-checkbox-color($color);
-    }
+@mixin lgn-checkbox-theme() {
+    @include lgn-checkbox-color();
 }
 
-@mixin lgn-checkbox-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $primary: map-get($config, primary);
-    $warn: map-get($config, warn);
-    $background: map-get($config, background);
-    $foreground: map-get($config, foreground);
+@mixin lgn-checkbox-color() {
 
     input[type='checkbox'] {
         position: absolute;
@@ -31,7 +21,7 @@
     .lgn-checkbox label {            
         &:before {
             background-color: transparent;
-            border: 2px solid lgn-color($foreground, input-border);
+            border: 2px solid var(--zitadel-color-input-border);
         }
         
         &:after {
@@ -44,8 +34,8 @@
     // Checked
     input[type='checkbox']:checked + label {
         &:before {
-            background-color: lgn-color($primary, default);
-            border-color: lgn-color($primary, default);
+            background-color: var(--zitadel-color-primary);
+            border-color: var(--zitadel-color-primary);
         }
         
         &:after {

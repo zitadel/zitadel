@@ -2,81 +2,68 @@
 @import "./button.scss";
 @import "../elevation/elevation.scss";
 
-@mixin lgn-button-theme($theme-or-color-config) {
-  $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-  $color: lgn-get-color-config($theme);
-
-  @if $color != null {
-    @include lgn-button-color($color);
-  }
+@mixin lgn-button-theme() {
+    @include lgn-button-color();
 }
 
-@mixin lgn-button-color($config-or-theme) {
-  $config: lgn-get-color-config($config-or-theme);
-  $primary: map-get($config, primary);
-  $accent: map-get($config, accent);
-  $warn: map-get($config, warn);
-  $background: map-get($config, background);
-  $foreground: map-get($config, foreground);
-
+@mixin lgn-button-color() {
   .lgn-button,
   .lgn-stroked-button,
   .lgn-icon-button {
     color: inherit;
     background: transparent;
 
-    @include _lgn-button-theme-property($config, "color", text);
+    @include _lgn-button-theme-color(false);
   }
 
   .lgn-button:focus,
   .lgn-stroked-button:focus,
   .lgn-raised-button:focus {
-    @include lgn-button-elevation(8, $config);
-    background: map-get($background, base);
+    @include lgn-button-elevation(8);
+    background: var(--zitadel-color-background);
   }
 
   .lgn-stroked-button:not([disabled]) {
-    border-color: lgn-color($foreground, divider);
+    border-color: var(--zitadel-color-divider);
   }
 
   .lgn-button {
-    @include _lgn-button-theme-property($config, "color", text);
+    @include _lgn-button-theme-color(false);
     &:hover {
-      $primary: map-get($config, primary);
-      background-color: rgba(lgn-color($primary, 500), 0.1);
+      background-color: rgba(var(--zitadel-color-primary-rgb), 0.1);
     }
 
     &:focus {
-      background-color: rgba(lgn-color($primary, 500), 0.2);
+      background-color: rgba(var(--zitadel-color-primary-rgb), 0.2);
     }
 
     &:active {
-      background-color: rgba(lgn-color($primary, 500), 0.25);
+      background-color: rgba(var(--zitadel-color-primary-rgb), 0.25);
     }
   }
 
   .lgn-raised-button {
-    color: lgn-color($foreground, text);
-    background-color: lgn-color($background, raised-button);
+    color: var(--zitadel-color-text);
+    background-color: var(--zitadel-color-raised-button-background);
 
-    @include _lgn-button-theme-property($config, "color", default-contrast);
-    @include _lgn-button-theme-property($config, "background-color", default);
+    @include _lgn-button-theme-color(true);
+    @include _lgn-button-theme-background-color();
 
     &:active {
-      background-color: rgba(lgn-color($primary, 500), 0.8);
+      background-color: rgba(var(--zitadel-color-primary-rgb), 0.8);
     }
   }
 
   .lgn-button,
   .lgn-stroked-button {
-    @include lgn-button-elevation(0, $config);
+    @include lgn-button-elevation(0);
   }
 
   .lgn-raised-button {
-    @include lgn-button-elevation(2, $config);
+    @include lgn-button-elevation(2);
 
     &:not([disabled]):active {
-      @include lgn-button-elevation(8, $config);
+      @include lgn-button-elevation(8);
     }
 
     // &:focus {
@@ -84,26 +71,20 @@
     // }
 
     &[disabled] {
-      @include lgn-button-elevation(0, $config);
+      @include lgn-button-elevation(0);
     }
   }
 }
 
-@mixin _lgn-button-theme-property($theme, $property, $hue) {
-  $primary: map-get($theme, primary);
-  $accent: map-get($theme, accent);
-  $warn: map-get($theme, warn);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-
+@mixin _lgn-button-theme-color() {
   &.lgn-primary {
-    #{$property}: lgn-color($primary, $hue);
+    color: var(--zitadel-color-primary);
   }
   &.lgn-accent {
-    #{$property}: lgn-color($accent, $hue);
+    color: var(--zitadel-color-secondary);
   }
   &.lgn-warn {
-    #{$property}: lgn-color($warn, $hue);
+    color: var(--zitadel-color-warn);
   }
 
   &.lgn-primary,
@@ -111,41 +92,94 @@
   &.lgn-warn,
   &[disabled] {
         &[disabled] {
-            $palette: if($property == "color", $foreground, $background);
-            #{$property}: lgn-color($palette, disabled-button);
+            color: var(--zitadel-color-button-disabled);
         }
   }
 }
 
-@mixin _lgn-button-focus-overlay-color($config-or-theme) {
-  $config: lgn-get-color-config($config-or-theme);
-  $primary: map-get($config, primary);
-  $accent: map-get($config, accent);
-  $warn: map-get($config, warn);
-
-  &.lgn-primary:focus {
-    background-color: lgn-color($primary);
+@mixin _lgn-button-theme-background-color() {
+  &.lgn-primary {
+    background-color: var(--zitadel-color-primary);
+  }
+  &.lgn-accent {
+    background-color: var(--zitadel-color-secondary);
+  }
+  &.lgn-warn {
+    background-color: var(--zitadel-color-warn);
   }
 
-  &.lgn-accent:focus {
-    background-color: lgn-color($accent);
-  }
-
-  &.lgn-warn:focus {
-    background-color: lgn-color($warn);
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+        &[disabled] {
+            background-color: var(--zitadel-color-button-disabled-background);
+        }
   }
 }
 
-@mixin lgn-button-elevation($zValue, $config, $opacity: $lgn-elevation-opacity) {
-  $foreground: map-get($config, foreground);
-  $elevation-color: map-get($foreground, elevation);
-  $elevation-color-or-default: if(
-    $elevation-color == null,
-    $lgn-elevation-color,
-    $elevation-color
-  );
+@mixin _lgn-button-theme-color($contrast) {
+  $color: if($contrast, var(--zitadel-color-primary-contrast), var(--zitadel-color-primary));
 
-  @include lgn-elevation($zValue, $elevation-color-or-default, $opacity);
+  &.lgn-primary {
+    color: $color;
+  }
+  &.lgn-accent {
+    color: $color;
+  }
+  &.lgn-warn {
+    color: $color;
+  }
+
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+        &[disabled] {
+            color: var(--zitadel-color-button-disabled);
+        }
+  }
+}
+
+@mixin _lgn-button-theme-background-color() {
+
+  &.lgn-primary {
+    background-color: var(--zitadel-color-primary);
+  }
+  &.lgn-accent {
+    background-color: var(--zitadel-color-primary);
+  }
+  &.lgn-warn {
+    background-color: var(--zitadel-color-primary);
+  }
+
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+        &[disabled] {
+            background-color: var(--zitadel-color-button-disabled-background);
+        }
+  }
+}
+
+@mixin _lgn-button-focus-overlay-color() {
+
+  &.lgn-primary:focus {
+    background-color: var(--zitadel-color-primary);
+  }
+
+  &.lgn-accent:focus {
+    background-color: var(--zitadel-color-secondary);
+  }
+
+  &.lgn-warn:focus {
+    background-color: var(--zitadel-color-warn);
+  }
+}
+
+@mixin lgn-button-elevation($zValue, $opacity: $lgn-elevation-opacity) {
+  @include lgn-elevation($zValue, rgb(0, 0, 0), $opacity);
 }
 
 @mixin lgn-button-typography($config-or-theme) {

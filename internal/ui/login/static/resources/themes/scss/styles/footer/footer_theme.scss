@@ -1,27 +1,20 @@
 @import './footer.scss';
 
-@mixin lgn-footer-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
+@mixin lgn-footer-theme() {
     // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
-      $color: lgn-get-color-config($theme);
 
-      @if $color != null {
-        @include lgn-footer-color($color);
-      }
+    @include lgn-footer-color();
     // }
 }
 
-@mixin lgn-footer-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $background: map-get($config, background);
-    $foreground: map-get($config, foreground);
+@mixin lgn-footer-color() {
   
     footer {
-      background-color: lgn-color($background, footer);
-      border-top: 1px solid lgn-color($foreground, footer-line);
+      background-color: var(--zitadel-color-background);
+      border-top: 1px solid var(--zitadel-color-footer-line);
 
       a {
-        color: lgn-color($background, footer-links);
+        color: var(--zitadel-color-primary);
       }
     }
 }
