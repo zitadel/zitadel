@@ -99,6 +99,19 @@ func (m *Minio) GetObjectInfo(ctx context.Context, bucketName, objectName string
 	return m.objectToAssetInfo(bucketName, info), nil
 }
 
+func (m *Minio) GetObject(ctx context.Context, bucketName, objectName string) (io.Reader, *domain.AssetInfo, error) {
+	bucketName = m.prefixBucketName(bucketName)
+	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
+	}
+	info, err := object.Stat()
+	if err != nil {
+		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
+	}
+	return object, m.objectToAssetInfo(bucketName, info), nil
+}
+
 func (m *Minio) GetObjectPresignedURL(ctx context.Context, bucketName, objectName string, expiration time.Duration) (*url.URL, error) {
 	bucketName = m.prefixBucketName(bucketName)
 	reqParams := make(url.Values)
