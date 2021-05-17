@@ -203,37 +203,39 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 	cssContent := ""
 	cssContent += fmt.Sprint(":root {")
 	if policy.PrimaryColor != "" {
-		cssContent += fmt.Sprintf("--primary-color: %s;", policy.PrimaryColor)
+		cssContent += fmt.Sprintf("--zitadel-color-primary: %s;", policy.PrimaryColor)
 	}
 	if policy.SecondaryColor != "" {
-		cssContent += fmt.Sprintf("--secondary-color: %s;", policy.SecondaryColor)
+		cssContent += fmt.Sprintf("--zitadel-color-secondary: %s;", policy.SecondaryColor)
 	}
 	if policy.PrimaryColor != "" {
-		cssContent += fmt.Sprintf("--warn-color: %s;", policy.SecondaryColor)
+		cssContent += fmt.Sprintf("--zitadel-color-warn: %s;", policy.SecondaryColor)
+	}
+	cssContent += fmt.Sprint(".lgn-dark-theme {")
+	if policy.SecondaryColorDark != "" {
+		cssContent += fmt.Sprintf("--zitadel-color-primary: %s;", policy.PrimaryColorDark)
 	}
 	if policy.SecondaryColorDark != "" {
-		cssContent += fmt.Sprintf("--primary-color-dark: %s;", policy.PrimaryColorDark)
-	}
-	if policy.SecondaryColorDark != "" {
-		cssContent += fmt.Sprintf("--secondary-color-dark: %s;", policy.SecondaryColorDark)
+		cssContent += fmt.Sprintf("--zitadel-color-secondary: %s;", policy.SecondaryColorDark)
 	}
 	if policy.WarnColorDark != "" {
-		cssContent += fmt.Sprintf("--warn-color-dark: %s;", policy.WarnColorDark)
+		cssContent += fmt.Sprintf("--zitadel-color-warn: %s;", policy.WarnColorDark)
 	}
+	cssContent += fmt.Sprint("}")
 	if policy.LogoURL != "" {
-		cssContent += fmt.Sprintf("--logo-url: %s;", policy.LogoURL)
+		cssContent += fmt.Sprintf("--zitadel-logo-url: %s;", policy.LogoURL)
 	}
 	if policy.LogoDarkURL != "" {
-		cssContent += fmt.Sprintf("--logo-url-dark: %s;", policy.LogoDarkURL)
+		cssContent += fmt.Sprintf("--zitadel-logo-url-dark: %s;", policy.LogoDarkURL)
 	}
 	if policy.IconURL != "" {
-		cssContent += fmt.Sprintf("--icon-url: %s;", policy.IconURL)
+		cssContent += fmt.Sprintf("--zitadel-icon-url: %s;", policy.IconURL)
 	}
 	if policy.IconDarkURL != "" {
-		cssContent += fmt.Sprintf("--icon-url-dark: %s;", policy.IconDarkURL)
+		cssContent += fmt.Sprintf("--zitadel-icon-url-dark: %s;", policy.IconDarkURL)
 	}
 	if policy.FontURL != "" {
-		cssContent += fmt.Sprintf("--font-url: %s;", policy.FontURL)
+		cssContent += fmt.Sprintf("--zitadel-font-url: %s;", policy.FontURL)
 	}
 	cssContent += fmt.Sprint("}")
 
