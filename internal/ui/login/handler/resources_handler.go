@@ -26,7 +26,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}
-	reader, info, _ := l.staticStorage.GetObject(r.Context(), bucketName, data.FileName)
+	reader, info, err := l.staticStorage.GetObject(r.Context(), bucketName, data.FileName)
 	if err != nil {
 		return
 	}
