@@ -291,6 +291,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
+		DarkMode:               l.isDarkMode(r),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -337,8 +338,12 @@ func (l *Login) getTheme(r *http.Request) string {
 	return "zitadel" //TODO: impl
 }
 
+func (l *Login) getThemeMode(r *http.Request) string {
+	return "lgn-dark-theme" //TODO: impl
+}
+
 func (l *Login) isDarkMode(r *http.Request) bool {
-	return true
+	return false
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
@@ -401,6 +406,7 @@ type baseData struct {
 	Title                  string
 	Theme                  string
 	ThemeMode              string
+	DarkMode               bool
 	OrgID                  string
 	OrgName                string
 	PrimaryDomain          string
