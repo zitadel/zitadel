@@ -1,5 +1,9 @@
 {{define "header"}}
 <header class="lgn-header">
-    <div class="lgn-logo" height="43px" width="160px" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo" ></div>
+<!--    {{ if hasCustomPolicy .LabelPolicy }}-->
+<!--    <link rel="stylesheet" href="{{ variablesCssFileUrl .OrgID .LabelPolicy}}" type="text/css">-->
+<!--    {{ end}}-->
+<!--    <div class="lgn-logo" height="43px" width="160px" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo" ></div>-->
+    <img class="lgn-logo" src="{{ resourceThemeUrl "logo-light.svg" .Theme }}" alt="Logo">
 </header>
 {{end}}

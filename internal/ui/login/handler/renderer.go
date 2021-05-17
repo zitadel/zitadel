@@ -337,8 +337,8 @@ func (l *Login) getTheme(r *http.Request) string {
 	return "zitadel" //TODO: impl
 }
 
-func (l *Login) getThemeMode(r *http.Request) string {
-	return "lgn-dark-theme" //TODO: impl
+func (l *Login) isDarkMode(r *http.Request) bool {
+	return true
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {

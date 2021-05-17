@@ -199,9 +199,11 @@ footer .watermark .lgn-logo {
   padding: 0;
   width: 100%;
 }
+
 .lgn-header .lgn-logo {
-  height: 43px;
-  width: 160px;
+  display: block;
+  max-width: 400px;
+  max-height: 60px;
   margin: 0 auto;
 }
 

@@ -19,66 +19,6 @@ import (
 	"github.com/caos/zitadel/internal/static"
 )
 
-var (
-	includePaths = []string{
-		"/resources/themes/scss/main.scss",
-		"/resources/themes/scss/bundle.scss",
-		"/resources/themes/scss/styles/a/a.scss",
-		"/resources/themes/scss/styles/a/a_theme.scss",
-		"/resources/themes/scss/styles/account_selection/account_selection.scss",
-		"/resources/themes/scss/styles/account_selection/account_selection_theme.scss",
-		"/resources/themes/scss/styles/avatar/avatar.scss",
-		"/resources/themes/scss/styles/avatar/avatar_theme.scss",
-		"/resources/themes/scss/styles/button/button.scss",
-		"/resources/themes/scss/styles/button/button_base.scss",
-		"/resources/themes/scss/styles/button/button_theme.scss",
-		"/resources/themes/scss/styles/checkbox/checkbox.scss",
-		"/resources/themes/scss/styles/checkbox/checkbox_base.scss",
-		"/resources/themes/scss/styles/checkbox/checkbox_theme.scss",
-		"/resources/themes/scss/styles/color/all_color.scss",
-		"/resources/themes/scss/styles/container/container.scss",
-		"/resources/themes/scss/styles/container/container_theme.scss",
-		"/resources/themes/scss/styles/core/core.scss",
-		"/resources/themes/scss/styles/elevation/elevation.scss",
-		"/resources/themes/scss/styles/error/error.scss",
-		"/resources/themes/scss/styles/error/error_theme.scss",
-		"/resources/themes/scss/styles/footer/footer.scss",
-		"/resources/themes/scss/styles/footer/footer_theme.scss",
-		"/resources/themes/scss/styles/header/header.scss",
-		"/resources/themes/scss/styles/header/header_theme.scss",
-		"/resources/themes/scss/styles/identity_provider/identity_provider.scss",
-		"/resources/themes/scss/styles/identity_provider/identity_provider_base.scss",
-		"/resources/themes/scss/styles/identity_provider/identity_provider_theme.scss",
-		"/resources/themes/scss/styles/input/input.scss",
-		"/resources/themes/scss/styles/input/input_base.scss",
-		"/resources/themes/scss/styles/input/input_theme.scss",
-		"/resources/themes/scss/styles/label/label.scss",
-		"/resources/themes/scss/styles/label/label_base.scss",
-		"/resources/themes/scss/styles/label/label_theme.scss",
-		"/resources/themes/scss/styles/list/list.scss",
-		"/resources/themes/scss/styles/list/list_base.scss",
-		"/resources/themes/scss/styles/list/list_theme.scss",
-		"/resources/themes/scss/styles/progress_bar/progress_bar.scss",
-		"/resources/themes/scss/styles/progress_bar/progress_bar_base.scss",
-		"/resources/themes/scss/styles/progress_bar/progress_bar_theme.scss",
-		"/resources/themes/scss/styles/qrcode/qrcode.scss",
-		"/resources/themes/scss/styles/qrcode/qrcode_theme.scss",
-		"/resources/themes/scss/styles/radio/radio.scss",
-		"/resources/themes/scss/styles/radio/radio_base.scss",
-		"/resources/themes/scss/styles/radio/radio_theme.scss",
-		"/resources/themes/scss/styles/register/register.scss",
-		"/resources/themes/scss/styles/select/select.scss",
-		"/resources/themes/scss/styles/select/select_base.scss",
-		"/resources/themes/scss/styles/select/select_theme.scss",
-		"/resources/themes/scss/styles/success_label/success_label.scss",
-		"/resources/themes/scss/styles/success_label/success_label_base.scss",
-		"/resources/themes/scss/styles/success_label/success_label_theme.scss",
-		"/resources/themes/scss/styles/theming/all.scss",
-		"/resources/themes/scss/styles/theming/palette.scss",
-		"/resources/themes/scss/styles/theming/theming.scss",
-	}
-)
-
 const (
 	stylingTable = "adminapi.styling"
 )
@@ -222,18 +162,6 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		cssContent += fmt.Sprintf("--zitadel-color-warn: %s;", policy.WarnColorDark)
 	}
 	cssContent += fmt.Sprint("}")
-	if policy.LogoURL != "" {
-		cssContent += fmt.Sprintf("--zitadel-logo-url: %s;", policy.LogoURL)
-	}
-	if policy.LogoDarkURL != "" {
-		cssContent += fmt.Sprintf("--zitadel-logo-url-dark: %s;", policy.LogoDarkURL)
-	}
-	if policy.IconURL != "" {
-		cssContent += fmt.Sprintf("--zitadel-icon-url: %s;", policy.IconURL)
-	}
-	if policy.IconDarkURL != "" {
-		cssContent += fmt.Sprintf("--zitadel-icon-url-dark: %s;", policy.IconDarkURL)
-	}
 	if policy.FontURL != "" {
 		cssContent += fmt.Sprintf("--zitadel-font-url: %s;", policy.FontURL)
 	}
