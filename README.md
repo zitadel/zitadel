@@ -36,21 +36,30 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 * APIs for Management, Administration, and Authentication
 * Policy configuration and enforcement
 
-## How To Use It
+## Run ZITADEL anywhere
 
-### ZITADEL Cloud
+### Self-Managed
 
-We provide a cloud service [**ZITADEL.ch**](https://zitadel.ch) where people can register their own organization. There is a **free tier** including unlimited users and all the security features you need.
+You can run an automatically operated **ZITADEL** instance on a CNCF compliant Kubernetes cluster of your choice:
+- [CRD Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/crd)
+- [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
+- [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
 
-### Run ZITADEL in the cloud or on-premise
+### CAOS-Managed
 
-**ZITADEL** is free open source software under [Apache 2.0](##License) managed by [CAOS](https://caos.ch). We provide our community access to ZITADEL releases at no cost and welcome all contributions.
+- **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
+- **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
-You can run an automatically operated **ZITADEL** instance on a CNCF compliant Kubernetes cluster of your choice. You can do so by using [CRDs](https://docs.zitadel.ch/docs/guides/installation/crd), [GitOps](https://docs.zitadel.ch/docs/guides/installation/gitops) or on a [dedicated Kubernetes Cluster](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance) on various infrastructure providers using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
+## Start using ZITADEL
 
-### Let us run ZITADEL for you
+### Quickstarts
 
-If  our cloud service or running **ZITADEL** on your own infrastructure does not work for you, we are happy to run a private instance of **ZITADEL** for you or provide you with our support services. [Get in touch!](https://zitadel.ch/contact/)
+See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
+
+### Client libraries
+* [Go](https://github.com/caos/zitadel-go) client library
+* [.NET](https://github.com/caos/zitadel-net) client library
+* [Dart](https://github.com/caos/zitadel-dart) client library
 
 ## Help and Documentation
 
