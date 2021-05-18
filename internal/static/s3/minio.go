@@ -3,6 +3,7 @@ package s3
 import (
 	"context"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -88,28 +89,30 @@ func (m *Minio) PutObject(ctx context.Context, bucketName, objectName, contentTy
 
 func (m *Minio) GetObjectInfo(ctx context.Context, bucketName, objectName string) (*domain.AssetInfo, error) {
 	bucketName = m.prefixBucketName(bucketName)
-	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
+	objectinfo, err := m.Client.StatObject(ctx, bucketName, objectName, minio.StatObjectOptions{})
 	if err != nil {
+		if errResp := minio.ToErrorResponse(err); errResp.StatusCode == http.StatusNotFound {
+			return nil, caos_errs.ThrowNotFound(err, "MINIO-Gdfh4", "Errors.Assets.Object.GetFailed")
+		}
 		return nil, caos_errs.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
 	}
-	info, err := object.Stat()
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
-	}
-	return m.objectToAssetInfo(bucketName, info), nil
+	return m.objectToAssetInfo(bucketName, objectinfo), nil
 }
 
-func (m *Minio) GetObject(ctx context.Context, bucketName, objectName string) (io.Reader, *domain.AssetInfo, error) {
+func (m *Minio) GetObject(ctx context.Context, bucketName, objectName string) (io.Reader, func() (*domain.AssetInfo, error), error) {
 	bucketName = m.prefixBucketName(bucketName)
 	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
+		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-VGDgv", "Errors.Assets.Object.GetFailed")
 	}
-	info, err := object.Stat()
-	if err != nil {
-		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
+	info := func() (*domain.AssetInfo, error) {
+		info, err := object.Stat()
+		if err != nil {
+			return nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
+		}
+		return m.objectToAssetInfo(bucketName, info), nil
 	}
-	return object, m.objectToAssetInfo(bucketName, info), nil
+	return object, info, nil
 }
 
 func (m *Minio) GetObjectPresignedURL(ctx context.Context, bucketName, objectName string, expiration time.Duration) (*url.URL, error) {
@@ -159,7 +162,8 @@ func (m *Minio) objectToAssetInfo(bucketName string, object minio.ObjectInfo) *d
 		Size:            object.Size,
 		LastModified:    object.LastModified,
 		VersionID:       object.VersionID,
-		Expiration:      object.Expiration,
+		Expiration:      object.Expires,
+		ContentType:     object.ContentType,
 		AutheticatedURL: m.Client.EndpointURL().String() + "/" + bucketName + "/" + object.Key,
 	}
 }

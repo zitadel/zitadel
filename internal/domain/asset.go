@@ -31,6 +31,7 @@ type AssetInfo struct {
 	VersionID       string
 	Expiration      time.Time
 	AutheticatedURL string
+	ContentType     string
 }
 
 func GetHumanAvatarAssetPath(userID string) string {

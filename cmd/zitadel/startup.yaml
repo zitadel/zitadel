@@ -278,6 +278,10 @@ UI:
       Cache:
         MaxAge: $ZITADEL_CACHE_MAXAGE
         SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+      StaticCache:
+        Type: bigcache
+        Config:
+          MaxCacheSizeInByte: 52428800 #50MB
   Console:
     EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
     ShortCache:
