@@ -511,7 +511,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             const config = { api: this.app.apiConfig };
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
           }
-          this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+          this.toast.showInfo('APP.TOAST.APIUPDATED', true);
         })
         .catch(error => {
           this.toast.showError(error);
@@ -540,7 +540,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
       this.dialog.open(AppSecretDialogComponent, {
         data: {
-          // clientId: data.toObject().clientId ?? '',
           clientSecret: resp.clientSecret,
         },
         width: '400px',

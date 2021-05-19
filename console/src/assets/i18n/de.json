@@ -1195,6 +1195,7 @@
       "REACTIVATED": "Anwendung reaktiviert.",
       "DEACTIVATED": "Anwendung deaktiviert.",
       "OIDCUPDATED": "OIDC-Konfiguration geändert.",
+      "APIUPDATED":"API Konfiguration geändert.",
       "UPDATED": "App geändert.",
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",
       "DELETED": "App gelöscht.",
