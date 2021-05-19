@@ -11,6 +11,27 @@ import (
 
 type mockExpectation func(sqlmock.Sqlmock)
 
+func expectFailureCount(tableName string, projectionName string, failedSeq, returnedSeq uint64) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+
+		m.ExpectQuery(`SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2`).
+			WithArgs(projectionName, failedSeq).
+			WillReturnRows(
+				sqlmock.NewRows([]string{"failure_count"}).
+					AddRow(returnedSeq),
+			)
+	}
+}
+
+func expectFailureCountErr(tableName string, projectionName string, failedSeq uint64) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+
+		m.ExpectExec(`SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2`).
+			WithArgs(projectionName, failedSeq).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+	}
+}
+
 func expectCreate(projectionName string, columnNames, placeholders []string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
 		args := make([]driver.Value, len(columnNames))

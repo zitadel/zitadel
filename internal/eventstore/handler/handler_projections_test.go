@@ -380,7 +380,7 @@ func TestProjectionHandler_push(t *testing.T) {
 			if h.pushSet {
 				t.Error("expected push set to be false")
 			}
-			if h.stmts != nil {
+			if len(h.stmts) != 0 {
 				t.Errorf("expected stmts to be nil but was %v", h.stmts)
 			}
 		})
@@ -774,11 +774,11 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 }
 
 func testUpdate(t *testing.T, expectedStmtCount int, returnedErr error) Update {
-	return func(ctx context.Context, stmts []Statement, reduce Reduce) error {
+	return func(ctx context.Context, stmts []Statement, reduce Reduce) ([]Statement, error) {
 		if expectedStmtCount != len(stmts) {
 			t.Errorf("expected %d stmts got %d", expectedStmtCount, len(stmts))
 		}
-		return returnedErr
+		return []Statement{}, returnedErr
 	}
 }
 

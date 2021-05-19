@@ -10,7 +10,7 @@ import (
 )
 
 //Update updates the projection with the given statements
-type Update func(context.Context, []Statement, Reduce) error
+type Update func(context.Context, []Statement, Reduce) (unexecutedStmts []Statement, err error)
 
 //Reduce reduces the given event to a statement
 //which is used to update the projection
@@ -231,13 +231,12 @@ func (h *ProjectionHandler) push(
 	ctx context.Context,
 	update Update,
 	reduce Reduce,
-) error {
+) (err error) {
 	h.lockMu.Lock()
 	defer h.lockMu.Unlock()
 
 	h.pushSet = false
-	err := update(ctx, h.stmts, reduce)
-	h.stmts = nil
+	h.stmts, err = update(ctx, h.stmts, reduce)
 
 	return err
 }

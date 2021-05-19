@@ -25,8 +25,12 @@ type StatementHandler struct {
 	aggregates     []eventstore.AggregateType
 
 	workerName string
-	lockStmt   string
 	bulkLimit  uint64
+
+	maxFailureCount     uint
+	failureCountStmt    string
+	setFailureCountStmt string
+	lockStmt            string
 }
 
 func NewStatementHandler(
@@ -34,6 +38,7 @@ func NewStatementHandler(
 	es *eventstore.Eventstore,
 	projectionName,
 	sequenceTable,
+	failedEventsTable,
 	lockTable string,
 	bulkLimit uint64,
 	aggregates ...eventstore.AggregateType,
@@ -45,14 +50,16 @@ func NewStatementHandler(
 	}
 
 	return StatementHandler{
-		client:         client,
-		eventstore:     es,
-		projectionName: projectionName,
-		sequenceTable:  sequenceTable,
-		workerName:     workerName,
-		lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
-		bulkLimit:      bulkLimit,
-		aggregates:     aggregates,
+		client:              client,
+		eventstore:          es,
+		projectionName:      projectionName,
+		sequenceTable:       sequenceTable,
+		failureCountStmt:    fmt.Sprintf(failureCountStmtFormat, failedEventsTable),
+		setFailureCountStmt: fmt.Sprintf(setFailureCountStmtFormat, failedEventsTable),
+		lockStmt:            fmt.Sprintf(lockStmtFormat, lockTable),
+		workerName:          workerName,
+		bulkLimit:           bulkLimit,
+		aggregates:          aggregates,
 	}
 }
 
@@ -64,21 +71,17 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(seq).Limit(h.bulkLimit), h.bulkLimit, nil
 }
 
-// func (h *StatementHandler) stmtError(stmt handler.Statement, err error) error {
-
-// 	return nil
-// }
-
-func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement, reduce handler.Reduce) error {
+//Update implements handler.Update
+func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement, reduce handler.Reduce) (unexecutedStmts []handler.Statement, err error) {
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return stmts, err
 	}
 
 	currentSeq, err := h.currentSequence(tx.QueryRow)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return stmts, err
 	}
 
 	//checks for events between create statement and current sequence
@@ -88,7 +91,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, currentSeq, reduce)
 		if err != nil {
 			tx.Rollback()
-			return err
+			return stmts, err
 		}
 		stmts = append(previousStmts, stmts...)
 	}
@@ -99,15 +102,23 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		seqErr := h.updateCurrentSequence(tx, stmts[lastSuccessfulIdx])
 		if seqErr != nil {
 			tx.Rollback()
-			return seqErr
+			return stmts, seqErr
 		}
 	}
 
 	if commitErr := tx.Commit(); commitErr != nil {
-		return commitErr
+		return stmts, commitErr
 	}
 
-	return nil
+	if lastSuccessfulIdx == 0 {
+		return stmts, nil
+	}
+
+	unexecutedStmts = make([]handler.Statement, len(stmts)-(lastSuccessfulIdx+1))
+	copy(unexecutedStmts, stmts[lastSuccessfulIdx+1:])
+	stmts = nil
+
+	return unexecutedStmts, nil
 }
 
 func (h *StatementHandler) fetchPreviousStmts(
@@ -147,14 +158,18 @@ func (h *StatementHandler) executeStmts(
 		if stmt.PreviousSequence > currentSeq {
 			break
 		}
-		if err := h.executeStmt(tx, stmt); err != nil {
-			//TODO: insert into error view
-			//TODO: should we retry because nothing will change
-			logging.LogWithFields("CRDB-wS8Ns", "seq", stmt.Sequence, "projection").WithError(err).Warn("unable to execute statement")
+		err := h.executeStmt(tx, stmt)
+		if err == nil {
+			currentSeq, lastSuccessfulIdx = stmt.Sequence, i
+			continue
+		}
+
+		shouldContinue := h.handleFailedStmt(tx, stmt, err)
+		if !shouldContinue {
 			break
 		}
-		currentSeq = stmt.Sequence
-		lastSuccessfulIdx = i
+
+		currentSeq, lastSuccessfulIdx = stmt.Sequence, i
 	}
 	return lastSuccessfulIdx
 }

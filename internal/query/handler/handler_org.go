@@ -43,6 +43,7 @@ func NewOrgHandler(
 			es,
 			"projections.orgs",
 			"projections.current_sequences",
+			"projections.failed_events",
 			"projections.locks",
 			10,
 			"org",
