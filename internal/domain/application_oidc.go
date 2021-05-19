@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
@@ -43,6 +44,7 @@ type OIDCApp struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
+	AdditionalOrigins        []string
 
 	State AppState
 }
@@ -119,7 +121,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if a.ClockSkew > time.Second*5 || a.ClockSkew < time.Second*0 {
+	if a.ClockSkew > time.Second*5 || a.ClockSkew < time.Second*0 || !a.OriginsValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -129,6 +131,15 @@ func (a *OIDCApp) IsValid() bool {
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(a.GrantTypes, grantType)
 		if !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *OIDCApp) OriginsValid() bool {
+	for _, origin := range a.AdditionalOrigins {
+		if !http_util.IsOrigin(origin) {
 			return false
 		}
 	}

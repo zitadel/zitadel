@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,25 +23,28 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
+import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { LinksModule } from 'src/app/modules/links/links.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { OriginPipeModule } from 'src/app/pipes/origin-pipe/origin-pipe.module';
+import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
 
+import { AdditionalOriginsComponent } from './additional-origins/additional-origins.component';
 import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
 import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
-import { A11yModule } from '@angular/cdk/a11y';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
-import { LinksModule } from 'src/app/modules/links/links.module';
-import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
-import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module';
+
 @NgModule({
     declarations: [
         AppCreateComponent,
         AppDetailComponent,
         AppSecretDialogComponent,
         RedirectUrisComponent,
+        AdditionalOriginsComponent,
     ],
     imports: [
         CommonModule,
@@ -51,6 +55,7 @@ import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module
         AppsRoutingModule,
         FormsModule,
         TranslateModule,
+        OriginPipeModule,
         ReactiveFormsModule,
         HasRoleModule,
         MatMenuModule,

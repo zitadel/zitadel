@@ -104,6 +104,8 @@
     }
   },
   "ACTIONS": {
+      "SHOW":"Aufklappen",
+      "HIDE":"Zuklappen",
     "SAVE": "Speichern",
     "SAVENOW": "Speichern",
     "NEW": "Neu",
@@ -1056,6 +1058,10 @@
     "AUTHMETHOD": "Authentifizierungsmethode",
     "AUTHMETHODSECTION": "Authentifizierungsmethode",
     "GRANT": "Berechtigungstypen",
+    "ADDITIONALORIGINS":"Zusätzliche Origins",
+    "ADDITIONALORIGINSDESC":"Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusätzen sind, können Sie dies hier tun.",
+    "ORIGINS":"Origins",
+    "NOTANORIGIN":"Der Angegebene Wert ist kein Origin.",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",

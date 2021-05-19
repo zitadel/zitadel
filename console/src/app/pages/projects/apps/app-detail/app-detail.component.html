@@ -118,7 +118,6 @@
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
             </cnsl-info-section>
 
-            <div style="margin: .5rem" class="divider"></div>
             <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
                 [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
                 (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
@@ -132,6 +131,27 @@
                 title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
                 [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
             </cnsl-redirect-uris>
+
+            <div style="margin: .5rem" class="divider"></div>
+
+            <div class="additional-origins">
+                <p class="title">{{'APP.ADDITIONALORIGINS' | translate}}
+                    <button mat-icon-button (click)="showAdditionalOrigins = !showAdditionalOrigins"
+                        matTooltip="{{(showAdditionalOrigins ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
+                        <mat-icon *ngIf="!showAdditionalOrigins">expand_more</mat-icon>
+                        <mat-icon *ngIf="showAdditionalOrigins">expand_less</mat-icon>
+                    </button>
+                </p>
+                <ng-container *ngIf="showAdditionalOrigins">
+                    <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
+                    <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
+                        [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $event"
+                        [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
+                    </cnsl-additional-origins>
+                </ng-container>
+            </div>
+
+            <div style="margin: .5rem" class="divider"></div>
         </div>
 
         <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
