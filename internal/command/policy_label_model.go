@@ -9,17 +9,19 @@ import (
 type LabelPolicyWriteModel struct {
 	eventstore.WriteModel
 
-	PrimaryColor   string
-	SecondaryColor string
-	WarnColor      string
-	LogoKey        string
-	IconKey        string
+	PrimaryColor    string
+	BackgroundColor string
+	WarnColor       string
+	FontColor       string
+	LogoKey         string
+	IconKey         string
 
-	PrimaryColorDark   string
-	SecondaryColorDark string
-	WarnColorDark      string
-	LogoDarkKey        string
-	IconDarkKey        string
+	PrimaryColorDark    string
+	BackgroundColorDark string
+	WarnColorDark       string
+	FontColorDark       string
+	LogoDarkKey         string
+	IconDarkKey         string
 
 	FontKey string
 
@@ -35,11 +37,13 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *policy.LabelPolicyAddedEvent:
 			wm.PrimaryColor = e.PrimaryColor
-			wm.SecondaryColor = e.SecondaryColor
+			wm.BackgroundColor = e.BackgroundColor
 			wm.WarnColor = e.WarnColor
+			wm.FontColor = e.FontColor
 			wm.PrimaryColorDark = e.PrimaryColorDark
-			wm.SecondaryColorDark = e.SecondaryColorDark
+			wm.BackgroundColorDark = e.BackgroundColorDark
 			wm.WarnColorDark = e.WarnColorDark
+			wm.FontColorDark = e.FontColorDark
 			wm.HideLoginNameSuffix = e.HideLoginNameSuffix
 			wm.ErrorMsgPopup = e.ErrorMsgPopup
 			wm.DisableWatermark = e.DisableWatermark
@@ -48,20 +52,26 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			if e.PrimaryColor != nil {
 				wm.PrimaryColor = *e.PrimaryColor
 			}
-			if e.SecondaryColor != nil {
-				wm.SecondaryColor = *e.SecondaryColor
+			if e.BackgroundColor != nil {
+				wm.BackgroundColor = *e.BackgroundColor
 			}
 			if e.WarnColor != nil {
 				wm.WarnColor = *e.WarnColor
 			}
+			if e.FontColor != nil {
+				wm.FontColor = *e.FontColor
+			}
 			if e.PrimaryColorDark != nil {
 				wm.PrimaryColorDark = *e.PrimaryColorDark
 			}
-			if e.SecondaryColorDark != nil {
-				wm.SecondaryColorDark = *e.SecondaryColorDark
+			if e.BackgroundColorDark != nil {
+				wm.BackgroundColorDark = *e.BackgroundColorDark
 			}
 			if e.WarnColorDark != nil {
 				wm.WarnColorDark = *e.WarnColorDark
+			}
+			if e.FontColorDark != nil {
+				wm.FontColorDark = *e.FontColorDark
 			}
 			if e.HideLoginNameSuffix != nil {
 				wm.HideLoginNameSuffix = *e.HideLoginNameSuffix

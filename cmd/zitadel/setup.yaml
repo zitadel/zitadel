@@ -81,9 +81,10 @@ SetUp:
       UserLoginMustBeDomain: true
   Step6:
     DefaultLabelPolicy:
-      PrimaryColor: '#222324'
-      SecondaryColor: '#ffffff'
-      WarnColor: '#ff0000'
+      PrimaryColor: '#5282c1'
+      BackgroundColor: '#141735'
+      WarnColor: '#f44336'
+      FontColor: '#ffffff'
   Step7:
     OTP: true
   Step8:

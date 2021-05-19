@@ -85,11 +85,13 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	primaryColor,
-	secondaryColor,
+	backgroundColor,
 	warnColor,
+	fontColor,
 	primaryColorDark,
-	secondaryColorDark,
-	warnColorDark string,
+	backgroundColorDark,
+	warnColorDark,
+	fontColorDark string,
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
@@ -98,20 +100,26 @@ func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(
 	if wm.PrimaryColor != primaryColor {
 		changes = append(changes, policy.ChangePrimaryColor(primaryColor))
 	}
-	if wm.SecondaryColor != secondaryColor {
-		changes = append(changes, policy.ChangeSecondaryColor(secondaryColor))
+	if wm.BackgroundColor != backgroundColor {
+		changes = append(changes, policy.ChangeBackgroundColor(backgroundColor))
 	}
 	if wm.WarnColor != warnColor {
 		changes = append(changes, policy.ChangeWarnColor(warnColor))
 	}
+	if wm.FontColor != fontColor {
+		changes = append(changes, policy.ChangeFontColor(fontColor))
+	}
 	if wm.PrimaryColorDark != primaryColorDark {
 		changes = append(changes, policy.ChangePrimaryColorDark(primaryColorDark))
 	}
-	if wm.SecondaryColorDark != secondaryColorDark {
-		changes = append(changes, policy.ChangeSecondaryColorDark(secondaryColorDark))
+	if wm.BackgroundColorDark != backgroundColorDark {
+		changes = append(changes, policy.ChangeBackgroundColorDark(backgroundColorDark))
 	}
 	if wm.WarnColorDark != warnColorDark {
 		changes = append(changes, policy.ChangeWarnColorDark(warnColorDark))
+	}
+	if wm.FontColorDark != fontColorDark {
+		changes = append(changes, policy.ChangeFontColorDark(fontColorDark))
 	}
 	if wm.HideLoginNameSuffix != hideLoginNameSuffix {
 		changes = append(changes, policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix))

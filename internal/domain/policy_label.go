@@ -10,17 +10,19 @@ type LabelPolicy struct {
 	State   LabelPolicyState
 	Default bool
 
-	PrimaryColor   string
-	SecondaryColor string
-	WarnColor      string
-	LogoURL        string
-	IconURL        string
+	PrimaryColor    string
+	BackgroundColor string
+	WarnColor       string
+	FontColor       string
+	LogoURL         string
+	IconURL         string
 
-	PrimaryColorDark   string
-	SecondaryColorDark string
-	WarnColorDark      string
-	LogoDarkURL        string
-	IconDarkURL        string
+	PrimaryColorDark    string
+	BackgroundColorDark string
+	WarnColorDark       string
+	FontColorDark       string
+	LogoDarkURL         string
+	IconDarkURL         string
 
 	Font string
 
@@ -30,7 +32,7 @@ type LabelPolicy struct {
 }
 
 func (p *LabelPolicy) IsValid() bool {
-	return p.PrimaryColor != "" && p.SecondaryColor != "" && p.WarnColor != ""
+	return p.PrimaryColor != "" && p.BackgroundColor != "" && p.WarnColor != ""
 }
 
 type LabelPolicyState int32

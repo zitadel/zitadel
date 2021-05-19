@@ -52,7 +52,7 @@ func SendUserInitCode(mailhtml string, text *iam_model.MailTextView, user *view_
 			Href:           url,
 			ButtonText:     text.ButtonText,
 			PrimaryColor:   colors.PrimaryColor,
-			SecondaryColor: colors.SecondaryColor,
+			SecondaryColor: colors.BackgroundColor,
 		},
 		URL: url,
 	}

@@ -14,6 +14,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/ajstarks/svgo v0.0.0-20200725142600-7a3c8b57fecb
 	github.com/allegro/bigcache v1.2.1
+	github.com/blend/go-sdk v2.0.0+incompatible // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.14.7
@@ -43,10 +44,12 @@ require (
 	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect
 	github.com/kevinburke/twilio-go v0.0.0-20200810163702-320748330fac
 	github.com/lib/pq v1.9.0
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/minio/minio-go/v7 v7.0.10
 	github.com/mitchellh/copystructure v1.1.2 // indirect
+	github.com/muesli/gamut v0.2.0 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
@@ -59,6 +62,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.1.0
+	github.com/wcharczuk/go-chart v2.0.2-0.20191206192251-962b9abdec2b+incompatible // indirect
 	github.com/wellington/go-libsass v0.9.2 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.13.0

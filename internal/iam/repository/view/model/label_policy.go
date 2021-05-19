@@ -28,11 +28,13 @@ type LabelPolicyView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 
 	PrimaryColor        string `json:"primaryColor" gorm:"column:primary_color"`
-	SecondaryColor      string `json:"secondaryColor" gorm:"column:secondary_color"`
+	BackgroundColor     string `json:"backgroundColor" gorm:"column:background_color"`
 	WarnColor           string `json:"warnColor" gorm:"column:warn_color"`
+	FontColor           string `json:"fontColor" gorm:"column:font_color"`
 	PrimaryColorDark    string `json:"primaryColorDark" gorm:"column:primary_color_dark"`
-	SecondaryColorDark  string `json:"secondaryColorDark" gorm:"column:secondary_color_dark"`
+	BackgroundColorDark string `json:"backgroundColorDark" gorm:"column:background_color_dark"`
 	WarnColorDark       string `json:"warnColorDark" gorm:"column:warn_color_dark"`
+	FontColorDark       string `json:"fontColorDark" gorm:"column:font_color_dark"`
 	LogoURL             string `json:"-" gorm:"column:logo_url"`
 	IconURL             string `json:"-" gorm:"column:icon_url"`
 	LogoDarkURL         string `json:"-" gorm:"column:logo_dark_url"`
@@ -58,19 +60,21 @@ func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
 			ChangeDate:   p.ChangeDate,
 			Sequence:     p.Sequence,
 		},
-		Default:        p.Default,
-		PrimaryColor:   p.PrimaryColor,
-		SecondaryColor: p.SecondaryColor,
-		WarnColor:      p.WarnColor,
-		LogoURL:        p.LogoURL,
-		IconURL:        p.IconURL,
+		Default:         p.Default,
+		PrimaryColor:    p.PrimaryColor,
+		BackgroundColor: p.BackgroundColor,
+		WarnColor:       p.WarnColor,
+		FontColor:       p.FontColor,
+		LogoURL:         p.LogoURL,
+		IconURL:         p.IconURL,
 
-		PrimaryColorDark:   p.PrimaryColorDark,
-		SecondaryColorDark: p.SecondaryColorDark,
-		WarnColorDark:      p.WarnColorDark,
-		LogoDarkURL:        p.LogoDarkURL,
-		IconDarkURL:        p.IconDarkURL,
-		Font:               p.FontURL,
+		PrimaryColorDark:    p.PrimaryColorDark,
+		BackgroundColorDark: p.BackgroundColorDark,
+		WarnColorDark:       p.WarnColorDark,
+		FontColorDark:       p.FontColorDark,
+		LogoDarkURL:         p.LogoDarkURL,
+		IconDarkURL:         p.IconDarkURL,
+		Font:                p.FontURL,
 
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ErrorMsgPopup,
@@ -85,17 +89,19 @@ func LabelPolicyViewToModel(policy *LabelPolicyView) *model.LabelPolicyView {
 		CreationDate: policy.CreationDate,
 		ChangeDate:   policy.ChangeDate,
 
-		PrimaryColor:   policy.PrimaryColor,
-		SecondaryColor: policy.SecondaryColor,
-		WarnColor:      policy.WarnColor,
-		LogoURL:        policy.LogoURL,
-		IconURL:        policy.IconURL,
+		PrimaryColor:    policy.PrimaryColor,
+		BackgroundColor: policy.BackgroundColor,
+		WarnColor:       policy.WarnColor,
+		FontColor:       policy.FontColor,
+		LogoURL:         policy.LogoURL,
+		IconURL:         policy.IconURL,
 
-		PrimaryColorDark:   policy.PrimaryColorDark,
-		SecondaryColorDark: policy.SecondaryColorDark,
-		WarnColorDark:      policy.WarnColorDark,
-		LogoDarkURL:        policy.LogoDarkURL,
-		IconDarkURL:        policy.IconDarkURL,
+		PrimaryColorDark:    policy.PrimaryColorDark,
+		BackgroundColorDark: policy.BackgroundColorDark,
+		WarnColorDark:       policy.WarnColorDark,
+		FontColorDark:       policy.FontColorDark,
+		LogoDarkURL:         policy.LogoDarkURL,
+		IconDarkURL:         policy.IconDarkURL,
 
 		FontURL: policy.FontURL,
 

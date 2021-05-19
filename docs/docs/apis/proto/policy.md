@@ -17,13 +17,15 @@ title: zitadel/policy.proto
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | primary_color |  string | hex value for primary color |  |
-| secondary_color |  string | hex value for secondary color |  |
 | is_default |  bool | defines if the organisation's admin changed the policy |  |
 | hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
 | warn_color |  string | hex value for secondary color |  |
+| background_color |  string | hex value for background color |  |
+| font_color |  string | hex value for font color |  |
 | primary_color_dark |  string | hex value for primary color dark theme |  |
-| secondary_color_dark |  string | hex value for secondary color dark theme |  |
+| background_color_dark |  string | hex value for background color dark theme |  |
 | warn_color_dark |  string | hex value for warn color dark theme |  |
+| font_color_dark |  string | hex value for font color dark theme |  |
 | error_msg_popup |  bool | Shows error messages as popup instead of inline |  |
 | disable_watermark |  bool | - |  |
 | logo_url |  string | - |  |

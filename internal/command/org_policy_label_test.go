@@ -47,8 +47,8 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:    "",
+					BackgroundColor: "secondary-color",
 				},
 			},
 			res: res{
@@ -66,8 +66,8 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:    "",
+					BackgroundColor: "secondary-color",
 				},
 			},
 			res: res{
@@ -102,10 +102,10 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color",
-					SecondaryColor:      "secondary-color",
+					BackgroundColor:     "secondary-color",
 					WarnColor:           "warn-color",
 					PrimaryColorDark:    "primary-color-dark",
-					SecondaryColorDark:  "secondary-color-dark",
+					BackgroundColorDark: "secondary-color-dark",
 					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
@@ -147,10 +147,10 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color",
-					SecondaryColor:      "secondary-color",
+					BackgroundColor:     "secondary-color",
 					WarnColor:           "warn-color",
 					PrimaryColorDark:    "primary-color-dark",
-					SecondaryColorDark:  "secondary-color-dark",
+					BackgroundColorDark: "secondary-color-dark",
 					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
@@ -164,10 +164,10 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					PrimaryColor:        "primary-color",
-					SecondaryColor:      "secondary-color",
+					BackgroundColor:     "secondary-color",
 					WarnColor:           "warn-color",
 					PrimaryColorDark:    "primary-color-dark",
-					SecondaryColorDark:  "secondary-color-dark",
+					BackgroundColorDark: "secondary-color-dark",
 					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
@@ -224,8 +224,8 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:    "primary-color",
+					BackgroundColor: "secondary-color",
 				},
 			},
 			res: res{
@@ -243,8 +243,8 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "",
-					SecondaryColor: "secondary-color",
+					PrimaryColor:    "",
+					BackgroundColor: "secondary-color",
 				},
 			},
 			res: res{
@@ -263,9 +263,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
-					PrimaryColor:   "primary-color",
-					SecondaryColor: "secondary-color",
-					WarnColor:      "warn-color",
+					PrimaryColor:    "primary-color",
+					BackgroundColor: "secondary-color",
+					WarnColor:       "warn-color",
 				},
 			},
 			res: res{
@@ -300,10 +300,10 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color",
-					SecondaryColor:      "secondary-color",
+					BackgroundColor:     "secondary-color",
 					WarnColor:           "warn-color",
 					PrimaryColorDark:    "primary-color-dark",
-					SecondaryColorDark:  "secondary-color-dark",
+					BackgroundColorDark: "secondary-color-dark",
 					WarnColorDark:       "warn-color-dark",
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
@@ -360,10 +360,10 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "primary-color-change",
-					SecondaryColor:      "secondary-color-change",
+					BackgroundColor:     "secondary-color-change",
 					WarnColor:           "warn-color-change",
 					PrimaryColorDark:    "primary-color-dark-change",
-					SecondaryColorDark:  "secondary-color-dark-change",
+					BackgroundColorDark: "secondary-color-dark-change",
 					WarnColorDark:       "warn-color-dark-change",
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
@@ -377,10 +377,10 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					PrimaryColor:        "primary-color-change",
-					SecondaryColor:      "secondary-color-change",
+					BackgroundColor:     "secondary-color-change",
 					WarnColor:           "warn-color-change",
 					PrimaryColorDark:    "primary-color-dark-change",
-					SecondaryColorDark:  "secondary-color-dark-change",
+					BackgroundColorDark: "secondary-color-dark-change",
 					WarnColorDark:       "warn-color-dark-change",
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
@@ -1877,10 +1877,10 @@ func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, second
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
-			policy.ChangeSecondaryColor(secondaryColor),
+			policy.ChangeBackgroundColor(secondaryColor),
 			policy.ChangeWarnColor(warnColor),
 			policy.ChangePrimaryColorDark(primaryColorDark),
-			policy.ChangeSecondaryColorDark(secondaryColorDark),
+			policy.ChangeBackgroundColorDark(secondaryColorDark),
 			policy.ChangeWarnColorDark(warnColorDark),
 			policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix),
 			policy.ChangeErrorMsgPopup(errMsgPopup),

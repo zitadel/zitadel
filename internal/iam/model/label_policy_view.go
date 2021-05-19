@@ -7,19 +7,21 @@ import (
 )
 
 type LabelPolicyView struct {
-	AggregateID    string
-	PrimaryColor   string
-	SecondaryColor string
-	WarnColor      string
-	LogoURL        string
-	IconURL        string
+	AggregateID     string
+	PrimaryColor    string
+	BackgroundColor string
+	WarnColor       string
+	FontColor       string
+	LogoURL         string
+	IconURL         string
 
-	PrimaryColorDark   string
-	SecondaryColorDark string
-	WarnColorDark      string
-	LogoDarkURL        string
-	IconDarkURL        string
-	FontURL            string
+	PrimaryColorDark    string
+	BackgroundColorDark string
+	WarnColorDark       string
+	FontColorDark       string
+	LogoDarkURL         string
+	IconDarkURL         string
+	FontURL             string
 
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool

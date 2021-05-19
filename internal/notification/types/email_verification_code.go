@@ -45,7 +45,7 @@ func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, us
 			Href:           url,
 			ButtonText:     text.ButtonText,
 			PrimaryColor:   colors.PrimaryColor,
-			SecondaryColor: colors.SecondaryColor,
+			SecondaryColor: colors.BackgroundColor,
 		},
 		URL: url,
 	}

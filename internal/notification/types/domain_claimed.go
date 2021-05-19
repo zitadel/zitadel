@@ -42,7 +42,7 @@ func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view
 			Href:           url,
 			ButtonText:     text.ButtonText,
 			PrimaryColor:   colors.PrimaryColor,
-			SecondaryColor: colors.SecondaryColor,
+			SecondaryColor: colors.BackgroundColor,
 		},
 		URL: url,
 	}

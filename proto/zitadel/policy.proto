@@ -29,12 +29,6 @@ message LabelPolicy {
             description: "hex value for primary color"
         }
     ];
-    // hex value for secondary color
-    string secondary_color = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for secondary color"
-        }
-    ];
     // defines if the organisation's admin changed the policy
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -53,36 +47,54 @@ message LabelPolicy {
             description: "hex value for warn color"
         }
      ];
+    // hex value for background color
+    string background_color = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color"
+        }
+    ];
+    // hex value for font color
+    string font_color = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color"
+        }
+    ];
     // hex value for primary color dark theme
-    string primary_color_dark = 7 [
+    string primary_color_dark = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for primary color dark theme"
         }
     ];
-    // hex value for secondary color dark theme
-    string secondary_color_dark = 8 [
+    // hex value for background color dark theme
+    string background_color_dark = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for secondary color dark theme"
+            description: "hex value for background color dark theme"
         }
     ];
     // hex value for warn color dark theme
-    string warn_color_dark = 9 [
+    string warn_color_dark = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for warn color dark theme"
         }
     ];
+    // hex value for font color dark theme
+    string font_color_dark = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme"
+        }
+    ];
     // Shows error messages as popup instead of inline
-    bool error_msg_popup = 10 [
+    bool error_msg_popup = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Shows error messages as popup instead of inline.";
         }
     ];
-    bool disable_watermark = 11;
-    string logo_url = 12;
-    string icon_url = 13;
-    string logo_url_dark = 14;
-    string icon_url_dark = 15;
-    string font_url = 16;
+    bool disable_watermark = 14;
+    string logo_url = 15;
+    string icon_url = 16;
+    string logo_url_dark = 17;
+    string icon_url_dark = 18;
+    string font_url = 19;
 }
 
 message LoginPolicy {

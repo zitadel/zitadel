@@ -8,11 +8,13 @@ import (
 func updateLabelPolicyToDomain(policy *admin_pb.UpdateLabelPolicyRequest) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		PrimaryColor:        policy.PrimaryColor,
-		SecondaryColor:      policy.SecondaryColor,
+		BackgroundColor:     policy.BackgroundColor,
 		WarnColor:           policy.WarnColor,
+		FontColor:           policy.FontColor,
 		PrimaryColorDark:    policy.PrimaryColorDark,
-		SecondaryColorDark:  policy.SecondaryColorDark,
+		BackgroundColorDark: policy.BackgroundColorDark,
 		WarnColorDark:       policy.WarnColorDark,
+		FontColorDark:       policy.FontColorDark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		ErrorMsgPopup:       policy.ErrorMsgPopup,
 		DisableWatermark:    policy.DisableWatermark,

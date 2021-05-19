@@ -34,11 +34,13 @@ type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PrimaryColor        string `json:"primaryColor,omitempty"`
-	SecondaryColor      string `json:"secondaryColor,omitempty"`
+	BackgroundColor     string `json:"backgroundColor,omitempty"`
 	WarnColor           string `json:"warnColor,omitempty"`
+	FontColor           string `json:"fontColor,omitempty"`
 	PrimaryColorDark    string `json:"primaryColorDark,omitempty"`
-	SecondaryColorDark  string `json:"secondaryColorDark,omitempty"`
+	BackgroundColorDark string `json:"backgroundColorDark,omitempty"`
 	WarnColorDark       string `json:"warnColorDark,omitempty"`
+	FontColorDark       string `json:"fontColorDark,omitempty"`
 	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix,omitempty"`
 	ErrorMsgPopup       bool   `json:"errorMsgPopup,omitempty"`
 	DisableWatermark    bool   `json:"disableMsgPopup,omitempty"`
@@ -55,11 +57,13 @@ func (e *LabelPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 func NewLabelPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	primaryColor,
-	secondaryColor,
+	backgroundColor,
 	warnColor,
+	fontColor,
 	primaryColorDark,
-	secondaryColorDark,
-	warnColorDark string,
+	backgroundColorDark,
+	warnColorDark,
+	fontColorDark string,
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
@@ -68,11 +72,13 @@ func NewLabelPolicyAddedEvent(
 	return &LabelPolicyAddedEvent{
 		BaseEvent:           *base,
 		PrimaryColor:        primaryColor,
-		SecondaryColor:      secondaryColor,
+		BackgroundColor:     backgroundColor,
 		WarnColor:           warnColor,
+		FontColor:           fontColor,
 		PrimaryColorDark:    primaryColorDark,
-		SecondaryColorDark:  secondaryColorDark,
+		BackgroundColorDark: backgroundColorDark,
 		WarnColorDark:       warnColorDark,
+		FontColorDark:       fontColorDark,
 		HideLoginNameSuffix: hideLoginNameSuffix,
 		ErrorMsgPopup:       errorMsgPopup,
 		DisableWatermark:    disableWatermark,
@@ -96,11 +102,13 @@ type LabelPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PrimaryColor        *string `json:"primaryColor,omitempty"`
-	SecondaryColor      *string `json:"secondaryColor,omitempty"`
+	BackgroundColor     *string `json:"backgroundColor,omitempty"`
 	WarnColor           *string `json:"warnColor,omitempty"`
+	FontColor           *string `json:"fontColor,omitempty"`
 	PrimaryColorDark    *string `json:"primaryColorDark,omitempty"`
-	SecondaryColorDark  *string `json:"secondaryColorDark,omitempty"`
+	BackgroundColorDark *string `json:"backgroundColorDark,omitempty"`
 	WarnColorDark       *string `json:"warnColorDark,omitempty"`
+	FontColorDark       *string `json:"fontColorDark,omitempty"`
 	HideLoginNameSuffix *bool   `json:"hideLoginNameSuffix,omitempty"`
 	ErrorMsgPopup       *bool   `json:"errorMsgPopup,omitempty"`
 	DisableWatermark    *bool   `json:"disableMsgPopup,omitempty"`
@@ -138,9 +146,9 @@ func ChangePrimaryColor(primaryColor string) func(*LabelPolicyChangedEvent) {
 	}
 }
 
-func ChangeSecondaryColor(secondaryColor string) func(*LabelPolicyChangedEvent) {
+func ChangeBackgroundColor(background string) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
-		e.SecondaryColor = &secondaryColor
+		e.BackgroundColor = &background
 	}
 }
 
@@ -150,21 +158,33 @@ func ChangeWarnColor(warnColor string) func(*LabelPolicyChangedEvent) {
 	}
 }
 
+func ChangeFontColor(fontColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.FontColor = &fontColor
+	}
+}
+
 func ChangePrimaryColorDark(primaryColorDark string) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
 		e.PrimaryColorDark = &primaryColorDark
 	}
 }
 
-func ChangeSecondaryColorDark(secondaryColorDark string) func(*LabelPolicyChangedEvent) {
+func ChangeBackgroundColorDark(backgroundColorDark string) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
-		e.SecondaryColorDark = &secondaryColorDark
+		e.BackgroundColorDark = &backgroundColorDark
 	}
 }
 
 func ChangeWarnColorDark(warnColorDark string) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
 		e.WarnColorDark = &warnColorDark
+	}
+}
+
+func ChangeFontColorDark(fontColorDark string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.FontColorDark = &fontColorDark
 	}
 }
 

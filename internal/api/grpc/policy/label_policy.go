@@ -8,14 +8,16 @@ import (
 
 func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy {
 	return &policy_pb.LabelPolicy{
-		IsDefault:          policy.Default,
-		PrimaryColor:       policy.PrimaryColor,
-		SecondaryColor:     policy.SecondaryColor,
-		WarnColor:          policy.WarnColor,
-		PrimaryColorDark:   policy.PrimaryColorDark,
-		SecondaryColorDark: policy.SecondaryColorDark,
-		WarnColorDark:      policy.WarnColorDark,
-		FontUrl:            policy.FontURL,
+		IsDefault:           policy.Default,
+		PrimaryColor:        policy.PrimaryColor,
+		BackgroundColor:     policy.BackgroundColor,
+		FontColor:           policy.FontColor,
+		WarnColor:           policy.WarnColor,
+		PrimaryColorDark:    policy.PrimaryColorDark,
+		BackgroundColorDark: policy.BackgroundColorDark,
+		WarnColorDark:       policy.WarnColorDark,
+		FontColorDark:       policy.FontColorDark,
+		FontUrl:             policy.FontURL,
 
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		Details: object.ToViewDetailsPb(
