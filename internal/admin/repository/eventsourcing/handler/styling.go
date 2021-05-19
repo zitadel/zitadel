@@ -149,11 +149,6 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		for i, color := range palette {
 			cssContent += fmt.Sprintf("--zitadel-color-primary-%v: %s;", i, color)
 		}
-
-		// Add Contrast
-		// --> Remove secondary Color
-		// --> Add Background Color
-		// --> Add Font Color
 	}
 
 	if policy.BackgroundColor != "" {
