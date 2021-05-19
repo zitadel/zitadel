@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -78,7 +78,7 @@ func (l *Login) getStatic(ctx context.Context, bucketName, fileName string) ([]b
 	if err != nil {
 		return s.Data, s.Info, err
 	}
-	s.Data, err = io.ReadAll(reader)
+	s.Data, err = ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, nil, err
 	}
