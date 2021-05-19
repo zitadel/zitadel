@@ -102,6 +102,7 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-6M23e", "Errors.IAM.LabelPolicy.NotFound")
 	}
+
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyActivatedEvent(ctx, iamAgg))
 	if err != nil {
@@ -111,6 +112,7 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	if err != nil {
 		return nil, err
 	}
+
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 

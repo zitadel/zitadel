@@ -7,13 +7,13 @@ const (
 	AvatarAssetPath = "/avatar"
 
 	policyPrefix          = "policy"
-	labelPolicyPrefix     = policyPrefix + "/label"
-	labelPolicyLogoPrefix = labelPolicyPrefix + "/logo"
-	labelPolicyIconPrefix = labelPolicyPrefix + "/icon"
-	labelPolicyFontPrefix = labelPolicyPrefix + "/font"
+	LabelPolicyPrefix     = policyPrefix + "/label"
+	labelPolicyLogoPrefix = LabelPolicyPrefix + "/logo"
+	labelPolicyIconPrefix = LabelPolicyPrefix + "/icon"
+	labelPolicyFontPrefix = LabelPolicyPrefix + "/font"
 	Dark                  = "dark"
 
-	CssPath              = labelPolicyPrefix + "/css"
+	CssPath              = LabelPolicyPrefix + "/css"
 	CssVariablesFileName = "variables.css"
 
 	LabelPolicyLogoPath = labelPolicyLogoPrefix

@@ -176,7 +176,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
 	}
 	if *managementEnabled {
-		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query)
+		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query, static)
 		logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}

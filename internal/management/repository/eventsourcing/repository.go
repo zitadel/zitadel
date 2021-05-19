@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -31,7 +32,7 @@ type EsRepository struct {
 	view *mgmt_view.View
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, queries *query.Queries) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, queries *query.Queries, staticStorage static.Storage) (*EsRepository, error) {
 
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
@@ -47,7 +48,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, staticStorage)
 
 	return &EsRepository{
 		spooler:       spool,

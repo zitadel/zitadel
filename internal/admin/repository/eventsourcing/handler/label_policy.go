@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -86,8 +87,13 @@ func (p *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 		model.LabelPolicyLogoDarkAdded,
 		model.LabelPolicyLogoDarkRemoved,
 		model.LabelPolicyIconDarkAdded,
-		model.LabelPolicyIconDarkRemoved,
-		model.LabelPolicyActivated:
+		model.LabelPolicyIconDarkRemoved:
+		policy, err = p.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
+		if err != nil {
+			return err
+		}
+		err = policy.AppendEvent(event)
+	case model.LabelPolicyActivated:
 		policy, err = p.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
