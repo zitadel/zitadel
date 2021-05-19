@@ -30,7 +30,7 @@
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
         {{if not $user.SelectionPossible}}disabled title="{{t "Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
-                <div class="lgn-avatar" displayname="{{$user.DisplayName}}">
+                <div class="lgn-avatar" loginname="{{$user.LoginName}}">
                     {{if $user.AvatarKey}}
                         <img class="avatar-img" src="{{ avatarResource $orgID $user.AvatarKey }}" alt="user-avatar">
                     {{else}}

@@ -4,7 +4,7 @@
     <div class="lgn-profile-image"></div>
     <div class="lgn-names">
         <div class="inline-block">
-            <div class="lgn-avatar lgn-primary" displayname="{{.DisplayName}}">
+            <div class="lgn-avatar lgn-primary" {{if not .AvatarKey}}loginname="{{.LoginName}}"{{end}}>
                 {{if .AvatarKey}}
                     <img class="avatar-img" src="{{ avatarResource .OrgID .AvatarKey }}" alt="user-avatar">
                 {{else}}
