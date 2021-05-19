@@ -5,9 +5,12 @@ on:
       - '**'
     tags-ignore:
       - '**'
+  # disabled due to a bug -> https://github.community/t/403-error-on-container-registry-push-from-github-action/173071/2
+  # pull_request:
+  #   branches:
+  #     - '**'
 
 env:
-  GITHUB_TOKEN: ${{ secrets.CR_PAT }}
   REGISTRY: ghcr.io
   NODE_VERSION: '12'
   GO_VERSION: '1.15'
@@ -73,8 +76,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - run: ls -la
       - uses: docker/build-push-action@v2
@@ -134,8 +137,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
         name: onlybuild
@@ -219,8 +222,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
         name: buildandpush
@@ -238,13 +241,17 @@ jobs:
     runs-on: ubuntu-18.04
     needs: [ refs, zitadel-image, operator-image, crdb-image ]
     env:
-      DOCKER_USERNAME: ${{ github.actor }}
-      DOCKER_PASSWORD: ${{ secrets.CR_PAT }}
+      DOCKER_USERNAME: ${{ github.repository_owner }}
+      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Docker Login
-        run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
       - name: Docker Pull ZITADEL Image
         run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
       - name: Docker Pull ZITADEL Operator Image
@@ -322,7 +329,7 @@ jobs:
           tag: ${{ needs.refs.outputs.short_ref }}-dev
           commit: ${{ needs.refs.outputs.short_ref }}
           name: Branch ${{ needs.refs.outputs.short_ref }}
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           replacesArtifacts: true
           prerelease: true
           draft: false
