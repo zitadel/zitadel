@@ -14,7 +14,6 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/ajstarks/svgo v0.0.0-20200725142600-7a3c8b57fecb
 	github.com/allegro/bigcache v1.2.1
-	github.com/blend/go-sdk v2.0.0+incompatible // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.14.7
