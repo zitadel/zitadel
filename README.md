@@ -67,6 +67,27 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 * [Ask a question or share ideas](https://github.com/caos/zitadel/discussions)
 * [Say hello](https://zitadel.ch/contact/)
 
+## Showcase
+
+### Passwordless Login
+Use our login widget to allow easy and sucure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
+- works on all modern platforms, devices, and browsers
+- phishing resistant alternative
+- requires only one gesture by the user
+- easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
+
+![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
+![passwordless-iphone](https://user-images.githubusercontent.com/1366906/118765439-5fa3f180-b87b-11eb-937b-b4acb7854086.gif)
+
+### Admin Console
+Use [Console](https://docs.zitadel.ch/docs/manuals/introduction) or our [APIs](https://docs.zitadel.ch/docs/apis/introduction) to setup organizations, projects and applications.
+
+Register new applications
+![OIDC-Client-Register](https://user-images.githubusercontent.com/1366906/118765446-62064b80-b87b-11eb-8b24-4f4c365b8c58.gif)
+
+Delegate the right to assign roles to another organization
+![projects_create_org_grant](https://user-images.githubusercontent.com/1366906/118766069-39cb1c80-b87c-11eb-84cf-f5becce4e9b6.gif)
+
 ## How To Contribute
 
 Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](./LICENSE) you are fine.
@@ -74,7 +95,6 @@ Details need to be announced, but feel free to contribute already. As long as yo
 ## Security
 
 See the policy [here](./SECURITY.md)
-
 
 ## Other CAOS Projects
 * [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
