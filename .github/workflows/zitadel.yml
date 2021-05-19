@@ -35,6 +35,8 @@ jobs:
         with:
           dry_run: true
           semantic_version: 17.0.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Set outputs
         id: refs
         run: |
@@ -273,6 +275,8 @@ jobs:
         with:
           dry_run: false
           semantic_version: 17.0.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Echo Semantic Release Versions
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
