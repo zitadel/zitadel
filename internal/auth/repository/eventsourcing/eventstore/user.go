@@ -220,6 +220,26 @@ func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_mo
 	return key_view_model.AuthNKeyToModel(key), nil
 }
 
+func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error) {
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-Gdgsw").OnError(sequenceErr).Warn("could not read latest user sequence")
+	users, count, err := repo.View.SearchUsers(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &model.UserSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      usr_view_model.UsersToModel(users),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
+}
+
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
 	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending, retention)
 

@@ -50,10 +50,6 @@ func (e *MailTextAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 	return []*eventstore.EventUniqueConstraint{NewAddMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
 }
 
-func (e *MailTextAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewMailTextAddedEvent(
 	base *eventstore.BaseEvent,
 	mailTextType,
@@ -109,10 +105,6 @@ func (e *MailTextChangedEvent) Data() interface{} {
 }
 
 func (e *MailTextChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *MailTextChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -200,10 +192,6 @@ func (e *MailTextRemovedEvent) Data() interface{} {
 
 func (e *MailTextRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
-}
-
-func (e *MailTextRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func NewMailTextRemovedEvent(base *eventstore.BaseEvent, mailTextType, language string) *MailTextRemovedEvent {

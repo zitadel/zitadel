@@ -134,7 +134,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 					EmailAddress:    organisation.Owner.Email,
 					IsEmailVerified: true,
 				},
-			}, orgIAMPolicy, pwPolicy)
+			}, orgIAMPolicy, pwPolicy, nil)
 		if err != nil {
 			return err
 		}

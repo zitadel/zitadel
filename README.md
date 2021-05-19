@@ -22,10 +22,10 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 ## Features of ZITADEL platform
 
 * Authentication
-    * OpenID Connect 1.0 Protocol (OP)
-    * Username / Password
-    * Machine-to-machine (JWT profile)
-    * Passwordless with FIDO2
+  * OpenID Connect 1.0 Protocol (OP)
+  * Username / Password
+  * Machine-to-machine (JWT profile)
+  * Passwordless with FIDO2
 * Multifactor authentication with OTP, U2F
 * Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
 * Authorization via Role Based Access Control (RBAC)
@@ -66,11 +66,11 @@ Details need to be announced, but feel free to contribute already. As long as yo
 
 See the policy [here](./SECURITY.md)
 
-
 ## Other CAOS Projects
+
 * [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
 * [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect SDK (client and server) for Go
-* [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT 
+* [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
 ## License
 

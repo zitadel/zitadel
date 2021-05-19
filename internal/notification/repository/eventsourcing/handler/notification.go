@@ -284,6 +284,9 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
+	if user.LastEmail == "" {
+		return nil
+	}
 	colors, err := n.getLabelPolicy(context.Background())
 	if err != nil {
 		return err

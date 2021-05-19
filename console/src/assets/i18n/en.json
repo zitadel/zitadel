@@ -1078,7 +1078,7 @@
       "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
       "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
       "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
-      "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol or http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.",
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
       "COMMAORENTERSEPERATION": "seperate with ↵",
       "TYPEREQUIRED": "The type is required.",

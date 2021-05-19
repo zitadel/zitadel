@@ -39,11 +39,11 @@ func (es *Eventstore) Health(ctx context.Context) error {
 //PushEvents pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher) ([]EventReader, error) {
-	events, assets, constraints, err := eventsToRepository(pushEvents)
+	events, constraints, err := eventsToRepository(pushEvents)
 	if err != nil {
 		return nil, err
 	}
-	err = es.repo.Push(ctx, events, assets, constraints...)
+	err = es.repo.Push(ctx, events, constraints...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,12 +57,12 @@ func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher)
 	return eventReaders, nil
 }
 
-func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, assets []*repository.Asset, constraints []*repository.UniqueConstraint, err error) {
+func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
 	events = make([]*repository.Event, len(pushEvents))
 	for i, event := range pushEvents {
 		data, err := EventData(event)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, err
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
@@ -77,12 +77,9 @@ func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, a
 		if len(event.UniqueConstraints()) > 0 {
 			constraints = append(constraints, uniqueConstraintsToRepository(event.UniqueConstraints())...)
 		}
-		if len(event.Assets()) > 0 {
-			assets = append(assets, assetsToRepository(event.Assets())...)
-		}
 	}
 
-	return events, assets, constraints, nil
+	return events, constraints, nil
 }
 
 func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {

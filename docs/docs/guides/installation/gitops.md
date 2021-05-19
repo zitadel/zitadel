@@ -28,7 +28,7 @@ zitadelctl --gitops writesecret zitadel.twilioauthtoken.encrypted --value $TWILI
 
 # Write your email relays app key so that ZITADEL is able to verify your users email addresses
 EMAIL_APP_KEY=<My email relays app key>
-zitadelctl --gitops writesecret zitadel.twilioauthtoken.encrypted --value $EMAIL_APP_KEY
+zitadelctl --gitops writesecret zitadel.emailappkey.encrypted --value $EMAIL_APP_KEY
 
 # Deploy the operators to the current-context of your ~/.kube/config file
 zitadelctl --gitops takeoff

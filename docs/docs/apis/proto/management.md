@@ -489,6 +489,16 @@ Creates a new organisation
 
 
 
+### UpdateOrg
+
+> **rpc** UpdateOrg([UpdateOrgRequest](#updateorgrequest))
+[UpdateOrgResponse](#updateorgresponse)
+
+Changes my organisation
+
+
+
+
 ### DeactivateOrg
 
 > **rpc** DeactivateOrg([DeactivateOrgRequest](#deactivateorgrequest))
@@ -5266,6 +5276,28 @@ This is an empty request
 
 
 ### UpdateOrgMemberResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateOrgResponse
 
 
 

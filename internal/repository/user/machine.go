@@ -33,10 +33,6 @@ func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstra
 	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
-func (e *MachineAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewMachineAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -82,10 +78,6 @@ func (e *MachineChangedEvent) Data() interface{} {
 }
 
 func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *MachineChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
