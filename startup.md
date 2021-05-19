@@ -4,8 +4,7 @@
 
 * docker
 * go
-
-`go get github.com/rakyll/statik`
+* statik `go get github.com/rakyll/statik`
 
 ## ENV variables
 
@@ -35,7 +34,7 @@ export ZITADEL_DOMAIN_VERIFICATION_KEY="domainverificationkey_1"
 
 #debug mode is used for notifications
 export DEBUG_MODE=true
-export CAOS_OIDC_DEV=true
+export CAOS_OIDC_DEV=true #TODO: IMO not used anymore
 export ZITADEL_CSRF_DEV=true
 
 #TODO: needed for local?
