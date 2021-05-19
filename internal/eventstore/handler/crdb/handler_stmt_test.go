@@ -180,7 +180,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewNoOpStatement(6, 0),
+					NewNoOpStatement(6, 0),
 				},
 			},
 			want: want{
@@ -205,7 +205,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewCreateStatement([]handler.Column{
+					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
 							Value: "val",
@@ -235,7 +235,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewCreateStatement([]handler.Column{
+					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
 							Value: "val",
@@ -269,7 +269,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewCreateStatement([]handler.Column{
+					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
 							Value: "val",
@@ -303,7 +303,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewNoOpStatement(7, 5),
+					NewNoOpStatement(7, 5),
 				},
 			},
 			want: want{
@@ -329,7 +329,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewNoOpStatement(7, 0),
+					NewNoOpStatement(7, 0),
 				},
 			},
 			want: want{
@@ -360,7 +360,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					handler.NewNoOpStatement(7, 0),
+					NewNoOpStatement(7, 0),
 				},
 				reduce: testReduce(),
 			},
@@ -579,24 +579,57 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					handler.NewCreateStatement([]handler.Column{
+					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
-							Value: "val",
+							Value: "val1",
 						},
 					}, 5, 0),
-					handler.NewCreateStatement([]handler.Column{
+					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
-							Value: "val",
+							Value: "val2",
 						},
 					}, 4, 3),
-					handler.NewCreateStatement([]handler.Column{
+					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
-							Value: "val",
+							Value: "val3",
 						},
-					}, 6, 5),
+					}, 6, 4),
+				},
+				currentSeq: 5,
+			},
+			want: want{
+				expectations: []mockExpectation{},
+				idx:          -1,
+			},
+		},
+		{
+			name: "previous sequence higher than sequence",
+			fields: fields{
+				projectionName: "my_projection",
+			},
+			args: args{
+				stmts: []handler.Statement{
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val1",
+						},
+					}, 5, 0),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val2",
+						},
+					}, 8, 7),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val3",
+						},
+					}, 9, 8),
 				},
 				currentSeq: 2,
 			},
@@ -610,62 +643,25 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 		},
 		// {
-		// 	name: "previous sequence higher than sequence",
-		// 	fields: fields{
-		// 		projectionName: "my_projection",
-		// 	},
-		// 	args: args{
-		// 		stmts: []handler.Statement{
-		// 			handler.NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 5, 0),
-		// 			handler.NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 8, 7),
-		// 			handler.NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 9, 8),
-		// 		},
-		// 		currentSeq: 2,
-		// 	},
-		// 	want: want{
-		// 		expectations: []mockExpectation{
-		// 			expectSavePoint(),
-		// 			expectCreate("my_projection", []string{"col"}, []string{"$1"}),
-		// 			expectSavePointRelease(),
-		// 		},
-		// 		idx: 0,
-		// 	},
-		// },
-		// {
 		// 	name: "execute fails",
 		// 	fields: fields{
 		// 		projectionName: "my_projection",
 		// 	},
 		// 	args: args{
 		// 		stmts: []handler.Statement{
-		// 			handler.NewCreateStatement([]handler.Column{
+		// 			NewCreateStatement([]handler.Column{
 		// 				{
 		// 					Name:  "col",
 		// 					Value: "val",
 		// 				},
 		// 			}, 5, 0),
-		// 			handler.NewCreateStatement([]handler.Column{
+		// 			NewCreateStatement([]handler.Column{
 		// 				{
 		// 					Name:  "col",
 		// 					Value: "val",
 		// 				},
 		// 			}, 6, 5),
-		// 			handler.NewCreateStatement([]handler.Column{
+		// 			NewCreateStatement([]handler.Column{
 		// 				{
 		// 					Name:  "col",
 		// 					Value: "val",
@@ -693,19 +689,19 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 		// 	},
 		// 	args: args{
 		// 		stmts: []handler.Statement{
-		// 			handler.NewCreateStatement([]handler.Column{
+		// 			NewCreateStatement([]handler.Column{
 		// 				{
 		// 					Name:  "col",
 		// 					Value: "val",
 		// 				},
 		// 			}, 5, 0),
-		// 			handler.NewCreateStatement([]handler.Column{
+		// 			NewCreateStatement([]handler.Column{
 		// 				{
 		// 					Name:  "col",
 		// 					Value: "val",
 		// 				},
 		// 			}, 6, 5),
-		// 			handler.NewCreateStatement([]handler.Column{
+		// 			NewCreateStatement([]handler.Column{
 		// 				{
 		// 					Name:  "col",
 		// 					Value: "val",
@@ -789,7 +785,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: handler.NewCreateStatement([]handler.Column{
+				stmt: NewCreateStatement([]handler.Column{
 					{
 						Name:  "col",
 						Value: "val",
@@ -811,7 +807,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: handler.NewCreateStatement([]handler.Column{
+				stmt: NewCreateStatement([]handler.Column{
 					{
 						Name:  "col",
 						Value: "val",
@@ -835,7 +831,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: handler.NewCreateStatement([]handler.Column{
+				stmt: NewCreateStatement([]handler.Column{
 					{
 						Name:  "col",
 						Value: "val",
@@ -859,7 +855,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: handler.NewNoOpStatement(1, 0),
+				stmt: NewNoOpStatement(1, 0),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -874,7 +870,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: handler.NewCreateStatement([]handler.Column{
+				stmt: NewCreateStatement([]handler.Column{
 					{
 						Name:  "col",
 						Value: "val",
@@ -1174,7 +1170,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 func testReduce(stmts ...handler.Statement) handler.Reduce {
 	return func(event eventstore.EventReader) ([]handler.Statement, error) {
 		return []handler.Statement{
-			handler.NewNoOpStatement(event.Sequence(), event.PreviousSequence()),
+			NewNoOpStatement(event.Sequence(), event.PreviousSequence()),
 		}, nil
 	}
 }

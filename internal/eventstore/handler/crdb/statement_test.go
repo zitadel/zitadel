@@ -1,10 +1,12 @@
-package handler
+package crdb
 
 import (
 	"database/sql"
 	"errors"
 	"reflect"
 	"testing"
+
+	"github.com/caos/zitadel/internal/eventstore/handler"
 )
 
 type wantExecuter struct {
@@ -42,7 +44,7 @@ func (ex *wantExecuter) Exec(query string, args ...interface{}) (sql.Result, err
 func TestNewCreateStatement(t *testing.T) {
 	type args struct {
 		table            string
-		values           []Column
+		values           []handler.Column
 		sequence         uint64
 		previousSequence uint64
 	}
@@ -62,7 +64,7 @@ func TestNewCreateStatement(t *testing.T) {
 			name: "no table",
 			args: args{
 				table: "",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
@@ -79,7 +81,7 @@ func TestNewCreateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoTable)
+					return errors.Is(err, handler.ErrNoTable)
 				},
 			},
 		},
@@ -87,7 +89,7 @@ func TestNewCreateStatement(t *testing.T) {
 			name: "sequence equal prev seq",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
@@ -104,7 +106,7 @@ func TestNewCreateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrPrevSeqGtSeq)
 				},
 			},
 		},
@@ -112,7 +114,7 @@ func TestNewCreateStatement(t *testing.T) {
 			name: "sequence less prev seq",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
@@ -129,7 +131,7 @@ func TestNewCreateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrPrevSeqGtSeq)
 				},
 			},
 		},
@@ -137,7 +139,7 @@ func TestNewCreateStatement(t *testing.T) {
 			name: "no values",
 			args: args{
 				table:            "my_table",
-				values:           []Column{},
+				values:           []handler.Column{},
 				sequence:         1,
 				previousSequence: 0,
 			},
@@ -149,7 +151,7 @@ func TestNewCreateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoValues)
+					return errors.Is(err, handler.ErrNoValues)
 				},
 			},
 		},
@@ -157,7 +159,7 @@ func TestNewCreateStatement(t *testing.T) {
 			name: "correct",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
@@ -198,8 +200,8 @@ func TestNewCreateStatement(t *testing.T) {
 func TestNewUpdateStatement(t *testing.T) {
 	type args struct {
 		table            string
-		conditions       []Column
-		values           []Column
+		conditions       []handler.Column
+		values           []handler.Column
 		sequence         uint64
 		previousSequence uint64
 	}
@@ -219,13 +221,13 @@ func TestNewUpdateStatement(t *testing.T) {
 			name: "no table",
 			args: args{
 				table: "",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
 					},
 				},
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -242,7 +244,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoTable)
+					return errors.Is(err, handler.ErrNoTable)
 				},
 			},
 		},
@@ -250,13 +252,13 @@ func TestNewUpdateStatement(t *testing.T) {
 			name: "sequence equal prev seq",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
 					},
 				},
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -273,7 +275,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrPrevSeqGtSeq)
 				},
 			},
 		},
@@ -281,13 +283,13 @@ func TestNewUpdateStatement(t *testing.T) {
 			name: "sequence less prev seq",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
 					},
 				},
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -304,7 +306,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrPrevSeqGtSeq)
 				},
 			},
 		},
@@ -312,8 +314,8 @@ func TestNewUpdateStatement(t *testing.T) {
 			name: "no values",
 			args: args{
 				table:  "my_table",
-				values: []Column{},
-				conditions: []Column{
+				values: []handler.Column{},
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -330,7 +332,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoValues)
+					return errors.Is(err, handler.ErrNoValues)
 				},
 			},
 		},
@@ -338,13 +340,13 @@ func TestNewUpdateStatement(t *testing.T) {
 			name: "no conditions",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
 					},
 				},
-				conditions:       []Column{},
+				conditions:       []handler.Column{},
 				sequence:         1,
 				previousSequence: 0,
 			},
@@ -356,7 +358,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoCondition)
+					return errors.Is(err, handler.ErrNoCondition)
 				},
 			},
 		},
@@ -364,13 +366,13 @@ func TestNewUpdateStatement(t *testing.T) {
 			name: "correct",
 			args: args{
 				table: "my_table",
-				values: []Column{
+				values: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val",
 					},
 				},
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -411,7 +413,7 @@ func TestNewUpdateStatement(t *testing.T) {
 func TestNewDeleteStatement(t *testing.T) {
 	type args struct {
 		table            string
-		conditions       []Column
+		conditions       []handler.Column
 		sequence         uint64
 		previousSequence uint64
 	}
@@ -432,7 +434,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			name: "no table",
 			args: args{
 				table: "",
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -449,7 +451,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoTable)
+					return errors.Is(err, handler.ErrNoTable)
 				},
 			},
 		},
@@ -457,7 +459,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			name: "sequence equal prev seq",
 			args: args{
 				table: "my_table",
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -474,7 +476,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrPrevSeqGtSeq)
 				},
 			},
 		},
@@ -482,7 +484,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			name: "sequence less prev seq",
 			args: args{
 				table: "my_table",
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -499,7 +501,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrPrevSeqGtSeq)
 				},
 			},
 		},
@@ -507,7 +509,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			name: "no conditions",
 			args: args{
 				table:            "my_table",
-				conditions:       []Column{},
+				conditions:       []handler.Column{},
 				sequence:         1,
 				previousSequence: 0,
 			},
@@ -519,7 +521,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoCondition)
+					return errors.Is(err, handler.ErrNoCondition)
 				},
 			},
 		},
@@ -527,7 +529,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			name: "correct",
 			args: args{
 				table: "my_table",
-				conditions: []Column{
+				conditions: []handler.Column{
 					{
 						Name:  "col1",
 						Value: 1,
@@ -573,7 +575,7 @@ func TestNewNoOpStatement(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want Statement
+		want handler.Statement
 	}{
 		{
 			name: "generate correctly",
@@ -581,7 +583,7 @@ func TestNewNoOpStatement(t *testing.T) {
 				sequence:         5,
 				previousSequence: 3,
 			},
-			want: Statement{
+			want: handler.Statement{
 				Execute:          nil,
 				Sequence:         5,
 				PreviousSequence: 3,
@@ -599,7 +601,7 @@ func TestNewNoOpStatement(t *testing.T) {
 
 func TestStatement_Execute(t *testing.T) {
 	type fields struct {
-		execute func(ex executer, projectionName string) error
+		execute func(ex handler.Executer, projectionName string) error
 	}
 	type want struct {
 		isErr func(error) bool
@@ -616,7 +618,7 @@ func TestStatement_Execute(t *testing.T) {
 		{
 			name: "execute returns no error",
 			fields: fields{
-				execute: func(ex executer, projectionName string) error { return nil },
+				execute: func(ex handler.Executer, projectionName string) error { return nil },
 			},
 			args: args{
 				projectionName: "my_projection",
@@ -633,7 +635,7 @@ func TestStatement_Execute(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			fields: fields{
-				execute: func(ex executer, projectionName string) error { return testErr },
+				execute: func(ex handler.Executer, projectionName string) error { return testErr },
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -644,7 +646,7 @@ func TestStatement_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stmt := &Statement{
+			stmt := &handler.Statement{
 				Execute: tt.fields.execute,
 			}
 			if err := stmt.Execute(nil, tt.args.projectionName); !tt.want.isErr(err) {
@@ -656,7 +658,7 @@ func TestStatement_Execute(t *testing.T) {
 
 func Test_columnsToQuery(t *testing.T) {
 	type args struct {
-		cols []Column
+		cols []handler.Column
 	}
 	type want struct {
 		names  []string
@@ -680,7 +682,7 @@ func Test_columnsToQuery(t *testing.T) {
 		{
 			name: "one column",
 			args: args{
-				cols: []Column{
+				cols: []handler.Column{
 					{
 						Name:  "col1",
 						Value: 1,
@@ -696,7 +698,7 @@ func Test_columnsToQuery(t *testing.T) {
 		{
 			name: "multiple columns",
 			args: args{
-				cols: []Column{
+				cols: []handler.Column{
 					{
 						Name:  "col1",
 						Value: 1,
@@ -732,7 +734,7 @@ func Test_columnsToQuery(t *testing.T) {
 
 func Test_columnsToWhere(t *testing.T) {
 	type args struct {
-		cols        []Column
+		cols        []handler.Column
 		paramOffset int
 	}
 	type want struct {
@@ -755,7 +757,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "no offset",
 			args: args{
-				cols: []Column{
+				cols: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -771,7 +773,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "multiple cols",
 			args: args{
-				cols: []Column{
+				cols: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -791,7 +793,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "2 offset",
 			args: args{
-				cols: []Column{
+				cols: []handler.Column{
 					{
 						Name:  "col1",
 						Value: "val1",

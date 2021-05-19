@@ -14,15 +14,22 @@ import (
 )
 
 var (
-	queryErr  = errors.New("query err")
-	filterErr = errors.New("filter err")
-	reduceErr = errors.New("reduce err")
-	lockErr   = errors.New("lock failed")
-	unlockErr = errors.New("unlock failed")
-	execErr   = errors.New("exec error")
-	bulkErr   = errors.New("bulk err")
-	updateErr = errors.New("update err")
+	QueryErr  = errors.New("query err")
+	FilterErr = errors.New("filter err")
+	ReduceErr = errors.New("reduce err")
+	LockErr   = errors.New("lock failed")
+	UnlockErr = errors.New("unlock failed")
+	ExecErr   = errors.New("exec error")
+	BulkErr   = errors.New("bulk err")
+	UpdateErr = errors.New("update err")
 )
+
+func newTestStatement(seq, previousSeq uint64) Statement {
+	return Statement{
+		Sequence:         seq,
+		PreviousSequence: previousSeq,
+	}
+}
 
 func TestProjectionHandler_processEvent(t *testing.T) {
 	type fields struct {
@@ -53,11 +60,11 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 				shouldPush: nil,
 			},
 			args: args{
-				reduce: testReduceErr(reduceErr),
+				reduce: testReduceErr(ReduceErr),
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, reduceErr)
+					return errors.Is(err, ReduceErr)
 				},
 				stmts: nil,
 			},
@@ -83,21 +90,21 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 			name: "existing stmts",
 			fields: fields{
 				stmts: []Statement{
-					NewNoOpStatement(1, 0),
+					newTestStatement(1, 0),
 				},
 				pushSet:    false,
 				shouldPush: make(chan *struct{}, 1),
 			},
 			args: args{
-				reduce: testReduce(NewNoOpStatement(2, 1)),
+				reduce: testReduce(newTestStatement(2, 1)),
 			},
 			want: want{
 				isErr: func(err error) bool {
 					return err == nil
 				},
 				stmts: []Statement{
-					NewNoOpStatement(1, 0),
-					NewNoOpStatement(2, 1),
+					newTestStatement(1, 0),
+					newTestStatement(2, 1),
 				},
 			},
 		},
@@ -144,14 +151,14 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 			name: "query returns err",
 			args: args{
 				ctx:    context.Background(),
-				query:  testQuery(nil, 0, queryErr),
+				query:  testQuery(nil, 0, QueryErr),
 				reduce: testReduce(),
 			},
 			fields: fields{},
 			want: want{
 				shouldLimitExeeded: false,
 				isErr: func(err error) bool {
-					return errors.Is(err, queryErr)
+					return errors.Is(err, QueryErr)
 				},
 			},
 		},
@@ -164,13 +171,13 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
-					es_repo_mock.NewRepo(t).ExpectFilterEventsError(filterErr),
+					es_repo_mock.NewRepo(t).ExpectFilterEventsError(FilterErr),
 				),
 			},
 			want: want{
 				shouldLimitExeeded: false,
 				isErr: func(err error) bool {
-					return errors.Is(err, filterErr)
+					return errors.Is(err, FilterErr)
 				},
 			},
 		},
@@ -320,8 +327,8 @@ func TestProjectionHandler_push(t *testing.T) {
 			name: "previous lock",
 			fields: fields{
 				stmts: []Statement{
-					NewNoOpStatement(1, 0),
-					NewNoOpStatement(2, 1),
+					newTestStatement(1, 0),
+					newTestStatement(2, 1),
 				},
 				pushSet: true,
 			},
@@ -340,8 +347,8 @@ func TestProjectionHandler_push(t *testing.T) {
 			name: "error in update",
 			fields: fields{
 				stmts: []Statement{
-					NewNoOpStatement(1, 0),
-					NewNoOpStatement(2, 1),
+					newTestStatement(1, 0),
+					newTestStatement(2, 1),
 				},
 				pushSet: true,
 			},
@@ -458,7 +465,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				ctx:         context.Background(),
 				executeBulk: &executeBulkMock{},
 				lock: &lockMock{
-					firstErr: lockErr,
+					firstErr: LockErr,
 					errWait:  time.Duration(500 * time.Millisecond),
 				},
 				unlock: &unlockMock{},
@@ -468,7 +475,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				executeBulkCount: 0,
 				unlockCount:      0,
 				isErr: func(err error) bool {
-					return errors.Is(err, lockErr)
+					return errors.Is(err, LockErr)
 				},
 			},
 		},
@@ -482,7 +489,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 					errWait: time.Duration(500 * time.Millisecond),
 				},
 				unlock: &unlockMock{
-					err: unlockErr,
+					err: UnlockErr,
 				},
 			},
 			res: res{
@@ -490,7 +497,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				executeBulkCount: 1,
 				unlockCount:      1,
 				isErr: func(err error) bool {
-					return errors.Is(err, unlockErr)
+					return errors.Is(err, UnlockErr)
 				},
 			},
 		},
@@ -551,7 +558,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				},
 				lock: &lockMock{
 					firstErr: nil,
-					err:      lockErr,
+					err:      LockErr,
 					errWait:  time.Duration(100 * time.Millisecond),
 					canceled: make(chan bool, 1),
 				},
@@ -575,7 +582,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				ctx: context.Background(),
 				executeBulk: &executeBulkMock{
 					canceled:      make(chan bool, 1),
-					err:           bulkErr,
+					err:           BulkErr,
 					waitForCancel: false,
 				},
 				lock: &lockMock{
@@ -594,7 +601,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				executeBulkCount: 1,
 				unlockCount:      1,
 				isErr: func(err error) bool {
-					return errors.Is(err, bulkErr)
+					return errors.Is(err, BulkErr)
 				},
 			},
 		},
@@ -694,16 +701,16 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 				shouldPush: make(chan *struct{}, 1),
 			},
 			args: args{
-				update: testUpdate(t, 2, updateErr),
+				update: testUpdate(t, 2, UpdateErr),
 				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
 				reduce: testReduce(
-					NewNoOpStatement(2, 1),
+					newTestStatement(2, 1),
 				),
 				ctx: context.Background(),
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, updateErr)
+					return errors.Is(err, UpdateErr)
 				},
 			},
 		},
@@ -742,8 +749,8 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 				update: testUpdate(t, 4, nil),
 				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
 				reduce: testReduce(
-					NewNoOpStatement(1, 0),
-					NewNoOpStatement(2, 1),
+					newTestStatement(1, 0),
+					newTestStatement(2, 1),
 				),
 				ctx: context.Background(),
 			},
