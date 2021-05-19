@@ -3,7 +3,7 @@
     {{ if hasCustomPolicy .LabelPolicy }}
         {{ $logo := customLogoResource .OrgID .LabelPolicy .DarkMode }}
         {{if $logo}}
-            <img class="lgn-logo" src="{{ customLogoResource .OrgID .LabelPolicy .DarkMode }}" alt="Logo">
+            <img class="lgn-logo" src="{{$logo}}" alt="Logo">
         {{end}}
     {{ else }}
 

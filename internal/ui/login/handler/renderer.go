@@ -95,6 +95,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			if darkMode && policy.LogoDarkURL != "" {
 				fileName = policy.LogoDarkURL
 			}
+			if fileName == "" {
+				return ""
+			}
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
 		},
 		"avatarResource": func(orgID, avatar string) string {
