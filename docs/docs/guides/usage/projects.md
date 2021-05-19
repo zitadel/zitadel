@@ -87,7 +87,7 @@ Please note that you can also grant selected roles of a project to an individual
 ## Exercise - Grant a project
 
 1. Visit the project that you have created before, then in the section GRANTED ORGANIZATIONS click New.
-2. Enter the domain ‘acme-caos.zitadel.ch’, search the organization and continue to the next step.
+2. Enter the domain ‘acme.caos.ch’, search the organization and continue to the next step.
 3. Select some roles you would like to grant to the organization ACME and confirm.
 4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
 
