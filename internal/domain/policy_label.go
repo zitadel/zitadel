@@ -31,10 +31,6 @@ type LabelPolicy struct {
 	DisableWatermark    bool
 }
 
-func (p *LabelPolicy) IsValid() bool {
-	return p.PrimaryColor != "" && p.BackgroundColor != "" && p.WarnColor != ""
-}
-
 type LabelPolicyState int32
 
 const (

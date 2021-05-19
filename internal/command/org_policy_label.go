@@ -12,9 +12,6 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
 	}
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Md9sf", "Errors.Org.LabelPolicy.Invalid")
-	}
 	addedPolicy := NewOrgLabelPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -52,9 +49,6 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3N9fs", "Errors.ResourceOwnerMissing")
-	}
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-dM9fs", "Errors.Org.LabelPolicy.Invalid")
 	}
 	existingPolicy := NewOrgLabelPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)

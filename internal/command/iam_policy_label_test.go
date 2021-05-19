@@ -37,24 +37,6 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "labelpolicy invalid, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				policy: &domain.LabelPolicy{
-					PrimaryColor:    "",
-					BackgroundColor: "background-color",
-				},
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "labelpolicy already existing, already exists error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -201,24 +183,6 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			name: "labelpolicy invalid, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				policy: &domain.LabelPolicy{
-					PrimaryColor:    "",
-					BackgroundColor: "background-color",
-				},
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
 		{
 			name: "labelpolicy not existing, not found error",
 			fields: fields{
