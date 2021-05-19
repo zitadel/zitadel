@@ -1,5 +1,5 @@
 module.exports = {
-    branches: ["main", "livio-a-patch-1"],
+    branches: ["main"],
     plugins: [
         "@semantic-release/commit-analyzer",
         "@semantic-release/release-notes-generator",
