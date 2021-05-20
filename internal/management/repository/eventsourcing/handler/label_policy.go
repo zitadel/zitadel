@@ -141,7 +141,7 @@ func (p *LabelPolicy) CleanUpBucket(policy *iam_model.LabelPolicyView) {
 }
 
 func deleteableObject(object *domain.AssetInfo, policy *iam_model.LabelPolicyView) bool {
-	if object.Key == policy.LogoURL || object.Key == policy.LogoDarkURL || object.Key == policy.IconURL || object.Key == policy.LogoDarkURL || object.Key == policy.FontURL {
+	if object.Key == policy.LogoURL || object.Key == policy.LogoDarkURL || object.Key == policy.IconURL || object.Key == policy.IconDarkURL || object.Key == policy.FontURL {
 		return false
 	}
 	return true
