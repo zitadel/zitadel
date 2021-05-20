@@ -2469,13 +2469,7 @@ message UpdateLabelPolicyRequest {
     string background_color_dark = 8 [(validate.rules).string = { max_len: 50}];
     string warn_color_dark = 9 [(validate.rules).string = { max_len: 50}];
     string font_color_dark = 10 [(validate.rules).string = { max_len: 50}];
-    // Shows error messages as popup instead of inline
-    bool error_msg_popup = 11 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Shows error messages as popup instead of inline.";
-        }
-    ];
-    bool disable_watermark = 12;
+    bool disable_watermark = 11;
 }
 
 message UpdateLabelPolicyResponse {

@@ -83,18 +83,12 @@ message LabelPolicy {
             description: "hex value for font color dark theme"
         }
     ];
-    // Shows error messages as popup instead of inline
-    bool error_msg_popup = 13 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Shows error messages as popup instead of inline.";
-        }
-    ];
-    bool disable_watermark = 14;
-    string logo_url = 15;
-    string icon_url = 16;
-    string logo_url_dark = 17;
-    string icon_url_dark = 18;
-    string font_url = 19;
+    bool disable_watermark = 13;
+    string logo_url = 14;
+    string icon_url = 15;
+    string logo_url_dark = 16;
+    string icon_url_dark = 17;
+    string font_url = 18;
 }
 
 message LoginPolicy {
