@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/lucasb-eyer/go-colorful"
@@ -98,7 +99,9 @@ func (m *Styling) processLabelPolicy(event *es_models.Event) (err error) {
 		iam_es_model.LabelPolicyLogoDarkAdded, model.LabelPolicyLogoDarkAdded,
 		iam_es_model.LabelPolicyLogoDarkRemoved, model.LabelPolicyLogoDarkRemoved,
 		iam_es_model.LabelPolicyIconDarkAdded, model.LabelPolicyIconDarkAdded,
-		iam_es_model.LabelPolicyIconDarkRemoved, model.LabelPolicyIconDarkRemoved:
+		iam_es_model.LabelPolicyIconDarkRemoved, model.LabelPolicyIconDarkRemoved,
+		iam_es_model.LabelPolicyFontAdded, model.LabelPolicyFontAdded,
+		iam_es_model.LabelPolicyFontRemoved, model.LabelPolicyFontRemoved:
 		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
@@ -163,6 +166,15 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 			cssContent += fmt.Sprintf("--zitadel-color-warn-%v: %s;", i, color)
 		}
 	}
+	if policy.FontURL != "" {
+		split := strings.Split(policy.FontURL, "/")
+		cssContent += fmt.Sprintf("--zitadel-font-family: %s;", split[len(split)-1])
+	}
+	cssContent += fmt.Sprint("}")
+	if policy.FontURL != "" {
+		split := strings.Split(policy.FontURL, "/")
+		cssContent += fmt.Sprintf("\n@font-face {\n  font-family: '%s';\n  font-style: normal;\n  font-display: swap;\n  src: url(/login/resources/dynamic?orgId=%s&filename=%s) format('opentype');\n}\n", split[len(split)-1], policy.AggregateID, policy.FontURL)
+	}
 	cssContent += fmt.Sprint(".lgn-dark-theme {")
 	if policy.PrimaryColorDark != "" {
 		palette := m.generateColorPaletteRGBA255(policy.PrimaryColorDark)
@@ -187,10 +199,6 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		for i, color := range palette {
 			cssContent += fmt.Sprintf("--zitadel-color-font-%v: %s;", i, color)
 		}
-	}
-	cssContent += fmt.Sprint("}")
-	if policy.FontURL != "" {
-		cssContent += fmt.Sprintf("--zitadel-font-url: %s;", policy.FontURL)
 	}
 	cssContent += fmt.Sprint("}")
 

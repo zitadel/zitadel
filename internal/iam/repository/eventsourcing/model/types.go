@@ -47,6 +47,8 @@ const (
 	LabelPolicyLogoDarkRemoved models.EventType = "iam.policy.label.logo.dark.removed"
 	LabelPolicyIconDarkAdded   models.EventType = "iam.policy.label.icon.dark.added"
 	LabelPolicyIconDarkRemoved models.EventType = "iam.policy.label.icon.dark.removed"
+	LabelPolicyFontAdded       models.EventType = "iam.policy.label.font.added"
+	LabelPolicyFontRemoved     models.EventType = "iam.policy.label.font.removed"
 
 	MailTemplateAdded   models.EventType = "iam.mail.template.added"
 	MailTemplateChanged models.EventType = "iam.mail.template.changed"

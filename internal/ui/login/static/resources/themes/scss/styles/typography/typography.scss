@@ -16,7 +16,7 @@
 }
 
 @function lgn-typography-config(
-  $font-family:   var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif),
+  $font-family:   var(--zitadel-font-family) + ", -apple-system, BlinkMacSystemFont, sans-serif",
   $display-4:     lgn-typography-level(112px, 112px, 300, $letter-spacing: -0.05em),
   $display-3:     lgn-typography-level(56px, 56px, 400, $letter-spacing: -0.02em),
   $display-2:     lgn-typography-level(45px, 48px, 400, $letter-spacing: -0.005em),

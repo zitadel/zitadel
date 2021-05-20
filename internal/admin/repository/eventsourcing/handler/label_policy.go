@@ -87,7 +87,9 @@ func (p *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 		model.LabelPolicyLogoDarkAdded,
 		model.LabelPolicyLogoDarkRemoved,
 		model.LabelPolicyIconDarkAdded,
-		model.LabelPolicyIconDarkRemoved:
+		model.LabelPolicyIconDarkRemoved,
+		model.LabelPolicyFontAdded,
+		model.LabelPolicyFontRemoved:
 		policy, err = p.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
