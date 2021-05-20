@@ -1865,7 +1865,6 @@ This is an empty request
 | background_color_dark |  string | - | string.max_len: 50<br />  |
 | warn_color_dark |  string | - | string.max_len: 50<br />  |
 | font_color_dark |  string | - | string.max_len: 50<br />  |
-| error_msg_popup |  bool | Shows error messages as popup instead of inline |  |
 | disable_watermark |  bool | - |  |
 
 

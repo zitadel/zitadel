@@ -26,7 +26,6 @@ title: zitadel/policy.proto
 | background_color_dark |  string | hex value for background color dark theme |  |
 | warn_color_dark |  string | hex value for warn color dark theme |  |
 | font_color_dark |  string | hex value for font color dark theme |  |
-| error_msg_popup |  bool | Shows error messages as popup instead of inline |  |
 | disable_watermark |  bool | - |  |
 | logo_url |  string | - |  |
 | icon_url |  string | - |  |
