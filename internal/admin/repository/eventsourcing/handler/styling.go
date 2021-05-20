@@ -209,38 +209,60 @@ func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {
 	palette := make(map[string]string)
 	defaultColor := gamut.Hex(hex)
 
-	color50, _ := colorful.MakeColor(gamut.Lighter(defaultColor, 1.0))
-	palette["50"] = cssRGB(color50.RGB255())
+	color50, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 1.0))
+	if ok {
+		palette["50"] = cssRGB(color50.RGB255())
+	}
 
-	color100, _ := colorful.MakeColor(gamut.Lighter(defaultColor, 0.8))
-	palette["100"] = cssRGB(color100.RGB255())
+	color100, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.8))
+	if ok {
+		palette["100"] = cssRGB(color100.RGB255())
+	}
 
-	color200, _ := colorful.MakeColor(gamut.Lighter(defaultColor, 0.6))
-	palette["200"] = cssRGB(color200.RGB255())
+	color200, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.6))
+	if ok {
+		palette["200"] = cssRGB(color200.RGB255())
+	}
 
-	color300, _ := colorful.MakeColor(gamut.Lighter(defaultColor, 0.4))
-	palette["300"] = cssRGB(color300.RGB255())
+	color300, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.4))
+	if ok {
+		palette["300"] = cssRGB(color300.RGB255())
+	}
 
-	color400, _ := colorful.MakeColor(gamut.Lighter(defaultColor, 0.1))
-	palette["400"] = cssRGB(color400.RGB255())
+	color400, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.1))
+	if ok {
+		palette["400"] = cssRGB(color400.RGB255())
+	}
 
-	color500, _ := colorful.MakeColor(defaultColor)
-	palette["500"] = cssRGB(color500.RGB255())
+	color500, ok := colorful.MakeColor(defaultColor)
+	if ok {
+		palette["500"] = cssRGB(color500.RGB255())
+	}
 
-	color600, _ := colorful.MakeColor(gamut.Darker(defaultColor, 0.1))
-	palette["600"] = cssRGB(color600.RGB255())
+	color600, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.1))
+	if ok {
+		palette["600"] = cssRGB(color600.RGB255())
+	}
 
-	color700, _ := colorful.MakeColor(gamut.Darker(defaultColor, 0.2))
-	palette["700"] = cssRGB(color700.RGB255())
+	color700, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.2))
+	if ok {
+		palette["700"] = cssRGB(color700.RGB255())
+	}
 
-	color800, _ := colorful.MakeColor(gamut.Darker(defaultColor, 0.3))
-	palette["800"] = cssRGB(color800.RGB255())
+	color800, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.3))
+	if ok {
+		palette["800"] = cssRGB(color800.RGB255())
+	}
 
-	color900, _ := colorful.MakeColor(gamut.Darker(defaultColor, 0.4))
-	palette["900"] = cssRGB(color900.RGB255())
+	color900, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.4))
+	if ok {
+		palette["900"] = cssRGB(color900.RGB255())
+	}
 
-	colorContrast, _ := colorful.MakeColor(gamut.Contrast(defaultColor))
-	palette["contrast"] = cssRGB(colorContrast.RGB255())
+	colorContrast, ok := colorful.MakeColor(gamut.Contrast(defaultColor))
+	if ok {
+		palette["contrast"] = cssRGB(colorContrast.RGB255())
+	}
 
 	return palette
 }
