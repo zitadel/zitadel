@@ -8,12 +8,12 @@ import (
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/api/assets"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/admin"
 	"github.com/caos/zitadel/internal/api/grpc/auth"
 	"github.com/caos/zitadel/internal/api/grpc/management"
 	"github.com/caos/zitadel/internal/api/oidc"
-	"github.com/caos/zitadel/internal/api/upload"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
@@ -188,9 +188,9 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {
-		verifier.RegisterServer("Management-API", "upload", nil)
-		uploadHandler := upload.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator)
-		apis.RegisterHandler("/assets/v1", uploadHandler)
+		verifier.RegisterServer("Management-API", "assets", nil)
+		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static)
+		apis.RegisterHandler("/assets/v1", assetsHandler)
 	}
 
 	openAPIHandler, err := openapi.Start()

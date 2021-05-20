@@ -12,7 +12,7 @@ import (
 
 const (
 	AdminRName     = "admin-rest-v1"
-	Upload         = "upload-v1"
+	Upload         = "assets-v1"
 	MgmtName       = "mgmt-v1"
 	OauthName      = "oauth-v1"
 	AuthRName      = "auth-rest-v1"
@@ -132,7 +132,7 @@ func AdaptFunc(
 				labels.MustForName(componentLabels, Upload),
 				false,
 				apiDomain,
-				"/upload/v1",
+				"/assets/v1",
 				"",
 				httpUrl,
 				30000,

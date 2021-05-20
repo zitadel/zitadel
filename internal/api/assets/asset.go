@@ -1,4 +1,4 @@
-package upload
+package assets
 
 import (
 	"context"
@@ -48,12 +48,14 @@ func NewHandler(
 	verifier *authz.TokenVerifier,
 	authConfig authz.Config,
 	idGenerator id.Generator,
+	storage static.Storage,
 ) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
 		idGenerator:     idGenerator,
+		storage:         storage,
 	}
 	h.router = mux.NewRouter()
 	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, true})).Methods("POST")
@@ -113,6 +115,9 @@ func (h *Handler) UploadHandleFunc(uploader Uploader) func(http.ResponseWriter, 
 func (h *Handler) DownloadHandleFunc(downloader Downloader) func(http.ResponseWriter, *http.Request) {
 	return h.authInterceptor.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			if h.storage == nil {
+				return
+			}
 			ctx := r.Context()
 			ctxData := authz.GetCtxData(ctx)
 

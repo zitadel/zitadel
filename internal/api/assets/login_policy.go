@@ -1,4 +1,4 @@
-package upload
+package assets
 
 import (
 	"context"

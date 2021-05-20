@@ -102,7 +102,7 @@ func TestHttp_Adapt(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               ".",
-				"prefix":             "/upload/v1",
+				"prefix":             "/assets/v1",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
@@ -358,7 +358,7 @@ func TestHttp_Adapt2(t *testing.T) {
 			"spec": map[string]interface{}{
 				"connect_timeout_ms": 30000,
 				"host":               "api.domain",
-				"prefix":             "/upload/v1",
+				"prefix":             "/assets/v1",
 				"rewrite":            "",
 				"service":            url,
 				"timeout_ms":         30000,
