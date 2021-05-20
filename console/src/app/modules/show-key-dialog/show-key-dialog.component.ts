@@ -21,7 +21,9 @@ export class ShowKeyDialogComponent {
   public saveFile(): void {
     const json = atob(this.keyResponse.keyDetails.toString());
     const blob = new Blob([json], { type: 'text/plain;charset=utf-8' });
-    const name = (this.keyResponse as AddMachineKeyResponse.AsObject).keyId ? (this.keyResponse as AddMachineKeyResponse.AsObject).keyId : (this.keyResponse as AddAppKeyResponse.AsObject).id;
+    const name = (this.keyResponse as AddMachineKeyResponse.AsObject).keyId ?
+      (this.keyResponse as AddMachineKeyResponse.AsObject).keyId :
+      (this.keyResponse as AddAppKeyResponse.AsObject).id;
     saveAs(blob, `${name}.json`);
   }
 
