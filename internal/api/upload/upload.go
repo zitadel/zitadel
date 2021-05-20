@@ -2,7 +2,9 @@ package upload
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/caos/logging"
 
@@ -25,6 +27,11 @@ type Handler struct {
 
 type Uploader interface {
 	Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error
+	ObjectName(data authz.CtxData) (string, error)
+	BucketName(data authz.CtxData) string
+}
+
+type Downloader interface {
 	ObjectName(data authz.CtxData) (string, error)
 	BucketName(data authz.CtxData) string
 }
@@ -60,6 +67,7 @@ func NewHandler(
 	h.router.HandleFunc(orgLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, false}))
 	h.router.HandleFunc(orgLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, false}))
 	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatar{}))
+	h.router.HandleFunc(userAvatarURL, h.DownloadHandleFunc(&humanAvatar{}))
 	return h.router
 }
 
@@ -98,5 +106,39 @@ func (h *Handler) UploadHandleFunc(uploader Uploader) func(http.ResponseWriter, 
 				h.errorHandler(w, r, err)
 				return
 			}
+		})
+}
+
+func (h *Handler) DownloadHandleFunc(downloader Downloader) func(http.ResponseWriter, *http.Request) {
+	return h.authInterceptor.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			ctxData := authz.GetCtxData(ctx)
+
+			bucketName := downloader.BucketName(ctxData)
+			objectName, err := downloader.ObjectName(ctxData)
+			if err != nil {
+				h.errorHandler(w, r, err)
+				return
+			}
+			reader, getInfo, err := h.storage.GetObject(ctx, bucketName, objectName)
+			if err != nil {
+				h.errorHandler(w, r, err)
+				return
+			}
+			data, err := ioutil.ReadAll(reader)
+			if err != nil {
+				h.errorHandler(w, r, err)
+				return
+			}
+			info, err := getInfo()
+			if err != nil {
+				h.errorHandler(w, r, err)
+				return
+			}
+			w.Header().Set("content-length", strconv.FormatInt(info.Size, 16))
+			w.Header().Set("content-type", info.ContentType)
+			w.Header().Set("ETag", info.ETag)
+			w.Write(data)
 		})
 }
