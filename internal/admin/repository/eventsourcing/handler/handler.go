@@ -31,7 +31,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage, localDevMode bool) []query.Handler {
 	handlers := []query.Handler{
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
@@ -70,7 +70,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 	if static != nil {
 		handlers = append(handlers, newStyling(
 			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
-			static))
+			static,
+			localDevMode))
 	}
 	return handlers
 }
