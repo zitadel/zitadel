@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/caos/logging"
+	"github.com/gorilla/mux"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -17,7 +18,7 @@ import (
 )
 
 type Handler struct {
-	router          *http.ServeMux
+	router          *mux.Router
 	errorHandler    ErrorHandler
 	storage         static.Storage
 	commands        *command.Commands
@@ -54,20 +55,20 @@ func NewHandler(
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
 		idGenerator:     idGenerator,
 	}
-	h.router = http.NewServeMux()
-	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, true}))
-	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, true}))
-	h.router.HandleFunc(defaultLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, true}))
-	h.router.HandleFunc(defaultLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, true}))
-	h.router.HandleFunc(defaultLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, true}))
+	h.router = mux.NewRouter()
+	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, true})).Methods("POST")
 
-	h.router.HandleFunc(orgLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, false}))
-	h.router.HandleFunc(orgLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, false}))
-	h.router.HandleFunc(orgLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, false}))
-	h.router.HandleFunc(orgLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, false}))
-	h.router.HandleFunc(orgLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, false}))
-	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatar{}))
-	h.router.HandleFunc(userAvatarURL, h.DownloadHandleFunc(&humanAvatar{}))
+	h.router.HandleFunc(orgLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, false})).Methods("POST")
+	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatar{})).Methods("POST")
+	h.router.HandleFunc(userAvatarURL, h.DownloadHandleFunc(&humanAvatar{})).Methods("GET")
 	return h.router
 }
 
