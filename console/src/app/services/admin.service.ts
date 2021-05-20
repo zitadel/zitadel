@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import {
+  ActivateLabelPolicyRequest,
+  ActivateLabelPolicyResponse,
   AddCustomOrgIAMPolicyRequest,
   AddCustomOrgIAMPolicyResponse,
   AddIAMMemberRequest,
@@ -101,10 +103,6 @@ import {
   UpdatePasswordLockoutPolicyRequest,
   UpdatePasswordLockoutPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
-import {
-  ActivateCustomLabelPolicyRequest,
-  ActivateCustomLabelPolicyResponse,
-} from '../proto/generated/zitadel/management_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
@@ -292,9 +290,9 @@ export class AdminService {
     return this.grpcService.admin.getPreviewLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public activateCustomLabelPolicy(req: ActivateCustomLabelPolicyRequest):
-    Promise<ActivateCustomLabelPolicyResponse.AsObject> {
-    return this.grpcService.admin.activateCustomLabelPolicy(req, null).then(resp => resp.toObject());
+  public activateLabelPolicy(req: ActivateLabelPolicyRequest):
+    Promise<ActivateLabelPolicyResponse.AsObject> {
+    return this.grpcService.admin.activateLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
   /* login */
