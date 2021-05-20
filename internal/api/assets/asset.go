@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/static"
 )
 
@@ -33,8 +34,8 @@ type Uploader interface {
 }
 
 type Downloader interface {
-	ObjectName(data authz.CtxData) (string, error)
-	BucketName(data authz.CtxData) string
+	ObjectName(ctx context.Context) (string, error)
+	BucketName(ctx context.Context) string
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error)
@@ -49,6 +50,7 @@ func NewHandler(
 	authConfig authz.Config,
 	idGenerator id.Generator,
 	storage static.Storage,
+	orgRepo repository.OrgRepository,
 ) http.Handler {
 	h := &Handler{
 		commands:        commands,
@@ -58,19 +60,48 @@ func NewHandler(
 		storage:         storage,
 	}
 	h.router = mux.NewRouter()
-	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, true})).Methods("POST")
-	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, true})).Methods("POST")
-	h.router.HandleFunc(defaultLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, true})).Methods("POST")
-	h.router.HandleFunc(defaultLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, true})).Methods("POST")
-	h.router.HandleFunc(defaultLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogoUploader{idGenerator, false, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyLogoURL, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, false, true, false})).Methods("GET")
+	h.router.HandleFunc(defaultLabelPolicyLogoURL+preview, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, false, true, true})).Methods("GET")
 
-	h.router.HandleFunc(orgLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, false, false})).Methods("POST")
-	h.router.HandleFunc(orgLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogo{idGenerator, true, false})).Methods("POST")
-	h.router.HandleFunc(orgLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, false, false})).Methods("POST")
-	h.router.HandleFunc(orgLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIcon{idGenerator, true, false})).Methods("POST")
-	h.router.HandleFunc(orgLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFont{idGenerator, false})).Methods("POST")
-	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatar{})).Methods("POST")
-	h.router.HandleFunc(userAvatarURL, h.DownloadHandleFunc(&humanAvatar{})).Methods("GET")
+	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogoUploader{idGenerator, true, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, false, true, false})).Methods("GET")
+	h.router.HandleFunc(defaultLabelPolicyLogoDarkURL+preview, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, false, true, true})).Methods("GET")
+
+	h.router.HandleFunc(defaultLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIconUploader{idGenerator, false, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyIconURL, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, false, true, false})).Methods("GET")
+	h.router.HandleFunc(defaultLabelPolicyIconURL+preview, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, false, true, true})).Methods("GET")
+
+	h.router.HandleFunc(defaultLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIconUploader{idGenerator, true, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyIconDarkURL, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, true, true, false})).Methods("GET")
+	h.router.HandleFunc(defaultLabelPolicyIconDarkURL+preview, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, true, true, true})).Methods("GET")
+
+	h.router.HandleFunc(defaultLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFontUploader{idGenerator, true})).Methods("POST")
+	h.router.HandleFunc(defaultLabelPolicyFontURL, h.DownloadHandleFunc(&labelPolicyFontDownloader{orgRepo, true, false})).Methods("GET")
+	h.router.HandleFunc(defaultLabelPolicyFontURL+preview, h.DownloadHandleFunc(&labelPolicyFontDownloader{orgRepo, true, true})).Methods("GET")
+
+	h.router.HandleFunc(orgLabelPolicyLogoURL, h.UploadHandleFunc(&labelPolicyLogoUploader{idGenerator, false, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyLogoURL, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, false, false, false})).Methods("GET")
+	h.router.HandleFunc(orgLabelPolicyLogoURL+preview, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, false, false, true})).Methods("GET")
+
+	h.router.HandleFunc(orgLabelPolicyLogoDarkURL, h.UploadHandleFunc(&labelPolicyLogoUploader{idGenerator, true, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyLogoDarkURL, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, true, false, false})).Methods("GET")
+	h.router.HandleFunc(orgLabelPolicyLogoDarkURL+preview, h.DownloadHandleFunc(&labelPolicyLogoDownloader{orgRepo, true, false, true})).Methods("GET")
+
+	h.router.HandleFunc(orgLabelPolicyIconDarkURL, h.UploadHandleFunc(&labelPolicyIconUploader{idGenerator, false, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyIconDarkURL, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, false, false, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyIconDarkURL+preview, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, false, false, true})).Methods("POST")
+
+	h.router.HandleFunc(orgLabelPolicyIconURL, h.UploadHandleFunc(&labelPolicyIconUploader{idGenerator, true, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyIconURL, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, true, false, false})).Methods("GET")
+	h.router.HandleFunc(orgLabelPolicyIconURL+preview, h.DownloadHandleFunc(&labelPolicyIconDownloader{orgRepo, true, false, true})).Methods("GET")
+
+	h.router.HandleFunc(orgLabelPolicyFontURL, h.UploadHandleFunc(&labelPolicyFontUploader{idGenerator, false})).Methods("POST")
+	h.router.HandleFunc(orgLabelPolicyFontURL, h.DownloadHandleFunc(&labelPolicyFontDownloader{orgRepo, false, false})).Methods("GET")
+	h.router.HandleFunc(orgLabelPolicyFontURL+preview, h.DownloadHandleFunc(&labelPolicyFontDownloader{orgRepo, false, true})).Methods("GET")
+
+	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatarUploader{})).Methods("POST")
+	h.router.HandleFunc(userAvatarURL, h.DownloadHandleFunc(&humanAvatarDownloader{})).Methods("GET")
 	return h.router
 }
 
@@ -119,10 +150,9 @@ func (h *Handler) DownloadHandleFunc(downloader Downloader) func(http.ResponseWr
 				return
 			}
 			ctx := r.Context()
-			ctxData := authz.GetCtxData(ctx)
 
-			bucketName := downloader.BucketName(ctxData)
-			objectName, err := downloader.ObjectName(ctxData)
+			bucketName := downloader.BucketName(ctx)
+			objectName, err := downloader.ObjectName(ctx)
 			if err != nil {
 				h.errorHandler(w, r, err)
 				return

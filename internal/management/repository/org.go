@@ -50,4 +50,5 @@ type OrgRepository interface {
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 }

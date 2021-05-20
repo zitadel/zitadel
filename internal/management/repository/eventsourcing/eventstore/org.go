@@ -225,7 +225,15 @@ func (repo *OrgRepository) GetPreviewLabelPolicy(ctx context.Context) (*iam_mode
 }
 
 func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, viewErr := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
+	return repo.getDefaultLabelPolicy(ctx, domain.LabelPolicyStateActive)
+}
+
+func (repo *OrgRepository) GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	return repo.getDefaultLabelPolicy(ctx, domain.LabelPolicyStatePreview)
+}
+
+func (repo *OrgRepository) getDefaultLabelPolicy(ctx context.Context, state domain.LabelPolicyState) (*iam_model.LabelPolicyView, error) {
+	policy, viewErr := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(state))
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}

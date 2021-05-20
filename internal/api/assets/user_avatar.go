@@ -12,17 +12,27 @@ const (
 	userAvatarURL = "/users/me/avatar"
 )
 
-type humanAvatar struct{}
+type humanAvatarUploader struct{}
 
-func (l *humanAvatar) ObjectName(ctxData authz.CtxData) (string, error) {
+func (l *humanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error) {
 	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil
 }
 
-func (l *humanAvatar) BucketName(ctxData authz.CtxData) string {
+func (l *humanAvatarUploader) BucketName(ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 
-func (l *humanAvatar) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *humanAvatarUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
 	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Key)
 	return err
+}
+
+type humanAvatarDownloader struct{}
+
+func (l *humanAvatarDownloader) ObjectName(ctx context.Context) (string, error) {
+	return domain.GetHumanAvatarAssetPath(authz.GetCtxData(ctx).UserID), nil
+}
+
+func (l *humanAvatarDownloader) BucketName(ctx context.Context) string {
+	return authz.GetCtxData(ctx).OrgID
 }

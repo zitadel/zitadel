@@ -175,9 +175,9 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	if *adminEnabled {
 		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
 	}
+	managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query, static)
+	logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 	if *managementEnabled {
-		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query, static)
-		logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
@@ -189,7 +189,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	}
 	if *assetsEnabled {
 		verifier.RegisterServer("Management-API", "assets", nil)
-		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static)
+		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo)
 		apis.RegisterHandler("/assets/v1", assetsHandler)
 	}
 
