@@ -122,21 +122,6 @@
             </div>
 
             <div class="color">
-              <!-- <span class="title">Secondary Color</span> -->
-              <cnsl-form-field class="formfield">
-                <cnsl-label>Secondary Color Hexcode</cnsl-label>
-                <input cnslInput [(ngModel)]="data.secondaryColorDark" />
-              </cnsl-form-field>
-              <div class="color-selector">
-                <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                  [ngClass]="{'active': data.secondaryColorDark == color.color}"
-                  (click)="data.secondaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
-                  <mat-icon *ngIf="data.secondaryColorDark == color.color">check</mat-icon>
-                </div>
-              </div>
-            </div>
-
-            <div class="color">
               <!-- <span class="title">Warn Color</span> -->
               <cnsl-form-field class="formfield">
                 <cnsl-label>Warn Color Hexcode</cnsl-label>
@@ -166,21 +151,6 @@
                   [ngClass]="{'active': data.primaryColor == color.color}"
                   (click)="data.primaryColor= color.color" [ngStyle]="{'background-color': color.color}">
                   <mat-icon *ngIf="data.primaryColor == color.color">check</mat-icon>
-              </div>
-            </div>
-          </div>
-
-          <div class="color">
-            <!-- <span class="title">Secondary Color</span> -->
-            <cnsl-form-field class="formfield">
-              <cnsl-label>Secondary Color Hexcode</cnsl-label>
-              <input cnslInput [(ngModel)]="data.secondaryColor" />
-            </cnsl-form-field>
-            <div class="color-selector">
-              <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                [ngClass]="{'active': data.secondaryColor == color.color}"
-                (click)="data.secondaryColor= color.color" [ngStyle]="{'background-color': color.color}">
-                <mat-icon *ngIf="data.secondaryColor == color.color">check</mat-icon>
               </div>
             </div>
           </div>

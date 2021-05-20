@@ -277,10 +277,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setPrimaryColorDark(this.data.primaryColorDark);
+    req.setPrimaryColor(this.data.primaryColorDark);
     req.setPrimaryColor(this.data.primaryColor);
-    req.setSecondaryColorDark(this.data.secondaryColorDark);
-    req.setSecondaryColor(this.data.secondaryColor);
     req.setWarnColorDark(this.data.warnColorDark);
     req.setWarnColor(this.data.warnColor);
 
