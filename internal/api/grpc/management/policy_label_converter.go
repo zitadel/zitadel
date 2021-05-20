@@ -14,7 +14,6 @@ func addLabelPolicyToDomain(p *mgmt_pb.AddCustomLabelPolicyRequest) *domain.Labe
 		BackgroundColorDark: p.BackgroundColorDark,
 		WarnColorDark:       p.WarnColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
-		ErrorMsgPopup:       p.ErrorMsgPopup,
 		DisableWatermark:    p.DisableWatermark,
 	}
 }
@@ -30,7 +29,6 @@ func updateLabelPolicyToDomain(p *mgmt_pb.UpdateCustomLabelPolicyRequest) *domai
 		WarnColorDark:       p.WarnColorDark,
 		FontColorDark:       p.FontColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
-		ErrorMsgPopup:       p.ErrorMsgPopup,
 		DisableWatermark:    p.DisableWatermark,
 	}
 }

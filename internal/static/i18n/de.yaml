@@ -303,6 +303,16 @@ Errors:
       NotChanged: Default Org IAM Policy wurde nicht verändert
   Policy:
     AlreadyExists: Policy existiert bereits
+    Label:
+      Invalid:
+        PrimaryColor: Primäre Farbe ist kein gültiger Hex Farbwert
+        BackgroundColor: Hintergrund Farbe ist kein gültiger Hex Farbwert
+        WarnColor: Warn Farbe ist kein gültiger Hex Farbwert
+        FontColor: Schrift Farbe ist kein gültiger Hex Farbwert
+        PrimaryColorDark: Primäre Farbe ist kein gültiger Hex Farbwert
+        BackgroundColorDark: Hintergrund Farbe ist kein gültiger Hex Farbwert
+        WarnColorDark: Warn Farbe ist kein gültiger Hex Farbwert
+        FontColorDark: Schrift Farbe ist kein gültiger Hex Farbwert
   UserGrant:
     AlreadyExists: Benutzer Berechtigung existiert bereits
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden

@@ -16,7 +16,6 @@ func updateLabelPolicyToDomain(policy *admin_pb.UpdateLabelPolicyRequest) *domai
 		WarnColorDark:       policy.WarnColorDark,
 		FontColorDark:       policy.FontColorDark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
-		ErrorMsgPopup:       policy.ErrorMsgPopup,
 		DisableWatermark:    policy.DisableWatermark,
 	}
 }

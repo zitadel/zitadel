@@ -29,6 +29,9 @@ func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, policy *domain.Lab
 }
 
 func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLabelPolicyWriteModel, policy *domain.LabelPolicy) (eventstore.EventPusher, error) {
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -55,6 +58,9 @@ func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore
 }
 
 func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
