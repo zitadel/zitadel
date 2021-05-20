@@ -18,12 +18,12 @@ type SpoolerConfig struct {
 	Handlers              handler.Configs
 }
 
-func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, defaults systemdefaults.SystemDefaults, static static.Storage) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, defaults systemdefaults.SystemDefaults, static static.Storage, localDevMode bool) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, defaults, static),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, defaults, static, localDevMode),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

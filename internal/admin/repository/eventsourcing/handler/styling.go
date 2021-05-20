@@ -30,13 +30,20 @@ type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
+	devMode      bool
+	resourceUrl  string
 }
 
-func newStyling(handler handler, static static.Storage) *Styling {
+func newStyling(handler handler, static static.Storage, localDevMode bool) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
+	prefix := ""
+	if localDevMode {
+		prefix = "/login"
+	}
+	h.resourceUrl = prefix + "/resources/dynamic" //TODO: ?
 
 	h.subscribe()
 
@@ -166,14 +173,15 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 			cssContent += fmt.Sprintf("--zitadel-color-warn-%v: %s;", i, color)
 		}
 	}
+	var fontname string
 	if policy.FontURL != "" {
 		split := strings.Split(policy.FontURL, "/")
-		cssContent += fmt.Sprintf("--zitadel-font-family: %s;", split[len(split)-1])
+		fontname = split[len(split)-1]
+		cssContent += fmt.Sprintf("--zitadel-font-family: %s;", fontname)
 	}
 	cssContent += fmt.Sprint("}")
 	if policy.FontURL != "" {
-		split := strings.Split(policy.FontURL, "/")
-		cssContent += fmt.Sprintf("\n@font-face {\n  font-family: '%s';\n  font-style: normal;\n  font-display: swap;\n  src: url(/login/resources/dynamic?orgId=%s&filename=%s) format('opentype');\n}\n", split[len(split)-1], policy.AggregateID, policy.FontURL)
+		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, m.resourceUrl, policy.AggregateID, policy.FontURL)
 	}
 	cssContent += fmt.Sprint(".lgn-dark-theme {")
 	if policy.PrimaryColorDark != "" {
@@ -206,6 +214,15 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 	buffer := bytes.NewBuffer(data)
 	return buffer, int64(buffer.Len()), nil
 }
+
+const fontFaceTemplate = `
+@font-face {
+	font-family: '%s';
+	font-style: normal;
+	font-display: swap;
+	src: url(%s?orgId=%s&filename=%s) format('opentype');
+}
+`
 
 func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
 	fileName := domain.CssPath + "/" + domain.CssVariablesFileName
