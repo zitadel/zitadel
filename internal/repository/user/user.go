@@ -3,8 +3,9 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -202,7 +203,7 @@ type UserTokenAddedEvent struct {
 	ApplicationID     string    `json:"applicationId"`
 	UserAgentID       string    `json:"userAgentId"`
 	Audience          []string  `json:"audience"`
-	Scopes            []string  `json:"scopes""`
+	Scopes            []string  `json:"scopes"`
 	Expiration        time.Time `json:"expiration"`
 	PreferredLanguage string    `json:"preferredLanguage"`
 }
