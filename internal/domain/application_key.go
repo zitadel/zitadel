@@ -49,7 +49,7 @@ func (k *ApplicationKey) MarshalJSON() ([]byte, error) {
 		KeyID    string `json:"keyId"`
 		Key      string `json:"key"`
 		AppID    string `json:"appId"`
-		ClientID string `json:"clientID"`
+		ClientID string `json:"clientId"`
 	}{
 		Type:     "application",
 		KeyID:    k.KeyID,
