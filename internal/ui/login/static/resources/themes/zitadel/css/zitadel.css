@@ -69,7 +69,6 @@
   --zitadel-color-grey-900: #212121;
   --zitadel-icon-select: url("../select_arrow_light.svg");
   --zitadel-logo-powered-by: url("../logo-dark.svg");
-  --zitadel-logo: var(--zitadel-logo-powered-by);
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
   --zitadel-color-qr: var(--zitadel-color-white);
@@ -2335,41 +2334,41 @@ i {
 
 h1, .lgn-headline, .lgn-typography h1 {
   font: 400 24px/32px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 h2, .lgn-title, .lgn-typography h2 {
   font: 500 20px/32px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 h3, .lgn-subheading-2, .lgn-typography h3 {
   font: 400 16px/28px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 h4, .lgn-subheading-1, .lgn-typography h4 {
   font: 400 15px/24px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 .lgn-body-strong, .lgn-body-2 {
   font: 500 14px/24px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 
 p, .lgn-body, .lgn-body-1, .lgn-typography {
   font: 400 14px/20px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
@@ -2378,59 +2377,59 @@ p p, .lgn-body p, .lgn-body-1 p, .lgn-typography p {
 
 button, .lgn-button, .lgn-raised-button, .lgn-stroked-button {
   font: 500 14px/36px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 
 span {
   font: 400 14px/20px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 
 a, .lgn-a {
   font: 400 14px/20px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 
 small .lgn-small, .lgn-caption {
   font: 400 12px/20px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
 }
 
 label, .lgn-label, .lgn-typography .lgn-label, .lgn-typography label {
   font: 400 12px/20px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
   margin: 0 0 2px 0;
 }
 
 .lgn-display-4, .lgn-typography .lgn-display-4 {
   font: 300 112px/112px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.05em;
   margin: 0 0 56px;
 }
 
 .lgn-display-3, .lgn-typography .lgn-display-3 {
   font: 400 56px/56px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.02em;
   margin: 0 0 64px;
 }
 
 .lgn-display-2, .lgn-typography .lgn-display-2 {
   font: 400 45px/48px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.005em;
   margin: 0 0 64px;
 }
 
 .lgn-display-1, .lgn-typography .lgn-display-1 {
   font: 400 34px/40px serif;
-  font-family: var(--zitadel-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--zitadel-font-family), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: normal;
   margin: 0 0 64px;
 }
@@ -2665,7 +2664,7 @@ footer a {
   color: var(--zitadel-color-primary);
 }
 footer .lgn-logo-watermark {
-  background: var(--zitadel-logo);
+  background: var(--zitadel-logo-powered-by);
   background-position: auto;
   background-size: contain;
 }

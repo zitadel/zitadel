@@ -7,12 +7,10 @@ for (let i = 0; i < avatars.length; i++) {
         if (username.includes('-')) {
             separator = '-';
         }
-        if (username.includes('-')) {
+        if (username.includes('.')) {
             separator = '.';
         }
-        console.log(username);
         const split = username.split(separator);
-        console.log(split);
         const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : '');
         avatars[i].getElementsByClassName('initials')[0].innerHTML = initials;
 

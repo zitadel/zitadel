@@ -164,6 +164,16 @@ func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 	case es_model.LabelPolicyIconDarkRemoved, org_es_model.LabelPolicyIconDarkRemoved:
 		i.IconDarkURL = ""
 		i.State = int32(domain.LabelPolicyStatePreview)
+	case es_model.LabelPolicyFontAdded, org_es_model.LabelPolicyFontAdded:
+		err = asset.SetData(event)
+		if err != nil {
+			return err
+		}
+		i.FontURL = asset.AssetURL
+		i.State = int32(domain.LabelPolicyStatePreview)
+	case es_model.LabelPolicyFontRemoved, org_es_model.LabelPolicyFontRemoved:
+		i.FontURL = ""
+		i.State = int32(domain.LabelPolicyStatePreview)
 	case es_model.LabelPolicyActivated, org_es_model.LabelPolicyActivated:
 		i.State = int32(domain.LabelPolicyStateActive)
 	}

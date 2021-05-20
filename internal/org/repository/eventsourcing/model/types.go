@@ -68,6 +68,8 @@ const (
 	LabelPolicyLogoDarkRemoved models.EventType = "org.policy.label.logo.dark.removed"
 	LabelPolicyIconDarkAdded   models.EventType = "org.policy.label.icon.dark.added"
 	LabelPolicyIconDarkRemoved models.EventType = "org.policy.label.icon.dark.removed"
+	LabelPolicyFontAdded       models.EventType = "org.policy.label.font.added"
+	LabelPolicyFontRemoved     models.EventType = "org.policy.label.font.removed"
 
 	MailTemplateAdded   models.EventType = "org.mail.template.added"
 	MailTemplateChanged models.EventType = "org.mail.template.changed"
