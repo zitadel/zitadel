@@ -309,7 +309,7 @@ deprecated: use SetHumanPassword
 [SetHumanPasswordResponse](#sethumanpasswordresponse)
 
 Set a new password for a user, on default the user has to change the password on the next login
-Set no_change_required to true if the user should not be able to change the password on the next login
+Set no_change_required to true if the user does not have to change the password on the next login
 
 
 
