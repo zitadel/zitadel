@@ -76,7 +76,7 @@ var (
 	managementEnabled   = flag.Bool("management", true, "enable management api")
 	authEnabled         = flag.Bool("auth", true, "enable auth api")
 	oidcEnabled         = flag.Bool("oidc", true, "enable oidc api")
-	uploadEnabled       = flag.Bool("upload", true, "enable upload api")
+	assetsEnabled       = flag.Bool("assets", true, "enable assets api")
 	loginEnabled        = flag.Bool("login", true, "enable login ui")
 	consoleEnabled      = flag.Bool("console", true, "enable console ui")
 	notificationEnabled = flag.Bool("notification", true, "enable notification handler")
@@ -187,10 +187,10 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
-	if *uploadEnabled {
+	if *assetsEnabled {
 		verifier.RegisterServer("Management-API", "upload", nil)
 		uploadHandler := upload.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator)
-		apis.RegisterHandler("/upload/v1", uploadHandler)
+		apis.RegisterHandler("/assets/v1", uploadHandler)
 	}
 
 	openAPIHandler, err := openapi.Start()
