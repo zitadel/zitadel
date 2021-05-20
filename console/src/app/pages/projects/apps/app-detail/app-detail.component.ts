@@ -266,6 +266,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             if (this.app.oidcConfig) {
               this.oidcForm.patchValue(this.app.oidcConfig);
             }
+            if (this.app.apiConfig) {
+              this.apiForm.patchValue(this.app.apiConfig);
+            }
 
             this.oidcForm.valueChanges.subscribe((oidcConfig) => {
               this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: oidcConfig });
@@ -375,7 +378,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         (partialConfig.api as Partial<APIConfig.AsObject>).authMethodType
         ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
 
-      this.apiAuthMethodType?.setValue(this.app.apiConfig.authMethodType);
+      this.apiForm.patchValue(this.app.apiConfig);
     }
   }
 
