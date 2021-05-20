@@ -155,6 +155,26 @@
     margin: 0 .5rem;
   }
 
+  .additional-origins {
+    display: block;
+    width: 100%;
+    margin: 0 .5rem;
+
+    .title {
+      margin: 0;
+    }
+
+    .desc {
+      color: var(--grey);
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .input {
+      width: 100%;
+    }
+  }
+
   .formfield {
     flex: 1 1 30%;
     margin: 0 .5rem;
