@@ -100,8 +100,8 @@ func NewHandler(
 	h.router.HandleFunc(orgLabelPolicyFontURL, h.DownloadHandleFunc(&labelPolicyFontDownloader{orgRepo, false, false})).Methods("GET")
 	h.router.HandleFunc(orgLabelPolicyFontURL+preview, h.DownloadHandleFunc(&labelPolicyFontDownloader{orgRepo, false, true})).Methods("GET")
 
-	h.router.HandleFunc(userAvatarURL, h.UploadHandleFunc(&humanAvatarUploader{})).Methods("POST")
-	h.router.HandleFunc(userAvatarURL, h.DownloadHandleFunc(&humanAvatarDownloader{})).Methods("GET")
+	h.router.HandleFunc(myUserAvatarURL, h.UploadHandleFunc(&myHumanAvatarUploader{})).Methods("POST")
+	h.router.HandleFunc(myUserAvatarURL, h.DownloadHandleFunc(&myHumanAvatarDownloader{})).Methods("GET")
 	return h.router
 }
 
