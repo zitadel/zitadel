@@ -4,18 +4,43 @@ import (
 	"html"
 
 	"github.com/caos/zitadel/internal/i18n"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+)
+
+const (
+	defaultFont            = "http://fonts.googleapis.com/css?family=Lato:200,300,400,600"
+	defaultFontFamily      = "-apple-system, BlinkMacSystemFont, Segoe UI, Lato, Arial, Helvetica, sans-serif"
+	defaultLogo            = "https://static.zitadel.ch/zitadel-logo-dark@3x.png"
+	defaultFontColor       = "#22292f"
+	defaultBackgroundColor = "#fafafa"
+	defaultPrimaryColor    = "#5282C1"
+	defaultOrgName         = "CAOS AG"
+	defaultOrgURL          = "http://www.caos.ch"
+	defaultFooter1         = "Teufener Strasse 19"
+	defaultFooter2         = "CH-9000 St. Gallen"
 )
 
 type TemplateData struct {
-	Title          string
-	PreHeader      string
-	Subject        string
-	Greeting       string
-	Text           string
-	Href           string
-	ButtonText     string
-	PrimaryColor   string
-	SecondaryColor string
+	Title           string
+	PreHeader       string
+	Subject         string
+	Greeting        string
+	Text            string
+	Href            string
+	ButtonText      string
+	PrimaryColor    string
+	BackgroundColor string
+	FontColor       string
+	IncludeLogo     bool
+	LogoURL         string
+	FontURL         string
+	FontFamily      string
+
+	IncludeFooter bool
+	OrgURL        string
+	OrgName       string
+	FooterPart1   string
+	FooterPart2   string
 }
 
 func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {
@@ -28,4 +53,43 @@ func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]inter
 		data.Href = i18n.Localize(data.Href, nil, langs...)
 	}
 	data.ButtonText = i18n.Localize(data.ButtonText, nil, langs...)
+}
+
+func GetTemplateData(href string, text *iam_model.MailTextView, policy *iam_model.LabelPolicyView) TemplateData {
+	templateData := TemplateData{
+		Title:           text.Title,
+		PreHeader:       text.PreHeader,
+		Subject:         text.Subject,
+		Greeting:        text.Greeting,
+		Text:            html.UnescapeString(text.Text),
+		Href:            href,
+		ButtonText:      text.ButtonText,
+		PrimaryColor:    defaultPrimaryColor,
+		BackgroundColor: defaultBackgroundColor,
+		FontColor:       defaultFont,
+		LogoURL:         defaultLogo,
+		FontURL:         defaultFont,
+		FontFamily:      defaultFontFamily,
+		OrgURL:          defaultOrgURL,
+		OrgName:         defaultOrgName,
+		FooterPart1:     defaultFooter1,
+		FooterPart2:     defaultFooter2,
+	}
+	if policy.LogoURL == "" {
+		templateData.IncludeLogo = false
+	} else {
+		templateData.IncludeLogo = true
+		templateData.LogoURL = policy.LogoURL
+	}
+	if policy.PrimaryColor != "" {
+		templateData.PrimaryColor = policy.PrimaryColor
+	}
+	if policy.BackgroundColor != "" {
+		templateData.BackgroundColor = policy.BackgroundColor
+	}
+	if policy.FontColor != "" {
+		templateData.FontColor = policy.FontColor
+	}
+	templateData.IncludeFooter = false
+	return templateData
 }

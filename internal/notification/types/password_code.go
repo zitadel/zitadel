@@ -38,20 +38,10 @@ func SendPasswordCode(mailhtml string, text *iam_model.MailTextView, user *view_
 	text.Text = html.UnescapeString(text.Text)
 
 	emailCodeData := &PasswordCodeData{
-		TemplateData: templates.TemplateData{
-			Title:          text.Title,
-			PreHeader:      text.PreHeader,
-			Subject:        text.Subject,
-			Greeting:       text.Greeting,
-			Text:           html.UnescapeString(text.Text),
-			Href:           url,
-			ButtonText:     text.ButtonText,
-			PrimaryColor:   colors.PrimaryColor,
-			SecondaryColor: colors.BackgroundColor,
-		},
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		URL:       url,
+		TemplateData: templates.GetTemplateData(url, text, colors),
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		URL:          url,
 	}
 	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
 	if err != nil {

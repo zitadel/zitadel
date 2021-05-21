@@ -33,18 +33,8 @@ func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view
 	text.Text = html.UnescapeString(text.Text)
 
 	emailCodeData := &DomainClaimedData{
-		TemplateData: templates.TemplateData{
-			Title:          text.Title,
-			PreHeader:      text.PreHeader,
-			Subject:        text.Subject,
-			Greeting:       text.Greeting,
-			Text:           html.UnescapeString(text.Text),
-			Href:           url,
-			ButtonText:     text.ButtonText,
-			PrimaryColor:   colors.PrimaryColor,
-			SecondaryColor: colors.BackgroundColor,
-		},
-		URL: url,
+		TemplateData: templates.GetTemplateData(url, text, colors),
+		URL:          url,
 	}
 	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
 	if err != nil {
