@@ -284,6 +284,5 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
     req.setDisableWatermark(this.data.disableWatermark);
     req.setHideLoginNameSuffix(this.data.hideLoginNameSuffix);
-    req.setErrorMsgPopup(this.data.errorMsgPopup);
   }
 }
