@@ -13,14 +13,41 @@ var (
 )
 
 type Subscription struct {
-	Events     chan EventReader
-	aggregates []AggregateType
+	Events     chan<- EventReader
+	aggregates map[AggregateType][]EventType
 }
 
-func Subscribe(eventQueue chan EventReader, aggregates ...AggregateType) *Subscription {
+//SubscribeAggregates subscribes for all events on the given aggregates
+func SubscribeAggregates(eventQueue chan<- EventReader, aggregates ...AggregateType) *Subscription {
+	types := make(map[AggregateType][]EventType, len(aggregates))
+	for _, aggregate := range aggregates {
+		types[aggregate] = nil
+	}
 	sub := &Subscription{
 		Events:     eventQueue,
-		aggregates: aggregates,
+		aggregates: types,
+	}
+
+	subsMutext.Lock()
+	defer subsMutext.Unlock()
+
+	for _, aggregate := range aggregates {
+		_, ok := subscriptions[aggregate]
+		if !ok {
+			subscriptions[aggregate] = make([]*Subscription, 0, 1)
+		}
+		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
+	}
+
+	return sub
+}
+
+//SubscribeEventTypes subscribes for the given event types
+// if no event types are provided the subscription is for all events of the aggregate
+func SubscribeEventTypes(eventQueue chan<- EventReader, types map[AggregateType][]EventType) *Subscription {
+	sub := &Subscription{
+		Events:     eventQueue,
+		aggregates: types,
 	}
 
 	subsMutext.Lock()

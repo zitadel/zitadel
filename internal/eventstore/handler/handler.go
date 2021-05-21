@@ -18,5 +18,5 @@ func NewHandler(es *eventstore.Eventstore) Handler {
 }
 
 func (h Handler) Subscribe(aggregates ...eventstore.AggregateType) {
-	h.Sub = eventstore.Subscribe(h.EventQueue, aggregates...)
+	h.Sub = eventstore.SubscribeAggregates(h.EventQueue, aggregates...)
 }

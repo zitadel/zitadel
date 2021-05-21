@@ -23,6 +23,7 @@ type StatementHandler struct {
 	client         *sql.DB
 	eventstore     *eventstore.Eventstore
 	aggregates     []eventstore.AggregateType
+	eventTypes     []eventstore.EventType
 
 	workerName string
 	bulkLimit  uint64
@@ -41,7 +42,8 @@ func NewStatementHandler(
 	failedEventsTable,
 	lockTable string,
 	bulkLimit uint64,
-	aggregates ...eventstore.AggregateType,
+	aggregates []eventstore.AggregateType,
+	eventTypes []eventstore.EventType,
 ) StatementHandler {
 	workerName, err := os.Hostname()
 	if err != nil || workerName == "" {
@@ -60,6 +62,7 @@ func NewStatementHandler(
 		workerName:          workerName,
 		bulkLimit:           bulkLimit,
 		aggregates:          aggregates,
+		eventTypes:          eventTypes,
 	}
 }
 
@@ -68,7 +71,13 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 	if err != nil {
 		return nil, 0, err
 	}
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(seq).Limit(h.bulkLimit), h.bulkLimit, nil
+
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(seq).Limit(h.bulkLimit)
+	if len(h.eventTypes) > 0 {
+		query.EventTypes(h.eventTypes...)
+	}
+
+	return query, h.bulkLimit, nil
 }
 
 //Update implements handler.Update
