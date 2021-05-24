@@ -4,16 +4,7 @@ import (
 	"context"
 	"flag"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/static/s3"
-	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
-	"github.com/caos/zitadel/openapi"
-
 	"github.com/caos/logging"
-
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
@@ -24,15 +15,22 @@ import (
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/eventstore"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/setup"
+	"github.com/caos/zitadel/internal/static/s3"
+	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
 	"github.com/caos/zitadel/internal/ui/login"
+	"github.com/caos/zitadel/openapi"
 )
 
 type Config struct {

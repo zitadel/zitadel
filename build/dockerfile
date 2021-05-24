@@ -198,6 +198,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo 
 #######################
 FROM go-base as dev-go-build
 RUN go get github.com/go-delve/delve/cmd/dlv
+# ENTRYPOINT [ "/entrypoint.sh" ]
+# CMD "chmod +x entrypoint.sh && /entrypoint.sh && go run cmd/zitadel/main.go ${ZITADEL_ARG}"
 
 
 #######################

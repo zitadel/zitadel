@@ -1,0 +1,12 @@
+FROM alpine:latest AS gen_keys
+RUN mkdir .keys \
+    && cd .keys \
+    && echo -e "otpverificationkey_1: $(head -c32 /dev/urandom | base64) \n\
+cookiekey_1: $(head -c32 /dev/urandom | base64) \n\
+domainverificationkey_1: $(head -c32 /dev/urandom | base64) \n\
+idpconfigverificationkey_1: $(head -c32 /dev/urandom | base64) \n\
+oidckey_1: $(head -c32 /dev/urandom | base64) \n\
+userverificationkey_1: $(head -c32 /dev/urandom | base64)" > local_keys.yaml
+
+FROM scratch AS copy_keys
+COPY --from=gen_keys .keys/local_keys.yaml .

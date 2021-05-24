@@ -1,23 +1,11 @@
-# Startup ZITADEL
+#!/bin/sh
+# ----------------------------------------------------------------
+# this script exports all necessary vars
+# and generates necessary ZITADEL keys
+# ----------------------------------------------------------------
 
-## Prerequesits
+set -e
 
-* docker
-* go
-
-## On system
-
-### Keys file
-
-Generates the required keys for cryptography. This step has to be executed once.
-
-```bash
-docker build --target copy_keys -f build/Dockerfile.dev . -o .keys
-```
-
-### env variables
-
-```bash
 #tracing is disabled locally
 export ZITADEL_TRACING_TYPE=none
 #metrics is disabled locally
@@ -77,29 +65,18 @@ export ZITADEL_CONSOLE_RESPONSE_TYPE="CODE"
 export ZITADEL_CONSOLE_GRANT_TYPE="AUTHORIZATION_CODE"
 
 export ZITADEL_CONSOLE_DEV_MODE=true
-export ZITADEL_CONSOLE_ENV_DIR="${workspaceFolder}/console/src/assets/"
-```
+export ZITADEL_CONSOLE_ENV_DIR="console/src/assets/"
 
-## Pre steps
+# -------------------------------
+# generate random ZITADEL keys if not exist
+# -------------------------------
 
-### generate code
+if [ ! -f ${ZITADEL_KEY_PATH} ]; then
+    touch ${ZITADEL_KEY_PATH}
+fi
 
-```bash
-DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --target go-copy -o .
-```
-
-### start database (cockroach)
-
-```bash
-docker run -d \
---name=zitadel-db \
---hostname=zitadel-db \
--p 26257:26257 -p 8080:8080 \
--v "${GOPATH}/src/github.com/caos/zitadel/cockroach-data/citadel1:/cockroach/cockroach-data"  \
--v "${GOPATH}/src/github.com/caos/zitadel/.backups:/backups" \
-cockroachdb/cockroach:v20.2.9 start-single-node --insecure --listen-addr=0.0.0.0
-```
-
-### execute migrations
-
-`go generate migrations/cockroach/migrate_local.go`
+for key in $(env | grep "ZITADEL_.*_KEY" | cut -d'=' -f2); do
+    if [[ $(grep -L ${key} ${ZITADEL_KEY_PATH}) ]]; then
+        echo -e "${key}: $(head -c32 /dev/urandom | base64)\n" >> ${ZITADEL_KEY_PATH}
+    fi
+done

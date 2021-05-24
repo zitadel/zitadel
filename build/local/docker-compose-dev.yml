@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  db:
+    image: cockroachdb/cockroach:v21.1.0
+    command: start-single-node --insecure --listen-addr=0.0.0.0
+    ports:
+      - 8080:8080
+      - 26257:26257
+  
+  db-migrations:
+    depends_on:
+      - db
+    image: flyway/flyway:latest
+    volumes:
+      - ../../migrations/cockroach:/flyway/sql
+    environment:
+      - FLYWAY_PLACEHOLDERS_eventstorepassword=NULL
+      - FLYWAY_PLACEHOLDERS_managementpassword=NULL
+      - FLYWAY_PLACEHOLDERS_adminapipassword=NULL
+      - FLYWAY_PLACEHOLDERS_authpassword=NULL
+      - FLYWAY_PLACEHOLDERS_notificationpassword=NULL
+      - FLYWAY_PLACEHOLDERS_authzpassword=NULL
+      - FLYWAY_PLACEHOLDERS_queriespassword=NULL
+    command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=60 migrate
+  
+  backend-setup:
+    depends_on:
+      - db-migrations
+    build:
+      context: ../..
+      dockerfile: build/dockerfile
+      target: dev-go-build
+      args:
+        ENV: dev
+        ZITADEL_ARG: setup
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+    command: chmod +x /entrypoint.sh && /entrypoint.sh && go run cmd/zitadel/main.go setup
+    # entrypoint: bash /entrypoint.sh && go run cmd/zitadel/main.go setup
+  
+  backend-run:
+    depends_on:
+      - backend-setup
+    build:
+      context: ../..
+      dockerfile: build/dockerfile
+      target: dev-go-build
+      args:
+        ENV: dev
+        ZITADEL_ARG: start
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+    ports:
+      - 50002:50002
+      - 50003:50003
+    command: chmod +x /entrypoint.sh && /entrypoint.sh && go run cmd/zitadel/main.go start
+  
+  frontend:
+    depends_on:
+      - backend-run
+    build:
+      context: ../..
+      dockerfile: build/dockerfile
+      target: dev-angular-build
+      args:
+        ENV: dev
+    command: sh -c "ng serve --host 0.0.0.0"
+    ports:
+      - 4200:4200
