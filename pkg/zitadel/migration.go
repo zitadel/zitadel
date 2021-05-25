@@ -34,7 +34,6 @@ func GitOpsMigrations(
 ) error {
 	desired, err := gitClient.ReadTree(git.ZitadelFile)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 
