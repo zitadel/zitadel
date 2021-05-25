@@ -1,0 +1,7 @@
+FROM alpine:latest AS gen-keys
+COPY build/local/keys.sh keys.sh
+RUN chmod +x /keys.sh
+ENTRYPOINT [ "/keys.sh" ]
+
+FROM scratch AS copy-keys
+COPY --from=gen-keys /.keys/local_keys.yaml .

@@ -119,6 +119,7 @@ COPY internal/static internal/static
 COPY internal/statik internal/statik
 
 RUN go generate internal/ui/login/statik/generate.go \
+    && go generate internal/ui/login/static/generate.go \
     && go generate internal/notification/statik/generate.go \
     && go generate internal/statik/generate.go
 
@@ -197,10 +198,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo 
 ## Go dev build
 #######################
 FROM go-base as dev-go-build
-RUN go get github.com/go-delve/delve/cmd/dlv
-# ENTRYPOINT [ "/entrypoint.sh" ]
-# CMD "chmod +x entrypoint.sh && /entrypoint.sh && go run cmd/zitadel/main.go ${ZITADEL_ARG}"
-
+ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 
 #######################
 ## Final Production Image

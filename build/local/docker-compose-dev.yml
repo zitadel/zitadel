@@ -2,6 +2,8 @@ version: "3.8"
 
 services:
   db:
+    networks:
+      - zitadel
     image: cockroachdb/cockroach:v21.1.0
     command: start-single-node --insecure --listen-addr=0.0.0.0
     ports:
@@ -9,6 +11,8 @@ services:
       - 26257:26257
   
   db-migrations:
+    networks:
+      - zitadel
     depends_on:
       - db
     image: flyway/flyway:latest
@@ -22,25 +26,41 @@ services:
       - FLYWAY_PLACEHOLDERS_notificationpassword=NULL
       - FLYWAY_PLACEHOLDERS_authzpassword=NULL
       - FLYWAY_PLACEHOLDERS_queriespassword=NULL
-    command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=60 migrate
+    command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=5 migrate
   
+  keys:
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.keys
+      target: gen-keys
+    volumes:
+      - ../../.keys:/.keys/
+    env_file:
+      - ./local.env
+
   backend-setup:
+    networks:
+      - zitadel
     depends_on:
       - db-migrations
+      - keys
     build:
       context: ../..
       dockerfile: build/dockerfile
       target: dev-go-build
       args:
         ENV: dev
-        ZITADEL_ARG: setup
     volumes:
-      - ./entrypoint.sh:/entrypoint.sh
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
-    command: chmod +x /entrypoint.sh && /entrypoint.sh && go run cmd/zitadel/main.go setup
-    # entrypoint: bash /entrypoint.sh && go run cmd/zitadel/main.go setup
+    env_file:
+      - ./local.env
+    command: [ "-setup-files=cmd/zitadel/setup.yaml", "-setup-files=cmd/zitadel/system-defaults.yaml", "-setup-files=cmd/zitadel/authz.yaml", "setup" ]
   
   backend-run:
+    networks:
+      - zitadel
     depends_on:
       - backend-setup
     build:
@@ -49,24 +69,47 @@ services:
       target: dev-go-build
       args:
         ENV: dev
-        ZITADEL_ARG: start
     volumes:
-      - ./entrypoint.sh:/entrypoint.sh
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+    env_file:
+      - ./local.env
     ports:
       - 50002:50002
       - 50003:50003
-    command: chmod +x /entrypoint.sh && /entrypoint.sh && go run cmd/zitadel/main.go start
+    command: [ "-console=false", "-localDevMode=true", "-config-files=cmd/zitadel/startup.yaml", "-config-files=cmd/zitadel/system-defaults.yaml", "-config-files=cmd/zitadel/authz.yaml", "start" ]
+
+  client-id:
+    networks:
+      - zitadel
+    depends_on: 
+      - backend-run
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.clientid
+      target: client-id
+    volumes:
+      - ./environment.json:/environment.json
+    environment:
+      - HOST=backend-run
+      - PORT=50002
   
-  frontend:
+  frontend-local-run:
+    networks:
+      - zitadel
     depends_on:
       - backend-run
+      - client-id
     build:
       context: ../..
       dockerfile: build/dockerfile
       target: dev-angular-build
       args:
         ENV: dev
+    volumes:
+      - ./environment.json:/console/src/assets/environment.json
     command: sh -c "ng serve --host 0.0.0.0"
     ports:
       - 4200:4200
+
+networks:
+  zitadel: {}

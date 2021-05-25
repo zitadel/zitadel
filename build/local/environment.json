@@ -1,0 +1,8 @@
+{
+  "authServiceUrl": "http://localhost:50002",
+  "mgmtServiceUrl": "http://localhost:50002",
+  "adminServiceUrl": "http://localhost:50002",
+  "subscriptionServiceUrl": "https://sub.zitadel.dev",
+  "issuer": "http://localhost:50002/oauth/v2/",
+  "clientid": "109847482552352772@zitadel"
+}
