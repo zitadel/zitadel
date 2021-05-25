@@ -24,7 +24,6 @@ func Destroy(
 
 	_, destroy, _, _, _, _, err := adapt(internalMonitor, treeDesired, treeCurrent)
 	if err != nil {
-		internalMonitor.Error(err)
 		return err
 	}
 
