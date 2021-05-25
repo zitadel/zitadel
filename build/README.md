@@ -25,30 +25,35 @@ DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --target g
 
 ## Run
 
-### Run Angular
+### Run Console
+
+
+#### API's from zitadel.dev
+
+This uses zitadel.dev as API-host. If you are outside of CAOS use zitadel.ch (//TODO: how to set up a project for console) or run the entire system locally (Fullstack including database).
 
 ```Bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-dev.yml up --build angular
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-dev.yml up backend-run frontend-run
 ```
 
-### Run Go
+### Run backend
 
 ```Bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-dev.yml up --build  go
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
+    && docker compose -f ./build/local/docker-compose-dev.yml up -d db \
+    && docker compose -f ./build/local/docker-compose-dev.yml up --exit-code-from db-migrations db-migrations \
+    && docker compose -f ./build/local/docker-compose-dev.yml up --exit-code-from backend-setup backend-setup \
+    && docker compose -f ./build/local/docker-compose-dev.yml up backend-run
 ```
 
 ### Fullstack including database
 
 ```Bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-dev.yml up --build
-```
-
-## Debug
-
-### Debug Go
-
-```Bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f build/docker-compose-debug.yml up --build  go
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
+    && docker compose -f ./build/local/docker-compose-dev.yml up -d db \
+    && docker compose -f ./build/local/docker-compose-dev.yml up --exit-code-from db-migrations db-migrations \
+    && docker compose -f ./build/local/docker-compose-dev.yml up --exit-code-from backend-setup backend-setup \
+    && docker compose -f ./build/local/docker-compose-dev.yml up backend-run frontend-local-run
 ```
 
 ## Production Build
