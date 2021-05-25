@@ -1,13 +1,14 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/user/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 )
 
 func TokenByID(db *gorm.DB, table, tokenID string) (*usr_model.TokenView, error) {
@@ -35,7 +36,10 @@ func TokensByUserID(db *gorm.DB, table, userID string) ([]*usr_model.TokenView, 
 }
 
 func PutToken(db *gorm.DB, table string, token *usr_model.TokenView) error {
-	save := repository.PrepareSave(table)
+	save := repository.PrepareSaveOnConflict(table,
+		[]string{"user_id", "user_agent_id", "application_id"},
+		[]string{"id", "creation_date", "change_date", "expiration", "sequence", "scopes", "audience", "preferred_language"},
+	)
 	return save(db, token)
 }
 
