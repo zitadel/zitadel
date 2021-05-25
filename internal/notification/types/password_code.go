@@ -18,7 +18,7 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendPasswordCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView, apiDomain string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func SendPasswordCode(mailhtml string, text *iam_model.MailTextView, user *view_
 	text.Text = html.UnescapeString(text.Text)
 
 	emailCodeData := &PasswordCodeData{
-		TemplateData: templates.GetTemplateData(url, text, colors),
+		TemplateData: templates.GetTemplateData(apiDomain, url, text, colors),
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		URL:          url,

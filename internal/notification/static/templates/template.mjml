@@ -34,16 +34,16 @@
 
           {{if .IncludeFooter}}
           <mj-divider
-          border-color="#dbdbdb"
-          border-width="2px"
-          border-style="solid"
-          padding-left="20px"
-          padding-right="20px"
-          padding-bottom="20px"
-          padding-top="20px"
-        ></mj-divider>
-          <mj-text padding="16px" color="#9ca299">
-            <a href="{{.OrgURL}}" style="color:{{.PrimaryColor}}; text-decoration: none;" target="_blank"> {{.OrgName}} </a> <span style="color: #000000; margin: 0 .5rem;">|</span> {{.FooterPart1}} <span style="color: #000000; margin: 0 .5rem;">|</span> {{.FooterPart1}} </mj-text>
+                  border-color="#dbdbdb"
+                  border-width="2px"
+                  border-style="solid"
+                  padding-left="20px"
+                  padding-right="20px"
+                  padding-bottom="20px"
+                  padding-top="20px"
+          ></mj-divider>
+          <mj-text padding="16px">
+            {{.FooterText}} </mj-text>
 
           {{end}}
         </mj-column>

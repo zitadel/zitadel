@@ -15,7 +15,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *iam_model.LabelPolicyView) error {
+func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *iam_model.LabelPolicyView, apiDomain string) error {
 	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func SendDomainClaimed(mailhtml string, text *iam_model.MailTextView, user *view
 	text.Text = html.UnescapeString(text.Text)
 
 	emailCodeData := &DomainClaimedData{
-		TemplateData: templates.GetTemplateData(url, text, colors),
+		TemplateData: templates.GetTemplateData(apiDomain, url, text, colors),
 		URL:          url,
 	}
 	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)

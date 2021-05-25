@@ -1,7 +1,9 @@
 package templates
 
 import (
+	"fmt"
 	"html"
+	"strings"
 
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -14,10 +16,10 @@ const (
 	defaultFontColor       = "#22292f"
 	defaultBackgroundColor = "#fafafa"
 	defaultPrimaryColor    = "#5282C1"
-	defaultOrgName         = "CAOS AG"
-	defaultOrgURL          = "http://www.caos.ch"
-	defaultFooter1         = "Teufener Strasse 19"
-	defaultFooter2         = "CH-9000 St. Gallen"
+	//defaultOrgName         = "CAOS AG"
+	//defaultOrgURL          = "http://www.caos.ch"
+	//defaultFooter1         = "Teufener Strasse 19"
+	//defaultFooter2         = "CH-9000 St. Gallen"
 )
 
 type TemplateData struct {
@@ -37,10 +39,7 @@ type TemplateData struct {
 	FontFamily      string
 
 	IncludeFooter bool
-	OrgURL        string
-	OrgName       string
-	FooterPart1   string
-	FooterPart2   string
+	FooterText    string
 }
 
 func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {
@@ -55,7 +54,7 @@ func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]inter
 	data.ButtonText = i18n.Localize(data.ButtonText, nil, langs...)
 }
 
-func GetTemplateData(href string, text *iam_model.MailTextView, policy *iam_model.LabelPolicyView) TemplateData {
+func GetTemplateData(apiDomain, href string, text *iam_model.MailTextView, policy *iam_model.LabelPolicyView) TemplateData {
 	templateData := TemplateData{
 		Title:           text.Title,
 		PreHeader:       text.PreHeader,
@@ -70,16 +69,7 @@ func GetTemplateData(href string, text *iam_model.MailTextView, policy *iam_mode
 		LogoURL:         defaultLogo,
 		FontURL:         defaultFont,
 		FontFamily:      defaultFontFamily,
-		OrgURL:          defaultOrgURL,
-		OrgName:         defaultOrgName,
-		FooterPart1:     defaultFooter1,
-		FooterPart2:     defaultFooter2,
-	}
-	if policy.LogoURL == "" {
-		templateData.IncludeLogo = false
-	} else {
-		templateData.IncludeLogo = true
-		templateData.LogoURL = policy.LogoURL
+		IncludeFooter:   false,
 	}
 	if policy.PrimaryColor != "" {
 		templateData.PrimaryColor = policy.PrimaryColor
@@ -90,6 +80,19 @@ func GetTemplateData(href string, text *iam_model.MailTextView, policy *iam_mode
 	if policy.FontColor != "" {
 		templateData.FontColor = policy.FontColor
 	}
-	templateData.IncludeFooter = false
+	if apiDomain == "" {
+		return templateData
+	}
+	if policy.LogoURL == "" {
+		templateData.IncludeLogo = false
+	} else {
+		templateData.IncludeLogo = true
+		templateData.LogoURL = fmt.Sprintf("%s/assets/v1/%s", apiDomain, policy.LogoURL)
+	}
+	if policy.FontURL != "" {
+		split := strings.Split(policy.FontURL, "/")
+		templateData.FontFamily = split[len(split)-1]
+		templateData.FontURL = fmt.Sprintf("%s/assets/v1/%s", apiDomain, policy.FontURL)
+	}
 	return templateData
 }
