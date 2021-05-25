@@ -24,7 +24,6 @@ func Reconcile(
 
 			if spec.Version == "" {
 				err := errors.New("No version provided for self-reconciling")
-				recMonitor.Error(err)
 				return err
 			}
 
