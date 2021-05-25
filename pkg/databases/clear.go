@@ -19,7 +19,6 @@ func GitOpsClear(
 ) error {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 
