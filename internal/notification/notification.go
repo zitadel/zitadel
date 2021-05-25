@@ -12,6 +12,7 @@ import (
 )
 
 type Config struct {
+	APIDomain  string
 	Repository eventsourcing.Config
 }
 
@@ -19,6 +20,6 @@ func Start(ctx context.Context, config Config, systemDefaults sd.SystemDefaults,
 	statikFS, err := fs.NewWithNamespace("notification")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start listener")
 
-	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command)
+	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, config.APIDomain)
 	logging.Log("MAIN-9uBxp").OnError(err).Panic("unable to start app")
 }

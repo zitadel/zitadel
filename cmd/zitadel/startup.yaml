@@ -293,6 +293,7 @@ UI:
     CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 Notification:
+  APIDomain: $ZITADEL_API_DOMAIN
   Repository:
     DefaultLanguage: 'de'
     Domain: $ZITADEL_DEFAULT_DOMAIN

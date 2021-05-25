@@ -66,7 +66,7 @@ func GetTemplateData(href string, text *iam_model.MailTextView, policy *iam_mode
 		ButtonText:      text.ButtonText,
 		PrimaryColor:    defaultPrimaryColor,
 		BackgroundColor: defaultBackgroundColor,
-		FontColor:       defaultFont,
+		FontColor:       defaultFontColor,
 		LogoURL:         defaultLogo,
 		FontURL:         defaultFont,
 		FontFamily:      defaultFontFamily,

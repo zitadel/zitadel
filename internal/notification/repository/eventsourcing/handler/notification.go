@@ -53,6 +53,7 @@ type Notification struct {
 	i18n           *i18n.Translator
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
+	apiDomain      string
 }
 
 func newNotification(
@@ -62,6 +63,7 @@ func newNotification(
 	aesCrypto crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
 	statikDir http.FileSystem,
+	apiDomain string,
 ) *Notification {
 	h := &Notification{
 		handler:        handler,
@@ -70,6 +72,7 @@ func newNotification(
 		i18n:           translator,
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
+		apiDomain:      apiDomain,
 	}
 
 	h.subscribe()
