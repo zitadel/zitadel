@@ -63,7 +63,6 @@ func clear(
 	}
 
 	if err := ensure(k8sClient); err != nil {
-		monitor.Error(err)
 		return err
 	}
 
