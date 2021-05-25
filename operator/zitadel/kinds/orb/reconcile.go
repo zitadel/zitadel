@@ -23,9 +23,7 @@ func Reconcile(
 			recMonitor := monitor.WithField("version", spec.Version)
 
 			if spec.Version == "" {
-				err := errors.New("No version provided for self-reconciling")
-				recMonitor.Error(err)
-				return err
+				return errors.New("no version provided for self-reconciling")
 			}
 
 			imageRegistry := spec.CustomImageRegistry
