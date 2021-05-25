@@ -130,13 +130,21 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			if err := checkLoginPolicyFeatures(features, requiredFeature); err != nil {
 				return err
 			}
+			continue
 		}
-		if requiredFeature == domain.FeaturePasswordComplexityPolicy && !features.PasswordComplexityPolicy {
-			return MissingFeatureErr(requiredFeature)
+		if requiredFeature == domain.FeaturePasswordComplexityPolicy {
+			if !features.PasswordComplexityPolicy {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
 		}
-		if requiredFeature == domain.FeatureLabelPolicy && !features.PasswordComplexityPolicy {
-			return MissingFeatureErr(requiredFeature)
+		if requiredFeature == domain.FeatureLabelPolicy {
+			if !features.PasswordComplexityPolicy {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
 		}
+		return MissingFeatureErr(requiredFeature)
 	}
 	return nil
 }

@@ -38,6 +38,10 @@ type httpReq struct{}
 
 func authorize(r *http.Request, verifier *authz.TokenVerifier, authConfig authz.Config) (_ context.Context, err error) {
 	ctx := r.Context()
+	authOpt, needsToken := verifier.CheckAuthMethod(r.Method + ":" + r.RequestURI)
+	if !needsToken {
+		return ctx, nil
+	}
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -46,7 +50,7 @@ func authorize(r *http.Request, verifier *authz.TokenVerifier, authConfig authz.
 		return nil, errors.New("auth header missing")
 	}
 
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), verifier, authConfig, authz.Option{Permission: "authenticated"}, r.RequestURI) //TODO: permission
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), verifier, authConfig, authOpt, r.RequestURI) //TODO: permission
 	if err != nil {
 		return nil, err
 	}

@@ -27,6 +27,22 @@ const (
 	preview = "/_preview"
 )
 
+func (h *Handler) UploadDefaultLabelPolicyLogo() Uploader {
+	return &labelPolicyLogoUploader{h.idGenerator, false, true}
+}
+
+func (h *Handler) UploadDefaultLabelPolicyLogoDark() Uploader {
+	return &labelPolicyLogoUploader{h.idGenerator, true, true}
+}
+
+func (h *Handler) UploadOrgLabelPolicyLogo() Uploader {
+	return &labelPolicyLogoUploader{h.idGenerator, false, false}
+}
+
+func (h *Handler) UploadOrgLabelPolicyLogoDark() Uploader {
+	return &labelPolicyLogoUploader{h.idGenerator, true, false}
+}
+
 type labelPolicyLogoUploader struct {
 	idGenerator   id.Generator
 	darkMode      bool
@@ -69,6 +85,38 @@ func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *domain.Ass
 	return err
 }
 
+func (h *Handler) GetDefaultLabelPolicyLogo() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, false, true, false}
+}
+
+func (h *Handler) GetDefaultLabelPolicyLogoDark() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, true, true, false}
+}
+
+func (h *Handler) GetPreviewDefaultLabelPolicyLogo() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, false, true, true}
+}
+
+func (h *Handler) GetPreviewDefaultLabelPolicyLogoDark() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, true, true, true}
+}
+
+func (h *Handler) GetOrgLabelPolicyLogo() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, false, false, false}
+}
+
+func (h *Handler) GetOrgLabelPolicyLogoDark() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, true, false, false}
+}
+
+func (h *Handler) GetPreviewOrgLabelPolicyLogo() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, false, false, true}
+}
+
+func (h *Handler) GetPreviewOrgLabelPolicyLogoDark() Downloader {
+	return &labelPolicyLogoDownloader{h.orgRepo, true, false, true}
+}
+
 type labelPolicyLogoDownloader struct {
 	org           repository.OrgRepository
 	darkMode      bool
@@ -92,6 +140,22 @@ func (l *labelPolicyLogoDownloader) BucketName(ctx context.Context) string {
 		return domain.IAMID
 	}
 	return authz.GetCtxData(ctx).OrgID
+}
+
+func (h *Handler) UploadDefaultLabelPolicyIcon() Uploader {
+	return &labelPolicyIconUploader{h.idGenerator, false, true}
+}
+
+func (h *Handler) UploadDefaultLabelPolicyIconDark() Uploader {
+	return &labelPolicyIconUploader{h.idGenerator, true, true}
+}
+
+func (h *Handler) UploadOrgLabelPolicyIcon() Uploader {
+	return &labelPolicyIconUploader{h.idGenerator, false, false}
+}
+
+func (h *Handler) UploadOrgLabelPolicyIconDark() Uploader {
+	return &labelPolicyIconUploader{h.idGenerator, true, false}
 }
 
 type labelPolicyIconUploader struct {
@@ -137,6 +201,38 @@ func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *domain.Ass
 	return err
 }
 
+func (h *Handler) GetDefaultLabelPolicyIcon() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, false, true, false}
+}
+
+func (h *Handler) GetDefaultLabelPolicyIconDark() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, true, true, false}
+}
+
+func (h *Handler) GetPreviewDefaultLabelPolicyIcon() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, false, true, true}
+}
+
+func (h *Handler) GetPreviewDefaultLabelPolicyIconDark() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, true, true, true}
+}
+
+func (h *Handler) GetOrgLabelPolicyIcon() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, false, false, false}
+}
+
+func (h *Handler) GetOrgLabelPolicyIconDark() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, true, false, false}
+}
+
+func (h *Handler) GetPreviewOrgLabelPolicyIcon() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, false, false, true}
+}
+
+func (h *Handler) GetPreviewOrgLabelPolicyIconDark() Downloader {
+	return &labelPolicyIconDownloader{h.orgRepo, true, false, true}
+}
+
 type labelPolicyIconDownloader struct {
 	org           repository.OrgRepository
 	darkMode      bool
@@ -160,6 +256,14 @@ func (l *labelPolicyIconDownloader) BucketName(ctx context.Context) string {
 		return domain.IAMID
 	}
 	return authz.GetCtxData(ctx).OrgID
+}
+
+func (h *Handler) UploadDefaultLabelPolicyFont() Uploader {
+	return &labelPolicyFontUploader{h.idGenerator, true}
+}
+
+func (h *Handler) UploadOrgLabelPolicyFont() Uploader {
+	return &labelPolicyFontUploader{h.idGenerator, false}
 }
 
 type labelPolicyFontUploader struct {
@@ -190,6 +294,22 @@ func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *domain.Ass
 	}
 	_, err := commands.AddFontLabelPolicy(ctx, orgID, info.Key)
 	return err
+}
+
+func (h *Handler) GetDefaultLabelPolicyFont() Downloader {
+	return &labelPolicyFontDownloader{h.orgRepo, true, false}
+}
+
+func (h *Handler) GetPreviewDefaultLabelPolicyFont() Downloader {
+	return &labelPolicyFontDownloader{h.orgRepo, true, true}
+}
+
+func (h *Handler) GetOrgLabelPolicyFont() Downloader {
+	return &labelPolicyFontDownloader{h.orgRepo, false, false}
+}
+
+func (h *Handler) GetPreviewOrgLabelPolicyFont() Downloader {
+	return &labelPolicyFontDownloader{h.orgRepo, true, true}
 }
 
 type labelPolicyFontDownloader struct {

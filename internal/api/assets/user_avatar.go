@@ -14,6 +14,10 @@ const (
 	myUserAvatarURL = usersPath + "/me" + avatarPath
 )
 
+func (h *Handler) UploadMyUserAvatar() Uploader {
+	return &myHumanAvatarUploader{}
+}
+
 type myHumanAvatarUploader struct{}
 
 func (l *myHumanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error) {
@@ -27,6 +31,10 @@ func (l *myHumanAvatarUploader) BucketName(ctxData authz.CtxData) string {
 func (l *myHumanAvatarUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
 	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Key)
 	return err
+}
+
+func (h *Handler) GetMyUserAvatar() Downloader {
+	return &myHumanAvatarDownloader{}
 }
 
 type myHumanAvatarDownloader struct{}
