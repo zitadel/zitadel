@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -25,7 +26,6 @@ const (
 
 var (
 	aggregateTypes = []eventstore.AggregateType{"org"}
-	eventTypes     = []eventstore.EventType{}
 )
 
 type OrgHandler struct {
@@ -64,7 +64,15 @@ func NewOrgHandler(
 		h.StatementHandler.SearchQuery,
 	)
 
-	h.ProjectionHandler.Handler.Subscribe("org")
+	h.ProjectionHandler.Handler.SubscribeEvents(map[eventstore.AggregateType][]eventstore.EventType{
+		"org": []eventstore.EventType{
+			org.OrgAddedEventType,
+			org.OrgChangedEventType,
+			org.OrgDeactivatedEventType,
+			org.OrgReactivatedEventType,
+			org.OrgDomainPrimarySetEventType,
+		},
+	})
 
 	return h
 }
@@ -84,7 +92,7 @@ func (h *OrgHandler) reduce(event eventstore.EventReader) ([]handler.Statement, 
 	case *org.DomainPrimarySetEvent:
 		stmts = append(stmts, h.orgPrimaryDomainStmts(e)...)
 	default:
-		stmts = append(stmts, crdb.NewNoOpStatement(e.Sequence(), e.PreviousSequence()))
+		logging.LogWithFields("HANDL-MQA15", "seq", event.Sequence()).Warn("unahandeled event")
 	}
 
 	return stmts, nil

@@ -13,8 +13,8 @@ var (
 )
 
 type Subscription struct {
-	Events     chan<- EventReader
-	aggregates map[AggregateType][]EventType
+	Events chan<- EventReader
+	types  map[AggregateType][]EventType
 }
 
 //SubscribeAggregates subscribes for all events on the given aggregates
@@ -24,8 +24,8 @@ func SubscribeAggregates(eventQueue chan<- EventReader, aggregates ...AggregateT
 		types[aggregate] = nil
 	}
 	sub := &Subscription{
-		Events:     eventQueue,
-		aggregates: types,
+		Events: eventQueue,
+		types:  types,
 	}
 
 	subsMutext.Lock()
@@ -45,9 +45,10 @@ func SubscribeAggregates(eventQueue chan<- EventReader, aggregates ...AggregateT
 //SubscribeEventTypes subscribes for the given event types
 // if no event types are provided the subscription is for all events of the aggregate
 func SubscribeEventTypes(eventQueue chan<- EventReader, types map[AggregateType][]EventType) *Subscription {
+	aggregates := make([]AggregateType, len(types))
 	sub := &Subscription{
-		Events:     eventQueue,
-		aggregates: types,
+		Events: eventQueue,
+		types:  types,
 	}
 
 	subsMutext.Lock()
@@ -74,7 +75,17 @@ func notify(events []EventReader) {
 			continue
 		}
 		for _, sub := range subs {
-			sub.Events <- event
+			eventTypes := sub.types[event.Aggregate().Typ]
+			if len(eventTypes) == 0 {
+				sub.Events <- event
+				continue
+			}
+			for _, eventType := range eventTypes {
+				if event.Type() == eventType {
+					sub.Events <- event
+					break
+				}
+			}
 		}
 	}
 }
@@ -82,7 +93,7 @@ func notify(events []EventReader) {
 func (s *Subscription) Unsubscribe() {
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
-	for _, aggregate := range s.aggregates {
+	for aggregate := range s.types {
 		subs, ok := subscriptions[aggregate]
 		if !ok {
 			continue
