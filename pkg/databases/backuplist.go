@@ -50,7 +50,6 @@ func listBackups(
 ) {
 	backups, err := orbdb.BackupListFunc()(monitor, k8sClient, desired)
 	if err != nil {
-		monitor.Error(err)
 		return nil, err
 	}
 
