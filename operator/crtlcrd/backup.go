@@ -25,7 +25,6 @@ func Restore(monitor mntr.Monitor, k8sClient *kubernetes.Client, backup string, 
 	}
 
 	if err := ensure(k8sClient); err != nil {
-		monitor.Error(err)
 		return err
 	}
 
