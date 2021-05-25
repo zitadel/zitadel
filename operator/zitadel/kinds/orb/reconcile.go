@@ -40,8 +40,7 @@ func Reconcile(
 				}
 
 				if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, gitops); err != nil {
-					recMonitor.Error(errors.Wrap(err, "Failed to deploy zitadel-operator into k8s-cluster"))
-					return err
+					return fmt.Errorf("failed to deploy zitadel-operator into k8s-cluster: %w", err)
 				}
 				recMonitor.Info("Applied zitadel-operator")
 			}
