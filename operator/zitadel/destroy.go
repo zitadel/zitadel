@@ -18,7 +18,6 @@ func Destroy(
 	internalMonitor.Info("Destroy")
 	treeDesired, err := operator.Parse(gitClient, "zitadel.yml")
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 	treeCurrent := &tree.Tree{}
