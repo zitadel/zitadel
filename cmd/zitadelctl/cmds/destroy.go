@@ -123,8 +123,6 @@ func destroyOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kube
 			}
 			spec := desired.Spec
 
-			// at takeoff the artifacts have to be applied
-			spec.SelfReconciling = true
 			_, del := orbzit.Reconcile(monitor, spec, gitops)
 			if err := del(k8sClient); err != nil {
 				return err
