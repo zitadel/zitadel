@@ -5,6 +5,11 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
 	"github.com/rakyll/statik/fs"

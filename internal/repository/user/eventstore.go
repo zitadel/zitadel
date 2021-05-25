@@ -96,6 +96,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPasswordlessTokenBeginLoginType, HumanPasswordlessBeginLoginEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenCheckSucceededType, HumanPasswordlessCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenCheckFailedType, HumanPasswordlessCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanRefreshTokenAddedType, HumanRefreshTokenAddedEventMapper).
+		RegisterFilterEventMapper(HumanRefreshTokenRenewedType, HumanRefreshTokenRenewedEventEventMapper).
+		RegisterFilterEventMapper(HumanRefreshTokenRemovedType, HumanRefreshTokenRemovedEventEventMapper).
 		RegisterFilterEventMapper(MachineAddedEventType, MachineAddedEventMapper).
 		RegisterFilterEventMapper(MachineChangedEventType, MachineChangedEventMapper).
 		RegisterFilterEventMapper(MachineKeyAddedEventType, MachineKeyAddedEventMapper).

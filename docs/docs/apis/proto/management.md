@@ -2179,6 +2179,7 @@ This is an empty request
 | id_token_role_assertion |  bool | - |  |
 | id_token_userinfo_assertion |  bool | - |  |
 | clock_skew |  google.protobuf.Duration | - | duration.lte.seconds: 5<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
+| additional_origins | repeated string | - |  |
 
 
 
@@ -5431,6 +5432,7 @@ This is an empty request
 | id_token_role_assertion |  bool | - |  |
 | id_token_userinfo_assertion |  bool | - |  |
 | clock_skew |  google.protobuf.Duration | - | duration.lte.seconds: 5<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
+| additional_origins | repeated string | - |  |
 
 
 
