@@ -28,7 +28,6 @@ func Destroy(
 	}
 
 	if err := destroy(k8sClient); err != nil {
-		internalMonitor.Error(err)
 		return err
 	}
 	return nil
