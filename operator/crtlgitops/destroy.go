@@ -32,7 +32,6 @@ func DestroyDatabase(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 
 	orbConfig, err := orbconfig.ParseOrbConfig(orbConfigPath)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 
