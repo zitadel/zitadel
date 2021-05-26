@@ -5,6 +5,11 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
 	"github.com/rakyll/statik/fs"
@@ -17,16 +22,12 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/cache"
 	cache_config "github.com/caos/zitadel/internal/cache/config"
-	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 type Login struct {

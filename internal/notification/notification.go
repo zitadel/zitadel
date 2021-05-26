@@ -16,10 +16,14 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func Start(ctx context.Context, config Config, systemDefaults sd.SystemDefaults, command *command.Commands) {
+func Start(ctx context.Context, config Config, systemDefaults sd.SystemDefaults, command *command.Commands, hasStatics bool) {
 	statikFS, err := fs.NewWithNamespace("notification")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start listener")
 
-	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, config.APIDomain)
+	apiDomain := config.APIDomain
+	if !hasStatics {
+		apiDomain = ""
+	}
+	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, apiDomain)
 	logging.Log("MAIN-9uBxp").OnError(err).Panic("unable to start app")
 }

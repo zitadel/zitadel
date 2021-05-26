@@ -16,7 +16,7 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView, apiDomain string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, us
 	text.Text = html.UnescapeString(text.Text)
 
 	emailCodeData := &EmailVerificationCodeData{
-		TemplateData: templates.GetTemplateData(url, text, colors),
+		TemplateData: templates.GetTemplateData(apiDomain, url, text, colors),
 		URL:          url,
 	}
 

@@ -31,7 +31,7 @@ zitadelctl writesecret zitadel.twilioauthtoken.existing --value $TWILIO_AUTH_TOK
 
 # Write your email relays app key so that ZITADEL is able to verify your users email addresses
 EMAIL_APP_KEY=<My email relays app key>
-zitadelctl writesecret zitadel.twilioauthtoken.existing --value $EMAIL_APP_KEY
+zitadelctl writesecret zitadel.emailappkey.existing --value $EMAIL_APP_KEY
 
 # Enjoy watching the zitadel pods becoming ready
 watch "kubectl --namespace caos-zitadel get pods"

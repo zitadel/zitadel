@@ -168,7 +168,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -245,7 +245,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -305,7 +305,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors)
+	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}

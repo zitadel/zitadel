@@ -256,6 +256,7 @@
                                           </td>
                                         </tr>
 
+
                                         <tr>
                                           <td
                                                   align="center" vertical-align="middle" class="shadow" style="font-size:0px;padding:10px 25px;word-break:break-word;"
@@ -279,7 +280,7 @@
 
                                           </td>
                                         </tr>
-
+                                        {{if .IncludeFooter}}
                                         <tr>
                                           <td
                                                   align="center" style="font-size:0px;padding:10px 25px;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px;word-break:break-word;"
@@ -297,15 +298,14 @@
                                           </td>
                                         </tr>
 
-                                        {{if .IncludeFooter}}
                                         <tr>
                                           <td
                                                   align="center" style="font-size:0px;padding:16px;word-break:break-word;"
                                           >
 
                                             <div
-                                                    style="font-family:{{.FontFamily}};font-size:13px;line-height:1;text-align:center;color:#9ca299;"
-                                            ><a href="{{.OrgURL}}" style="color:{{.PrimaryColor}}; text-decoration: none;" target="_blank"> {{.OrgName}} </a> <span style="color: #000000; margin: 0 .5rem;">|</span> {{.FooterPart1}} <span style="color: #000000; margin: 0 .5rem;">|</span> {{.FooterPart1}}</div>
+                                                    style="font-family:{{.FontFamily}};font-size:13px;line-height:1;text-align:center;color:{{.FontColor}};"
+                                            >{{.FooterText}}</div>
 
                                           </td>
                                         </tr>
