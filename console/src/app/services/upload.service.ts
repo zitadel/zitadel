@@ -17,10 +17,10 @@ export enum UploadEndpoint {
   IAMDARKICON = 'iam/policy/label/icon/dark',
   IAMLIGHTICON = 'iam/policy/label/icon/light',
 
-  MGMTDARKLOGO = 'management/policy/label/logo/dark',
-  MGMTLIGHTLOGO = 'management/policy/label/logo/light',
-  MGMTDARKICON = 'management/policy/label/icon/dark',
-  MGMTLIGHTICON = 'management/policy/label/icon/light',
+  MGMTDARKLOGO = 'org/policy/label/logo/dark',
+  MGMTLIGHTLOGO = 'org/policy/label/logo/light',
+  MGMTDARKICON = 'org/policy/label/icon/dark',
+  MGMTLIGHTICON = 'org/policy/label/icon/light',
 }
 
 @Injectable({

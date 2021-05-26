@@ -38,7 +38,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
+  public previewData!: LabelPolicy.AsObject;
   public data!: LabelPolicy.AsObject;
+
   public panelOpenState: boolean = false;
   public isHoveringOverDarkLogo: boolean = false;
   public isHoveringOverDarkIcon: boolean = false;
@@ -144,7 +146,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         this.logoURL = event.target?.result;
 
         const formData = new FormData();
-        formData.append('file', this.logoURL);
+        formData.append('file', file);
         if (theme === Theme.DARK) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
@@ -188,7 +190,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         this.logoURL = event.target?.result;
 
         const formData = new FormData();
-        formData.append('file', this.logoURL);
+        formData.append('file', file);
         if (theme === Theme.DARK) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
@@ -212,8 +214,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public fetchData(): void {
     this.loading = true;
 
+    this.getPreviewData().then(data => {
+      console.log('preview', data);
+
+      if (data.policy) {
+        this.previewData = data.policy;
+        this.loading = false;
+      }
+    }).catch(error => {
+      this.toast.showError(error);
+    });
+
     this.getData().then(data => {
-      console.log(data);
+      console.log('data', data);
 
       if (data.policy) {
         this.data = data.policy;
@@ -228,7 +241,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     this.sub.unsubscribe();
   }
 
-  private async getData():
+  private async getPreviewData():
     Promise<MgmtGetPreviewLabelPolicyResponse.AsObject |
       AdminGetPreviewLabelPolicyResponse.AsObject |
       MgmtGetLabelPolicyResponse.AsObject |
@@ -238,6 +251,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         return (this.service as ManagementService).getPreviewLabelPolicy();
       case PolicyComponentServiceType.ADMIN:
         return (this.service as AdminService).getPreviewLabelPolicy();
+    }
+  }
+
+  private async getData():
+    Promise<MgmtGetPreviewLabelPolicyResponse.AsObject |
+      AdminGetPreviewLabelPolicyResponse.AsObject |
+      MgmtGetLabelPolicyResponse.AsObject |
+      AdminGetLabelPolicyResponse.AsObject> {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return (this.service as ManagementService).getLabelPolicy();
+      case PolicyComponentServiceType.ADMIN:
+        return (this.service as AdminService).getLabelPolicy();
     }
   }
 
@@ -257,7 +283,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public savePolicy(): void {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        if ((this.data as LabelPolicy.AsObject).isDefault) {
+        if ((this.previewData as LabelPolicy.AsObject).isDefault) {
           const req0 = new AddCustomLabelPolicyRequest();
           this.overwriteValues(req0);
 
@@ -291,20 +317,20 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public get isDefault(): boolean {
-    if (this.data && this.serviceType === PolicyComponentServiceType.MGMT) {
-      return (this.data as LabelPolicy.AsObject).isDefault;
+    if (this.previewData && this.serviceType === PolicyComponentServiceType.MGMT) {
+      return (this.previewData as LabelPolicy.AsObject).isDefault;
     } else {
       return false;
     }
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setPrimaryColor(this.data.primaryColorDark);
-    req.setPrimaryColor(this.data.primaryColor);
-    req.setWarnColorDark(this.data.warnColorDark);
-    req.setWarnColor(this.data.warnColor);
+    req.setPrimaryColor(this.previewData.primaryColorDark);
+    req.setPrimaryColor(this.previewData.primaryColor);
+    req.setWarnColorDark(this.previewData.warnColorDark);
+    req.setWarnColor(this.previewData.warnColor);
 
-    req.setDisableWatermark(this.data.disableWatermark);
-    req.setHideLoginNameSuffix(this.data.hideLoginNameSuffix);
+    req.setDisableWatermark(this.previewData.disableWatermark);
+    req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
   }
 }

@@ -19,13 +19,9 @@
   .content {
     padding-top: 1rem;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
 
     .settings {
-      margin-right: 2rem;
-      max-width: 700px;
-
       .expansion {
         background: if($is-dark-theme, #2d2e30, #ffffff) !important;
 
@@ -114,7 +110,6 @@
             }
 
             &.hovering {
-              cursor: d;
               border-radius: 16px;
               box-shadow: if(
                 $is-dark-theme,
@@ -230,6 +225,7 @@
       .adv-container {
         display: flex;
         flex-direction: column;
+        padding-bottom: 50px;
 
         .toggle {
           margin-bottom: .5rem;
@@ -237,77 +233,14 @@
       }
     }
 
-    .preview {
-      width: calc(100px + 360px);
-      pointer-events: none;
-      margin: 1rem 0;
+    .preview-wrapper {
+      display: flex;
+      overflow-x: auto;
+      justify-content: space-around;
+      margin: 0 -1rem;
 
-      * {
-        pointer-events: none;
-      }
-
-      .label {
-        color: var(--grey);
-        font-size: 12px;
-      }
-
-      .dashed {
-        border: 2px dashed rgba(#697386, .5);
-        border-radius: 1rem;
-        margin-top: .5rem;
-        padding: 100px 50px;
-        // box-shadow: if(
-        //   $is-dark-theme,
-        //    (inset 9px 9px 14px #252628, inset -9px -9px 14px #353638),
-        //    (inset 9px 9px 18px #d4d4d4, inset -9px -9px 18px #ffffff)
-        // );
-
-        .login-wrapper {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          width: 360px;
-
-          img {
-            max-width: 160px;
-            max-height: 150px;
-            margin-bottom: 1rem;
-
-            &.light {
-              display: if($is-dark-theme, none, block);
-            }
-
-            &.dark {
-              display: if($is-dark-theme, block, none);
-            }
-          }
-
-          h1 {
-            font-size: 20px;
-          }
-
-          .desc {
-            color: inherit;
-          }
-
-          .formfield {
-            width: 100%;
-          }
-
-          .btn-wrapper {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-
-            .light {
-              display: if($is-dark-theme, none, block);
-            }
-
-            .dark {
-              display: if($is-dark-theme, block, none);
-            }
-          }
-        }
+      .prev {
+        margin: 0 1rem;
       }
     }
   }

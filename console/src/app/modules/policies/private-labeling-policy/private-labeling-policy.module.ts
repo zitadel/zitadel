@@ -16,9 +16,10 @@ import { InputModule } from '../../input/input.module';
 import { LinksModule } from '../../links/links.module';
 import { PrivateLabelingPolicyRoutingModule } from './private-labeling-policy-routing.module';
 import { PrivateLabelingPolicyComponent } from './private-labeling-policy.component';
+import { PreviewComponent } from './preview/preview.component';
 
 @NgModule({
-  declarations: [PrivateLabelingPolicyComponent],
+  declarations: [PrivateLabelingPolicyComponent, PreviewComponent],
   imports: [
     PrivateLabelingPolicyRoutingModule,
     CommonModule,
