@@ -5,7 +5,7 @@ You can start ZITADEL with a simple docker compose up.
 The services are configured to restart if an error occurs. Until the essential services are started and executed some services panic, this is expected just give it some minutes to setup the database and execute migrations.
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-dev.yml --profile init --profile backend --profile frontend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile init --profile backend --profile frontend -p zitadel up
 ```
 
 # Development
@@ -50,7 +50,7 @@ DOCKER_BUILDKIT=1 docker build --target copy_keys -f build/Dockerfile.dev . -o .
 Used if you want to setup the database and load the initial data.
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database --profile init-backend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend -p zitadel up
 ```
 
 You can stop as soon as db-migrations AND backend-setup returned with exit code 0.
@@ -62,7 +62,7 @@ Used to set the client id of the console This step is for local development. If 
 You must [initialise the data](###-Initialise-data)) first.
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database --profile backend --profile init-frontend -p zitadel up --exit-code-from client-id
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile backend --profile init-frontend -p zitadel up --exit-code-from client-id
 ```
 
 The command exists as soon as the client id is set.
@@ -72,7 +72,7 @@ The command exists as soon as the client id is set.
 Used if you want to run the backend/console locally and only need the database. It's recommended to [initialise the data](###-Initialise-data) first.
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database -p zitadel up
 ```
 
 **On apple silicon:**
@@ -89,7 +89,7 @@ If you use the local backend ensure that you run that you have [set the correct 
 #### Docker compose
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile frontend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile frontend -p zitadel up
 ```
 
 ### Run backend
@@ -99,7 +99,7 @@ Used if you want to run the backend locally. It's recommended to [initialise the
 #### Docker compose
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-dev.yml --profile database --profile backend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile database --profile backend -p zitadel up
 ```
 
 #### Local
@@ -124,7 +124,7 @@ go run cmd/zitadel/main.go -console=false -localDevMode=true -config-files=cmd/z
 
 If you want to run your backend locally and the frontend by docker compose you have to replace the following variables:
 
-[docker compose yaml](local/docker-compose-dev.yml):
+[docker compose yaml](local/docker-compose-local.yml):
 
 ```yaml
 service:
