@@ -36,10 +36,7 @@ func TokensByUserID(db *gorm.DB, table, userID string) ([]*usr_model.TokenView, 
 }
 
 func PutToken(db *gorm.DB, table string, token *usr_model.TokenView) error {
-	save := repository.PrepareSaveOnConflict(table,
-		[]string{"user_id", "user_agent_id", "application_id"},
-		[]string{"id", "creation_date", "change_date", "expiration", "sequence", "scopes", "audience", "preferred_language"},
-	)
+	save := repository.PrepareSave(table)
 	return save(db, token)
 }
 
