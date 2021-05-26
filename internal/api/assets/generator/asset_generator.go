@@ -12,13 +12,11 @@ import (
 
 func main() {
 	configFile := "./asset.yaml"
-	output := os.Stdout
-	output2 := output
-	output, err := os.OpenFile("../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
-	output2, err = os.OpenFile("../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
-	GenerateAssetHandler(configFile, output, output2)
+	authz, err := os.OpenFile("../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
+	router, err := os.OpenFile("../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
+	GenerateAssetHandler(configFile, authz, router)
 }
 
 type Method struct {
@@ -95,12 +93,12 @@ func GenerateAssetHandler(configFilePath string, output io.Writer, output2 io.Wr
 		Services Services
 	})
 	err := config.Read(conf, configFilePath)
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
-	t, err := template.New("").Parse(authzTmpl)
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
-	t2, err := template.New("").Parse(routerTmpl)
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
-	err = t.Execute(output, struct {
+	logging.Log("ASSETS-Dgbn4").OnError(err).Fatal("cannot read config")
+	tmplAuthz, err := template.New("").Parse(authzTmpl)
+	logging.Log("ASSETS-BGbbg").OnError(err).Fatal("cannot parse authz template")
+	tmplRouter, err := template.New("").Parse(routerTmpl)
+	logging.Log("ASSETS-gh4rq").OnError(err).Fatal("cannot parse router template")
+	data := &struct {
 		GoPkgName string
 		Name      string
 		Prefix    string
@@ -110,18 +108,11 @@ func GenerateAssetHandler(configFilePath string, output io.Writer, output2 io.Wr
 		Name:      "AssetsService",
 		Prefix:    "/assets/v1",
 		Services:  conf.Services,
-	})
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
-	err = t2.Execute(output2, struct {
-		GoPkgName string
-		Name      string
-		Services  Services
-	}{
-		GoPkgName: "assets",
-		Name:      "AssetsService",
-		Services:  conf.Services,
-	})
-	logging.Log("ASSETS-DAg42").OnError(err).Fatal("cannot read config")
+	}
+	err = tmplAuthz.Execute(output, data)
+	logging.Log("ASSETS-BHngj").OnError(err).Fatal("cannot generate authz")
+	err = tmplRouter.Execute(output2, data)
+	logging.Log("ASSETS-Bfd41").OnError(err).Fatal("cannot generate router")
 }
 
 const authzTmpl = `package {{.GoPkgName}}

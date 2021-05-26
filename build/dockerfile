@@ -108,7 +108,12 @@ COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
 COPY build/zitadel/generate-grpc.sh build/zitadel/generate-grpc.sh
 COPY internal/protoc internal/protoc
+COPY internal/api/assets/generator internal/api/assets/generator
+COPY internal/config internal/config
+COPY internal/errors internal/errors
 RUN build/zitadel/generate-grpc.sh
+WORKDIR internal/api/assets/generator
+RUN go run asset_generator.go
 
 #######################
 ## Go base build
@@ -126,6 +131,8 @@ COPY --from=go-gen /go/src/github.com/caos/zitadel/openapi/v2/zitadel ./openapi/
 COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 COPY --from=go-gen /go/src/github.com/caos/zitadel/docs/apis/proto ./docs/docs/apis/proto
+COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
+COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
 
 
 #######################

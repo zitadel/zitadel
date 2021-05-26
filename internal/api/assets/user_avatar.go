@@ -8,12 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
-const (
-	usersPath       = "/users"
-	avatarPath      = "/avatar"
-	myUserAvatarURL = usersPath + "/me" + avatarPath
-)
-
 func (h *Handler) UploadMyUserAvatar() Uploader {
 	return &myHumanAvatarUploader{}
 }
