@@ -8,11 +8,11 @@ Please file an issue [here](https://github.com/caos/zitadel/issues/new/choose).
 
 ### build for local development
 
-* use the step by step [guide](startup.md) to get ZITADEL running
+* Check out our [Dev Build Guide](build/README.md#-Start-with-docker-compose).
 
 ### docker build
 
-* Check out our [Dev Build Guide](build/README.md).
+* Check out our [Dev Build Guide](build/README.md#-Development).
 
 ## **Did you find a security flaw?**
 * Please read [Security Policy](SECURITY.md).

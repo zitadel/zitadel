@@ -16,7 +16,11 @@ You should stay in the ZITADEL root directory to execute the statements in the f
 
 - Buildkit compatible docker installation
 
-## Generate Proto Clients
+### env variables
+
+Default env variables are provided in [this .env-file](build/local/local.env)
+
+## Generate required files
 
 This part is relevant if you start the backend or console without docker compose.
 
@@ -24,7 +28,7 @@ This part is relevant if you start the backend or console without docker compose
 
 This command generates the grpc stub for console into the folder console/src/app/proto/generated for local development.
 
-```Bash
+```bash
 DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-fe --target npm-copy -o .
 ```
 
@@ -32,8 +36,11 @@ DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-fe --target 
 
 With this command you can generate the stub for the backend.
 
-```Bash
+```bash
+# generates grpc stub
 DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-be --target go-copy -o .
+# generates keys for cryptography
+DOCKER_BUILDKIT=1 docker build --target copy_keys -f build/Dockerfile.dev . -o .keys
 ```
 
 ## Run
@@ -42,7 +49,7 @@ DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-be --target 
 
 Used if you want to setup the database and load the initial data.
 
-```Bash
+```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database --profile init-backend -p zitadel up
 ```
 
@@ -54,7 +61,7 @@ Used to set the client id of the console This step is for local development. If 
 
 You must [initialise the data](###-Initialise-data)) first.
 
-```Bash
+```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database --profile backend --profile init-frontend -p zitadel up --exit-code-from client-id
 ```
 
@@ -64,7 +71,7 @@ The command exists as soon as the client id is set.
 
 Used if you want to run the backend/console locally and only need the database. It's recommended to [initialise the data](###-Initialise-data) first.
 
-```Bash
+```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database -p zitadel up
 ```
 
@@ -81,7 +88,7 @@ If you use the local backend ensure that you run that you have [set the correct 
 
 #### Docker compose
 
-```Bash
+```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile frontend -p zitadel up
 ```
 
@@ -97,6 +104,8 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/doc
 
 #### Local
 
+##### Export environment variables
+
 ```bash
 # exports all default env variables
 while read line; do
@@ -104,7 +113,11 @@ while read line; do
         export $line
     fi
 done < build/local/local.env
+```
 
+##### Start ZITADEL
+
+```bash
 # starts zitadel with default config files
 go run cmd/zitadel/main.go -console=false -localDevMode=true -config-files=cmd/zitadel/startup.yaml -config-files=cmd/zitadel/system-defaults.yaml -config-files=cmd/zitadel/authz.yaml start
 ```
@@ -133,6 +146,13 @@ service:
   grpc-web-gateway:
     environment:
       - BKD_HOST=host.docker.internal
+```
+
+##### Setup ZITADEL
+
+```bash
+# starts zitadel with default config files
+go run cmd/zitadel/main.go -setup-files=cmd/zitadel/setup.yaml -setup-files=cmd/zitadel/system-defaults.yaml -setup-files=cmd/zitadel/authz.yaml setup
 ```
 
 ## Initial login credentials
