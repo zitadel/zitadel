@@ -379,3 +379,13 @@ func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy
 	}
 	return writeModel, nil
 }
+
+func (c *Commands) getDefaultLabelPolicy(ctx context.Context) (*domain.LabelPolicy, error) {
+	policyWriteModel, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	policy := writeModelToLabelPolicy(&policyWriteModel.LabelPolicyWriteModel)
+	policy.Default = true
+	return policy, nil
+}

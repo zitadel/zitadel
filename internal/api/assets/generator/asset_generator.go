@@ -171,6 +171,9 @@ type {{.Name}} interface {
 }
 
 func RegisterRoutes(router *mux.Router, s {{.Name}}) {
+
+	router.Use(s.AuthInterceptor().Handler)
+
 	{{ range $service := .Services}}
 	{{ range $methodName, $method := .Methods}}
 	{{ range $handler := .Handlers}}

@@ -4,7 +4,6 @@ Services:
     Methods:
       DefaultLabelPolicyLogo:
         Path: "/policy/label/logo"
-        Feature: "privatelabel"
         HasDarkMode: true
         Handlers:
           - Name: Upload
@@ -21,7 +20,6 @@ Services:
             Permission: iam.policy.read
       DefaultLabelPolicyIcon:
         Path: "/policy/label/icon"
-        Feature: "privatelabel"
         HasDarkMode: true
         Handlers:
           - Name: Upload
@@ -38,7 +36,6 @@ Services:
             Permission: iam.policy.read
       DefaultLabelPolicyFont:
         Path: "/policy/label/font"
-        Feature: "privatelabel"
         Handlers:
           - Name: Upload
             Comment:

@@ -24,12 +24,13 @@ type FeaturesView struct {
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
 	PasswordComplexityPolicy bool
-	LabelPolicy              bool
+	LabelPolicyPrivateLabel  bool
+	LabelPolicyWatermark     bool
 	CustomDomain             bool
 }
 
 func (f *FeaturesView) FeatureList() []string {
-	list := make([]string, 0, 6)
+	list := make([]string, 0)
 	if f.LoginPolicyFactors {
 		list = append(list, domain.FeatureLoginPolicyFactors)
 	}
@@ -48,8 +49,11 @@ func (f *FeaturesView) FeatureList() []string {
 	if f.PasswordComplexityPolicy {
 		list = append(list, domain.FeaturePasswordComplexityPolicy)
 	}
-	if f.LabelPolicy {
-		list = append(list, domain.FeatureLabelPolicy)
+	if f.LabelPolicyPrivateLabel {
+		list = append(list, domain.FeatureLabelPolicyPrivateLabel)
+	}
+	if f.LabelPolicyWatermark {
+		list = append(list, domain.FeatureLabelPolicyWatermark)
 	}
 	if f.CustomDomain {
 		list = append(list, domain.FeatureCustomDomain)

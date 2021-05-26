@@ -57,6 +57,7 @@ type Downloader interface {
 type ErrorHandler func(http.ResponseWriter, *http.Request, error)
 
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+	logging.Log("ASSET-g5ef1").WithError(err).WithField("uri", r.RequestURI).Error("error occurred on asset api")
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
@@ -77,7 +78,7 @@ func NewHandler(
 		orgRepo:         orgRepo,
 	}
 
-	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods)
+	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
 	router := mux.NewRouter()
 	RegisterRoutes(router, h)
 	return router
@@ -87,72 +88,70 @@ const maxMemory = 10 << 20
 const paramFile = "file"
 
 func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWriter, *http.Request) {
-	return s.AuthInterceptor().HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-			ctxData := authz.GetCtxData(ctx)
-			err := r.ParseMultipartForm(maxMemory)
-			file, handler, err := r.FormFile(paramFile)
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			defer func() {
-				err = file.Close()
-				logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
-			}()
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		ctxData := authz.GetCtxData(ctx)
+		err := r.ParseMultipartForm(maxMemory)
+		file, handler, err := r.FormFile(paramFile)
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		defer func() {
+			err = file.Close()
+			logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
+		}()
 
-			bucketName := uploader.BucketName(ctxData)
-			objectName, err := uploader.ObjectName(ctxData)
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, handler.Header.Get("content-type"), file, handler.Size)
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			err = uploader.Callback(ctx, info, ctxData.OrgID, s.Commands())
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-		})
+		bucketName := uploader.BucketName(ctxData)
+		objectName, err := uploader.ObjectName(ctxData)
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, handler.Header.Get("content-type"), file, handler.Size)
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		err = uploader.Callback(ctx, info, ctxData.OrgID, s.Commands())
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+	}
 }
 
 func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.ResponseWriter, *http.Request) {
-	return s.AuthInterceptor().HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			if s.Storage() == nil {
-				return
-			}
-			ctx := r.Context()
+	return func(w http.ResponseWriter, r *http.Request) {
+		if s.Storage() == nil {
+			return
+		}
+		ctx := r.Context()
 
-			bucketName := downloader.BucketName(ctx)
-			objectName, err := downloader.ObjectName(ctx)
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			reader, getInfo, err := s.Storage().GetObject(ctx, bucketName, objectName)
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			data, err := ioutil.ReadAll(reader)
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			info, err := getInfo()
-			if err != nil {
-				s.ErrorHandler()(w, r, err)
-				return
-			}
-			w.Header().Set("content-length", strconv.FormatInt(info.Size, 16))
-			w.Header().Set("content-type", info.ContentType)
-			w.Header().Set("ETag", info.ETag)
-			w.Write(data)
-		})
+		bucketName := downloader.BucketName(ctx)
+		objectName, err := downloader.ObjectName(ctx)
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		reader, getInfo, err := s.Storage().GetObject(ctx, bucketName, objectName)
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		data, err := ioutil.ReadAll(reader)
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		info, err := getInfo()
+		if err != nil {
+			s.ErrorHandler()(w, r, err)
+			return
+		}
+		w.Header().Set("content-length", strconv.FormatInt(info.Size, 16))
+		w.Header().Set("content-type", info.ContentType)
+		w.Header().Set("ETag", info.ETag)
+		w.Write(data)
+	}
 }

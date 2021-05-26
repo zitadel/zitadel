@@ -72,6 +72,7 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		PasswordComplexityPolicy: req.PasswordComplexityPolicy,
 		LabelPolicy:              req.LabelPolicy,
 		CustomDomain:             req.CustomDomain,
+		PrivateLabel:             req.PrivateLabel,
 	}
 }
 
@@ -90,5 +91,6 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		PasswordComplexityPolicy: req.PasswordComplexityPolicy,
 		LabelPolicy:              req.LabelPolicy,
 		CustomDomain:             req.CustomDomain,
+		PrivateLabel:             req.PrivateLabel,
 	}
 }

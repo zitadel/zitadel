@@ -34,6 +34,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.PasswordComplexityPolicy,
 		features.LabelPolicy,
 		features.CustomDomain,
+		features.PrivateLabel,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -105,15 +106,12 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removePasswordComplexityEvent)
 		}
 	}
-	if !features.LabelPolicy {
-		removeLabelPolicyEvent, err := c.removeLabelPolicyIfExists(ctx, orgID)
-		if err != nil {
-			return nil, err
-		}
-		if removeLabelPolicyEvent != nil {
-			events = append(events, removeLabelPolicyEvent)
-		}
+	labelPolicyEvents, err := c.setAllowedLabelPolicy(ctx, orgID, features)
+	if err != nil {
+		return nil, err
 	}
+	events = append(events, labelPolicyEvents...)
+
 	if !features.CustomDomain {
 		removeCustomDomainsEvents, err := c.removeCustomDomains(ctx, orgID)
 		if err != nil {
@@ -226,6 +224,53 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 		if event != nil {
 			events = append(events, event)
 		}
+	}
+	return events, nil
+}
+
+func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
+	events := make([]eventstore.EventPusher, 0)
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, nil
+	}
+	if !features.LabelPolicyPrivateLabel && !features.LabelPolicyWatermark {
+		removeEvent, err := c.removeLabelPolicyIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		return append(events, removeEvent), nil
+	}
+	defaultPolicy, err := c.getDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	policy := *existingPolicy
+	if !features.LabelPolicyWatermark && defaultPolicy.DisableWatermark != existingPolicy.DisableWatermark {
+		policy.DisableWatermark = defaultPolicy.DisableWatermark
+	}
+	if !features.LabelPolicyPrivateLabel {
+		if defaultPolicy.HideLoginNameSuffix != existingPolicy.HideLoginNameSuffix {
+			policy.HideLoginNameSuffix = defaultPolicy.HideLoginNameSuffix
+		}
+		policy.PrimaryColor = ""
+		policy.BackgroundColor = ""
+		policy.WarnColor = ""
+		policy.FontColor = ""
+		policy.PrimaryColorDark = ""
+		policy.BackgroundColorDark = ""
+		policy.WarnColorDark = ""
+		policy.FontColorDark = ""
+	}
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel),
+		policy.PrimaryColor, policy.BackgroundColor, policy.WarnColor, policy.FontColor,
+		policy.PrimaryColorDark, policy.BackgroundColorDark, policy.WarnColorDark, policy.FontColorDark,
+		policy.HideLoginNameSuffix, policy.ErrorMsgPopup, policy.HideLoginNameSuffix)
+	if hasChanged {
+		events = append(events, changedEvent)
 	}
 	return events, nil
 }

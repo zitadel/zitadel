@@ -22,6 +22,18 @@ func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Co
 	}
 }
 
+func (a *AuthInterceptor) Handler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx, err := authorize(r, a.verifier, a.authConfig)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		r = r.WithContext(ctx)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (a *AuthInterceptor) HandlerFunc(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := authorize(r, a.verifier, a.authConfig)

@@ -2,8 +2,8 @@ package org
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -25,6 +25,8 @@ var (
 
 	LabelPolicyFontAddedEventType   = orgEventTypePrefix + policy.LabelPolicyFontAddedEventType
 	LabelPolicyFontRemovedEventType = orgEventTypePrefix + policy.LabelPolicyFontRemovedEventType
+
+	LabelPolicyAssetsRemovedEventType = orgEventTypePrefix + policy.LabelPolicyFontRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {
@@ -448,4 +450,34 @@ func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.Even
 	}
 
 	return &LabelPolicyFontRemovedEvent{LabelPolicyFontRemovedEvent: *e.(*policy.LabelPolicyFontRemovedEvent)}, nil
+}
+
+type LabelPolicyAssetsRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyAssetsRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *LabelPolicyAssetsRemovedEvent {
+	return &LabelPolicyAssetsRemovedEvent{
+		*eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LabelPolicyAssetsRemovedEventType),
+	}
+}
+
+func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LabelPolicyAssetsRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
