@@ -87,3 +87,9 @@ ng serve --host localhost
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-dev.yml up frontend-local-run
 ```
+
+
+
+
+zitadel-admin@caos-ag.zitadel.ch
+Password1!

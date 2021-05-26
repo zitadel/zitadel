@@ -2,6 +2,8 @@ version: "3.8"
 
 services:
   db:
+    profiles: ["database"]
+    restart: always
     networks:
       - zitadel
     image: cockroachdb/cockroach:v21.1.0
@@ -11,6 +13,8 @@ services:
       - 26257:26257
   
   db-migrations:
+    profiles: ["database"]
+    restart: on-failure
     networks:
       - zitadel
     depends_on:
@@ -29,6 +33,8 @@ services:
     command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=5 migrate
   
   keys:
+    profiles: ["init-backend"]
+    restart: on-failure
     networks:
       - zitadel
     build:
@@ -41,10 +47,11 @@ services:
       - ./local.env
 
   backend-setup:
+    profiles: ["init-backend"]
+    restart: on-failure
     networks:
       - zitadel
     depends_on:
-      - db-migrations
       - keys
     build:
       context: ../..
@@ -56,13 +63,17 @@ services:
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
     env_file:
       - ./local.env
+    environment: 
+      - ZITADEL_EVENTSTORE_HOST=db
     command: [ "-setup-files=cmd/zitadel/setup.yaml", "-setup-files=cmd/zitadel/system-defaults.yaml", "-setup-files=cmd/zitadel/authz.yaml", "setup" ]
   
   backend-run:
+    profiles: ["backend"]
+    restart: on-failure
     networks:
       - zitadel
     depends_on:
-      - backend-setup
+      - db
     build:
       context: ../..
       dockerfile: build/dockerfile
@@ -73,16 +84,17 @@ services:
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
     env_file:
       - ./local.env
+    environment: 
+      - ZITADEL_EVENTSTORE_HOST=db
     ports:
       - 50002:50002
       - 50003:50003
     command: [ "-console=false", "-localDevMode=true", "-config-files=cmd/zitadel/startup.yaml", "-config-files=cmd/zitadel/system-defaults.yaml", "-config-files=cmd/zitadel/authz.yaml", "start" ]
 
   client-id:
+    profiles: ["init-frontend"]
     networks:
       - zitadel
-    depends_on: 
-      - backend-run
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.clientid
@@ -92,13 +104,32 @@ services:
     environment:
       - HOST=backend-run
       - PORT=50002
+
+  grpc-web-gateway:
+    profiles: ["frontend"]
+    restart: on-failure
+    logging:
+      driver: none
+    networks:
+      - zitadel
+    depends_on: 
+      - backend-run
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.gateway
+    image: grpcweb/grpcwebproxy
+    ports:
+      - "50000:8080"
+    environment:
+      - BKD_HOST=backend-run
+      - BKD_PORT=50001
   
   frontend-local-run:
+    profiles: ["frontend"]
     networks:
       - zitadel
     depends_on:
-      - backend-run
-      - client-id
+      - grpc-web-gateway
     build:
       context: ../..
       dockerfile: build/dockerfile
