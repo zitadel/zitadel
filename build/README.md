@@ -50,15 +50,15 @@ You can stop as soon as db-migrations AND backend-setup returned with exit code 
 
 ### Initialise frontend
 
-Used to set the client id of the console This step is for local development. If you don't work with a local backend you have to set the client id manually. This
+Used to set the client id of the console This step is for local development. If you don't work with a local backend you have to set the client id manually.
 
 You must [initialise the data](###-Initialise-data)) first.
 
 ```Bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database --profile backend --profile init-frontend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database --profile backend --profile init-frontend -p zitadel up --exit-code-from client-id
 ```
 
-You can stop as soon as client-id returned with exit code 0.
+The command exists as soon as the client id is set.
 
 ### Run database
 
@@ -67,6 +67,9 @@ Used if you want to run the backend/console locally and only need the database. 
 ```Bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-dev.yml --profile database -p zitadel up
 ```
+
+**On apple silicon:**
+Restart the command (second terminal `docker restart zitadel-<SERVICE_NAME>_1`) if `db` logs `qemu: uncaught target signal 11 (Segmentation fault) - core dumped` or no logs are written from `db-migrations`.
 
 ### Run Console
 
@@ -92,7 +95,7 @@ Used if you want to run the backend locally. It's recommended to [initialise the
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-dev.yml --profile database --profile backend -p zitadel up
 ```
 
-#### local
+#### Local
 
 ```bash
 # exports all default env variables
@@ -105,6 +108,38 @@ done < build/local/local.env
 # starts zitadel with default config files
 go run cmd/zitadel/main.go -console=false -localDevMode=true -config-files=cmd/zitadel/startup.yaml -config-files=cmd/zitadel/system-defaults.yaml -config-files=cmd/zitadel/authz.yaml start
 ```
+
+If you want to run your backend locally and the frontend by docker compose you have to replace the following variables:
+
+[docker compose yaml](local/docker-compose-dev.yml):
+
+```yaml
+service:
+  client-id:
+    environment:
+      - HOST=backend-run
+  grpc-web-gateway:
+    environment:
+      - BKD_HOST=backend-run
+```
+
+with
+
+```yaml
+service:
+  client-id:
+    environment:
+      - HOST=host.docker.internal
+  grpc-web-gateway:
+    environment:
+      - BKD_HOST=host.docker.internal
+```
+
+## Initial login credentials
+
+**username**: `zitadel-admin@caos-ag.zitadel.ch`
+
+**password**: `Password1!`
 
 # Production Build
 

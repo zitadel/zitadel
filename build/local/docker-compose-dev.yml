@@ -112,8 +112,6 @@ services:
       driver: none
     networks:
       - zitadel
-    depends_on: 
-      - backend-run
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.gateway

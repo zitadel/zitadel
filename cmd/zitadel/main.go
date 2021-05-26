@@ -101,7 +101,7 @@ func main() {
 func startZitadel(configPaths []string) {
 	conf := new(Config)
 	err := config.Read(conf, configPaths...)
-	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
+	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
