@@ -14,13 +14,17 @@ import { DropzoneModule } from '../../../directives/dropzone/dropzone.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
 import { InputModule } from '../../input/input.module';
 import { LinksModule } from '../../links/links.module';
+import { ColorComponent } from './color/color.component';
+import { PreviewComponent } from './preview/preview.component';
 import { PrivateLabelingPolicyRoutingModule } from './private-labeling-policy-routing.module';
 import { PrivateLabelingPolicyComponent } from './private-labeling-policy.component';
-import { PreviewComponent } from './preview/preview.component';
-import { ColorComponent } from './color/color.component';
 
 @NgModule({
-  declarations: [PrivateLabelingPolicyComponent, PreviewComponent, ColorComponent],
+  declarations: [
+    PrivateLabelingPolicyComponent,
+    PreviewComponent,
+    ColorComponent,
+  ],
   imports: [
     PrivateLabelingPolicyRoutingModule,
     CommonModule,

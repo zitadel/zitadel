@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'cnsl-color',
   templateUrl: './color.component.html',
-  styleUrls: ['./color.component.scss']
+  styleUrls: ['./color.component.scss'],
 })
-export class ColorComponent implements OnInit {
+export class ColorComponent {
   public colors: Array<{ name: string; color: string; }> = [
     { name: 'red', color: '#f44336' },
     { name: 'pink', color: '#e91e63' },
@@ -40,14 +40,9 @@ export class ColorComponent implements OnInit {
   @Input() previewColor: string = '';
   @Input() name: string = '';
   @Output() previewChanged: EventEmitter<string> = new EventEmitter();
-  constructor() { }
 
-  ngOnInit(): void {
-  }
-
-  emitPreview(color: string) {
+  public emitPreview(color: string): void {
     this.previewColor = color;
     this.previewChanged.emit(this.previewColor);
   }
-
 }

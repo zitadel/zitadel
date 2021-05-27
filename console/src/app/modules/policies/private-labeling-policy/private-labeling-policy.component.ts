@@ -176,7 +176,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
             case PolicyComponentServiceType.ADMIN:
               return this.uploadService.upload(UploadEndpoint.IAMLIGHTICON, formData);
           }
-        };
+        }
       };
     }
   }
