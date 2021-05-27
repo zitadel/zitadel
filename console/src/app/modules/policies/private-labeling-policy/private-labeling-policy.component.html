@@ -14,11 +14,16 @@
         </button>
     </ng-template>
 
-    <div *ngIf="previewData" class="content">
+    <div *ngIf="previewData && data" class="content">
       <div class="preview-wrapper">
-      <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data" [logoURL]="logoURL"></cnsl-preview>
-      <cnsl-preview class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
-    </div>
+        <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview>
+        <div class="col">
+          <cnsl-preview class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
+          <button class="activate-button" mat-raised-button>
+            {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
+          </button>
+        </div>
+      </div>
 
       <mat-accordion class="settings">
         <mat-expansion-panel class="expansion">
@@ -109,67 +114,25 @@
           </mat-expansion-panel-header>
 
           <span class="title">Dark Design</span>
-
-          <div class="colors">
+          <div class="colors" *ngIf="data && previewData">
             <div class="color">
-              <cnsl-form-field class="formfield">
-                <cnsl-label>Primary Color Hexcode</cnsl-label>
-                <input cnslInput [(ngModel)]="previewData.primaryColorDark" />
-              </cnsl-form-field>
-              <div class="color-selector">
-                <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                    [ngClass]="{'active': previewData.primaryColorDark == color.color}"
-                    (click)="previewData.primaryColorDark= color.color" [ngStyle]="{'background-color': color.color}">
-                    <mat-icon *ngIf="previewData.primaryColorDark == color.color">check</mat-icon>
-                </div>
-              </div>
+              <cnsl-color (previewChanged)="previewData.primaryColorDark = $event" name="Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-form-field class="formfield">
-                <cnsl-label>Warn Color Hexcode</cnsl-label>
-                <input cnslInput [(ngModel)]="previewData.warnColorDark" />
-              </cnsl-form-field>
-              <div class="color-selector">
-                <div *ngFor="let color of warncolors" class="circle mat-elevation-z3"
-                  [ngClass]="{'active': previewData.warnColorDark == color.color}"
-                  (click)="previewData.warnColorDark= color.color" [ngStyle]="{'background-color': color.color}">
-                  <mat-icon *ngIf="previewData.warnColorDark == color.color">check</mat-icon>
-                </div>
-              </div>
-            </div>
-        </div>
-
-        <span class="title">Light Design</span>
-
-        <div class="colors">
-          <div class="color">
-            <cnsl-form-field class="formfield">
-              <cnsl-label>Primary Color Hexcode</cnsl-label>
-              <input cnslInput [(ngModel)]="previewData.primaryColor" />
-            </cnsl-form-field>
-            <div class="color-selector">
-              <div *ngFor="let color of colors" class="circle mat-elevation-z3"
-                  [ngClass]="{'active': previewData.primaryColor == color.color}"
-                  (click)="previewData.primaryColor= color.color" [ngStyle]="{'background-color': color.color}">
-                  <mat-icon *ngIf="previewData.primaryColor == color.color">check</mat-icon>
-              </div>
+              <cnsl-color (previewChanged)="previewData.warnColorDark = $event" name="Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
             </div>
           </div>
 
-          <div class="color">
-            <cnsl-form-field class="formfield">
-              <cnsl-label>Warn Color Hexcode</cnsl-label>
-              <input cnslInput [(ngModel)]="previewData.warnColor" />
-            </cnsl-form-field>
-            <div class="color-selector">
-              <div *ngFor="let color of warncolors" class="circle mat-elevation-z3"
-                [ngClass]="{'active': previewData.warnColor == color.color}"
-                (click)="previewData.warnColor= color.color" [ngStyle]="{'background-color': color.color}">
-                <mat-icon *ngIf="previewData.warnColor == color.color">check</mat-icon>
-              </div>
+          <span class="title">Light Design</span>
+          <div class="colors" *ngIf="data && previewData">
+            <div class="color">
+              <cnsl-color (previewChanged)="previewData.primaryColor= $event" name="Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
             </div>
-          </div>
+
+            <div class="color">
+              <cnsl-color name="Warn Color Light" (previewChanged)="previewData.warnColor = $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+            </div>
       </div>
         </mat-expansion-panel>
 

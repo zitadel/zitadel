@@ -72,11 +72,7 @@
             width: 100%;
             border-radius: 16px;
             background: if($is-dark-theme, #2d2e30, #ffffff);
-            box-shadow: if(
-              $is-dark-theme,
-               (inset 9px 9px 14px #252628, inset -9px -9px 14px #353638),
-               (inset 9px 9px 18px #d4d4d4, inset -9px -9px 18px #ffffff)
-            );
+            border: 1px solid if($is-dark-theme, #4a4b4b, #dddddd);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -141,39 +137,6 @@
 
         .color {
           padding-bottom: 1rem;
-
-          .title {
-            font-size: 1rem;
-            display: block;
-            font-size: 18px;
-
-            &.border {
-              border-top: 1px solid if($is-dark-theme, #ffffff20, #00000020);
-              padding-top: 1.5rem;
-            }
-          }
-
-          .color-selector {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 0 -.25rem;
-            width: 100%;
-            padding-bottom: 1rem;
-
-            .circle {
-              height: 30px;
-              width: 30px;
-              background-color: #cd5c5c;
-              border-radius: 50%;
-              margin: .25rem;
-              box-sizing: border-box;
-
-              &.active {
-                border: 3px solid #ffffff90;
-              }
-            }
-          }
         }
       }
 
@@ -239,8 +202,21 @@
       justify-content: space-around;
       margin: 0 -1rem;
 
-      .prev {
-        margin: 0 1rem;
+      .col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 2rem;
+
+        .prev {
+          margin: 0 1rem;
+        }
+
+        .activate-button {
+          border-radius: 50%;
+          background-color: if($is-dark-theme, #ffffff, #000000);
+          color: if($is-dark-theme, #000000, #ffffff);
+        }
       }
     }
   }

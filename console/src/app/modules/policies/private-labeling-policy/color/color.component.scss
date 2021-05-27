@@ -1,0 +1,39 @@
+.title {
+  font-size: 1rem;
+  display: block;
+  font-size: 18px;
+
+  &.border {
+    border-top: 1px solid var(--grey);
+    padding-top: 1.5rem;
+  }
+}
+
+.color-selector {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 -.25rem;
+  width: 100%;
+  padding-bottom: 1rem;
+
+  .circle {
+    height: 30px;
+    width: 30px;
+    background-color: #cd5c5c;
+    border-radius: 50%;
+    margin: .25rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      font-size: 18px;
+    }
+
+    &.active {
+      border: 3px solid #ffffff90;
+    }
+  }
+}
