@@ -17,6 +17,7 @@ fi
 
 for key in $(env | grep "ZITADEL_.*_KEY" | cut -d'=' -f2); do
     if [ $(grep -L ${key} ${KEY_FILE}) ]; then
+        echo "create key for ${key} in ${KEY_FILE}"
         echo -e "${key}: $(head -c22 /dev/urandom | base64)" >> ${KEY_FILE}
     fi
 done
