@@ -6,7 +6,7 @@ The services are configured to restart if an error occurs.
 
 In the following script the basic setup of the database is executed before ZITADEL starts. Execute the statement from the root of ZITADEL.
 
-ZITADEL is ready as soon as you can read
+You can connect to [ZITADEL on localhost:4200](http://localhost:4200) as soon as the following text appears:
 
 ```text
 ++=========++
