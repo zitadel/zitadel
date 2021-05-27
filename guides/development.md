@@ -8,7 +8,7 @@ You should stay in the ZITADEL root directory to execute the statements in the f
 
 ### env variables
 
-Default env variables are provided in [this .env-file](../build/local/local.env)
+You can use the default vars provided in [this .env-file](../build/local/local.env) or create your own and update the paths in the [docker compose file](../build/local/docker-compose-local.yml).
 
 ## Generate required files
 
@@ -66,7 +66,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/doc
 ```
 
 **On apple silicon:**
-Restart the command (second terminal `docker restart zitadel-<SERVICE_NAME>_1`) if `db` logs `qemu: uncaught target signal 11 (Segmentation fault) - core dumped` or no logs are written from `db-migrations`.
+Restart the command (second terminal `docker restart zitadel_<SERVICE_NAME>_1`) if `db` logs `qemu: uncaught target signal 11 (Segmentation fault) - core dumped` or no logs are written from `db-migrations`.
 
 ### Run Console
 
@@ -76,7 +76,7 @@ If you don't use the backend from local you have to configure [the environment.j
 
 If you use the local backend ensure that you run that you have [set the correct client id](###-Initialise-frontend).
 
-#### Docker compose
+#### Run console in docker compose
 
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile frontend -p zitadel up
@@ -86,13 +86,13 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/doc
 
 Used if you want to run the backend locally. It's recommended to [initialise the data](###-Initialise-data) first.
 
-#### Docker compose
+#### Run backend in docker compose
 
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile database --profile backend -p zitadel up
 ```
 
-#### Local
+#### Run backend locally
 
 ##### Export environment variables
 
@@ -105,7 +105,7 @@ while read line; do
 done < build/local/local.env
 ```
 
-##### Start ZITADEL
+##### Start command for backend
 
 ```bash
 # starts zitadel with default config files
@@ -140,8 +140,9 @@ service:
 
 ##### Setup ZITADEL
 
+The following command starts the backend of ZITADEL with the default config files:
+
 ```bash
-# starts zitadel with default config files
 go run cmd/zitadel/main.go -setup-files=cmd/zitadel/setup.yaml -setup-files=cmd/zitadel/system-defaults.yaml -setup-files=cmd/zitadel/authz.yaml setup
 ```
 
