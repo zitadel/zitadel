@@ -38,5 +38,5 @@ type CustomMessageText struct {
 }
 
 func (m *CustomMessageText) IsValid() bool {
-	return m.MessageTextType != "" && m.Language != language.Und && m.Title != "" && m.PreHeader != "" && m.Subject != "" && m.Greeting != "" && m.Text != "" && m.ButtonText != ""
+	return m.MessageTextType != "" && m.Language != language.Und
 }

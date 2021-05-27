@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	customTextPrefix           = mailPolicyPrefix + "customtext."
-	CustomTextSetEventType     = customTextPrefix + "set"
-	CustomTextRemovedEventType = customTextPrefix + "removed"
+	customTextPrefix                  = mailPolicyPrefix + "customtext."
+	CustomTextSetEventType            = customTextPrefix + "set"
+	CustomTextRemovedEventType        = customTextPrefix + "removed"
+	CustomTextMessageRemovedEventType = customTextPrefix + "message.removed"
 )
 
 type CustomTextSetEvent struct {
@@ -83,6 +84,35 @@ func NewCustomTextRemovedEvent(base *eventstore.BaseEvent, key string, language 
 }
 
 func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &CustomTextRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type CustomTextMessageRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Key      string       `json:"key,omitempty"`
+	Language language.Tag `json:"language,omitempty"`
+}
+
+func (e *CustomTextMessageRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *CustomTextMessageRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewCustomTextMessageRemovedEvent(base *eventstore.BaseEvent, key string, language language.Tag) *CustomTextMessageRemovedEvent {
+	return &CustomTextMessageRemovedEvent{
+		BaseEvent: *base,
+		Key:       key,
+		Language:  language,
+	}
+}
+
+func CustomTextMessageRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &CustomTextRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

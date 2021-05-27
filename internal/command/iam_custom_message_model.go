@@ -1,6 +1,8 @@
 package command
 
 import (
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/iam"
@@ -10,13 +12,15 @@ type IAMCustomMessageTextReadModel struct {
 	CustomMessageTextReadModel
 }
 
-func NewIAMCustomMessageTextWriteModel() *IAMCustomMessageTextReadModel {
+func NewIAMCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *IAMCustomMessageTextReadModel {
 	return &IAMCustomMessageTextReadModel{
 		CustomMessageTextReadModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
 				ResourceOwner: domain.IAMID,
 			},
+			MessageTextType: messageTextType,
+			Language:        lang,
 		},
 	}
 }

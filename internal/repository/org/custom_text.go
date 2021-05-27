@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	CustomTextSetEventType     = orgEventTypePrefix + policy.CustomTextSetEventType
-	CustomTextRemovedEventType = orgEventTypePrefix + policy.CustomTextRemovedEventType
+	CustomTextSetEventType            = orgEventTypePrefix + policy.CustomTextSetEventType
+	CustomTextRemovedEventType        = orgEventTypePrefix + policy.CustomTextRemovedEventType
+	CustomTextMessageRemovedEventType = orgEventTypePrefix + policy.CustomTextRemovedEventType
 )
 
 type CustomTextSetEvent struct {
@@ -71,4 +72,32 @@ func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventRead
 	}
 
 	return &CustomTextRemovedEvent{CustomTextRemovedEvent: *e.(*policy.CustomTextRemovedEvent)}, nil
+}
+
+type CustomTextMessageRemovedEvent struct {
+	policy.CustomTextMessageRemovedEvent
+}
+
+func NewCustomTextMessageRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	key string,
+	language language.Tag,
+) *CustomTextMessageRemovedEvent {
+	return &CustomTextMessageRemovedEvent{
+		CustomTextMessageRemovedEvent: *policy.NewCustomTextMessageRemovedEvent(
+			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextMessageRemovedEventType),
+			key,
+			language,
+		),
+	}
+}
+
+func CustomTextMessageRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.CustomTextMessageRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CustomTextMessageRemovedEvent{CustomTextMessageRemovedEvent: *e.(*policy.CustomTextMessageRemovedEvent)}, nil
 }
