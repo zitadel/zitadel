@@ -12,8 +12,15 @@ const bearerPrefix = 'Bearer';
 const accessTokenStorageKey = 'access_token';
 
 export enum UploadEndpoint {
-  DARKLOGO = 'iam/policy/label/logo/dark',
-  LIGHTLOGO = 'iam/policy/label/logo/light',
+  IAMDARKLOGO = 'iam/policy/label/logo/dark',
+  IAMLIGHTLOGO = 'iam/policy/label/logo/light',
+  IAMDARKICON = 'iam/policy/label/icon/dark',
+  IAMLIGHTICON = 'iam/policy/label/icon/light',
+
+  MGMTDARKLOGO = 'org/policy/label/logo/dark',
+  MGMTLIGHTLOGO = 'org/policy/label/logo/light',
+  MGMTDARKICON = 'org/policy/label/icon/dark',
+  MGMTLIGHTICON = 'org/policy/label/icon/light',
 }
 
 @Injectable({
@@ -47,7 +54,7 @@ export class UploadService {
   }
 
   public upload(endpoint: UploadEndpoint, body: any): Promise<any> {
-    return this.http.post(`${this.serviceUrl}/upload/v1/${endpoint}`,
+    return this.http.post(`${this.serviceUrl}/assets/v1/${endpoint}`,
       body,
       {
         headers: {

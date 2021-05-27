@@ -654,7 +654,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "DESCRIPTION": "Customize the appearance of the Login"
+      "BTN":"Select File",
+      "DESCRIPTION": "Customize the appearance of the Login",
+      "ACTIVATEPREVIEW":"Activate Configuration"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Policy",

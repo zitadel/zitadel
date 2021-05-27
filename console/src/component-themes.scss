@@ -19,6 +19,7 @@
 @import 'src/app/modules/meta-layout/meta.scss';
 @import 'src/app/modules/onboarding/onboarding.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
+@import 'src/app/modules/policies/private-labeling-policy/preview/preview.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -42,4 +43,5 @@
   @include info-section-theme($theme);
   @include onboarding-theme($theme);
   @include private-label-theme($theme);
+  @include private-label-preview-theme($theme);
 }

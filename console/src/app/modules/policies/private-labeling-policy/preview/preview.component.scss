@@ -1,0 +1,74 @@
+@import '~@angular/material/theming';
+
+@mixin private-label-preview-theme($theme) {
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .dashed {
+    img,
+    .btn-wrapper {
+      &.light,
+      .light {
+        display: if($is-dark-theme, none, block);
+      }
+
+      &.dark,
+      .dark {
+        display: if($is-dark-theme, block, none);
+      }
+    }
+  }
+}
+
+.preview {
+  width: calc(100px + 300px);
+  margin: 0 1rem;
+  pointer-events: none;
+  margin: 1rem 0;
+
+  * {
+    pointer-events: none;
+  }
+
+  .label {
+    color: var(--grey);
+    font-size: 12px;
+  }
+
+  .dashed {
+    border: 2px dashed rgba(#697386, .5);
+    border-radius: 1rem;
+    margin-top: .5rem;
+    padding: 100px 20px;
+
+    .login-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 360px;
+
+      img {
+        max-width: 160px;
+        max-height: 150px;
+        margin-bottom: 1rem;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .desc {
+        color: inherit;
+      }
+
+      .formfield {
+        width: 100%;
+      }
+
+      .btn-wrapper {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  }
+}
