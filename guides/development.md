@@ -89,7 +89,7 @@ Used if you want to run the backend locally. It's recommended to [initialise the
 #### Run backend in docker compose
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile database --profile backend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile backend -p zitadel up
 ```
 
 #### Run backend locally
