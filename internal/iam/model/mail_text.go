@@ -21,6 +21,7 @@ type MailText struct {
 	Greeting     string
 	Text         string
 	ButtonText   string
+	FooterText   string
 }
 
 func (p *MailText) IsValid() bool {

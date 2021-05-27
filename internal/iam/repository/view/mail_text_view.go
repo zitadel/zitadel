@@ -35,7 +35,7 @@ func GetMailTextByIDs(db *gorm.DB, table, aggregateID string, textType string, l
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, textTypeQuery, languageQuery)
 	err := query(db, mailText)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-IiJjm", "Errors.IAM.MailText.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-IiJjm", "Errors.IAM.CustomMessageText.NotExisting")
 	}
 	return mailText, err
 }

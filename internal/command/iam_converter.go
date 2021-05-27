@@ -60,20 +60,21 @@ func writeModelToMailTemplate(wm *MailTemplateWriteModel) *domain.MailTemplate {
 	}
 }
 
-func writeModelToMailText(wm *MailTextWriteModel) *domain.MailText {
-	return &domain.MailText{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-		MailTextType: wm.MailTextType,
-		Language:     wm.Language,
-		Title:        wm.Title,
-		PreHeader:    wm.PreHeader,
-		Subject:      wm.Subject,
-		Greeting:     wm.Greeting,
-		Text:         wm.Text,
-		ButtonText:   wm.ButtonText,
-		State:        wm.State,
-	}
-}
+//
+//func writeModelToMailText(wm *MailTextWriteModel) *domain.CustomMessageText {
+//	return &domain.CustomMessageText{
+//		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+//		MessageTextType: wm.MessageTextType,
+//		Language:     wm.Language,
+//		Title:        wm.Title,
+//		PreHeader:    wm.PreHeader,
+//		Subject:      wm.Subject,
+//		Greeting:     wm.Greeting,
+//		Text:         wm.Text,
+//		ButtonText:   wm.ButtonText,
+//		State:        wm.State,
+//	}
+//}
 
 func writeModelToOrgIAMPolicy(wm *IAMOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
 	return &domain.OrgIAMPolicy{
@@ -89,18 +90,29 @@ func writeModelToMailTemplatePolicy(wm *MailTemplateWriteModel) *domain.MailTemp
 	}
 }
 
-func writeModelToMailTextPolicy(wm *MailTextWriteModel) *domain.MailText {
-	return &domain.MailText{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-		State:        wm.State,
-		MailTextType: wm.MailTextType,
-		Language:     wm.Language,
-		Title:        wm.Title,
-		PreHeader:    wm.PreHeader,
-		Subject:      wm.Subject,
-		Greeting:     wm.Greeting,
-		Text:         wm.Text,
-		ButtonText:   wm.ButtonText,
+//
+//func writeModelToMailTextPolicy(wm *MailTextWriteModel) *domain.MailText {
+//	return &domain.MailText{
+//		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+//		State:        wm.State,
+//		MessageTextType: wm.MessageTextType,
+//		Language:     wm.Language,
+//		Title:        wm.Title,
+//		PreHeader:    wm.PreHeader,
+//		Subject:      wm.Subject,
+//		Greeting:     wm.Greeting,
+//		Text:         wm.Text,
+//		ButtonText:   wm.ButtonText,
+//	}
+//}
+
+func writeModelToCustomText(wm *CustomTextWriteModel) *domain.CustomText {
+	return &domain.CustomText{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		State:      wm.State,
+		Key:        wm.Key,
+		Language:   wm.Language,
+		Text:       wm.Text,
 	}
 }
 

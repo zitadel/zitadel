@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"time"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type MailTextsView struct {
@@ -19,6 +20,7 @@ type MailTextView struct {
 	Greeting     string
 	Text         string
 	ButtonText   string
+	FooterText   string
 	Default      bool
 
 	CreationDate time.Time

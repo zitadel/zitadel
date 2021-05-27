@@ -338,6 +338,10 @@ Errors:
       AlreadyExists: Step done already exists
   Features:
     NotChanged: Feature hat nicht geändert
+  CustomText:
+    AlreadyExists: Custom text already exists
+    Invalid: Custom text invalid
+    NotFound: Custom text not found
 EventTypes:
   user:
     added: User added

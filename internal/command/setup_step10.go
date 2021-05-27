@@ -2,14 +2,16 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
 type Step10 struct {
 	DefaultMailTemplate domain.MailTemplate
-	DefaultMailTexts    []domain.MailText
+	DefaultMailTexts    []domain.CustomMessageText
 }
 
 func (s *Step10) Step() domain.Step {
@@ -30,13 +32,13 @@ func (c *Commands) SetupStep10(ctx context.Context, step *Step10) error {
 		events := []eventstore.EventPusher{
 			mailTemplateEvent,
 		}
-		for _, text := range step.DefaultMailTexts {
-			defaultTextEvent, err := c.addDefaultMailText(ctx, iamAgg, NewIAMMailTextWriteModel(text.MailTextType, text.Language), &text)
-			if err != nil {
-				return nil, err
-			}
-			events = append(events, defaultTextEvent)
-		}
+		//for _, text := range step.DefaultMailTexts {
+		//	defaultTextEvent, err := c.addDefaultMailText(ctx, iamAgg, NewIAMMailTextWriteModel(text.MessageTextType, text.Language), &text)
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//	events = append(events, defaultTextEvent)
+		//}
 		logging.Log("SETUP-3N9fs").Info("default mail template/text set up")
 		return events, nil
 	}

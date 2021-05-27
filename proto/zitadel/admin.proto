@@ -6,6 +6,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
 
@@ -1383,6 +1384,301 @@ service AdminService {
         };
     }
 
+    //Returns the custom text for initial message
+    rpc GetInitMessageCustomText(GetInitMessageCustomTextRequest) returns (GetInitMessageCustomTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/init/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default init message text";
+                };
+            };
+        };
+    }
+
+    //Sets the default custom text for initial message
+    // it impacts all organisations without customized initial message text
+    rpc SetInitMessageCustomText(SetInitMessageCustomTextRequest) returns (SetInitMessageCustomTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/init/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default init message text updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+    //Returns the custom text for password reset message
+    rpc GetPasswordResetMessageCustomText(GetPasswordResetMessageCustomTextRequest) returns (GetPasswordResetMessageCustomTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/passwordreset/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default init message text";
+                };
+            };
+        };
+    }
+
+    //Sets the default custom text for password reset message
+    // it impacts all organisations without customized password reset message text
+    rpc SetPasswordResetMessageCustomText(SetPasswordResetMessageCustomTextRequest) returns (SetPasswordResetMessageCustomTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/passwordreset/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default init message text updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+    //Returns the custom text for verify email message
+    rpc GetVerifyEmailMessageCustomText(GetVerifyEmailMessageCustomTextRequest) returns (GetVerifyEmailMessageCustomTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifyemail/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default init message text";
+                };
+            };
+        };
+    }
+
+    //Sets the default custom text for verify email message
+    // it impacts all organisations without customized verify email message text
+    rpc SetVerifyEmailMessageCustomText(SetVerifyEmailMessageCustomTextRequest) returns (SetVerifyEmailMessageCustomTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyemail/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default verify email message text updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+    //Returns the custom text for verify phone message
+    rpc GetVerifyPhoneMessageCustomText(GetVerifyPhoneMessageCustomTextRequest) returns (GetVerifyPhoneMessageCustomTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifyphone/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default verify phone message text";
+                };
+            };
+        };
+    }
+
+    //Sets the default custom text for verify phone message
+    // it impacts all organisations without customized verify phone message text
+    rpc SetVerifyPhoneMessageCustomText(SetVerifyPhoneMessageCustomTextRequest) returns (SetVerifyPhoneMessageCustomTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyphone/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default verify phone message text updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+    //Returns the custom text for domain claimed message
+    rpc GetDomainClaimedMessageCustomText(GetDomainClaimedMessageCustomTextRequest) returns (GetDomainClaimedMessageCustomTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/domainclaimed/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default domain claimed message text";
+                };
+            };
+        };
+    }
+
+    //Sets the default custom text for domain claimed phone message
+    // it impacts all organisations without customized verify phone message text
+    rpc SetDomainClaimedMessageCustomText(SetDomainClaimedMessageCustomTextRequest) returns (SetDomainClaimedMessageCustomTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyphone/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "custom text";
+            tags: "custom text message";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default domain claimed message text updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Returns the IAM roles visible for the requested user 
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
@@ -2635,6 +2931,151 @@ message UpdatePasswordLockoutPolicyRequest {
 }
 
 message UpdatePasswordLockoutPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetInitMessageCustomTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetInitMessageCustomTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetInitMessageCustomTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetInitMessageCustomTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetPasswordResetMessageCustomTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetPasswordResetMessageCustomTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetPasswordResetMessageCustomTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetPasswordResetMessageCustomTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetVerifyEmailMessageCustomTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetVerifyEmailMessageCustomTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetVerifyEmailMessageCustomTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetVerifyEmailMessageCustomTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetVerifyPhoneMessageCustomTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetVerifyPhoneMessageCustomTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetVerifyPhoneMessageCustomTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetVerifyPhoneMessageCustomTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDomainClaimedMessageCustomTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDomainClaimedMessageCustomTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDomainClaimedMessageCustomTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDomainClaimedMessageCustomTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

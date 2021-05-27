@@ -337,6 +337,10 @@ Errors:
       AlreadyExists: Schritt ausgeführt existiert bereits
   Features:
     NotChanged: Feature hat nicht geändert
+  CustomText:
+    AlreadyExists: Kundenspezifischer Text existiert bereits
+    Invalid: Kundenspezifischer Text ist ungültig
+    NotFound: Kundenspezifischer Text nicht gefunden
 EventTypes:
   user:
     added: Benutzer hinzugefügt
