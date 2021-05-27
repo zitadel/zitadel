@@ -78,7 +78,7 @@ func (h *OrgHandler) reduce(event eventstore.EventReader) ([]handler.Statement, 
 	case *org.DomainPrimarySetEvent:
 		stmts = append(stmts, h.orgPrimaryDomainStmts(e)...)
 	default:
-		stmts = append(stmts, handler.NewNoOpStatement(e.Sequence(), e.PreviousSequence()))
+		stmts = append(stmts, crdb.NewNoOpStatement(e.Sequence(), e.PreviousSequence()))
 	}
 
 	return stmts, nil
@@ -86,7 +86,7 @@ func (h *OrgHandler) reduce(event eventstore.EventReader) ([]handler.Statement, 
 
 func (h *OrgHandler) orgAddedStmts(event *org.OrgAddedEvent) []handler.Statement {
 	return []handler.Statement{
-		handler.NewCreateStatement([]handler.Column{
+		crdb.NewCreateStatement([]handler.Column{
 			{
 				Name:  idColName,
 				Value: event.Aggregate().ID,
@@ -140,7 +140,7 @@ func (h *OrgHandler) orgChangedStmts(event *org.OrgChangedEvent) []handler.State
 		})
 	}
 	return []handler.Statement{
-		handler.NewUpdateStatement(
+		crdb.NewUpdateStatement(
 			[]handler.Column{
 				{
 					Name:  idColName,
@@ -156,7 +156,7 @@ func (h *OrgHandler) orgChangedStmts(event *org.OrgChangedEvent) []handler.State
 
 func (h *OrgHandler) orgReactivatedStmts(event *org.OrgReactivatedEvent) []handler.Statement {
 	return []handler.Statement{
-		handler.NewUpdateStatement(
+		crdb.NewUpdateStatement(
 			[]handler.Column{
 				{
 					Name:  idColName,
@@ -185,7 +185,7 @@ func (h *OrgHandler) orgReactivatedStmts(event *org.OrgReactivatedEvent) []handl
 
 func (h *OrgHandler) orgDeactivatedStmts(event *org.OrgDeactivatedEvent) []handler.Statement {
 	return []handler.Statement{
-		handler.NewUpdateStatement(
+		crdb.NewUpdateStatement(
 			[]handler.Column{
 				{
 					Name:  idColName,
@@ -214,7 +214,7 @@ func (h *OrgHandler) orgDeactivatedStmts(event *org.OrgDeactivatedEvent) []handl
 
 func (h *OrgHandler) orgPrimaryDomainStmts(event *org.DomainPrimarySetEvent) []handler.Statement {
 	return []handler.Statement{
-		handler.NewUpdateStatement(
+		crdb.NewUpdateStatement(
 			[]handler.Column{
 				{
 					Name:  idColName,
