@@ -91,19 +91,18 @@ services:
       - 50003:50003
     command: [ "-console=false", "-localDevMode=true", "-config-files=cmd/zitadel/startup.yaml", "-config-files=cmd/zitadel/system-defaults.yaml", "-config-files=cmd/zitadel/authz.yaml", "start" ]
 
-  client-id:
-    profiles: ["init-frontend"]
+  zitadel-setted-up:
+    profiles: ["setup"]
     networks:
       - zitadel
     build:
       context: ../..
-      dockerfile: build/local/Dockerfile.clientid
-      target: client-id
+      dockerfile: build/local/Dockerfile.started
     volumes:
       - ./environment.json:/environment.json
     environment:
-      - HOST=backend-run
-      - PORT=50002
+      - BE_PORT=50002
+      - FE_PORT=4200
 
   grpc-web-gateway:
     profiles: ["frontend"]
@@ -139,6 +138,20 @@ services:
     command: sh -c "ng serve --host 0.0.0.0"
     ports:
       - 4200:4200
+
+  client-id:
+    profiles: ["init-frontend"]
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.clientid
+      target: client-id
+    volumes:
+      - ./environment.json:/environment.json
+    environment:
+      - HOST=backend-run
+      - PORT=50002
 
 networks:
   zitadel: {}

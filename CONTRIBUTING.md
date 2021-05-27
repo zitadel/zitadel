@@ -1,18 +1,36 @@
 # How to contribute to ZITADEL
 
-## **Did you find a bug?**
+## Did you find a bug?
 
-Please file an issue [here](https://github.com/caos/zitadel/issues/new/choose).
+Please file an issue [here](https://github.com/caos/zitadel/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
 
-## **Want to contribute code?**
+Bugs are evaluated every day as soon as possible.
 
-### build for local development
+## Enhancement
 
-* Check out our [Dev Build Guide](build/README.md#-Start-with-docker-compose).
+Do you miss a feature? Please file an issue [here](https://github.com/caos/zitadel/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
 
-### docker build
+Enhancements are discussed and evaluated every Wednesday by the ZITADEL core team.
 
-* Check out our [Dev Build Guide](build/README.md#-Development).
+## Grab an Issues
+
+We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
+
+* [Issues for first time contributors](https://github.com/caos/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+* [All issues](https://github.com/caos/zitadel/issues)
+
+## Want to start ZITADEL?
+
+Checkout the following chapters to start ZITADEL locally.
+
+### Build for local development
+
+* Check out our [development guide](guides/development.md).
+
+### Quick start
+
+* Check out our [quick start guide](guides/quickstart.md).
 
 ## **Did you find a security flaw?**
+
 * Please read [Security Policy](SECURITY.md).

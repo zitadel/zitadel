@@ -1,13 +1,3 @@
-# Start with docker compose
-
-You can start ZITADEL with a simple docker compose up.
-
-The services are configured to restart if an error occurs. Until the essential services are started and executed some services panic, this is expected just give it some minutes to setup the database and execute migrations.
-
-```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile init --profile backend --profile frontend -p zitadel up
-```
-
 # Development
 
 You should stay in the ZITADEL root directory to execute the statements in the following chapters.
@@ -18,7 +8,7 @@ You should stay in the ZITADEL root directory to execute the statements in the f
 
 ### env variables
 
-Default env variables are provided in [this .env-file](build/local/local.env)
+Default env variables are provided in [this .env-file](../build/local/local.env)
 
 ## Generate required files
 
@@ -82,7 +72,7 @@ Restart the command (second terminal `docker restart zitadel-<SERVICE_NAME>_1`) 
 
 The console service is configured for hot reloading. You can also use docker compose for local development.
 
-If you don't use the backend from local you have to configure [the environment.json](local/environment.json) manually.
+If you don't use the backend from local you have to configure [the environment.json](../build/local/environment.json) manually.
 
 If you use the local backend ensure that you run that you have [set the correct client id](###-Initialise-frontend).
 
@@ -124,7 +114,7 @@ go run cmd/zitadel/main.go -console=false -localDevMode=true -config-files=cmd/z
 
 If you want to run your backend locally and the frontend by docker compose you have to replace the following variables:
 
-[docker compose yaml](local/docker-compose-local.yml):
+[docker compose yaml](../build/local/docker-compose-local.yml):
 
 ```yaml
 service:
@@ -160,11 +150,3 @@ go run cmd/zitadel/main.go -setup-files=cmd/zitadel/setup.yaml -setup-files=cmd/
 **username**: `zitadel-admin@caos-ag.zitadel.ch`
 
 **password**: `Password1!`
-
-# Production Build
-
-This can also be run locally!
-
-```bash
-DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:local --build-arg ENV=prod
-```

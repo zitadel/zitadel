@@ -4,4 +4,4 @@ RUN chmod +x /keys.sh
 ENTRYPOINT [ "/keys.sh" ]
 
 FROM scratch AS copy-keys
-COPY --from=gen-keys /.keys/local_keys.yaml .
+COPY --from=gen-keys /.keys /.keys

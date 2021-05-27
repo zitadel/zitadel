@@ -1,0 +1,10 @@
+FROM ubuntu:latest AS started
+#install dependencies
+RUN apt-get update \
+    && apt-get install curl -y
+
+#prepare script
+COPY build/local/zitadel-started.sh zitadel-started.sh
+RUN chmod +x /zitadel-started.sh
+
+ENTRYPOINT [ "/zitadel-started.sh" ]
