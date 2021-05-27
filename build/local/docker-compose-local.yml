@@ -42,7 +42,7 @@ services:
       dockerfile: build/local/Dockerfile.keys
       target: gen-keys
     volumes:
-      - ../../.keys:/.keys/
+      - ../../.:/zitadel
     env_file:
       - ./local.env
 

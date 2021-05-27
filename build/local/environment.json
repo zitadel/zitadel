@@ -4,5 +4,5 @@
   "adminServiceUrl": "http://localhost:50000",
   "subscriptionServiceUrl": "https://sub.zitadel.dev",
   "issuer": "http://localhost:50002/oauth/v2",
-  "clientid": "110109384104837124@zitadel"
+  "clientid": "@zitadel"
 }

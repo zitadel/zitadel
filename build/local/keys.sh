@@ -7,7 +7,7 @@
 set -e
 
 
-KEY_PATH=/.keys
+KEY_PATH=$(echo "/zitadel/$(dirname ${ZITADEL_KEY_PATH})")
 KEY_FILE=${KEY_PATH}/local_keys.yaml
 
 mkdir -p ${KEY_PATH}
