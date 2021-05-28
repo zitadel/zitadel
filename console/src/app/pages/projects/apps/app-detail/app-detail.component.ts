@@ -449,7 +449,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.grantTypesList?.setValue([OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, ...c]);
       }
     } else {
-      const index = (this.grantTypesList?.value as OIDCGrantType[]).findIndex(gt => gt === OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN);
+      const index = (this.grantTypesList?.value as OIDCGrantType[])
+        .findIndex(gt => gt === OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN);
       if (index > -1) {
         const copy = Object.assign([], this.grantTypesList?.value);
         copy.splice(index, 1);
