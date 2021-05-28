@@ -24,16 +24,7 @@
     </div>
 
     <div *ngIf="previewData && data" class="content">
-      <div class="preview-wrapper">
-        <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview>
-        <div class="col">
-          <cnsl-preview class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
-          <button class="activate-button" mat-raised-button>
-            {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
-          </button>
-        </div>
-      </div>
-
+  
       <mat-accordion class="settings">
         <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header>
@@ -47,7 +38,7 @@
 
           <p class="description">Your Logo will be used in the Login itself, while the icon is used for smaller UI elements like in the organisation switcher in console</p>
           
-          <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span>
+          <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
@@ -89,7 +80,7 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
 
-          <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span>
+          <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
@@ -153,9 +144,6 @@
               <mat-icon class="icon">accessibility_new</mat-icon>Advanced Behavior
             </div>
             </mat-panel-title>
-            <!-- <mat-panel-description>
-              Currently I am {{panelOpenState ? 'open' : 'closed'}}
-            </mat-panel-description> -->
           </mat-expansion-panel-header>
           <div class="adv-container" *ngIf="previewData">
           <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
@@ -169,6 +157,22 @@
       </div>
         </mat-expansion-panel>
       </mat-accordion>
+
+      <div class="preview-wrapper">
+        <!-- <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview> -->
+        <div class="col">
+          <button color="primary" mat-raised-button class="preview-changer" (click)="preview = preview == Preview.PREVIEW ? Preview.CURRENT : Preview.PREVIEW" matTooltip="{{'POLICY.PRIVATELABELING.CHANGEVIEW' | translate}}" [ngClass]="{'active': preview === Preview.PREVIEW}" >
+            <span>P / C</span>
+          </button>
+
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW" class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
+
+          <button class="activate-button" mat-raised-button>
+            {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="btn-container">

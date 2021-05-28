@@ -29,6 +29,11 @@ enum Theme {
   LIGHT,
 }
 
+enum Preview {
+  CURRENT,
+  PREVIEW,
+}
+
 @Component({
   selector: 'app-private-labeling-policy',
   templateUrl: './private-labeling-policy.component.html',
@@ -36,6 +41,7 @@ enum Theme {
 })
 export class PrivateLabelingPolicyComponent implements OnDestroy {
   public theme: Theme = Theme.LIGHT;
+  public preview: Preview = Preview.PREVIEW;
 
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
@@ -71,6 +77,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   ];
 
   public Theme: any = Theme;
+  public Preview: any = Preview;
 
   constructor(
     private route: ActivatedRoute,

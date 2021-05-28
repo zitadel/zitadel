@@ -638,7 +638,11 @@
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
-      "BTN":"Select File"
+      "BTN":"Select File",
+      "ACTIVATEPREVIEW":"Set preview as current configuration",
+      "DARK":"Dark Mode",
+      "LIGHT":"Lighg Mode",
+      "CHANGEVIEW":"Change View"
     },
     "PWD_AGE": {
       "TITLE": "Password Aging",
