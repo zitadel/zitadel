@@ -761,8 +761,9 @@ export class ManagementService {
     return this.grpcService.mgmt.getPreviewLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public activateCustomLabelPolicy(req: ActivateCustomLabelPolicyRequest):
+  public activateCustomLabelPolicy():
     Promise<ActivateCustomLabelPolicyResponse.AsObject> {
+    const req = new ActivateCustomLabelPolicyRequest();
     return this.grpcService.mgmt.activateCustomLabelPolicy(req, null).then(resp => resp.toObject());
   }
 

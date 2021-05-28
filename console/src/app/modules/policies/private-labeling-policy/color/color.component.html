@@ -1,6 +1,6 @@
 <cnsl-form-field class="formfield">
-  <cnsl-label>{{name}}</cnsl-label>
-  <input cnslInput [(ngModel)]="color" />
+  <cnsl-label>{{name}} (current {{color}})</cnsl-label>
+  <input cnslInput [(ngModel)]="previewColor" />
 </cnsl-form-field>
 <div class="color-selector">
   <div *ngFor="let c of (warn ? warncolors : colors)" class="circle mat-elevation-z3"

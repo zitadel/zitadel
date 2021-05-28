@@ -12,6 +12,9 @@ const bearerPrefix = 'Bearer';
 const accessTokenStorageKey = 'access_token';
 
 export enum UploadEndpoint {
+  IAMFONT = 'iam/policy/label/font',
+  MGMTFONT = 'org/policy/label/font',
+
   IAMDARKLOGO = 'iam/policy/label/logo/dark',
   IAMLIGHTLOGO = 'iam/policy/label/logo/light',
   IAMDARKICON = 'iam/policy/label/icon/dark',

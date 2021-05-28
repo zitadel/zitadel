@@ -85,11 +85,11 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event" name="Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event" name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark = $event" name="Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark = $event" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -97,11 +97,11 @@
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColor= $event" name="Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.primaryColor= $event" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" name="Warn Color Light" (previewChanged)="previewData.warnColor = $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+                <cnsl-color [warn]="true" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor = $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -112,18 +112,27 @@
             <mat-panel-title>
               <div class="panel-title"><mat-icon class="icon">text_fields</mat-icon>Font</div>
             </mat-panel-title>
-            <!-- <mat-panel-description>
-              {{fontCssRule}}
-            </mat-panel-description> -->
           </mat-expansion-panel-header>
           <div class="fonts">
-            <div class="font-preview" [style.font-family]="fontCssRule">
+            <div class="font-preview">
               <mat-icon>text_fields</mat-icon>
               <span>ABC • abc • 123</span>
               <span>_</span>
-              <span>Select your favorite font for the UI</span>
+              <span>Upload your favorite font for the UI</span>
             </div>
-            <cnsl-form-field class="formfield">
+
+            <div class="dropzone" cnslDropzone  (hovered)="toggleHoverFont($event)"
+              (dropped)="onDropFont($event)"
+              [class.hovering]="isHoveringOverFont">
+                <label class="file-label">
+                  <input #selectedFontFile style="display: none;"  class="file-input" type="file" (change)="onDropFont($event.target.files)">
+                  <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFontFile.click();" />
+
+                  <i class="icon las la-cloud-upload-alt"></i>
+                  <span class="desc">{{isHoveringOverFont ? 'Release': 'Drop your Logo here'}}</span>
+                </label>
+            </div>
+            <!-- <cnsl-form-field class="formfield">
               <cnsl-label>CSS Rule for font-family</cnsl-label>
               <input cnslInput [(ngModel)]="fontCssRule" />
             </cnsl-form-field>
@@ -133,7 +142,7 @@
                 (click)="fontCssRule = f.css">
                 Aa
             </button>
-            </div>
+            </div> -->
         </div>
         </mat-expansion-panel>
 
@@ -168,7 +177,7 @@
           <cnsl-preview *ngIf="preview === Preview.CURRENT" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
           <cnsl-preview *ngIf="preview === Preview.PREVIEW" class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
 
-          <button class="activate-button" mat-raised-button>
+          <button class="activate-button" mat-raised-button (click)="activatePolicy()">
             {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
           </button>
         </div>

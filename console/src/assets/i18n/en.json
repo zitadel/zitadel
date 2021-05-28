@@ -642,7 +642,8 @@
       "ACTIVATEPREVIEW":"Set preview as current configuration",
       "DARK":"Dark Mode",
       "LIGHT":"Lighg Mode",
-      "CHANGEVIEW":"Change View"
+      "CHANGEVIEW":"Change View",
+      "ACTIVATED":"Policy changes are now LIVE"
     },
     "PWD_AGE": {
       "TITLE": "Password Aging",
