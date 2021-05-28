@@ -21,9 +21,8 @@
 
 .preview {
   width: calc(100px + 300px);
-  margin: 0 1rem;
   pointer-events: none;
-  margin: 1rem 0;
+  margin-bottom: 2rem;
 
   * {
     pointer-events: none;
@@ -32,12 +31,14 @@
   .label {
     color: var(--grey);
     font-size: 12px;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
   }
 
   .dashed {
     border: 2px dashed rgba(#697386, .5);
     border-radius: 1rem;
-    margin-top: .5rem;
     padding: 100px 20px;
 
     .login-wrapper {

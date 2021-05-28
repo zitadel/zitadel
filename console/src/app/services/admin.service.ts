@@ -290,8 +290,9 @@ export class AdminService {
     return this.grpcService.admin.getPreviewLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public activateLabelPolicy(req: ActivateLabelPolicyRequest):
+  public activateLabelPolicy():
     Promise<ActivateLabelPolicyResponse.AsObject> {
+    const req = new ActivateLabelPolicyRequest();
     return this.grpcService.admin.activateLabelPolicy(req, null).then(resp => resp.toObject());
   }
 

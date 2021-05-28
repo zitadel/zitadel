@@ -29,12 +29,20 @@ enum Theme {
   LIGHT,
 }
 
+enum Preview {
+  CURRENT,
+  PREVIEW,
+}
+
 @Component({
   selector: 'app-private-labeling-policy',
   templateUrl: './private-labeling-policy.component.html',
   styleUrls: ['./private-labeling-policy.component.scss'],
 })
 export class PrivateLabelingPolicyComponent implements OnDestroy {
+  public theme: Theme = Theme.LIGHT;
+  public preview: Preview = Preview.PREVIEW;
+
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
@@ -46,6 +54,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public isHoveringOverDarkIcon: boolean = false;
   public isHoveringOverLightLogo: boolean = false;
   public isHoveringOverLightIcon: boolean = false;
+  public isHoveringOverFont: boolean = false;
 
   private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -58,17 +67,11 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   ];
 
   public logoFile!: File;
+  public fontFile!: File;
   public logoURL: any = '';
 
-  public font: string = 'Lato';
-  public fontCssRule: string = '\'Lato\', sans-serif';
-  public fonts: Array<{ name: string; css: string; }> = [
-    { name: 'Lato', css: '\'Lato\', sans-serif' },
-    { name: 'Merriweather', css: '\'Merriweather\', sans-serif' },
-    { name: 'System', css: 'ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;' },
-  ];
-
   public Theme: any = Theme;
+  public Preview: any = Preview;
 
   constructor(
     private route: ActivatedRoute,
@@ -103,10 +106,13 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
+  public toggleHoverFont(isHovering: boolean): void {
+    this.isHoveringOverFont = isHovering;
+  }
+
   public onDropLogo(theme: Theme, filelist: FileList): Promise<any> | void {
     const file = filelist.item(0);
     if (file) {
-      console.log(filelist.item(0));
       this.logoFile = file;
 
       const reader = new FileReader();
@@ -134,6 +140,27 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
           }
         }
       };
+    }
+  }
+
+  public onDropFont(filelist: FileList): Promise<any> | void {
+    const file = filelist.item(0);
+    if (file) {
+      this.fontFile = file;
+
+      // const reader = new FileReader();
+      // reader.readAsDataURL(this.fontFile);
+      // reader.onload = (event) => { // called once readAsDataURL is completed
+      //   console.log(event.target?.result);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      switch (this.serviceType) {
+        case PolicyComponentServiceType.MGMT:
+          return this.uploadService.upload(UploadEndpoint.MGMTFONT, formData);
+        case PolicyComponentServiceType.ADMIN:
+          return this.uploadService.upload(UploadEndpoint.IAMFONT, formData);
+      }
     }
   }
 
@@ -302,5 +329,22 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
     req.setDisableWatermark(this.previewData.disableWatermark);
     req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
+  }
+
+  public activatePolicy(): Promise<any> {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return (this.service as ManagementService).activateCustomLabelPolicy().then(() => {
+          this.toast.showInfo('POLICY.PRIVATELABELING.ACTIVATED', true);
+        }).catch(error => {
+          this.toast.showError(error);
+        });
+      case PolicyComponentServiceType.ADMIN:
+        return (this.service as AdminService).activateLabelPolicy().then(() => {
+          this.toast.showInfo('POLICY.PRIVATELABELING.ACTIVATED', true);
+        }).catch(error => {
+          this.toast.showError(error);
+        });
+    }
   }
 }
