@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -112,6 +113,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public OIDCAuthMethodType: any = OIDCAuthMethodType;
   public APIAuthMethodType: any = APIAuthMethodType;
   public OIDCTokenType: any = OIDCTokenType;
+  public OIDCGrantType: any = OIDCGrantType;
 
   public ChangeType: any = ChangeType;
 
@@ -436,6 +438,23 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         .catch(error => {
           this.toast.showError(error);
         });
+    }
+  }
+
+  public toggleRefreshToken(event: MatCheckboxChange) {
+    const c = this.grantTypesList?.value;
+
+    if (event.checked) {
+      if (!c.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)) {
+        this.grantTypesList?.setValue([OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, ...c]);
+      }
+    } else {
+      const index = (this.grantTypesList?.value as OIDCGrantType[]).findIndex(gt => gt === OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN);
+      if (index > -1) {
+        const copy = Object.assign([], this.grantTypesList?.value);
+        copy.splice(index, 1);
+        this.grantTypesList?.setValue(copy);
+      }
     }
   }
 

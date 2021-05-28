@@ -142,6 +142,17 @@
   flex-wrap: wrap;
   margin: 0 -.5rem;
 
+  .grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+    .rt {
+      margin-top: 2.3rem;
+      margin-left: .5rem;
+    }
+  }
+
   &.nowrap {
     flex-wrap: nowrap;
   }

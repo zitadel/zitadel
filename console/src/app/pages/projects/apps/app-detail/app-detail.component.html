@@ -198,6 +198,7 @@
                 </div>
 
                 <div class="content">
+                  <div class="grid">
                     <cnsl-form-field class="formfield" appearance="outline">
                         <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
                         <input cnslInput formControlName="clientId" />
@@ -238,6 +239,12 @@
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
+
+                    <mat-checkbox color="primary" class="rt"
+                        (change)="toggleRefreshToken($event)" [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)">
+                        {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
+                    </mat-checkbox>
+                  </div>
 
                     <div class="divider"></div>
 
