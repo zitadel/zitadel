@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"os"
 	"text/template"
@@ -10,13 +11,17 @@ import (
 	"github.com/caos/zitadel/internal/config"
 )
 
+var (
+	configFile = flag.String("config-file", "./asset.yaml", "file with the assets routes definitions")
+)
+
 func main() {
-	configFile := "./asset.yaml"
+	flag.Parse()
 	authz, err := os.OpenFile("../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
 	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
 	router, err := os.OpenFile("../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
 	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
-	GenerateAssetHandler(configFile, authz, router)
+	GenerateAssetHandler(*configFile, authz, router)
 }
 
 type Method struct {
