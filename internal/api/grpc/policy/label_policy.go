@@ -18,7 +18,12 @@ func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy 
 		WarnColorDark:       policy.WarnColorDark,
 		FontColorDark:       policy.FontColorDark,
 		FontUrl:             policy.FontURL,
+		LogoUrl:             policy.LogoURL,
+		LogoUrlDark:         policy.LogoDarkURL,
+		IconUrl:             policy.IconURL,
+		IconUrlDark:         policy.IconDarkURL,
 
+		DisableWatermark:    policy.DisableWatermark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
