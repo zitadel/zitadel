@@ -26,7 +26,7 @@ var (
 	LabelPolicyFontAddedEventType   = orgEventTypePrefix + policy.LabelPolicyFontAddedEventType
 	LabelPolicyFontRemovedEventType = orgEventTypePrefix + policy.LabelPolicyFontRemovedEventType
 
-	LabelPolicyAssetsRemovedEventType = orgEventTypePrefix + policy.LabelPolicyFontRemovedEventType
+	LabelPolicyAssetsRemovedEventType = orgEventTypePrefix + policy.LabelPolicyAssetsRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {
@@ -453,7 +453,7 @@ func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.Even
 }
 
 type LabelPolicyAssetsRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	policy.LabelPolicyAssetsRemovedEvent
 }
 
 func (e *LabelPolicyAssetsRemovedEvent) Data() interface{} {
@@ -469,15 +469,20 @@ func NewLabelPolicyAssetsRemovedEvent(
 	aggregate *eventstore.Aggregate,
 ) *LabelPolicyAssetsRemovedEvent {
 	return &LabelPolicyAssetsRemovedEvent{
-		*eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			LabelPolicyAssetsRemovedEventType),
+		LabelPolicyAssetsRemovedEvent: *policy.NewLabelPolicyAssetsRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyAssetsRemovedEventType),
+		),
 	}
 }
 
 func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &LabelPolicyAssetsRemovedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	e, err := policy.LabelPolicyAssetsRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyAssetsRemovedEvent{LabelPolicyAssetsRemovedEvent: *e.(*policy.LabelPolicyAssetsRemovedEvent)}, nil
 }

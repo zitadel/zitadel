@@ -37,7 +37,9 @@ type FeaturesView struct {
 	LoginPolicyRegistration  bool          `json:"loginPolicyRegistration" gorm:"column:login_policy_registration"`
 	LoginPolicyUsernameLogin bool          `json:"loginPolicyUsernameLogin" gorm:"column:login_policy_username_login"`
 	PasswordComplexityPolicy bool          `json:"passwordComplexityPolicy" gorm:"column:password_complexity_policy"`
-	LabelPolicy              bool          `json:"labelPolicy" gorm:"column:label_policy"`
+	LabelPolicy              *bool         `json:"labelPolicy" gorm:"-"`
+	LabelPolicyPrivateLabel  bool          `json:"labelPolicyPrivateLabel" gorm:"column:label_policy_private_label"`
+	LabelPolicyWatermark     bool          `json:"labelPolicyWatermark" gorm:"column:label_policy_watermark"`
 	CustomDomain             bool          `json:"customDomain" gorm:"column:custom_domain"`
 }
 
@@ -59,7 +61,8 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		LoginPolicyRegistration:  features.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: features.LoginPolicyUsernameLogin,
 		PasswordComplexityPolicy: features.PasswordComplexityPolicy,
-		LabelPolicy:              features.LabelPolicy,
+		LabelPolicyPrivateLabel:  features.LabelPolicyPrivateLabel,
+		LabelPolicyWatermark:     features.LabelPolicyWatermark,
 		CustomDomain:             features.CustomDomain,
 	}
 }
@@ -92,6 +95,9 @@ func (f *FeaturesView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, f); err != nil {
 		logging.Log("EVEN-DVsf2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Bfg31", "Could not unmarshal data")
+	}
+	if f.LabelPolicy != nil {
+		f.LabelPolicyPrivateLabel = *f.LabelPolicy
 	}
 	return nil
 }

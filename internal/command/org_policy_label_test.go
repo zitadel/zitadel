@@ -498,6 +498,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		static     static.Storage
 	}
 	type args struct {
 		ctx   context.Context
@@ -574,6 +575,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 						},
 					),
 				),
+				static: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -586,6 +588,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.static,
 			}
 			_, err := r.RemoveLabelPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {

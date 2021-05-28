@@ -183,6 +183,8 @@ func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
 		LoginPolicyRegistration:  wm.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: wm.LoginPolicyUsernameLogin,
 		PasswordComplexityPolicy: wm.PasswordComplexityPolicy,
-		LabelPolicy:              wm.LabelPolicy,
+		LabelPolicyPrivateLabel:  wm.LabelPolicyPrivateLabel,
+		LabelPolicyWatermark:     wm.LabelPolicyWatermark,
+		CustomDomain:             wm.CustomDomain,
 	}
 }

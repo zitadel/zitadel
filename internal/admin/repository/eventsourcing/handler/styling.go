@@ -108,7 +108,8 @@ func (m *Styling) processLabelPolicy(event *es_models.Event) (err error) {
 		iam_es_model.LabelPolicyIconDarkAdded, model.LabelPolicyIconDarkAdded,
 		iam_es_model.LabelPolicyIconDarkRemoved, model.LabelPolicyIconDarkRemoved,
 		iam_es_model.LabelPolicyFontAdded, model.LabelPolicyFontAdded,
-		iam_es_model.LabelPolicyFontRemoved, model.LabelPolicyFontRemoved:
+		iam_es_model.LabelPolicyFontRemoved, model.LabelPolicyFontRemoved,
+		iam_es_model.LabelPolicyAssetsRemoved, model.LabelPolicyAssetsRemoved:
 		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err

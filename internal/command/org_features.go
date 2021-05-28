@@ -32,9 +32,9 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
 		features.PasswordComplexityPolicy,
-		features.LabelPolicy,
+		features.LabelPolicyPrivateLabel,
+		features.LabelPolicyWatermark,
 		features.CustomDomain,
-		features.PrivateLabel,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -238,7 +238,7 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 		return nil, nil
 	}
 	if !features.LabelPolicyPrivateLabel && !features.LabelPolicyWatermark {
-		removeEvent, err := c.removeLabelPolicyIfExists(ctx, orgID)
+		removeEvent, err := c.removeLabelPolicy(ctx, existingPolicy)
 		if err != nil {
 			return nil, err
 		}
@@ -264,6 +264,12 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 		policy.BackgroundColorDark = ""
 		policy.WarnColorDark = ""
 		policy.FontColorDark = ""
+
+		assetsEvent, err := c.removeLabelPolicyAssets(ctx, existingPolicy)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, assetsEvent)
 	}
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel),
 		policy.PrimaryColor, policy.BackgroundColor, policy.WarnColor, policy.FontColor,

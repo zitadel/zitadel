@@ -176,6 +176,13 @@ func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 		i.State = int32(domain.LabelPolicyStatePreview)
 	case es_model.LabelPolicyActivated, org_es_model.LabelPolicyActivated:
 		i.State = int32(domain.LabelPolicyStateActive)
+	case es_model.LabelPolicyAssetsRemoved, org_es_model.LabelPolicyAssetsRemoved:
+		i.LogoURL = ""
+		i.IconURL = ""
+		i.LogoDarkURL = ""
+		i.IconDarkURL = ""
+		i.FontURL = ""
+		i.State = int32(domain.LabelPolicyStatePreview)
 	}
 	return err
 }

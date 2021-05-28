@@ -62,5 +62,7 @@ func (c *Commands) getDefaultFeatures(ctx context.Context) (*domain.Features, er
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
+	features := writeModelToFeatures(&existingFeatures.FeaturesWriteModel)
+	features.IsDefault = true
+	return features, nil
 }

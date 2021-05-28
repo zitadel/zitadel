@@ -24,6 +24,8 @@ var (
 
 	LabelPolicyFontAddedEventType   = iamEventTypePrefix + policy.LabelPolicyFontAddedEventType
 	LabelPolicyFontRemovedEventType = iamEventTypePrefix + policy.LabelPolicyFontRemovedEventType
+
+	LabelPolicyAssetsRemovedEventType = iamEventTypePrefix + policy.LabelPolicyAssetsRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {
@@ -420,4 +422,39 @@ func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.Even
 	}
 
 	return &LabelPolicyFontRemovedEvent{LabelPolicyFontRemovedEvent: *e.(*policy.LabelPolicyFontRemovedEvent)}, nil
+}
+
+type LabelPolicyAssetsRemovedEvent struct {
+	policy.LabelPolicyAssetsRemovedEvent
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyAssetsRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *LabelPolicyAssetsRemovedEvent {
+	return &LabelPolicyAssetsRemovedEvent{
+		LabelPolicyAssetsRemovedEvent: *policy.NewLabelPolicyAssetsRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyAssetsRemovedEventType),
+		),
+	}
+}
+
+func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LabelPolicyAssetsRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyAssetsRemovedEvent{LabelPolicyAssetsRemovedEvent: *e.(*policy.LabelPolicyAssetsRemovedEvent)}, nil
 }

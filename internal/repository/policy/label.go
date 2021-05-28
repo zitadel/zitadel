@@ -113,7 +113,7 @@ type LabelPolicyChangedEvent struct {
 	FontColorDark       *string `json:"fontColorDark,omitempty"`
 	HideLoginNameSuffix *bool   `json:"hideLoginNameSuffix,omitempty"`
 	ErrorMsgPopup       *bool   `json:"errorMsgPopup,omitempty"`
-	DisableWatermark    *bool   `json:"disableMsgPopup,omitempty"`
+	DisableWatermark    *bool   `json:"disableWatermark,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) Data() interface{} {
@@ -537,4 +537,28 @@ func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.Even
 	}
 
 	return &LabelPolicyFontRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyAssetsRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyAssetsRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyAssetsRemovedEvent {
+	return &LabelPolicyAssetsRemovedEvent{
+		*base,
+	}
+}
+
+func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LabelPolicyAssetsRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

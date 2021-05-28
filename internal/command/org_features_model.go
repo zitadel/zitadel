@@ -68,9 +68,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
 	passwordComplexityPolicy,
-	labelPolicy,
-	customDomain,
-	privateLabel bool,
+	labelPolicyPrivateLabel,
+	labelPolicyWatermark,
+	customDomain bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -108,14 +108,14 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
 		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))
 	}
-	if wm.LabelPolicy != labelPolicy {
-		changes = append(changes, features.ChangeLabelPolicy(labelPolicy))
+	if wm.LabelPolicyPrivateLabel != labelPolicyPrivateLabel {
+		changes = append(changes, features.ChangeLabelPolicyPrivateLabel(labelPolicyPrivateLabel))
+	}
+	if wm.LabelPolicyWatermark != labelPolicyWatermark {
+		changes = append(changes, features.ChangeLabelPolicyWatermark(labelPolicyWatermark))
 	}
 	if wm.CustomDomain != customDomain {
 		changes = append(changes, features.ChangeCustomDomain(customDomain))
-	}
-	if wm.PrivateLabel != privateLabel {
-		changes = append(changes, features.ChangePrivateLabel(privateLabel))
 	}
 
 	if len(changes) == 0 {

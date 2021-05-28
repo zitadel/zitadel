@@ -158,7 +158,7 @@ func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID string) (*do
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-4MVsf", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.LogoKey)
+	err = c.RemoveAsset(ctx, orgID, existingPolicy.LogoKey)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID string) (*do
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-1nd9f", "Errors.Org.LabelPolicy.NotFound")
 	}
 
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.IconKey)
+	err = c.RemoveAsset(ctx, orgID, existingPolicy.IconKey)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID string) 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-0peQw", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.LogoDarkKey)
+	err = c.RemoveAsset(ctx, orgID, existingPolicy.LogoDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -324,7 +324,7 @@ func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID string) 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-3NFos", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.IconDarkKey)
+	err = c.RemoveAsset(ctx, orgID, existingPolicy.IconDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -379,7 +379,7 @@ func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID string) (*do
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-4n9SD", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.FontKey)
+	err = c.RemoveAsset(ctx, orgID, existingPolicy.FontKey)
 	if err != nil {
 		return nil, err
 	}
@@ -423,6 +423,10 @@ func (c *Commands) removeLabelPolicy(ctx context.Context, existingPolicy *OrgLab
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
 	}
+	err = c.RemoveAsset(ctx, existingPolicy.AggregateID, domain.LabelPolicyPrefix)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	return org.NewLabelPolicyRemovedEvent(ctx, orgAgg), nil
 }
@@ -435,8 +439,21 @@ func (c *Commands) removeLabelPolicyIfExists(ctx context.Context, orgID string) 
 	if existingPolicy.State != domain.PolicyStateActive {
 		return nil, nil
 	}
+	err = c.RemoveAsset(ctx, orgID, domain.LabelPolicyPrefix)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	return org.NewLabelPolicyRemovedEvent(ctx, orgAgg), nil
+}
+
+func (c *Commands) removeLabelPolicyAssets(ctx context.Context, existingPolicy *OrgLabelPolicyWriteModel) (*org.LabelPolicyAssetsRemovedEvent, error) {
+	err := c.RemoveAsset(ctx, existingPolicy.AggregateID, domain.LabelPolicyPrefix)
+	if err != nil {
+		return nil, err
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
+	return org.NewLabelPolicyAssetsRemovedEvent(ctx, orgAgg), nil
 }
 
 func (c *Commands) orgLabelPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLabelPolicyWriteModel, error) {
