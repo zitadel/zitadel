@@ -112,7 +112,7 @@ COPY internal/api/assets/generator internal/api/assets/generator
 COPY internal/config internal/config
 COPY internal/errors internal/errors
 RUN build/zitadel/generate-grpc.sh
-RUN go run internal/api/assets/generator/asset_generator.go -config-file=internal/api/assets/generator/asset.yaml
+RUN go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/
 
 #######################
 ## Go base build

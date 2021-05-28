@@ -12,16 +12,17 @@ import (
 )
 
 var (
-	configFile = flag.String("config-file", "./asset.yaml", "file with the assets routes definitions")
+	directory = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
 )
 
 func main() {
 	flag.Parse()
-	authz, err := os.OpenFile("../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	configFile := *directory + "asset.yaml"
+	authz, err := os.OpenFile(*directory+"../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
 	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
-	router, err := os.OpenFile("../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	router, err := os.OpenFile(*directory+"../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
 	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
-	GenerateAssetHandler(*configFile, authz, router)
+	GenerateAssetHandler(configFile, authz, router)
 }
 
 type Method struct {
