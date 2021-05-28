@@ -441,7 +441,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  public toggleRefreshToken(event: MatCheckboxChange) {
+  public toggleRefreshToken(event: MatCheckboxChange): void {
     const c = this.grantTypesList?.value;
 
     if (event.checked) {

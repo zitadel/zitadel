@@ -241,7 +241,7 @@
                     </cnsl-form-field>
 
                     <mat-checkbox color="primary" class="rt"
-                        (change)="toggleRefreshToken($event)" [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)">
+                        (change)="toggleRefreshToken($event)" [disabled]="!this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE)" [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)">
                         {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
                     </mat-checkbox>
                   </div>
