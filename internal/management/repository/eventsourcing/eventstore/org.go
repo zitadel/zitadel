@@ -550,6 +550,30 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
 }
 
+func (repo *OrgRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
+	text, err := repo.View.MailTextByIDs(repo.SystemDefaults.IamID, textType, language)
+	if err != nil {
+		return nil, err
+	}
+	text.Default = true
+	return iam_es_model.MailTextViewToModel(text), err
+}
+
+func (repo *OrgRepository) GetMailText(ctx context.Context, orgID, textType, language string) (*iam_model.MailTextView, error) {
+	text, err := repo.View.MailTextByIDs(orgID, textType, language)
+	if errors.IsNotFound(err) {
+		result, err := repo.GetDefaultMailText(ctx, textType, language)
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MailTextViewToModel(text), err
+}
+
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
 	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending, auditLogRetention)
 

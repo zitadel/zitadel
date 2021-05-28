@@ -46,6 +46,8 @@ type OrgRepository interface {
 
 	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
 	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error)
+	GetMailText(ctx context.Context, orgID, textType, language string) (*iam_model.MailTextView, error)
 
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)

@@ -1,13 +1,13 @@
-package admin
+package management
 
 import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func SetInitCustomTextToDomain(msg *admin_pb.SetDefaultInitMessageTextRequest) *domain.CustomMessageText {
+func SetInitCustomTextToDomain(msg *mgmt_pb.SetCustomInitMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
 		MessageTextType: domain.InitCodeMessageType,
@@ -22,7 +22,7 @@ func SetInitCustomTextToDomain(msg *admin_pb.SetDefaultInitMessageTextRequest) *
 	}
 }
 
-func SetPasswordResetCustomTextToDomain(msg *admin_pb.SetDefaultPasswordResetMessageTextRequest) *domain.CustomMessageText {
+func SetPasswordResetCustomTextToDomain(msg *mgmt_pb.SetCustomPasswordResetMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
 		MessageTextType: domain.PasswordResetMessageType,
@@ -37,7 +37,7 @@ func SetPasswordResetCustomTextToDomain(msg *admin_pb.SetDefaultPasswordResetMes
 	}
 }
 
-func SetVerifyEmailCustomTextToDomain(msg *admin_pb.SetDefaultVerifyEmailMessageTextRequest) *domain.CustomMessageText {
+func SetVerifyEmailCustomTextToDomain(msg *mgmt_pb.SetCustomVerifyEmailMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
 		MessageTextType: domain.VerifyEmailMessageType,
@@ -52,7 +52,7 @@ func SetVerifyEmailCustomTextToDomain(msg *admin_pb.SetDefaultVerifyEmailMessage
 	}
 }
 
-func SetVerifyPhoneCustomTextToDomain(msg *admin_pb.SetDefaultVerifyPhoneMessageTextRequest) *domain.CustomMessageText {
+func SetVerifyPhoneCustomTextToDomain(msg *mgmt_pb.SetCustomVerifyPhoneMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
 		MessageTextType: domain.VerifyPhoneMessageType,
@@ -67,7 +67,7 @@ func SetVerifyPhoneCustomTextToDomain(msg *admin_pb.SetDefaultVerifyPhoneMessage
 	}
 }
 
-func SetDomainClaimedCustomTextToDomain(msg *admin_pb.SetDefaultDomainClaimedMessageTextRequest) *domain.CustomMessageText {
+func SetDomainClaimedCustomTextToDomain(msg *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
 		MessageTextType: domain.DomainClaimedMessageType,
