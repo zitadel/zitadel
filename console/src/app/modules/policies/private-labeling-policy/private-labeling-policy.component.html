@@ -14,6 +14,15 @@
         </button>
     </ng-template>
 
+    <div class="theme-changer">
+      <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light" [ngClass]="{'active': theme === Theme.LIGHT}" >
+        <mat-icon class="icon">check</mat-icon>
+      </button>
+      <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark" [ngClass]="{'active': theme === Theme.DARK}" >
+        <mat-icon class="icon">check</mat-icon>
+      </button>
+    </div>
+
     <div *ngIf="previewData && data" class="content">
       <div class="preview-wrapper">
         <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview>
@@ -38,15 +47,15 @@
 
           <p class="description">Your Logo will be used in the Login itself, while the icon is used for smaller UI elements like in the organisation switcher in console</p>
           
-          <span class="title">Dark Design</span>
+          <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span>
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
-              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.DARK, $event)"
-              (dropped)="onDropLogo(Theme.DARK, $event)"
+              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(theme, $event)"
+              (dropped)="onDropLogo(theme, $event)"
               [class.hovering]="isHoveringOverDarkLogo">
                 <label class="file-label">
-                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(Theme.DARK, $event.target.files)">
+                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $event.target.files)">
                   <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
 
                   <i class="icon las la-cloud-upload-alt"></i>
@@ -57,11 +66,11 @@
 
             <div class="part">
               <span class="label">Icon</span>
-              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(Theme.DARK, $event)"
-              (dropped)="onDropIcon(Theme.DARK, $event)"
+              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
+              (dropped)="onDropIcon(theme, $event)"
               [class.hovering]="isHoveringOverDarkIcon">
               <label class="file-label">
-                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropIcon(Theme.DARK, $event.target.files)">
+                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
                 <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
 
                 <i class="icon las la-cloud-upload-alt"></i>
@@ -71,39 +80,6 @@
             </div>
           </div>
 
-          <span class="title">Light Design</span>
-
-          <div class="logo-setup-wrapper">
-            <div class="part">
-              <span class="label">Logo</span>
-              <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(Theme.LIGHT, $event)"
-              (dropped)="onDropLogo(Theme.LIGHT, $event)"
-              [class.hovering]="isHoveringOverLightLogo">
-              <label class="file-label">
-                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(Theme.LIGHT, $event.target.files)">
-                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
-
-                <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLightLogo ? 'Release': 'Drop your Logo here'}}</span>
-              </label>
-              </div>
-            </div>
-
-            <div class="part">
-              <span class="label">Icon</span>
-              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(Theme.LIGHT,$event)"
-              (dropped)="onDropIcon(Theme.LIGHT, $event)"
-              [class.hovering]="isHoveringOverLightIcon">
-              <label class="file-label">
-                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropIcon(Theme.LIGHT, $event.target.files)">
-                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
-
-                <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverLightIcon ? 'Release': 'Drop your Logo here'}}</span>
-              </label>
-              </div>
-            </div>
-          </div>
         </mat-expansion-panel>
 
         <mat-expansion-panel class="expansion" [expanded]="true">
@@ -113,27 +89,31 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
 
-          <span class="title">Dark Design</span>
-          <div class="colors" *ngIf="data && previewData">
-            <div class="color">
-              <cnsl-color (previewChanged)="previewData.primaryColorDark = $event" name="Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
-            </div>
+          <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span>
+          
+          <ng-container *ngIf="theme==Theme.DARK">
+            <div class="colors" *ngIf="data && previewData">
+              <div class="color">
+                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event" name="Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+              </div>
 
-            <div class="color">
-              <cnsl-color (previewChanged)="previewData.warnColorDark = $event" name="Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+              <div class="color">
+                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark = $event" name="Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+              </div>
             </div>
-          </div>
+          </ng-container>
 
-          <span class="title">Light Design</span>
-          <div class="colors" *ngIf="data && previewData">
-            <div class="color">
-              <cnsl-color (previewChanged)="previewData.primaryColor= $event" name="Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
-            </div>
+          <ng-container *ngIf="theme==Theme.LIGHT">
+            <div class="colors" *ngIf="data && previewData">
+              <div class="color">
+                <cnsl-color (previewChanged)="previewData.primaryColor= $event" name="Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+              </div>
 
-            <div class="color">
-              <cnsl-color name="Warn Color Light" (previewChanged)="previewData.warnColor = $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+              <div class="color">
+                <cnsl-color [warn]="true" name="Warn Color Light" (previewChanged)="previewData.warnColor = $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+              </div>
             </div>
-      </div>
+          </ng-container>
         </mat-expansion-panel>
 
         <mat-expansion-panel class="expansion">

@@ -3,7 +3,7 @@
   <input cnslInput [(ngModel)]="color" />
 </cnsl-form-field>
 <div class="color-selector">
-  <div *ngFor="let c of colors" class="circle mat-elevation-z3"
+  <div *ngFor="let c of (warn ? warncolors : colors)" class="circle mat-elevation-z3"
     [ngClass]="{'active': color == c.color || previewColor == c.color}"
     (click)="emitPreview(c.color)" [ngStyle]="{'background-color': c.color}">
     <span *ngIf="previewColor == c.color">P</span>

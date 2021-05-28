@@ -639,7 +639,9 @@
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
       "BTN":"Datei auswählen",
-      "ACTIVATEPREVIEW":"Konfiguration übernehmen"
+      "ACTIVATEPREVIEW":"Konfiguration übernehmen",
+      "DARK":"Dunkler Modus",
+      "LIGHT":"Heller Modus"
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",

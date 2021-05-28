@@ -35,6 +35,8 @@ enum Theme {
   styleUrls: ['./private-labeling-policy.component.scss'],
 })
 export class PrivateLabelingPolicyComponent implements OnDestroy {
+  public theme: Theme = Theme.LIGHT;
+
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 

@@ -7,6 +7,44 @@
   margin: .5rem 0;
 }
 
+.theme-changer {
+  display: flex;
+  margin: 1rem -0.5rem;
+
+  button {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 1px solid #81868a50;
+    margin: 0 .5rem;
+
+    .icon {
+      visibility: hidden;
+    }
+  }
+  .dark {
+    background-color: black;
+
+    &.active {
+      .icon {
+        visibility: visible;
+        color: white;
+      }
+    }
+  }
+
+  .light {
+    background-color: white;
+
+    &.active {
+      .icon {
+        visibility: visible;
+        color: black;
+      }
+    }
+  }
+}
+
 @import '~@angular/material/theming';
 
 @mixin private-label-theme($theme) {

@@ -35,7 +35,7 @@ export class ColorComponent {
     { name: 'purple', color: '#9c27b0' },
     { name: 'deeppurple', color: '#673ab7' },
   ];
-
+  @Input() warn: boolean = false;
   @Input() color: string = '';
   @Input() previewColor: string = '';
   @Input() name: string = '';
