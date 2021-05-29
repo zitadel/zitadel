@@ -173,6 +173,11 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
+  public changeColor(attrToSet: string, valueToSet: string) {
+    // attrToSet = valueToSet;
+    this.savePolicy();
+  }
+
   public onDropIcon(theme: Theme, filelist: FileList): Promise<any> | void {
     console.log(filelist);
     const file = filelist.item(0);

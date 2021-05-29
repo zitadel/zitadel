@@ -3,20 +3,25 @@
   margin-top: 0;
 }
 
+.desc {
+  font-size: 14px;
+  color: var(--grey);
+}
+
 .spinner-wr {
   margin: .5rem 0;
 }
 
 .theme-changer {
   display: flex;
-  margin: 1rem -0.5rem;
+  margin: 1rem -0.25rem;
 
   button {
     height: 40px;
     width: 40px;
     border-radius: 50%;
     border: 1px solid #81868a50;
-    margin: 0 .5rem;
+    margin: 0 .25rem;
 
     .icon {
       visibility: hidden;
@@ -26,6 +31,8 @@
     background-color: black;
 
     &.active {
+      transform: scale(1.1);
+
       .icon {
         visibility: visible;
         color: white;
@@ -37,6 +44,8 @@
     background-color: white;
 
     &.active {
+      transform: scale(1.1);
+
       .icon {
         visibility: visible;
         color: black;
@@ -248,6 +257,16 @@
           top: .5rem;
           left: .5rem;
           border-radius: 10px !important;
+
+          span {
+            color: if($is-dark-theme, #ffffff50, #00000050);
+          }
+
+          .strong {
+            color: if($is-dark-theme, #ffffff, #000000);
+            font-weight: bold;
+            font-size: 18px;
+          }
         }
 
         .activate-button {

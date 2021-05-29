@@ -638,6 +638,7 @@
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
+      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment. To view those changes, a 'x-preview' scope will have to be added to your login scopes.",
       "BTN":"Select File",
       "ACTIVATEPREVIEW":"Set preview as current configuration",
       "DARK":"Dark Mode",
