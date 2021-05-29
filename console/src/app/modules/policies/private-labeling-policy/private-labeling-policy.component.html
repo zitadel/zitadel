@@ -95,15 +95,15 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.backgroundColorDark = $event; changeColor(previewData.backgroundColorDark, $event)"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event; changeColor(previewData.primaryColorDark, $event)"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event; savePolicy()"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark =  $event; changeColor(previewData.warnColorDark, $event)" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark =  $event; savePolicy()" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -111,15 +111,15 @@
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.backgroundColor = $event; changeColor(previewData.backgroundColor, $event)"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.backgroundColor = $event; savePolicy()"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColor = $event; changeColor(previewData.primaryColor, $event)" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.primaryColor = $event; savePolicy()" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event; changeColor(previewData.warnColor, $event)" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+                <cnsl-color [warn]="true" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event; savePolicy()" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
               </div>
             </div>
           </ng-container>

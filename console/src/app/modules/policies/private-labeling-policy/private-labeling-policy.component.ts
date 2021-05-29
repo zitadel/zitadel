@@ -173,11 +173,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public changeColor(attrToSet: string, valueToSet: string) {
-    // attrToSet = valueToSet;
-    this.savePolicy();
-  }
-
   public onDropIcon(theme: Theme, filelist: FileList): Promise<any> | void {
     console.log(filelist);
     const file = filelist.item(0);
@@ -282,8 +277,15 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  private loadAsset(url: string) {
-    this.uploadService.load(`/iam/${url}`);
+  private loadAsset(url: string): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.ADMIN:
+        this.uploadService.load(`/iam/${url}`);
+        break;
+      case PolicyComponentServiceType.MGMT:
+        this.uploadService.load(`/org/${url}`);
+        break;
+    }
   }
 
   public removePolicy(): void {
