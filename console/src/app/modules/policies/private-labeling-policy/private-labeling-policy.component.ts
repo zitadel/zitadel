@@ -336,6 +336,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public activatePolicy(): Promise<any> {
+    // dialog warning
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).activateCustomLabelPolicy().then(() => {

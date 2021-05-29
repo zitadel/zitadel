@@ -15,14 +15,23 @@
         </button>
     </ng-template>
 
-    <div class="theme-changer">
-      <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light" [ngClass]="{'active': theme === Theme.LIGHT}" >
-        <mat-icon class="icon">check</mat-icon>
+    <div class="top-row">
+      <div>
+        <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
+        <div class="theme-changer">
+          <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light" [ngClass]="{'active': theme === Theme.LIGHT}" >
+            <mat-icon class="icon">edit</mat-icon>
+          </button>
+          <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark" [ngClass]="{'active': theme === Theme.DARK}" >
+            <mat-icon class="icon">edit</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <button class="activate-button" mat-raised-button (click)="activatePolicy()">
+        {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
       </button>
-      <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark" [ngClass]="{'active': theme === Theme.DARK}" >
-        <mat-icon class="icon">check</mat-icon>
-      </button>
-    </div>
+  </div>
 
     <div *ngIf="previewData && data" class="content">
   
@@ -166,10 +175,6 @@
 
           <cnsl-preview *ngIf="preview === Preview.CURRENT" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
           <cnsl-preview *ngIf="preview === Preview.PREVIEW" class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
-
-          <button class="activate-button" mat-raised-button (click)="activatePolicy()">
-            {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
-          </button>
         </div>
       </div>
     </div>

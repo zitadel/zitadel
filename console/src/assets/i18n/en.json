@@ -644,7 +644,8 @@
       "DARK":"Dark Mode",
       "LIGHT":"Lighg Mode",
       "CHANGEVIEW":"Change View",
-      "ACTIVATED":"Policy changes are now LIVE"
+      "ACTIVATED":"Policy changes are now LIVE",
+      "THEME":"Theme"
     },
     "PWD_AGE": {
       "TITLE": "Password Aging",

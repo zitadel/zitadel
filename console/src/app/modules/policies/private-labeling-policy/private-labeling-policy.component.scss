@@ -6,52 +6,12 @@
 .desc {
   font-size: 14px;
   color: var(--grey);
+  max-width: 800px;
+  margin-bottom: 2rem;
 }
 
 .spinner-wr {
   margin: .5rem 0;
-}
-
-.theme-changer {
-  display: flex;
-  margin: 1rem -0.25rem;
-
-  button {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    border: 1px solid #81868a50;
-    margin: 0 .25rem;
-
-    .icon {
-      visibility: hidden;
-    }
-  }
-  .dark {
-    background-color: black;
-
-    &.active {
-      transform: scale(1.1);
-
-      .icon {
-        visibility: visible;
-        color: white;
-      }
-    }
-  }
-
-  .light {
-    background-color: white;
-
-    &.active {
-      transform: scale(1.1);
-
-      .icon {
-        visibility: visible;
-        color: black;
-      }
-    }
-  }
 }
 
 @import '~@angular/material/theming';
@@ -63,11 +23,70 @@
   $warn: map-get($theme, warn);
   $warn-color: mat-color($warn, 500);
 
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+
+    .activate-button {
+      border-radius: 50%;
+      background-color: if($is-dark-theme, #ffffff, #000000);
+      color: if($is-dark-theme, #000000, #ffffff);
+      align-self: flex-end;
+    }
+
+    .theme-changer {
+      display: flex;
+      margin: 0 -0.25rem;
+
+      button {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        border: 1px solid #81868a50;
+        margin: 0 .25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .icon {
+          visibility: hidden;
+        }
+      }
+      .dark {
+        background-color: black;
+
+        &.active {
+          transform: scale(1.1);
+
+          .icon {
+            visibility: visible;
+            color: white;
+          }
+        }
+      }
+
+      .light {
+        background-color: white;
+
+        &.active {
+          transform: scale(1.1);
+
+          .icon {
+            visibility: visible;
+            color: black;
+          }
+        }
+      }
+    }
+  }
+
   .content {
     padding-top: 1rem;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1000px;
 
     .settings {
       max-width: 400px;
@@ -267,12 +286,6 @@
             font-weight: bold;
             font-size: 18px;
           }
-        }
-
-        .activate-button {
-          border-radius: 50%;
-          background-color: if($is-dark-theme, #ffffff, #000000);
-          color: if($is-dark-theme, #000000, #ffffff);
         }
       }
     }
