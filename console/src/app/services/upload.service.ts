@@ -66,4 +66,14 @@ export class UploadService {
         },
       }).toPromise();
   }
+
+  public load(endpoint: string): Promise<any> {
+    return this.http.get(`${this.serviceUrl}/assets/v1/${endpoint}`,
+      {
+        headers: {
+          [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
+          [orgKey]: `${this.org.id}`,
+        },
+      }).toPromise();
+  }
 }

@@ -222,6 +222,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (data.policy) {
         this.previewData = data.policy;
         this.loading = false;
+
+        if (this.previewData.logoUrlDark) {
+          this.loadAsset(this.previewData.logoUrlDark);
+        }
+        if (this.previewData.iconUrlDark) {
+          this.loadAsset(this.previewData.iconUrlDark);
+        }
+        if (this.previewData.logoUrl) {
+          this.loadAsset(this.previewData.logoUrl);
+        }
+        if (this.previewData.iconUrl) {
+          this.loadAsset(this.previewData.iconUrl);
+        }
       }
     }).catch(error => {
       this.toast.showError(error);
@@ -267,6 +280,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       case PolicyComponentServiceType.ADMIN:
         return (this.service as AdminService).getLabelPolicy();
     }
+  }
+
+  private loadAsset(url: string) {
+    this.uploadService.load(`/iam/${url}`);
   }
 
   public removePolicy(): void {
