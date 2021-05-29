@@ -303,7 +303,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       case PolicyComponentServiceType.ADMIN:
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
-        console.log(req.toObject());
         (this.service as AdminService).updateLabelPolicy(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
@@ -322,7 +321,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setPrimaryColor(this.previewData.primaryColorDark);
+    req.setPrimaryColorDark(this.previewData.primaryColorDark);
     req.setPrimaryColor(this.previewData.primaryColor);
     req.setWarnColorDark(this.previewData.warnColorDark);
     req.setWarnColor(this.previewData.warnColor);
