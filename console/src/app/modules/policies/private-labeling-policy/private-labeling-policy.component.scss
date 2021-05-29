@@ -3,6 +3,13 @@
   margin-top: 0;
 }
 
+.desc {
+  font-size: 14px;
+  color: var(--grey);
+  max-width: 800px;
+  margin-bottom: 2rem;
+}
+
 .spinner-wr {
   margin: .5rem 0;
 }
@@ -46,6 +53,7 @@
 }
 
 @import '~@angular/material/theming';
+@import './preview/preview.component.scss';
 
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
@@ -54,11 +62,70 @@
   $warn: map-get($theme, warn);
   $warn-color: mat-color($warn, 500);
 
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+
+    .activate-button {
+      border-radius: 50%;
+      background-color: if($is-dark-theme, #ffffff, #000000);
+      color: if($is-dark-theme, #000000, #ffffff);
+      align-self: flex-end;
+    }
+
+    .theme-changer {
+      display: flex;
+      margin: 0 -0.25rem;
+
+      button {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        border: 1px solid #81868a50;
+        margin: 0 .25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .icon {
+          visibility: hidden;
+        }
+      }
+      .dark {
+        background-color: black;
+
+        &.active {
+          transform: scale(1.1);
+
+          .icon {
+            visibility: visible;
+            color: white;
+          }
+        }
+      }
+
+      .light {
+        background-color: white;
+
+        &.active {
+          transform: scale(1.1);
+
+          .icon {
+            visibility: visible;
+            color: black;
+          }
+        }
+      }
+    }
+  }
+
   .content {
     padding-top: 1rem;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1000px;
 
     .settings {
       max-width: 400px;
@@ -248,12 +315,26 @@
           top: .5rem;
           left: .5rem;
           border-radius: 10px !important;
+
+          span {
+            color: if($is-dark-theme, #ffffff50, #00000050);
+          }
+
+          .strong {
+            color: if($is-dark-theme, #ffffff, #000000);
+            font-weight: bold;
+            font-size: 18px;
+          }
         }
 
-        .activate-button {
-          border-radius: 50%;
-          background-color: if($is-dark-theme, #ffffff, #000000);
-          color: if($is-dark-theme, #000000, #ffffff);
+        .prev {
+          &.dark {
+            @include private-label-preview-theme($dark-theme);
+          }
+
+          &.light {
+            @include private-label-preview-theme($light-theme);
+          }
         }
       }
     }

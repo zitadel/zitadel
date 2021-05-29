@@ -68,6 +68,16 @@ import {
   RemoveIDPFromLoginPolicyResponse,
   RemoveIDPRequest,
   RemoveIDPResponse,
+  RemoveLabelPolicyFontRequest,
+  RemoveLabelPolicyFontResponse,
+  RemoveLabelPolicyIconDarkRequest,
+  RemoveLabelPolicyIconDarkResponse,
+  RemoveLabelPolicyIconRequest,
+  RemoveLabelPolicyIconResponse,
+  RemoveLabelPolicyLogoDarkRequest,
+  RemoveLabelPolicyLogoDarkResponse,
+  RemoveLabelPolicyLogoRequest,
+  RemoveLabelPolicyLogoResponse,
   RemoveMultiFactorFromLoginPolicyRequest,
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveSecondFactorFromLoginPolicyRequest,
@@ -294,6 +304,36 @@ export class AdminService {
     Promise<ActivateLabelPolicyResponse.AsObject> {
     const req = new ActivateLabelPolicyRequest();
     return this.grpcService.admin.activateLabelPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyFont():
+    Promise<RemoveLabelPolicyFontResponse.AsObject> {
+    const req = new RemoveLabelPolicyFontRequest();
+    return this.grpcService.admin.removeLabelPolicyFont(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyIcon():
+    Promise<RemoveLabelPolicyIconResponse.AsObject> {
+    const req = new RemoveLabelPolicyIconRequest();
+    return this.grpcService.admin.removeLabelPolicyIcon(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyIconDark():
+    Promise<RemoveLabelPolicyIconDarkResponse.AsObject> {
+    const req = new RemoveLabelPolicyIconDarkRequest();
+    return this.grpcService.admin.removeLabelPolicyIconDark(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyLogo():
+    Promise<RemoveLabelPolicyLogoResponse.AsObject> {
+    const req = new RemoveLabelPolicyLogoRequest();
+    return this.grpcService.admin.removeLabelPolicyLogo(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyLogoDark():
+    Promise<RemoveLabelPolicyLogoDarkResponse.AsObject> {
+    const req = new RemoveLabelPolicyLogoDarkRequest();
+    return this.grpcService.admin.removeLabelPolicyLogoDark(req, null).then(resp => resp.toObject());
   }
 
   /* login */

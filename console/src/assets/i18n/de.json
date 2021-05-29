@@ -638,12 +638,14 @@
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "PREVIEW_DESCRIPTION":"Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar. Um die Preview zu Testen muss dem login flow der scope 'x-preview' mitgegeben werden.",
       "BTN":"Datei auswählen",
       "ACTIVATEPREVIEW":"Konfiguration übernehmen",
       "DARK":"Dunkler Modus",
       "LIGHT":"Heller Modus",
       "CHANGEVIEW":"Ansicht wechseln",
-      "ACTIVATED":"Richtlinie wurde LIVE geschaltet"
+      "ACTIVATED":"Richtlinie wurde LIVE geschaltet",
+      "THEME":"Modus"
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",

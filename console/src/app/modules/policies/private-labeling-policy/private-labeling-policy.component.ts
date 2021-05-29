@@ -24,7 +24,7 @@ import { CnslLinks } from '../../links/links.component';
 import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
-enum Theme {
+export enum Theme {
   DARK,
   LIGHT,
 }
@@ -217,6 +217,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (data.policy) {
         this.previewData = data.policy;
         this.loading = false;
+
+        if (this.previewData.logoUrlDark) {
+          this.loadAsset(this.previewData.logoUrlDark);
+        }
+        if (this.previewData.iconUrlDark) {
+          this.loadAsset(this.previewData.iconUrlDark);
+        }
+        if (this.previewData.logoUrl) {
+          this.loadAsset(this.previewData.logoUrl);
+        }
+        if (this.previewData.iconUrl) {
+          this.loadAsset(this.previewData.iconUrl);
+        }
       }
     }).catch(error => {
       this.toast.showError(error);
@@ -264,6 +277,17 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
+  private loadAsset(url: string): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.ADMIN:
+        this.uploadService.load(`/iam/${url}`);
+        break;
+      case PolicyComponentServiceType.MGMT:
+        this.uploadService.load(`/org/${url}`);
+        break;
+    }
+  }
+
   public removePolicy(): void {
     if (this.service instanceof ManagementService) {
       this.service.resetPasswordComplexityPolicyToDefault().then(() => {
@@ -303,7 +327,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       case PolicyComponentServiceType.ADMIN:
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
-        console.log(req.toObject());
         (this.service as AdminService).updateLabelPolicy(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
@@ -322,7 +345,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setPrimaryColor(this.previewData.primaryColorDark);
+    req.setBackgroundColorDark(this.previewData.backgroundColorDark);
+    req.setBackgroundColor(this.previewData.backgroundColor);
+
+    req.setPrimaryColorDark(this.previewData.primaryColorDark);
     req.setPrimaryColor(this.previewData.primaryColor);
     req.setWarnColorDark(this.previewData.warnColorDark);
     req.setWarnColor(this.previewData.warnColor);
@@ -332,6 +358,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public activatePolicy(): Promise<any> {
+    // dialog warning
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).activateCustomLabelPolicy().then(() => {
@@ -346,5 +373,13 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
           this.toast.showError(error);
         });
     }
+  }
+
+  public resetPolicy(): Promise<any> {
+    return (this.service as ManagementService).resetLabelPolicyToDefault().then(() => {
+      this.toast.showInfo('POLICY.PRIVATELABELING.RESET', true);
+    }).catch(error => {
+      this.toast.showError(error);
+    });
   }
 }

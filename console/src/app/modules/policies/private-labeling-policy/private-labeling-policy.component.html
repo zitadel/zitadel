@@ -1,6 +1,7 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.PRIVATELABELING.TITLE' | translate" [description]="'POLICY.PRIVATELABELING.DESCRIPTION' | translate">
 
+    <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
     <div class="spinner-wr">
@@ -14,14 +15,23 @@
         </button>
     </ng-template>
 
-    <div class="theme-changer">
-      <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light" [ngClass]="{'active': theme === Theme.LIGHT}" >
-        <mat-icon class="icon">check</mat-icon>
+    <div class="top-row">
+      <div>
+        <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
+        <div class="theme-changer">
+          <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light" [ngClass]="{'active': theme === Theme.LIGHT}" >
+            <mat-icon class="icon">edit</mat-icon>
+          </button>
+          <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark" [ngClass]="{'active': theme === Theme.DARK}" >
+            <mat-icon class="icon">edit</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <button class="activate-button" mat-raised-button (click)="activatePolicy()">
+        {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
       </button>
-      <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark" [ngClass]="{'active': theme === Theme.DARK}" >
-        <mat-icon class="icon">check</mat-icon>
-      </button>
-    </div>
+  </div>
 
     <div *ngIf="previewData && data" class="content">
   
@@ -85,11 +95,15 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event" name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark = $event" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event; savePolicy()"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+              </div>
+
+              <div class="color">
+                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark =  $event; savePolicy()" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -97,11 +111,15 @@
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColor= $event" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.backgroundColor = $event; savePolicy()"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor = $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+                <cnsl-color (previewChanged)="previewData.primaryColor = $event; savePolicy()" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+              </div>
+
+              <div class="color">
+                <cnsl-color [warn]="true" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event; savePolicy()" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -132,17 +150,6 @@
                   <span class="desc">{{isHoveringOverFont ? 'Release': 'Drop your Logo here'}}</span>
                 </label>
             </div>
-            <!-- <cnsl-form-field class="formfield">
-              <cnsl-label>CSS Rule for font-family</cnsl-label>
-              <input cnslInput [(ngModel)]="fontCssRule" />
-            </cnsl-form-field>
-            <div class="font-selector">
-              <button matTooltip="{{f.name}}" *ngFor="let f of fonts" class="font"
-                [ngClass]="{'active': fontCssRule == f.css}" [style.font-family]="f.css"
-                (click)="fontCssRule = f.css">
-                Aa
-            </button>
-            </div> -->
         </div>
         </mat-expansion-panel>
 
@@ -156,11 +163,11 @@
           </mat-expansion-panel-header>
           <div class="adv-container" *ngIf="previewData">
           <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
-            [(ngModel)]="previewData.hideLoginNameSuffix">
+            [(ngModel)]="previewData.hideLoginNameSuffix" (change)="savePolicy()">
             {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
         </mat-slide-toggle>
         <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
-            [(ngModel)]="previewData.disableWatermark">
+            [(ngModel)]="previewData.disableWatermark" (change)="savePolicy()">
             {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
         </mat-slide-toggle>
       </div>
@@ -171,22 +178,13 @@
         <!-- <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview> -->
         <div class="col">
           <button color="primary" mat-raised-button class="preview-changer" (click)="preview = preview == Preview.PREVIEW ? Preview.CURRENT : Preview.PREVIEW" matTooltip="{{'POLICY.PRIVATELABELING.CHANGEVIEW' | translate}}" [ngClass]="{'active': preview === Preview.PREVIEW}" >
-            <span>P / C</span>
+            <span><span [ngClass]="{'strong': preview == Preview.PREVIEW}">P</span> / <span [ngClass]="{'strong': preview == Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
-
-          <button class="activate-button" mat-raised-button (click)="activatePolicy()">
-            {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
-          </button>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
         </div>
       </div>
-    </div>
-
-    <div class="btn-container">
-        <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
-            }}</button>
     </div>
 
     <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
