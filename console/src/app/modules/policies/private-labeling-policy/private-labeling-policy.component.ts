@@ -24,7 +24,7 @@ import { CnslLinks } from '../../links/links.component';
 import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
-enum Theme {
+export enum Theme {
   DARK,
   LIGHT,
 }
@@ -326,6 +326,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
+    req.setBackgroundColorDark(this.previewData.backgroundColorDark);
+    req.setBackgroundColor(this.previewData.backgroundColor);
+
     req.setPrimaryColorDark(this.previewData.primaryColorDark);
     req.setPrimaryColor(this.previewData.primaryColor);
     req.setWarnColorDark(this.previewData.warnColorDark);

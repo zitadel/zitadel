@@ -1,19 +1,16 @@
 <div class="preview" *ngIf="policy">
   <span class="label">{{label}}</span>
   <!--  [style.font-family]="policy.fontCssRule" -->
-  <div class="dashed">
+  <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}" [style.background]="theme == Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper">
-      <img *ngIf="logoURL; else defaultDarkLogo" class="light" [src]="logoURL" alt="logo-mock" />
-      <ng-template #defaultDarkLogo>
-        <img class="light" src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
-      </ng-template>
+      <img *ngIf="logoURL && theme == Theme.LIGHT" [src]="logoURL" alt="logo-mock" />
+      <img *ngIf="!logoURL && theme == Theme.LIGHT" src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
     
-      <img *ngIf="logoURL; else defaultLightLogo" class="dark" [src]="logoURL" alt="logo-mock" />
-      <ng-template #defaultLightLogo>
-        <img class="dark" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
-      </ng-template>
+      <img *ngIf="logoURL && theme == Theme.DARK" [src]="logoURL" alt="logo-mock" />
+      <img *ngIf="!logoURL && theme == Theme.DARK" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
+
       <h1>Anmeldung</h1>
-      <p class="desc">mit ZITADEL Konto anmelden</p>
+      <p class="desc-text">mit ZITADEL Konto anmelden</p>
       <cnsl-form-field class="formfield">
         <cnsl-label>Loginname</cnsl-label>
         <input cnslInput value="road.runner"/>
@@ -21,8 +18,8 @@
 
       <div class="btn-wrapper">
         <button mat-stroked-button>cancel</button>
-        <button class="dark" mat-raised-button [style.background]="policy.primaryColorDark" [style.color]="policy.primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
-        <button class="light" mat-raised-button [style.background]="policy.primaryColor" [style.color]="policy.primaryColor == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+        <button *ngIf="theme == Theme.DARK" mat-raised-button [style.background]="policy.primaryColorDark" [style.color]="policy.primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+        <button *ngIf="theme == Theme.LIGHT" mat-raised-button [style.background]="policy.primaryColor" [style.color]="policy.primaryColor == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
       </div>
     </div>
   </div>

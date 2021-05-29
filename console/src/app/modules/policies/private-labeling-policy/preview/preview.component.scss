@@ -2,21 +2,9 @@
 
 @mixin private-label-preview-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
-
-  .dashed {
-    img,
-    .btn-wrapper {
-      &.light,
-      .light {
-        display: if($is-dark-theme, none, block);
-      }
-
-      &.dark,
-      .dark {
-        display: if($is-dark-theme, block, none);
-      }
-    }
-  }
+  @include angular-material-color($theme);
+  @include angular-material-color($theme);
+  @include cnsl-form-field-theme($theme);
 }
 
 .preview {
@@ -55,10 +43,6 @@
 
       h1 {
         font-size: 20px;
-      }
-
-      .desc {
-        color: inherit;
       }
 
       .formfield {

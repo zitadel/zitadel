@@ -95,6 +95,10 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
+                <cnsl-color (previewChanged)="previewData.backgroundColorDark = $event; changeColor(previewData.backgroundColorDark, $event)"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
+              </div>
+
+              <div class="color">
                 <cnsl-color (previewChanged)="previewData.primaryColorDark = $event; changeColor(previewData.primaryColorDark, $event)"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
               </div>
 
@@ -106,6 +110,10 @@
 
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
+              <div class="color">
+                <cnsl-color (previewChanged)="previewData.backgroundColor = $event; changeColor(previewData.backgroundColor, $event)"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
+              </div>
+
               <div class="color">
                 <cnsl-color (previewChanged)="previewData.primaryColor = $event; changeColor(previewData.primaryColor, $event)" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
               </div>
@@ -173,8 +181,8 @@
             <span><span [ngClass]="{'strong': preview == Preview.PREVIEW}">P</span> / <span [ngClass]="{'strong': preview == Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" class="prev" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
         </div>
       </div>
     </div>

@@ -15,6 +15,7 @@
 }
 
 @import '~@angular/material/theming';
+@import './preview/preview.component.scss';
 
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
@@ -285,6 +286,16 @@
             color: if($is-dark-theme, #ffffff, #000000);
             font-weight: bold;
             font-size: 18px;
+          }
+        }
+
+        .prev {
+          &.dark {
+            @include private-label-preview-theme($dark-theme);
+          }
+
+          &.light {
+            @include private-label-preview-theme($light-theme);
           }
         }
       }
