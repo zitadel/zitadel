@@ -3,6 +3,16 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
+import {
+  RemoveLabelPolicyFontRequest,
+  RemoveLabelPolicyFontResponse,
+  RemoveLabelPolicyIconDarkRequest,
+  RemoveLabelPolicyIconDarkResponse,
+  RemoveLabelPolicyIconRequest,
+  RemoveLabelPolicyIconResponse,
+  RemoveLabelPolicyLogoDarkRequest,
+  RemoveLabelPolicyLogoDarkResponse,
+} from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -202,6 +212,8 @@ import {
   RemoveAppKeyResponse,
   RemoveAppRequest,
   RemoveAppResponse,
+  RemoveCustomLabelPolicyLogoRequest,
+  RemoveCustomLabelPolicyLogoResponse,
   RemoveHumanAuthFactorOTPRequest,
   RemoveHumanAuthFactorOTPResponse,
   RemoveHumanAuthFactorU2FRequest,
@@ -742,8 +754,9 @@ export class ManagementService {
     return this.grpcService.mgmt.updateCustomLabelPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public resetLabelPolicyToDefault(req: ResetLabelPolicyToDefaultRequest):
+  public resetLabelPolicyToDefault():
     Promise<ResetLabelPolicyToDefaultResponse.AsObject> {
+    const req = new ResetLabelPolicyToDefaultRequest();
     return this.grpcService.mgmt.resetLabelPolicyToDefault(req, null).then(resp => resp.toObject());
   }
 
@@ -765,6 +778,36 @@ export class ManagementService {
     Promise<ActivateCustomLabelPolicyResponse.AsObject> {
     const req = new ActivateCustomLabelPolicyRequest();
     return this.grpcService.mgmt.activateCustomLabelPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyFont():
+    Promise<RemoveLabelPolicyFontResponse.AsObject> {
+    const req = new RemoveLabelPolicyFontRequest();
+    return this.grpcService.admin.removeLabelPolicyFont(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyIcon():
+    Promise<RemoveLabelPolicyIconResponse.AsObject> {
+    const req = new RemoveLabelPolicyIconRequest();
+    return this.grpcService.admin.removeLabelPolicyIcon(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyIconDark():
+    Promise<RemoveLabelPolicyIconDarkResponse.AsObject> {
+    const req = new RemoveLabelPolicyIconDarkRequest();
+    return this.grpcService.admin.removeLabelPolicyIconDark(req, null).then(resp => resp.toObject());
+  }
+
+  public removeCustomLabelPolicyLogo():
+    Promise<RemoveCustomLabelPolicyLogoResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyLogoRequest();
+    return this.grpcService.mgmt.removeCustomLabelPolicyLogo(req, null).then(resp => resp.toObject());
+  }
+
+  public removeLabelPolicyLogoDark():
+    Promise<RemoveLabelPolicyLogoDarkResponse.AsObject> {
+    const req = new RemoveLabelPolicyLogoDarkRequest();
+    return this.grpcService.admin.removeLabelPolicyLogoDark(req, null).then(resp => resp.toObject());
   }
 
   public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {

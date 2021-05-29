@@ -346,4 +346,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
     }
   }
+
+  public resetPolicy(): Promise<any> {
+    return (this.service as ManagementService).resetLabelPolicyToDefault().then(() => {
+      this.toast.showInfo('POLICY.PRIVATELABELING.RESET', true);
+    }).catch(error => {
+      this.toast.showError(error);
+    });
+  }
 }
