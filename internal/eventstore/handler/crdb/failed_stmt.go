@@ -30,7 +30,7 @@ func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt handler.Statement, 
 }
 
 func (h *StatementHandler) failureCount(tx *sql.Tx, seq uint64) (count uint, err error) {
-	row := tx.QueryRow(h.failureCountStmt, h.projectionName, seq)
+	row := tx.QueryRow(h.failureCountStmt, h.ProjectionName, seq)
 	if err = row.Err(); err != nil {
 		return 0, err
 	}
@@ -39,6 +39,6 @@ func (h *StatementHandler) failureCount(tx *sql.Tx, seq uint64) (count uint, err
 }
 
 func (h *StatementHandler) setFailureCount(tx *sql.Tx, seq uint64, count uint, err error) error {
-	_, dbErr := tx.Exec(h.setFailureCountStmt, h.projectionName, seq, count, err.Error())
+	_, dbErr := tx.Exec(h.setFailureCountStmt, h.ProjectionName, seq, count, err.Error())
 	return dbErr
 }

@@ -27,9 +27,10 @@ type SearchQuery func() (query *eventstore.SearchQueryBuilder, queryLimit uint64
 
 type ProjectionHandler struct {
 	Handler
-	RequeueAfter  time.Duration
-	Timer         *time.Timer
-	SequenceTable string
+	RequeueAfter time.Duration
+	Timer        *time.Timer
+
+	ProjectionName string
 
 	lockMu     sync.Mutex
 	stmts      []Statement
@@ -38,20 +39,34 @@ type ProjectionHandler struct {
 }
 
 func NewProjectionHandler(
-	eventstore *eventstore.Eventstore,
+	es *eventstore.Eventstore,
 	requeueAfter time.Duration,
+	projectionName string,
 ) *ProjectionHandler {
-	return &ProjectionHandler{
-		Handler:      NewHandler(eventstore),
-		RequeueAfter: requeueAfter,
+	h := &ProjectionHandler{
+		Handler:        NewHandler(es),
+		ProjectionName: projectionName,
+		RequeueAfter:   requeueAfter,
 		// first bulk is instant on startup
-		Timer:      time.NewTimer(0),
+		Timer:      time.NewTimer(1 * time.Second),
 		shouldPush: make(chan *struct{}, 1),
 	}
+
+	if requeueAfter <= 0 {
+		if !h.Timer.Stop() {
+			<-h.Timer.C
+		}
+		logging.LogWithFields("HANDL-fAC5O", "projection", projectionName).Debug("starting handler without requeue")
+		return h
+	}
+	logging.LogWithFields("HANDL-fAC5O", "projection", projectionName).Debug("starting handler")
+	return h
 }
 
 func (h *ProjectionHandler) ResetTimer() {
-	h.Timer.Reset(h.RequeueAfter)
+	if h.RequeueAfter > 0 {
+		h.Timer.Reset(h.RequeueAfter)
+	}
 }
 
 //Process waits for several conditions:

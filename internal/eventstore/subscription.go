@@ -32,10 +32,6 @@ func SubscribeAggregates(eventQueue chan<- EventReader, aggregates ...AggregateT
 	defer subsMutext.Unlock()
 
 	for _, aggregate := range aggregates {
-		_, ok := subscriptions[aggregate]
-		if !ok {
-			subscriptions[aggregate] = make([]*Subscription, 0, 1)
-		}
 		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
 	}
 
@@ -55,10 +51,6 @@ func SubscribeEventTypes(eventQueue chan<- EventReader, types map[AggregateType]
 	defer subsMutext.Unlock()
 
 	for _, aggregate := range aggregates {
-		_, ok := subscriptions[aggregate]
-		if !ok {
-			subscriptions[aggregate] = make([]*Subscription, 0, 1)
-		}
 		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
 	}
 
@@ -76,10 +68,12 @@ func notify(events []EventReader) {
 		}
 		for _, sub := range subs {
 			eventTypes := sub.types[event.Aggregate().Typ]
+			//subscription for all events
 			if len(eventTypes) == 0 {
 				sub.Events <- event
 				continue
 			}
+			//subscription for certain events
 			for _, eventType := range eventTypes {
 				if event.Type() == eventType {
 					sub.Events <- event

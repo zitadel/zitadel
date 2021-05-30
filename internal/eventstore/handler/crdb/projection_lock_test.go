@@ -9,6 +9,7 @@ import (
 	"time"
 
 	z_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/handler"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )
@@ -82,10 +83,12 @@ func TestStatementHandler_handleLock(t *testing.T) {
 				t.Fatal(err)
 			}
 			h := &StatementHandler{
-				projectionName: projectionName,
-				client:         client,
-				workerName:     workerName,
-				lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: projectionName,
+				},
+				client:     client,
+				workerName: workerName,
+				lockStmt:   fmt.Sprintf(lockStmtFormat, lockTable),
 			}
 
 			for _, expectation := range tt.want.expectations {
@@ -171,10 +174,12 @@ func TestStatementHandler_renewLock(t *testing.T) {
 				t.Fatal(err)
 			}
 			h := &StatementHandler{
-				projectionName: projectionName,
-				client:         client,
-				workerName:     workerName,
-				lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: projectionName,
+				},
+				client:     client,
+				workerName: workerName,
+				lockStmt:   fmt.Sprintf(lockStmtFormat, lockTable),
 			}
 
 			for _, expectation := range tt.want.expectations {
@@ -233,10 +238,12 @@ func TestStatementHandler_Unlock(t *testing.T) {
 				t.Fatal(err)
 			}
 			h := &StatementHandler{
-				projectionName: projectionName,
-				client:         client,
-				workerName:     workerName,
-				lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: projectionName,
+				},
+				client:     client,
+				workerName: workerName,
+				lockStmt:   fmt.Sprintf(lockStmtFormat, lockTable),
 			}
 
 			for _, expectation := range tt.want.expectations {

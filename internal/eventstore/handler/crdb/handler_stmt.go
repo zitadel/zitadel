@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
@@ -18,32 +19,38 @@ var (
 )
 
 type StatementHandler struct {
-	projectionName string
-	sequenceTable  string
-	client         *sql.DB
-	eventstore     *eventstore.Eventstore
-	aggregates     []eventstore.AggregateType
-	eventTypes     []eventstore.EventType
+	*handler.ProjectionHandler
 
-	workerName string
-	bulkLimit  uint64
-
+	client              *sql.DB
+	sequenceTable       string
 	maxFailureCount     uint
 	failureCountStmt    string
 	setFailureCountStmt string
 	lockStmt            string
+
+	aggregates []eventstore.AggregateType
+	eventTypes []eventstore.EventType
+	reduces    map[string]handler.Reduce
+
+	workerName string
+	bulkLimit  uint64
 }
 
 func NewStatementHandler(
-	client *sql.DB,
+	ctx context.Context,
+
 	es *eventstore.Eventstore,
+	requeueAfter time.Duration,
+
+	client *sql.DB,
 	projectionName,
 	sequenceTable,
-	failedEventsTable,
-	lockTable string,
+	lockTable,
+	failedEventsTable string,
+	maxFailureCount uint,
+
 	bulkLimit uint64,
-	aggregates []eventstore.AggregateType,
-	eventTypes []eventstore.EventType,
+	reducers []handler.EventReducer,
 ) StatementHandler {
 	workerName, err := os.Hostname()
 	if err != nil || workerName == "" {
@@ -51,19 +58,44 @@ func NewStatementHandler(
 		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
 	}
 
-	return StatementHandler{
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(reducers))
+	eventTypes := make([]eventstore.EventType, 0, len(reducers))
+	reduces := make(map[string]handler.Reduce, len(reducers))
+	subscriptionTopics := make(map[eventstore.AggregateType][]eventstore.EventType)
+	for _, reducer := range reducers {
+		aggregateTypes = append(aggregateTypes, reducer.Aggregate)
+		eventTypes = append(eventTypes, reducer.Event)
+		reduces[string(reducer.Aggregate)+"."+string(reducer.Event)] = reducer.Reduce
+		subscriptionTopics[reducer.Aggregate] = append(subscriptionTopics[reducer.Aggregate], reducer.Event)
+	}
+
+	h := StatementHandler{
+		ProjectionHandler:   handler.NewProjectionHandler(es, requeueAfter, projectionName),
 		client:              client,
-		eventstore:          es,
-		projectionName:      projectionName,
 		sequenceTable:       sequenceTable,
+		maxFailureCount:     maxFailureCount,
 		failureCountStmt:    fmt.Sprintf(failureCountStmtFormat, failedEventsTable),
 		setFailureCountStmt: fmt.Sprintf(setFailureCountStmtFormat, failedEventsTable),
 		lockStmt:            fmt.Sprintf(lockStmtFormat, lockTable),
+		aggregates:          aggregateTypes,
+		eventTypes:          eventTypes,
+		reduces:             reduces,
 		workerName:          workerName,
 		bulkLimit:           bulkLimit,
-		aggregates:          aggregates,
-		eventTypes:          eventTypes,
 	}
+
+	go h.ProjectionHandler.Process(
+		ctx,
+		h.reduce,
+		h.Update,
+		h.Lock,
+		h.Unlock,
+		h.SearchQuery,
+	)
+
+	h.ProjectionHandler.Handler.SubscribeEvents(subscriptionTopics)
+
+	return h
 }
 
 func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64, error) {
@@ -138,7 +170,7 @@ func (h *StatementHandler) fetchPreviousStmts(
 ) (previousStmts []handler.Statement, err error) {
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(currentSeq).SequenceLess(stmtSeq)
-	events, err := h.eventstore.FilterEvents(ctx, query)
+	events, err := h.Eventstore.FilterEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +225,7 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt handler.Statement) error
 	if err != nil {
 		return err
 	}
-	err = stmt.Execute(tx, h.projectionName)
+	err = stmt.Execute(tx, h.ProjectionName)
 	if err != nil {
 		_, rollbackErr := tx.Exec("ROLLBACK TO SAVEPOINT push_stmt")
 		if rollbackErr != nil {
@@ -213,7 +245,7 @@ SELECT
 		(SELECT current_sequence FROM seq),
 		0 AS current_sequence
 	) 
-FROM seq`, h.projectionName)
+FROM seq`, h.ProjectionName)
 	if row.Err() != nil {
 		return 0, row.Err()
 	}
@@ -226,7 +258,7 @@ FROM seq`, h.projectionName)
 }
 
 func (h *StatementHandler) updateCurrentSequence(tx *sql.Tx, stmt handler.Statement) error {
-	res, err := tx.Exec(`UPSERT INTO `+h.sequenceTable+` (view_name, current_sequence, timestamp) VALUES ($1, $2, NOW())`, h.projectionName, stmt.Sequence)
+	res, err := tx.Exec(`UPSERT INTO `+h.sequenceTable+` (view_name, current_sequence, timestamp) VALUES ($1, $2, NOW())`, h.ProjectionName, stmt.Sequence)
 	if err != nil {
 		return err
 	}

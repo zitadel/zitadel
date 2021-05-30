@@ -14,14 +14,14 @@ import (
 )
 
 var (
-	QueryErr  = errors.New("query err")
-	FilterErr = errors.New("filter err")
-	ReduceErr = errors.New("reduce err")
-	LockErr   = errors.New("lock failed")
-	UnlockErr = errors.New("unlock failed")
-	ExecErr   = errors.New("exec error")
-	BulkErr   = errors.New("bulk err")
-	UpdateErr = errors.New("update err")
+	ErrQuery  = errors.New("query err")
+	ErrFilter = errors.New("filter err")
+	ErrReduce = errors.New("reduce err")
+	ErrLock   = errors.New("lock failed")
+	ErrUnlock = errors.New("unlock failed")
+	ErrExec   = errors.New("exec error")
+	ErrBulk   = errors.New("bulk err")
+	ErrUpdate = errors.New("update err")
 )
 
 func newTestStatement(seq, previousSeq uint64) Statement {
@@ -60,11 +60,11 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 				shouldPush: nil,
 			},
 			args: args{
-				reduce: testReduceErr(ReduceErr),
+				reduce: testReduceErr(ErrReduce),
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, ReduceErr)
+					return errors.Is(err, ErrReduce)
 				},
 				stmts: nil,
 			},
@@ -111,12 +111,15 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &ProjectionHandler{
-				lockMu:     sync.Mutex{},
-				stmts:      tt.fields.stmts,
-				pushSet:    tt.fields.pushSet,
-				shouldPush: tt.fields.shouldPush,
-			}
+			h := NewProjectionHandler(
+				nil,
+				-1,
+				"",
+			)
+			h.stmts = tt.fields.stmts
+			h.pushSet = tt.fields.pushSet
+			h.shouldPush = tt.fields.shouldPush
+
 			err := h.processEvent(tt.args.ctx, tt.args.event, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error %v", err)
@@ -151,14 +154,14 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 			name: "query returns err",
 			args: args{
 				ctx:    context.Background(),
-				query:  testQuery(nil, 0, QueryErr),
+				query:  testQuery(nil, 0, ErrQuery),
 				reduce: testReduce(),
 			},
 			fields: fields{},
 			want: want{
 				shouldLimitExeeded: false,
 				isErr: func(err error) bool {
-					return errors.Is(err, QueryErr)
+					return errors.Is(err, ErrQuery)
 				},
 			},
 		},
@@ -171,13 +174,13 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
-					es_repo_mock.NewRepo(t).ExpectFilterEventsError(FilterErr),
+					es_repo_mock.NewRepo(t).ExpectFilterEventsError(ErrFilter),
 				),
 			},
 			want: want{
 				shouldLimitExeeded: false,
 				isErr: func(err error) bool {
-					return errors.Is(err, FilterErr)
+					return errors.Is(err, ErrFilter)
 				},
 			},
 		},
@@ -465,7 +468,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				ctx:         context.Background(),
 				executeBulk: &executeBulkMock{},
 				lock: &lockMock{
-					firstErr: LockErr,
+					firstErr: ErrLock,
 					errWait:  time.Duration(500 * time.Millisecond),
 				},
 				unlock: &unlockMock{},
@@ -475,7 +478,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				executeBulkCount: 0,
 				unlockCount:      0,
 				isErr: func(err error) bool {
-					return errors.Is(err, LockErr)
+					return errors.Is(err, ErrLock)
 				},
 			},
 		},
@@ -489,7 +492,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 					errWait: time.Duration(500 * time.Millisecond),
 				},
 				unlock: &unlockMock{
-					err: UnlockErr,
+					err: ErrUnlock,
 				},
 			},
 			res: res{
@@ -497,7 +500,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				executeBulkCount: 1,
 				unlockCount:      1,
 				isErr: func(err error) bool {
-					return errors.Is(err, UnlockErr)
+					return errors.Is(err, ErrUnlock)
 				},
 			},
 		},
@@ -558,7 +561,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				},
 				lock: &lockMock{
 					firstErr: nil,
-					err:      LockErr,
+					err:      ErrLock,
 					errWait:  time.Duration(100 * time.Millisecond),
 					canceled: make(chan bool, 1),
 				},
@@ -582,7 +585,7 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				ctx: context.Background(),
 				executeBulk: &executeBulkMock{
 					canceled:      make(chan bool, 1),
-					err:           BulkErr,
+					err:           ErrBulk,
 					waitForCancel: false,
 				},
 				lock: &lockMock{
@@ -601,16 +604,14 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				executeBulkCount: 1,
 				unlockCount:      1,
 				isErr: func(err error) bool {
-					return errors.Is(err, BulkErr)
+					return errors.Is(err, ErrBulk)
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &ProjectionHandler{
-				RequeueAfter: time.Duration(0),
-			}
+			h := NewProjectionHandler(nil, -1, "")
 			err := h.bulk(tt.args.ctx, tt.args.lock.lock(), tt.args.executeBulk.executeBulk(), tt.args.unlock.unlock())
 			if !tt.res.isErr(err) {
 				t.Errorf("unexpected error %v", err)
@@ -701,7 +702,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 				shouldPush: make(chan *struct{}, 1),
 			},
 			args: args{
-				update: testUpdate(t, 2, UpdateErr),
+				update: testUpdate(t, 2, ErrUpdate),
 				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
 				reduce: testReduce(
 					newTestStatement(2, 1),
@@ -710,7 +711,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, UpdateErr)
+					return errors.Is(err, ErrUpdate)
 				},
 			},
 		},
@@ -764,12 +765,11 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &ProjectionHandler{
-				Handler:       tt.fields.Handler,
-				SequenceTable: tt.fields.SequenceTable,
-				lockMu:        sync.Mutex{},
-				stmts:         tt.fields.stmts,
-				pushSet:       tt.fields.pushSet,
-				shouldPush:    tt.fields.shouldPush,
+				Handler:    tt.fields.Handler,
+				lockMu:     sync.Mutex{},
+				stmts:      tt.fields.stmts,
+				pushSet:    tt.fields.pushSet,
+				shouldPush: tt.fields.shouldPush,
 			}
 			execBulk := h.prepareExecuteBulk(tt.args.query, tt.args.reduce, tt.args.update)
 			err := execBulk(tt.args.ctx)
