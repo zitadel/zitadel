@@ -28,10 +28,12 @@ type OPHandlerConfig struct {
 }
 
 type StorageConfig struct {
-	DefaultLoginURL            string
-	SigningKeyAlgorithm        string
-	DefaultAccessTokenLifetime types.Duration
-	DefaultIdTokenLifetime     types.Duration
+	DefaultLoginURL                   string
+	SigningKeyAlgorithm               string
+	DefaultAccessTokenLifetime        types.Duration
+	DefaultIdTokenLifetime            types.Duration
+	DefaultRefreshTokenIdleExpiration types.Duration
+	DefaultRefreshTokenExpiration     types.Duration
 }
 
 type EndpointConfig struct {
@@ -49,13 +51,15 @@ type Endpoint struct {
 }
 
 type OPStorage struct {
-	repo                       repository.Repository
-	command                    *command.Commands
-	query                      *query.Queries
-	defaultLoginURL            string
-	defaultAccessTokenLifetime time.Duration
-	defaultIdTokenLifetime     time.Duration
-	signingKeyAlgorithm        string
+	repo                              repository.Repository
+	command                           *command.Commands
+	query                             *query.Queries
+	defaultLoginURL                   string
+	defaultAccessTokenLifetime        time.Duration
+	defaultIdTokenLifetime            time.Duration
+	signingKeyAlgorithm               string
+	defaultRefreshTokenIdleExpiration time.Duration
+	defaultRefreshTokenExpiration     time.Duration
 }
 
 func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig *crypto.KeyConfig, localDevMode bool) op.OpenIDProvider {
@@ -69,6 +73,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	}
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
 	config.OPConfig.CodeMethodS256 = true
+	config.OPConfig.GrantTypeRefreshToken = true
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	provider, err := op.NewOpenIDProvider(
 		ctx,
@@ -94,13 +99,15 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 
 func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository) *OPStorage {
 	return &OPStorage{
-		repo:                       repo,
-		command:                    command,
-		query:                      query,
-		defaultLoginURL:            config.DefaultLoginURL,
-		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
-		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime.Duration,
-		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime.Duration,
+		repo:                              repo,
+		command:                           command,
+		query:                             query,
+		defaultLoginURL:                   config.DefaultLoginURL,
+		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
+		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime.Duration,
+		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime.Duration,
+		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration.Duration,
+		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration.Duration,
 	}
 }
 

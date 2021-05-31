@@ -2953,6 +2953,7 @@ message AddOIDCAppRequest {
     bool id_token_role_assertion = 13;
     bool id_token_userinfo_assertion = 14;
     google.protobuf.Duration clock_skew = 15 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
+    repeated string additional_origins = 16;
 }
 
 message AddOIDCAppResponse {
@@ -3023,6 +3024,7 @@ message UpdateOIDCAppConfigRequest {
     bool id_token_role_assertion = 12;
     bool id_token_userinfo_assertion = 13;
     google.protobuf.Duration clock_skew = 14 [(validate.rules).duration = {gte: {}, lte: {seconds: 5}}];
+    repeated string additional_origins = 15;
 }
 
 message UpdateOIDCAppConfigResponse {

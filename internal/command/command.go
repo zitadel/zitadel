@@ -2,19 +2,20 @@ package command
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"time"
 
 	"github.com/caos/zitadel/internal/api/http"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
-	keypair "github.com/caos/zitadel/internal/repository/keypair"
+	"github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
 	proj_repo "github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"

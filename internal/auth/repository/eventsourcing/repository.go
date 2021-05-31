@@ -36,6 +36,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
+	eventstore.RefreshTokenRepo
 	eventstore.KeyRepository
 	eventstore.ApplicationRepo
 	eventstore.UserSessionRepo
@@ -109,6 +110,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		eventstore.TokenRepo{
 			View:       view,
 			Eventstore: es,
+		},
+		eventstore.RefreshTokenRepo{
+			View:         view,
+			Eventstore:   es,
+			SearchLimit:  conf.SearchLimit,
+			KeyAlgorithm: keyAlgorithm,
 		},
 		eventstore.KeyRepository{
 			View:                     view,

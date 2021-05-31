@@ -132,6 +132,9 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 }
 
 func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+	if human != nil && human.Username == "" {
+		human.Username = human.EmailAddress
+	}
 	if orgID == "" || !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}

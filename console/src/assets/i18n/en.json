@@ -104,6 +104,8 @@
     }
   },
   "ACTIONS": {
+    "SHOW":"Show",
+    "HIDE":"Hide",
     "SAVE": "Save",
     "SAVENOW": "Save now",
     "NEW": "New",
@@ -1057,6 +1059,10 @@
     "AUTHMETHOD": "Authentication Method",
     "AUTHMETHODSECTION": "Authentication Method",
     "GRANT": "Grant Types",
+    "ADDITIONALORIGINS":"Additional Origins",
+    "ADDITIONALORIGINSDESC":"If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
+    "ORIGINS":"Origins",
+    "NOTANORIGIN":"The entered value is not an origin",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1101,6 +1107,7 @@
         "1": "ID Token",
         "2": "Token-ID Token"
       },
+      "REFRESHTOKEN":"Refresh Token",
       "GRANTTYPE": "Grant Types",
       "GRANT": {
         "0": "Authorization Code",
@@ -1146,6 +1153,9 @@
       }
     },
     "API": {
+      "INFO": {
+        "CLIENTID": "Client Id"
+      },
       "REGENERATESECRET": "Regenerate Client Secret",
       "SELECTION": {
         "TITLE": "API",
@@ -1190,6 +1200,7 @@
       "REACTIVATED": "Application reactivated.",
       "DEACTIVATED": "Application deactivated.",
       "OIDCUPDATED": "OIDC configuration updated.",
+      "APIUPDATED":"API configuration updated",
       "UPDATED": "App updated.",
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",

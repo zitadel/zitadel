@@ -73,6 +73,19 @@
                     </button>
                 </div>
             </div>
+            <div class="environment" *ngIf="app?.apiConfig?.clientId">
+              <span class="key">{{'APP.API.INFO.CLIENTID' | translate}}</span>
+              <div class="environment-row">
+                  <span>{{this.app.apiConfig?.clientId}}</span>
+                  <button color="primary" [disabled]="copiedKey == this.app.apiConfig?.clientId"
+                      [matTooltip]="(copiedKey != this.app.apiConfig?.clientId ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                      appCopyToClipboard [valueToCopy]="this.app.apiConfig?.clientId"
+                      (copiedValue)="copiedKey = 'clientId'" mat-icon-button>
+                      <i *ngIf="copiedKey != 'clientId'" class="las la-clipboard"></i>
+                      <i *ngIf="copiedKey == 'clientId'" class="las la-clipboard-check"></i>
+                  </button>
+              </div>
+          </div>
             <ng-container *ngFor="let environmentV of (environmentMap | keyvalue)">
                 <div *ngIf="environmentV.value" class="environment">
                     <span class="key">{{environmentV.key}}</span>
@@ -118,7 +131,6 @@
                 {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
             </cnsl-info-section>
 
-            <div style="margin: .5rem" class="divider"></div>
             <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
                 [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
                 (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
@@ -132,6 +144,27 @@
                 title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
                 [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
             </cnsl-redirect-uris>
+
+            <div style="margin: .5rem" class="divider"></div>
+
+            <div class="additional-origins">
+                <p class="title">{{'APP.ADDITIONALORIGINS' | translate}}
+                    <button mat-icon-button (click)="showAdditionalOrigins = !showAdditionalOrigins"
+                        matTooltip="{{(showAdditionalOrigins ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
+                        <mat-icon *ngIf="!showAdditionalOrigins">expand_more</mat-icon>
+                        <mat-icon *ngIf="showAdditionalOrigins">expand_less</mat-icon>
+                    </button>
+                </p>
+                <ng-container *ngIf="showAdditionalOrigins">
+                    <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
+                    <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
+                        [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $event"
+                        [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
+                    </cnsl-additional-origins>
+                </ng-container>
+            </div>
+
+            <div style="margin: .5rem" class="divider"></div>
         </div>
 
         <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
@@ -165,9 +198,19 @@
                 </div>
 
                 <div class="content">
+                  <div class="grid">
                     <cnsl-form-field class="formfield" appearance="outline">
                         <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
                         <input cnslInput formControlName="clientId" />
+                    </cnsl-form-field>
+
+                    <cnsl-form-field appearance="outline" class="formfield">
+                      <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
+                      <mat-select formControlName="appType">
+                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
+                          {{ 'APP.OIDC.APPTYPE.'+type | translate }}
+                        </mat-option>
+                      </mat-select>
                     </cnsl-form-field>
 
                     <cnsl-form-field class="formfield" appearance="outline">
@@ -175,24 +218,6 @@
                         <mat-select formControlName="responseTypesList" multiple>
                             <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
                                 {{ 'APP.OIDC.RESPONSE.'+type | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field class="formfield" appearance="outline">
-                        <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="grantTypesList" multiple>
-                            <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
-                                {{ 'APP.OIDC.GRANT.'+grant | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="appType">
-                            <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                                {{ 'APP.OIDC.APPTYPE.'+type | translate }}
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
@@ -205,6 +230,21 @@
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
+
+                    <cnsl-form-field class="formfield" appearance="outline">
+                      <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
+                      <mat-select formControlName="grantTypesList" multiple>
+                        <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
+                          {{ 'APP.OIDC.GRANT.'+grant | translate }}
+                        </mat-option>
+                      </mat-select>
+                    </cnsl-form-field>
+
+                    <mat-checkbox color="primary" class="rt"
+                        (change)="toggleRefreshToken($event)" [disabled]="!this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE)" [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)">
+                        {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
+                    </mat-checkbox>
+                  </div>
 
                     <div class="divider"></div>
 

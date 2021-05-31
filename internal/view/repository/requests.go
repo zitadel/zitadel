@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/jinzhu/gorm"
@@ -73,6 +74,21 @@ func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) err
 func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	return func(db *gorm.DB, object interface{}) error {
 		err := db.Table(table).Save(object).Error
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "VIEW-AfC7G", "unable to put object to view")
+		}
+		return nil
+	}
+}
+
+func PrepareSaveOnConflict(table string, conflictColumns, updateColumns []string) func(db *gorm.DB, object interface{}) error {
+	updates := make([]string, len(updateColumns))
+	for i, column := range updateColumns {
+		updates[i] = column + "=excluded." + column
+	}
+	onConflict := fmt.Sprintf("ON CONFLICT (%s) DO UPDATE SET %s", strings.Join(conflictColumns, ","), strings.Join(updates, ","))
+	return func(db *gorm.DB, object interface{}) error {
+		err := db.Table(table).Set("gorm:insert_option", onConflict).Save(object).Error
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "VIEW-AfC7G", "unable to put object to view")
 		}
