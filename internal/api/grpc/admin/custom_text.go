@@ -9,7 +9,7 @@ import (
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) GetInitMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultInitMessageTextRequest) (*admin_pb.GetDefaultInitMessageTextResponse, error) {
+func (s *Server) GetDefaultInitMessageText(ctx context.Context, req *admin_pb.GetDefaultInitMessageTextRequest) (*admin_pb.GetDefaultInitMessageTextResponse, error) {
 	msg, err := s.iam.GetDefaultMessageText(ctx, domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -19,7 +19,7 @@ func (s *Server) GetInitMessageCustomText(ctx context.Context, req *admin_pb.Get
 	}, nil
 }
 
-func (s *Server) UpdateInitMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultInitMessageTextRequest) (*admin_pb.SetDefaultInitMessageTextResponse, error) {
+func (s *Server) SetDefaultInitMessageText(ctx context.Context, req *admin_pb.SetDefaultInitMessageTextRequest) (*admin_pb.SetDefaultInitMessageTextResponse, error) {
 	result, err := s.command.SetDefaultMessageText(ctx, SetInitCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (s *Server) UpdateInitMessageCustomText(ctx context.Context, req *admin_pb.
 	}, nil
 }
 
-func (s *Server) GetPasswordResetMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultPasswordResetMessageTextRequest) (*admin_pb.GetDefaultPasswordResetMessageTextResponse, error) {
+func (s *Server) GetDefaultPasswordResetMessageText(ctx context.Context, req *admin_pb.GetDefaultPasswordResetMessageTextRequest) (*admin_pb.GetDefaultPasswordResetMessageTextResponse, error) {
 	msg, err := s.iam.GetDefaultMessageText(ctx, domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func (s *Server) GetPasswordResetMessageCustomText(ctx context.Context, req *adm
 	}, nil
 }
 
-func (s *Server) UpdatePasswordResetMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultPasswordResetMessageTextRequest) (*admin_pb.SetDefaultPasswordResetMessageTextResponse, error) {
+func (s *Server) SetDefaultPasswordResetMessageText(ctx context.Context, req *admin_pb.SetDefaultPasswordResetMessageTextRequest) (*admin_pb.SetDefaultPasswordResetMessageTextResponse, error) {
 	result, err := s.command.SetDefaultMessageText(ctx, SetPasswordResetCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (s *Server) UpdatePasswordResetMessageCustomText(ctx context.Context, req *
 	}, nil
 }
 
-func (s *Server) GetVerifyEmailMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultVerifyEmailMessageTextRequest) (*admin_pb.GetDefaultVerifyEmailMessageTextResponse, error) {
+func (s *Server) GetDefaultVerifyEmailMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifyEmailMessageTextRequest) (*admin_pb.GetDefaultVerifyEmailMessageTextResponse, error) {
 	msg, err := s.iam.GetDefaultMessageText(ctx, domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (s *Server) GetVerifyEmailMessageCustomText(ctx context.Context, req *admin
 	}, nil
 }
 
-func (s *Server) UpdateVerifyEmailMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailMessageTextResponse, error) {
+func (s *Server) SetVerifyEmailMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailMessageTextResponse, error) {
 	result, err := s.command.SetDefaultMessageText(ctx, SetVerifyEmailCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (s *Server) UpdateVerifyEmailMessageCustomText(ctx context.Context, req *ad
 	}, nil
 }
 
-func (s *Server) GetVerifyPhoneMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.GetDefaultVerifyPhoneMessageTextResponse, error) {
+func (s *Server) GetDefaultVerifyPhoneMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.GetDefaultVerifyPhoneMessageTextResponse, error) {
 	msg, err := s.iam.GetDefaultMessageText(ctx, domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (s *Server) GetVerifyPhoneMessageCustomText(ctx context.Context, req *admin
 	}, nil
 }
 
-func (s *Server) UpdateVerifyPhoneMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.SetDefaultVerifyPhoneMessageTextResponse, error) {
+func (s *Server) SetDefaultVerifyPhoneMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.SetDefaultVerifyPhoneMessageTextResponse, error) {
 	result, err := s.command.SetDefaultMessageText(ctx, SetVerifyPhoneCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func (s *Server) UpdateVerifyPhoneMessageCustomText(ctx context.Context, req *ad
 	}, nil
 }
 
-func (s *Server) GetDomainClaimedMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultDomainClaimedMessageTextRequest) (*admin_pb.GetDefaultDomainClaimedMessageTextResponse, error) {
+func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *admin_pb.GetDefaultDomainClaimedMessageTextRequest) (*admin_pb.GetDefaultDomainClaimedMessageTextResponse, error) {
 	msg, err := s.iam.GetDefaultMessageText(ctx, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ func (s *Server) GetDomainClaimedMessageCustomText(ctx context.Context, req *adm
 	}, nil
 }
 
-func (s *Server) UpdateDomainClaimedMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultDomainClaimedMessageTextRequest) (*admin_pb.SetDefaultDomainClaimedMessageTextResponse, error) {
+func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *admin_pb.SetDefaultDomainClaimedMessageTextRequest) (*admin_pb.SetDefaultDomainClaimedMessageTextResponse, error) {
 	result, err := s.command.SetDefaultMessageText(ctx, SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err

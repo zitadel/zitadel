@@ -20,7 +20,7 @@ func (s *Server) GetInitMessageCustomText(ctx context.Context, req *mgmt_pb.GetC
 	}, nil
 }
 
-func (s *Server) UpdateInitMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomInitMessageTextRequest) (*mgmt_pb.SetCustomInitMessageTextResponse, error) {
+func (s *Server) SetInitMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomInitMessageTextRequest) (*mgmt_pb.SetCustomInitMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetInitCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (s *Server) GetPasswordResetMessageCustomText(ctx context.Context, req *mgm
 	}, nil
 }
 
-func (s *Server) UpdatePasswordResetMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomPasswordResetMessageTextRequest) (*mgmt_pb.SetCustomPasswordResetMessageTextResponse, error) {
+func (s *Server) SetPasswordResetMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomPasswordResetMessageTextRequest) (*mgmt_pb.SetCustomPasswordResetMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetPasswordResetCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (s *Server) GetVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_
 	}, nil
 }
 
-func (s *Server) UpdateVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.SetCustomVerifyEmailMessageTextResponse, error) {
+func (s *Server) SetVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.SetCustomVerifyEmailMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetVerifyEmailCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (s *Server) GetVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_
 	}, nil
 }
 
-func (s *Server) UpdateVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.SetCustomVerifyPhoneMessageTextResponse, error) {
+func (s *Server) SetVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.SetCustomVerifyPhoneMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetVerifyPhoneCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (s *Server) GetDomainClaimedMessageCustomText(ctx context.Context, req *mgm
 	}, nil
 }
 
-func (s *Server) UpdateDomainClaimedMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
+func (s *Server) SetDomainClaimedMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
