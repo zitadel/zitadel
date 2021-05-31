@@ -47,7 +47,7 @@ You can stop as soon as db-migrations AND backend-setup returned with exit code 
 
 ### Initialise frontend
 
-Used to set the client id of the console This step is for local development. If you don't work with a local backend you have to set the client id manually.
+Used to set the client id of the console. This step is for local development. If you don't work with a local backend you have to set the client id manually.
 
 You must [initialise the data](###-Initialise-data)) first.
 
@@ -74,7 +74,7 @@ The console service is configured for hot reloading. You can also use docker com
 
 If you don't use the backend from local you have to configure [the environment.json](../build/local/environment.json) manually.
 
-If you use the local backend ensure that you run that you have [set the correct client id](###-Initialise-frontend).
+If you use the local backend ensure that you have [set the correct client id](###-Initialise-frontend).
 
 #### Run console in docker compose
 
