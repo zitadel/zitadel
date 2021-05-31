@@ -8,7 +8,10 @@
 }
 
 .preview {
-  width: calc(100px + 300px);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  // width: calc(100px + 300px);
   pointer-events: none;
   margin-bottom: 2rem;
 
@@ -33,7 +36,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 360px;
+      width: 100%;
+      max-width: 360px;
+      margin: auto;
+
+      @media only screen and (min-width: 1000px) {
+        width: 360px;
+      }
 
       img {
         max-width: 160px;

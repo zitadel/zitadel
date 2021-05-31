@@ -8,16 +8,15 @@
   }
 
   .row {
-    width: 100%;
     display: flex;
     overflow-x: auto;
     flex-wrap: wrap;
     padding-bottom: .5rem;
     margin: 0 -0.5rem;
+    margin-bottom: 2rem;
 
     .step {
       min-width: 220px;
-      max-width: 280px;
       padding: 1rem;
       margin: 1rem .5rem;
       border: 1px solid #8795a150;
@@ -27,6 +26,10 @@
       align-items: center;
       box-sizing: border-box;
       flex: 1;
+
+      @media only screen and (min-width: 899px) {
+        max-width: 280px;
+      }
 
       h6 {
         font-size: 1rem;

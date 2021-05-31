@@ -1,6 +1,13 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'POLICY.PRIVATELABELING.TITLE' | translate" [description]="'POLICY.PRIVATELABELING.DESCRIPTION' | translate">
-
+  <div class="policy enlarged-container">
+    <div class="header">
+      <a [routerLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']" mat-icon-button>
+        <mat-icon class="icon">arrow_back</mat-icon>
+      </a>
+      <div class="col">
+        <h1>{{'POLICY.PRIVATELABELING.TITLE' | translate}}</h1>
+        <p>{{'POLICY.PRIVATELABELING.DESCRIPTION' | translate}}</p>
+      </div>
+    </div>
     <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
@@ -28,12 +35,12 @@
         </div>
       </div>
 
-      <button class="activate-button" mat-raised-button (click)="activatePolicy()">
+      <button class="activate-button" mat-raised-button color="primary" (click)="activatePolicy()">
         {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
       </button>
   </div>
 
-    <div *ngIf="previewData && data" class="content">
+    <div *ngIf="previewData && data" class="lab-policy-content">
   
       <mat-accordion class="settings">
         <mat-expansion-panel class="expansion">
@@ -188,4 +195,4 @@
     </div>
 
     <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
-</app-detail-layout>
+</div>
