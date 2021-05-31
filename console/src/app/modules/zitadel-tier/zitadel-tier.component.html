@@ -13,5 +13,5 @@
   <!-- <a *ngIf="['features.write'] | hasRole | async" class="ext" href="https://zitadel.ch/pricing"
       target="_blank"><i class="las la-external-link-alt"></i></a> -->
 
-  <button mat-raised-button color="primary" [routerLink]="['features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
+  <button mat-raised-button color="primary" [routerLink]="[ iam ? '/iam/features' : '/org/features']">{{'FEATURES.BTN-EDIT' | translate}}</button>
 </div>
