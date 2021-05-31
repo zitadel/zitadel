@@ -3,7 +3,6 @@
 @mixin private-label-preview-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
   @include angular-material-color($theme);
-  @include angular-material-color($theme);
   @include cnsl-form-field-theme($theme);
 }
 

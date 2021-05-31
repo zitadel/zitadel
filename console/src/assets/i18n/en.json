@@ -104,6 +104,7 @@
     }
   },
   "ACTIONS": {
+    "SET":"Set",
     "SHOW":"Show",
     "HIDE":"Hide",
     "SAVE": "Save",

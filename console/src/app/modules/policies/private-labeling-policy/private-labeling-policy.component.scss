@@ -140,11 +140,12 @@
       padding-top: 1rem;
       display: flex;
       flex-direction: column;
+      margin: 0 -1rem;
 
       .settings {
-        // max-width: 400px;
-        margin-bottom: 2rem;
         flex: 1;
+        margin: 0 1rem;
+        margin-bottom: 2rem;
 
         .expansion {
           background: if($is-dark-theme, #2d2e30, #ffffff) !important;
@@ -317,6 +318,7 @@
       }
 
       .preview-wrapper {
+        margin: 0 1rem;
         flex: 1;
         .col {
           display: flex;
@@ -324,7 +326,6 @@
           align-items: center;
           padding-bottom: 2rem;
           position: relative;
-          min-width: 400px;
           min-height: 500px;
 
           .preview-changer {
@@ -362,8 +363,10 @@
         justify-content: space-between;
         flex-wrap: wrap;
 
-        .settings {
-          margin-right: 2rem;
+        .preview-wrapper {
+          .col {
+            min-width: 400px;
+          }
         }
       }
     }

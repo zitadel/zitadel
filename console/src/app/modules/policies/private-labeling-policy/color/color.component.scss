@@ -9,6 +9,19 @@
   }
 }
 
+.form-row {
+  display: flex;
+  align-items: flex-end;
+
+  .formfield {
+    flex: 1;
+  }
+
+  button {
+    margin-bottom: .9rem;
+  }
+}
+
 .color-selector {
   display: flex;
   align-items: center;

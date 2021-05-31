@@ -1,7 +1,10 @@
-<cnsl-form-field class="formfield">
-  <cnsl-label>{{name}} (current {{color}})</cnsl-label>
-  <input cnslInput [(ngModel)]="previewColor" />
-</cnsl-form-field>
+<div class="form-row">
+  <cnsl-form-field class="formfield">
+    <cnsl-label>{{name}} (current {{color}})</cnsl-label>
+    <input cnslInput [(ngModel)]="previewColor" (keydown.enter)="name ? emitPreview(previewColor) : null" />
+  </cnsl-form-field>
+  <button matTooltip="{{'ACTIONS.SET' | translate}}" (click)="emitPreview(previewColor)" mat-icon-button><mat-icon>check</mat-icon></button>
+</div>
 <div class="color-selector">
   <div *ngFor="let c of (warn ? warncolors : colors)" class="circle mat-elevation-z3"
     [ngClass]="{'active': color == c.color || previewColor == c.color}"

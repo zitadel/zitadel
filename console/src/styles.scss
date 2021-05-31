@@ -152,8 +152,8 @@ $custom-typography: mat-typography-config($font-family: 'Lato');
 @include mat-core($custom-typography);
 
 // default theme
-// @include component-themes($dark-theme);
-// @include angular-material-theme($dark-theme);
+@include component-themes($dark-theme);
+@include angular-material-theme($dark-theme);
 
 .mat-dialog-container,
 .mat-raised-button,

@@ -104,8 +104,9 @@
     }
   },
   "ACTIONS": {
-      "SHOW":"Aufklappen",
-      "HIDE":"Zuklappen",
+    "SET":"Übernehmen",
+    "SHOW":"Aufklappen",
+    "HIDE":"Zuklappen",
     "SAVE": "Speichern",
     "SAVENOW": "Speichern",
     "NEW": "Neu",
