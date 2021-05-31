@@ -12,7 +12,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 | Device Authorization                                  | under consideration |
 | Implicit                                              | yes                 |
 | JSON Web Token (JWT) Profile                          | yes                 |
-| Refresh Token                                         | work in progress    |
+| Refresh Token                                         | yes                 |
 | Resource Owner Password Credentials                   | no                  |
 | Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
 | Token Exchange                                        | work in progress    |

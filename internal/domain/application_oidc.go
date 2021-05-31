@@ -190,6 +190,7 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 		compliance.NoneCompliant = true
 		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
 	}
+	CheckGrantTypes(compliance, grantTypes)
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
 	} else {
@@ -211,6 +212,13 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
 	}
 	return compliance
+}
+
+func CheckGrantTypes(compliance *Compliance, grantTypes []OIDCGrantType) {
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeRefreshToken) && !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.GrantType.Refresh.NoAuthCode")
+	}
 }
 
 func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
@@ -238,7 +246,7 @@ func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, 
 		}
 		if appType == OIDCApplicationTypeNative && !onlyLocalhostIsHttp(redirectUris) {
 			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.NativeShouldBeHttpLocalhost")
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
 		}
 	}
 	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
@@ -259,7 +267,7 @@ func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationTy
 		if appType == OIDCApplicationTypeNative {
 			if !onlyLocalhostIsHttp(redirectUris) {
 				compliance.NoneCompliant = true
-				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
+				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
 			}
 			return
 		}
@@ -283,7 +291,7 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplic
 		}
 		if !onlyLocalhostIsHttp(redirectUris) && appType == OIDCApplicationTypeNative {
 			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
 		}
 	}
 	if !compliance.NoneCompliant {
