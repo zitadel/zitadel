@@ -32,7 +32,7 @@ func NewCreateStatement(values []handler.Column, sequence, previousSequence uint
 	}
 }
 
-func NewUpdateStatement(conditions []handler.Column, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+func NewUpdateStatement(conditions, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -58,6 +58,29 @@ func NewUpdateStatement(conditions []handler.Column, values []handler.Column, se
 				return handler.ErrNoCondition
 			}
 			query := "UPDATE " + projectionName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
+			_, err := ex.Exec(query, args...)
+			return err
+		},
+	}
+}
+
+func NewUpsertStatement(conditions, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+	cols, params, args := columnsToQuery(values)
+	columnNames := strings.Join(cols, ", ")
+	valuesPlaceholder := strings.Join(params, ", ")
+
+	return handler.Statement{
+		Sequence:         sequence,
+		PreviousSequence: previousSequence,
+		Execute: func(ex handler.Executer, projectionName string) error {
+			if projectionName == "" {
+				return handler.ErrNoTable
+			}
+			if previousSequence >= sequence {
+				return handler.ErrPrevSeqGtSeq
+			}
+
+			query := "INSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ") + ON CONFLICT"
 			_, err := ex.Exec(query, args...)
 			return err
 		},

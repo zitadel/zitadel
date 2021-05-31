@@ -27,6 +27,13 @@ type Executer interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 }
 
+func NewCol(name string, value interface{}) Column {
+	return Column{
+		Name:  name,
+		Value: value,
+	}
+}
+
 type Column struct {
 	Name  string
 	Value interface{}

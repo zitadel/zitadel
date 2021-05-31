@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -424,7 +423,7 @@ func TestStatementHandler_Update(t *testing.T) {
 						Eventstore: tt.fields.eventstore,
 					},
 					ProjectionName: "my_projection",
-					RequeueEvery:   types.Duration{Duration: 0},
+					RequeueEvery:   0,
 				}),
 				aggregates: tt.fields.aggregates,
 			}
@@ -582,7 +581,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 						Eventstore: tt.fields.eventstore,
 					},
 					ProjectionName: "my_projection",
-					RequeueEvery:   types.Duration{Duration: 0},
+					RequeueEvery:   0,
 				}),
 				aggregates: tt.fields.aggregates,
 			}
@@ -819,7 +818,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							Eventstore: nil,
 						},
 						ProjectionName: tt.fields.projectionName,
-						RequeueEvery:   types.Duration{Duration: 0},
+						RequeueEvery:   0,
 					},
 					Client:            client,
 					FailedEventsTable: tt.fields.failedEventsTable,
