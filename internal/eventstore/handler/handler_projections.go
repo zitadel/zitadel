@@ -9,6 +9,12 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
+type ProjectionHandlerConfig struct {
+	HandlerConfig
+	ProjectionName string
+	RequeueEvery   time.Duration
+}
+
 //Update updates the projection with the given statements
 type Update func(context.Context, []Statement, Reduce) (unexecutedStmts []Statement, err error)
 
@@ -38,28 +44,24 @@ type ProjectionHandler struct {
 	shouldPush chan *struct{}
 }
 
-func NewProjectionHandler(
-	es *eventstore.Eventstore,
-	requeueAfter time.Duration,
-	projectionName string,
-) *ProjectionHandler {
+func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 	h := &ProjectionHandler{
-		Handler:        NewHandler(es),
-		ProjectionName: projectionName,
-		RequeueAfter:   requeueAfter,
+		Handler:        NewHandler(config.HandlerConfig),
+		ProjectionName: config.ProjectionName,
+		RequeueAfter:   config.RequeueEvery,
 		// first bulk is instant on startup
 		Timer:      time.NewTimer(1 * time.Second),
 		shouldPush: make(chan *struct{}, 1),
 	}
 
-	if requeueAfter <= 0 {
+	if config.RequeueEvery <= 0 {
 		if !h.Timer.Stop() {
 			<-h.Timer.C
 		}
-		logging.LogWithFields("HANDL-fAC5O", "projection", projectionName).Debug("starting handler without requeue")
+		logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler without requeue")
 		return h
 	}
-	logging.LogWithFields("HANDL-fAC5O", "projection", projectionName).Debug("starting handler")
+	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler")
 	return h
 }
 

@@ -1,9 +1,7 @@
-package handler
+package projection
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
@@ -26,7 +24,7 @@ const (
 )
 
 var (
-	reducers = []handler.EventReducer{
+	orgReducers = []handler.EventReducer{
 		{
 			Aggregate: "org",
 			Event:     org.OrgAddedEventType,
@@ -55,30 +53,10 @@ var (
 	}
 )
 
-type OrgHandler struct {
-	crdb.StatementHandler
-}
-
-func NewOrgHandler(
-	ctx context.Context,
-	es *eventstore.Eventstore,
-	client *sql.DB,
-) *OrgHandler {
-	return &OrgHandler{
-		StatementHandler: crdb.NewStatementHandler(
-			ctx,
-			es,
-			10*time.Second,
-			client,
-			"projections.orgs",
-			"projections.current_sequences",
-			"projections.locks",
-			"projections.failed_events",
-			5,
-			20,
-			reducers,
-		),
-	}
+func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) crdb.StatementHandler {
+	config.ProjectionName = "projections.orgs"
+	config.Reducers = orgReducers
+	return crdb.NewStatementHandler(ctx, config)
 }
 
 func orgAddedStmts(event eventstore.EventReader) ([]handler.Statement, error) {

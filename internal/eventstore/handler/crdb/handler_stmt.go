@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
@@ -17,6 +16,19 @@ import (
 var (
 	errSeqNotUpdated = errors.ThrowInternal(nil, "CRDB-79GWt", "current sequence not updated")
 )
+
+type StatementHandlerConfig struct {
+	handler.ProjectionHandlerConfig
+
+	Client            *sql.DB
+	SequenceTable     string
+	LockTable         string
+	FailedEventsTable string
+	MaxFailureCount   uint
+	BulkLimit         uint64
+
+	Reducers []handler.EventReducer
+}
 
 type StatementHandler struct {
 	*handler.ProjectionHandler
@@ -30,7 +42,7 @@ type StatementHandler struct {
 
 	aggregates []eventstore.AggregateType
 	eventTypes []eventstore.EventType
-	reduces    map[string]handler.Reduce
+	reduces    map[eventstore.EventType]handler.Reduce
 
 	workerName string
 	bulkLimit  uint64
@@ -38,19 +50,7 @@ type StatementHandler struct {
 
 func NewStatementHandler(
 	ctx context.Context,
-
-	es *eventstore.Eventstore,
-	requeueAfter time.Duration,
-
-	client *sql.DB,
-	projectionName,
-	sequenceTable,
-	lockTable,
-	failedEventsTable string,
-	maxFailureCount uint,
-
-	bulkLimit uint64,
-	reducers []handler.EventReducer,
+	config StatementHandlerConfig,
 ) StatementHandler {
 	workerName, err := os.Hostname()
 	if err != nil || workerName == "" {
@@ -58,30 +58,30 @@ func NewStatementHandler(
 		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
 	}
 
-	aggregateTypes := make([]eventstore.AggregateType, 0, len(reducers))
-	eventTypes := make([]eventstore.EventType, 0, len(reducers))
-	reduces := make(map[string]handler.Reduce, len(reducers))
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
+	eventTypes := make([]eventstore.EventType, 0, len(config.Reducers))
+	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
 	subscriptionTopics := make(map[eventstore.AggregateType][]eventstore.EventType)
-	for _, reducer := range reducers {
+	for _, reducer := range config.Reducers {
 		aggregateTypes = append(aggregateTypes, reducer.Aggregate)
 		eventTypes = append(eventTypes, reducer.Event)
-		reduces[string(reducer.Aggregate)+"."+string(reducer.Event)] = reducer.Reduce
+		reduces[reducer.Event] = reducer.Reduce
 		subscriptionTopics[reducer.Aggregate] = append(subscriptionTopics[reducer.Aggregate], reducer.Event)
 	}
 
 	h := StatementHandler{
-		ProjectionHandler:   handler.NewProjectionHandler(es, requeueAfter, projectionName),
-		client:              client,
-		sequenceTable:       sequenceTable,
-		maxFailureCount:     maxFailureCount,
-		failureCountStmt:    fmt.Sprintf(failureCountStmtFormat, failedEventsTable),
-		setFailureCountStmt: fmt.Sprintf(setFailureCountStmtFormat, failedEventsTable),
-		lockStmt:            fmt.Sprintf(lockStmtFormat, lockTable),
+		ProjectionHandler:   handler.NewProjectionHandler(config.ProjectionHandlerConfig),
+		client:              config.Client,
+		sequenceTable:       config.SequenceTable,
+		maxFailureCount:     config.MaxFailureCount,
+		failureCountStmt:    fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
+		setFailureCountStmt: fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
+		lockStmt:            fmt.Sprintf(lockStmtFormat, config.LockTable),
 		aggregates:          aggregateTypes,
 		eventTypes:          eventTypes,
 		reduces:             reduces,
 		workerName:          workerName,
-		bulkLimit:           bulkLimit,
+		bulkLimit:           config.BulkLimit,
 	}
 
 	go h.ProjectionHandler.Process(

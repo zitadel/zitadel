@@ -111,11 +111,13 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := NewProjectionHandler(
-				nil,
-				-1,
-				"",
-			)
+			h := NewProjectionHandler(ProjectionHandlerConfig{
+				HandlerConfig: HandlerConfig{
+					Eventstore: nil,
+				},
+				ProjectionName: "",
+				RequeueEvery:   -1,
+			})
 			h.stmts = tt.fields.stmts
 			h.pushSet = tt.fields.pushSet
 			h.shouldPush = tt.fields.shouldPush
@@ -611,7 +613,11 @@ func TestProjectionHandler_bulk(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := NewProjectionHandler(nil, -1, "")
+			h := NewProjectionHandler(ProjectionHandlerConfig{
+				HandlerConfig:  HandlerConfig{},
+				ProjectionName: "",
+				RequeueEvery:   -1,
+			})
 			err := h.bulk(tt.args.ctx, tt.args.lock.lock(), tt.args.executeBulk.executeBulk(), tt.args.unlock.unlock())
 			if !tt.res.isErr(err) {
 				t.Errorf("unexpected error %v", err)
@@ -673,7 +679,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 		{
 			name: "push fails",
 			fields: fields{
-				Handler: NewHandler(
+				Handler: NewHandler(HandlerConfig{
 					eventstore.NewEventstore(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
@@ -698,6 +704,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 							},
 						),
 					),
+				},
 				),
 				shouldPush: make(chan *struct{}, 1),
 			},
@@ -718,7 +725,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				Handler: NewHandler(
+				Handler: NewHandler(HandlerConfig{
 					eventstore.NewEventstore(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
@@ -743,6 +750,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 							},
 						),
 					),
+				},
 				),
 				shouldPush: make(chan *struct{}, 1),
 			},

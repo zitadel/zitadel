@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/query/handler"
+	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/repository/org"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 
@@ -28,7 +28,7 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartQueries(ctx context.Context, eventstore *eventstore.Eventstore, db types.SQL, defaults sd.SystemDefaults) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, eventstore *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
 	repo = &Queries{
 		iamID:       defaults.IamID,
 		eventstore:  eventstore,
@@ -43,7 +43,7 @@ func StartQueries(ctx context.Context, eventstore *eventstore.Eventstore, db typ
 		return nil, err
 	}
 
-	err = handler.Start(ctx, eventstore, db)
+	err = projection.Start(ctx, eventstore, projections)
 	if err != nil {
 		return nil, err
 	}

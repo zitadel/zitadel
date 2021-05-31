@@ -1,8 +1,8 @@
 CREATE DATABASE zitadel;
-GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE zitadel TO authz;
+GRANT SELECT, INSERT, UPDATE, DELETE ON DATABASE zitadel TO queries;
 use zitadel;
 
-CREATE SCHEMA projections AUTHORIZATION authz;
+CREATE SCHEMA projections AUTHORIZATION queries;
 
 CREATE TABLE projections.locks (
     locker_id TEXT,
@@ -18,6 +18,15 @@ CREATE TABLE projections.current_sequences (
     timestamp TIMESTAMPTZ,
 
     PRIMARY KEY (view_name)
+);
+
+CREATE TABLE projections.failed_events (
+    projection_name TEXT,
+    failed_sequence BIGINT,
+    failure_count SMALLINT,
+    error TEXT,
+
+    PRIMARY KEY (projection_name, failed_sequence)
 );
 
 CREATE TABLE projections.orgs (

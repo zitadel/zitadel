@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -416,10 +417,16 @@ func TestStatementHandler_Update(t *testing.T) {
 			defer client.Close()
 
 			h := &StatementHandler{
-				sequenceTable:     "my_sequences",
-				client:            client,
-				ProjectionHandler: handler.NewProjectionHandler(tt.fields.eventstore, 0, "my_projection"),
-				aggregates:        tt.fields.aggregates,
+				sequenceTable: "my_sequences",
+				client:        client,
+				ProjectionHandler: handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
+					HandlerConfig: handler.HandlerConfig{
+						Eventstore: tt.fields.eventstore,
+					},
+					ProjectionName: "my_projection",
+					RequeueEvery:   types.Duration{Duration: 0},
+				}),
+				aggregates: tt.fields.aggregates,
 			}
 
 			for _, expectation := range tt.want.expectations {
@@ -570,8 +577,14 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &StatementHandler{
-				ProjectionHandler: handler.NewProjectionHandler(tt.fields.eventstore, 0, "my_projection"),
-				aggregates:        tt.fields.aggregates,
+				ProjectionHandler: handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
+					HandlerConfig: handler.HandlerConfig{
+						Eventstore: tt.fields.eventstore,
+					},
+					ProjectionName: "my_projection",
+					RequeueEvery:   types.Duration{Duration: 0},
+				}),
+				aggregates: tt.fields.aggregates,
 			}
 			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, tt.args.currentSeq, tt.args.reduce)
 			if !tt.want.isErr(err) {
@@ -800,16 +813,18 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 
 			h := NewStatementHandler(
 				context.Background(),
-				nil,
-				0,
-				client,
-				tt.fields.projectionName,
-				"",
-				"",
-				tt.fields.failedEventsTable,
-				tt.fields.maxFailureCount,
-				0,
-				nil,
+				StatementHandlerConfig{
+					ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+						HandlerConfig: handler.HandlerConfig{
+							Eventstore: nil,
+						},
+						ProjectionName: tt.fields.projectionName,
+						RequeueEvery:   types.Duration{Duration: 0},
+					},
+					Client:            client,
+					FailedEventsTable: tt.fields.failedEventsTable,
+					MaxFailureCount:   tt.fields.maxFailureCount,
+				},
 			)
 
 			mock.ExpectBegin()
