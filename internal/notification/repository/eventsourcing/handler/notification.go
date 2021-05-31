@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -391,6 +393,10 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 
 // Read organization specific texts
 func (n *Notification) getMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+	langTag := language.Make(lang)
+	if langTag == language.Und {
+		lang = language.English.String()
+	}
 	// read from Org
 	mailText, err := n.view.MessageTextByIDs(authz.GetCtxData(ctx).OrgID, textType, lang, mailTextTableOrg)
 	if errors.IsNotFound(err) {

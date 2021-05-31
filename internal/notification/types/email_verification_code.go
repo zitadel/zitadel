@@ -25,11 +25,9 @@ func SendEmailVerificationCode(mailhtml string, text *iam_model.MessageTextView,
 	if err != nil {
 		return err
 	}
-	var args = map[string]interface{}{
-		"FirstName": user.FirstName,
-		"LastName":  user.LastName,
-		"Code":      codeString,
-	}
+
+	var args = mapNotifyUserToArgs(user)
+	args["Code"] = codeString
 
 	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
 	text.Text, err = templates.ParseTemplateText(text.Text, args)

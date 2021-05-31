@@ -18,11 +18,9 @@ func SendPhoneVerificationCode(i18n *i18n.Translator, user *view_model.NotifyUse
 	if err != nil {
 		return err
 	}
-	var args = map[string]interface{}{
-		"FirstName": user.FirstName,
-		"LastName":  user.LastName,
-		"Code":      codeString,
-	}
+	var args = mapNotifyUserToArgs(user)
+	args["Code"] = codeString
+
 	systemDefaults.Notifications.TemplateData.VerifyPhone.Translate(i18n, args, user.PreferredLanguage)
 	codeData := &PhoneVerificationCodeData{UserID: user.ID}
 	template, err := templates.ParseTemplateText(systemDefaults.Notifications.TemplateData.VerifyPhone.Text, codeData)

@@ -31,12 +31,8 @@ func SendUserInitCode(mailhtml string, text *iam_model.MessageTextView, user *vi
 	if err != nil {
 		return err
 	}
-	var args = map[string]interface{}{
-		"FirstName":          user.FirstName,
-		"LastName":           user.LastName,
-		"Code":               codeString,
-		"PreferredLoginName": user.PreferredLoginName,
-	}
+	var args = mapNotifyUserToArgs(user)
+	args["Code"] = codeString
 
 	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
 	text.Text, err = templates.ParseTemplateText(text.Text, args)

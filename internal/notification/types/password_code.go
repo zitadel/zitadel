@@ -27,15 +27,8 @@ func SendPasswordCode(mailhtml string, text *iam_model.MessageTextView, user *vi
 	if err != nil {
 		return err
 	}
-	var args = map[string]interface{}{
-		"FirstName": user.FirstName,
-		"LastName":  user.LastName,
-		"Code":      codeString,
-	}
-
-	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
-	text.Text, err = templates.ParseTemplateText(text.Text, args)
-	text.Text = html.UnescapeString(text.Text)
+	var args = mapNotifyUserToArgs(user)
+	args["Code"] = codeString
 
 	emailCodeData := &PasswordCodeData{
 		TemplateData: templates.TemplateData{
