@@ -8,7 +8,7 @@ import (
 )
 
 type Step15 struct {
-	DefaultMailTexts []domain.CustomMessageText
+	DefaultMessageTexts []domain.CustomMessageText
 }
 
 func (s *Step15) Step() domain.Step {
@@ -24,7 +24,7 @@ func (c *Commands) SetupStep15(ctx context.Context, step *Step15) error {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		events := make([]eventstore.EventPusher, 0)
 
-		for _, text := range step.DefaultMailTexts {
+		for _, text := range step.DefaultMessageTexts {
 			mailEvents, _, err := c.setDefaultMessageText(ctx, iamAgg, &text)
 			if err != nil {
 				return nil, err

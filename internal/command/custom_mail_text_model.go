@@ -1,8 +1,6 @@
 package command
 
 import (
-	"strings"
-
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -30,26 +28,25 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *policy.CustomTextSetEvent:
-			if e.Key != wm.MessageTextType || wm.Language != e.Language {
+			if e.Template != wm.MessageTextType || wm.Language != e.Language {
 				continue
 			}
-
-			if strings.HasSuffix(e.Key, domain.MailSubject) {
+			if e.Key == domain.MessageSubject {
 				wm.Subject = e.Text
 			}
-			if strings.HasSuffix(e.Key, domain.MailTitle) {
+			if e.Key == domain.MessageTitle {
 				wm.Title = e.Text
 			}
-			if strings.HasSuffix(e.Key, domain.MailPreHeader) {
+			if e.Key == domain.MessagePreHeader {
 				wm.PreHeader = e.Text
 			}
-			if strings.HasSuffix(e.Key, domain.MailGreeting) {
+			if e.Key == domain.MessageGreeting {
 				wm.Greeting = e.Text
 			}
-			if strings.HasSuffix(e.Key, domain.MailButtonText) {
+			if e.Key == domain.MessageButtonText {
 				wm.ButtonText = e.Text
 			}
-			if strings.HasSuffix(e.Key, domain.MailFooterText) {
+			if e.Key == domain.MessageFooterText {
 				wm.FooterText = e.Text
 			}
 			wm.State = domain.PolicyStateActive
@@ -57,22 +54,22 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			if e.Key != wm.MessageTextType || wm.Language != e.Language {
 				continue
 			}
-			if strings.HasSuffix(e.Key, domain.MailSubject) {
+			if e.Key == domain.MessageSubject {
 				wm.Subject = ""
 			}
-			if strings.HasSuffix(e.Key, domain.MailTitle) {
+			if e.Key == domain.MessageTitle {
 				wm.Title = ""
 			}
-			if strings.HasSuffix(e.Key, domain.MailPreHeader) {
+			if e.Key == domain.MessagePreHeader {
 				wm.PreHeader = ""
 			}
-			if strings.HasSuffix(e.Key, domain.MailGreeting) {
+			if e.Key == domain.MessageGreeting {
 				wm.Greeting = ""
 			}
-			if strings.HasSuffix(e.Key, domain.MailButtonText) {
+			if e.Key == domain.MessageButtonText {
 				wm.ButtonText = ""
 			}
-			if strings.HasSuffix(e.Key, domain.MailFooterText) {
+			if e.Key == domain.MessageFooterText {
 				wm.FooterText = ""
 			}
 		case *policy.CustomTextMessageRemovedEvent:

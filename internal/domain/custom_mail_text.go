@@ -12,13 +12,13 @@ const (
 	VerifyEmailMessageType   = "VerifyEmail"
 	VerifyPhoneMessageType   = "VerifyPhone"
 	DomainClaimedMessageType = "DomainClaimed"
-	MailTitle                = "Title"
-	MailPreHeader            = "PreHeader"
-	MailSubject              = "Subject"
-	MailGreeting             = "Greeting"
-	MailText                 = "Text"
-	MailButtonText           = "ButtonText"
-	MailFooterText           = "FooterText"
+	MessageTitle             = "Title"
+	MessagePreHeader         = "PreHeader"
+	MessageSubject           = "Subject"
+	MessageGreeting          = "Greeting"
+	MessageText              = "Text"
+	MessageButtonText        = "ButtonText"
+	MessageFooterText        = "FooterText"
 )
 
 type CustomMessageText struct {

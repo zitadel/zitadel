@@ -42,6 +42,7 @@ func (c *Commands) setDefaultCustomText(ctx context.Context, iamAgg *eventstore.
 	return iam_repo.NewCustomTextSetEvent(
 		ctx,
 		iamAgg,
+		text.Template,
 		text.Key,
 		text.Text,
 		text.Language), nil

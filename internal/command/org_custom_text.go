@@ -29,6 +29,7 @@ func (c *Commands) SetOrgCustomText(ctx context.Context, resourceOwner string, t
 		org.NewCustomTextSetEvent(
 			ctx,
 			orgAgg,
+			text.Template,
 			text.Key,
 			text.Text,
 			text.Language))
@@ -43,14 +44,14 @@ func (c *Commands) SetOrgCustomText(ctx context.Context, resourceOwner string, t
 	return writeModelToCustomText(&setText.CustomTextWriteModel), nil
 }
 
-func (c *Commands) RemoveOrgCustomText(ctx context.Context, resourceOwner, key string, lang language.Tag) error {
+func (c *Commands) RemoveOrgCustomText(ctx context.Context, resourceOwner, template, key string, lang language.Tag) error {
 	if resourceOwner == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "Org-2N7fd", "Errors.ResourceOwnerMissing")
 	}
-	if key == "" || lang == language.Und {
+	if template == "" || key == "" || lang == language.Und {
 		return caos_errs.ThrowInvalidArgument(nil, "Org-3n9fsd", "Errors.CustomText.Invalid")
 	}
-	customText := NewOrgCustomTextWriteModel(resourceOwner, key, lang)
+	customText := NewOrgCustomTextWriteModel(resourceOwner, template, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, customText)
 	if err != nil {
 		return err
@@ -59,6 +60,6 @@ func (c *Commands) RemoveOrgCustomText(ctx context.Context, resourceOwner, key s
 		return caos_errs.ThrowNotFound(nil, "Org-3n8fs", "Errors.CustomText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewCustomTextRemovedEvent(ctx, orgAgg, key, lang))
+	_, err = c.eventstore.PushEvents(ctx, org.NewCustomTextRemovedEvent(ctx, orgAgg, template, key, lang))
 	return err
 }

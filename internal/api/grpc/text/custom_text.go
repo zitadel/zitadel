@@ -6,7 +6,7 @@ import (
 	text_pb "github.com/caos/zitadel/pkg/grpc/text"
 )
 
-func ModelCustomMsgTextToPb(msg *model.MailTextView) *text_pb.MessageCustomText {
+func ModelCustomMsgTextToPb(msg *model.MessageTextView) *text_pb.MessageCustomText {
 	return &text_pb.MessageCustomText{
 		Title:      msg.Title,
 		PreHeader:  msg.PreHeader,

@@ -3,16 +3,17 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"golang.org/x/text/language"
-	"net/http"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -35,8 +36,8 @@ const (
 	labelPolicyTableDef       = "adminapi.label_policies"
 	mailTemplateTableOrg      = "management.mail_templates"
 	mailTemplateTableDef      = "adminapi.mail_templates"
-	mailTextTableOrg          = "management.mail_texts"
-	mailTextTableDef          = "adminapi.mail_texts"
+	mailTextTableOrg          = "management.message_texts"
+	mailTextTableDef          = "adminapi.message_texts"
 	mailTextTypeDomainClaimed = "DomainClaimed"
 	mailTextTypeInitCode      = "InitCode"
 	mailTextTypePasswordReset = "PasswordReset"
@@ -159,7 +160,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMessageText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -198,7 +199,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMessageText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -236,7 +237,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMessageText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -297,7 +298,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMessageText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -389,17 +390,12 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 }
 
 // Read organization specific texts
-func (n *Notification) getMailText(ctx context.Context, textType string, lang string) (*iam_model.MailTextView, error) {
-	langTag := language.Make(lang)
-	if langTag == language.Und {
-		langTag = n.systemDefaults.DefaultLanguage
-	}
-	base, _ := langTag.Base()
+func (n *Notification) getMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
 	// read from Org
-	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, base.String(), mailTextTableOrg)
+	mailText, err := n.view.MessageTextByIDs(authz.GetCtxData(ctx).OrgID, textType, lang, mailTextTableOrg)
 	if errors.IsNotFound(err) {
 		// read from default
-		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, base.String(), mailTextTableDef)
+		mailText, err = n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, lang, mailTextTableDef)
 		if err != nil {
 			return nil, err
 		}
@@ -408,7 +404,7 @@ func (n *Notification) getMailText(ctx context.Context, textType string, lang st
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextViewToModel(mailText), err
+	return iam_es_model.MessageTextViewToModel(mailText), err
 }
 
 func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error) {

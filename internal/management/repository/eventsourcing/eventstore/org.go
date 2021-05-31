@@ -3,6 +3,11 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"strings"
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -10,11 +15,9 @@ import (
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/golang/protobuf/ptypes"
-	"strings"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
@@ -526,19 +529,19 @@ func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.Mail
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
-	texts, err := repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+func (repo *OrgRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
+	texts, err := repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(texts, true), err
+	return iam_es_model.MessageTextsViewToModel(texts, true), err
 }
 
-func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+func (repo *OrgRepository) GetMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
 	defaultIn := false
-	texts, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
+	texts, err := repo.View.MessageTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) || len(texts) == 0 {
-		texts, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+		texts, err = repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
 		}
@@ -547,22 +550,22 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+	return iam_es_model.MessageTextsViewToModel(texts, defaultIn), err
 }
 
-func (repo *OrgRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
-	text, err := repo.View.MailTextByIDs(repo.SystemDefaults.IamID, textType, language)
+func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
 	text.Default = true
-	return iam_es_model.MailTextViewToModel(text), err
+	return iam_es_model.MessageTextViewToModel(text), err
 }
 
-func (repo *OrgRepository) GetMailText(ctx context.Context, orgID, textType, language string) (*iam_model.MailTextView, error) {
-	text, err := repo.View.MailTextByIDs(orgID, textType, language)
+func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(orgID, textType, lang)
 	if errors.IsNotFound(err) {
-		result, err := repo.GetDefaultMailText(ctx, textType, language)
+		result, err := repo.GetDefaultMessageText(ctx, textType, lang)
 		if err != nil {
 			return nil, err
 		}
@@ -571,7 +574,7 @@ func (repo *OrgRepository) GetMailText(ctx context.Context, orgID, textType, lan
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextViewToModel(text), err
+	return iam_es_model.MessageTextViewToModel(text), err
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {

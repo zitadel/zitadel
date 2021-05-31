@@ -40,25 +40,25 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore
 	}
 	events := make([]eventstore.EventPusher, 0)
 	if existingMailText.Greeting != msg.Greeting {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailGreeting, msg.Greeting, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageGreeting, msg.Greeting, msg.Language))
 	}
 	if existingMailText.Subject != msg.Subject {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailSubject, msg.Subject, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageSubject, msg.Subject, msg.Language))
 	}
 	if existingMailText.Title != msg.Title {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailTitle, msg.Title, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageTitle, msg.Title, msg.Language))
 	}
 	if existingMailText.PreHeader != msg.PreHeader {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailPreHeader, msg.PreHeader, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessagePreHeader, msg.PreHeader, msg.Language))
 	}
 	if existingMailText.Text != msg.Text {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailText, msg.Text, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageText, msg.Text, msg.Language))
 	}
 	if existingMailText.ButtonText != msg.ButtonText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailButtonText, msg.ButtonText, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageButtonText, msg.ButtonText, msg.Language))
 	}
 	if existingMailText.FooterText != msg.FooterText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType+domain.MailFooterText, msg.FooterText, msg.Language))
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageFooterText, msg.FooterText, msg.Language))
 	}
 	return events, existingMailText, nil
 }

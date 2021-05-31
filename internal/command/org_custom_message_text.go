@@ -41,51 +41,51 @@ func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Agg
 	events := make([]eventstore.EventPusher, 0)
 	if existingMailText.Greeting != message.Greeting {
 		if message.Greeting != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailGreeting, message.Greeting, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageGreeting, message.Greeting, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailGreeting, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageGreeting, message.Language))
 		}
 	}
 	if existingMailText.Subject != message.Subject {
 		if message.Subject != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailSubject, message.Subject, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageSubject, message.Subject, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailSubject, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageSubject, message.Language))
 		}
 	}
 	if existingMailText.Title != message.Title {
 		if message.Title != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailTitle, message.Title, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageTitle, message.Title, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailTitle, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageTitle, message.Language))
 		}
 	}
 	if existingMailText.PreHeader != message.PreHeader {
 		if message.PreHeader != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailPreHeader, message.PreHeader, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessagePreHeader, message.PreHeader, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailPreHeader, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessagePreHeader, message.Language))
 		}
 	}
 	if existingMailText.Text != message.Text {
 		if message.Text != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailText, message.Text, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageText, message.Text, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailText, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageText, message.Language))
 		}
 	}
 	if existingMailText.ButtonText != message.ButtonText {
 		if message.ButtonText != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailButtonText, message.ButtonText, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageButtonText, message.ButtonText, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailButtonText, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageButtonText, message.Language))
 		}
 	}
 	if existingMailText.FooterText != message.FooterText {
 		if message.FooterText != "" {
-			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType+domain.MailFooterText, message.FooterText, message.Language))
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageFooterText, message.FooterText, message.Language))
 		} else {
-			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType+domain.MailFooterText, message.Language))
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageFooterText, message.Language))
 		}
 	}
 	return events, existingMailText, nil

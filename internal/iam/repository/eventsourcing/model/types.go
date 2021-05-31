@@ -43,6 +43,9 @@ const (
 	MailTextAdded       models.EventType = "iam.mail.text.added"
 	MailTextChanged     models.EventType = "iam.mail.text.changed"
 
+	CustomTextSet     models.EventType = "iam.customtext.set"
+	CustomTextRemoved models.EventType = "iam.customtext.removed"
+
 	PasswordComplexityPolicyAdded   models.EventType = "iam.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "iam.policy.password.complexity.changed"
 

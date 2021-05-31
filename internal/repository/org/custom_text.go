@@ -24,6 +24,7 @@ type CustomTextSetEvent struct {
 func NewCustomTextSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	template,
 	key,
 	text string,
 	language language.Tag,
@@ -31,6 +32,7 @@ func NewCustomTextSetEvent(
 	return &CustomTextSetEvent{
 		CustomTextSetEvent: *policy.NewCustomTextSetEvent(
 			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextSetEventType),
+			template,
 			key,
 			text,
 			language),
@@ -53,12 +55,14 @@ type CustomTextRemovedEvent struct {
 func NewCustomTextRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	template,
 	key string,
 	language language.Tag,
 ) *CustomTextRemovedEvent {
 	return &CustomTextRemovedEvent{
 		CustomTextRemovedEvent: *policy.NewCustomTextRemovedEvent(
 			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextRemovedEventType),
+			template,
 			key,
 			language,
 		),
@@ -81,13 +85,13 @@ type CustomTextMessageRemovedEvent struct {
 func NewCustomTextMessageRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	key string,
+	template string,
 	language language.Tag,
 ) *CustomTextMessageRemovedEvent {
 	return &CustomTextMessageRemovedEvent{
 		CustomTextMessageRemovedEvent: *policy.NewCustomTextMessageRemovedEvent(
 			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextMessageRemovedEventType),
-			key,
+			template,
 			language,
 		),
 	}

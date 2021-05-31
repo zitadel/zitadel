@@ -21,6 +21,7 @@ type CustomTextSetEvent struct {
 func NewCustomTextSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	template,
 	key,
 	text string,
 	language language.Tag,
@@ -28,6 +29,7 @@ func NewCustomTextSetEvent(
 	return &CustomTextSetEvent{
 		CustomTextSetEvent: *policy.NewCustomTextSetEvent(
 			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextSetEventType),
+			template,
 			key,
 			text,
 			language),

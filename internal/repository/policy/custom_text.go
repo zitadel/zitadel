@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	customTextPrefix                  = mailPolicyPrefix + "customtext."
+	customTextPrefix                  = "customtext."
 	CustomTextSetEventType            = customTextPrefix + "set"
 	CustomTextRemovedEventType        = customTextPrefix + "removed"
 	CustomTextMessageRemovedEventType = customTextPrefix + "message.removed"
@@ -20,6 +20,7 @@ const (
 type CustomTextSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	Template string       `json:"template,omitempty"`
 	Key      string       `json:"key,omitempty"`
 	Language language.Tag `json:"language,omitempty"`
 	Text     string       `json:"text,omitempty"`
@@ -35,12 +36,14 @@ func (e *CustomTextSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 
 func NewCustomTextSetEvent(
 	base *eventstore.BaseEvent,
+	template,
 	key,
 	text string,
 	language language.Tag,
 ) *CustomTextSetEvent {
 	return &CustomTextSetEvent{
 		BaseEvent: *base,
+		Template:  template,
 		Key:       key,
 		Language:  language,
 		Text:      text,
@@ -63,6 +66,7 @@ func CustomTextSetEventMapper(event *repository.Event) (eventstore.EventReader, 
 type CustomTextRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	Template string       `json:"template,omitempty"`
 	Key      string       `json:"key,omitempty"`
 	Language language.Tag `json:"language,omitempty"`
 }
@@ -75,9 +79,10 @@ func (e *CustomTextRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewCustomTextRemovedEvent(base *eventstore.BaseEvent, key string, language language.Tag) *CustomTextRemovedEvent {
+func NewCustomTextRemovedEvent(base *eventstore.BaseEvent, template, key string, language language.Tag) *CustomTextRemovedEvent {
 	return &CustomTextRemovedEvent{
 		BaseEvent: *base,
+		Template:  template,
 		Key:       key,
 		Language:  language,
 	}
@@ -92,7 +97,7 @@ func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventRead
 type CustomTextMessageRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Key      string       `json:"key,omitempty"`
+	Template string       `json:"template,omitempty"`
 	Language language.Tag `json:"language,omitempty"`
 }
 
@@ -104,10 +109,10 @@ func (e *CustomTextMessageRemovedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
-func NewCustomTextMessageRemovedEvent(base *eventstore.BaseEvent, key string, language language.Tag) *CustomTextMessageRemovedEvent {
+func NewCustomTextMessageRemovedEvent(base *eventstore.BaseEvent, template string, language language.Tag) *CustomTextMessageRemovedEvent {
 	return &CustomTextMessageRemovedEvent{
 		BaseEvent: *base,
-		Key:       key,
+		Template:  template,
 		Language:  language,
 	}
 }

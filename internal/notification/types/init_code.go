@@ -22,7 +22,7 @@ type UrlData struct {
 	PasswordSet bool
 }
 
-func SendUserInitCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendUserInitCode(mailhtml string, text *iam_model.MessageTextView, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err

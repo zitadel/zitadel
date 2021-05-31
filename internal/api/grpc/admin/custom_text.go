@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetInitMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultInitMessageTextRequest) (*admin_pb.GetDefaultInitMessageTextResponse, error) {
-	msg, err := s.iam.GetDefaultMailText(ctx, domain.InitCodeMessageType, req.Language)
+	msg, err := s.iam.GetDefaultMessageText(ctx, domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *Server) UpdateInitMessageCustomText(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) GetPasswordResetMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultPasswordResetMessageTextRequest) (*admin_pb.GetDefaultPasswordResetMessageTextResponse, error) {
-	msg, err := s.iam.GetDefaultMailText(ctx, domain.PasswordResetMessageType, req.Language)
+	msg, err := s.iam.GetDefaultMessageText(ctx, domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (s *Server) UpdatePasswordResetMessageCustomText(ctx context.Context, req *
 }
 
 func (s *Server) GetVerifyEmailMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultVerifyEmailMessageTextRequest) (*admin_pb.GetDefaultVerifyEmailMessageTextResponse, error) {
-	msg, err := s.iam.GetDefaultMailText(ctx, domain.VerifyEmailMessageType, req.Language)
+	msg, err := s.iam.GetDefaultMessageText(ctx, domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (s *Server) UpdateVerifyEmailMessageCustomText(ctx context.Context, req *ad
 }
 
 func (s *Server) GetVerifyPhoneMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.GetDefaultVerifyPhoneMessageTextResponse, error) {
-	msg, err := s.iam.GetDefaultMailText(ctx, domain.VerifyPhoneMessageType, req.Language)
+	msg, err := s.iam.GetDefaultMessageText(ctx, domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (s *Server) UpdateVerifyPhoneMessageCustomText(ctx context.Context, req *ad
 }
 
 func (s *Server) GetDomainClaimedMessageCustomText(ctx context.Context, req *admin_pb.GetDefaultDomainClaimedMessageTextRequest) (*admin_pb.GetDefaultDomainClaimedMessageTextResponse, error) {
-	msg, err := s.iam.GetDefaultMailText(ctx, domain.DomainClaimedMessageType, req.Language)
+	msg, err := s.iam.GetDefaultMessageText(ctx, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}

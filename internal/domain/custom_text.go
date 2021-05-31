@@ -11,6 +11,7 @@ type CustomText struct {
 
 	State    CustomTextState
 	Default  bool
+	Template string
 	Key      string
 	Language language.Tag
 	Text     string
