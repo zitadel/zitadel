@@ -204,29 +204,20 @@
                         <input cnslInput formControlName="clientId" />
                     </cnsl-form-field>
 
+                    <cnsl-form-field appearance="outline" class="formfield">
+                      <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
+                      <mat-select formControlName="appType">
+                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
+                          {{ 'APP.OIDC.APPTYPE.'+type | translate }}
+                        </mat-option>
+                      </mat-select>
+                    </cnsl-form-field>
+
                     <cnsl-form-field class="formfield" appearance="outline">
                         <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
                         <mat-select formControlName="responseTypesList" multiple>
                             <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
                                 {{ 'APP.OIDC.RESPONSE.'+type | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field class="formfield" appearance="outline">
-                        <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="grantTypesList" multiple>
-                            <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
-                                {{ 'APP.OIDC.GRANT.'+grant | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="appType">
-                            <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                                {{ 'APP.OIDC.APPTYPE.'+type | translate }}
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
@@ -238,6 +229,15 @@
                                 {{ 'APP.OIDC.AUTHMETHOD.'+type | translate }}
                             </mat-option>
                         </mat-select>
+                    </cnsl-form-field>
+
+                    <cnsl-form-field class="formfield" appearance="outline">
+                      <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
+                      <mat-select formControlName="grantTypesList" multiple>
+                        <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
+                          {{ 'APP.OIDC.GRANT.'+grant | translate }}
+                        </mat-option>
+                      </mat-select>
                     </cnsl-form-field>
 
                     <mat-checkbox color="primary" class="rt"
