@@ -137,8 +137,8 @@ github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBW
 github.com/caos/logging v0.0.2 h1:ebg5C/HN0ludYR+WkvnFjwSExF4wvyiWPyWGcKMYsoo=
 github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX7Wp0=
 github.com/caos/oidc v0.14.4/go.mod h1:H5Y2zw3YIrWqQOoy0wcmZva2a66bumDyU2iOhXiM9uA=
-github.com/caos/oidc v0.15.1 h1:dzMelbk9uYkNTfEy9+273o0fwZTgMSj9eqvS7UtKUpo=
-github.com/caos/oidc v0.15.1/go.mod h1:JiK5RXSOgag66wiSOMEkS+yS4R46Baz6dGwfr60VfvI=
+github.com/caos/oidc v0.15.2 h1:fvR8Mtnv+d0Lw+tmXHS5u8XYpuE2xCNpobPA66rx/9Q=
+github.com/caos/oidc v0.15.2/go.mod h1:JiK5RXSOgag66wiSOMEkS+yS4R46Baz6dGwfr60VfvI=
 github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980 h1:Fz0aYUwGMA2tsu5w7SryqFGjqGClJVHbyhBMT5SXtPU=
 github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980/go.mod h1:2I8oiZb5SMRm/qTLvwpSmdV0M6ex8J/UKyxUGfKaqJo=
 github.com/casbin/casbin/v2 v2.1.2/go.mod h1:YcPU1XXisHhLzuxH9coDNf2FbKpjGlbCg3n9yuLkIJQ=
