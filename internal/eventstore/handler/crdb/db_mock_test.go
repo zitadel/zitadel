@@ -134,11 +134,10 @@ func expectCurrentSequence(tableName, projection string, seq uint64) func(sqlmoc
 		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
 SELECT 
 	IF\(
-		COUNT\(current_sequence\) > 0, 
+		EXISTS\(SELECT current_sequence FROM seq\),
 		\(SELECT current_sequence FROM seq\),
-		0 AS current_sequence
-	\) 
-FROM seq`).
+		0
+	\) AS current_sequence`).
 			WithArgs(
 				projection,
 			).
@@ -154,11 +153,10 @@ func expectCurrentSequenceErr(tableName, projection string, err error) func(sqlm
 		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
 SELECT 
 	IF\(
-		COUNT\(current_sequence\) > 0, 
+		EXISTS\(SELECT current_sequence FROM seq\),
 		\(SELECT current_sequence FROM seq\),
-		0 AS current_sequence
-	\) 
-FROM seq`).
+		0
+	\) AS current_sequence`).
 			WithArgs(
 				projection,
 			).
@@ -171,11 +169,10 @@ func expectCurrentSequenceNotExists(tableName, projection string) func(sqlmock.S
 		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
 SELECT 
 	IF\(
-		COUNT\(current_sequence\) > 0, 
+		EXISTS\(SELECT current_sequence FROM seq\),
 		\(SELECT current_sequence FROM seq\),
-		0 AS current_sequence
-	\) 
-FROM seq`).
+		0
+	\) AS current_sequence`).
 			WithArgs(
 				projection,
 			).
@@ -191,11 +188,10 @@ func expectCurrentSequenceScanErr(tableName, projection string) func(sqlmock.Sql
 		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
 SELECT 
 	IF\(
-		COUNT\(current_sequence\) > 0, 
+		EXISTS\(SELECT current_sequence FROM seq\),
 		\(SELECT current_sequence FROM seq\),
-		0 AS current_sequence
-	\) 
-FROM seq`).
+		0
+	\) AS current_sequence`).
 			WithArgs(
 				projection,
 			).

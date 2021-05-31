@@ -80,30 +80,31 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 					Limit(5),
 			},
 		},
-		{
-			name: "aggregates and events",
-			fields: fields{
-				sequenceTable:  "my_sequences",
-				projectionName: "my_projection",
-				aggregates:     []eventstore.AggregateType{"testAgg"},
-				events:         []eventstore.EventType{"testAgg.added"},
-				bulkLimit:      5,
-			},
-			want: want{
-				limit: 5,
-				isErr: func(err error) bool {
-					return err == nil
-				},
-				expectations: []mockExpectation{
-					expectCurrentSequence("my_sequences", "my_projection", 5),
-				},
-				SearchQueryBuilder: eventstore.
-					NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg").
-					EventTypes("testAgg.added").
-					SequenceGreater(5).
-					Limit(5),
-			},
-		},
+		//TODO: discuss about event types in handler first
+		// {
+		// 	name: "aggregates and events",
+		// 	fields: fields{
+		// 		sequenceTable:  "my_sequences",
+		// 		projectionName: "my_projection",
+		// 		aggregates:     []eventstore.AggregateType{"testAgg"},
+		// 		events:         []eventstore.EventType{"testAgg.added"},
+		// 		bulkLimit:      5,
+		// 	},
+		// 	want: want{
+		// 		limit: 5,
+		// 		isErr: func(err error) bool {
+		// 			return err == nil
+		// 		},
+		// 		expectations: []mockExpectation{
+		// 			expectCurrentSequence("my_sequences", "my_projection", 5),
+		// 		},
+		// 		SearchQueryBuilder: eventstore.
+		// 			NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg").
+		// 			EventTypes("testAgg.added").
+		// 			SequenceGreater(5).
+		// 			Limit(5),
+		// 	},
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
