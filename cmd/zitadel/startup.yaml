@@ -224,6 +224,8 @@ API:
       DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
       DefaultAccessTokenLifetime: 12h
       DefaultIdTokenLifetime: 12h
+      DefaultRefreshTokenIdleExpiration: 720h #30d
+      DefaultRefreshTokenExpiration: 2160h #90d
       SigningKeyAlgorithm: RS256
     UserAgentCookieConfig:
       Name: caos.zitadel.useragent

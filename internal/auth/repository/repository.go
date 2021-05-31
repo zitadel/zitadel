@@ -17,4 +17,5 @@ type Repository interface {
 	OrgRepository
 	IAMRepository
 	FeaturesRepository
+	RefreshTokenRepository
 }

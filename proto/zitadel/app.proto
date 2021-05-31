@@ -65,7 +65,7 @@ message AppNameQuery {
 message OIDCConfig {
     repeated string redirect_uris = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"console.zitadel.ch/authorized\"]";
+            example: "[\"https://console.zitadel.ch/auth/callback\"]";
             description: "Callback URI of the authorization request where the code or tokens will be sent to";
         }
     ];
@@ -103,7 +103,7 @@ message OIDCConfig {
     ];
     repeated string post_logout_redirect_uris = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"console.zitadel.ch/logout\"]";
+            example: "[\"https://console.zitadel.ch/logout\"]";
             description: "ZITADEL will redirect to this link after a successful logout";
         }
     ];
@@ -152,6 +152,18 @@ message OIDCConfig {
             description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and substracted from \"iat\", \"auth_time\" and \"nbf\" claims";
             // min: "0s";
             // max: "5s";
+        }
+    ];
+    repeated string additional_origins = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://console.zitadel.ch/auth/callback\"]";
+            description: "additional origins (other than the redirect_uris) from where the api can be used";
+        }
+    ];
+    repeated string allowed_origins = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://console.zitadel.ch/auth/callback\"]";
+            description: "all allowed origins from where the api can be used";
         }
     ];
 }
