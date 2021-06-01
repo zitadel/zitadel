@@ -1,220 +1,282 @@
 ---
 title: Privacy Policy
 --- 
-:::caution German Version
 
-Currently this agreement is only available in German. We will provide an English version shortly. Please reach out to us in case you need an English Version immediately.
+## Introduction
 
-:::
+This privacy policy applies to CAOS AG, the websites it operates (including caos.ch and zitadel.ch) and the services and products it provides (including ZITADEL). This privacy policy describes how we process personal data for the provision of this website and our products.
 
-# Einleitung
-Diese Datenschutzerklärung gilt für die CAOS AG sowie deren erbrachte Leistungen und Produkte.
+If any inconsistencies arise between this Privacy Policy and the otherwise applicable contractual terms or general terms of service of CAOS AG, the provisions of this Privacy Policy shall prevail. This privacy policy covers both existing personal data and personal data collected from you in the future.
 
-Sollten sich zwischen dieser Datenschutzerklärung und den sonst anwendbaren Vertrags- oder Geschäftsbedingungen des CAOS AG irgendwelche Widersprüche ergeben, so haben die Bestimmungen dieser Datenschutzerklärung Vorrang.
-
-Diese Datenschutzerklärung erfasst sowohl historische als auch zukünftige Personendaten. Stimmen Sie der Bearbeitung Ihrer Personendaten zu, werden wir nicht nur die in Zukunft von Ihnen erhobenen Personendaten in Übereinstimmung mit dieser Datenschutzerklärung bearbeiten, sondern auch Ihre bei uns bereits gespeicherten Personendaten. 
-
-Verantwortliche Stelle im Sinne der Datenschutzgesetze, insbesondere der EU-Datenschutzgrundverordnung (DSGVO), ist:
+The responsible party for the data processing described in this privacy policy is:
 
 CAOS AG  
-Florian Forster  
 Teufener Strasse 19  
-9000 St. Gallen
+9000 St. Gallen  
 
-Telefon: 043 215 27 44  
-E-Mail: hi@caos.ch  
-WebSite: https://caos.ch
+Contact for questions and issues regarding data protection is:
 
-# Allgemeiner Hinweis
-Gestützt auf Artikel 13 der schweizerischen Bundesverfassung und den datenschutzrechtlichen Bestimmungen des Bundes (Datenschutzgesetz, DSG) hat jede Person Anspruch auf Schutz ihrer Privatsphäre sowie auf Schutz vor Missbrauch ihrer persönlichen Daten. Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.
+CAOS AG  
+Data Protection Officer  
+Teufener Strasse 19  
+9000 St. Gallen  
+Phone: 043 215 27 44  
+E-mail: legal@caos.ch  
 
-In Zusammenarbeit mit unseren Hosting-Providern bemühen wir uns, die Datenbanken so gut wie möglich vor fremden Zugriffen, Verlusten, Missbrauch oder vor Fälschung zu schützen.
+## General notes
 
-Wir weisen darauf hin, dass die Datenübertragung im Internet (z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.
+Based on Article 13 of the Swiss Federal Constitution and the data protection provisions of the Swiss Confederation (Data Protection Act, DSG), every person has the right to protection of their privacy as well as protection against misuse of their personal data. The operators of these websites and services take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the legal data protection regulations as well as this data protection declaration.
 
-Durch die Nutzung dieser Website erklären Sie sich mit der Erhebung, Verarbeitung und Nutzung von Daten gemäss der nachfolgenden Beschreibung einverstanden. Diese Website kann grundsätzlich ohne Registrierung besucht werden. Dabei werden Daten wie beispielsweise aufgerufene Seiten bzw. Namen der abgerufenen Datei, Datum und Uhrzeit zu statistischen Zwecken auf dem Server gespeichert, ohne dass diese Daten unmittelbar auf Ihre Person bezogen werden. Personenbezogene Daten, insbesondere Name, Adresse oder E-Mail-Adresse werden soweit möglich auf freiwilliger Basis erhoben. Ohne Ihre Einwilligung erfolgt keine Weitergabe der Daten an Dritte.
+In cooperation with our providers, we make every effort to protect the databases and any of our users data as well as possible against unauthorized access, loss, misuse or falsification. We point out that data transmission over the internet in general may result in security risks. A complete protection of the data against access by third parties is not possible.
 
-# Bearbeitung von Personendaten
-Personendaten sind alle Angaben, die sich auf eine bestimmte oder bestimmbare Person beziehen. Eine betroffene Person ist eine Person, über die Personendaten bearbeitet werden. Bearbeiten umfasst jeden Umgang mit Personendaten, unabhängig von den angewandten Mitteln und Verfahren, insbesondere das Aufbewahren, Bekanntgeben, Beschaffen, Löschen, Speichern, Verändern, Vernichten und Verwenden von Personendaten.
+This website uses SSL/TLS encryption for security reasons and to protect the transmission of confidential content, such as requests that you send to us as the website operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from &quot;http://&quot; to &quot;https://&quot;.
 
-Wir bearbeiten Personendaten im Einklang mit dem schweizerischen Datenschutzrecht. Im Übrigen bearbeiten wir – soweit und sofern die EU-DSGVO anwendbar ist – Personendaten gemäss folgenden Rechtsgrundlagen im Zusammenhang mit Art. 6 Abs. 1 DSGVO :
+## Processing of personal data, legal basis, storage period
 
-- lit. a) Bearbeitung von Personendaten mit Einwilligung der betroffenen Person.
-- lit. b) Bearbeitung von Personendaten zur Erfüllung eines Vertrages mit der betroffenen Person sowie zur Durchführung entsprechender vorvertraglicher Massnahmen.
-- lit. c) Bearbeitung von Personendaten zur Erfüllung einer rechtlichen Verpflichtung, der wir gemäss allenfalls anwendbarem Recht der EU oder gemäss allenfalls anwendbarem Recht eines Landes, in dem die DSGVO ganz oder teilweise anwendbar ist, unterliegen.
-- lit. d) Bearbeitung von Personendaten um lebenswichtige Interessen der betroffenen Person oder einer anderen natürlichen Person zu schützen.
-- lit. f) Bearbeitung von Personendaten um die berechtigten Interessen von uns oder von Dritten zu wahren, sofern nicht die Grundfreiheiten und Grundrechte sowie Interessen der betroffenen Person überwiegen. Berechtigte Interessen sind insbesondere unser betriebswirtschaftliches Interesse, unsere Website bereitstellen zu können, die Informationssicherheit, die Durchsetzung von eigenen rechtlichen Ansprüchen und die Einhaltung von schweizerischem Recht.
+**Personal data** is any information that relates to an identified or identifiable person. A **data subject** is a person about whom personal data is processed. Processing includes any handling of personal data, regardless of the means and procedures used, in particular the storage, disclosure, acquisition, deletion, storage, modification, destruction and use of personal data.
 
-Wir bearbeiten Personendaten für jene Dauer, die für den jeweiligen Zweck erforderlich ist. Bei länger dauernden Aufbewahrungspflichten aufgrund von gesetzlichen und sonstigen Pflichten, denen wir unterliegen, schränken wir die Bearbeitung entsprechend ein.
+We process personal data in accordance with Swiss data protection law. In addition, we process - to the extent and insofar as the EU Data Protection Regulation is applicable - personal data in accordance with the following legal bases within the meaning of Art. 6 (1) DSGVO :
 
-Zur Vertragserfüllung zählen insbesondere, aber nicht abschliessend das Bearbeiten von Personendaten zur: 
+- Insofar as we obtain the consent of the data subject for processing operations, Art. 6 (1) a) DSGVO serves as the legal basis.
+- When processing personal data for the fulfillment of a contract with the data subject as well as for the implementation of corresponding pre-contractual measures, Art. 6 para. 1 lit. b DSGVO serves as the legal basis.
+- To the extent that processing of personal data is necessary to comply with a legal obligation to which we are subject under any applicable law of the EU or under any applicable law of a country in which the GDPR applies in whole or in part, Art. 6 para. 1 lit. c GDPR serves as the legal basis.
+- For the processing of personal data in order to protect vital interests of the data subject or another natural person, Art. 6 para. 1 lit. d DSGVO serves as the legal basis.
+- If personal data is processed in order to protect the legitimate interests of us or of third parties and if the fundamental freedoms and rights and interests of the data subject do not override our interests and the interests of third parties, Article 6 (1) (f) of the GDPR serves as the legal basis. Legitimate interests are in particular our business interest in being able to provide our website and our products, information security, the enforcement of our own legal claims and compliance with Swiss law.
 
-- Authentifizierung und Autorisierung der Nutzer
-- Speicherung und Bearbeitung von Nutzer-Aktionen im Audit Trail
-- Bearbeitung der persönlichen Daten und Anmeldeinformationen
-- Verifikation von Kommunikationsmitteln
-- Kommunikation betreffend Service-Unterbrüchen oder Service-Änderungen
+We will retain personal data for the period of time necessary for the particular purpose for which it was collected.
 
-Die gesammelten Personendaten sind vielfältig. Zum einen sammeln wir Personendaten, die Sie uns 
-zur Verfügung stellen. Zum andern sammeln wir Personendaten, die bei Ihrem Kontakt mit uns automatisch oder manuell erfasst werden, wie zum Beispiel:
+Subsequently, they are either deleted or made anonymous, unless we need them for a longer period of time in exceptional cases, e.g. due to legal storage and documentation obligations or our legitimate interests, such as the protection of rights to which we are entitled or the defense of claims.
 
-- Name und Vorname
-- Geburtstag und Alter
-- Geschlecht
-- Adresse(n)
-- Rechnungsadresse
-- Kreditkarten- und Zahlungsinformationen
-- Sprache
-- Telefonnummer(n)
-- E-Mail-Adresse(n)
-- Benutzernamen oder Kennungen externer Login Provider
-- Benutzerprofil (Benutzernamen, Profilbilder)
-- Externe Loginprovider und deren Identifier (“Social-Logins”, “Enterprise-Logins”, ...)
-- Public Keys von Schlüsseln (“FIDO2”, “U2F”, “x509”, ...)
-- HTTP(S) Metadaten
-  - User-Agent
-  - IP Adressen
-  - Betriebssystem
-  - Zeit und Datum
-  - URL
-  - Referrer URL
+### Processing of personal data when using the website, contact forms and in connection with newsletters
 
-Eine jederzeit aktuelle Aufstellung aller von uns eingesetzten Anbieter sowie deren Tätigkeitsbereich finden sie auf unserer “Trust Seite”.
+Our websites can generally be visited without registration. Each time one of our website is requested, data such as content of the requested page, name of the requested file, IP address, date and time are automatically stored in log files on the server.
 
-# Datenschutzerklärung für Cookies
-Diese Website verwendet Cookies. Das sind kleine Textdateien, die es möglich machen, auf dem Endgerät des Nutzers spezifische, auf den Nutzer bezogene Informationen zu speichern, während er die Website nutzt. Cookies ermöglichen es uns, insbesondere ein Einmal-Anmeldeverfahren (“Single-Sign-On”) anzubieten, die Performance unserer Services zu steuern, aber auch unser Angebot kundenfreundlicher zu gestalten. Cookies bleiben über das Ende einer Browser-Sitzung gespeichert und können bei einem erneuten Seitenbesuch wieder aufgerufen werden. 
+This data is processed to enable correct delivery and functioning of the website. In addition, we use the data to optimize the website and to ensure the security of our systems.
 
-Für die Leistungserbringung verwenden wir insbesondere folgende Cookies:
+Personal data, in particular name, address or e-mail address are collected as far as possible on a voluntary basis, for example when you contact us via a contact form or by e-mail. Without your consent, the data will not be passed on to third parties, unless shown in this privacy policy.
 
-## Cloudflare
-https://www.cloudflare.com/privacypolicy/
-https://support.cloudflare.com/hc/en-us/articles/200170156-Understanding-the-Cloudflare-Cookies
+If you send us inquiries via contact form, your data from the form, including any data you provided, will be stored by us for the purpose of processing the inquiry and in case of follow-up questions. We do not pass on this data without your consent, except insofar as this is shown in this privacy policy.
 
-__cfuid  
-__cflb  
-__cf_bm  
+If you would like to receive newsletters offered on our websites, we require an e-mail address from you as well as information that allows us to verify that you are the owner of the specified e-mail address and agree to receive the newsletter. Further data will not be collected. We use this data exclusively for sending the requested information and do not pass it on to third parties, except as described in this privacy policy.
 
-## ZITADEL
-__useragent  
-__csrf 
+You can revoke your consent to the storage of the data, the e-mail address and their use for sending the newsletter at any time, for example via the &quot;unsubscribe link&quot; in the newsletter.
 
-Cookies werden nur für Technische Zwecke genutzt wie:
-- Session Management
-- Single Sign On
-- Rate Limiting
-- DDOS Mitigation
+### Processing of personal data in connection with the use of our products
 
-# Datenschutzerklärung für SSL-/TLS-Verschlüsselung
-Diese Website nutzt aus Gründen der Sicherheit und zum Schutz der Übertragung vertraulicher Inhalte, wie zum Beispiel der Anfragen, die Sie an uns als Seitenbetreiber senden, eine SSL-/TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von `http://` auf `https://` wechselt.
+The use of our services is generally only possible with registration. During registration and in the course of using the services, we collect and process various personal data.
 
-Wenn die SSL bzw. TLS Verschlüsselung aktiviert ist, können die Daten, die Sie an uns übermitteln, nicht von Dritten mitgelesen werden.
+In particular, the following personal data are part of the processing:
+<table>
+  <tr>
+    <th>Type of personal data</th>
+    <th>Examples</th>
+    <th>Affected data subjects</th>
+  </tr>
+  <tr>
+    <td><strong>Basic data</strong></td>
+    <td>
+      <ul>
+        <li>Surname and first name</li>
+        <li>Email addresses</li>
+        <li>User name</li>
+        <li>Language</li>
+      </ul>
+    </td>
+    <td>All users</td>
+  </tr>
+    <tr>
+    <td><strong>Login data</strong></td>
+    <td>
+      <ul>
+        <li>Randomly generated ID</li>
+        <li>Password</li>
+        <li>Public keys / certificates (&quot;FIDO2&quot;, &quot;U2F&quot;, &quot;x509&quot;, ...)</li>
+        <li>User names or identifiers of external login providers</li>
+        <li>Phone number(s)</li>
+      </ul>
+    </td>
+    <td>
+      <p>All users</p>
+      <p>Password: Users who use authentication methods with password.</p>
+      <p>Public Keys: Users who use an authentication procedure with cryptographic keys.</p>
+      <p> External login provider identifiers: Users who use an external login provider.</p>
+      <p>Phone number: Users who use authentication methods with SMS</p>
+    </td>
+  </tr>
+  </tr>
+    <tr>
+    <td><strong>Profile data</strong></td>
+    <td>
+      <ul>
+        <li>Profile pictures</li>
+        <li>Gender</li>
+        <li>Birthday</li>
+        <li>Language</li>
+        <li>Address(es)</li>
+        <li>Phone number(s)</li>
+      </ul>
+    </td>
+    <td>Users who voluntarily add profile data</td>
+  </tr>
+  </tr>
+    <tr>
+    <td><strong>Communication data</strong></td>
+    <td>
+      <ul>
+        <li>Emails</li>
+        <li>Chats</li>
+        <li>Call metadata</li>
+      </ul>
+    </td>
+    <td>Customers and users who communicate with us directly (e.g. support)</td>
+  </tr>
+  </tr>
+    <tr>
+    <td><strong>Payment data</strong></td>
+    <td>
+      <ul>
+        <li>Billing address</li>
+        <li>Customer number</li>
+        <li>Customer history</li>
+        <li>Credit rating information</li>
+      </ul>
+    </td>
+    <td>
+      <p>Customers who use services that require payment</p>
+      <p>Credit rating information: Only customers who pay by invoice</p>
+    </td>
+  </tr>
+  </tr>
+    <tr>
+    <td><strong>Data traffic data</strong></td>
+    <td>
+      <ul>
+        <li>User agent</li>
+        <li>IP addresses</li>
+        <li>Operating system</li>
+        <li>Time and date</li>
+        <li>URL</li>
+        <li>Referrer URL</li>
+        <li>Accept Language</li>
+      </ul>
+    </td>
+    <td>All users</td>
+  </tr>  
+</table>
 
-# Datenschutzerklärung für Kontaktformular
-Wenn Sie uns per Kontaktformular Anfragen zukommen lassen, werden Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort angegebenen Kontaktdaten zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns gespeichert. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter.
+Unless otherwise mentioned, the nature and purpose of the processing is as follows:
 
-# Datenschutzerklärung für Newsletterdaten
-Wenn Sie den auf dieser Website angebotenen Newsletter beziehen möchten, benötigen wir von Ihnen eine E-Mail-Adresse sowie Informationen, welche uns die Überprüfung gestatten, dass Sie der Inhaber der angegebenen E-Mail-Adresse sind und mit dem Empfang des Newsletters einverstanden sind. Weitere Daten werden nicht erhoben. Diese Daten verwenden wir ausschliesslich für den Versand der angeforderten Informationen und geben sie nicht an Dritte weiter.
+The data is uploaded by customers in our services or collected by us based on requests from users. The personal data is processed by us exclusively for the provision of the requested services or the use of the agreed services.
 
-Die erteilte Einwilligung zur Speicherung der Daten, der E-Mail-Adresse sowie deren Nutzung zum Versand des Newsletters können Sie jederzeit widerrufen, etwa über den «Austragen-Link» im Newsletter.
+The fulfillment of the contract includes in particular, but is not limited to, the processing of personal data for the purpose of:
 
-# Rechte betroffener Personen
-## Recht auf Bestätigung
-Jede betroffene Person hat das Recht, vom Betreiber der Website eine Bestätigung darüber zu verlangen, ob betroffene Personen betreffende, personenbezogene Daten verarbeitet werden. Möchten Sie dieses Bestätigungsrecht in Anspruch nehmen, können Sie sich hierzu jederzeit an den Datenschutzbeauftragten wenden.
-## Recht auf Auskunft
-Jede von der Verarbeitung betroffene Person mit personenbezogenen Daten hat das Recht, jederzeit vom Betreiber dieser Website unentgeltliche Auskunft über die zu seiner Person gespeicherten personenbezogenen Daten und eine Kopie dieser Auskunft zu erhalten. Ferner kann gegebenenfalls über folgende Informationen Auskunft gegeben werden:
+- Authentication and authorization of users
+- Storage and processing of user actions in the audit trail
+- Processing of personal data and login information
+- Verification of communication means
+- Communication regarding service interruptions or service changes
 
-- die Verarbeitungszwecke
-- die Kategorien personenbezogener Daten, die verarbeitet werden
-- die Empfänger, gegenüber denen die personenbezogenen Daten offengelegt worden sind oder noch offengelegt werden
-- falls möglich, die geplante Dauer, für die die personenbezogenen Daten gespeichert werden, oder, falls dies nicht möglich ist, die Kriterien für die Festlegung dieser Dauer
-- das Bestehen eines Rechts auf Berichtigung oder Löschung der sie betreffenden personenbezogenen Daten oder auf - Einschränkung der Verarbeitung durch den Verantwortlichen oder eines Widerspruchsrechts gegen diese Verarbeitung
-- das Bestehen eines Beschwerderechts bei einer Aufsichtsbehörde
-- wenn die personenbezogenen Daten nicht bei der betroffenen Person erhoben werden: Alle verfügbaren Informationen über die Herkunft der Daten
+## Disclosure to third parties
 
-Ferner steht der betroffenen Person ein Auskunftsrecht darüber zu, ob personenbezogene Daten an ein Drittland oder an eine internationale Organisation übermittelt wurden. Sofern dies der Fall ist, so steht der betroffenen Person im übrigen das Recht zu, Auskunft über die geeigneten Garantien im Zusammenhang mit der Übermittlung zu erhalten.
+We use third-party services to provide the website and our offers. An up-to-date list of all the providers we use and their areas of activity can be found on our &quot;[Trust Page](https://zitadel.ch/trust)&quot;.
 
-Möchten Sie dieses Auskunftsrecht in Anspruch nehmen, können Sie sich hierzu jederzeit an unseren Datenschutzbeauftragten wenden.
-
-## Recht auf Berichtigung
-Jede von der Verarbeitung personenbezogener Daten betroffene Person hat das Recht, die unverzügliche Berichtigung sie betreffender unrichtiger personenbezogener Daten zu verlangen. Ferner steht der betroffenen Person das Recht zu, unter Berücksichtigung der Zwecke der Verarbeitung, die Vervollständigung unvollständiger personenbezogener Daten - auch mittels einer ergänzenden Erklärung - zu verlangen.
-
-Möchten Sie dieses Berichtigungsrecht in Anspruch nehmen, können Sie sich hierzu jederzeit an unseren Datenschutzbeauftragten wenden.
-
-## Recht auf Löschung (Recht auf Vergessen werden)
-Jede von der Verarbeitung personenbezogener Daten betroffene Person hat das Recht, von dem Verantwortlichen dieser Website zu verlangen, dass die sie betreffenden personenbezogenen Daten unverzüglich gelöscht werden, sofern einer der folgenden Gründe zutrifft und soweit die Verarbeitung nicht erforderlich ist:
-
-- Die personenbezogenen Daten wurden für solche Zwecke erhoben oder auf sonstige Weise verarbeitet, für welche sie nicht mehr notwendig sind
-- Die betroffene Person widerruft ihre Einwilligung, auf die sich die Verarbeitung stützte, und es fehlt an einer anderweitigen Rechtsgrundlage für die Verarbeitung
-- Die betroffene Person legt aus Gründen, die sich aus ihrer besonderen Situation ergeben, Widerspruch gegen die Verarbeitung ein und es liegen keine vorrangigen berechtigten Gründe für die Verarbeitung vor, oder die betroffene Person legt im Falle von Direktwerbung und damit verbundenem Profiling Widerspruch gegen die Verarbeitung ein
-- Die personenbezogenen Daten wurden unrechtmässig verarbeitet
-- Die Löschung der personenbezogenen Daten ist zur Erfüllung einer rechtlichen Verpflichtung nach dem Unionsrecht oder dem Recht der Mitgliedstaaten erforderlich, dem der Verantwortliche unterliegt
-- Die personenbezogenen Daten wurden in Bezug auf angebotene Dienste der Informationsgesellschaft, die einem Kind direkt gemacht wurden, erhoben
-
-Sofern einer der oben genannten Gründe zutrifft und Sie die Löschung von personenbezogenen Daten, die beim Betreiber dieser Website gespeichert sind, veranlassen möchten, können Sie sich hierzu jederzeit an unseren Datenschutzbeauftragten wenden. Der Datenschutzbeauftragte dieser Website wird veranlassen, dass dem Löschverlangen unverzüglich nachgekommen wird.
-
-## Recht auf Einschränkung der Verarbeitung
-Jede von der Verarbeitung personenbezogener Daten betroffene Person hat das Recht, von dem Verantwortlichen dieser Website die Einschränkung der Verarbeitung zu verlangen, wenn eine der folgenden Voraussetzungen gegeben ist:
-
-- Die Richtigkeit der personenbezogenen Daten wird von der betroffenen Person bestritten, und zwar für eine Dauer, die es dem Verantwortlichen ermöglicht, die Richtigkeit der personenbezogenen Daten zu überprüfen
-- Die Verarbeitung ist unrechtmässig, die betroffene Person lehnt die Löschung der personenbezogenen Daten ab und verlangt stattdessen die Einschränkung der Nutzung der personenbezogenen Daten
-- Der Verantwortliche benötigt die personenbezogenen Daten für die Zwecke der Verarbeitung nicht länger, die betroffene Person benötigt sie jedoch zur Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen
-- Die betroffene Person hat aus Gründen, die sich aus ihrer besonderen Situation ergeben, Widerspruch gegen die Verarbeitung eingelegt und es steht noch nicht fest, ob die berechtigten Gründe des Verantwortlichen gegenüber denen der betroffenen Person überwiegen
-
-Sofern eine der oben genannten Voraussetzungen gegeben ist Sie die Einschränkung von personenbezogenen Daten, die beim Betreiber dieser Website gespeichert sind, verlangen möchten, können Sie sich hierzu jederzeit an unseren Datenschutzbeauftragten wenden. Der Datenschutzbeauftragte dieser Website wird die Einschränkung der Verarbeitung veranlassen.
-
-## Recht auf Datenübertragbarkeit
-Jede von der Verarbeitung personenbezogener Daten betroffene Person hat das Recht, die sie betreffenden personenbezogenen Daten in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten. Sie hat ausserdem das Recht, dass diese Daten bei Vorliegen der gesetzlichen Voraussetzungen einem anderen Verantwortlichen übermittelt werden.
-
-Ferner hat die betroffene Person das Recht, zu erwirken, dass die personenbezogenen Daten direkt von einem Verantwortlichen an einen anderen Verantwortlichen übermittelt werden, soweit dies technisch machbar ist und sofern hiervon nicht die Rechte und Freiheiten anderer Personen beeinträchtigt werden.
-
-Zur Geltendmachung des Rechts auf Datenübertragbarkeit können Sie sich jederzeit an den vom Betreiber dieser Website bestellten Datenschutzbeauftragten wenden.
-
-## Recht auf Widerspruch
-Jede von der Verarbeitung personenbezogener Daten betroffene Person hat das Recht, aus Gründen, die sich aus ihrer besonderen Situation ergeben, jederzeit gegen die Verarbeitung sie betreffender personenbezogener Daten, Widerspruch einzulegen.
-
-Der Betreiber dieser Website verarbeitet die personenbezogenen Daten im Falle des Widerspruchs nicht mehr, es sei denn, wir können zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die den Interessen, Rechten und Freiheiten der betroffenen Person überwiegen, oder wenn die Verarbeitung der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen dient.
-
-Zur Ausübung des Rechts auf Widerspruch können Sie sich direkt an den Datenschutzbeauftragten dieser Website wenden.
-
-## Recht auf Widerruf einer datenschutzrechtlichen Einwilligung
-Jede von der Verarbeitung personenbezogener Daten betroffene Person hat das Recht, eine abgegebene Einwilligung zur Verarbeitung personenbezogener Daten jederzeit zu widerrufen.
-
-Möchten Sie Ihr Recht auf Widerruf einer Einwilligung geltend machen, können Sie sich hierzu jederzeit an unseren Datenschutzbeauftragten wenden.
-
-# Kostenpflichtige Leistungen
-Zur Erbringung kostenpflichtiger Leistungen werden von uns zusätzliche Daten erfragt, wie z.B. Zahlungsangaben, um Ihre Bestellung resp. Ihren Auftrag ausführen zu können. Wir speichern diese Daten in unseren Systemen, bis die gesetzlichen Aufbewahrungsfristen abgelaufen sind.
-
-# Externe Zahlungsdienstleister
-Diese Website setzt externe Zahlungsdienstleister ein, über deren Plattformen die Nutzer und wir Zahlungstransaktionen vornehmen können. Zum Beispiel über
+This website uses external payment service providers through whose platforms users and we can make payment transactions. For example via
 
 - Stripe (https://stripe.com/ch/privacy)
 - Bexio AG (https://www.bexio.com/de-CH/datenschutz)
 
-Wir setzen externe Zahlungsdienstleister auf Grundlage unserer berechtigten Interessen gem. schweizerischer Datenschutzverordnung sowie und soweit nötig, gem. Art. 6 Abs. 1 lit. f. EU-DSGVO ein, um unseren Nutzern effektive und sichere Zahlungsmöglichkeit zu bieten. Wir bieten Kunden die Möglichkeit per Rechnung zu zahlen, statt der Nutzung externer Zahlungsanbieter, vorausgesetzt die Bonität konnte im Einverständnis geprüft werden.
+As an alternative, we offer customers the option to pay by invoice instead of using external payment providers. However, this may require a positive credit check in advance.
 
-Zu den durch die Zahlungsdienstleister verarbeiteten Daten gehören Bestandsdaten, wie z.B. der Name und die Adresse, Bankdaten, wie u.a. Kontonummern oder Kreditkartennummern, Passwörter, TANs und Prüfsummen sowie die Vertrags-, Summen und empfänger bezogenen Angaben. Die Angaben sind erforderlich, um die Transaktionen durchzuführen. Die eingegebenen Daten werden jedoch nur durch die Zahlungsdienstleister verarbeitet und bei diesen gespeichert. Wir als Betreiber erhalten keinerlei Informationen zu (Bank-) Konto oder Kreditkarte, sondern lediglich Informationen zur Bestätigung (Annahme) oder Ablehnung der Zahlung. Unter Umständen werden die Daten seitens der Zahlungsdienstleister an Wirtschaftsauskunfteien übermittelt. Diese Übermittlung bezweckt die Identitäts- und Bonitätsprüfung. Hierzu verweisen wir auf die AGB und Datenschutzhinweise der Zahlungsdienstleister.
+The data processed by the payment service providers includes personal data, such as the name and address, bank data, such as account numbers or credit card numbers, passwords, TANs and checksums, as well as the contract, totals and recipient-related information. The information is necessary to carry out the transactions. However, the data entered is only processed by the payment service providers and stored with them. We as the operator do not receive any information about (bank) account or credit card, but only information to confirm (accept) or reject the payment. Under certain circumstances, the data is transmitted by the payment service providers to credit agencies. The purpose of this transmission is to check the identity and creditworthiness of the payment service provider. In this regard, we refer to the terms and conditions and data protection information of the payment service providers.
 
-Für die Zahlungsgeschäfte gelten die Geschäftsbedingungen und die Datenschutzhinweise der jeweiligen Zahlungsdienstleister, welche innerhalb der jeweiligen Website, bzw. Transaktionsapplikationen abrufbar sind. Wir verweisen auf diese ebenfalls zwecks weiterer Informationen und Geltendmachung von Widerrufs-, Auskunfts- und anderen betroffenen Rechten.
+For payment transactions, the terms and conditions and the data protection notices of the respective payment service providers apply, which can be accessed within the respective website or transaction applications. We also refer to these for the purpose of further information and assertion of revocation, information and other rights concerned.
 
-# Hinweis zur Datenweitergabe in die USA
-Auf unserer Website sind unter anderem Tools von Unternehmen mit Sitz in den USA eingebunden. Wenn diese Tools aktiv sind, können Ihre personenbezogenen Daten an die US-Server der jeweiligen Unternehmen weitergegeben werden. Wir weisen darauf hin, dass die USA kein sicherer Drittstaat im Sinne des EU-Datenschutzrechts sind. US-Unternehmen sind dazu verpflichtet, personenbezogene Daten an Sicherheitsbehörden herauszugeben, ohne dass Sie als Betroffener hiergegen gerichtlich vorgehen könnten. Es kann daher nicht ausgeschlossen werden, dass US-Behörden (z.B. Geheimdienste) Ihre auf US-Servern befindlichen Daten zu Überwachungszwecken verarbeiten, auswerten und dauerhaft speichern. Wir haben auf diese Verarbeitungstätigkeiten keinen Einfluss.
+We disclose personal information to law enforcement agencies, investigative authorities or in legal proceedings to the extent we are required to do so by law or when necessary to protect our rights or the rights of users.
 
-Wir versuchen aktiv die Nutzung von Tools von Unternehmen mit Sitz in den USA zu reduzieren, um unsere Kundschaft vor Weitergabe ihrer Daten zu schützen, jedoch ist dies derzeit mangels Alternativen nicht immer ohne grössere Umstände zu verwirklichen.  Bei Bedenken bitten wir Sie uns direkt zu kontaktieren, wir versuchen eine gemeinsame Lösung für Ihre Bedürfnisse zu finden.
+We also share data with third parties in aggregate form and/or in a form that does not allow the recipient to identify the data subject from that data third parties, for example for analytics.
 
-# Allgemeiner Haftungsausschluss
-Alle Angaben unseres Internetangebotes wurden sorgfältig geprüft. Wir bemühen uns, unser Informationsangebot aktuell, inhaltlich richtig und vollständig anzubieten. Trotzdem kann das Auftreten von Fehlern nicht völlig ausgeschlossen werden, womit wir keine Garantie für Vollständigkeit, Richtigkeit und Aktualität von Informationen auch journalistisch-redaktioneller Art übernehmen können. Haftungsansprüche aus Schäden materieller oder ideeller Art, die durch die Nutzung der angebotenen Informationen verursacht wurden, sind ausgeschlossen, sofern kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt.
+## Cookies
 
-Der Herausgeber kann nach eigenem Ermessen und ohne Ankündigung Texte verändern oder löschen und ist nicht verpflichtet, Inhalte dieser Website zu aktualisieren. Die Benutzung bzw. der Zugang zu dieser Website geschieht auf eigene Gefahr des Besuchers. Der Herausgeber, seine Auftraggeber oder Partner sind nicht verantwortlich für Schäden, wie direkte, indirekte, zufällige, vorab konkret zu bestimmende oder Folgeschäden, die angeblich durch den Besuch dieser Website entstanden sind und übernehmen hierfür folglich keine Haftung.
+Our websites use cookies. These are small text files that make it possible to store specific information related to the user on the user&#39;s terminal device while the user is using the website. Cookies enable us, in particular, to offer a single sign-on procedure, to control the performance of our services, but also to make our offer more customer-friendly. Cookies remain stored beyond the end of a browser session and can be retrieved when the user visits the site again.
 
-Der Herausgeber übernimmt ebenfalls keine Verantwortung und Haftung für die Inhalte und die Verfügbarkeit von Website Dritter, die über externe Links dieser Website erreichbar sind. Für den Inhalt der verlinkten Seiten sind ausschliesslich deren Betreiber verantwortlich. Der Herausgeber distanziert sich damit ausdrücklich von allen Inhalten Dritter, die möglicherweise straf- oder haftungsrechtlich relevant sind oder gegen die guten Sitten verstossen.
+In particular, we use the following cookies to provide our services:
 
-# Änderungen
-Wir können diese Datenschutzerklärung jederzeit ohne Vorankündigung anpassen. Es gilt die jeweils aktuelle, auf unserer Website publizierte Fassung. Soweit die Datenschutzerklärung Teil einer Vereinbarung mit Ihnen ist, werden wir Sie im Falle einer Aktualisierung über die Änderung per E-Mail oder auf andere geeignete Weise informieren.
+### Cloudflare
 
-# Fragen an den Datenschutzbeauftragten
-Wenn Sie Fragen zum Datenschutz haben, schreiben Sie uns bitte eine E-Mail oder wenden Sie sich direkt an die für den Datenschutz zu Beginn der Datenschutzerklärung aufgeführten, verantwortlichen Person in unserer Organisation.
+\_\_cfuid  
+\_\_cflb  
+\_\_cf\_bm
 
-# Inkrafttreten
-Diese Datenschutzerklärung ist gültig ab dem 31.05.2021
+For further reference see Cloudflare's [privacy policy](https://www.cloudflare.com/privacypolicy/) or their article [Understanding the Cloudflare Cookies](https://support.cloudflare.com/hc/en-us/articles/200170156-Understanding-the-Cloudflare-Cookies).
 
-St. Gallen, 31.05.2021
+### ZITADEL
+
+\_\_useragent  
+\_\_csrf
+
+Cookies are only used for technical purposes to enable the functionality and efficient use of our website and our offers, such as:
+
+- Session management
+- Single Sign On
+- Rate Limiting
+- DDOS Mitigation
+
+If you do not want us to use cookies during your visit, you can disable their use in your browser settings. In this case, certain parts of our website (e.g. language selection) may not function or may not function fully.
+
+## Rights of data subjects
+
+### Right to information
+
+Any person affected by the processing has the right to obtain information from the responsible data processor at any time about the personal data stored about him or her.
+
+### Right to rectification
+
+Every person affected by the processing has the right to demand the correction of inaccurate personal data concerning him or her. Furthermore, the data subject has the right to request the completion of incomplete personal data, taking into account the purposes of the processing.
+
+### Right to erasure (right to be forgotten)
+
+Any person affected by the processing has the right, in certain cases, to request from the responsible data processor to delete the personal data concerning him or her.
+
+### Right to restrict processing
+
+Every person affected by the processing has the right in certain cases to request from the responsible data processor to restrict the processing.
+
+### Right to data portability
+
+Every person affected by the processing has the right to receive the personal data concerning him or her in a structured, common and machine-readable format. He or she also has the right to have this data transferred to another data processor if the legal requirements are met.
+
+### Right to object
+
+Every person affected by the processing has the right to object to the processing of personal data concerning him or her, insofar as we base the processing of his or her personal data on a balancing of interests. This is the case if the processing is not necessary, for example, to fulfill a contract or a legal obligation.
+
+To exercise such an objection, the data subject must explain his or her reasons why we should not process his or her personal data as we have done. We will then review the situation and either stop or adjust the data processing or show the data subject our reasons for continuing the processing.
+
+### Right to revoke consent under data protection law
+
+Insofar as our processing is based on consent, the data subject has the right to revoke this consent at any time with effect for the future.
+
+### Assertion of rights by the data subjects
+
+If you wish to exercise your rights, you may do so by contacting the above-mentioned contact person.
+
+A data subject also has the right to lodge a complaint with the competent data protection authority. The competent data protection authority in Switzerland is the Federal Data Protection and Information Commissioner (www.edoeb.admin.ch). The competent data protection authorities of EU countries can be viewed at this link: [https://ec.europa.eu/justice/article-29/structure/data-protection-authorities/index\_en.htm](https://ec.europa.eu/justice/article-29/structure/data-protection-authorities/index_en.htm)
+
+## Note on data transfer abroad
+
+Our websites and services make use of tools from companies based in countries outside of Switzerland or the EU/EEA, namely those based in the USA. When these tools are active, your personal data may be transferred to the servers of the respective companies abroad. We would like to point out that some of these countries, namely the USA, are not a safe third country in the sense of Swiss and EU data protection law. In these cases, we only transfer personal data after we have implemented the legally required measures for this, such as concluding standard contractual clauses on data protection or obtaining the consent of the data subjects. If interested, the documentation on these measures can be obtained from the contact person mentioned above.
+
+We actively try to minimize the use of tools from companies located in countries without equivalent data protection, however, due to the lack of alternatives, this is currently not always feasible without major inconvenience. If you have any concerns, please contact us directly and we will try to find a mutual solution for your needs.
+
+## Changes
+
+We may amend this privacy policy at any time without prior notice. Always the current version published on our website applies to users and customers of our website and services. Insofar as the data protection declaration is part of an agreement with you, we will inform you of the change by e-mail or other suitable means in the event of an update.
+
+## Questions about data processing by us
+
+If you have any questions about our data processing, please email us or contact the person in our organization listed at the beginning of this privacy statement directly.
+
+## Entry into force
+
+This privacy policy is valid from 11.06.2021
+
+St. Gallen, 11.06.2021
