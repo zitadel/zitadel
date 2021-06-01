@@ -26,6 +26,31 @@ export enum UploadEndpoint {
   MGMTLIGHTICON = 'org/policy/label/icon/light',
 }
 
+export enum DownloadEndpoint {
+  IAMFONT = 'iam/policy/label/font',
+  MGMTFONT = 'org/policy/label/font',
+
+  IAMDARKLOGO = 'iam/policy/label/logo/dark',
+  IAMLOGO = 'iam/policy/label/logo',
+  IAMDARKICON = 'iam/policy/label/icon/dark',
+  IAMICON = 'iam/policy/label/icon',
+
+  MGMTDARKLOGO = 'org/policy/label/logo/dark',
+  MGMTLOGO = 'org/policy/label/logo',
+  MGMTDARKICON = 'org/policy/label/icon/dark',
+  MGMTICON = 'org/policy/label/icon',
+
+  IAMDARKLOGOPREVIEW = 'iam/policy/label/logo/dark/_preview',
+  IAMLOGOPREVIEW = 'iam/policy/label/logo/_preview',
+  IAMDARKICONPREVIEW = 'iam/policy/label/icon/dark/_preview',
+  IAMICONPREVIEW = 'iam/policy/label/icon/_preview',
+
+  MGMTDARKLOGOPREVIEW = 'org/policy/label/logo/dark/_preview',
+  MGMTLOGOPREVIEW = 'org/policy/label/logo/_preview',
+  MGMTDARKICONPREVIEW = 'org/policy/label/icon/dark/_preview',
+  MGMTICONPREVIEW = 'org/policy/label/icon/_preview',
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -69,7 +94,9 @@ export class UploadService {
 
   public load(endpoint: string): Promise<any> {
     return this.http.get(`${this.serviceUrl}/assets/v1/${endpoint}`,
+
       {
+        responseType: 'blob',
         headers: {
           [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
           [orgKey]: `${this.org.id}`,

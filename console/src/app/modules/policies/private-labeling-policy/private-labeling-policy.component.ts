@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, EventEmitter, Injector, OnDestroy, Type } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -18,7 +19,7 @@ import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { UploadEndpoint, UploadService } from 'src/app/services/upload.service';
+import { DownloadEndpoint, UploadEndpoint, UploadService } from 'src/app/services/upload.service';
 
 import { CnslLinks } from '../../links/links.component';
 import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
@@ -29,9 +30,19 @@ export enum Theme {
   LIGHT,
 }
 
-enum Preview {
+export enum Preview {
   CURRENT,
   PREVIEW,
+}
+
+export enum ColorType {
+  BACKGROUND,
+  PRIMARY,
+  WARN,
+  FONTDARK,
+  FONTLIGHT,
+  BACKGROUNDDARK,
+  BACKGROUNDLIGHT,
 }
 
 @Component({
@@ -48,6 +59,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public previewData!: LabelPolicy.AsObject;
   public data!: LabelPolicy.AsObject;
+
+  public images: { [key: string]: any; } = {};
 
   public panelOpenState: boolean = false;
   public isHoveringOverDarkLogo: boolean = false;
@@ -72,12 +85,16 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public Theme: any = Theme;
   public Preview: any = Preview;
+  public ColorType: any = ColorType;
+
+  public refreshPreview: EventEmitter<void> = new EventEmitter();
 
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private uploadService: UploadService,
+    private sanitizer: DomSanitizer,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
@@ -218,18 +235,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         this.previewData = data.policy;
         this.loading = false;
 
-        if (this.previewData.logoUrlDark) {
-          this.loadAsset(this.previewData.logoUrlDark);
-        }
-        if (this.previewData.iconUrlDark) {
-          this.loadAsset(this.previewData.iconUrlDark);
-        }
-        if (this.previewData.logoUrl) {
-          this.loadAsset(this.previewData.logoUrl);
-        }
-        if (this.previewData.iconUrl) {
-          this.loadAsset(this.previewData.iconUrl);
-        }
+        this.loadPreviewImages();
       }
     }).catch(error => {
       this.toast.showError(error);
@@ -241,10 +247,72 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (data.policy) {
         this.data = data.policy;
         this.loading = false;
+
+        this.loadImages();
       }
     }).catch(error => {
       this.toast.showError(error);
     });
+  }
+
+  private loadImages(): void {
+    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+      if (this.data.logoUrlDark) {
+        this.loadAsset('darkLogo', DownloadEndpoint.IAMDARKLOGOPREVIEW);
+      }
+      if (this.data.iconUrlDark) {
+        this.loadAsset('darkIcon', DownloadEndpoint.IAMDARKICONPREVIEW);
+      }
+      if (this.data.logoUrl) {
+        this.loadAsset('logo', DownloadEndpoint.IAMLOGOPREVIEW);
+      }
+      if (this.data.iconUrl) {
+        this.loadAsset('icon', DownloadEndpoint.IAMICONPREVIEW);
+      }
+    } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      if (this.data.logoUrlDark) {
+        this.loadAsset('darkLogo', DownloadEndpoint.MGMTDARKLOGOPREVIEW);
+      }
+      if (this.data.iconUrlDark) {
+        this.loadAsset('darkIcon', DownloadEndpoint.MGMTDARKICONPREVIEW);
+      }
+      if (this.data.logoUrl) {
+        this.loadAsset('logo', DownloadEndpoint.MGMTLOGOPREVIEW);
+      }
+      if (this.data.iconUrl) {
+        this.loadAsset('icon', DownloadEndpoint.MGMTICONPREVIEW);
+      }
+    }
+  }
+
+  private loadPreviewImages(): void {
+    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+      if (this.previewData.logoUrlDark) {
+        this.loadAsset('previewDarkLogo', DownloadEndpoint.IAMDARKLOGOPREVIEW);
+      }
+      if (this.previewData.iconUrlDark) {
+        this.loadAsset('previewDarkIcon', DownloadEndpoint.IAMDARKICONPREVIEW);
+      }
+      if (this.previewData.logoUrl) {
+        this.loadAsset('previewLogo', DownloadEndpoint.IAMLOGOPREVIEW);
+      }
+      if (this.previewData.iconUrl) {
+        this.loadAsset('previewIcon', DownloadEndpoint.IAMICONPREVIEW);
+      }
+    } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      if (this.previewData.logoUrlDark) {
+        this.loadAsset('previewDarkLogo', DownloadEndpoint.MGMTDARKLOGOPREVIEW);
+      }
+      if (this.previewData.iconUrlDark) {
+        this.loadAsset('previewDarkIcon', DownloadEndpoint.MGMTDARKICONPREVIEW);
+      }
+      if (this.previewData.logoUrl) {
+        this.loadAsset('previewLogo', DownloadEndpoint.MGMTLOGOPREVIEW);
+      }
+      if (this.previewData.iconUrl) {
+        this.loadAsset('previewIcon', DownloadEndpoint.MGMTICONPREVIEW);
+      }
+    }
   }
 
   public ngOnDestroy(): void {
@@ -277,15 +345,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  private loadAsset(url: string): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.ADMIN:
-        this.uploadService.load(`/iam/${url}`);
-        break;
-      case PolicyComponentServiceType.MGMT:
-        this.uploadService.load(`/org/${url}`);
-        break;
-    }
+  private loadAsset(imagekey: string, url: string): Promise<any> {
+    return this.uploadService.load(`${url}`).then(data => {
+      const objectURL = URL.createObjectURL(data);
+      this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+      this.refreshPreview.emit();
+    });
   }
 
   public removePolicy(): void {

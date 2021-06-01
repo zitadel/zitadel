@@ -59,6 +59,18 @@
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
+              <container [ngSwitch]="theme">
+                <div class="logo-view" *ngSwitchCase="Theme.DARK">
+                  <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkLogo']" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
+                  <span class="fill-space"></span>
+                  <img matTooltip="Current" class="curr" *ngIf="images['darkLogo']" [src]="images['darkLogo']" alt="dark logo"/>
+                </div>
+                <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
+                  <img matTooltip="Preview" class="prev" *ngIf="images['previewLogo']" [src]="images['previewLogo']" alt="logo preview"/>
+                  <span class="fill-space"></span>
+                  <img matTooltip="Current" class="curr" *ngIf="images['logo']" [src]="images['logo']" alt="logo"/>
+                </div>
+              </container>
               <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(theme, $event)"
               (dropped)="onDropLogo(theme, $event)"
               [class.hovering]="isHoveringOverDarkLogo">
@@ -67,13 +79,25 @@
                   <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
 
                   <i class="icon las la-cloud-upload-alt"></i>
-                  <span class="desc">{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
+                  <span>{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
                 </label>
             </div>
             </div>
 
             <div class="part">
               <span class="label">Icon</span>
+                <container [ngSwitch]="theme">
+                  <div class="logo-view" *ngSwitchCase="Theme.DARK">
+                    <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkIcon']" [src]="images['previewDarkIcon']" alt="dark icon preview"/>
+                    <span class="fill-space"></span>
+                    <img matTooltip="Current" class="curr" *ngIf="images['darkIcon']" [src]="images['darkIcon']" alt="dark icon"/>
+                  </div>
+                  <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
+                    <img matTooltip="Preview" class="prev" *ngIf="images['previewIcon']" [src]="images['previewIcon']" alt="icon preview"/>
+                    <span class="fill-space"></span>
+                    <img matTooltip="Current" class="curr" *ngIf="images['icon']" [src]="images['icon']" alt="icon"/>
+                  </div>
+                </container>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
               (dropped)="onDropIcon(theme, $event)"
               [class.hovering]="isHoveringOverDarkIcon">
@@ -82,7 +106,7 @@
                 <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
 
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span class="desc">{{isHoveringOverDarkIcon ? 'Release': 'Drop your Logo here'}}</span>
+                <span>{{isHoveringOverDarkIcon ? 'Release': 'Drop your Logo here'}}</span>
               </label>
               </div>
             </div>
@@ -102,15 +126,19 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.BACKGROUNDDARK"(previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColorDark = $event; savePolicy()"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.PRIMARY"(previewChanged)="previewData.primaryColorDark = $event; savePolicy()"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" (previewChanged)="previewData.warnColorDark =  $event; savePolicy()" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.WARN" (previewChanged)="previewData.warnColorDark =  $event; savePolicy()" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+              </div>
+
+              <div class="color">
+                <cnsl-color [colorType]="ColorType.FONTDARK"(previewChanged)="previewData.fontColorDark = $event; savePolicy()"  name="Font Color Dark" [color]="data.fontColorDark" [previewColor]="previewData.fontColorDark"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -118,15 +146,19 @@
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.backgroundColor = $event; savePolicy()"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT" (previewChanged)="previewData.backgroundColor = $event; savePolicy()"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color (previewChanged)="previewData.primaryColor = $event; savePolicy()" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event; savePolicy()" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [warn]="true" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event; savePolicy()" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.WARN" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event; savePolicy()" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+              </div>
+
+              <div class="color">
+                <cnsl-color [colorType]="ColorType.FONTLIGHT" (previewChanged)="previewData.fontColor = $event; savePolicy()"  name="Font Color" [color]="data.fontColor" [previewColor]="previewData.fontColor"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -154,7 +186,7 @@
                   <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFontFile.click();" />
 
                   <i class="icon las la-cloud-upload-alt"></i>
-                  <span class="desc">{{isHoveringOverFont ? 'Release': 'Drop your Logo here'}}</span>
+                  <span >{{isHoveringOverFont ? 'Release': 'Drop your Logo here'}}</span>
                 </label>
             </div>
         </div>
@@ -188,8 +220,8 @@
             <span><span [ngClass]="{'strong': preview == Preview.PREVIEW}">P</span> / <span [ngClass]="{'strong': preview == Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW"  [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData"></cnsl-preview>
         </div>
       </div>
     </div>
