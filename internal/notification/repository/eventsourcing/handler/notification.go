@@ -387,7 +387,7 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 }
 
 // Read organization specific texts
-func (n *Notification) getMessageText(user *view_model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
+func (n *Notification) getMessageText(user *model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
 	langTag := language.Make(lang)
 	if langTag == language.Und {
 		lang = language.English.String()
