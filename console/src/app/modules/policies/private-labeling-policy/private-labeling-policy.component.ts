@@ -42,7 +42,7 @@ export enum ColorType {
   FONTDARK,
   FONTLIGHT,
   BACKGROUNDDARK,
-  BACKGROUNDLIGHT
+  BACKGROUNDLIGHT,
 }
 
 @Component({
@@ -92,7 +92,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private uploadService: UploadService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
@@ -253,8 +253,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     });
   }
 
-  private loadImages() {
-    if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+  private loadImages(): void {
+    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (this.data.logoUrlDark) {
         this.loadAsset('darkLogo', DownloadEndpoint.IAMDARKLOGOPREVIEW);
       }
@@ -267,8 +267,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (this.data.iconUrl) {
         this.loadAsset('icon', DownloadEndpoint.IAMICONPREVIEW);
       }
-    }
-    else if (this.serviceType == PolicyComponentServiceType.MGMT) {
+    } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (this.data.logoUrlDark) {
         this.loadAsset('darkLogo', DownloadEndpoint.MGMTDARKLOGOPREVIEW);
       }
@@ -284,8 +283,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  private loadPreviewImages() {
-    if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+  private loadPreviewImages(): void {
+    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (this.previewData.logoUrlDark) {
         this.loadAsset('previewDarkLogo', DownloadEndpoint.IAMDARKLOGOPREVIEW);
       }
@@ -298,8 +297,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (this.previewData.iconUrl) {
         this.loadAsset('previewIcon', DownloadEndpoint.IAMICONPREVIEW);
       }
-    }
-    else if (this.serviceType == PolicyComponentServiceType.MGMT) {
+    } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (this.previewData.logoUrlDark) {
         this.loadAsset('previewDarkLogo', DownloadEndpoint.MGMTDARKLOGOPREVIEW);
       }
@@ -347,9 +345,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
     return this.uploadService.load(`${url}`).then(data => {
-      let objectURL = URL.createObjectURL(data);
+      const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-      console.log(imagekey);
     });
   }
 

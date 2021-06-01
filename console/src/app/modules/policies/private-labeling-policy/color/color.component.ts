@@ -76,7 +76,7 @@ export class ColorComponent implements OnInit {
     { name: 'black', color: '#000000' },
   ];
 
-  public colors = this.PRIMARY;
+  public colors: Array<{ name: string; color: string; }> = this.PRIMARY;
 
   @Input() colorType: ColorType = ColorType.PRIMARY;
   @Input() color: string = '';

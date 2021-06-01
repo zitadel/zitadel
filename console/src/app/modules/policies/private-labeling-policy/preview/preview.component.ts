@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 
 import { Preview, Theme } from '../private-labeling-policy.component';
@@ -18,14 +18,14 @@ export class PreviewComponent implements OnInit {
   public Preview: any = Preview;
   constructor() { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     console.log(this.images);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    //Add '${implements OnChanges}' to the class.
-    console.log(this.images);
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
+  //   //Add '${implements OnChanges}' to the class.
+  //   console.log(this.images);
 
-  }
+  // }
 }
