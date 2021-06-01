@@ -37,42 +37,45 @@ func NewOrgAdminProjection(ctx context.Context, config crdb.StatementHandlerConf
 	return p
 }
 
-func (p *OrgAdminProjection) reducers() []handler.EventReducer {
-	return []handler.EventReducer{
+func (p *OrgAdminProjection) reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
 		{
-			Aggregate: "org",
-			Event:     org.MemberAddedEventType,
-			Reduce:    p.reduceMemberAdded,
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.MemberAddedEventType,
+					Reduce: p.reduceMemberAdded,
+				},
+				{
+					Event:  org.MemberChangedEventType,
+					Reduce: p.reduceMemberChanged,
+				},
+				{
+					Event:  org.MemberRemovedEventType,
+					Reduce: p.reduceMemberRemoved,
+				},
+				{
+					Event:  org.OrgChangedEventType,
+					Reduce: p.reduceOrgChanged,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
+			},
 		},
 		{
-			Aggregate: "org",
-			Event:     org.MemberChangedEventType,
-			Reduce:    p.reduceMemberChanged,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.MemberRemovedEventType,
-			Reduce:    p.reduceMemberRemoved,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.OrgChangedEventType,
-			Reduce:    p.reduceOrgChanged,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.OrgRemovedEventType,
-			Reduce:    p.reduceOrgRemoved,
-		},
-		{
-			Aggregate: "user",
-			Event:     user.HumanEmailChangedType,
-			Reduce:    p.reduceHumanEmailChanged,
-		},
-		{
-			Aggregate: "user",
-			Event:     user.HumanProfileChangedType,
-			Reduce:    p.reduceHumanProfileChanged,
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.HumanEmailChangedType,
+					Reduce: p.reduceHumanEmailChanged,
+				},
+				{
+					Event:  user.HumanProfileChangedType,
+					Reduce: p.reduceHumanProfileChanged,
+				},
+			},
 		},
 	}
 }

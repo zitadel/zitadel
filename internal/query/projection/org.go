@@ -24,32 +24,32 @@ func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	return p
 }
 
-func (p *OrgProjection) reducers() []handler.EventReducer {
-	return []handler.EventReducer{
+func (p *OrgProjection) reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
 		{
 			Aggregate: "org",
-			Event:     org.OrgAddedEventType,
-			Reduce:    p.reduceOrgAdded,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.OrgChangedEventType,
-			Reduce:    p.reduceOrgChanged,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.OrgDeactivatedEventType,
-			Reduce:    p.reduceOrgDeactivated,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.OrgReactivatedEventType,
-			Reduce:    p.reduceOrgReactivated,
-		},
-		{
-			Aggregate: "org",
-			Event:     org.OrgDomainPrimarySetEventType,
-			Reduce:    p.reducePrimaryDomainSet,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgAddedEventType,
+					Reduce: p.reduceOrgAdded,
+				},
+				{
+					Event:  org.OrgChangedEventType,
+					Reduce: p.reduceOrgChanged,
+				},
+				{
+					Event:  org.OrgDeactivatedEventType,
+					Reduce: p.reduceOrgDeactivated,
+				},
+				{
+					Event:  org.OrgReactivatedEventType,
+					Reduce: p.reduceOrgReactivated,
+				},
+				{
+					Event:  org.OrgDomainPrimarySetEventType,
+					Reduce: p.reducePrimaryDomainSet,
+				},
+			},
 		},
 	}
 }
