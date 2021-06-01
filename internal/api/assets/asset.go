@@ -149,7 +149,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			s.ErrorHandler()(w, r, err)
 			return
 		}
-		w.Header().Set("content-length", strconv.FormatInt(info.Size, 16))
+		w.Header().Set("content-length", strconv.FormatInt(info.Size, 10))
 		w.Header().Set("content-type", info.ContentType)
 		w.Header().Set("ETag", info.ETag)
 		w.Write(data)

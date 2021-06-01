@@ -45,7 +45,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("content-length", strconv.Itoa(int(info.Size)))
+	w.Header().Set("content-length", strconv.FormatInt(info.Size, 10))
 	w.Header().Set("content-type", info.ContentType)
 	w.Header().Set("ETag", info.ETag)
 	w.Write(asset)
