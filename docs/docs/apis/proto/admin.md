@@ -476,7 +476,7 @@ Returns the custom text for initial message
 Sets the default custom text for initial message
 it impacts all organisations without customized initial message text
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -499,7 +499,7 @@ Returns the custom text for password reset message
 Sets the default custom text for password reset message
 it impacts all organisations without customized password reset message text
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -522,7 +522,7 @@ Returns the custom text for verify email message
 Sets the default custom text for verify email message
 it impacts all organisations without customized verify email message text
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -545,7 +545,7 @@ Returns the custom text for verify phone message
 Sets the default custom text for verify phone message
 it impacts all organisations without customized verify phone message text
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -568,7 +568,7 @@ Returns the custom text for domain claimed message
 Sets the default custom text for domain claimed phone message
 it impacts all organisations without customized verify phone message text
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -1701,7 +1701,7 @@ This is an empty response
 | pre_header |  string | - | string.max_len: 200<br />  |
 | subject |  string | - | string.max_len: 200<br />  |
 | greeting |  string | - | string.max_len: 200<br />  |
-| text |  string | - | string.max_len: 800<br />  |
+| text |  string | - | string.max_len: 1000<br />  |
 | button_text |  string | - | string.max_len: 200<br />  |
 | footer_text |  string | - | string.max_len: 200<br />  |
 

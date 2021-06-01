@@ -261,5 +261,5 @@ SetUp:
         PreHeader: Change email / username
         Subject: Domain has been claimed
         Greeting: Hello {{.FirstName}} {{.LastName}},
-        Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.Username}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
+        Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
         ButtonText: Login
