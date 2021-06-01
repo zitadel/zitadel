@@ -72,7 +72,7 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			if e.Key == domain.MessageFooterText {
 				wm.FooterText = ""
 			}
-		case *policy.CustomTextMessageRemovedEvent:
+		case *policy.CustomTextTemplateRemovedEvent:
 			wm.State = domain.PolicyStateRemoved
 		}
 	}

@@ -106,7 +106,7 @@ func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, mai
 		return caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.CustomMailText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewCustomTextMessageRemovedEvent(ctx, orgAgg, mailTextType, lang))
+	_, err = c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, mailTextType, lang))
 	return err
 }
 

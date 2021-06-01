@@ -31,8 +31,8 @@ func (wm *OrgCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event
 			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextSetEvent)
 		case *org.CustomTextRemovedEvent:
 			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextRemovedEvent)
-		case *org.CustomTextMessageRemovedEvent:
-			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextMessageRemovedEvent)
+		case *org.CustomTextTemplateRemovedEvent:
+			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextTemplateRemovedEvent)
 		}
 	}
 }
@@ -48,5 +48,5 @@ func (wm *OrgCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder 
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,
-			org.CustomTextMessageRemovedEventType)
+			org.CustomTextTemplateRemovedEventType)
 }

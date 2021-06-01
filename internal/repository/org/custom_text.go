@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	CustomTextSetEventType            = orgEventTypePrefix + policy.CustomTextSetEventType
-	CustomTextRemovedEventType        = orgEventTypePrefix + policy.CustomTextRemovedEventType
-	CustomTextMessageRemovedEventType = orgEventTypePrefix + policy.CustomTextRemovedEventType
+	CustomTextSetEventType             = orgEventTypePrefix + policy.CustomTextSetEventType
+	CustomTextRemovedEventType         = orgEventTypePrefix + policy.CustomTextRemovedEventType
+	CustomTextTemplateRemovedEventType = orgEventTypePrefix + policy.CustomTextTemplateRemovedEventType
 )
 
 type CustomTextSetEvent struct {
@@ -78,30 +78,30 @@ func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventRead
 	return &CustomTextRemovedEvent{CustomTextRemovedEvent: *e.(*policy.CustomTextRemovedEvent)}, nil
 }
 
-type CustomTextMessageRemovedEvent struct {
-	policy.CustomTextMessageRemovedEvent
+type CustomTextTemplateRemovedEvent struct {
+	policy.CustomTextTemplateRemovedEvent
 }
 
-func NewCustomTextMessageRemovedEvent(
+func NewCustomTextTemplateRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	template string,
 	language language.Tag,
-) *CustomTextMessageRemovedEvent {
-	return &CustomTextMessageRemovedEvent{
-		CustomTextMessageRemovedEvent: *policy.NewCustomTextMessageRemovedEvent(
-			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextMessageRemovedEventType),
+) *CustomTextTemplateRemovedEvent {
+	return &CustomTextTemplateRemovedEvent{
+		CustomTextTemplateRemovedEvent: *policy.NewCustomTextTemplateRemovedEvent(
+			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextTemplateRemovedEventType),
 			template,
 			language,
 		),
 	}
 }
 
-func CustomTextMessageRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := policy.CustomTextMessageRemovedEventMapper(event)
+func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.CustomTextTemplateRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &CustomTextMessageRemovedEvent{CustomTextMessageRemovedEvent: *e.(*policy.CustomTextMessageRemovedEvent)}, nil
+	return &CustomTextTemplateRemovedEvent{CustomTextTemplateRemovedEvent: *e.(*policy.CustomTextTemplateRemovedEvent)}, nil
 }

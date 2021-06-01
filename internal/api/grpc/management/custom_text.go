@@ -10,7 +10,7 @@ import (
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetInitMessageCustomText(ctx context.Context, req *mgmt_pb.GetCustomInitMessageTextRequest) (*mgmt_pb.GetCustomInitMessageTextResponse, error) {
+func (s *Server) GetCustomInitMessageText(ctx context.Context, req *mgmt_pb.GetCustomInitMessageTextRequest) (*mgmt_pb.GetCustomInitMessageTextResponse, error) {
 	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func (s *Server) GetInitMessageCustomText(ctx context.Context, req *mgmt_pb.GetC
 	}, nil
 }
 
-func (s *Server) SetInitMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomInitMessageTextRequest) (*mgmt_pb.SetCustomInitMessageTextResponse, error) {
+func (s *Server) SetCustomInitMessageText(ctx context.Context, req *mgmt_pb.SetCustomInitMessageTextRequest) (*mgmt_pb.SetCustomInitMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetInitCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (s *Server) SetInitMessageCustomText(ctx context.Context, req *mgmt_pb.SetC
 	}, nil
 }
 
-func (s *Server) GetPasswordResetMessageCustomText(ctx context.Context, req *mgmt_pb.GetCustomPasswordResetMessageTextRequest) (*mgmt_pb.GetCustomPasswordResetMessageTextResponse, error) {
+func (s *Server) GetCustomPasswordResetMessageText(ctx context.Context, req *mgmt_pb.GetCustomPasswordResetMessageTextRequest) (*mgmt_pb.GetCustomPasswordResetMessageTextResponse, error) {
 	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (s *Server) GetPasswordResetMessageCustomText(ctx context.Context, req *mgm
 	}, nil
 }
 
-func (s *Server) SetPasswordResetMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomPasswordResetMessageTextRequest) (*mgmt_pb.SetCustomPasswordResetMessageTextResponse, error) {
+func (s *Server) SetCustomPasswordResetMessageText(ctx context.Context, req *mgmt_pb.SetCustomPasswordResetMessageTextRequest) (*mgmt_pb.SetCustomPasswordResetMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetPasswordResetCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (s *Server) SetPasswordResetMessageCustomText(ctx context.Context, req *mgm
 	}, nil
 }
 
-func (s *Server) GetVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_pb.GetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.GetCustomVerifyEmailMessageTextResponse, error) {
+func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *mgmt_pb.GetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.GetCustomVerifyEmailMessageTextResponse, error) {
 	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (s *Server) GetVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_
 	}, nil
 }
 
-func (s *Server) SetVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.SetCustomVerifyEmailMessageTextResponse, error) {
+func (s *Server) SetCustomVerifyEmailMessageText(ctx context.Context, req *mgmt_pb.SetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.SetCustomVerifyEmailMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetVerifyEmailCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (s *Server) SetVerifyEmailMessageCustomText(ctx context.Context, req *mgmt_
 	}, nil
 }
 
-func (s *Server) GetVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_pb.GetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.GetCustomVerifyPhoneMessageTextResponse, error) {
+func (s *Server) GetCustomVerifyPhoneMessageText(ctx context.Context, req *mgmt_pb.GetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.GetCustomVerifyPhoneMessageTextResponse, error) {
 	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (s *Server) GetVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_
 	}, nil
 }
 
-func (s *Server) SetVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.SetCustomVerifyPhoneMessageTextResponse, error) {
+func (s *Server) SetCustomVerifyPhoneMessageText(ctx context.Context, req *mgmt_pb.SetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.SetCustomVerifyPhoneMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetVerifyPhoneCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (s *Server) SetVerifyPhoneMessageCustomText(ctx context.Context, req *mgmt_
 	}, nil
 }
 
-func (s *Server) GetDomainClaimedMessageCustomText(ctx context.Context, req *mgmt_pb.GetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.GetCustomDomainClaimedMessageTextResponse, error) {
+func (s *Server) GetCustomDomainClaimedMessageText(ctx context.Context, req *mgmt_pb.GetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.GetCustomDomainClaimedMessageTextResponse, error) {
 	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (s *Server) GetDomainClaimedMessageCustomText(ctx context.Context, req *mgm
 	}, nil
 }
 
-func (s *Server) SetDomainClaimedMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
+func (s *Server) SetCustomDomainClaimedMessageText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err

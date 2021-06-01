@@ -162,7 +162,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMessageText(user, mailTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMessageText(user, mailTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -239,7 +239,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMessageText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMessageText(user, mailTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -300,7 +300,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMessageText(user, mailTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -392,7 +392,7 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 }
 
 // Read organization specific texts
-func (n *Notification) getMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+func (n *Notification) getMessageText(user *view_model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
 	langTag := language.Make(lang)
 	if langTag == language.Und {
 		lang = language.English.String()
@@ -405,7 +405,7 @@ func (n *Notification) getMessageText(ctx context.Context, textType, lang string
 	defaultMessageText.Default = true
 
 	// read from Org
-	orgMessageText, err := n.view.MessageTextByIDs(authz.GetCtxData(ctx).OrgID, textType, lang, mailTextTableOrg)
+	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, lang, mailTextTableOrg)
 	if errors.IsNotFound(err) {
 		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
 	}

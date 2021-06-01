@@ -51,7 +51,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MailTextRemovedEventType, MailTextRemovedEventMapper).
 		RegisterFilterEventMapper(CustomTextSetEventType, CustomTextSetEventMapper).
 		RegisterFilterEventMapper(CustomTextRemovedEventType, CustomTextRemovedEventMapper).
-		RegisterFilterEventMapper(CustomTextMessageRemovedEventType, CustomTextMessageRemovedEventMapper).
+		RegisterFilterEventMapper(CustomTextTemplateRemovedEventType, CustomTextTemplateRemovedEventMapper).
 		RegisterFilterEventMapper(IDPConfigAddedEventType, IDPConfigAddedEventMapper).
 		RegisterFilterEventMapper(IDPConfigChangedEventType, IDPConfigChangedEventMapper).
 		RegisterFilterEventMapper(IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).
