@@ -112,7 +112,7 @@ Errors:
       Invalid: Refresh Token ist ungültig
       NotFound: Refresh Token nicht gefunden
   Org:
-    AlreadyExist: Organisationsname existiert bereits
+    AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv
