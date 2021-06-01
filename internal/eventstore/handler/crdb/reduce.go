@@ -10,7 +10,6 @@ func (h *StatementHandler) reduce(event eventstore.EventReader) ([]handler.State
 	reduce, ok := h.reduces[event.Type()]
 	if !ok {
 		return []handler.Statement{NewNoOpStatement(event.Sequence(), event.PreviousSequence())}, nil
-		// logging.LogWithFields("CRDB-TXMc2", "aggregateType", event.Aggregate().Typ, "eventType", event.Type()).Panic("no reduce function found")
 	}
 
 	return reduce(event)
