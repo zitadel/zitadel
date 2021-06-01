@@ -146,10 +146,9 @@ func (h *ProjectionHandler) processEvent(
 
 	h.stmts = append(h.stmts, stmts...)
 
-	if !h.pushSet {
-		h.pushSet = true
-		h.shouldPush.Reset(0)
-	}
+	h.pushSet = true
+	h.shouldPush.Reset(0)
+
 	return nil
 }
 
@@ -268,8 +267,8 @@ func (h *ProjectionHandler) push(
 	})
 	h.stmts, err = update(ctx, h.stmts, reduce)
 
-	h.pushSet = len(h.stmts) > 0
-	if h.pushSet {
+	if len(h.stmts) > 0 {
+		h.pushSet = true
 		h.shouldPush.Reset(h.retryFailedAfter)
 	}
 
