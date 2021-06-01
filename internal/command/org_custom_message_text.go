@@ -12,6 +12,9 @@ import (
 )
 
 func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, mailText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2biiR", "Errors.ResourceOwnerMissing")
+	}
 	iamAgg := org.NewAggregate(resourceOwner, resourceOwner)
 	events, existingMailText, err := c.setOrgMessageText(ctx, &iamAgg.Aggregate, mailText)
 	if err != nil {
@@ -29,7 +32,6 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 }
 
 func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Aggregate, message *domain.CustomMessageText) ([]eventstore.EventPusher, *OrgCustomMessageTextReadModel, error) {
-	//TODO: Check variablen
 	if !message.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2jfsf", "Errors.CustomText.Invalid")
 	}

@@ -29,7 +29,6 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, mailText *domain.C
 }
 
 func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.EventPusher, *IAMCustomMessageTextReadModel, error) {
-	//TODO: Check variablen
 	if !msg.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomText.Invalid")
 	}

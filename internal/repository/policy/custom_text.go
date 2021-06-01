@@ -125,7 +125,7 @@ func NewCustomTextTemplateRemovedEvent(base *eventstore.BaseEvent, template stri
 }
 
 func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &CustomTextRemovedEvent{
+	e := &CustomTextTemplateRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

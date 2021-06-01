@@ -40,6 +40,9 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			if e.Key == domain.MessagePreHeader {
 				wm.PreHeader = e.Text
 			}
+			if e.Key == domain.MessageText {
+				wm.Text = e.Text
+			}
 			if e.Key == domain.MessageGreeting {
 				wm.Greeting = e.Text
 			}
@@ -62,6 +65,9 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			}
 			if e.Key == domain.MessagePreHeader {
 				wm.PreHeader = ""
+			}
+			if e.Key == domain.MessageText {
+				wm.Text = ""
 			}
 			if e.Key == domain.MessageGreeting {
 				wm.Greeting = ""
