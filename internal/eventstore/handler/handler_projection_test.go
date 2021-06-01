@@ -31,11 +31,17 @@ func newTestStatement(seq, previousSeq uint64) Statement {
 	}
 }
 
+func initTimer() *time.Timer {
+	t := time.NewTimer(0)
+	<-t.C
+	return t
+}
+
 func TestProjectionHandler_processEvent(t *testing.T) {
 	type fields struct {
 		stmts      []Statement
 		pushSet    bool
-		shouldPush chan *struct{}
+		shouldPush *time.Timer
 	}
 	type args struct {
 		ctx    context.Context
@@ -74,7 +80,7 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 			fields: fields{
 				stmts:      nil,
 				pushSet:    false,
-				shouldPush: make(chan *struct{}, 1),
+				shouldPush: initTimer(),
 			},
 			args: args{
 				reduce: testReduce(),
@@ -93,7 +99,7 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 					newTestStatement(1, 0),
 				},
 				pushSet:    false,
-				shouldPush: make(chan *struct{}, 1),
+				shouldPush: initTimer(),
 			},
 			args: args{
 				reduce: testReduce(newTestStatement(2, 1)),
@@ -293,7 +299,7 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 				Handler: Handler{
 					Eventstore: tt.fields.eventstore,
 				},
-				shouldPush: make(chan *struct{}, 10),
+				shouldPush: initTimer(),
 			}
 			gotLimitExeeded, err := h.fetchBulkStmts(tt.args.ctx, tt.args.query, tt.args.reduce)
 			if !tt.want.isErr(err) {
@@ -635,7 +641,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 		SequenceTable string
 		stmts         []Statement
 		pushSet       bool
-		shouldPush    chan *struct{}
+		shouldPush    *time.Timer
 	}
 	type args struct {
 		ctx    context.Context
@@ -706,7 +712,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 					),
 				},
 				),
-				shouldPush: make(chan *struct{}, 1),
+				shouldPush: initTimer(),
 			},
 			args: args{
 				update: testUpdate(t, 2, ErrUpdate),
@@ -752,7 +758,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 					),
 				},
 				),
-				shouldPush: make(chan *struct{}, 1),
+				shouldPush: initTimer(),
 			},
 			args: args{
 				update: testUpdate(t, 4, nil),

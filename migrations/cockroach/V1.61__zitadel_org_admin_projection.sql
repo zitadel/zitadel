@@ -9,6 +9,7 @@ CREATE TABLE projections.org_admins (
     owner_email TEXT,
     owner_first_name TEXT,
 	owner_last_name TEXT,
+    owner_gender INT2,
 
     PRIMARY KEY (org_id, owner_id)
 );

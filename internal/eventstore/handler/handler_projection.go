@@ -12,8 +12,9 @@ import (
 
 type ProjectionHandlerConfig struct {
 	HandlerConfig
-	ProjectionName string
-	RequeueEvery   time.Duration
+	ProjectionName   string
+	RequeueEvery     time.Duration
+	RetryFailedAfter time.Duration
 }
 
 //Update updates the projection with the given statements
@@ -34,30 +35,38 @@ type SearchQuery func() (query *eventstore.SearchQueryBuilder, queryLimit uint64
 
 type ProjectionHandler struct {
 	Handler
-	RequeueAfter time.Duration
-	Timer        *time.Timer
+
+	requeueAfter time.Duration
+	shouldBulk   *time.Timer
+
+	retryFailedAfter time.Duration
+	shouldPush       *time.Timer
+	pushSet          bool
 
 	ProjectionName string
 
-	lockMu     sync.Mutex
-	stmts      []Statement
-	pushSet    bool
-	shouldPush chan *struct{}
+	lockMu sync.Mutex
+	stmts  []Statement
 }
 
 func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 	h := &ProjectionHandler{
 		Handler:        NewHandler(config.HandlerConfig),
 		ProjectionName: config.ProjectionName,
-		RequeueAfter:   config.RequeueEvery,
+		requeueAfter:   config.RequeueEvery,
 		// first bulk is instant on startup
-		Timer:      time.NewTimer(1 * time.Second),
-		shouldPush: make(chan *struct{}, 1),
+		shouldBulk:       time.NewTimer(0),
+		shouldPush:       time.NewTimer(0),
+		retryFailedAfter: config.RetryFailedAfter,
 	}
 
+	//unitialized timer
+	//https://github.com/golang/go/issues/12721
+	<-h.shouldPush.C
+
 	if config.RequeueEvery <= 0 {
-		if !h.Timer.Stop() {
-			<-h.Timer.C
+		if !h.shouldBulk.Stop() {
+			<-h.shouldBulk.C
 		}
 		logging.LogWithFields("HANDL-mC9Xx", "projection", h.ProjectionName).Debug("starting handler without requeue")
 		return h
@@ -66,9 +75,9 @@ func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 	return h
 }
 
-func (h *ProjectionHandler) ResetTimer() {
-	if h.RequeueAfter > 0 {
-		h.Timer.Reset(h.RequeueAfter)
+func (h *ProjectionHandler) ResetShouldBulk() {
+	if h.requeueAfter > 0 {
+		h.shouldBulk.Reset(h.requeueAfter)
 	}
 }
 
@@ -96,9 +105,9 @@ func (h *ProjectionHandler) Process(
 			return
 		case event := <-h.Handler.EventQueue:
 			h.processEvent(ctx, event, reduce)
-		case <-h.Timer.C:
+		case <-h.shouldBulk.C:
 			h.bulk(ctx, lock, execBulk, unlock)
-			h.ResetTimer()
+			h.ResetShouldBulk()
 		default:
 			//lower prio select with push
 			select {
@@ -110,12 +119,12 @@ func (h *ProjectionHandler) Process(
 				return
 			case event := <-h.Handler.EventQueue:
 				h.processEvent(ctx, event, reduce)
-			case <-h.Timer.C:
+			case <-h.shouldBulk.C:
 				h.bulk(ctx, lock, execBulk, unlock)
-				h.ResetTimer()
-			case <-h.shouldPush:
+				h.ResetShouldBulk()
+			case <-h.shouldPush.C:
 				h.push(ctx, update, reduce)
-				h.ResetTimer()
+				h.ResetShouldBulk()
 			}
 		}
 	}
@@ -139,7 +148,7 @@ func (h *ProjectionHandler) processEvent(
 
 	if !h.pushSet {
 		h.pushSet = true
-		h.shouldPush <- nil
+		h.shouldPush.Reset(0)
 	}
 	return nil
 }
@@ -153,7 +162,7 @@ func (h *ProjectionHandler) bulk(
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	errs := lock(ctx, h.RequeueAfter)
+	errs := lock(ctx, h.requeueAfter)
 	//wait until projection is locked or ctx canceled
 	if err, ok := <-errs; err != nil || !ok {
 		logging.Log("HANDL-XDJ4i").OnError(err).Warn("initial lock failed")
@@ -208,7 +217,7 @@ func (h *ProjectionHandler) prepareExecuteBulk(
 					return err
 				}
 
-				<-h.shouldPush
+				<-h.shouldPush.C
 				if err = h.push(ctx, update, reduce); err != nil {
 					logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
 					return err
@@ -261,7 +270,7 @@ func (h *ProjectionHandler) push(
 
 	h.pushSet = len(h.stmts) > 0
 	if h.pushSet {
-		h.shouldPush <- nil
+		h.shouldPush.Reset(h.retryFailedAfter)
 	}
 
 	return err
@@ -271,7 +280,11 @@ func (h *ProjectionHandler) shutdown() {
 	h.lockMu.Lock()
 	defer h.lockMu.Unlock()
 	h.Sub.Unsubscribe()
-	h.Timer.Stop()
-	close(h.shouldPush)
+	if !h.shouldBulk.Stop() {
+		<-h.shouldBulk.C
+	}
+	if !h.shouldPush.Stop() {
+		<-h.shouldPush.C
+	}
 	logging.Log("EVENT-XG5Og").Info("stop processing")
 }

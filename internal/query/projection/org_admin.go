@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -23,6 +24,7 @@ type OrgAdmin struct {
 	OwnerEmailAddress string        `col:"owner_email"`
 	OwnerFirstName    string        `col:"owner_first_name"`
 	OwnerLastName     string        `col:"owner_last_name"`
+	OwnerGender       domain.Gender `col:"owner_gender"`
 }
 
 type OrgAdminProjection struct {
@@ -89,6 +91,7 @@ const (
 	orgAdminOwnerEmail      = "owner_email"
 	orgAdminOwnerFirstName  = "owner_first_name"
 	orgAdminOwnerLastName   = "owner_last_name"
+	orgAdminOwnerGender     = "owner_gender"
 )
 
 func (p *OrgAdminProjection) reduceMemberAdded(event eventstore.EventReader) ([]handler.Statement, error) {
@@ -218,8 +221,11 @@ func (p *OrgAdminProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	if e.LastName != "" {
 		values = append(values, handler.NewCol(orgAdminOwnerLastName, e.LastName))
 	}
-	if !e.PreferredLanguage.IsRoot() {
-		values = append(values, handler.NewCol(orgAdminOwnerLanguage, e.PreferredLanguage))
+	if e.PreferredLanguage != nil {
+		values = append(values, handler.NewCol(orgAdminOwnerLanguage, e.PreferredLanguage.String()))
+	}
+	if e.Gender != nil {
+		values = append(values, handler.NewCol(orgAdminOwnerGender, *e.Gender))
 	}
 
 	if len(values) == 0 {
@@ -285,6 +291,7 @@ func (p *OrgAdminProjection) addAdmin(orgID, userID string, sequence, previousSe
 		handler.NewCol(orgAdminOwnerEmail, admin.OwnerEmailAddress),
 		handler.NewCol(orgAdminOwnerFirstName, admin.OwnerFirstName),
 		handler.NewCol(orgAdminOwnerLastName, admin.OwnerLastName),
+		handler.NewCol(orgAdminOwnerGender, admin.OwnerGender),
 	}, sequence, previousSequence), nil
 }
 
@@ -296,6 +303,7 @@ func (p *OrgAdminProjection) reduce(admin *OrgAdmin, events []eventstore.EventRe
 			admin.OwnerEmailAddress = e.EmailAddress
 			admin.OwnerFirstName = e.FirstName
 			admin.OwnerLastName = e.LastName
+			admin.OwnerGender = e.Gender
 		case *user.HumanEmailChangedEvent:
 			admin.OwnerEmailAddress = e.EmailAddress
 		case *user.HumanProfileChangedEvent:
@@ -307,6 +315,9 @@ func (p *OrgAdminProjection) reduce(admin *OrgAdmin, events []eventstore.EventRe
 			}
 			if e.LastName != "" {
 				admin.OwnerLastName = e.LastName
+			}
+			if e.Gender != nil {
+				admin.OwnerGender = *e.Gender
 			}
 		case *org.OrgAddedEvent:
 			admin.OrgName = e.Name

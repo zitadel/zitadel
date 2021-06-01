@@ -51,6 +51,7 @@ Queries:
 
 Projections:  
   RequeueEvery: 10s
+  RetryFailedAfter: 1s
   MaxFailureCount: 5
   BulkLimit: 20
   CRDB:
