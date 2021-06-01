@@ -79,6 +79,16 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	case usr_es_model.UserTokenAdded:
 		view.setRootData(event)
 		err = view.setData(event)
+	case usr_es_model.SignedOut,
+		usr_es_model.HumanSignedOut:
+		id, err := agentIDFromSession(event)
+		if err != nil {
+			return err
+		}
+		if view.UserAgentID == id {
+			t.Deactivated = true
+		}
+		return nil
 	case usr_es_model.UserRemoved,
 		usr_es_model.UserDeactivated,
 		usr_es_model.UserLocked:
@@ -125,4 +135,13 @@ func (t *TokenView) setData(event *es_models.Event) error {
 		return caos_errs.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
 	return nil
+}
+
+func agentIDFromSession(event *es_models.Event) (string, error) {
+	session := make(map[string]interface{})
+	if err := json.Unmarshal(event.Data, &session); err != nil {
+		logging.Log("EVEN-Ghgt3").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
+	}
+	return session["userAgentID"].(string), nil
 }
