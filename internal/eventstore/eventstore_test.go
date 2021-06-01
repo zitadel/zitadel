@@ -892,8 +892,12 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -915,8 +919,12 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -938,8 +946,12 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1016,8 +1028,12 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxSequence,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1034,8 +1050,12 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxSequence,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1052,8 +1072,12 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxSequence,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1134,8 +1158,12 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 				readModel: &testReducer{
 					t:              t,
@@ -1161,8 +1189,12 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 				readModel: &testReducer{
 					t:              t,
@@ -1187,7 +1219,14 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 		{
 			name: "found events",
 			args: args{
-				query: NewSearchQueryBuilder(repository.ColumnsEvent, "test.aggregate"),
+				query: &SearchQueryBuilder{
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
+				},
 				readModel: &testReducer{
 					t:              t,
 					expectedLength: 1,
@@ -1214,8 +1253,12 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "append in reducer fails",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
 				},
 				readModel: &testReducer{
 					t:              t,

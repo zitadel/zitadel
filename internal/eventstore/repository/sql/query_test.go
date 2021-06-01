@@ -208,7 +208,7 @@ func prepareTestScan(err error, res []interface{}) scan {
 
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
-		filters []*repository.Filter
+		filters [][]*repository.Filter
 	}
 	type res struct {
 		clause string
@@ -232,7 +232,7 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "empty filters",
 			args: args{
-				filters: []*repository.Filter{},
+				filters: [][]*repository.Filter{},
 			},
 			res: res{
 				clause: "",
@@ -242,8 +242,10 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "invalid condition",
 			args: args{
-				filters: []*repository.Filter{
-					repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
+				filters: [][]*repository.Filter{
+					{
+						repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
+					},
 				},
 			},
 			res: res{
@@ -254,8 +256,10 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "array as condition value",
 			args: args{
-				filters: []*repository.Filter{
-					repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+				filters: [][]*repository.Filter{
+					{
+						repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+					},
 				},
 			},
 			res: res{
@@ -266,10 +270,12 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "multiple filters",
 			args: args{
-				filters: []*repository.Filter{
-					repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
-					repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
-					repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "org.created"}, repository.OperationIn),
+				filters: [][]*repository.Filter{
+					{
+						repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+						repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "org.created"}, repository.OperationIn),
+					},
 				},
 			},
 			res: res{
@@ -304,7 +310,6 @@ func Test_query_events_with_crdb(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
-		existingAssets []*repository.Asset
 		client         *sql.DB
 	}
 	type res struct {
@@ -322,8 +327,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -345,8 +352,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -369,9 +378,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
-						repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+							repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -395,8 +406,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldResourceOwner, "caos", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldResourceOwner, "caos", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -420,9 +433,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldEditorService, "MANAGEMENT-API", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEditorService, "ADMIN-API", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldEditorService, "MANAGEMENT-API", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEditorService, "ADMIN-API", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -446,10 +461,12 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldEditorUser, "adlerhurst", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEditorUser, "nobody", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEditorUser, "", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldEditorUser, "adlerhurst", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEditorUser, "nobody", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEditorUser, "", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -475,9 +492,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldEventType, repository.EventType("user.created"), repository.OperationEquals),
-						repository.NewFilter(repository.FieldEventType, repository.EventType("user.updated"), repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldEventType, repository.EventType("user.created"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldEventType, repository.EventType("user.updated"), repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -559,11 +578,13 @@ func Test_query_events_mocked(t *testing.T) {
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
@@ -586,11 +607,13 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   5,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
@@ -613,11 +636,13 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   5,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
@@ -640,11 +665,13 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   0,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
@@ -667,11 +694,13 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   0,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
@@ -702,8 +731,10 @@ func Test_query_events_mocked(t *testing.T) {
 			args: args{
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						{},
+					Filters: [][]*repository.Filter{
+						{
+							{},
+						},
 					},
 				},
 			},
