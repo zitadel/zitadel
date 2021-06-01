@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -10,7 +10,7 @@ import { Preview, Theme } from '../private-labeling-policy.component';
   templateUrl: './preview.component.html',
   styleUrls: ['./preview.component.scss'],
 })
-export class PreviewComponent implements OnInit {
+export class PreviewComponent implements OnInit, OnDestroy {
   @Input() preview: Preview = Preview.PREVIEW;
   @Input() policy!: LabelPolicy.AsObject;
   @Input() label: string = 'PREVIEW';
