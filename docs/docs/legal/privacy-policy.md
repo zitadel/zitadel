@@ -84,7 +84,7 @@ In particular, the following personal data are part of the processing:
     </td>
     <td>All users</td>
   </tr>
-    <tr>
+  <tr>
     <td><strong>Login data</strong></td>
     <td>
       <ul>
@@ -103,8 +103,7 @@ In particular, the following personal data are part of the processing:
       <p>Phone number: Users who use authentication methods with SMS</p>
     </td>
   </tr>
-  </tr>
-    <tr>
+  <tr>
     <td><strong>Profile data</strong></td>
     <td>
       <ul>
@@ -118,8 +117,7 @@ In particular, the following personal data are part of the processing:
     </td>
     <td>Users who voluntarily add profile data</td>
   </tr>
-  </tr>
-    <tr>
+  <tr>
     <td><strong>Communication data</strong></td>
     <td>
       <ul>
@@ -130,8 +128,7 @@ In particular, the following personal data are part of the processing:
     </td>
     <td>Customers and users who communicate with us directly (e.g. support)</td>
   </tr>
-  </tr>
-    <tr>
+  <tr>
     <td><strong>Payment data</strong></td>
     <td>
       <ul>
@@ -146,8 +143,7 @@ In particular, the following personal data are part of the processing:
       <p>Credit rating information: Only customers who pay by invoice</p>
     </td>
   </tr>
-  </tr>
-    <tr>
+  <tr>
     <td><strong>Data traffic data</strong></td>
     <td>
       <ul>
