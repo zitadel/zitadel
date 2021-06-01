@@ -193,7 +193,7 @@ func (h *StatementHandler) executeStmts(
 
 	lastSuccessfulIdx := -1
 	for i, stmt := range stmts {
-		if stmt.Sequence < currentSeq {
+		if stmt.Sequence <= currentSeq {
 			continue
 		}
 		if stmt.PreviousSequence > currentSeq {

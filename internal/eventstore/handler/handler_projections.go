@@ -238,7 +238,8 @@ func (h *ProjectionHandler) fetchBulkStmts(
 		return false, err
 	}
 	for _, event := range events {
-		h.processEvent(ctx, event, reduce)
+		err = h.processEvent(ctx, event, reduce)
+		logging.Log("HANDL-QRz8p").OnError(err).Warn("unable to reduce event")
 	}
 
 	return len(events) == int(eventsLimit), nil
