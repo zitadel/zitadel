@@ -465,7 +465,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil {
 		return err
 	}
-
+	if user.State == int32(domain.UserStateInactive) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
+	}
 	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", user.ResourceOwner)
 	return nil
 }
