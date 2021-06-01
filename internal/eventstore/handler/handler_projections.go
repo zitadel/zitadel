@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"sort"
 	"sync"
 	"time"
 
@@ -58,7 +59,7 @@ func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 		if !h.Timer.Stop() {
 			<-h.Timer.C
 		}
-		logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler without requeue")
+		logging.LogWithFields("HANDL-mC9Xx", "projection", h.ProjectionName).Debug("starting handler without requeue")
 		return h
 	}
 	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler")
@@ -253,8 +254,15 @@ func (h *ProjectionHandler) push(
 	h.lockMu.Lock()
 	defer h.lockMu.Unlock()
 
-	h.pushSet = false
+	sort.Slice(h.stmts, func(i, j int) bool {
+		return h.stmts[i].Sequence < h.stmts[j].Sequence
+	})
 	h.stmts, err = update(ctx, h.stmts, reduce)
+
+	h.pushSet = len(h.stmts) > 0
+	if h.pushSet {
+		h.shouldPush <- nil
+	}
 
 	return err
 }

@@ -31,7 +31,6 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 		sequenceTable  string
 		projectionName string
 		aggregates     []eventstore.AggregateType
-		events         []eventstore.EventType
 		bulkLimit      uint64
 	}
 	tests := []struct {
@@ -121,7 +120,6 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				sequenceTable: tt.fields.sequenceTable,
 				bulkLimit:     tt.fields.bulkLimit,
 				aggregates:    tt.fields.aggregates,
-				eventTypes:    tt.fields.events,
 				client:        client,
 			}
 
@@ -157,6 +155,7 @@ func TestStatementHandler_Update(t *testing.T) {
 	type want struct {
 		expectations []mockExpectation
 		isErr        func(error) bool
+		stmtsLen     int
 	}
 	type args struct {
 		ctx    context.Context
@@ -223,6 +222,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				isErr: func(err error) bool {
 					return errors.Is(err, errFilter)
 				},
+				stmtsLen: 1,
 			},
 		},
 		{
@@ -253,6 +253,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
 				},
+				stmtsLen: 1,
 			},
 		},
 		{
@@ -287,6 +288,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				isErr: func(err error) bool {
 					return errors.Is(err, errSeqNotUpdated)
 				},
+				stmtsLen: 1,
 			},
 		},
 		{
@@ -321,6 +323,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				isErr: func(err error) bool {
 					return errors.Is(err, sql.ErrConnDone)
 				},
+				stmtsLen: 1,
 			},
 		},
 		{
@@ -347,6 +350,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
 				},
+				stmtsLen: 0,
 			},
 		},
 		{
@@ -433,9 +437,12 @@ func TestStatementHandler_Update(t *testing.T) {
 				expectation(mock)
 			}
 
-			_, err = h.Update(tt.args.ctx, tt.args.stmts, tt.args.reduce)
+			stmts, err := h.Update(tt.args.ctx, tt.args.stmts, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("StatementHandler.Update() error = %v", err)
+			}
+			if tt.want.stmtsLen != len(stmts) {
+				t.Errorf("wrong stmts length: want: %d got %d", tt.want.stmtsLen, len(stmts))
 			}
 
 			mock.MatchExpectationsInOrder(true)

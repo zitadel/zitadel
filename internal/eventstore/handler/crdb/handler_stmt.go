@@ -27,7 +27,7 @@ type StatementHandlerConfig struct {
 	MaxFailureCount   uint
 	BulkLimit         uint64
 
-	Reducers []handler.EventReducer
+	Reducers []handler.AggregateReducer
 }
 
 type StatementHandler struct {
@@ -41,7 +41,6 @@ type StatementHandler struct {
 	lockStmt            string
 
 	aggregates []eventstore.AggregateType
-	eventTypes []eventstore.EventType
 	reduces    map[eventstore.EventType]handler.Reduce
 
 	workerName string
@@ -59,14 +58,12 @@ func NewStatementHandler(
 	}
 
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
-	eventTypes := make([]eventstore.EventType, 0, len(config.Reducers))
 	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
-	// subscriptionTopics := make(map[eventstore.AggregateType][]eventstore.EventType)
-	for _, reducer := range config.Reducers {
-		aggregateTypes = append(aggregateTypes, reducer.Aggregate)
-		eventTypes = append(eventTypes, reducer.Event)
-		reduces[reducer.Event] = reducer.Reduce
-		// subscriptionTopics[reducer.Aggregate] = append(subscriptionTopics[reducer.Aggregate], reducer.Event)
+	for _, aggReducer := range config.Reducers {
+		aggregateTypes = append(aggregateTypes, aggReducer.Aggregate)
+		for _, eventReducer := range aggReducer.EventRedusers {
+			reduces[eventReducer.Event] = eventReducer.Reduce
+		}
 	}
 
 	h := StatementHandler{
@@ -78,7 +75,6 @@ func NewStatementHandler(
 		setFailureCountStmt: fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
 		lockStmt:            fmt.Sprintf(lockStmtFormat, config.LockTable),
 		aggregates:          aggregateTypes,
-		eventTypes:          eventTypes,
 		reduces:             reduces,
 		workerName:          workerName,
 		bulkLimit:           config.BulkLimit,
@@ -105,9 +101,6 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(seq).Limit(h.bulkLimit)
-	// if len(h.eventTypes) > 0 {
-	// 	query.EventTypes(h.eventTypes...)
-	// }
 
 	return query, h.bulkLimit, nil
 }
@@ -151,7 +144,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		return stmts, commitErr
 	}
 
-	if lastSuccessfulIdx == 0 {
+	if lastSuccessfulIdx == -1 {
 		return stmts, nil
 	}
 

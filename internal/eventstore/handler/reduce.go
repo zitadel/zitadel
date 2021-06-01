@@ -5,7 +5,13 @@ import "github.com/caos/zitadel/internal/eventstore"
 //EventReducer represents the required data
 //to work with events
 type EventReducer struct {
-	Aggregate eventstore.AggregateType
-	Event     eventstore.EventType
-	Reduce    Reduce
+	Event  eventstore.EventType
+	Reduce Reduce
+}
+
+//EventReducer represents the required data
+//to work with aggregates
+type AggregateReducer struct {
+	Aggregate     eventstore.AggregateType
+	EventRedusers []EventReducer
 }
