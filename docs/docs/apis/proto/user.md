@@ -241,6 +241,24 @@ this query is always equals
 
 
 
+### RefreshToken
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| client_id |  string | - |  |
+| auth_time |  google.protobuf.Timestamp | - |  |
+| idle_expiration |  google.protobuf.Timestamp | - |  |
+| expiration |  google.protobuf.Timestamp | - |  |
+| scopes | repeated string | - |  |
+| audience | repeated string | - |  |
+
+
+
+
 ### SearchQuery
 
 

@@ -38,7 +38,7 @@ func (h *StatementHandler) handleLock(ctx context.Context, errs chan error, lock
 }
 
 func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Duration) error {
-	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Milliseconds()/millisecondsAsSeconds, h.projectionName)
+	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Milliseconds()/millisecondsAsSeconds, h.ProjectionName)
 	if err != nil {
 		return err
 	}
@@ -51,6 +51,6 @@ func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Dura
 }
 
 func (h *StatementHandler) Unlock() error {
-	_, err := h.client.Exec(h.lockStmt, h.workerName, 0, h.projectionName)
+	_, err := h.client.Exec(h.lockStmt, h.workerName, 0, h.ProjectionName)
 	return err
 }

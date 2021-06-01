@@ -9,6 +9,12 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
+type ProjectionHandlerConfig struct {
+	HandlerConfig
+	ProjectionName string
+	RequeueEvery   time.Duration
+}
+
 //Update updates the projection with the given statements
 type Update func(context.Context, []Statement, Reduce) (unexecutedStmts []Statement, err error)
 
@@ -27,9 +33,10 @@ type SearchQuery func() (query *eventstore.SearchQueryBuilder, queryLimit uint64
 
 type ProjectionHandler struct {
 	Handler
-	RequeueAfter  time.Duration
-	Timer         *time.Timer
-	SequenceTable string
+	RequeueAfter time.Duration
+	Timer        *time.Timer
+
+	ProjectionName string
 
 	lockMu     sync.Mutex
 	stmts      []Statement
@@ -37,21 +44,31 @@ type ProjectionHandler struct {
 	shouldPush chan *struct{}
 }
 
-func NewProjectionHandler(
-	eventstore *eventstore.Eventstore,
-	requeueAfter time.Duration,
-) *ProjectionHandler {
-	return &ProjectionHandler{
-		Handler:      NewHandler(eventstore),
-		RequeueAfter: requeueAfter,
+func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
+	h := &ProjectionHandler{
+		Handler:        NewHandler(config.HandlerConfig),
+		ProjectionName: config.ProjectionName,
+		RequeueAfter:   config.RequeueEvery,
 		// first bulk is instant on startup
-		Timer:      time.NewTimer(0),
+		Timer:      time.NewTimer(1 * time.Second),
 		shouldPush: make(chan *struct{}, 1),
 	}
+
+	if config.RequeueEvery <= 0 {
+		if !h.Timer.Stop() {
+			<-h.Timer.C
+		}
+		logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler without requeue")
+		return h
+	}
+	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler")
+	return h
 }
 
 func (h *ProjectionHandler) ResetTimer() {
-	h.Timer.Reset(h.RequeueAfter)
+	if h.RequeueAfter > 0 {
+		h.Timer.Reset(h.RequeueAfter)
+	}
 }
 
 //Process waits for several conditions:
@@ -221,7 +238,8 @@ func (h *ProjectionHandler) fetchBulkStmts(
 		return false, err
 	}
 	for _, event := range events {
-		h.processEvent(ctx, event, reduce)
+		err = h.processEvent(ctx, event, reduce)
+		logging.Log("HANDL-QRz8p").OnError(err).Warn("unable to reduce event")
 	}
 
 	return len(events) == int(eventsLimit), nil

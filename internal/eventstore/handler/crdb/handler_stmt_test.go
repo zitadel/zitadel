@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	filterErr = errors.New("filter err")
-	reduceErr = errors.New("reduce err")
+	errFilter = errors.New("filter err")
+	errReduce = errors.New("reduce err")
 )
 
 func TestProjectionHandler_SearchQuery(t *testing.T) {
@@ -31,6 +31,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 		sequenceTable  string
 		projectionName string
 		aggregates     []eventstore.AggregateType
+		events         []eventstore.EventType
 		bulkLimit      uint64
 	}
 	tests := []struct {
@@ -58,7 +59,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "only aggregates",
 			fields: fields{
 				sequenceTable:  "my_sequences",
 				projectionName: "my_projection",
@@ -79,6 +80,31 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 					Limit(5),
 			},
 		},
+		//TODO: discuss about event types in handler first
+		// {
+		// 	name: "aggregates and events",
+		// 	fields: fields{
+		// 		sequenceTable:  "my_sequences",
+		// 		projectionName: "my_projection",
+		// 		aggregates:     []eventstore.AggregateType{"testAgg"},
+		// 		events:         []eventstore.EventType{"testAgg.added"},
+		// 		bulkLimit:      5,
+		// 	},
+		// 	want: want{
+		// 		limit: 5,
+		// 		isErr: func(err error) bool {
+		// 			return err == nil
+		// 		},
+		// 		expectations: []mockExpectation{
+		// 			expectCurrentSequence("my_sequences", "my_projection", 5),
+		// 		},
+		// 		SearchQueryBuilder: eventstore.
+		// 			NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg").
+		// 			EventTypes("testAgg.added").
+		// 			SequenceGreater(5).
+		// 			Limit(5),
+		// 	},
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -86,12 +112,17 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer client.Close()
+
 			h := &StatementHandler{
-				sequenceTable:  tt.fields.sequenceTable,
-				projectionName: tt.fields.projectionName,
-				bulkLimit:      tt.fields.bulkLimit,
-				aggregates:     tt.fields.aggregates,
-				client:         client,
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: tt.fields.projectionName,
+				},
+				sequenceTable: tt.fields.sequenceTable,
+				bulkLimit:     tt.fields.bulkLimit,
+				aggregates:    tt.fields.aggregates,
+				eventTypes:    tt.fields.events,
+				client:        client,
 			}
 
 			for _, expectation := range tt.want.expectations {
@@ -173,7 +204,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).
-						ExpectFilterEventsError(filterErr),
+						ExpectFilterEventsError(errFilter),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -190,7 +221,7 @@ func TestStatementHandler_Update(t *testing.T) {
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, filterErr)
+					return errors.Is(err, errFilter)
 				},
 			},
 		},
@@ -383,12 +414,19 @@ func TestStatementHandler_Update(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer client.Close()
+
 			h := &StatementHandler{
-				projectionName: "my_projection",
-				sequenceTable:  "my_sequences",
-				client:         client,
-				eventstore:     tt.fields.eventstore,
-				aggregates:     tt.fields.aggregates,
+				sequenceTable: "my_sequences",
+				client:        client,
+				ProjectionHandler: handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
+					HandlerConfig: handler.HandlerConfig{
+						Eventstore: tt.fields.eventstore,
+					},
+					ProjectionName: "my_projection",
+					RequeueEvery:   0,
+				}),
+				aggregates: tt.fields.aggregates,
 			}
 
 			for _, expectation := range tt.want.expectations {
@@ -437,13 +475,13 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
-					es_repo_mock.NewRepo(t).ExpectFilterEventsError(filterErr),
+					es_repo_mock.NewRepo(t).ExpectFilterEventsError(errFilter),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, filterErr)
+					return errors.Is(err, errFilter)
 				},
 			},
 		},
@@ -509,7 +547,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			name: "reduce fails",
 			args: args{
 				ctx:    context.Background(),
-				reduce: testReduceErr(reduceErr),
+				reduce: testReduceErr(errReduce),
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -531,7 +569,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			want: want{
 				stmtCount: 0,
 				isErr: func(err error) bool {
-					return errors.Is(err, reduceErr)
+					return errors.Is(err, errReduce)
 				},
 			},
 		},
@@ -539,7 +577,13 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &StatementHandler{
-				eventstore: tt.fields.eventstore,
+				ProjectionHandler: handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
+					HandlerConfig: handler.HandlerConfig{
+						Eventstore: tt.fields.eventstore,
+					},
+					ProjectionName: "my_projection",
+					RequeueEvery:   0,
+				}),
 				aggregates: tt.fields.aggregates,
 			}
 			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, tt.args.currentSeq, tt.args.reduce)
@@ -556,7 +600,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 
 func TestStatementHandler_executeStmts(t *testing.T) {
 	type fields struct {
-		projectionName string
+		projectionName    string
+		maxFailureCount   uint
+		failedEventsTable string
 	}
 	type args struct {
 		stmts      []handler.Statement
@@ -584,19 +630,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							Name:  "col",
 							Value: "val1",
 						},
-					}, 5, 0),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val2",
-						},
-					}, 4, 3),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val3",
-						},
-					}, 6, 4),
+					}, 5, 2),
 				},
 				currentSeq: 5,
 			},
@@ -614,22 +648,55 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				stmts: []handler.Statement{
 					NewCreateStatement([]handler.Column{
 						{
-							Name:  "col",
+							Name:  "col1",
 							Value: "val1",
 						},
 					}, 5, 0),
 					NewCreateStatement([]handler.Column{
 						{
-							Name:  "col",
+							Name:  "col2",
 							Value: "val2",
 						},
 					}, 8, 7),
+				},
+				currentSeq: 2,
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col1"}, []string{"$1"}),
+					expectSavePointRelease(),
+				},
+				idx: 0,
+			},
+		},
+		{
+			name: "execute fails not continue",
+			fields: fields{
+				projectionName:    "my_projection",
+				maxFailureCount:   5,
+				failedEventsTable: "failed_events",
+			},
+			args: args{
+				stmts: []handler.Statement{
 					NewCreateStatement([]handler.Column{
 						{
 							Name:  "col",
-							Value: "val3",
+							Value: "val",
 						},
-					}, 9, 8),
+					}, 5, 0),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 6, 5),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 7, 6),
 				},
 				currentSeq: 2,
 			},
@@ -638,104 +705,127 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
+					expectSavePoint(),
+					expectCreateErr("my_projection", []string{"col"}, []string{"$1"}, sql.ErrConnDone),
+					expectSavePointRollback(),
+					expectFailureCount("failed_events", "my_projection", 6, 4),
 				},
 				idx: 0,
 			},
 		},
-		// {
-		// 	name: "execute fails",
-		// 	fields: fields{
-		// 		projectionName: "my_projection",
-		// 	},
-		// 	args: args{
-		// 		stmts: []handler.Statement{
-		// 			NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 5, 0),
-		// 			NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 6, 5),
-		// 			NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 7, 6),
-		// 		},
-		// 		currentSeq: 2,
-		// 	},
-		// 	want: want{
-		// 		expectations: []mockExpectation{
-		// 			expectSavePoint(),
-		// 			expectCreate("my_projection", []string{"col"}, []string{"$1"}),
-		// 			expectSavePointRelease(),
-		// 			expectSavePoint(),
-		// 			expectCreateErr("my_projection", []string{"col"}, []string{"$1"}, sql.ErrConnDone),
-		// 			expectSavePointRollback(),
-		// 		},
-		// 		idx: 0,
-		// 	},
-		// },
-		// {
-		// 	name: "correct",
-		// 	fields: fields{
-		// 		projectionName: "my_projection",
-		// 	},
-		// 	args: args{
-		// 		stmts: []handler.Statement{
-		// 			NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 5, 0),
-		// 			NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 6, 5),
-		// 			NewCreateStatement([]handler.Column{
-		// 				{
-		// 					Name:  "col",
-		// 					Value: "val",
-		// 				},
-		// 			}, 7, 6),
-		// 		},
-		// 		currentSeq: 2,
-		// 	},
-		// 	want: want{
-		// 		expectations: []mockExpectation{
-		// 			expectSavePoint(),
-		// 			expectCreate("my_projection", []string{"col"}, []string{"$1"}),
-		// 			expectSavePointRelease(),
-		// 			expectSavePoint(),
-		// 			expectCreate("my_projection", []string{"col"}, []string{"$1"}),
-		// 			expectSavePointRelease(),
-		// 			expectSavePoint(),
-		// 			expectCreate("my_projection", []string{"col"}, []string{"$1"}),
-		// 			expectSavePointRelease(),
-		// 		},
-		// 		idx: 2,
-		// 	},
-		// },
+		{
+			name: "execute fails continue",
+			fields: fields{
+				projectionName:    "my_projection",
+				maxFailureCount:   5,
+				failedEventsTable: "failed_events",
+			},
+			args: args{
+				stmts: []handler.Statement{
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col1",
+							Value: "val1",
+						},
+					}, 5, 0),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col2",
+							Value: "val2",
+						},
+					}, 6, 5),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col3",
+							Value: "val3",
+						},
+					}, 7, 6),
+				},
+				currentSeq: 2,
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col1"}, []string{"$1"}),
+					expectSavePointRelease(),
+					expectSavePoint(),
+					expectCreateErr("my_projection", []string{"col2"}, []string{"$1"}, sql.ErrConnDone),
+					expectSavePointRollback(),
+					expectFailureCount("failed_events", "my_projection", 6, 5),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col3"}, []string{"$1"}),
+					expectSavePointRelease(),
+				},
+				idx: 2,
+			},
+		},
+		{
+			name: "correct",
+			fields: fields{
+				projectionName: "my_projection",
+			},
+			args: args{
+				stmts: []handler.Statement{
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 5, 0),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 6, 5),
+					NewCreateStatement([]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}, 7, 6),
+				},
+				currentSeq: 2,
+			},
+			want: want{
+				expectations: []mockExpectation{
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
+				},
+				idx: 2,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &StatementHandler{
-				projectionName: tt.fields.projectionName,
-			}
-
 			client, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer client.Close()
+
+			h := NewStatementHandler(
+				context.Background(),
+				StatementHandlerConfig{
+					ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+						HandlerConfig: handler.HandlerConfig{
+							Eventstore: nil,
+						},
+						ProjectionName: tt.fields.projectionName,
+						RequeueEvery:   0,
+					},
+					Client:            client,
+					FailedEventsTable: tt.fields.failedEventsTable,
+					MaxFailureCount:   tt.fields.maxFailureCount,
+				},
+			)
 
 			mock.ExpectBegin()
 
@@ -745,16 +835,20 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 
 			mock.ExpectCommit()
 
-			tx, _ := client.Begin()
+			tx, err := client.Begin()
+			if err != nil {
+				t.Fatalf("unexpected err in begin: %v", err)
+			}
 
 			idx := h.executeStmts(tx, tt.args.stmts, tt.args.currentSeq)
 			if idx != tt.want.idx {
 				t.Errorf("unexpected index want: %d got %d", tt.want.idx, idx)
 			}
 
-			tx.Commit()
+			if err := tx.Commit(); err != nil {
+				t.Fatalf("unexpected err in commit: %v", err)
+			}
 
-			mock.MatchExpectationsInOrder(true)
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("expectations not met: %v", err)
 			}
@@ -892,13 +986,16 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &StatementHandler{
-				projectionName: tt.fields.projectionName,
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: tt.fields.projectionName,
+				},
 			}
 
 			client, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer client.Close()
 
 			mock.ExpectBegin()
 
@@ -908,14 +1005,19 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 
 			mock.ExpectCommit()
 
-			tx, _ := client.Begin()
+			tx, err := client.Begin()
+			if err != nil {
+				t.Fatalf("unexpected err in begin: %v", err)
+			}
 
 			err = h.executeStmt(tx, tt.args.stmt)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
 
-			tx.Commit()
+			if err = tx.Commit(); err != nil {
+				t.Fatalf("unexpected err in begin: %v", err)
+			}
 
 			mock.MatchExpectationsInOrder(true)
 			if err := mock.ExpectationsWereMet(); err != nil {
@@ -1023,22 +1125,38 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &StatementHandler{
-				sequenceTable:  tt.fields.sequenceTable,
-				projectionName: tt.fields.projectionName,
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: tt.fields.projectionName,
+				},
+				sequenceTable: tt.fields.sequenceTable,
 			}
 
 			client, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer client.Close()
+
+			mock.ExpectBegin()
 
 			for _, expectation := range tt.want.expectations {
 				expectation(mock)
 			}
 
-			seq, err := h.currentSequence(client.QueryRow)
+			mock.ExpectCommit()
+
+			tx, err := client.Begin()
+			if err != nil {
+				t.Fatalf("unexpected err in begin: %v", err)
+			}
+
+			seq, err := h.currentSequence(tx.QueryRow)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
+			}
+
+			if err = tx.Commit(); err != nil {
+				t.Fatalf("unexpected err in commit: %v", err)
 			}
 
 			mock.MatchExpectationsInOrder(true)
@@ -1135,14 +1253,17 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &StatementHandler{
-				sequenceTable:  tt.fields.sequenceTable,
-				projectionName: tt.fields.projectionName,
+				ProjectionHandler: &handler.ProjectionHandler{
+					ProjectionName: tt.fields.projectionName,
+				},
+				sequenceTable: tt.fields.sequenceTable,
 			}
 
 			client, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer client.Close()
 
 			mock.ExpectBegin()
 			for _, expectation := range tt.want.expectations {
@@ -1150,14 +1271,20 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			}
 			mock.ExpectCommit()
 
-			tx, _ := client.Begin()
+			tx, err := client.Begin()
+			if err != nil {
+				t.Fatalf("unexpected error in begin: %v", err)
+			}
 
 			err = h.updateCurrentSequence(tx, tt.args.stmt)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
 
-			tx.Commit()
+			err = tx.Commit()
+			if err != nil {
+				t.Fatalf("unexpected error in commit: %v", err)
+			}
 
 			mock.MatchExpectationsInOrder(true)
 			if err := mock.ExpectationsWereMet(); err != nil {

@@ -33,6 +33,7 @@ type OIDCApplicationWriteModel struct {
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
 	State                    domain.AppState
+	AdditionalOrigins        []string
 }
 
 func NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *OIDCApplicationWriteModel {
@@ -151,6 +152,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.IDTokenRoleAssertion = e.IDTokenRoleAssertion
 	wm.IDTokenUserinfoAssertion = e.IDTokenUserinfoAssertion
 	wm.ClockSkew = e.ClockSkew
+	wm.AdditionalOrigins = e.AdditionalOrigins
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -193,6 +195,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.ClockSkew != nil {
 		wm.ClockSkew = *e.ClockSkew
 	}
+	if e.AdditionalOrigins != nil {
+		wm.AdditionalOrigins = *e.AdditionalOrigins
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -229,6 +234,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	idTokenRoleAssertion,
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
+	additionalOrigins []string,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -271,6 +277,9 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if wm.ClockSkew != clockSkew {
 		changes = append(changes, project.ChangeClockSkew(clockSkew))
+	}
+	if !reflect.DeepEqual(wm.AdditionalOrigins, additionalOrigins) {
+		changes = append(changes, project.ChangeAdditionalOrigins(additionalOrigins))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

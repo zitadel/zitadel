@@ -4,7 +4,8 @@
     <ng-container *ngIf="keyResponse">
         <div class="row">
             <p class="left">{{'USER.MACHINE.ID' | translate}}</p>
-            <p class="right">{{keyResponse?.keyId}}</p>
+            <p class="right">{{$any(keyResponse)?.id}}</p>
+            <p class="right">{{$any(keyResponse)?.keyId}}</p>
         </div>
 
         <div class="row">

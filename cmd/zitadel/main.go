@@ -23,6 +23,7 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/setup"
 	"github.com/caos/zitadel/internal/static/s3"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
@@ -44,7 +45,7 @@ type Config struct {
 	EventstoreBase types.SQLBase
 	Commands       command.Config
 	Queries        query.Config
-	ReadModels     types.SQL
+	Projections    projection.Config
 
 	AuthZ authz.Config
 	Auth  auth_es.Config
@@ -110,7 +111,7 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
 
-	queries, err := query.StartQueries(ctx, esQueries, conf.ReadModels, conf.SystemDefaults)
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
 	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
 
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
