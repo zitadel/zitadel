@@ -276,7 +276,7 @@ func (p *OrgAdminProjection) addAdmin(orgID, userID string, sequence, previousSe
 
 	p.reduce(admin, events)
 
-	return crdb.NewCreateStatement([]handler.Column{
+	return crdb.NewUpsertStatement([]handler.Column{
 		handler.NewCol(orgAdminOrgID, admin.OrgID),
 		handler.NewCol(orgAdminOrgName, admin.OrgName),
 		handler.NewCol(orgAdminOrgCreationDate, admin.OrgCreationDate),

@@ -32,6 +32,31 @@ func NewCreateStatement(values []handler.Column, sequence, previousSequence uint
 	}
 }
 
+func NewUpsertStatement(values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+	cols, params, args := columnsToQuery(values)
+	columnNames := strings.Join(cols, ", ")
+	valuesPlaceholder := strings.Join(params, ", ")
+
+	return handler.Statement{
+		Sequence:         sequence,
+		PreviousSequence: previousSequence,
+		Execute: func(ex handler.Executer, projectionName string) error {
+			if projectionName == "" {
+				return handler.ErrNoTable
+			}
+			if previousSequence >= sequence {
+				return handler.ErrPrevSeqGtSeq
+			}
+			if len(values) == 0 {
+				return handler.ErrNoValues
+			}
+			query := "UPSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
+			_, err := ex.Exec(query, args...)
+			return err
+		},
+	}
+}
+
 func NewUpdateStatement(conditions, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
