@@ -1,9 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"time"
 )
 
 type LoginPolicyView struct {
@@ -12,6 +13,7 @@ type LoginPolicyView struct {
 	AllowRegister         bool
 	AllowExternalIDP      bool
 	ForceMFA              bool
+	HidePasswordReset     bool
 	PasswordlessType      PasswordlessType
 	SecondFactors         []SecondFactorType
 	MultiFactors          []MultiFactorType

@@ -1421,6 +1421,7 @@ This is an empty response
 | password_complexity_policy |  bool | - |  |
 | label_policy |  bool | - |  |
 | custom_domain |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 
 
 
@@ -1456,6 +1457,7 @@ This is an empty response
 | password_complexity_policy |  bool | - |  |
 | label_policy |  bool | - |  |
 | custom_domain |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 
 
 
@@ -1696,6 +1698,7 @@ This is an empty response
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 

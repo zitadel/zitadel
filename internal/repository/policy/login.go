@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,6 +23,7 @@ type LoginPolicyAddedEvent struct {
 	AllowRegister         bool                    `json:"allowRegister,omitempty"`
 	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA              bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset     bool                    `json:"hidePasswordReset,omitempty"`
 	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
@@ -38,7 +40,8 @@ func NewLoginPolicyAddedEvent(
 	allowUserNamePassword,
 	allowRegister,
 	allowExternalIDP,
-	forceMFA bool,
+	forceMFA,
+	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
@@ -48,6 +51,7 @@ func NewLoginPolicyAddedEvent(
 		AllowUserNamePassword: allowUserNamePassword,
 		ForceMFA:              forceMFA,
 		PasswordlessType:      passwordlessType,
+		HidePasswordReset:     hidePasswordReset,
 	}
 }
 
@@ -71,6 +75,7 @@ type LoginPolicyChangedEvent struct {
 	AllowRegister         *bool                    `json:"allowRegister,omitempty"`
 	AllowExternalIDP      *bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA              *bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset     *bool                    `json:"hidePasswordReset,omitempty"`
 	PasswordlessType      *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
@@ -130,6 +135,12 @@ func ChangeForceMFA(forceMFA bool) func(*LoginPolicyChangedEvent) {
 func ChangePasswordlessType(passwordlessType domain.PasswordlessType) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.PasswordlessType = &passwordlessType
+	}
+}
+
+func ChangeHidePasswordReset(hidePasswordReset bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.HidePasswordReset = &hidePasswordReset
 	}
 }
 

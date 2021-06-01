@@ -3373,6 +3373,7 @@ message AddCustomLoginPolicyRequest {
     bool allow_external_idp = 3;
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
+    bool hide_password_reset = 6;
 }
 
 message AddCustomLoginPolicyResponse {
@@ -3385,6 +3386,7 @@ message UpdateCustomLoginPolicyRequest {
     bool allow_external_idp = 3;
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
+    bool hide_password_reset = 6;
 }
 
 message UpdateCustomLoginPolicyResponse {
