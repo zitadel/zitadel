@@ -1,15 +1,15 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin input-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, A900);
-  $secondary-dark: mat-color($primary, A800);
-  $inv-color: mat-color($primary, A600);
-  $primary-color: mat-color($primary, 500);
-  $primary-light-color: mat-color($primary, 200);
+  $primary-dark: mat.get-color-from-palette($primary, A900);
+  $secondary-dark: mat.get-color-from-palette($primary, A800);
+  $inv-color: mat.get-color-from-palette($primary, A600);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-light-color: mat.get-color-from-palette($primary, 200);
   $warn: map-get($theme, warn);
-  $warn-color: mat-color($warn, 500);
+  $warn-color: mat.get-color-from-palette($warn, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
@@ -34,7 +34,7 @@
     padding: 10px;
     transition: border-color .2s ease-in-out;
     width: 100%;
-    color: mat-color($foreground, text);
+    color: mat.get-color-from-palette($foreground, text);
     margin-bottom: 2px;
 
     &:hover {

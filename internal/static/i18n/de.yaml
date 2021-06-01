@@ -699,11 +699,15 @@ Application:
         RedirectUris:
           CustomNotAllowed: Grant Type Implicit erlaubt keine custom Redirect Uris.
           HttpNotAllowed: Grant Type Implicit erlaubt keine http Redirect Uris.
-          NativeShouldBeHttpLocalhost: Grant Type Implicit erlaubt beim Apptype Native http nur mit localhost (http://localhost)
           HttpLocalhostOnlyForNative: Http://localhost Redirect Uri ist nur für Native Applikationen erlaubt.
       Native:
         AuthMethodType:
           NotNone: Bei Native Applikationen sollte der AuthMethodType none sein.
+        RedirectUris:
+          MustBeHttpLocalhost: Die Weiterleitung muss mit einem eigenen Protokoll, http://127.0.0.1, http://[::1] oder http://localhost beginnen.
       UserAgent:
         AuthMethodType:
           NotNone: Bei einem User Agent sollte der AuthMethodType none sein.
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token nur in Kombination mit Authorization Code erlaubt.

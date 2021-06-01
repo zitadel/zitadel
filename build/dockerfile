@@ -1,5 +1,5 @@
 ARG GO_VERSION=1.15.8
-ARG NODE_VERSION=15.8.0
+ARG NODE_VERSION=14.17.0
 ARG ENV=prod
 
 #######################
@@ -10,6 +10,7 @@ ENV PROTOC_ARCH aarch_64
 
 FROM alpine AS amd64-base
 ENV PROTOC_ARCH x86_64
+
 
 #######################
 ## This step sets up the folder structure,
@@ -23,7 +24,6 @@ ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
 ARG GRPC_WEB_VERSION=1.2.1
 # no arm specific version available and x86 works fine at the moment:
 ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
-
 
 RUN apk add tar curl
 WORKDIR /proto
@@ -51,7 +51,6 @@ RUN curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.1
 COPY proto/ include/.
 
 
-
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
@@ -75,11 +74,13 @@ RUN build/console/generate-grpc.sh
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
+
 #######################
 ## angular dev build
 #######################
 FROM npm-base as dev-angular-build
 RUN npm install -g @angular/cli
+
 
 #######################
 ## angular lint workspace and prod build
@@ -88,44 +89,79 @@ FROM npm-base as prod-angular-build
 RUN npm run lint
 RUN npm run prodbuild
 
+
 #######################
 ## Go dependencies
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM golang:${GO_VERSION} as go-dep
 RUN mkdir -p src/github.com/caos/zitadel
-# copy mod definitions
-COPY tools src/github.com/caos/zitadel/tools
-COPY ./go.* src/github.com/caos/zitadel
-
-# install all dependencies
 WORKDIR /go/src/github.com/caos/zitadel
+
+#download modules
+COPY ./go.* .
 RUN go mod download
+
+# install tools
+COPY tools ./tools
 RUN ./tools/install.sh
 
-FROM go-dep AS go-gen
+
+#######################
+## generates static files
+#######################
+FROM go-dep AS go-static
+COPY internal/ui/login/static internal/ui/login/static
+COPY internal/ui/login/statik internal/ui/login/statik
+COPY internal/notification/static internal/notification/static
+COPY internal/notification/statik internal/notification/statik
+COPY internal/static internal/static
+COPY internal/statik internal/statik
+
+RUN go generate internal/ui/login/statik/generate.go \
+    && go generate internal/ui/login/static/generate.go \
+    && go generate internal/notification/statik/generate.go \
+    && go generate internal/statik/generate.go
+
+
+#######################
+## generates grpc stub
+#######################
+FROM go-static AS go-stub
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
+
 COPY build/zitadel/generate-grpc.sh build/zitadel/generate-grpc.sh
 COPY internal/protoc internal/protoc
-RUN build/zitadel/generate-grpc.sh
+COPY openapi/statik openapi/statik
+
+RUN build/zitadel/generate-grpc.sh \
+    && go generate openapi/statik/generate.go
+
 
 #######################
 ## Go base build
 #######################
-FROM go-gen as go-base
-# copy all zitadel files
+FROM go-stub as go-base
+# copy remaining zitadel files
 COPY . .
+
 
 #######################
 ## copy for local dev
 #######################
 FROM scratch as go-copy
-COPY --from=go-gen /go/src/github.com/caos/zitadel/pkg/grpc ./pkg/grpc
-COPY --from=go-gen /go/src/github.com/caos/zitadel/openapi/v2/zitadel ./openapi/v2/zitadel
-COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go ./internal/protoc/protoc-gen-authoption/templates.gen.go
-COPY --from=go-gen /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go ./internal/protoc/protoc-gen-authoption/authoption/options.pb.go
-COPY --from=go-gen /go/src/github.com/caos/zitadel/docs/apis/proto ./docs/docs/apis/proto
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/ui/login/statik/statik.go internal/ui/login/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
+
+COPY --from=go-stub /go/src/github.com/caos/zitadel/pkg/grpc pkg/grpc
+COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/v2/zitadel openapi/v2/zitadel
+COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/proto docs/docs/apis/proto
 
 
 #######################
@@ -151,13 +187,11 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 #######################
 FROM go-test as prod-go-build
 ARG BUILDARCH
+
+#generate statik code for console
 COPY --from=prod-angular-build console/dist/console console/dist/console/
-RUN go get github.com/rakyll/statik \
-    && ./build/console/generate-static.sh \
-    && ./build/login/generate-static.sh \
-    && ./build/notification/generate-static.sh \
-    && ./build/zitadel/generate-static.sh \
-    && ./build/zitadel/generate-openapi-static.sh
+RUN go generate internal/statik/generate.go
+
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
 
@@ -165,8 +199,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo 
 ## Go dev build
 #######################
 FROM go-base as dev-go-build
-RUN go get github.com/go-delve/delve/cmd/dlv
-
+ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 
 #######################
 ## Final Production Image

@@ -3,15 +3,14 @@ package query
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	usr_repo "github.com/caos/zitadel/internal/repository/user"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/eventstore"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/id"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 

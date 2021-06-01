@@ -1,13 +1,13 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin detail-layout-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-color: mat-color($primary, 500);
-  $primary-dark: mat-color($primary, A800);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-dark: mat.get-color-from-palette($primary, A800);
   /* stylelint-enable */
 
-  $lighter-color: rgba(mat-color($primary, 300), .5);
+  $lighter-color: rgba(mat.get-color-from-palette($primary, 300), .5);
 
   .detail-container {
     width: 100%;

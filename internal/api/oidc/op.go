@@ -73,6 +73,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	}
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
 	config.OPConfig.CodeMethodS256 = true
+	config.OPConfig.GrantTypeRefreshToken = true
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	provider, err := op.NewOpenIDProvider(
 		ctx,
