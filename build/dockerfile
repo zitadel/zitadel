@@ -151,10 +151,10 @@ COPY . .
 ## copy for local dev
 #######################
 FROM scratch as go-copy
-COPY --from=go-static /go/src/github.com/caos/zitadel/internal/ui/login/statik/statik.go internal/ui/login/statik/statik.go
-COPY --from=go-static /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
-COPY --from=go-static /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
-COPY --from=go-static /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/ui/login/statik/statik.go internal/ui/login/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
 
 COPY --from=go-stub /go/src/github.com/caos/zitadel/pkg/grpc pkg/grpc
 COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/v2/zitadel openapi/v2/zitadel
