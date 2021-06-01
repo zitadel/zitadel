@@ -70,6 +70,7 @@ const (
 	PromptLogin
 	PromptConsent
 	PromptSelectAccount
+	PromptCreate
 )
 
 type LevelOfAssurance int
