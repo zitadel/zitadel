@@ -1,4 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Observable, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 
 import { Preview, Theme } from '../private-labeling-policy.component';
@@ -14,18 +16,20 @@ export class PreviewComponent implements OnInit {
   @Input() label: string = 'PREVIEW';
   @Input() images: { [imagekey: string]: any; } = {};
   @Input() theme: Theme = Theme.DARK;
+  @Input() refresh: Observable<void> = of();
+  private destroyed$: Subject<void> = new Subject();
   public Theme: any = Theme;
   public Preview: any = Preview;
-  constructor() { }
+  constructor(private chd: ChangeDetectorRef) { }
 
   public ngOnInit(): void {
-    console.log(this.images);
+    this.refresh.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+      this.chd.detectChanges();
+    });
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-  //   //Add '${implements OnChanges}' to the class.
-  //   console.log(this.images);
-
-  // }
+  public ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
 }

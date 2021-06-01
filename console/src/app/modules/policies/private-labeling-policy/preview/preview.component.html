@@ -3,11 +3,11 @@
   <!--  [style.font-family]="policy.fontCssRule" -->
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}" [style.background]="theme == Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper">
-      <img *ngIf="images['previewIcon'] && theme == Theme.LIGHT" [src]="images['previewIcon']" alt="logo-mock" />
-      <img *ngIf="!images['previewIcon'] && theme == Theme.LIGHT" src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
+      <img *ngIf="images['previewLogo'] && theme == Theme.LIGHT" [src]="images['previewLogo']" alt="logo-mock" />
+      <img *ngIf="!images['previewLogo'] && theme == Theme.LIGHT" src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
     
-      <img *ngIf="images['previewDarkIcon'] && theme == Theme.DARK"  [src]="images['previewDarkIcon']" alt="logo-mock" />
-      <img *ngIf="!images['previewDarkIcon'] && theme == Theme.DARK" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
+      <img *ngIf="images['previewDarkLogo'] && theme == Theme.DARK"  [src]="images['previewDarkLogo']" alt="logo-mock" />
+      <img *ngIf="!images['previewDarkLogo'] && theme == Theme.DARK" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
 
       <h1>Anmeldung</h1>
       <p class="desc-text">mit ZITADEL Konto anmelden</p>

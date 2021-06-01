@@ -220,8 +220,8 @@
             <span><span [ngClass]="{'strong': preview == Preview.PREVIEW}">P</span> / <span [ngClass]="{'strong': preview == Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW"  [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData"></cnsl-preview>
         </div>
       </div>
     </div>

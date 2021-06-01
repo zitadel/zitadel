@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, EventEmitter, Injector, OnDestroy, Type } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -86,6 +86,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public Theme: any = Theme;
   public Preview: any = Preview;
   public ColorType: any = ColorType;
+
+  public refreshPreview: EventEmitter<void> = new EventEmitter();
 
   constructor(
     private route: ActivatedRoute,
@@ -347,6 +349,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     return this.uploadService.load(`${url}`).then(data => {
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+      this.refreshPreview.emit();
     });
   }
 
