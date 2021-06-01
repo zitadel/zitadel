@@ -397,20 +397,23 @@ func (n *Notification) getMessageText(ctx context.Context, textType, lang string
 	if langTag == language.Und {
 		lang = language.English.String()
 	}
+
+	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, lang, mailTextTableDef)
+	if err != nil {
+		return nil, err
+	}
+	defaultMessageText.Default = true
+
 	// read from Org
-	mailText, err := n.view.MessageTextByIDs(authz.GetCtxData(ctx).OrgID, textType, lang, mailTextTableOrg)
+	orgMessageText, err := n.view.MessageTextByIDs(authz.GetCtxData(ctx).OrgID, textType, lang, mailTextTableOrg)
 	if errors.IsNotFound(err) {
-		// read from default
-		mailText, err = n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, lang, mailTextTableDef)
-		if err != nil {
-			return nil, err
-		}
-		mailText.Default = true
+		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MessageTextViewToModel(mailText), err
+	mergedText := mergeMessageTexts(defaultMessageText, orgMessageText)
+	return iam_es_model.MessageTextViewToModel(mergedText), err
 }
 
 func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error) {
@@ -435,4 +438,29 @@ func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error
 		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
 	}
 	return &userCopy, nil
+}
+
+func mergeMessageTexts(defaultText *iam_es_model.MessageTextView, orgText *iam_es_model.MessageTextView) *iam_es_model.MessageTextView {
+	if orgText.Subject == "" {
+		orgText.Subject = defaultText.Subject
+	}
+	if orgText.Title == "" {
+		orgText.Title = defaultText.Title
+	}
+	if orgText.PreHeader == "" {
+		orgText.PreHeader = defaultText.PreHeader
+	}
+	if orgText.Text == "" {
+		orgText.Text = defaultText.Text
+	}
+	if orgText.Greeting == "" {
+		orgText.Greeting = defaultText.Greeting
+	}
+	if orgText.ButtonText == "" {
+		orgText.ButtonText = defaultText.ButtonText
+	}
+	if orgText.FooterText == "" {
+		orgText.FooterText = defaultText.FooterText
+	}
+	return orgText
 }

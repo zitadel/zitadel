@@ -1981,6 +1981,8 @@ service ManagementService {
 
     //Sets the default custom text for initial message
     // it impacts all organisations without customized initial message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetCustomInitMessageText(SetCustomInitMessageTextRequest) returns (SetCustomInitMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/init/{language}";
@@ -2016,6 +2018,8 @@ service ManagementService {
 
     //Sets the default custom text for password reset message
     // it impacts all organisations without customized password reset message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetCustomPasswordResetMessageText(SetCustomPasswordResetMessageTextRequest) returns (SetCustomPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordreset/{language}";
@@ -2052,6 +2056,8 @@ service ManagementService {
 
     //Sets the default custom text for verify email message
     // it impacts all organisations without customized verify email message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetCustomVerifyEmailMessageText(SetCustomVerifyEmailMessageTextRequest) returns (SetCustomVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyemail/{language}";
@@ -2088,6 +2094,8 @@ service ManagementService {
 
     //Sets the default custom text for verify email message
     // it impacts all organisations without customized verify email message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetCustomVerifyPhoneMessageText(SetCustomVerifyPhoneMessageTextRequest) returns (SetCustomVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyphone/{language}";
@@ -2124,6 +2132,8 @@ service ManagementService {
 
     //Sets the default custom text for domain claimed message
     // it impacts all organisations without customized domain claimed message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetCustomDomainClaimedMessageCustomText(SetCustomDomainClaimedMessageTextRequest) returns (SetCustomDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/domainclaimed/{language}";

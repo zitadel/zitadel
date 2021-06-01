@@ -1637,6 +1637,8 @@ Returns the custom text for initial message
 
 Sets the default custom text for initial message
 it impacts all organisations without customized initial message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -1669,6 +1671,8 @@ Returns the custom text for password reset message
 
 Sets the default custom text for password reset message
 it impacts all organisations without customized password reset message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -1701,6 +1705,8 @@ Returns the custom text for verify email message
 
 Sets the default custom text for verify email message
 it impacts all organisations without customized verify email message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -1733,6 +1739,8 @@ Returns the custom text for verify email message
 
 Sets the default custom text for verify email message
 it impacts all organisations without customized verify email message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
@@ -1765,6 +1773,8 @@ Returns the custom text for domain claimed message
 
 Sets the default custom text for domain claimed message
 it impacts all organisations without customized domain claimed message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
