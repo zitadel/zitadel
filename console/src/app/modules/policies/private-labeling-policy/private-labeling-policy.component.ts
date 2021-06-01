@@ -413,8 +413,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     req.setBackgroundColorDark(this.previewData.backgroundColorDark);
     req.setBackgroundColor(this.previewData.backgroundColor);
 
+    req.setFontColorDark(this.previewData.fontColorDark);
+    req.setFontColor(this.previewData.fontColor);
+
     req.setPrimaryColorDark(this.previewData.primaryColorDark);
     req.setPrimaryColor(this.previewData.primaryColor);
+
     req.setWarnColorDark(this.previewData.warnColorDark);
     req.setWarnColor(this.previewData.warnColor);
 
