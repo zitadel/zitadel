@@ -39,31 +39,41 @@ export class ColorComponent implements OnInit {
   ];
 
   public FONTLIGHT: Array<{ name: string; color: string; }> = [
-    { name: 'red', color: '#f44336' },
-    { name: 'pink', color: '#e91e63' },
-    { name: 'purple', color: '#9c27b0' },
-    { name: 'deeppurple', color: '#673ab7' },
+    { name: 'gray-500', color: '#6b7280' },
+    { name: 'gray-600', color: '#4b5563' },
+    { name: 'gray-700', color: '#374151' },
+    { name: 'gray-800', color: '#1f2937' },
+    { name: 'gray-900', color: '#111827' },
+    { name: 'black', color: '#000000' },
   ];
 
   public FONTDARK: Array<{ name: string; color: string; }> = [
-    { name: 'red', color: '#f44336' },
-    { name: 'pink', color: '#e91e63' },
-    { name: 'purple', color: '#9c27b0' },
-    { name: 'deeppurple', color: '#673ab7' },
+    { name: 'white', color: '#ffffff' },
+    { name: 'gray-50', color: '#f9fafb' },
+    { name: 'gray-100', color: '#f3f4f6' },
+    { name: 'gray-200', color: '#e5e7eb' },
+    { name: 'gray-300', color: '#d1d5db' },
+    { name: 'gray-400', color: '#9ca3af' },
+    { name: 'gray-500', color: '#6b7280' },
   ];
 
   public BACKGROUNDLIGHT: Array<{ name: string; color: string; }> = [
-    { name: 'red', color: '#f44336' },
-    { name: 'pink', color: '#e91e63' },
-    { name: 'purple', color: '#9c27b0' },
-    { name: 'deeppurple', color: '#673ab7' },
+    { name: 'white', color: '#ffffff' },
+    { name: 'gray-50', color: '#f9fafb' },
+    { name: 'gray-100', color: '#f3f4f6' },
+    { name: 'gray-200', color: '#e5e7eb' },
+    { name: 'gray-300', color: '#d1d5db' },
+    { name: 'gray-400', color: '#9ca3af' },
+    { name: 'gray-500', color: '#6b7280' },
   ];
 
   public BACKGROUNDDARK: Array<{ name: string; color: string; }> = [
-    { name: 'red', color: '#f44336' },
-    { name: 'pink', color: '#e91e63' },
-    { name: 'purple', color: '#9c27b0' },
-    { name: 'deeppurple', color: '#673ab7' },
+    { name: 'gray-500', color: '#6b7280' },
+    { name: 'gray-600', color: '#4b5563' },
+    { name: 'gray-700', color: '#374151' },
+    { name: 'gray-800', color: '#1f2937' },
+    { name: 'gray-900', color: '#111827' },
+    { name: 'black', color: '#000000' },
   ];
 
   public colors = this.PRIMARY;

@@ -59,20 +59,18 @@
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
-              <div class="logo-view">
-                <container [ngSwitch]="theme">
-                  <ng-container *ngSwitchCase="Theme.DARK">
-                    <img class="prev" *ngIf="images['previewDarkLogo']" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
-                    <span class="fill-space"></span>
-                    <img class="curr" *ngIf="images['darkLogo']" [src]="images['darkLogo']" alt="dark logo"/>
-                  </ng-container>
-                  <ng-container *ngSwitchCase="Theme.LIGHT">
-                    <img class="prev" *ngIf="images['previewLogo']" [src]="images['previewLogo']" alt="logo preview"/>
-                    <span class="fill-space"></span>
-                    <img class="curr" *ngIf="images['logo']" [src]="images['logo']" alt="logo"/>
-                  </ng-container>
-                </container>
-              </div>
+              <container [ngSwitch]="theme">
+                <div class="logo-view" *ngSwitchCase="Theme.DARK">
+                  <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkLogo']" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
+                  <span class="fill-space"></span>
+                  <img matTooltip="Current" class="curr" *ngIf="images['darkLogo']" [src]="images['darkLogo']" alt="dark logo"/>
+                </div>
+                <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
+                  <img matTooltip="Preview" class="prev" *ngIf="images['previewLogo']" [src]="images['previewLogo']" alt="logo preview"/>
+                  <span class="fill-space"></span>
+                  <img matTooltip="Current" class="curr" *ngIf="images['logo']" [src]="images['logo']" alt="logo"/>
+                </div>
+              </container>
               <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(theme, $event)"
               (dropped)="onDropLogo(theme, $event)"
               [class.hovering]="isHoveringOverDarkLogo">
@@ -88,20 +86,18 @@
 
             <div class="part">
               <span class="label">Icon</span>
-              <div class="logo-view">
                 <container [ngSwitch]="theme">
-                  <ng-container *ngSwitchCase="Theme.DARK">
-                    <img class="prev" *ngIf="images['previewDarkIcon']" [src]="images['previewDarkIcon']" alt="dark icon preview"/>
+                  <div class="logo-view" *ngSwitchCase="Theme.DARK">
+                    <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkIcon']" [src]="images['previewDarkIcon']" alt="dark icon preview"/>
                     <span class="fill-space"></span>
-                    <img class="curr" *ngIf="images['darkIcon']" [src]="images['darkIcon']" alt="dark icon"/>
-                  </ng-container>
-                  <ng-container *ngSwitchCase="Theme.LIGHT">
-                    <img class="prev" *ngIf="images['previewIcon']" [src]="images['previewIcon']" alt="icon preview"/>
+                    <img matTooltip="Current" class="curr" *ngIf="images['darkIcon']" [src]="images['darkIcon']" alt="dark icon"/>
+                  </div>
+                  <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
+                    <img matTooltip="Preview" class="prev" *ngIf="images['previewIcon']" [src]="images['previewIcon']" alt="icon preview"/>
                     <span class="fill-space"></span>
-                    <img class="curr" *ngIf="images['icon']" [src]="images['icon']" alt="icon"/>
-                  </ng-container>
+                    <img matTooltip="Current" class="curr" *ngIf="images['icon']" [src]="images['icon']" alt="icon"/>
+                  </div>
                 </container>
-              </div>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
               (dropped)="onDropIcon(theme, $event)"
               [class.hovering]="isHoveringOverDarkIcon">
@@ -224,8 +220,8 @@
             <span><span [ngClass]="{'strong': preview == Preview.PREVIEW}">P</span> / <span [ngClass]="{'strong': preview == Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData" [logoURL]="logoURL"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData"></cnsl-preview>
         </div>
       </div>
     </div>

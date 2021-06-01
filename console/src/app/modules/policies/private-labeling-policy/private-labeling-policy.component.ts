@@ -30,7 +30,7 @@ export enum Theme {
   LIGHT,
 }
 
-enum Preview {
+export enum Preview {
   CURRENT,
   PREVIEW,
 }
