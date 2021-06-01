@@ -3,21 +3,16 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"golang.org/x/text/language"
 	"net/http"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -26,6 +21,9 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"golang.org/x/text/language"
 )
 
 const (
@@ -278,7 +276,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	data := make(map[string]string)
 	if err := json.Unmarshal(event.Data, &data); err != nil {
 		logging.Log("HANDLE-Gghq2").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
+		return errors.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
 	}
 	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
@@ -356,7 +354,7 @@ func getSetNotifyContextData(orgID string) context.Context {
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
 	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
-	if caos_errs.IsNotFound(err) {
+	if errors.IsNotFound(err) {
 		// read from default
 		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
 		if err != nil {
@@ -411,13 +409,13 @@ func (n *Notification) getMailText(ctx context.Context, textType string, lang st
 	return iam_es_model.MailTextViewToModel(mailText), err
 }
 
-func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error) {
+func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
 	user, usrErr := n.view.NotifyUserByID(userID)
-	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+	if usrErr != nil && !errors.IsNotFound(usrErr) {
 		return nil, usrErr
 	}
 	if user == nil {
-		user = &view_model.NotifyUser{}
+		user = &model.NotifyUser{}
 	}
 	events, err := n.getUserEvents(userID, user.Sequence)
 	if err != nil {
@@ -430,7 +428,7 @@ func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error
 		}
 	}
 	if userCopy.State == int32(model.UserStateDeleted) {
-		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
+		return nil, errors.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
 	}
 	return &userCopy, nil
 }
