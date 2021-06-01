@@ -1,8 +1,8 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin info-section-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat-color($primary, 500);
+  $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
   .info-section-row {
@@ -25,6 +25,15 @@
     }
 
     &.info {
+      background-color: if($is-dark-theme, #6d6f7382, #e4e4e4);
+      color: if($is-dark-theme, #f0f0f0, #4a4a4a);
+
+      .icon {
+        color: $primary-color;
+      }
+    }
+
+    &.success {
       background-color: if($is-dark-theme, #4f566b, #cbf4c9);
       color: if($is-dark-theme, #cbf4c9, #0e6245);
 

@@ -323,7 +323,7 @@ jobs:
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
       - name: Development Release
         id: create_release
-        uses: ncipollo/release-action@v1.8.1
+        uses: ncipollo/release-action@v1.8.4
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
         with:
           artifacts: "${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe"

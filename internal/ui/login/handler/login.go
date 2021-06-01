@@ -5,26 +5,24 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/query"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-
 	"github.com/caos/logging"
-	"github.com/gorilla/csrf"
-	"github.com/rakyll/statik/fs"
-	"golang.org/x/text/language"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/query"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/gorilla/csrf"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
 )
 
 type Login struct {

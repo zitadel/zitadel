@@ -1,0 +1,11 @@
+FROM ubuntu:latest AS client-id
+#install dependencies
+RUN apt-get update \
+    && apt-get install curl -y \
+    && apt-get install jq -y
+
+#prepare script
+COPY build/local/clientid.sh clientid.sh
+RUN chmod +x /clientid.sh
+
+ENTRYPOINT [ "/clientid.sh" ]

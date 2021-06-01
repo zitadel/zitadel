@@ -1,5 +1,4 @@
-
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 .radio-button-wrapper {
   display: flex;
@@ -10,7 +9,7 @@
 
 @mixin app-type-radio-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat-color($primary, 500);
+  $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
   input[type="radio"] {

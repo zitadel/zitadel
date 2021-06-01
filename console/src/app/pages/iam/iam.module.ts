@@ -22,6 +22,7 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { ZitadelTierModule } from 'src/app/modules/zitadel-tier/zitadel-tier.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
@@ -33,37 +34,38 @@ import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
 @NgModule({
-    declarations: [IamComponent, EventstoreComponent, IamViewsComponent, FailedEventsComponent],
-    imports: [
-        CommonModule,
-        IamRoutingModule,
-        ChangesModule,
-        CardModule,
-        MatAutocompleteModule,
-        MatChipsModule,
-        MatButtonModule,
-        HasRoleModule,
-        MatCheckboxModule,
-        MetaLayoutModule,
-        MatIconModule,
-        MatTableModule,
-        MatPaginatorModule,
-        InputModule,
-        MatSortModule,
-        MatTooltipModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
-        FormsModule,
-        TranslateModule,
-        MatDialogModule,
-        ContributorsModule,
-        LocalizedDatePipeModule,
-        TimestampToDatePipeModule,
-        SharedModule,
-        RefreshTableModule,
-        HasRolePipeModule,
-        MatSortModule,
-        PolicyGridModule,
-    ],
+  declarations: [IamComponent, EventstoreComponent, IamViewsComponent, FailedEventsComponent],
+  imports: [
+    CommonModule,
+    IamRoutingModule,
+    ChangesModule,
+    CardModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatButtonModule,
+    HasRoleModule,
+    MatCheckboxModule,
+    MetaLayoutModule,
+    MatIconModule,
+    MatTableModule,
+    ZitadelTierModule,
+    MatPaginatorModule,
+    InputModule,
+    MatSortModule,
+    MatTooltipModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+    TranslateModule,
+    MatDialogModule,
+    ContributorsModule,
+    LocalizedDatePipeModule,
+    TimestampToDatePipeModule,
+    SharedModule,
+    RefreshTableModule,
+    HasRolePipeModule,
+    MatSortModule,
+    PolicyGridModule,
+  ],
 })
 export class IamModule { }
