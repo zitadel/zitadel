@@ -1,11 +1,11 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin membership-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, A900);
+  $primary-dark: mat.get-color-from-palette($primary, A900);
   $accent: map-get($theme, accent);
-  $accent-color: mat-color($accent, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
   /* stylelint-enable */
 
   .membership-groups {

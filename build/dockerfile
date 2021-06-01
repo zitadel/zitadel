@@ -1,5 +1,5 @@
 ARG GO_VERSION=1.15.8
-ARG NODE_VERSION=15.8.0
+ARG NODE_VERSION=14.17.0
 ARG ENV=prod
 
 #######################

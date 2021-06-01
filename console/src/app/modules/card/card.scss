@@ -1,12 +1,12 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin card-theme($theme) {
 /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-color: mat-color($primary, 500);
-  $primary-dark: mat-color($primary, A800);
-  $border-color: mat-color($primary, A700);
-  $border-selected-color: mat-color($primary, A600);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-dark: mat.get-color-from-palette($primary, A800);
+  $border-color: mat.get-color-from-palette($primary, A700);
+  $border-selected-color: mat.get-color-from-palette($primary, A600);
 /* stylelint-enable */
 
   .card {

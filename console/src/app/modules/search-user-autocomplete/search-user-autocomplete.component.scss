@@ -8,6 +8,7 @@
 
 .target-desc {
   font-size: 14px;
+  display: block;
 
   a {
     color: #4072b4;
@@ -69,4 +70,9 @@
 
 .circle {
   margin-right: .5rem;
+}
+
+input {
+  max-width: 500px;
+  display: block;
 }
