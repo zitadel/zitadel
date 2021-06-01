@@ -245,6 +245,23 @@
               margin-bottom: 1rem;
               display: block;
             }
+
+            .logo-view {
+              width: 100%;
+              display: flex;
+              margin-bottom: 1rem;
+
+              .prev,
+              .curr {
+                height: 50px;
+                object-fit: contain;
+                border-radius: .5rem;
+              }
+
+              .fill-space {
+                flex: 1;
+              }
+            }
           }
         }
 

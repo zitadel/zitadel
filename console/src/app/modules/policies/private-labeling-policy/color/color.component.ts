@@ -1,12 +1,14 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+import { ColorType } from '../private-labeling-policy.component';
 
 @Component({
   selector: 'cnsl-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
 })
-export class ColorComponent {
-  public colors: Array<{ name: string; color: string; }> = [
+export class ColorComponent implements OnInit {
+  public PRIMARY: Array<{ name: string; color: string; }> = [
     { name: 'red', color: '#f44336' },
     { name: 'pink', color: '#e91e63' },
     { name: 'purple', color: '#9c27b0' },
@@ -29,13 +31,44 @@ export class ColorComponent {
     { name: 'white', color: '#ffffff' },
   ];
 
-  public warncolors: Array<{ name: string; color: string; }> = [
+  public WARN: Array<{ name: string; color: string; }> = [
     { name: 'red', color: '#f44336' },
     { name: 'pink', color: '#e91e63' },
     { name: 'purple', color: '#9c27b0' },
     { name: 'deeppurple', color: '#673ab7' },
   ];
-  @Input() warn: boolean = false;
+
+  public FONTLIGHT: Array<{ name: string; color: string; }> = [
+    { name: 'red', color: '#f44336' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' },
+    { name: 'deeppurple', color: '#673ab7' },
+  ];
+
+  public FONTDARK: Array<{ name: string; color: string; }> = [
+    { name: 'red', color: '#f44336' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' },
+    { name: 'deeppurple', color: '#673ab7' },
+  ];
+
+  public BACKGROUNDLIGHT: Array<{ name: string; color: string; }> = [
+    { name: 'red', color: '#f44336' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' },
+    { name: 'deeppurple', color: '#673ab7' },
+  ];
+
+  public BACKGROUNDDARK: Array<{ name: string; color: string; }> = [
+    { name: 'red', color: '#f44336' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' },
+    { name: 'deeppurple', color: '#673ab7' },
+  ];
+
+  public colors = this.PRIMARY;
+
+  @Input() colorType: ColorType = ColorType.PRIMARY;
   @Input() color: string = '';
   @Input() previewColor: string = '';
   @Input() name: string = '';
@@ -44,5 +77,32 @@ export class ColorComponent {
   public emitPreview(color: string): void {
     this.previewColor = color;
     this.previewChanged.emit(this.previewColor);
+  }
+
+  ngOnInit(): void {
+
+    switch (this.colorType) {
+      case ColorType.PRIMARY:
+        this.colors = this.PRIMARY;
+        break;
+      case ColorType.WARN:
+        this.colors = this.WARN;
+        break;
+      case ColorType.FONTDARK:
+        this.colors = this.FONTDARK;
+        break;
+      case ColorType.FONTLIGHT:
+        this.colors = this.FONTLIGHT;
+        break;
+      case ColorType.BACKGROUNDDARK:
+        this.colors = this.BACKGROUNDDARK;
+        break;
+      case ColorType.BACKGROUNDLIGHT:
+        this.colors = this.BACKGROUNDLIGHT;
+        break;
+      default:
+        this.colors = this.PRIMARY;
+        break;
+    }
   }
 }
