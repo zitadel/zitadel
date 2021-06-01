@@ -143,17 +143,17 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         if (theme === Theme.DARK) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              return this.uploadService.upload(UploadEndpoint.MGMTDARKLOGO, formData);
+              return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTDARKLOGO, formData));
             case PolicyComponentServiceType.ADMIN:
-              return this.uploadService.upload(UploadEndpoint.IAMDARKLOGO, formData);
+              return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMDARKLOGO, formData));
           }
         }
         if (theme === Theme.LIGHT) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              return this.uploadService.upload(UploadEndpoint.MGMTDARKLOGO, formData);
+              return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTDARKLOGO, formData));
             case PolicyComponentServiceType.ADMIN:
-              return this.uploadService.upload(UploadEndpoint.IAMDARKLOGO, formData);
+              return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMDARKLOGO, formData));
           }
         }
       };
@@ -190,7 +190,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public onDropIcon(theme: Theme, filelist: FileList): Promise<any> | void {
+  public onDropIcon(theme: Theme, filelist: FileList): void {
     console.log(filelist);
     const file = filelist.item(0);
     if (file) {
@@ -208,21 +208,32 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         if (theme === Theme.DARK) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              return this.uploadService.upload(UploadEndpoint.MGMTDARKICON, formData);
+              this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTDARKICON, formData));
+              break;
             case PolicyComponentServiceType.ADMIN:
-              return this.uploadService.upload(UploadEndpoint.IAMDARKICON, formData);
+              this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMDARKICON, formData));
+              break;
           }
         }
         if (theme === Theme.LIGHT) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              return this.uploadService.upload(UploadEndpoint.MGMTLIGHTICON, formData);
+              this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTLIGHTICON, formData));
+              break;
             case PolicyComponentServiceType.ADMIN:
-              return this.uploadService.upload(UploadEndpoint.IAMLIGHTICON, formData);
+              this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMLIGHTICON, formData));
+              break;
           }
         }
       };
     }
+  }
+
+  private handleUploadPromise(task: Promise<any>): Promise<any> {
+    return task.then(() => {
+      console.log('then');
+      this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
+    }).catch(error => this.toast.showError(error));
   }
 
   public fetchData(): void {

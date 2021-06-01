@@ -704,7 +704,9 @@
     "CREATECUSTOM": "Create Custom Policy",
     "TOAST": {
       "SET": "Policy set successfully!",
-      "RESETSUCCESS": "Policy reset successfully!"
+      "RESETSUCCESS": "Policy reset successfully!",
+      "UPLOADSUCCESS": "Uploaded successfully!",
+      "UPLOADFAILED":"Upload failed!"
     }
   },
   "ORG_DETAIL": {

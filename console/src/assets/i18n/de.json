@@ -702,7 +702,9 @@
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
     "TOAST": {
       "SET": "Richtline erfolgreich gesetzt!",
-      "RESETSUCCESS": "Richtline zurückgesetzt!"
+      "RESETSUCCESS": "Richtline zurückgesetzt!",
+      "UPLOADSUCCESS": "Upload erfolgreich",
+      "UPLOADFAILED":"Upload fehlgeschlagen!"
     }
   },
   "ORG_DETAIL": {
