@@ -30,6 +30,7 @@ type ApplicationView struct {
 	ComplianceProblems         []string
 	DevMode                    bool
 	OriginAllowList            []string
+	AdditionalOrigins          []string
 	AccessTokenType            OIDCTokenType
 	IDTokenRoleAssertion       bool
 	AccessTokenRoleAssertion   bool

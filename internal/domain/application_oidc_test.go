@@ -1,9 +1,10 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"testing"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 func TestApplicationValid(t *testing.T) {
@@ -159,6 +160,20 @@ func TestApplicationValid(t *testing.T) {
 				},
 			},
 			result: true,
+		},
+		{
+			name: "invalid oidc application: invalid origin",
+			args: args{
+				app: &OIDCApp{
+					ObjectRoot:        models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:             "AppID",
+					AppName:           "Name",
+					ResponseTypes:     []OIDCResponseType{OIDCResponseTypeCode, OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken},
+					GrantTypes:        []OIDCGrantType{OIDCGrantTypeAuthorizationCode, OIDCGrantTypeImplicit},
+					AdditionalOrigins: []string{"https://test.com/test"},
+				},
+			},
+			result: false,
 		},
 	}
 	for _, tt := range tests {

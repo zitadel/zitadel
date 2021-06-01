@@ -51,6 +51,7 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		IDTokenRoleAssertion:     writeModel.IDTokenRoleAssertion,
 		IDTokenUserinfoAssertion: writeModel.IDTokenUserinfoAssertion,
 		ClockSkew:                writeModel.ClockSkew,
+		AdditionalOrigins:        writeModel.AdditionalOrigins,
 	}
 }
 

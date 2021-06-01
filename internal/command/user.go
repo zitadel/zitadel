@@ -3,12 +3,14 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/repository/user"
@@ -209,50 +211,57 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 }
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-55n8M", "Errors.IDMissing")
+	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
-
-	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
+	userWriteModel := NewUserWriteModel(userID, orgID)
+	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, lifetime)
 	if err != nil {
 		return nil, err
 	}
-	if !isUserStateExists(existingUser.UserState) {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
+	_, err = c.eventstore.PushEvents(ctx, event)
+	if err != nil {
+		return nil, err
+	}
+	return accessToken, nil
+}
+
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !isUserStateExists(userWriteModel.UserState) {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
 	audience = domain.AddAudScopeToAudience(audience, scopes)
 
 	preferredLanguage := ""
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
+	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
 	if existingHuman != nil {
 		preferredLanguage = existingHuman.PreferredLanguage.String()
 	}
 	expiration := time.Now().UTC().Add(lifetime)
 	tokenID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx,
-		user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, audience, scopes, expiration))
-	if err != nil {
-		return nil, err
-	}
-
-	return &domain.Token{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: userID,
-		},
-		TokenID:           tokenID,
-		UserAgentID:       agentID,
-		ApplicationID:     clientID,
-		Audience:          audience,
-		Scopes:            scopes,
-		Expiration:        expiration,
-		PreferredLanguage: preferredLanguage,
-	}, nil
+	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
+	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, audience, scopes, expiration),
+		&domain.Token{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID: userWriteModel.AggregateID,
+			},
+			TokenID:           tokenID,
+			UserAgentID:       agentID,
+			ApplicationID:     clientID,
+			Audience:          audience,
+			Scopes:            scopes,
+			Expiration:        expiration,
+			PreferredLanguage: preferredLanguage,
+		}, nil
 }
 
 func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.EventPusher, _ *UserWriteModel, err error) {

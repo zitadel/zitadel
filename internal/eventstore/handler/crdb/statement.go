@@ -32,7 +32,7 @@ func NewCreateStatement(values []handler.Column, sequence, previousSequence uint
 	}
 }
 
-func NewUpdateStatement(conditions []handler.Column, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+func NewUpdateStatement(conditions, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)

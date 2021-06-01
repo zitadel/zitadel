@@ -47,6 +47,36 @@ Returns the user sessions of the authorized user of the current useragent
 
 
 
+### ListMyRefreshTokens
+
+> **rpc** ListMyRefreshTokens([ListMyRefreshTokensRequest](#listmyrefreshtokensrequest))
+[ListMyRefreshTokensResponse](#listmyrefreshtokensresponse)
+
+Returns the refresh tokens of the authorized user
+
+
+
+
+### RevokeMyRefreshToken
+
+> **rpc** RevokeMyRefreshToken([RevokeMyRefreshTokenRequest](#revokemyrefreshtokenrequest))
+[RevokeMyRefreshTokenResponse](#revokemyrefreshtokenresponse)
+
+Revokes a single refresh token of the authorized user by its (token) id
+
+
+
+
+### RevokeAllMyRefreshTokens
+
+> **rpc** RevokeAllMyRefreshTokens([RevokeAllMyRefreshTokensRequest](#revokeallmyrefreshtokensrequest))
+[RevokeAllMyRefreshTokensResponse](#revokeallmyrefreshtokensresponse)
+
+Revokes all refresh tokens of the authorized user
+
+
+
+
 ### UpdateMyUserName
 
 > **rpc** UpdateMyUserName([UpdateMyUserNameRequest](#updatemyusernamerequest))
@@ -636,6 +666,24 @@ This is an empty request
 
 
 
+### ListMyRefreshTokensRequest
+This is an empty request
+
+
+
+
+### ListMyRefreshTokensResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.RefreshToken | - |  |
+
+
+
+
 ### ListMyUserChangesRequest
 
 
@@ -858,6 +906,40 @@ This is an empty request
 
 
 ### ResendMyPhoneVerificationResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RevokeAllMyRefreshTokensRequest
+This is an empty request
+
+
+
+
+### RevokeAllMyRefreshTokensResponse
+This is an empty response
+
+
+
+
+### RevokeMyRefreshTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RevokeMyRefreshTokenResponse
 
 
 

@@ -81,7 +81,8 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 		oidcApp.AccessTokenRoleAssertion,
 		oidcApp.IDTokenRoleAssertion,
 		oidcApp.IDTokenUserinfoAssertion,
-		oidcApp.ClockSkew))
+		oidcApp.ClockSkew,
+		oidcApp.AdditionalOrigins))
 
 	return events, stringPw, nil
 }
@@ -115,7 +116,8 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.AccessTokenRoleAssertion,
 		oidc.IDTokenRoleAssertion,
 		oidc.IDTokenUserinfoAssertion,
-		oidc.ClockSkew)
+		oidc.ClockSkew,
+		oidc.AdditionalOrigins)
 	if err != nil {
 		return nil, err
 	}

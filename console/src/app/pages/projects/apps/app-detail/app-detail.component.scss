@@ -142,6 +142,17 @@
   flex-wrap: wrap;
   margin: 0 -.5rem;
 
+  .grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+    .rt {
+      margin-top: 2.3rem;
+      margin-left: .5rem;
+    }
+  }
+
   &.nowrap {
     flex-wrap: nowrap;
   }
@@ -153,6 +164,26 @@
   .redirect-section {
     flex: 1;
     margin: 0 .5rem;
+  }
+
+  .additional-origins {
+    display: block;
+    width: 100%;
+    margin: 0 .5rem;
+
+    .title {
+      margin: 0;
+    }
+
+    .desc {
+      color: var(--grey);
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .input {
+      width: 100%;
+    }
   }
 
   .formfield {

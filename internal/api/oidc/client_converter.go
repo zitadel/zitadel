@@ -61,6 +61,10 @@ func (c *Client) ResponseTypes() []oidc.ResponseType {
 	return responseTypesToOIDC(c.OIDCResponseTypes)
 }
 
+func (c *Client) GrantTypes() []oidc.GrantType {
+	return grantTypesToOIDC(c.OIDCGrantTypes)
+}
+
 func (c *Client) DevMode() bool {
 	return c.ApplicationView.DevMode
 }
@@ -162,6 +166,27 @@ func responseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
 		return oidc.ResponseTypeIDTokenOnly
 	default:
 		return oidc.ResponseTypeCode
+	}
+}
+
+func grantTypesToOIDC(grantTypes []model.OIDCGrantType) []oidc.GrantType {
+	oidcTypes := make([]oidc.GrantType, len(grantTypes))
+	for i, t := range grantTypes {
+		oidcTypes[i] = grantTypeToOIDC(t)
+	}
+	return oidcTypes
+}
+
+func grantTypeToOIDC(grantType model.OIDCGrantType) oidc.GrantType {
+	switch grantType {
+	case model.OIDCGrantTypeAuthorizationCode:
+		return oidc.GrantTypeCode
+	case model.OIDCGrantTypeImplicit:
+		return oidc.GrantTypeImplicit
+	case model.OIDCGrantTypeRefreshToken:
+		return oidc.GrantTypeRefreshToken
+	default:
+		return oidc.GrantTypeCode
 	}
 }
 

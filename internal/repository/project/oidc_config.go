@@ -3,12 +3,12 @@ package project
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -39,6 +39,7 @@ type OIDCConfigAddedEvent struct {
 	IDTokenRoleAssertion     bool                       `json:"idTokenRoleAssertion,omitempty"`
 	IDTokenUserinfoAssertion bool                       `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Data() interface{} {
@@ -68,6 +69,7 @@ func NewOIDCConfigAddedEvent(
 	idTokenRoleAssertion bool,
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
+	additionalOrigins []string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -91,6 +93,7 @@ func NewOIDCConfigAddedEvent(
 		IDTokenRoleAssertion:     idTokenRoleAssertion,
 		IDTokenUserinfoAssertion: idTokenUserinfoAssertion,
 		ClockSkew:                clockSkew,
+		AdditionalOrigins:        additionalOrigins,
 	}
 }
 
@@ -124,6 +127,7 @@ type OIDCConfigChangedEvent struct {
 	IDTokenRoleAssertion     *bool                       `json:"idTokenRoleAssertion,omitempty"`
 	IDTokenUserinfoAssertion *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Data() interface{} {
@@ -235,6 +239,12 @@ func ChangeIDTokenUserinfoAssertion(idTokenUserinfoAssertion bool) func(event *O
 func ChangeClockSkew(clockSkew time.Duration) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.ClockSkew = &clockSkew
+	}
+}
+
+func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AdditionalOrigins = &additionalOrigins
 	}
 }
 
