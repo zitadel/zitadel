@@ -221,7 +221,7 @@ const fontFaceTemplate = `
 	font-family: '%s';
 	font-style: normal;
 	font-display: swap;
-	src: url(%s?orgId=%s&filename=%s) format('opentype');
+	src: url(%s?orgId=%s&filename=%s);
 }
 `
 
