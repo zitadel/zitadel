@@ -137,6 +137,9 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 		if requiredFeature == domain.FeatureLabelPolicy && !features.PasswordComplexityPolicy {
 			return MissingFeatureErr(requiredFeature)
 		}
+		if requiredFeature == domain.FeatureCustomText && !features.CustomText {
+			return MissingFeatureErr(requiredFeature)
+		}
 	}
 	return nil
 }
