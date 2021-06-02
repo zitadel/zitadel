@@ -33,6 +33,16 @@ func testSetLimit(limit uint64) func(factory *SearchQueryBuilder) *SearchQueryBu
 	}
 }
 
+func testOr(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQuery) *SearchQuery {
+	return func(query *SearchQuery) *SearchQuery {
+		subQuery := query.Or()
+		for _, queryFunc := range queryFuncs {
+			queryFunc(subQuery)
+		}
+		return subQuery
+	}
+}
+
 func testSetAggregateTypes(types ...AggregateType) func(*SearchQuery) *SearchQuery {
 	return func(query *SearchQuery) *SearchQuery {
 		query = query.AggregateTypes(types...)
@@ -399,6 +409,40 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			},
 		},
 		{
+			name: "filter multiple aggregate type and aggregate id",
+			args: args{
+				columns: ColumnsEvent,
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+					testAddQuery(
+						testSetAggregateTypes("user"),
+						testSetAggregateIDs("1234"),
+						testOr(
+							testSetAggregateTypes("org"),
+							testSetAggregateIDs("izu"),
+						),
+					),
+				},
+			},
+			res: res{
+				isErr: nil,
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    false,
+					Limit:   0,
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
+						},
+						{
+							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("org"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldAggregateID, "izu", repository.OperationEquals),
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "filter aggregate type and aggregate ids",
 			args: args{
 				columns: ColumnsEvent,
@@ -559,15 +603,14 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(query, tt.res.query) {
-				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", query, tt.res.query)
-			}
+			assertRepoQuery(t, tt.res.query, query)
 		})
 	}
 }
 
 func assertBuilder(t *testing.T, want, got *SearchQueryBuilder) {
 	t.Helper()
+
 	if got.columns != want.columns {
 		t.Errorf("wrong column: got: %v want: %v", got.columns, want.columns)
 	}
@@ -590,6 +633,8 @@ func assertBuilder(t *testing.T, want, got *SearchQueryBuilder) {
 }
 
 func assertQuery(t *testing.T, i int, want, got *SearchQuery) {
+	t.Helper()
+
 	if !reflect.DeepEqual(got.aggregateIDs, want.aggregateIDs) {
 		t.Errorf("wrong aggregateIDs in query %d : got: %v want: %v", i, got.aggregateIDs, want.aggregateIDs)
 	}
@@ -604,5 +649,50 @@ func assertQuery(t *testing.T, i int, want, got *SearchQuery) {
 	}
 	if !reflect.DeepEqual(got.eventTypes, want.eventTypes) {
 		t.Errorf("wrong eventTypes in query %d : got: %v want: %v", i, got.eventTypes, want.eventTypes)
+	}
+}
+
+func assertRepoQuery(t *testing.T, want, got *repository.SearchQuery) {
+	t.Helper()
+
+	if want == nil && got == nil {
+		return
+	}
+
+	if !reflect.DeepEqual(got.Columns, want.Columns) {
+		t.Errorf("wrong columns in query: got: %v want: %v", got.Columns, want.Columns)
+	}
+	if !reflect.DeepEqual(got.Desc, want.Desc) {
+		t.Errorf("wrong desc in query: got: %v want: %v", got.Desc, want.Desc)
+	}
+	if !reflect.DeepEqual(got.Limit, want.Limit) {
+		t.Errorf("wrong limit in query: got: %v want: %v", got.Limit, want.Limit)
+	}
+
+	if len(got.Filters) != len(want.Filters) {
+		t.Errorf("wrong length of filters: got: %v want: %v", len(got.Filters), len(want.Filters))
+	}
+
+	for filterIdx, filter := range got.Filters {
+		if len(got.Filters) != len(want.Filters) {
+			t.Errorf("wrong length of subfilters: got: %v want: %v", len(filter), len(want.Filters[filterIdx]))
+		}
+		for subFilterIdx, f := range filter {
+			assertFilters(t, subFilterIdx, want.Filters[filterIdx][subFilterIdx], f)
+		}
+	}
+}
+
+func assertFilters(t *testing.T, i int, want, got *repository.Filter) {
+	t.Helper()
+
+	if want.Field != got.Field {
+		t.Errorf("wrong field in filter %d : got: %v want: %v", i, got.Field, want.Field)
+	}
+	if want.Operation != got.Operation {
+		t.Errorf("wrong operation in filter %d : got: %v want: %v", i, got.Operation, want.Operation)
+	}
+	if !reflect.DeepEqual(want.Value, got.Value) {
+		t.Errorf("wrong value in filter %d : got: %v want: %v", i, got.Value, want.Value)
 	}
 }
