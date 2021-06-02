@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/caos/logging"
+	"github.com/cockroachdb/cockroach-go/v2/testserver"
 )
 
 var (
@@ -18,24 +21,24 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	// ts, err := testserver.NewTestServer()
-	// if err != nil {
-	// 	logging.LogWithFields("REPOS-RvjLG", "error", err).Fatal("unable to start db")
-	// }
+	ts, err := testserver.NewTestServer()
+	if err != nil {
+		logging.LogWithFields("REPOS-RvjLG", "error", err).Fatal("unable to start db")
+	}
 
-	// testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
-	// if err != nil {
-	// 	logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to connect to db")
-	// }
+	testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
+	if err != nil {
+		logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to connect to db")
+	}
 
-	// defer func() {
-	// 	testCRDBClient.Close()
-	// 	ts.Stop()
-	// }()
+	defer func() {
+		testCRDBClient.Close()
+		ts.Stop()
+	}()
 
-	// if err = executeMigrations(); err != nil {
-	// 	logging.LogWithFields("REPOS-jehDD", "error", err).Fatal("migrations failed")
-	// }
+	if err = executeMigrations(); err != nil {
+		logging.LogWithFields("REPOS-jehDD", "error", err).Fatal("migrations failed")
+	}
 
 	os.Exit(m.Run())
 }
