@@ -72,7 +72,7 @@ package command
 //			args: args{
 //				ctx: context.Background(),
 //				policy: &domain.MessageText{
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title",
 //					PreHeader:    "pre-header",
@@ -115,7 +115,7 @@ package command
 //			args: args{
 //				ctx: context.Background(),
 //				policy: &domain.MessageText{
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title",
 //					PreHeader:    "pre-header",
@@ -131,7 +131,7 @@ package command
 //						AggregateID:   "IAM",
 //						ResourceOwner: "IAM",
 //					},
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title",
 //					PreHeader:    "pre-header",
@@ -207,7 +207,7 @@ package command
 //			args: args{
 //				ctx: context.Background(),
 //				policy: &domain.MessageText{
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title",
 //					PreHeader:    "pre-header",
@@ -246,7 +246,7 @@ package command
 //			args: args{
 //				ctx: context.Background(),
 //				policy: &domain.MessageText{
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title",
 //					PreHeader:    "pre-header",
@@ -301,7 +301,7 @@ package command
 //			args: args{
 //				ctx: context.Background(),
 //				policy: &domain.MessageText{
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title-change",
 //					PreHeader:    "pre-header-change",
@@ -317,7 +317,7 @@ package command
 //						AggregateID:   "IAM",
 //						ResourceOwner: "IAM",
 //					},
-//					MessageTextType: "mail-text-type",
+//					Template: "mail-text-type",
 //					Language:     "de",
 //					Title:        "title-change",
 //					PreHeader:    "pre-header-change",

@@ -2,7 +2,7 @@ package command
 
 //
 //func (c *Commands) AddDefaultMailText(ctx context.Context, policy *domain.MailText) (*domain.MailText, error) {
-//	addedPolicy := NewIAMMailTextWriteModel(policy.MessageTextType, policy.Language)
+//	addedPolicy := NewIAMMailTextWriteModel(policy.Template, policy.Language)
 //	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.MailTextWriteModel.WriteModel)
 //	event, err := c.addDefaultMailText(ctx, iamAgg, addedPolicy, policy)
 //	if err != nil {
@@ -35,7 +35,7 @@ package command
 //	return iam_repo.NewMailTextAddedEvent(
 //		ctx,
 //		iamAgg,
-//		mailText.MessageTextType,
+//		mailText.Template,
 //		mailText.Language,
 //		mailText.Title,
 //		mailText.PreHeader,
@@ -49,7 +49,7 @@ package command
 //	if !mailText.IsValid() {
 //		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.IAM.CustomMailText.Invalid")
 //	}
-//	existingPolicy, err := c.defaultMailTextWriteModelByID(ctx, mailText.MessageTextType, mailText.Language)
+//	existingPolicy, err := c.defaultMailTextWriteModelByID(ctx, mailText.Template, mailText.Language)
 //	if err != nil {
 //		return nil, err
 //	}
@@ -62,7 +62,7 @@ package command
 //	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
 //		ctx,
 //		iamAgg,
-//		mailText.MessageTextType,
+//		mailText.Template,
 //		mailText.Language,
 //		mailText.Title,
 //		mailText.PreHeader,

@@ -4,7 +4,7 @@ package command
 //type MailTextWriteModel struct {
 //	eventstore.WriteModel
 //
-//	MessageTextType string
+//	Template string
 //	Language     string
 //	Title        string
 //	PreHeader    string
@@ -20,7 +20,7 @@ package command
 //	for _, event := range wm.Events {
 //		switch e := event.(type) {
 //		case *policy.MailTextAddedEvent:
-//			if wm.MessageTextType != e.MessageTextType || wm.Language != e.Language {
+//			if wm.Template != e.Template || wm.Language != e.Language {
 //				continue
 //			}
 //			wm.Title = e.Title
@@ -31,7 +31,7 @@ package command
 //			wm.ButtonText = e.ButtonText
 //			wm.State = domain.PolicyStateActive
 //		case *policy.MailTextChangedEvent:
-//			if wm.MessageTextType != e.MessageTextType || wm.Language != e.Language {
+//			if wm.Template != e.Template || wm.Language != e.Language {
 //				continue
 //			}
 //			if e.Title != nil {

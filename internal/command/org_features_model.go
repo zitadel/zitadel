@@ -69,7 +69,8 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	loginPolicyUsernameLogin,
 	passwordComplexityPolicy,
 	labelPolicy,
-	customDomain bool,
+	customDomain,
+	customText bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -112,6 +113,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.CustomDomain != customDomain {
 		changes = append(changes, features.ChangeCustomDomain(customDomain))
+	}
+	if wm.CustomText != customText {
+		changes = append(changes, features.ChangeCustomText(customText))
 	}
 
 	if len(changes) == 0 {

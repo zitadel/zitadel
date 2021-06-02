@@ -12,7 +12,7 @@ package command
 //				AggregateID:   domain.IAMID,
 //				ResourceOwner: domain.IAMID,
 //			},
-//			MessageTextType: mailTextType,
+//			Template: mailTextType,
 //			Language:     language,
 //		},
 //	}

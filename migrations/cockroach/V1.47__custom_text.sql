@@ -1,3 +1,8 @@
+ALTER TABLE adminapi.features ADD COLUMN custom_text BOOLEAN;
+ALTER TABLE auth.features ADD COLUMN custom_text BOOLEAN;
+ALTER TABLE authz.features ADD COLUMN custom_text BOOLEAN;
+ALTER TABLE management.features ADD COLUMN custom_text BOOLEAN;
+
 CREATE TABLE adminapi.message_texts (
      aggregate_id TEXT,
 

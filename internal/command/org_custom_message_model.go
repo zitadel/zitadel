@@ -50,3 +50,45 @@ func (wm *OrgCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder 
 			org.CustomTextRemovedEventType,
 			org.CustomTextTemplateRemovedEventType)
 }
+
+type OrgCustomMessageTemplatesReadModel struct {
+	CustomMessageTemplatesReadModel
+}
+
+func NewOrgCustomMessageTextsWriteModel(orgID string) *OrgCustomMessageTemplatesReadModel {
+	return &OrgCustomMessageTemplatesReadModel{
+		CustomMessageTemplatesReadModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+		},
+	}
+}
+
+func (wm *OrgCustomMessageTemplatesReadModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.CustomTextSetEvent:
+			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextSetEvent)
+		case *org.CustomTextRemovedEvent:
+			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextRemovedEvent)
+		case *org.CustomTextTemplateRemovedEvent:
+			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextTemplateRemovedEvent)
+		}
+	}
+}
+
+func (wm *OrgCustomMessageTemplatesReadModel) Reduce() error {
+	return wm.CustomMessageTemplatesReadModel.Reduce()
+}
+
+func (wm *OrgCustomMessageTemplatesReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
+		AggregateIDs(wm.CustomMessageTemplatesReadModel.AggregateID).
+		ResourceOwner(wm.ResourceOwner).
+		EventTypes(
+			org.CustomTextSetEventType,
+			org.CustomTextRemovedEventType,
+			org.CustomTextTemplateRemovedEventType)
+}

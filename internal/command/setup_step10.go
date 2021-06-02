@@ -33,7 +33,7 @@ func (c *Commands) SetupStep10(ctx context.Context, step *Step10) error {
 			mailTemplateEvent,
 		}
 		//for _, text := range step.DefaultMailTexts {
-		//	defaultTextEvent, err := c.addDefaultMailText(ctx, iamAgg, NewIAMMailTextWriteModel(text.MessageTextType, text.Language), &text)
+		//	defaultTextEvent, err := c.addDefaultMailText(ctx, iamAgg, NewIAMMailTextWriteModel(text.Template, text.Language), &text)
 		//	if err != nil {
 		//		return nil, err
 		//	}

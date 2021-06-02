@@ -1991,6 +1991,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+            feature: "custom_text"
         };
     }
 
@@ -2028,6 +2029,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+            feature: "custom_text"
         };
     }
 
@@ -2066,6 +2068,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+            feature: "custom_text"
         };
     }
 
@@ -2104,6 +2107,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+            feature: "custom_text"
         };
     }
 
@@ -2142,6 +2146,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+            feature: "custom_text"
         };
     }
 

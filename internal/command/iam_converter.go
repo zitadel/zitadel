@@ -64,7 +64,7 @@ func writeModelToMailTemplate(wm *MailTemplateWriteModel) *domain.MailTemplate {
 //func writeModelToMailText(wm *MailTextWriteModel) *domain.CustomMessageText {
 //	return &domain.CustomMessageText{
 //		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-//		MessageTextType: wm.MessageTextType,
+//		Template: wm.Template,
 //		Language:     wm.Language,
 //		Title:        wm.Title,
 //		PreHeader:    wm.PreHeader,
@@ -95,7 +95,7 @@ func writeModelToMailTemplatePolicy(wm *MailTemplateWriteModel) *domain.MailTemp
 //	return &domain.MailText{
 //		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
 //		State:        wm.State,
-//		MessageTextType: wm.MessageTextType,
+//		Template: wm.Template,
 //		Language:     wm.Language,
 //		Title:        wm.Title,
 //		PreHeader:    wm.PreHeader,

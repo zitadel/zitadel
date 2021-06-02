@@ -24,6 +24,7 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		PasswordComplexityPolicy: features.PasswordComplexityPolicy,
 		LabelPolicy:              features.LabelPolicy,
 		CustomDomain:             features.CustomDomain,
+		CustomText:               features.CustomText,
 	}
 }
 

@@ -112,6 +112,21 @@ func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, mai
 	return err
 }
 
+func (c *Commands) removeOrgMessageTextsIfExists(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+	msgTemplates := NewOrgCustomMessageTextsWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, msgTemplates)
+	if err != nil {
+		return nil, err
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&msgTemplates.WriteModel)
+	events := make([]eventstore.EventPusher, 0, len(msgTemplates.CustomMessageTemplate))
+	for _, tmpl := range msgTemplates.CustomMessageTemplate {
+		events = append(events, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, tmpl.Template, tmpl.Language))
+	}
+	return events, nil
+}
+
 func (c *Commands) orgCustomMessageTextWriteModelByID(ctx context.Context, orgID, messageType string, lang language.Tag) (*OrgCustomMessageTextReadModel, error) {
 	writeModel := NewOrgCustomMessageTextWriteModel(orgID, messageType, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
