@@ -82,6 +82,7 @@ func (p *LoginPolicyView) ToLoginPolicyDomain() *domain.LoginPolicy {
 		AllowRegister:         p.AllowRegister,
 		AllowExternalIDP:      p.AllowExternalIDP,
 		ForceMFA:              p.ForceMFA,
+		HidePasswordReset:     p.HidePasswordReset,
 		PasswordlessType:      passwordLessTypeToDomain(p.PasswordlessType),
 		SecondFactors:         secondFactorsToDomain(p.SecondFactors),
 		MultiFactors:          multiFactorsToDomain(p.MultiFactors),

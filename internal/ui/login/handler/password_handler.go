@@ -21,7 +21,15 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := l.getUserData(r, authReq, "Password", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPassword], data, nil)
+	funcs := map[string]interface{}{
+		"showPasswordReset": func() bool {
+			if authReq.LoginPolicy != nil {
+				return !authReq.LoginPolicy.HidePasswordReset
+			}
+			return true
+		},
+	}
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPassword], data, funcs)
 }
 
 func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
