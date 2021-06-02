@@ -179,7 +179,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
       const formData = new FormData();
       formData.append('file', file);
-      console.log('icon');
       if (theme === Theme.DARK) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
