@@ -742,6 +742,47 @@ func Test_query_events_mocked(t *testing.T) {
 				wantErr: true,
 			},
 		},
+		{
+			name: "with subqueries",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    true,
+					Limit:   5,
+					Filters: [][]*repository.Filter{
+						{
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
+						},
+						{
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("org"),
+								Operation: repository.OperationEquals,
+							},
+							{
+								Field:     repository.FieldAggregateID,
+								Value:     "asdf42",
+								Operation: repository.OperationEquals,
+							},
+						},
+					},
+				},
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) OR \( aggregate_type = \$2 AND aggregate_id = \$3 \) ORDER BY event_sequence DESC LIMIT \$4`,
+					[]driver.Value{repository.AggregateType("user"), repository.AggregateType("org"), "asdf42", uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
