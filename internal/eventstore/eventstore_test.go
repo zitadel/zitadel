@@ -869,6 +869,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"no.aggregates"},
 						},
 					},
@@ -896,6 +897,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"no.aggregates"},
 						},
 					},
@@ -923,6 +925,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"test.aggregate"},
 						},
 					},
@@ -1005,6 +1008,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 					columns: repository.ColumnsMaxSequence,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"no.aggregates"},
 						},
 					},
@@ -1027,6 +1031,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 					columns: repository.ColumnsMaxSequence,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"no.aggregates"},
 						},
 					},
@@ -1049,6 +1054,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 					columns: repository.ColumnsMaxSequence,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"test.aggregate"},
 						},
 					},
@@ -1135,6 +1141,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"no.aggregates"},
 						},
 					},
@@ -1166,6 +1173,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"no.aggregates"},
 						},
 					},
@@ -1197,6 +1205,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"test.aggregate"},
 						},
 					},
@@ -1230,6 +1239,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					columns: repository.ColumnsEvent,
 					queries: []*SearchQuery{
 						{
+							builder:        &SearchQueryBuilder{},
 							aggregateTypes: []AggregateType{"test.aggregate"},
 						},
 					},
