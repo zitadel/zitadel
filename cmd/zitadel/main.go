@@ -5,6 +5,7 @@ import (
 	"flag"
 
 	"github.com/caos/logging"
+
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/assets"
@@ -21,15 +22,11 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/setup"
-	"github.com/caos/zitadel/internal/static/s3"
-	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"

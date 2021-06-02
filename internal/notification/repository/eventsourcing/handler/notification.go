@@ -3,23 +3,19 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"golang.org/x/text/language"
 	"net/http"
 	"time"
 
 	"github.com/caos/logging"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -30,7 +26,6 @@ import (
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"golang.org/x/text/language"
 )
 
 const (
