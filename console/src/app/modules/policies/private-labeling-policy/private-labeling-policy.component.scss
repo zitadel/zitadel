@@ -58,6 +58,7 @@
           visibility: hidden;
         }
       }
+
       .dark {
         background-color: black;
 
@@ -239,6 +240,10 @@
           .part {
             padding-bottom: 1rem;
 
+            .spinner {
+              margin-bottom: 1rem;
+            }
+
             .label {
               font-size: 14px;
               color: var(--grey);
@@ -328,8 +333,12 @@
           flex-direction: column;
           padding-bottom: 50px;
 
-          .toggle {
+          .info {
             margin-bottom: .5rem;
+          }
+
+          .toggle {
+            margin-bottom: 1rem;
           }
         }
       }
@@ -343,7 +352,7 @@
           align-items: center;
           padding-bottom: 2rem;
           position: relative;
-          min-height: 500px;
+          min-height: 600px;
 
           .preview-changer {
             position: absolute;
@@ -364,13 +373,7 @@
           }
 
           .prev {
-            &.dark {
-              @include private-label-preview-theme($dark-theme);
-            }
-
-            &.light {
-              @include private-label-preview-theme($light-theme);
-            }
+            @include private-label-preview-theme($theme);
           }
         }
       }
@@ -399,12 +402,4 @@
       }
     }
   }
-}
-
-::ng-deep .max-width-container {
-  max-width: none !important;
-}
-
-::ng-deep .detail-left {
-  width: 50px !important;
 }

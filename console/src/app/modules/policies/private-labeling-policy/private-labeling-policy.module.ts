@@ -9,9 +9,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 
 import { DropzoneModule } from '../../../directives/dropzone/dropzone.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
 import { LinksModule } from '../../links/links.module';
 import { ColorComponent } from './color/color.component';
@@ -41,6 +43,8 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     MatProgressSpinnerModule,
     LinksModule,
     MatExpansionModule,
+    InfoSectionModule,
+    HasFeaturePipeModule,
   ],
 })
 export class PrivateLabelingPolicyModule { }

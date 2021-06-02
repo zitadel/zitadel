@@ -613,7 +613,8 @@
       "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",
       "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
-      "LABELPOLICY": "Label Richtlinie - benutzerdefiniert",
+      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
+      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar"
     },
     "TIERSTATES": {
@@ -646,7 +647,17 @@
       "LIGHT":"Heller Modus",
       "CHANGEVIEW":"Ansicht wechseln",
       "ACTIVATED":"Richtlinie wurde LIVE geschaltet",
-      "THEME":"Modus"
+      "THEME":"Modus",
+      "COLORS":"Farben",
+      "FONT":"Schrift",
+      "ADVANCEDBEHAVIOR":"Erweitertes Verhalten",
+      "PREVIEW": {
+        "TITLE":"Anmeldung",
+        "SECOND":"mit ZITADEL-Konto anmelden.",
+        "ERROR":"Benutzer konnte nicht gefunden werden!",
+        "PRIMARYBUTTON":"weiter",
+        "SECONDARYBUTTON":"registrieren"
+      }
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",

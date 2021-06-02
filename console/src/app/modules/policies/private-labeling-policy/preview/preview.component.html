@@ -1,6 +1,5 @@
 <div class="preview" *ngIf="policy">
   <span class="label">{{label}}</span>
-  <!--  [style.font-family]="policy.fontCssRule" -->
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}" [style.background]="theme == Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper" [style.color]="theme == Theme.DARK ? policy.fontColorDark : policy.fontColor">
       <img *ngIf="images['previewLogo'] && theme == Theme.LIGHT" [src]="images['previewLogo']" alt="logo-mock" />
@@ -9,17 +8,22 @@
       <img *ngIf="images['previewDarkLogo'] && theme == Theme.DARK"  [src]="images['previewDarkLogo']" alt="logo-mock" />
       <img *ngIf="!images['previewDarkLogo'] && theme == Theme.DARK" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
 
-      <h1>Anmeldung</h1>
-      <p class="desc-text">mit ZITADEL Konto anmelden</p>
+      <h1>{{'POLICY.PRIVATELABELING.PREVIEW.TITLE' | translate}}</h1>
+      <p class="desc-text">{{'POLICY.PRIVATELABELING.PREVIEW.SECOND' | translate}}</p>
       <cnsl-form-field class="formfield">
         <cnsl-label>Loginname</cnsl-label>
         <input cnslInput value="road.runner"/>
       </cnsl-form-field>
 
+      <div class="error-msg"  [style.color]="theme == Theme.DARK ? policy.warnColorDark : policy.warnColor">
+        <i class="las la-exclamation-circle" [style.color]="theme == Theme.DARK ? policy.warnColorDark : policy.warnColor"></i>
+        <span [style.color]="theme == Theme.DARK ? policy.warnColorDark : policy.warnColor">{{'POLICY.PRIVATELABELING.PREVIEW.ERROR' | translate}}</span>
+      </div>
+
       <div class="btn-wrapper">
-        <button mat-stroked-button>cancel</button>
-        <button *ngIf="theme == Theme.DARK" mat-raised-button [style.background]="policy.primaryColorDark" [style.color]="policy.primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
-        <button *ngIf="theme == Theme.LIGHT" mat-raised-button [style.background]="policy.primaryColor" [style.color]="policy.primaryColor == '#ffffff' ? '#000000' : '#ffffff'">Login</button>
+        <button mat-stroked-button>{{'POLICY.PRIVATELABELING.PREVIEW.SECONDARYBUTTON' | translate}}</button>
+        <button *ngIf="theme == Theme.DARK" mat-raised-button [style.background]="policy.primaryColorDark" [style.color]="policy.primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON' | translate}}</button>
+        <button *ngIf="theme == Theme.LIGHT" mat-raised-button [style.background]="policy.primaryColor" [style.color]="policy.primaryColor == '#ffffff' ? '#000000' : '#ffffff'">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON' | translate}}</button>
       </div>
     </div>
   </div>
