@@ -24,14 +24,14 @@ const (
 )
 
 type RefreshTokenView struct {
-	ID                    string         `json:"tokenId" gorm:"column:id"`
+	ID                    string         `json:"tokenId" gorm:"column:id;primary_key"`
 	CreationDate          time.Time      `json:"-" gorm:"column:creation_date"`
 	ChangeDate            time.Time      `json:"-" gorm:"column:change_date"`
 	ResourceOwner         string         `json:"-" gorm:"column:resource_owner"`
 	Token                 string         `json:"-" gorm:"column:token"`
-	UserID                string         `json:"-" gorm:"column:user_id;primary_key"`
-	ClientID              string         `json:"clientID" gorm:"column:client_id;primary_key"`
-	UserAgentID           string         `json:"userAgentId" gorm:"column:user_agent_id;primary_key"`
+	UserID                string         `json:"-" gorm:"column:user_id"`
+	ClientID              string         `json:"clientID" gorm:"column:client_id"`
+	UserAgentID           string         `json:"userAgentId" gorm:"column:user_agent_id"`
 	Audience              pq.StringArray `json:"audience" gorm:"column:audience"`
 	Scopes                pq.StringArray `json:"scopes" gorm:"column:scopes"`
 	AuthMethodsReferences pq.StringArray `json:"authMethodsReference" gorm:"column:amr"`

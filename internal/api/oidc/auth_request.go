@@ -110,17 +110,7 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	var userAgentID, applicationID, userOrgID string
-	var authTime time.Time
-	var authMethodsReferences []string
-	authReq, ok := req.(*AuthRequest)
-	if ok {
-		userAgentID = authReq.AgentID
-		applicationID = authReq.ApplicationID
-		userOrgID = authReq.UserOrgID
-		authTime = authReq.AuthTime
-		authMethodsReferences = authReq.GetAMR()
-	}
+	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
 	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
@@ -128,6 +118,18 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		return "", "", time.Time{}, err
 	}
 	return resp.TokenID, token, resp.Expiration, nil
+}
+
+func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time, []string) {
+	authReq, ok := req.(*AuthRequest)
+	if ok {
+		return authReq.AgentID, authReq.ApplicationID, authReq.UserOrgID, authReq.AuthTime, authReq.GetAMR()
+	}
+	refreshReq, ok := req.(*RefreshTokenRequest)
+	if ok {
+		return refreshReq.UserAgentID, refreshReq.ClientID, "", refreshReq.AuthTime, refreshReq.AuthMethodsReferences
+	}
+	return "", "", "", time.Time{}, nil
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {

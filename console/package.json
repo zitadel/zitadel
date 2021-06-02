@@ -5,23 +5,24 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "prodbuild": "ng build --prod",
-    "lint": "ng lint"
+    "prodbuild": "ng build --configuration production",
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "~11.0.0",
-    "@angular/cdk": "~11.0.0",
-    "@angular/common": "~11.0.0",
-    "@angular/compiler": "~11.0.0",
-    "@angular/core": "~11.0.0",
-    "@angular/forms": "~11.0.0",
-    "@angular/material": "^11.0.0",
-    "@angular/material-moment-adapter": "^11.0.0",
-    "@angular/platform-browser": "~11.0.0",
-    "@angular/platform-browser-dynamic": "~11.0.0",
-    "@angular/router": "~11.0.0",
-    "@angular/service-worker": "~11.0.0",
+    "@angular/animations": "~12.0.0",
+    "@angular/cdk": "~12.0.0",
+    "@angular/common": "~12.0.0",
+    "@angular/compiler": "~12.0.0",
+    "@angular/core": "~12.0.0",
+    "@angular/forms": "~12.0.0",
+    "@angular/material": "^12.0.0",
+    "@angular/material-moment-adapter": "^12.0.0",
+    "@angular/platform-browser": "~12.0.0",
+    "@angular/platform-browser-dynamic": "~12.0.0",
+    "@angular/router": "~12.0.0",
+    "@angular/service-worker": "~12.0.0",
+    "@grpc/grpc-js": "^1.3.2",
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^6.0.0",
     "@types/file-saver": "^2.0.2",
@@ -33,7 +34,6 @@
     "file-saver": "^2.0.5",
     "google-proto-files": "^2.4.0",
     "google-protobuf": "^3.15.8",
-    "grpc": "^1.24.5",
     "grpc-web": "^1.2.1",
     "libphonenumber-js": "^1.9.16",
     "moment": "^2.29.1",
@@ -42,13 +42,13 @@
     "ts-protoc-gen": "^0.14.0",
     "tslib": "^2.2.0",
     "uuid": "^8.3.2",
-    "zone.js": "~0.11.3"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.1102.8",
-    "@angular/cli": "~11.2.8",
-    "@angular/compiler-cli": "~11.0.0",
-    "@angular/language-service": "~11.2.9",
+    "@angular-devkit/build-angular": "~12.0.0",
+    "@angular/cli": "~12.0.0",
+    "@angular/compiler-cli": "~12.0.0",
+    "@angular/language-service": "~12.0.0",
     "@types/jasmine": "~3.6.9",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.14.37",
@@ -67,6 +67,6 @@
     "stylelint-scss": "^3.19.0",
     "ts-node": "~9.1.1",
     "tslint": "~6.1.3",
-    "typescript": "^4.0.7"
+    "typescript": "^4.2.4"
   }
 }

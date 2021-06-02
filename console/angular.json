@@ -22,14 +22,13 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": true,
             "assets": [
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss"  
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
@@ -37,7 +36,22 @@
                 "src/app/proto/generated/**",
                 "file-saver",
                 "qrcode"
-             ]
+             ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": {
+              "scripts": true,
+              "fonts": {
+                "inline": true
+              },
+              "styles": {
+                "minify": true,
+                "inlineCritical": false
+              }
+            },
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -47,7 +61,16 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "fonts": {
+                  "inline": false
+                },
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                }
+              },
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
@@ -68,19 +91,24 @@
               ],
               "serviceWorker": true,
               "ngswConfigPath": "ngsw-config.json"
-            }
-          }
+            },
+            "development": {}
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "console:build"
           },
           "configurations": {
             "production": {
               "browserTarget": "console:build:production"
+            },
+            "development": {
+              "browserTarget": "console:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -123,14 +151,17 @@
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "console:serve"
+            "protractorConfig": "e2e/protractor.conf.js"
           },
           "configurations": {
             "production": {
               "devServerTarget": "console:serve:production"
+            },
+            "development": {
+              "devServerTarget": "console:serve:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         }
       }
     }

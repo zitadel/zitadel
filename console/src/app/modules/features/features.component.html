@@ -7,7 +7,12 @@
 
     <div class="detail">
         <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
-        <p>{{features?.tier?.name}}</p>
+        <p class="center">{{features?.tier?.name}}
+          <a class="ext" href="https://zitadel.ch/pricing"
+          target="_blank">
+            <i class="las la-external-link-alt"></i>
+          </a>
+        </p>
     </div>
 
     <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">

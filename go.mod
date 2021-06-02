@@ -16,11 +16,11 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.15.0
+	github.com/caos/oidc v0.15.2
 	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
-	github.com/envoyproxy/protoc-gen-validate v0.5.1
+	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
@@ -49,7 +49,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.10
 	github.com/mitchellh/copystructure v1.1.2 // indirect
 	github.com/muesli/gamut v0.2.0
-	github.com/nicksnyder/go-i18n/v2 v2.1.1
+	github.com/nicksnyder/go-i18n/v2 v2.1.2
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
 	github.com/prometheus/client_golang v1.8.0 // indirect

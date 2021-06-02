@@ -699,11 +699,15 @@ Application:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
           HttpNotAllowed: Grant tpye implicit doesn't allow http redirect uris
-          NativeShouldBeHttpLocalhost: Grant tpye implicit only allowed http://localhost for native apptype
           HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
       Native:
         AuthMethodType:
           NotNone: Native applications should have authmethodtype none.
+        RedirectUris:
+          MustBeHttpLocalhost: Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.
       UserAgent:
         AuthMethodType:
           NotNone: User agent app should have authmethodtype none.
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token only allowed in combination with Authorization Code.

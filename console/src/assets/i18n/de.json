@@ -1132,6 +1132,7 @@
         "1": "ID-Token",
         "2": "Token-ID-Token"
       },
+      "REFRESHTOKEN":"Refresh Token",
       "GRANTTYPE": "Berechtigungstypen",
       "GRANT": {
         "0": "Authorisation Code",

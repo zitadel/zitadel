@@ -1,4 +1,4 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 .root-header {
   position: fixed;
@@ -122,6 +122,12 @@
           border-bottom-right-radius: 1.5rem;
 
           .icon {
+            margin: .5rem 1rem;
+          }
+
+          .iam-i {
+            object-fit: contain;
+            max-height: 24px;
             margin: .5rem 1rem;
           }
 
@@ -263,12 +269,12 @@
     margin: 0 .5rem;
     /* stylelint-disable */
     $foreground: map-get($theme, foreground);
-    color: mat-color($foreground, text) !important;
+    color: mat.get-color-from-palette($foreground, text) !important;
   }
 
   .show-all {
     $primary: map-get($theme, primary);
-    color: mat-color($primary, 300) !important;
+    color: mat.get-color-from-palette($primary, 300) !important;
     border-bottom: 2px solid var(--grey);
     margin-bottom: .5rem;
   }

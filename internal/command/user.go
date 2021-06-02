@@ -211,7 +211,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 }
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
-	if orgID == "" || userID == "" {
+	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)

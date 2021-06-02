@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"github.com/caos/logging"
-
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/assets"
@@ -22,11 +21,15 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/setup"
+	"github.com/caos/zitadel/internal/static/s3"
+	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
 	metrics "github.com/caos/zitadel/internal/telemetry/metrics/config"
@@ -97,7 +100,7 @@ func main() {
 	case cmdStart:
 		startZitadel(configPaths.Values())
 	case cmdSetup:
-		startSetup(setupPaths.Values(), *localDevMode)
+		startSetup(setupPaths.Values())
 	default:
 		logging.Log("MAIN-afEQ2").Fatal("please provide an valid argument [start, setup]")
 	}
@@ -106,7 +109,7 @@ func main() {
 func startZitadel(configPaths []string) {
 	conf := new(Config)
 	err := config.Read(conf, configPaths...)
-	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
+	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
@@ -115,21 +118,21 @@ func startZitadel(configPaths []string) {
 	}
 	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
 	if err != nil {
-		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start queries")
+		logging.Log("ZITAD-WpeJY").OnError(err).Fatal("cannot start queries")
 	}
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 	verifier := internal_authz.Start(authZRepo)
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	if err != nil {
-		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for commands")
+		logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
 	}
 	store, err := conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
 	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
 	if err != nil {
-		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start commands")
+		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
 	}
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
@@ -199,7 +202,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	apis.Start(ctx)
 }
 
-func startSetup(configPaths []string, localDevMode bool) {
+func startSetup(configPaths []string) {
 	conf := new(setupConfig)
 	err := config.Read(conf, configPaths...)
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
