@@ -75,13 +75,17 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 }
 
 func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			user.HumanRefreshTokenAddedType,
 			user.HumanRefreshTokenRenewedType,
 			user.HumanRefreshTokenRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		SearchQueryBuilder()
+
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

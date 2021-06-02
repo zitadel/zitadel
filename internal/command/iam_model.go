@@ -44,14 +44,17 @@ func (wm *IAMWriteModel) Reduce() error {
 }
 
 func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			iam.ProjectSetEventType,
 			iam.GlobalOrgSetEventType,
 			iam.SetupStartedEventType,
-			iam.SetupDoneEventType)
+			iam.SetupDoneEventType).
+		SearchQueryBuilder()
 }
 
 func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

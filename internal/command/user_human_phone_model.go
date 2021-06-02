@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -74,9 +75,11 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 }
 
 func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanInitialCodeAddedType,
@@ -93,7 +96,8 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PhoneCodeAddedType,
 			user.UserV1PhoneChangedType,
 			user.UserV1PhoneVerifiedType,
-			user.UserV1PhoneRemovedType)
+			user.UserV1PhoneRemovedType).
+		SearchQueryBuilder()
 }
 
 func (wm *HumanPhoneWriteModel) NewChangedEvent(

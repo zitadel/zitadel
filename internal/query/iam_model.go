@@ -128,5 +128,9 @@ func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
 }
 
 func (rm *ReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).AggregateIDs(rm.AggregateID)
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(rm.AggregateID).
+		SearchQueryBuilder()
 }

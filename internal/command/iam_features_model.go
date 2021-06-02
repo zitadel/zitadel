@@ -43,10 +43,12 @@ func (wm *IAMFeaturesWriteModel) Reduce() error {
 }
 
 func (wm *IAMFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.FeaturesWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		EventTypes(iam.FeaturesSetEventType)
+		AddQuery().
+		EventTypes(iam.FeaturesSetEventType).
+		AggregateTypes(iam.AggregateType).
+		SearchQueryBuilder()
 }
 
 func (wm *IAMFeaturesWriteModel) NewSetEvent(

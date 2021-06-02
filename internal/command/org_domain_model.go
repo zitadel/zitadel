@@ -84,16 +84,19 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 }
 
 func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			org.OrgDomainAddedEventType,
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainVerificationAddedEventType,
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainPrimarySetEventType,
-			org.OrgDomainRemovedEventType)
+			org.OrgDomainRemovedEventType).
+		SearchQueryBuilder()
 }
 
 type OrgDomainsWriteModel struct {
@@ -151,9 +154,11 @@ func (wm *OrgDomainsWriteModel) Reduce() error {
 }
 
 func (wm *OrgDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			org.OrgAddedEventType,
 			org.OrgChangedEventType,
@@ -162,5 +167,6 @@ func (wm *OrgDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgDomainVerificationAddedEventType,
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainPrimarySetEventType,
-			org.OrgDomainRemovedEventType)
+			org.OrgDomainRemovedEventType).
+		SearchQueryBuilder()
 }

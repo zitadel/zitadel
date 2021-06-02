@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -40,12 +41,15 @@ func (wm *IAMPasswordComplexityPolicyWriteModel) Reduce() error {
 }
 
 func (wm *IAMPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.PasswordComplexityPolicyWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.PasswordComplexityPolicyWriteModel.AggregateID).
 		EventTypes(
 			iam.PasswordComplexityPolicyAddedEventType,
-			iam.PasswordComplexityPolicyChangedEventType)
+			iam.PasswordComplexityPolicyChangedEventType).
+		SearchQueryBuilder()
 }
 
 func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(

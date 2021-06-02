@@ -80,6 +80,7 @@ func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
 func (query SearchQuery) Or() *SearchQuery {
 	return query.builder.AddQuery()
 }
+
 func (query *SearchQuery) AggregateTypes(types ...AggregateType) *SearchQuery {
 	query.aggregateTypes = types
 	return query

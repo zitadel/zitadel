@@ -98,9 +98,11 @@ func (wm *HumanWriteModel) Reduce() error {
 }
 
 func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanInitialCodeAddedType,
@@ -128,7 +130,8 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PhoneChangedType,
 			user.UserV1PhoneVerifiedType,
 			user.UserV1PhoneRemovedType,
-			user.UserV1PasswordChangedType)
+			user.UserV1PasswordChangedType).
+		SearchQueryBuilder()
 }
 
 func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {

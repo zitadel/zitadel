@@ -43,10 +43,13 @@ func (wm *OrgIdentityProviderWriteModel) Reduce() error {
 }
 
 func (wm *OrgIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			org.LoginPolicyIDPProviderAddedEventType,
-			org.LoginPolicyIDPProviderRemovedEventType)
+			org.LoginPolicyIDPProviderRemovedEventType).
+		SearchQueryBuilder()
 }

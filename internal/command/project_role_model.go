@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/project"
@@ -82,14 +83,17 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 }
 
 func (wm *ProjectRoleWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.RoleAddedType,
 			project.RoleChangedType,
 			project.RoleRemovedType,
-			project.ProjectRemovedType)
+			project.ProjectRemovedType).
+		SearchQueryBuilder()
 }
 
 func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(

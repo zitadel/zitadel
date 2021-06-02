@@ -41,9 +41,11 @@ func (rm *IAMIDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) 
 }
 
 func (rm *IAMIDPConfigReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
 		AggregateIDs(rm.iamID).
 		EventData(map[string]interface{}{
 			"idpConfigId": rm.configID,
-		})
+		}).SearchQueryBuilder()
 }

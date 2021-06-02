@@ -1,8 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/project"
@@ -126,9 +127,11 @@ func (wm *ApplicationKeyWriteModel) appendChangeAPIEvent(e *project.APIConfigCha
 }
 
 func (wm *ApplicationKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.ApplicationRemovedType,
 			project.OIDCConfigAddedType,
@@ -137,6 +140,6 @@ func (wm *ApplicationKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.APIConfigChangedType,
 			project.ApplicationKeyAddedEventType,
 			project.ApplicationKeyRemovedEventType,
-			project.ProjectRemovedType,
-		)
+			project.ProjectRemovedType).
+		SearchQueryBuilder()
 }

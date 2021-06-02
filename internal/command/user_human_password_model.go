@@ -1,8 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -66,7 +67,9 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 }
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
@@ -82,7 +85,9 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1InitializedCheckSucceededType,
 			user.UserV1PasswordChangedType,
 			user.UserV1PasswordCodeAddedType,
-			user.UserV1EmailVerifiedType)
+			user.UserV1EmailVerifiedType).
+		SearchQueryBuilder()
+
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

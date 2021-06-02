@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"golang.org/x/text/language"
@@ -78,16 +79,19 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 }
 
 func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanProfileChangedType,
 			user.UserRemovedType,
 			user.UserV1AddedType,
 			user.UserV1RegisteredType,
-			user.UserV1ProfileChangedType)
+			user.UserV1ProfileChangedType).
+		SearchQueryBuilder()
 }
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(

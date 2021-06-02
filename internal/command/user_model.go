@@ -1,8 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
 	"strings"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errors "github.com/caos/zitadel/internal/errors"
@@ -67,7 +68,9 @@ func (wm *UserWriteModel) Reduce() error {
 }
 
 func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			user.HumanAddedType,
@@ -83,7 +86,9 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserRemovedType,
 			user.UserV1AddedType,
 			user.UserV1RegisteredType,
-			user.UserV1InitializedCheckSucceededType)
+			user.UserV1InitializedCheckSucceededType).
+		SearchQueryBuilder()
+
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

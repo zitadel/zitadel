@@ -70,16 +70,19 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 }
 
 func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.UserV1AddedType,
 			user.UserV1RegisteredType,
 			user.UserV1AddressChangedType,
 			user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanAddressChangedType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		SearchQueryBuilder()
 }
 
 func (wm *HumanAddressWriteModel) NewChangedEvent(
