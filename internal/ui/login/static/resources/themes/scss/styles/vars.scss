@@ -1,5 +1,6 @@
 :root {
   --zitadel-color-primary: var(--zitadel-color-primary-500);
+  --zitadel-color-background: var(--zitadel-color-background-500);
   --zitadel-color-secondary: var(--zitadel-color-secondary-500);
   --zitadel-color-warn: var(--zitadel-color-warn-500);
 
@@ -41,7 +42,7 @@
 
   --zitadel-font-family: 'Lato';
 
-  --zitadel-color-background: var(--zitadel-color-grey-50);
+  --zitadel-color-background-500: var(--zitadel-color-grey-50);
   --zitadel-color-footer-line: #e3e8ee;
 
   --zitadel-color-input-background: #fafafa50;

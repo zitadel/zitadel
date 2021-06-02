@@ -1,6 +1,7 @@
 @charset "UTF-8";
 :root {
   --zitadel-color-primary: var(--zitadel-color-primary-500);
+  --zitadel-color-background: var(--zitadel-color-background-500);
   --zitadel-color-secondary: var(--zitadel-color-secondary-500);
   --zitadel-color-warn: var(--zitadel-color-warn-500);
   --zitadel-color-primary-50: #eaedfa;
@@ -37,7 +38,7 @@
   --zitadel-color-warn-800: #c62828;
   --zitadel-color-warn-900: #b71c1c;
   --zitadel-font-family: "Lato";
-  --zitadel-color-background: var(--zitadel-color-grey-50);
+  --zitadel-color-background-500: var(--zitadel-color-grey-50);
   --zitadel-color-footer-line: #e3e8ee;
   --zitadel-color-input-background: #fafafa50;
   --zitadel-color-input-border: #00000040;
