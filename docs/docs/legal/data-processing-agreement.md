@@ -9,7 +9,7 @@ Within the scope of the [**Framework Agreement**](terms-of-service), the **Proce
 
 This Annex to the Agreement governs the Parties' data protection obligations in addition to the provisions of the Agreement.
 
-## Subject matter, duration, nature and purpose of the processing as well as type of personal data and categories of data subjects
+## Subject matter, duration, nature and purpose of the processing as well as the type of personal data and categories of data subjects
 
 This annex reflects the commitment of both parties to abide by the applicable data protection laws for the processing of Personal Data for the purpose of Processor's execution of the Framework Agreement.
 
@@ -112,7 +112,7 @@ In particular, the following Personal Data are part of the processing:
 
 ## Scope and responsibility
 
-Under the Agreement, the Processor shall process Personal Data on behalf of the Customer.
+Under this Agreement, the Processor shall process Personal Data on behalf of the Customer.
 
 This Annex applies to all processing of Customer's data (including data of the users of Customer's organization) with reference to persons ("**Personal Data**") which is related to the Agreement and which is carried out by the Processor, its employees or agents.
 
@@ -126,7 +126,7 @@ The Processor is responsible for taking appropriate technical and organizational
 
 The Processor processes personal data in accordance with its privacy policy (cf. [Privacy Policy](privacy-policy.md)) and on the documented directions of the Customer. The initial direction result from the Agreement. Subsequent instructions shall be given either in writing, whereby e-mail shall suffice, or orally with immediate written confirmation.
 
-If the Processor is of the opinion that an direction of the Customer violates the Agreement, the GDPR or other data protection provisions of the EU, EU Member States or Switzerland, it shall inform the Customer thereof and shall be entitled to suspend the Processing until the instruction is withdrawn or confirmed.
+If the Processor is of the opinion that a direction of the Customer violates the Agreement, the GDPR or other data protection provisions of the EU, EU Member States or Switzerland, it shall inform the Customer thereof and shall be entitled to suspend the Processing until the instruction is withdrawn or confirmed.
 
 ## Obligation of the processing persons to confidentiality
 
@@ -172,8 +172,8 @@ The Processor has taken the following organizational and technical security meas
 
 The following measures for pseudonymization and encryption exist:
 
-1. All communication is encrypted with TLS >=1.2 with PFS
-2. Critical data is stored in encrypted form
+1. All communication is encrypted with TLS &gt;1.2 with PFS
+2. Critical data is exclusively stored in encrypted form
 3. Storage media that store customer data are always encrypted
 4. Passwords are irreversibly stored with a hash function (bcrypt)
 5. Data for web analytics are pseudonymized and do not contain any personal data
