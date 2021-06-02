@@ -129,6 +129,7 @@ module.exports = {
   ],
   legal: [
     'legal/introduction',
+    'legal/common-definitions',
     'legal/terms-of-service',
     'legal/privacy-policy',
     'legal/data-processing-agreement',

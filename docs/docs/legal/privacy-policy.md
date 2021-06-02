@@ -7,7 +7,7 @@ custom_edit_url: null
 
 This privacy policy applies to CAOS AG, the websites it operates (including caos.ch and zitadel.ch) and the services and products it provides (including ZITADEL). This privacy policy describes how we process personal data for the provision of this website and our products.
 
-If any inconsistencies arise between this Privacy Policy and the otherwise applicable contractual terms or general terms of service of CAOS AG, the provisions of this Privacy Policy shall prevail. This privacy policy covers both existing personal data and personal data collected from you in the future.
+If any inconsistencies arise between this Privacy Policy and the otherwise applicable contractual terms, framework agreement, or general terms of service, the provisions of this Privacy Policy shall prevail. This privacy policy covers both existing personal data and personal data collected from you in the future.
 
 The responsible party for the data processing described in this privacy policy is:
 
