@@ -1,4 +1,6 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
+
+@import "./theme-copy.scss";
 
 @mixin private-label-preview-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
@@ -10,12 +12,12 @@
 
     &.light {
       @include cnsl-form-field-theme($light-theme);
-      @include mat-button-theme($light-theme);
+      // @include mat-button-theme($light-theme);
     }
 
     &.dark {
       @include cnsl-form-field-theme($dark-theme);
-      @include mat-button-theme($dark-theme);
+      // @include mat-button-theme($dark-theme);
     }
   }
 }
