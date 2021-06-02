@@ -190,7 +190,7 @@ ARG BUILDARCH
 
 #generate statik code for console
 COPY --from=prod-angular-build console/dist/console console/dist/console/
-RUN go generate internal/statik/generate.go
+RUN go generate internal/ui/console/statik/generate.go
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
