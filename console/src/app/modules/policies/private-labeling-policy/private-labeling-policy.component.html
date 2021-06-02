@@ -27,15 +27,15 @@
         <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
         <div class="theme-changer">
           <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light" [ngClass]="{'active': theme === Theme.LIGHT}" >
-            <mat-icon class="icon">edit</mat-icon>
+            <i class="icon las la-edit"></i>
           </button>
           <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark" [ngClass]="{'active': theme === Theme.DARK}" >
-            <mat-icon class="icon">edit</mat-icon>
+            <i class="icon las la-edit"></i>
           </button>
         </div>
       </div>
 
-      <button class="activate-button" mat-raised-button color="primary" (click)="activatePolicy()">
+      <button class="activate-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" mat-raised-button color="primary" (click)="activatePolicy()">
         {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
       </button>
   </div>
@@ -46,7 +46,9 @@
         <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              <div class="panel-title"><mat-icon class="icon">branding_watermark</mat-icon>Logo</div>
+              <div class="panel-title">
+                <i class="icon las la-image"></i>
+                Logo</div>
             </mat-panel-title>
             <mat-panel-description>
               
@@ -59,6 +61,7 @@
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
+              <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
                   <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkLogo']" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
@@ -86,24 +89,25 @@
 
             <div class="part">
               <span class="label">Icon</span>
-                <container [ngSwitch]="theme">
-                  <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                    <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkIcon']" [src]="images['previewDarkIcon']" alt="dark icon preview"/>
-                    <span class="fill-space"></span>
-                    <img matTooltip="Current" class="curr" *ngIf="images['darkIcon']" [src]="images['darkIcon']" alt="dark icon"/>
-                  </div>
-                  <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                    <img matTooltip="Preview" class="prev" *ngIf="images['previewIcon']" [src]="images['previewIcon']" alt="icon preview"/>
-                    <span class="fill-space"></span>
-                    <img matTooltip="Current" class="curr" *ngIf="images['icon']" [src]="images['icon']" alt="icon"/>
-                  </div>
-                </container>
+              <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
+              <container [ngSwitch]="theme">
+                <div class="logo-view" *ngSwitchCase="Theme.DARK">
+                  <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkIcon']" [src]="images['previewDarkIcon']" alt="dark icon preview"/>
+                  <span class="fill-space"></span>
+                  <img matTooltip="Current" class="curr" *ngIf="images['darkIcon']" [src]="images['darkIcon']" alt="dark icon"/>
+                </div>
+                <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
+                  <img matTooltip="Preview" class="prev" *ngIf="images['previewIcon']" [src]="images['previewIcon']" alt="icon preview"/>
+                  <span class="fill-space"></span>
+                  <img matTooltip="Current" class="curr" *ngIf="images['icon']" [src]="images['icon']" alt="icon"/>
+                </div>
+              </container>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
               (dropped)="onDropIcon(theme, $event)"
               [class.hovering]="isHoveringOverDarkIcon">
               <label class="file-label">
-                <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
-                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+                <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
+                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFileIcon.click();" />
 
                 <i class="icon las la-cloud-upload-alt"></i>
                 <span>{{isHoveringOverDarkIcon ? 'Release': 'Drop your Logo here'}}</span>
@@ -117,7 +121,9 @@
         <mat-expansion-panel class="expansion" [expanded]="true">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              <div class="panel-title"><mat-icon class="icon">palette</mat-icon>Colors</div>
+              <div class="panel-title">
+                <i class="icon las la-palette"></i>
+                {{'POLICY.PRIVATELABELING.COLORS' | translate}}</div>
             </mat-panel-title>
           </mat-expansion-panel-header>
 
@@ -167,7 +173,9 @@
         <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header class="header">
             <mat-panel-title>
-              <div class="panel-title"><mat-icon class="icon">text_fields</mat-icon>Font</div>
+              <div class="panel-title">
+                <i class="icon las la-font"></i>
+                {{'POLICY.PRIVATELABELING.FONT' | translate}}</div>
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div class="fonts">
@@ -196,17 +204,33 @@
           <mat-expansion-panel-header>
             <mat-panel-title>
               <div class="panel-title">
-              <mat-icon class="icon">accessibility_new</mat-icon>Advanced Behavior
+                <i class="icon las la-universal-access"></i>
+                {{'POLICY.PRIVATELABELING.ADVANCEDBEHAVIOR' | translate}}
             </div>
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div class="adv-container" *ngIf="previewData">
-          <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
+
+            <ng-container
+        *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false">
+          <cnsl-info-section  class="info" type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+              'label_policy.private_label'})}}
+          </cnsl-info-section>
+        </ng-container>
+
+        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
             [(ngModel)]="previewData.hideLoginNameSuffix" (change)="savePolicy()">
             {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
         </mat-slide-toggle>
-        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
-            [(ngModel)]="previewData.disableWatermark" (change)="savePolicy()">
+
+        <ng-container
+        *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) == false">
+          <cnsl-info-section class="info" type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+              'label_policy.watermark'})}}
+          </cnsl-info-section>
+        </ng-container>
+        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) == false"
+            [(ngModel)]="previewData.disableWatermark" (change)="saveWatermark()">
             {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
         </mat-slide-toggle>
       </div>
@@ -220,8 +244,8 @@
             <span><span [ngClass]="{'strong': preview == Preview.PREVIEW}">P</span> / <span [ngClass]="{'strong': preview == Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'dark': theme == Theme.DARK}" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW"  [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" [ngClass]="{'light': theme == Theme.LIGHT}" label="PREVIEW" [policy]="previewData"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev"  label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW"  [refresh]="refreshPreview" [images]="images" [preview]="preview" [theme]="theme" class="prev" label="PREVIEW" [policy]="previewData"></cnsl-preview>
         </div>
       </div>
     </div>

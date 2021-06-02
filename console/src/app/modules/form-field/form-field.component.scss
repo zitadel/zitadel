@@ -1,10 +1,10 @@
-
 @import '~@angular/material/theming';
 
 @mixin cnsl-form-field-theme($theme) {
   $primary: map-get($theme, primary);
   $primary-color: mat-color($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map-get($theme, foreground);
 
   .ng-untouched {
     .cnsl-error {
@@ -28,6 +28,10 @@
     top: 9px;
     height: inherit;
     vertical-align: middle;
+  }
+
+  input {
+    color: mat-color($foreground, text) !important;
   }
 
   // Wrapper for the hints and error messages.

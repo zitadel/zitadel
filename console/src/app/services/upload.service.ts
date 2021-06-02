@@ -16,14 +16,14 @@ export enum UploadEndpoint {
   MGMTFONT = 'org/policy/label/font',
 
   IAMDARKLOGO = 'iam/policy/label/logo/dark',
-  IAMLIGHTLOGO = 'iam/policy/label/logo/light',
+  IAMLIGHTLOGO = 'iam/policy/label/logo',
   IAMDARKICON = 'iam/policy/label/icon/dark',
-  IAMLIGHTICON = 'iam/policy/label/icon/light',
+  IAMLIGHTICON = 'iam/policy/label/icon',
 
   MGMTDARKLOGO = 'org/policy/label/logo/dark',
-  MGMTLIGHTLOGO = 'org/policy/label/logo/light',
+  MGMTLIGHTLOGO = 'org/policy/label/logo',
   MGMTDARKICON = 'org/policy/label/icon/dark',
-  MGMTLIGHTICON = 'org/policy/label/icon/light',
+  MGMTLIGHTICON = 'org/policy/label/icon',
 }
 
 export enum DownloadEndpoint {

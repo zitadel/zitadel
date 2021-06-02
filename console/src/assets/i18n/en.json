@@ -613,7 +613,8 @@
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
       "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICY": "Labeling Policy - custom",
+      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
+      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domain Verification - available"
     },
     "TIERSTATES": {
@@ -646,7 +647,17 @@
       "LIGHT":"Lighg Mode",
       "CHANGEVIEW":"Change View",
       "ACTIVATED":"Policy changes are now LIVE",
-      "THEME":"Theme"
+      "THEME":"Theme",
+      "COLORS":"Colors",
+      "FONT":"Font",
+      "ADVANCEDBEHAVIOR":"Advanced Behavior",
+      "PREVIEW": {
+        "TITLE":"Login",
+        "SECOND":"login with your ZITADEL-Account.",
+        "ERROR":"User could not be found!",
+        "PRIMARYBUTTON":"next",
+        "SECONDARYBUTTON":"register"
+      }
     },
     "PWD_AGE": {
       "TITLE": "Password Aging",

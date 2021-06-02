@@ -2,13 +2,28 @@
 
 @mixin private-label-preview-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
+
+  .preview .dashed {
+    border: 2px dashed rgba(#697386, .5);
+    border-radius: 1rem;
+    padding: 100px 20px;
+
+    &.light {
+      @include cnsl-form-field-theme($light-theme);
+      @include mat-button-theme($light-theme);
+    }
+
+    &.dark {
+      @include cnsl-form-field-theme($dark-theme);
+      @include mat-button-theme($dark-theme);
+    }
+  }
 }
 
 .preview {
   position: absolute;
   left: 0;
   width: 100%;
-  // width: calc(100px + 300px);
   pointer-events: none;
   margin-bottom: 2rem;
 
@@ -59,6 +74,40 @@
         display: flex;
         width: 100%;
         justify-content: space-between;
+      }
+
+      .error-msg {
+        align-self: flex-start;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        outline: none;
+        justify-content: flex-start;
+
+        i {
+          margin-right: 0.5rem;
+        }
+
+        span {
+          font-size: 14px;
+          margin: 1rem 0;
+        }
+      }
+    }
+
+    &.light {
+      background: #ffffff;
+
+      .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
+        color: #000000;
+      }
+    }
+
+    &.dark {
+      background: #212224;
+
+      .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
+        color: #ffffff;
       }
     }
   }
