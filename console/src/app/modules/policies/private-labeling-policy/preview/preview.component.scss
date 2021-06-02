@@ -85,7 +85,7 @@
         justify-content: flex-start;
 
         i {
-          margin-right: 0.5rem;
+          margin-right: .5rem;
         }
 
         span {
@@ -96,10 +96,10 @@
     }
 
     &.light {
-      background: #ffffff;
+      background: #fff;
 
       .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
-        color: #000000;
+        color: #000;
       }
     }
 
@@ -107,7 +107,7 @@
       background: #212224;
 
       .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
-        color: #ffffff;
+        color: #fff;
       }
     }
   }
