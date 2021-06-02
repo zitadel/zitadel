@@ -49,7 +49,7 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 		EventTypes(
 			iam.PasswordLockoutPolicyAddedEventType,
 			iam.PasswordLockoutPolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(

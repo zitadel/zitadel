@@ -51,7 +51,7 @@ func (wm *OrgMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.MailTemplateAddedEventType,
 			org.MailTemplateChangedEventType,
 			org.MailTemplateRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

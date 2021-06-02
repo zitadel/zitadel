@@ -227,7 +227,7 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			org.MemberRemovedEventType,
 			project.MemberAddedType,
 			project.MemberRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (rm *UniqueConstraintReadModel) getUniqueConstraint(aggregateID, objectID, constraintType string) *domain.UniqueConstraintMigration {

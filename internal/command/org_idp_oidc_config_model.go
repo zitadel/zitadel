@@ -81,7 +81,7 @@ func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.IDPConfigReactivatedEventType,
 			org.IDPConfigDeactivatedEventType,
 			org.IDPConfigRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IDPOIDCConfigWriteModel) NewChangedEvent(

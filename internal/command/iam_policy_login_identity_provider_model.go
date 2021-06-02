@@ -49,5 +49,5 @@ func (wm *IAMIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder 
 		AddQuery().
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		SearchQueryBuilder()
+		Builder()
 }

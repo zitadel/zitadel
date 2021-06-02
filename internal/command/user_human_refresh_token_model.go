@@ -84,7 +84,7 @@ func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanRefreshTokenRenewedType,
 			user.HumanRefreshTokenRemovedType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

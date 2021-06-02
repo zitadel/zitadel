@@ -53,7 +53,7 @@ func (wm *OrgFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.FeaturesSetEventType,
 			org.FeaturesRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgFeaturesWriteModel) NewSetEvent(

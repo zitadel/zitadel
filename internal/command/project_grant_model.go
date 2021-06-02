@@ -103,7 +103,7 @@ func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantReactivatedType,
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
@@ -171,7 +171,7 @@ func (wm *ProjectGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuil
 			project.ProjectRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 	return query
 }

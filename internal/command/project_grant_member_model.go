@@ -83,5 +83,5 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantMemberRemovedType,
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }

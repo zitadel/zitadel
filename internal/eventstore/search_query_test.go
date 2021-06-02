@@ -15,7 +15,7 @@ func testAddQuery(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQue
 		for _, queryFunc := range queryFuncs {
 			queryFunc(query)
 		}
-		return query.SearchQueryBuilder()
+		return query.Builder()
 	}
 }
 

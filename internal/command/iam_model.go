@@ -54,7 +54,7 @@ func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 			iam.GlobalOrgSetEventType,
 			iam.SetupStartedEventType,
 			iam.SetupDoneEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func IAMAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

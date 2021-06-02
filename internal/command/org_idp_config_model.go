@@ -40,7 +40,7 @@ func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.IDPConfigRemovedEventType,
 			org.IDPOIDCConfigAddedEventType,
 			org.IDPOIDCConfigChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {

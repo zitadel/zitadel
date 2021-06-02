@@ -49,7 +49,7 @@ func (wm *IAMOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.OrgIAMPolicyAddedEventType,
 			iam.OrgIAMPolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(

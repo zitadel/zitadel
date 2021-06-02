@@ -50,7 +50,7 @@ func (wm *IAMSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.LoginPolicySecondFactorAddedEventType,
 			iam.LoginPolicySecondFactorRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 type IAMMultiFactorWriteModel struct {
@@ -97,5 +97,5 @@ func (wm *IAMMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.LoginPolicyMultiFactorAddedEventType,
 			iam.LoginPolicyMultiFactorRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }

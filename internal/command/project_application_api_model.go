@@ -150,7 +150,7 @@ func (wm *APIApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.APIConfigChangedType,
 			project.APIConfigSecretChangedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *APIApplicationWriteModel) NewChangedEvent(

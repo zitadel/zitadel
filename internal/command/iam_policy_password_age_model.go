@@ -49,7 +49,7 @@ func (wm *IAMPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 		EventTypes(
 			iam.PasswordAgePolicyAddedEventType,
 			iam.PasswordAgePolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMPasswordAgePolicyWriteModel) NewChangedEvent(

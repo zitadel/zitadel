@@ -84,7 +84,7 @@ func (wm *HumanInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1InitializedCheckSucceededType,
 			user.HumanInitializedCheckSucceededType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

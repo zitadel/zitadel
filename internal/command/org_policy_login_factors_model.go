@@ -51,7 +51,7 @@ func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.LoginPolicySecondFactorAddedEventType,
 			org.LoginPolicySecondFactorRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 type OrgMultiFactorWriteModel struct {
@@ -98,7 +98,7 @@ func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.LoginPolicyMultiFactorAddedEventType,
 			org.LoginPolicyMultiFactorRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func NewOrgAuthFactorsAllowedWriteModel(orgID string) *OrgAuthFactorsAllowedWriteModel {
@@ -189,7 +189,7 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 			org.LoginPolicyMultiFactorAddedEventType,
 			org.LoginPolicyMultiFactorRemovedEventType,
 		).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgAuthFactorsAllowedWriteModel) ToSecondFactorWriteModel(factor domain.SecondFactorType) *OrgSecondFactorWriteModel {

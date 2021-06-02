@@ -50,7 +50,7 @@ func (wm *ORGOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(org.OrgIAMPolicyAddedEventType,
 			org.OrgIAMPolicyChangedEventType,
 			org.OrgIAMPolicyRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *ORGOrgIAMPolicyWriteModel) NewChangedEvent(

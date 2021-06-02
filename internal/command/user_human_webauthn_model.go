@@ -138,7 +138,7 @@ func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanU2FTokenRemovedType,
 			user.HumanPasswordlessTokenRemovedType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 type HumanU2FTokensReadModel struct {
@@ -211,7 +211,7 @@ func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanU2FTokenAddedType,
 			user.HumanU2FTokenVerifiedType,
 			user.HumanU2FTokenRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 }
 
@@ -294,7 +294,7 @@ func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuild
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanPasswordlessTokenVerifiedType,
 			user.HumanPasswordlessTokenRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 }
 
@@ -366,7 +366,7 @@ func (rm *HumanU2FLoginReadModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanU2FTokenBeginLoginType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 type HumanPasswordlessLoginReadModel struct {
@@ -427,6 +427,6 @@ func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilde
 		EventTypes(
 			user.HumanPasswordlessTokenBeginLoginType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 }

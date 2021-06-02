@@ -48,7 +48,7 @@ func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.LabelPolicyAddedEventType,
 			org.LabelPolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(

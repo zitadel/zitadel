@@ -50,7 +50,7 @@ func (wm *OrgMailTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(org.MailTextAddedEventType,
 			org.MailTextChangedEventType,
 			org.MailTextRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

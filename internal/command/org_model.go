@@ -52,7 +52,7 @@ func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgAddedEventType,
 			org.OrgChangedEventType,
 			org.OrgDomainPrimarySetEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func OrgAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

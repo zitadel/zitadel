@@ -72,7 +72,7 @@ func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.ProjectDeactivatedType,
 			project.ProjectReactivatedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *ProjectWriteModel) NewChangedEvent(

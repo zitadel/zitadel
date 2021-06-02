@@ -82,7 +82,7 @@ func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanRegisteredType,
 			user.HumanAddressChangedType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *HumanAddressWriteModel) NewChangedEvent(

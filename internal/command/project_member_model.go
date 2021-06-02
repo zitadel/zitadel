@@ -56,5 +56,5 @@ func (wm *ProjectMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(project.MemberAddedType,
 			project.MemberChangedType,
 			project.MemberRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }

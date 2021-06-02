@@ -51,5 +51,5 @@ func (wm *OrgIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder 
 		EventTypes(
 			org.LoginPolicyIDPProviderAddedEventType,
 			org.LoginPolicyIDPProviderRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }

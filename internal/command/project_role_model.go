@@ -93,7 +93,7 @@ func (wm *ProjectRoleWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.RoleChangedType,
 			project.RoleRemovedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *ProjectRoleWriteModel) NewProjectRoleChangedEvent(

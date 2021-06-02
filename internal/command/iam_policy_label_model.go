@@ -49,7 +49,7 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.LabelPolicyAddedEventType,
 			iam.LabelPolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(

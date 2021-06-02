@@ -86,7 +86,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PasswordChangedType,
 			user.UserV1PasswordCodeAddedType,
 			user.UserV1EmailVerifiedType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

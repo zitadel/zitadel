@@ -71,7 +71,7 @@ func (wm *UserGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 			usergrant.UserGrantReactivatedType,
 			usergrant.UserGrantRemovedType,
 			usergrant.UserGrantCascadeRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
@@ -175,6 +175,6 @@ func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder
 			project.GrantRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType).
-		SearchQueryBuilder()
+		Builder()
 	return query
 }

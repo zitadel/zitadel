@@ -56,5 +56,5 @@ func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanExternalIDPRemovedType,
 			user.HumanExternalIDPCascadeRemovedType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }

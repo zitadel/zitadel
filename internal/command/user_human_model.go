@@ -131,7 +131,7 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PhoneVerifiedType,
 			user.UserV1PhoneRemovedType,
 			user.UserV1PasswordChangedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {

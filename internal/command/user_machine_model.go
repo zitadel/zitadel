@@ -82,7 +82,7 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *MachineWriteModel) NewChangedEvent(

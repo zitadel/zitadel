@@ -53,7 +53,7 @@ func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.LoginPolicyAddedEventType,
 			iam.LoginPolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(

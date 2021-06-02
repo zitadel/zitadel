@@ -106,5 +106,5 @@ func (wm *ApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.ApplicationReactivatedType,
 			project.ApplicationRemovedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }

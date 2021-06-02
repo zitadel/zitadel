@@ -53,7 +53,7 @@ func (rm *UserReadModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(rm.AggregateID).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func NewUserEventSearchQuery(userID, orgID string, sequence uint64) *eventstore.SearchQueryBuilder {
@@ -63,5 +63,5 @@ func NewUserEventSearchQuery(userID, orgID string, sequence uint64) *eventstore.
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(userID).
 		SequenceGreater(sequence).
-		SearchQueryBuilder()
+		Builder()
 }

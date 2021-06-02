@@ -51,7 +51,7 @@ func (wm *OrgPasswordAgePolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 			org.PasswordAgePolicyAddedEventType,
 			org.PasswordAgePolicyChangedEventType,
 			org.PasswordAgePolicyRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgPasswordAgePolicyWriteModel) NewChangedEvent(

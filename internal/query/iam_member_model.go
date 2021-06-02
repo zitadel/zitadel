@@ -40,5 +40,5 @@ func (rm *IAMMemberReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(rm.iamID).
 		EventData(map[string]interface{}{
 			"userId": rm.userID,
-		}).SearchQueryBuilder()
+		}).Builder()
 }

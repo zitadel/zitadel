@@ -50,7 +50,7 @@ func (wm *OrgPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQuery
 		EventTypes(org.PasswordComplexityPolicyAddedEventType,
 			org.PasswordComplexityPolicyChangedEventType,
 			org.PasswordComplexityPolicyRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgPasswordComplexityPolicyWriteModel) NewChangedEvent(

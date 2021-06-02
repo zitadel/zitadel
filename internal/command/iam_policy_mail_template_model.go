@@ -50,7 +50,7 @@ func (wm *IAMMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.MailTemplateAddedEventType,
 			iam.MailTemplateChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMMailTemplateWriteModel) NewChangedEvent(

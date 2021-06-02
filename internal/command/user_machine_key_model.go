@@ -75,7 +75,7 @@ func (wm *MachineKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.MachineKeyAddedEventType,
 			user.MachineKeyRemovedEventType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *MachineKeyWriteModel) Exists() bool {

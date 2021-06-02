@@ -91,7 +91,7 @@ func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1AddedType,
 			user.UserV1RegisteredType,
 			user.UserV1ProfileChangedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(

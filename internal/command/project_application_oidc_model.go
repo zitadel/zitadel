@@ -217,7 +217,7 @@ func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.OIDCConfigChangedType,
 			project.OIDCConfigSecretChangedType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OIDCApplicationWriteModel) NewChangedEvent(

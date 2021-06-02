@@ -49,7 +49,7 @@ func (wm *IAMPasswordComplexityPolicyWriteModel) Query() *eventstore.SearchQuery
 		EventTypes(
 			iam.PasswordComplexityPolicyAddedEventType,
 			iam.PasswordComplexityPolicyChangedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMPasswordComplexityPolicyWriteModel) NewChangedEvent(

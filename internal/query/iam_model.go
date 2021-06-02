@@ -132,5 +132,5 @@ func (rm *ReadModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(rm.AggregateID).
-		SearchQueryBuilder()
+		Builder()
 }

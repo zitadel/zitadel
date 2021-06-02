@@ -81,7 +81,7 @@ func (wm *IAMIDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			iam.IDPConfigReactivatedEventType,
 			iam.IDPConfigDeactivatedEventType,
 			iam.IDPConfigRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(

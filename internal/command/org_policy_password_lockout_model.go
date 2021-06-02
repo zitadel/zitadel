@@ -50,7 +50,7 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBui
 		EventTypes(org.PasswordLockoutPolicyAddedEventType,
 			org.PasswordLockoutPolicyChangedEventType,
 			org.PasswordLockoutPolicyRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(

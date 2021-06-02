@@ -58,5 +58,5 @@ func (wm *IAMMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			iam.MemberAddedEventType,
 			iam.MemberChangedEventType,
 			iam.MemberRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }

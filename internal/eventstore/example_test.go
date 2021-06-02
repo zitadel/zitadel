@@ -312,7 +312,7 @@ func TestUserReadModel(t *testing.T) {
 
 	users := UsersReadModel{}
 
-	err = es.FilterToReducer(context.Background(), eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).AddQuery().AggregateTypes("test.user").SearchQueryBuilder(), &users)
+	err = es.FilterToReducer(context.Background(), eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).AddQuery().AggregateTypes("test.user").Builder(), &users)
 	if err != nil {
 		t.Errorf("unexpected error on filter to reducer: %v", err)
 	}

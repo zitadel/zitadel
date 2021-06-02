@@ -56,7 +56,7 @@ func (wm *OrgLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LoginPolicyAddedEventType,
 			org.LoginPolicyChangedEventType,
 			org.LoginPolicyRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(

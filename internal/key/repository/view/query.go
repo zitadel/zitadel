@@ -12,5 +12,5 @@ func KeyPairQuery(latestSequence uint64) *eventstore.SearchQueryBuilder {
 		AggregateTypes(iam.AggregateType).
 		SequenceGreater(latestSequence).
 		EventTypes(keypair.AddedEventType).
-		SearchQueryBuilder()
+		Builder()
 }

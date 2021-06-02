@@ -48,16 +48,39 @@ func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	}
 }
 
+//Columns defines which fields are set
 func (factory *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
 	factory.columns = repository.Columns(columns)
 	return factory
 }
 
+//Limit defines how many events are returned maximally.
 func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 	factory.limit = limit
 	return factory
 }
 
+//ResourceOwner defines the resource owner (org) of the events
+func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
+	factory.resourceOwner = resourceOwner
+	return factory
+}
+
+//OrderDesc changes the sorting order of the returned events to descending
+func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
+	factory.desc = true
+	return factory
+}
+
+//OrderAsc changes the sorting order of the returned events to ascending
+func (factory *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
+	factory.desc = false
+	return factory
+}
+
+//AddQuery creates a new sub query.
+//All fields in the sub query are AND-connected in the storage request.
+//Multiple sub queries are OR-connected in the storage request.
 func (factory *SearchQueryBuilder) AddQuery() *SearchQuery {
 	query := &SearchQuery{
 		builder: factory,
@@ -67,51 +90,44 @@ func (factory *SearchQueryBuilder) AddQuery() *SearchQuery {
 	return query
 }
 
-func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
-	factory.resourceOwner = resourceOwner
-	return factory
-}
-
-func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
-	factory.desc = true
-	return factory
-}
-
+//Or creates a new sub query on the search query builder
 func (query SearchQuery) Or() *SearchQuery {
 	return query.builder.AddQuery()
 }
 
+//AggregateTypes filters for events with the given aggregate types
 func (query *SearchQuery) AggregateTypes(types ...AggregateType) *SearchQuery {
 	query.aggregateTypes = types
 	return query
 }
 
+//SequenceGreater filters for events with sequence greater the requested sequence
 func (query *SearchQuery) SequenceGreater(sequence uint64) *SearchQuery {
 	query.eventSequence = sequence
 	return query
 }
 
+//AggregateIDs filters for events with the given aggregate id's
 func (query *SearchQuery) AggregateIDs(ids ...string) *SearchQuery {
 	query.aggregateIDs = ids
 	return query
 }
 
+//EventTypes filters for events with the given event types
 func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
 	query.eventTypes = types
 	return query
 }
 
-func (factory *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
-	factory.desc = false
-	return factory
-}
-
+//EventData filters for events with the given event data.
+//Use this call with care as it will be slower than the other filters.
 func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 	query.eventData = data
 	return query
 }
 
-func (query *SearchQuery) SearchQueryBuilder() *SearchQueryBuilder {
+//Builder returns the SearchQueryBuilder of the sub query
+func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 

@@ -96,7 +96,7 @@ func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainPrimarySetEventType,
 			org.OrgDomainRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 type OrgDomainsWriteModel struct {
@@ -168,5 +168,5 @@ func (wm *OrgDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainPrimarySetEventType,
 			org.OrgDomainRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }

@@ -141,5 +141,5 @@ func (wm *ApplicationKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.ApplicationKeyAddedEventType,
 			project.ApplicationKeyRemovedEventType,
 			project.ProjectRemovedType).
-		SearchQueryBuilder()
+		Builder()
 }

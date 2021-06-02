@@ -57,5 +57,5 @@ func (wm *OrgMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.MemberAddedEventType,
 			org.MemberChangedEventType,
 			org.MemberRemovedEventType).
-		SearchQueryBuilder()
+		Builder()
 }

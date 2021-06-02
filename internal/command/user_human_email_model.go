@@ -84,7 +84,7 @@ func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1EmailVerifiedType,
 			user.HumanEmailVerifiedType,
 			user.UserRemovedType).
-		SearchQueryBuilder()
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

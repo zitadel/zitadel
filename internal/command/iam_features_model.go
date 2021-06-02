@@ -48,7 +48,7 @@ func (wm *IAMFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		EventTypes(iam.FeaturesSetEventType).
 		AggregateTypes(iam.AggregateType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func (wm *IAMFeaturesWriteModel) NewSetEvent(

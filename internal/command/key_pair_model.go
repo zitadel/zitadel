@@ -55,7 +55,7 @@ func (wm *KeyPairWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(keypair.AddedEventType).
-		SearchQueryBuilder()
+		Builder()
 }
 
 func KeyPairAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
