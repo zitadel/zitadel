@@ -129,6 +129,7 @@ func (factory *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 			query.eventSequenceFilter,
 			query.eventTypeFilter,
 			query.eventDataFilter,
+			query.builder.resourceOwnerFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {

@@ -81,9 +81,8 @@ func testSetSortOrder(asc bool) func(*SearchQueryBuilder) *SearchQueryBuilder {
 
 func TestSearchQueryFactorySetters(t *testing.T) {
 	type args struct {
-		columns        Columns
-		aggregateTypes []AggregateType
-		setters        []func(*SearchQueryBuilder) *SearchQueryBuilder
+		columns Columns
+		setters []func(*SearchQueryBuilder) *SearchQueryBuilder
 	}
 	tests := []struct {
 		name string
@@ -93,16 +92,10 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 		{
 			name: "New factory",
 			args: args{
-				columns:        ColumnsEvent,
-				aggregateTypes: []AggregateType{"user", "org"},
+				columns: ColumnsEvent,
 			},
 			res: &SearchQueryBuilder{
 				columns: repository.Columns(ColumnsEvent),
-				queries: []*SearchQuery{
-					{
-						aggregateTypes: []AggregateType{"user", "org"},
-					},
-				},
 			},
 		},
 		{
@@ -174,8 +167,7 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 		{
 			name: "default search query",
 			args: args{
-				aggregateTypes: []AggregateType{"user"},
-				setters:        []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetAggregateTypes("user"), testSetAggregateIDs("1235", "024")), testSetSortOrder(false)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetAggregateTypes("user"), testSetAggregateIDs("1235", "024")), testSetSortOrder(false)},
 			},
 			res: &SearchQueryBuilder{
 				desc: true,
@@ -190,13 +182,12 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := NewSearchQueryBuilder(tt.args.columns)
+			builder := NewSearchQueryBuilder(tt.args.columns)
 			for _, setter := range tt.args.setters {
-				factory = setter(factory)
+				builder = setter(builder)
 			}
-			if !reflect.DeepEqual(factory, tt.res) {
-				t.Errorf("NewSearchQueryFactory() = %v, want %v", factory, tt.res)
-			}
+
+			assertBuilder(t, tt.res, builder)
 		})
 	}
 }
@@ -569,8 +560,49 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(query, tt.res.query) {
-				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", factory, tt.res.query)
+				t.Errorf("NewSearchQueryFactory() = %+v, want %+v", query, tt.res.query)
 			}
 		})
+	}
+}
+
+func assertBuilder(t *testing.T, want, got *SearchQueryBuilder) {
+	t.Helper()
+	if got.columns != want.columns {
+		t.Errorf("wrong column: got: %v want: %v", got.columns, want.columns)
+	}
+	if got.desc != want.desc {
+		t.Errorf("wrong desc: got: %v want: %v", got.desc, want.desc)
+	}
+	if got.limit != want.limit {
+		t.Errorf("wrong limit: got: %v want: %v", got.limit, want.limit)
+	}
+	if got.resourceOwner != want.resourceOwner {
+		t.Errorf("wrong : got: %v want: %v", got.resourceOwner, want.resourceOwner)
+	}
+	if len(got.queries) != len(want.queries) {
+		t.Errorf("wrong length of queries: got: %v want: %v", len(got.queries), len(want.queries))
+	}
+
+	for i, query := range got.queries {
+		assertQuery(t, i, want.queries[i], query)
+	}
+}
+
+func assertQuery(t *testing.T, i int, want, got *SearchQuery) {
+	if !reflect.DeepEqual(got.aggregateIDs, want.aggregateIDs) {
+		t.Errorf("wrong aggregateIDs in query %d : got: %v want: %v", i, got.aggregateIDs, want.aggregateIDs)
+	}
+	if !reflect.DeepEqual(got.aggregateTypes, want.aggregateTypes) {
+		t.Errorf("wrong aggregateTypes in query %d : got: %v want: %v", i, got.aggregateTypes, want.aggregateTypes)
+	}
+	if !reflect.DeepEqual(got.eventData, want.eventData) {
+		t.Errorf("wrong eventData in query %d : got: %v want: %v", i, got.eventData, want.eventData)
+	}
+	if got.eventSequence != want.eventSequence {
+		t.Errorf("wrong eventSequence in query %d : got: %v want: %v", i, got.eventSequence, want.eventSequence)
+	}
+	if !reflect.DeepEqual(got.eventTypes, want.eventTypes) {
+		t.Errorf("wrong eventTypes in query %d : got: %v want: %v", i, got.eventTypes, want.eventTypes)
 	}
 }

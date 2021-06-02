@@ -124,15 +124,16 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 }
 
 func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, len(filters))
-	clauses := make([]string, len(filters))
+	values = make([]interface{}, 0, len(filters))
 
 	if len(filters) == 0 {
 		return clause, values
 	}
-	subClauses := make([]string, len(filters))
-	for i, filter := range filters {
-		for _, f := range filter {
+
+	clauses := make([]string, len(filters))
+	for idx, filter := range filters {
+		subClauses := make([]string, len(filter))
+		for subIdx, f := range filter {
 			value := f.Value
 			switch value.(type) {
 			case []bool, []float64, []int64, []string, []repository.AggregateType, []repository.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]repository.AggregateType, *[]repository.EventType:
@@ -143,15 +144,15 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 				logging.Log("SQL-BSsNy").OnError(err).Warn("unable to marshal search value")
 			}
 
-			clauses[i] = getCondition(criteria, f)
-			if clauses[i] == "" {
+			subClauses[subIdx] = getCondition(criteria, f)
+			if subClauses[subIdx] == "" {
 				return "", nil
 			}
-			values[i] = value
+			values = append(values, value)
 		}
-		subClauses[i] = "( " + strings.Join(clauses, " AND ") + " )"
+		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	return " WHERE " + strings.Join(subClauses, " OR "), values
+	return " WHERE " + strings.Join(clauses, " OR "), values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

@@ -13,31 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
-type testAggregate struct {
-	id     string
-	events []EventPusher
-}
-
-func (a *testAggregate) ID() string {
-	return a.id
-}
-
-func (a *testAggregate) Type() AggregateType {
-	return "test.aggregate"
-}
-
-func (a *testAggregate) Events() []EventPusher {
-	return a.events
-}
-
-func (a *testAggregate) ResourceOwner() string {
-	return "caos"
-}
-
-func (a *testAggregate) Version() Version {
-	return "v1"
-}
-
 // testEvent implements the Event interface
 type testEvent struct {
 	BaseEvent
@@ -368,8 +343,7 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		aggregates []Aggregate
-		events     []EventPusher
+		events []EventPusher
 	}
 	type res struct {
 		wantErr bool
@@ -1314,13 +1288,6 @@ func combineEventLists(lists ...[]*repository.Event) []*repository.Event {
 	events := []*repository.Event{}
 	for _, list := range lists {
 		events = append(events, list...)
-	}
-	return events
-}
-
-func linkEvents(events ...*repository.Event) []*repository.Event {
-	for i := 1; i < len(events); i++ {
-		// events[i].PreviousEvent = events[i-1]
 	}
 	return events
 }
