@@ -139,7 +139,7 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
-		if strings.HasPrefix(requiredFeature, domain.FeatureLoginPolicy) {
+		if strings.HasPrefix(requiredFeature, domain.FeatureLabelPolicy) {
 			if err := checkLabelPolicyFeatures(features, requiredFeature); err != nil {
 				return err
 			}
