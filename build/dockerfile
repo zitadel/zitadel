@@ -140,7 +140,7 @@ COPY internal/errors internal/errors
 
 RUN build/zitadel/generate-grpc.sh \
     && go generate openapi/statik/generate.go \
-    && RUN go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/
+    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/
 
 
 #######################

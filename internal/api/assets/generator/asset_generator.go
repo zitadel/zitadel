@@ -141,6 +141,12 @@ var {{.Name}}_AuthMethods = authz.MethodMapping {
                Permission: "{{$handler.Permission}}",
                Feature:    "{{$method.Feature}}",
         },
+	{{ if $method.HasDarkMode }}
+		"{{$handler.Method}}:{{$prefix}}{{$service.Prefix}}{{$method.Path}}/dark{{$handler.PathSuffix}}": authz.Option{
+               Permission: "{{$handler.Permission}}",
+               Feature:    "{{$method.Feature}}",
+        },
+	{{end}}
 	{{end}}
     {{end}}
     {{end}}
