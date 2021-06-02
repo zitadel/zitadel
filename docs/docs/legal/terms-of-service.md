@@ -8,7 +8,7 @@ custom_edit_url: null
 
 CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
 
-The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**&quot;you&quot;**) by creating a user or organisation within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**) and subsequently terminate them.
+The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by creating a user or organisation within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**) and subsequently terminate them.
 
 The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any services.
 
@@ -62,7 +62,7 @@ If you need support integrating or setting up ZITADEL, please contact our consul
 
 ### Limited influence
 
-Be advised that the scope of our influence is limited. For example, the actual accessibility of a service is also dependent on the connection to and between various Internet Service Providers (&quot;ISPs&quot;). Portions of our services, i.e. software components, may also be beyond our influence and be subject to their own contractual conditions. You accept that in such cases we reject any responsibility.
+Be advised that the scope of our influence is limited. For example, the actual accessibility of a service is also dependent on the connection to and between various Internet Service Providers ("ISPs"). Portions of our services, i.e. software components, may also be beyond our influence and be subject to their own contractual conditions. You accept that in such cases we reject any responsibility.
 
 ### Service level
 
@@ -147,7 +147,7 @@ We are entitled to suspend and terminate services used by you if
 * Your credit has been used up by services and/or any applicable credit limit has been reached;
 * You are in default in the payment of open invoices and/or prompt payment seems unlikely (i.e. in the event of insolvency proceedings);
 * Your services were used illegally or in breach of contract, or if there is reasonable suspicion of such use (i.e. in the event of complaints or abuse reports);
-* Other customers&#39; services are being negatively affected in breach of the fair use provision, including in the event of your services being subject to attacks by third parties (i.e. DoS/DDoS attacks);
+* Other customers' services are being negatively affected in breach of the fair use provision, including in the event of your services being subject to attacks by third parties (i.e. DoS/DDoS attacks);
 * We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
 
 We reserve the right to immediately terminate the Framework Agreement in such cases.

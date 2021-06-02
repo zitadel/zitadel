@@ -30,7 +30,7 @@ Based on Article 13 of the Swiss Federal Constitution and the data protection pr
 
 In cooperation with our providers, we make every effort to protect the databases and any of our users data as well as possible against unauthorized access, loss, misuse or falsification. We point out that data transmission over the internet in general may result in security risks. A complete protection of the data against access by third parties is not possible.
 
-This website uses SSL/TLS encryption for security reasons and to protect the transmission of confidential content, such as requests that you send to us as the website operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from &quot;http://&quot; to &quot;https://&quot;.
+This website uses SSL/TLS encryption for security reasons and to protect the transmission of confidential content, such as requests that you send to us as the website operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from "http://" to "https://".
 
 ## Processing of personal data, legal basis, storage period
 
@@ -60,7 +60,7 @@ If you send us inquiries via contact form, your data from the form, including an
 
 If you would like to receive newsletters offered on our websites, we require an e-mail address from you as well as information that allows us to verify that you are the owner of the specified e-mail address and agree to receive the newsletter. Further data will not be collected. We use this data exclusively for sending the requested information and do not pass it on to third parties, except as described in this privacy policy.
 
-You can revoke your consent to the storage of the data, the e-mail address and their use for sending the newsletter at any time, for example via the &quot;unsubscribe link&quot; in the newsletter.
+You can revoke your consent to the storage of the data, the e-mail address and their use for sending the newsletter at any time, for example via the "unsubscribe link" in the newsletter.
 
 ### Processing of personal data in connection with the use of our products
 
@@ -91,7 +91,7 @@ In particular, the following personal data are part of the processing:
       <ul>
         <li>Randomly generated ID</li>
         <li>Password</li>
-        <li>Public keys / certificates (&quot;FIDO2&quot;, &quot;U2F&quot;, &quot;x509&quot;, ...)</li>
+        <li>Public keys / certificates ("FIDO2", "U2F", "x509", ...)</li>
         <li>User names or identifiers of external login providers</li>
         <li>Phone number(s)</li>
       </ul>
@@ -175,7 +175,7 @@ The fulfillment of the contract includes in particular, but is not limited to, t
 
 ## Disclosure to third parties
 
-We use third-party services to provide the website and our offers. An up-to-date list of all the providers we use and their areas of activity can be found on our &quot;[Trust Page](https://zitadel.ch/trust)&quot;.
+We use third-party services to provide the website and our offers. An up-to-date list of all the providers we use and their areas of activity can be found on our "[Trust Page](https://zitadel.ch/trust)".
 
 This website uses external payment service providers through whose platforms users and we can make payment transactions. For example via
 
@@ -194,7 +194,7 @@ We also share data with third parties in aggregate form and/or in a form that do
 
 ## Cookies
 
-Our websites use cookies. These are small text files that make it possible to store specific information related to the user on the user&#39;s terminal device while the user is using the website. Cookies enable us, in particular, to offer a single sign-on procedure, to control the performance of our services, but also to make our offer more customer-friendly. Cookies remain stored beyond the end of a browser session and can be retrieved when the user visits the site again.
+Our websites use cookies. These are small text files that make it possible to store specific information related to the user on the user's terminal device while the user is using the website. Cookies enable us, in particular, to offer a single sign-on procedure, to control the performance of our services, but also to make our offer more customer-friendly. Cookies remain stored beyond the end of a browser session and can be retrieved when the user visits the site again.
 
 In particular, we use the following cookies to provide our services:
 

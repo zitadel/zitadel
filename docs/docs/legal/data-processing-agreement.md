@@ -7,7 +7,7 @@ custom_edit_url: null
 
 Within the scope of the [**Framework Agreement**](terms-of-service), the **Processor** (CAOS AG) processes **Personal Data** on behalf of the **Customer** (Responsible Party), collectively the **"Parties"**.
 
-This Annex to the Agreement governs the Parties&#39; data protection obligations in addition to the provisions of the Agreement.
+This Annex to the Agreement governs the Parties' data protection obligations in addition to the provisions of the Agreement.
 
 ## Subject matter, duration, nature and purpose of the processing as well as type of personal data and categories of data subjects
 
@@ -40,7 +40,7 @@ In particular, the following Personal Data are part of the processing:
       <ul>
         <li>Randomly generated ID</li>
         <li>Password</li>
-        <li>Public keys / certificates (&quot;FIDO2&quot;, &quot;U2F&quot;, &quot;x509&quot;, ...)</li>
+        <li>Public keys / certificates ("FIDO2", "U2F", "x509", ...)</li>
         <li>User names or identifiers of external login providers</li>
         <li>Phone number(s)</li>
       </ul>
@@ -114,7 +114,7 @@ In particular, the following Personal Data are part of the processing:
 
 Under the Agreement, the Processor shall process Personal Data on behalf of the Customer.
 
-This Annex applies to all processing of Customer&#39;s data (including data of the users of Customer&#39;s organization) with reference to persons (&quot; **Personal Data**&quot;) which is related to the Agreement and which is carried out by the Processor, its employees or agents.
+This Annex applies to all processing of Customer's data (including data of the users of Customer's organization) with reference to persons ("**Personal Data**") which is related to the Agreement and which is carried out by the Processor, its employees or agents.
 
 The Customer shall be responsible for compliance with the statutory provisions of the data protection laws, in particular for the lawfulness of the transfer of data to the Processor as well as for the lawfulness of the data processing.
 
@@ -156,7 +156,7 @@ The Processor shall, taking into account the nature of the processing and the in
 
 ## Deletion or destruction after termination
 
-Upon Customer&#39;s request, the Processor shall delete personal data received after the end of the agreement, unless there is a legal obligation for the Processor to store or further process such data.
+Upon Customer's request, the Processor shall delete personal data received after the end of the agreement, unless there is a legal obligation for the Processor to store or further process such data.
 
 ## Information and control rights of the customer
 
@@ -172,7 +172,7 @@ The Processor has taken the following organizational and technical security meas
 
 The following measures for pseudonymization and encryption exist:
 
-1. All communication is encrypted with TLS &gt;1.2 with PFS
+1. All communication is encrypted with TLS >=1.2 with PFS
 2. Critical data is stored in encrypted form
 3. Storage media that store customer data are always encrypted
 4. Passwords are irreversibly stored with a hash function (bcrypt)
@@ -225,4 +225,4 @@ The following measures exist for regular review, assessment and evaluation of ef
 
 1. At least annual audit and evaluation of processes within the framework of an information security management system
 2. Responsible Disclosure and Bug Bounty policies
-3. External audit of system security (&quot;penetration testing&quot;)
+3. External audit of system security ("penetration testing")
