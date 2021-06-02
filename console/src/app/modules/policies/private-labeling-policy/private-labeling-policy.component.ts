@@ -346,6 +346,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();
       this.loadingImages = false;
+    }).catch(error => {
+      this.toast.showError(error);
+      this.loadingImages = false;
     });
   }
 
