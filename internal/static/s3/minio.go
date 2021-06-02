@@ -28,6 +28,7 @@ func (m *Minio) CreateBucket(ctx context.Context, name, location string) error {
 	name = m.prefixBucketName(name)
 	exists, err := m.Client.BucketExists(ctx, name)
 	if err != nil {
+		logging.LogWithFields("MINIO-ADvf3", "bucketname", name).WithError(err).Error("cannot check if bucket exists")
 		return caos_errs.ThrowInternal(err, "MINIO-1b8fs", "Errors.Assets.Bucket.Internal")
 	}
 	if exists {
