@@ -14,6 +14,7 @@ func ModelLoginPolicyToPb(policy *model.LoginPolicyView) *policy_pb.LoginPolicy 
 		AllowExternalIdp:      policy.AllowExternalIDP,
 		ForceMfa:              policy.ForceMFA,
 		PasswordlessType:      ModelPasswordlessTypeToPb(policy.PasswordlessType),
+		HidePasswordReset:     policy.HidePasswordReset,
 	}
 }
 

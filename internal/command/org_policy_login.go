@@ -42,6 +42,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.AllowRegister,
 			policy.AllowExternalIDP,
 			policy.ForceMFA,
+			policy.HidePasswordReset,
 			policy.PasswordlessType))
 	if err != nil {
 		return nil, err
@@ -81,7 +82,16 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
+		ctx,
+		orgAgg,
+		policy.AllowUsernamePassword,
+		policy.AllowRegister,
+		policy.AllowExternalIDP,
+		policy.ForceMFA,
+		policy.HidePasswordReset,
+		policy.PasswordlessType)
+
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 	}
@@ -117,6 +127,9 @@ func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, resourceOwner st
 	}
 	if defaultPolicy.AllowUsernamePassword != policy.AllowUsernamePassword {
 		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyUsernameLogin)
+	}
+	if defaultPolicy.HidePasswordReset != policy.HidePasswordReset {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyPasswordReset)
 	}
 	return authz.CheckOrgFeatures(ctx, c.tokenVerifier, resourceOwner, requiredFeatures...)
 }

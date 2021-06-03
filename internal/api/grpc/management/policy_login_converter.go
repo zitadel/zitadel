@@ -15,6 +15,7 @@ func addLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.Logi
 		AllowExternalIDP:      p.AllowExternalIdp,
 		ForceMFA:              p.ForceMfa,
 		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:     p.HidePasswordReset,
 	}
 }
 
@@ -25,6 +26,7 @@ func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domai
 		AllowExternalIDP:      p.AllowExternalIdp,
 		ForceMFA:              p.ForceMfa,
 		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:     p.HidePasswordReset,
 	}
 }
 

@@ -1803,6 +1803,7 @@ Change OIDC identity provider configuration of the organisation
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 
@@ -4988,6 +4989,7 @@ This is an empty request
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 
