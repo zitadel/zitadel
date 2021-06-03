@@ -608,6 +608,7 @@
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
       "LOGINPOLICYUSERNAMELOGIN": "Login Policy: Allow login with Username - custom",
+      "LOGINPOLICYPASSWORDRESET": "Login Policy: Hide reset password link - custom",
       "LOGINPOLICYREGISTRATION": "Login Policy: Allow self registration - custom",
       "LOGINPOLICYIDP": "Login Policy: Identity Provider - custom",
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
@@ -707,6 +708,8 @@
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
       "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
+      "HIDEPASSWORDRESET": "Hide Password reset",
+      "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process."
       "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
       "ERRORMSGPOPUP":"Show Error in Dialog",
       "DISABLEWATERMARK":"Disable Watermark"

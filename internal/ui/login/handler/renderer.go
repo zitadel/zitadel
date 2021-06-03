@@ -187,6 +187,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"hasUsernamePasswordLogin": func() bool {
 			return false
 		},
+		"showPasswordReset": func() bool {
+			return true
+		},
 		"hasExternalLogin": func() bool {
 			return false
 		},

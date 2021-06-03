@@ -21,8 +21,9 @@ message Features {
   bool password_complexity_policy = 10;
   bool label_policy = 11;
   bool custom_domain = 12;
-  bool label_policy_private_label = 15;
+  bool login_policy_password_reset = 13;
   bool label_policy_watermark = 14;
+  bool label_policy_private_label = 15;
 }
 
 message FeatureTier {

@@ -1612,6 +1612,7 @@ This is an empty request
 | custom_domain |  bool | - |  |
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 
 
 
@@ -1649,6 +1650,7 @@ This is an empty request
 | custom_domain |  bool | - |  |
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 
 
 
@@ -1896,6 +1898,7 @@ This is an empty request
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 

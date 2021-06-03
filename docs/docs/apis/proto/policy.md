@@ -49,6 +49,7 @@ title: zitadel/policy.proto
 | force_mfa |  bool | - |  |
 | passwordless_type |  PasswordlessType | - |  |
 | is_default |  bool | - |  |
+| hide_password_reset |  bool | - |  |
 
 
 

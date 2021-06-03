@@ -123,6 +123,11 @@ message LoginPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
+    bool hide_password_reset = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if password reset link should be shown in the login screen"
+        }
+    ];
 }
 
 enum SecondFactorType {

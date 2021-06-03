@@ -608,6 +608,7 @@
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
       "LOGINPOLICYUSERNAMELOGIN": "Login Richtlinie: Login mit Username erlauben - benutzerdefiniert",
+      "LOGINPOLICYPASSWORDRESET": "Login Richtlinie: Passwort vergessen Link nicht anzeigen - benutzerdefiniert",
       "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
       "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
       "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",
@@ -705,6 +706,8 @@
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "Mfa erzwingen",
       "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
+      "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
+      "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link."
       "HIDELOGINNAMESUFFIX":"Loginname Suffix ausblenden",
       "ERRORMSGPOPUP":"Fehler als Dialog Fenster",
       "DISABLEWATERMARK":"Wasserzeichen ausblenden"

@@ -2,13 +2,16 @@ package model
 
 import (
 	"encoding/json"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/lib/pq"
 	"time"
+
+	"github.com/lib/pq"
+
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
@@ -29,6 +32,7 @@ type LoginPolicyView struct {
 	AllowUsernamePassword bool          `json:"allowUsernamePassword" gorm:"column:allow_username_password"`
 	AllowExternalIDP      bool          `json:"allowExternalIdp" gorm:"column:allow_external_idp"`
 	ForceMFA              bool          `json:"forceMFA" gorm:"column:force_mfa"`
+	HidePasswordReset     bool          `json:"hidePasswordReset" gorm:"column:hide_password_reset"`
 	PasswordlessType      int32         `json:"passwordlessType" gorm:"column:passwordless_type"`
 	SecondFactors         pq.Int64Array `json:"-" gorm:"column:second_factors"`
 	MultiFactors          pq.Int64Array `json:"-" gorm:"column:multi_factors"`
@@ -47,6 +51,7 @@ func LoginPolicyViewFromModel(policy *model.LoginPolicyView) *LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
+		HidePasswordReset:     policy.HidePasswordReset,
 		PasswordlessType:      int32(policy.PasswordlessType),
 		SecondFactors:         secondFactorsFromModel(policy.SecondFactors),
 		MultiFactors:          multiFactorsFromModel(policy.MultiFactors),
@@ -80,6 +85,7 @@ func LoginPolicyViewToModel(policy *LoginPolicyView) *model.LoginPolicyView {
 		AllowExternalIDP:      policy.AllowExternalIDP,
 		AllowUsernamePassword: policy.AllowUsernamePassword,
 		ForceMFA:              policy.ForceMFA,
+		HidePasswordReset:     policy.HidePasswordReset,
 		PasswordlessType:      model.PasswordlessType(policy.PasswordlessType),
 		SecondFactors:         secondFactorsToModel(policy.SecondFactors),
 		MultiFactors:          multiFactorsToToModel(policy.MultiFactors),
