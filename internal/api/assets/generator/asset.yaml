@@ -102,6 +102,29 @@ Services:
             Comment:
             Type: preview
             Permission: policy.read
+  Public:
+    Prefix: "/{id}"
+    Methods:
+      LabelPolicyLogo:
+        Path: "/policy/label/logo"
+        HasDarkMode: true
+        Handlers:
+          - Name: Get
+            Comment:
+            Type: download
+      LabelPolicyIcon:
+        Path: "/policy/label/icon"
+        HasDarkMode: true
+        Handlers:
+          - Name: Get
+            Comment:
+            Type: download
+      LabelPolicyFont:
+        Path: "/policy/label/font"
+        Handlers:
+          - Name: Get
+            Comment:
+            Type: download
   Users:
     Prefix: "/users"
     Methods:

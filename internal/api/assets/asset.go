@@ -13,6 +13,7 @@ import (
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/static"
@@ -51,7 +52,7 @@ type Uploader interface {
 
 type Downloader interface {
 	ObjectName(ctx context.Context) (string, error)
-	BucketName(ctx context.Context) string
+	BucketName(ctx context.Context, id string) string
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error)
@@ -128,10 +129,14 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		}
 		ctx := r.Context()
 
-		bucketName := downloader.BucketName(ctx)
+		bucketName := downloader.BucketName(ctx, mux.Vars(r)["id"])
 		objectName, err := downloader.ObjectName(ctx)
 		if err != nil {
 			s.ErrorHandler()(w, r, err)
+			return
+		}
+		if objectName == "" {
+			s.ErrorHandler()(w, r, caos_errs.ThrowNotFound(nil, "UPLOAD-adf4f", "file not found"))
 			return
 		}
 		reader, getInfo, err := s.Storage().GetObject(ctx, bucketName, objectName)

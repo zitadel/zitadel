@@ -86,35 +86,43 @@ func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *domain.Ass
 }
 
 func (h *Handler) GetDefaultLabelPolicyLogo() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, false, true, false}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: true, preview: false}
 }
 
 func (h *Handler) GetDefaultLabelPolicyLogoDark() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, true, true, false}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: true, preview: false}
 }
 
 func (h *Handler) GetPreviewDefaultLabelPolicyLogo() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, false, true, true}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: true, preview: true}
 }
 
 func (h *Handler) GetPreviewDefaultLabelPolicyLogoDark() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, true, true, true}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: true, preview: true}
 }
 
 func (h *Handler) GetOrgLabelPolicyLogo() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, false, false, false}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: false, preview: false}
 }
 
 func (h *Handler) GetOrgLabelPolicyLogoDark() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, true, false, false}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: false, preview: false}
 }
 
 func (h *Handler) GetPreviewOrgLabelPolicyLogo() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, false, false, true}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: false, preview: true}
 }
 
 func (h *Handler) GetPreviewOrgLabelPolicyLogoDark() Downloader {
-	return &labelPolicyLogoDownloader{h.orgRepo, true, false, true}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: false, preview: true}
+}
+
+func (h *Handler) GetLabelPolicyLogo() Downloader {
+	return &labelPolicyLogoDownloader{org: h.orgRepo, useID: true}
+}
+
+func (h *Handler) GetLabelPolicyLogoDark() Downloader {
+	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: true, useID: true}
 }
 
 type labelPolicyLogoDownloader struct {
@@ -122,6 +130,7 @@ type labelPolicyLogoDownloader struct {
 	darkMode      bool
 	defaultPolicy bool
 	preview       bool
+	useID         bool
 }
 
 func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context) (string, error) {
@@ -135,7 +144,10 @@ func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context) (string, err
 	return policy.LogoURL, nil
 }
 
-func (l *labelPolicyLogoDownloader) BucketName(ctx context.Context) string {
+func (l *labelPolicyLogoDownloader) BucketName(ctx context.Context, id string) string {
+	if l.useID {
+		return id
+	}
 	if l.defaultPolicy {
 		return domain.IAMID
 	}
@@ -202,35 +214,43 @@ func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *domain.Ass
 }
 
 func (h *Handler) GetDefaultLabelPolicyIcon() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, false, true, false}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: true, preview: false}
 }
 
 func (h *Handler) GetDefaultLabelPolicyIconDark() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, true, true, false}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: true, preview: false}
 }
 
 func (h *Handler) GetPreviewDefaultLabelPolicyIcon() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, false, true, true}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: true, preview: true}
 }
 
 func (h *Handler) GetPreviewDefaultLabelPolicyIconDark() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, true, true, true}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: true, preview: true}
 }
 
 func (h *Handler) GetOrgLabelPolicyIcon() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, false, false, false}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: false, preview: false}
 }
 
 func (h *Handler) GetOrgLabelPolicyIconDark() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, true, false, false}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: false, preview: false}
 }
 
 func (h *Handler) GetPreviewOrgLabelPolicyIcon() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, false, false, true}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: false, defaultPolicy: false, preview: true}
 }
 
 func (h *Handler) GetPreviewOrgLabelPolicyIconDark() Downloader {
-	return &labelPolicyIconDownloader{h.orgRepo, true, false, true}
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: true, defaultPolicy: false, preview: true}
+}
+
+func (h *Handler) GetLabelPolicyIcon() Downloader {
+	return &labelPolicyIconDownloader{org: h.orgRepo, useID: true}
+}
+
+func (h *Handler) GetLabelPolicyIconDark() Downloader {
+	return &labelPolicyIconDownloader{org: h.orgRepo, darkMode: true, useID: true}
 }
 
 type labelPolicyIconDownloader struct {
@@ -238,6 +258,7 @@ type labelPolicyIconDownloader struct {
 	darkMode      bool
 	defaultPolicy bool
 	preview       bool
+	useID         bool
 }
 
 func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context) (string, error) {
@@ -251,7 +272,10 @@ func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context) (string, err
 	return policy.IconURL, nil
 }
 
-func (l *labelPolicyIconDownloader) BucketName(ctx context.Context) string {
+func (l *labelPolicyIconDownloader) BucketName(ctx context.Context, id string) string {
+	if l.useID {
+		return id
+	}
 	if l.defaultPolicy {
 		return domain.IAMID
 	}
@@ -297,25 +321,30 @@ func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *domain.Ass
 }
 
 func (h *Handler) GetDefaultLabelPolicyFont() Downloader {
-	return &labelPolicyFontDownloader{h.orgRepo, true, false}
+	return &labelPolicyFontDownloader{org: h.orgRepo, defaultPolicy: true, preview: false}
 }
 
 func (h *Handler) GetPreviewDefaultLabelPolicyFont() Downloader {
-	return &labelPolicyFontDownloader{h.orgRepo, true, true}
+	return &labelPolicyFontDownloader{org: h.orgRepo, defaultPolicy: true, preview: true}
 }
 
 func (h *Handler) GetOrgLabelPolicyFont() Downloader {
-	return &labelPolicyFontDownloader{h.orgRepo, false, false}
+	return &labelPolicyFontDownloader{org: h.orgRepo, defaultPolicy: false, preview: false}
 }
 
 func (h *Handler) GetPreviewOrgLabelPolicyFont() Downloader {
-	return &labelPolicyFontDownloader{h.orgRepo, true, true}
+	return &labelPolicyFontDownloader{org: h.orgRepo, defaultPolicy: true, preview: true}
+}
+
+func (h *Handler) GetLabelPolicyFont() Downloader {
+	return &labelPolicyFontDownloader{org: h.orgRepo, useID: true}
 }
 
 type labelPolicyFontDownloader struct {
 	org           repository.OrgRepository
 	defaultPolicy bool
 	preview       bool
+	useID         bool
 }
 
 func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context) (string, error) {
@@ -326,7 +355,10 @@ func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context) (string, err
 	return policy.FontURL, nil
 }
 
-func (l *labelPolicyFontDownloader) BucketName(ctx context.Context) string {
+func (l *labelPolicyFontDownloader) BucketName(ctx context.Context, id string) string {
+	if l.useID {
+		return id
+	}
 	if l.defaultPolicy {
 		return domain.IAMID
 	}
