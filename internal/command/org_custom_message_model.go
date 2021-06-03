@@ -62,6 +62,7 @@ func NewOrgCustomMessageTextsWriteModel(orgID string) *OrgCustomMessageTemplates
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
 			},
+			CustomMessageTemplate: make(map[string]*CustomText),
 		},
 	}
 }
