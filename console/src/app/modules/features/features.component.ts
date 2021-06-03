@@ -159,6 +159,7 @@ export class FeaturesComponent implements OnDestroy {
         req.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
         req.setLabelPolicy(this.features.labelPolicy);
         req.setCustomDomain(this.features.customDomain);
+        req.setCustomText(this.features.customText);
 
         this.adminService.setOrgFeatures(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -177,6 +178,7 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
         dreq.setLabelPolicy(this.features.labelPolicy);
         dreq.setCustomDomain(this.features.customDomain);
+        dreq.setCustomText(this.features.customText);
 
         this.adminService.setDefaultFeatures(dreq).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);

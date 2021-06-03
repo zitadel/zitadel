@@ -609,11 +609,12 @@
       "LOGINPOLICYUSERNAMELOGIN": "Login Richtlinie: Login mit Username erlauben - benutzerdefiniert",
       "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
       "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
-      "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",
+      "LOGINPOLICYFACTORS": "Login Richtlinie: Multifaktoren - benutzerdefiniert",
       "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
       "LABELPOLICY": "Label Richtlinie - benutzerdefiniert",
-      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar"
+      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
+      "CUSTOMTEXT": "Benutzerdefinierte Texte"
     },
     "TIERSTATES": {
       "0": "Aktiv",
