@@ -156,7 +156,7 @@ export class LoginPolicyComponent implements OnDestroy {
         adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
-        adminreq.setHidePasswordReset(this.loginData.hidePasswordReset)
+        adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }
