@@ -147,12 +147,13 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -162,7 +163,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -171,7 +172,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.command.HumanInitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanInitCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
@@ -185,13 +186,13 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
-
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -201,7 +202,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -209,7 +210,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.command.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.PasswordCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
@@ -224,12 +225,13 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return nil
 	}
 
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -239,7 +241,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -248,7 +250,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	return n.command.HumanEmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanEmailVerificationCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
@@ -290,17 +292,18 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if user.LastEmail == "" {
 		return nil
 	}
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -308,7 +311,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return n.command.UserDomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.UserDomainClaimedSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {
