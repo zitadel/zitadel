@@ -392,10 +392,23 @@ service ManagementService {
         };
     }
 
-    // A Manager is only allowed to set an initial password, on the next login the user has to change his password
+    // deprecated: use SetHumanPassword
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_initialize"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Set a new password for a user, on default the user has to change the password on the next login
+    // Set no_change_required to true if the user does not have to change the password on the next login
+    rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/password"
             body: "*"
         };
 
@@ -2377,6 +2390,16 @@ message SetHumanInitialPasswordRequest {
 }
 
 message SetHumanInitialPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message SetHumanPasswordRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
+    bool no_change_required = 3;
+}
+
+message SetHumanPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
