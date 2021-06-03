@@ -21,6 +21,7 @@ type FeaturesWriteModel struct {
 	LoginPolicyPasswordless  bool
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
+	LoginPolicyPasswordReset bool
 	PasswordComplexityPolicy bool
 	LabelPolicy              bool
 	CustomDomain             bool
@@ -60,6 +61,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.LoginPolicyUsernameLogin != nil {
 				wm.LoginPolicyUsernameLogin = *e.LoginPolicyUsernameLogin
+			}
+			if e.LoginPolicyPasswordReset != nil {
+				wm.LoginPolicyPasswordReset = *e.LoginPolicyPasswordReset
 			}
 			if e.PasswordComplexityPolicy != nil {
 				wm.PasswordComplexityPolicy = *e.PasswordComplexityPolicy

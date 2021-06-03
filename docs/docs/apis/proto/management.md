@@ -298,7 +298,18 @@ An sms will be sent to the given phone number to finish the phone verification p
 > **rpc** SetHumanInitialPassword([SetHumanInitialPasswordRequest](#sethumaninitialpasswordrequest))
 [SetHumanInitialPasswordResponse](#sethumaninitialpasswordresponse)
 
-A Manager is only allowed to set an initial password, on the next login the user has to change his password
+deprecated: use SetHumanPassword
+
+
+
+
+### SetHumanPassword
+
+> **rpc** SetHumanPassword([SetHumanPasswordRequest](#sethumanpasswordrequest))
+[SetHumanPasswordResponse](#sethumanpasswordresponse)
+
+Set a new password for a user, on default the user has to change the password on the next login
+Set no_change_required to true if the user does not have to change the password on the next login
 
 
 
@@ -1803,6 +1814,7 @@ Change OIDC identity provider configuration of the organisation
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 
@@ -4861,6 +4873,30 @@ This is an empty request
 
 
 
+### SetHumanPasswordRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| password |  string | - | string.min_len: 1<br /> string.max_len: 72<br />  |
+| no_change_required |  bool | - |  |
+
+
+
+
+### SetHumanPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetPrimaryOrgDomainRequest
 
 
@@ -4988,6 +5024,7 @@ This is an empty request
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 

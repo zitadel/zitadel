@@ -163,6 +163,10 @@ func checkLoginPolicyFeatures(features *features_view_model.FeaturesView, requir
 		if !features.LoginPolicyUsernameLogin {
 			return MissingFeatureErr(requiredFeature)
 		}
+	case domain.FeatureLoginPolicyPasswordReset:
+		if !features.LoginPolicyPasswordReset {
+			return MissingFeatureErr(requiredFeature)
+		}
 	default:
 		if !features.LoginPolicyFactors && !features.LoginPolicyIDP && !features.LoginPolicyPasswordless && !features.LoginPolicyRegistration && !features.LoginPolicyUsernameLogin {
 			return MissingFeatureErr(requiredFeature)

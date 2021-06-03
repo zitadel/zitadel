@@ -14,6 +14,7 @@ type LoginPolicy struct {
 	SecondFactors         []SecondFactorType
 	MultiFactors          []MultiFactorType
 	PasswordlessType      PasswordlessType
+	HidePasswordReset     bool
 }
 
 type IDPProvider struct {

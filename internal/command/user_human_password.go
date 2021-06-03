@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) SetOneTimePassword(ctx context.Context, orgID, userID, passwordString string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordString string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if userID == "" {
@@ -26,7 +26,7 @@ func (c *Commands) SetOneTimePassword(ctx context.Context, orgID, userID, passwo
 	}
 	password := &domain.Password{
 		SecretString:   passwordString,
-		ChangeRequired: true,
+		ChangeRequired: oneTime,
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
 	passwordEvent, err := c.changePassword(ctx, "", password, userAgg, existingPassword)
@@ -44,7 +44,7 @@ func (c *Commands) SetOneTimePassword(ctx context.Context, orgID, userID, passwo
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) SetPassword(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

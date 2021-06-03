@@ -324,11 +324,21 @@ func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
-	objectDetails, err := s.command.SetOneTimePassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.SetHumanInitialPasswordResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPasswordRequest) (*mgmt_pb.SetHumanPasswordResponse, error) {
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetHumanPasswordResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
