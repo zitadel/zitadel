@@ -65,7 +65,7 @@ OUTPOST | 99.50%
 STARBASE | 99.90%
 FORTRESS | 99.95%
 
-2. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document.
+2. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document. Financial Credit shall be the sole and exclusive remedy for breach of this SLA.
 3. The Customer must request Financial Credit and must notify CAOS Support in writing within 30 days of becoming eligible for Financial Credit and must prove Failed Customer Requests during Downtime Periods. Financial Credit will be made in the form of a monetary credit applied to the next possible subscription invoice of ZITADEL Cloud,  may only be used to book services in the future, and will in no case be paid as a cash equivalent. No further guarantees are provided.
 4. The Service Level commitments apply only to organizations with a subscription plan where a Service Level is applicable and does not include any other organizations of the same customer. The Customer is not entitled to any Financial Credit, if it is in breach of the Agreement at the time of the occurrence of the event giving rise to the credit.
 

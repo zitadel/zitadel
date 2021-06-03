@@ -94,7 +94,7 @@ In particular, the following Personal Data are part of the processing:
     </td>
   </tr>
   <tr>
-    <td><strong>Data traffic data</strong></td>
+    <td><strong>Usage meta data</strong></td>
     <td>
       <ul>
         <li>User agent</li>
@@ -180,14 +180,14 @@ The following measures for pseudonymization and encryption exist:
 
 ### Ensuring certain properties of the systems and services
 
-### Confidentiality
+#### Confidentiality
 
 The following confidentiality measures exist:
 
 1. Implementation of information security policies
 2. Implementation of secure authentication policies
 
-### Integrity
+#### Integrity
 
 The following integrity measures exist:
 
@@ -196,7 +196,7 @@ The following integrity measures exist:
 3. Secrets are automatically rotated whenever possible and are short-lived (for example, signing keys)
 4. Changes to code or infrastructure require mandatory review by at least one other employee
 
-### Availability
+#### Availability
 
 The following measures of availability exist:
 
@@ -204,14 +204,14 @@ The following measures of availability exist:
 2. High availability operation
 3. Geo-redundant operation over at least two data centers
 
-### Load capacity
+#### Load capacity
 
 The following measures of availability exist:
 
 1. Automatic scaling of resources
 2. Monitoring, logging, tracing and alerting
 
-### Restoring availability and access
+#### Restoring availability and access
 
 The following measures exist to restore availability and access:
 
@@ -219,7 +219,7 @@ The following measures exist to restore availability and access:
 2. Emergency plan
 3. Testing of the emergency plan
 
-### Regular review, assessment and evaluation of effectiveness
+#### Regular review, assessment and evaluation of effectiveness
 
 The following measures exist for regular review, assessment and evaluation of effectiveness:
 
