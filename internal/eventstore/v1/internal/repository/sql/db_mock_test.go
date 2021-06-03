@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_root_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
+	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
 )
 
 var (
-	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_aggregate_sequence", "previous_aggregate_root_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
+	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_aggregate_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
 	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence LIMIT \$2`).String()
 	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence DESC`).String()
 	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 ORDER BY event_sequence LIMIT \$3`).String()
@@ -124,7 +124,7 @@ func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, eventCount int) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := 0; i < eventCount; i++ {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsLimitFormat).
 		WithArgs(aggregateType, limit).
@@ -135,7 +135,7 @@ func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, ev
 func (db *dbMock) expectFilterEventsDesc(aggregateType string, eventCount int) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := eventCount; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsDescFormat).
 		WillReturnRows(rows)
@@ -145,7 +145,7 @@ func (db *dbMock) expectFilterEventsDesc(aggregateType string, eventCount int) *
 func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID string, limit uint64) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := limit; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDLimit).
 		WithArgs(aggregateType, aggregateID, limit).
@@ -156,7 +156,7 @@ func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID 
 func (db *dbMock) expectFilterEventsAggregateIDTypeLimit(aggregateType, aggregateID string, limit uint64) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := limit; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDTypeLimit).
 		WithArgs(aggregateType, aggregateID, limit).
