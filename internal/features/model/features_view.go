@@ -23,6 +23,7 @@ type FeaturesView struct {
 	LoginPolicyPasswordless  bool
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
+	LoginPolicyPasswordReset bool
 	PasswordComplexityPolicy bool
 	LabelPolicy              bool
 	CustomDomain             bool
@@ -45,6 +46,9 @@ func (f *FeaturesView) FeatureList() []string {
 	}
 	if f.LoginPolicyUsernameLogin {
 		list = append(list, domain.FeatureLoginPolicyUsernameLogin)
+	}
+	if f.LoginPolicyPasswordReset {
+		list = append(list, domain.FeatureLoginPolicyPasswordReset)
 	}
 	if f.PasswordComplexityPolicy {
 		list = append(list, domain.FeaturePasswordComplexityPolicy)

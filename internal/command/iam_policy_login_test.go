@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"testing"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,7 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
@@ -44,6 +45,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								true,
 								true,
+								false,
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
@@ -79,6 +81,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 									true,
 									true,
 									true,
+									true,
 									domain.PasswordlessTypeAllowed,
 								),
 							),
@@ -93,6 +96,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: true,
 					AllowExternalIDP:      true,
 					ForceMFA:              true,
+					HidePasswordReset:     true,
 					PasswordlessType:      domain.PasswordlessTypeAllowed,
 				},
 			},
@@ -106,6 +110,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: true,
 					AllowExternalIDP:      true,
 					ForceMFA:              true,
+					HidePasswordReset:     true,
 					PasswordlessType:      domain.PasswordlessTypeAllowed,
 				},
 			},
@@ -180,6 +185,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -193,6 +199,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: true,
 					AllowExternalIDP:      true,
 					ForceMFA:              true,
+					HidePasswordReset:     true,
 					PasswordlessType:      domain.PasswordlessTypeAllowed,
 				},
 			},
@@ -213,6 +220,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -220,7 +228,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultLoginPolicyChangedEvent(context.Background(), false, false, false, false, domain.PasswordlessTypeNotAllowed),
+								newDefaultLoginPolicyChangedEvent(context.Background(), false, false, false, false, false, domain.PasswordlessTypeNotAllowed),
 							),
 						},
 					),
@@ -233,6 +241,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: false,
 					AllowExternalIDP:      false,
 					ForceMFA:              false,
+					HidePasswordReset:     false,
 					PasswordlessType:      domain.PasswordlessTypeNotAllowed,
 				},
 			},
@@ -246,6 +255,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: false,
 					AllowExternalIDP:      false,
 					ForceMFA:              false,
+					HidePasswordReset:     false,
 					PasswordlessType:      domain.PasswordlessTypeNotAllowed,
 				},
 			},
@@ -341,6 +351,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -496,6 +507,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -533,6 +545,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -579,6 +592,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -633,6 +647,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -1181,7 +1196,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allowUsernamePassword, allowExternalIDP, forceMFA bool, passwordlessType domain.PasswordlessType) *iam.LoginPolicyChangedEvent {
+func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allowUsernamePassword, allowExternalIDP, forceMFA, hidePasswordReset bool, passwordlessType domain.PasswordlessType) *iam.LoginPolicyChangedEvent {
 	event, _ := iam.NewLoginPolicyChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		[]policy.LoginPolicyChanges{
@@ -1189,6 +1204,7 @@ func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allow
 			policy.ChangeAllowExternalIDP(allowExternalIDP),
 			policy.ChangeForceMFA(forceMFA),
 			policy.ChangeAllowUserNamePassword(allowUsernamePassword),
+			policy.ChangeHidePasswordReset(hidePasswordReset),
 			policy.ChangePasswordlessType(passwordlessType),
 		},
 	)

@@ -2304,6 +2304,7 @@ message SetDefaultFeaturesRequest {
     bool password_complexity_policy = 11;
     bool label_policy = 12;
     bool custom_domain = 13;
+    bool login_policy_password_reset = 14;
     bool custom_text = 14;
 }
 
@@ -2335,6 +2336,7 @@ message SetOrgFeaturesRequest {
     bool password_complexity_policy = 12;
     bool label_policy = 13;
     bool custom_domain = 14;
+    bool login_policy_password_reset = 15;
     bool custom_text = 15;
 }
 
@@ -2533,6 +2535,11 @@ message UpdateLoginPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if passwordless is allowed for users"
         }];
+    bool hide_password_reset = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if password reset link should be shown in the login screen"
+        }
+    ];
 }
 
 message UpdateLoginPolicyResponse {

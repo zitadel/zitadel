@@ -152,6 +152,7 @@ export class FeaturesComponent implements OnDestroy {
         req.setOrgId(this.org.id);
 
         req.setLoginPolicyUsernameLogin(this.features.loginPolicyUsernameLogin);
+        req.setLoginPolicyPasswordReset(this.features.loginPolicyPasswordReset);
         req.setLoginPolicyRegistration(this.features.loginPolicyRegistration);
         req.setLoginPolicyIdp(this.features.loginPolicyIdp);
         req.setLoginPolicyFactors(this.features.loginPolicyFactors);
@@ -171,6 +172,7 @@ export class FeaturesComponent implements OnDestroy {
         // update Default org iam policy?
         const dreq = new SetDefaultFeaturesRequest();
         dreq.setLoginPolicyUsernameLogin(this.features.loginPolicyUsernameLogin);
+        dreq.setLoginPolicyPasswordReset(this.features.loginPolicyPasswordReset);
         dreq.setLoginPolicyRegistration(this.features.loginPolicyRegistration);
         dreq.setLoginPolicyIdp(this.features.loginPolicyIdp);
         dreq.setLoginPolicyFactors(this.features.loginPolicyFactors);

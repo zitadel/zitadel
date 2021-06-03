@@ -458,121 +458,6 @@ it impacts all organisations without a customised policy
 
 
 
-### GetDefaultInitMessageText
-
-> **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
-[GetDefaultInitMessageTextResponse](#getdefaultinitmessagetextresponse)
-
-Returns the custom text for initial message
-
-
-
-
-### SetDefaultInitMessageText
-
-> **rpc** SetDefaultInitMessageText([SetDefaultInitMessageTextRequest](#setdefaultinitmessagetextrequest))
-[SetDefaultInitMessageTextResponse](#setdefaultinitmessagetextresponse)
-
-Sets the default custom text for initial message
-it impacts all organisations without customized initial message text
-The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
-
-
-
-
-### GetDefaultPasswordResetMessageText
-
-> **rpc** GetDefaultPasswordResetMessageText([GetDefaultPasswordResetMessageTextRequest](#getdefaultpasswordresetmessagetextrequest))
-[GetDefaultPasswordResetMessageTextResponse](#getdefaultpasswordresetmessagetextresponse)
-
-Returns the custom text for password reset message
-
-
-
-
-### SetDefaultPasswordResetMessageText
-
-> **rpc** SetDefaultPasswordResetMessageText([SetDefaultPasswordResetMessageTextRequest](#setdefaultpasswordresetmessagetextrequest))
-[SetDefaultPasswordResetMessageTextResponse](#setdefaultpasswordresetmessagetextresponse)
-
-Sets the default custom text for password reset message
-it impacts all organisations without customized password reset message text
-The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
-
-
-
-
-### GetDefaultVerifyEmailMessageText
-
-> **rpc** GetDefaultVerifyEmailMessageText([GetDefaultVerifyEmailMessageTextRequest](#getdefaultverifyemailmessagetextrequest))
-[GetDefaultVerifyEmailMessageTextResponse](#getdefaultverifyemailmessagetextresponse)
-
-Returns the custom text for verify email message
-
-
-
-
-### SetDefaultVerifyEmailMessageText
-
-> **rpc** SetDefaultVerifyEmailMessageText([SetDefaultVerifyEmailMessageTextRequest](#setdefaultverifyemailmessagetextrequest))
-[SetDefaultVerifyEmailMessageTextResponse](#setdefaultverifyemailmessagetextresponse)
-
-Sets the default custom text for verify email message
-it impacts all organisations without customized verify email message text
-The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
-
-
-
-
-### GetDefaultVerifyPhoneMessageText
-
-> **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
-[GetDefaultVerifyPhoneMessageTextResponse](#getdefaultverifyphonemessagetextresponse)
-
-Returns the custom text for verify phone message
-
-
-
-
-### SetDefaultVerifyPhoneMessageText
-
-> **rpc** SetDefaultVerifyPhoneMessageText([SetDefaultVerifyPhoneMessageTextRequest](#setdefaultverifyphonemessagetextrequest))
-[SetDefaultVerifyPhoneMessageTextResponse](#setdefaultverifyphonemessagetextresponse)
-
-Sets the default custom text for verify phone message
-it impacts all organisations without customized verify phone message text
-The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
-
-
-
-
-### GetDefaultDomainClaimedMessageText
-
-> **rpc** GetDefaultDomainClaimedMessageText([GetDefaultDomainClaimedMessageTextRequest](#getdefaultdomainclaimedmessagetextrequest))
-[GetDefaultDomainClaimedMessageTextResponse](#getdefaultdomainclaimedmessagetextresponse)
-
-Returns the custom text for domain claimed message
-
-
-
-
-### SetDefaultDomainClaimedMessageText
-
-> **rpc** SetDefaultDomainClaimedMessageText([SetDefaultDomainClaimedMessageTextRequest](#setdefaultdomainclaimedmessagetextrequest))
-[SetDefaultDomainClaimedMessageTextResponse](#setdefaultdomainclaimedmessagetextresponse)
-
-Sets the default custom text for domain claimed phone message
-it impacts all organisations without customized verify phone message text
-The Following Variables can be used:
-{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
-
-
-
-
 ### ListIAMMemberRoles
 
 > **rpc** ListIAMMemberRoles([ListIAMMemberRolesRequest](#listiammemberrolesrequest))
@@ -905,28 +790,6 @@ This is an empty response
 
 
 
-### GetDefaultDomainClaimedMessageTextRequest
-This is an empty request
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetDefaultDomainClaimedMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
-
-
-
-
 ### GetDefaultFeaturesRequest
 
 
@@ -940,94 +803,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | features |  zitadel.features.v1.Features | - |  |
-
-
-
-
-### GetDefaultInitMessageTextRequest
-This is an empty request
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetDefaultInitMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
-
-
-
-
-### GetDefaultPasswordResetMessageTextRequest
-This is an empty request
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetDefaultPasswordResetMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
-
-
-
-
-### GetDefaultVerifyEmailMessageTextRequest
-This is an empty request
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetDefaultVerifyEmailMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
-
-
-
-
-### GetDefaultVerifyPhoneMessageTextRequest
-This is an empty request
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetDefaultVerifyPhoneMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
@@ -1629,35 +1404,6 @@ This is an empty response
 
 
 
-### SetDefaultDomainClaimedMessageTextRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| title |  string | - | string.max_len: 200<br />  |
-| pre_header |  string | - | string.max_len: 200<br />  |
-| subject |  string | - | string.max_len: 200<br />  |
-| greeting |  string | - | string.max_len: 200<br />  |
-| text |  string | - | string.max_len: 800<br />  |
-| button_text |  string | - | string.max_len: 200<br />  |
-| footer_text |  string | - | string.max_len: 200<br />  |
-
-
-
-
-### SetDefaultDomainClaimedMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### SetDefaultFeaturesRequest
 
 
@@ -1675,128 +1421,12 @@ This is an empty response
 | password_complexity_policy |  bool | - |  |
 | label_policy |  bool | - |  |
 | custom_domain |  bool | - |  |
-| custom_text |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 
 
 
 
 ### SetDefaultFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetDefaultInitMessageTextRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| title |  string | - | string.max_len: 200<br />  |
-| pre_header |  string | - | string.max_len: 200<br />  |
-| subject |  string | - | string.max_len: 200<br />  |
-| greeting |  string | - | string.max_len: 200<br />  |
-| text |  string | - | string.max_len: 1000<br />  |
-| button_text |  string | - | string.max_len: 200<br />  |
-| footer_text |  string | - | string.max_len: 200<br />  |
-
-
-
-
-### SetDefaultInitMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetDefaultPasswordResetMessageTextRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| title |  string | - | string.max_len: 200<br />  |
-| pre_header |  string | - | string.max_len: 200<br />  |
-| subject |  string | - | string.max_len: 200<br />  |
-| greeting |  string | - | string.max_len: 200<br />  |
-| text |  string | - | string.max_len: 800<br />  |
-| button_text |  string | - | string.max_len: 200<br />  |
-| footer_text |  string | - | string.max_len: 200<br />  |
-
-
-
-
-### SetDefaultPasswordResetMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetDefaultVerifyEmailMessageTextRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| title |  string | - | string.max_len: 200<br />  |
-| pre_header |  string | - | string.max_len: 200<br />  |
-| subject |  string | - | string.max_len: 200<br />  |
-| greeting |  string | - | string.max_len: 200<br />  |
-| text |  string | - | string.max_len: 800<br />  |
-| button_text |  string | - | string.max_len: 200<br />  |
-| footer_text |  string | - | string.max_len: 200<br />  |
-
-
-
-
-### SetDefaultVerifyEmailMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetDefaultVerifyPhoneMessageTextRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| title |  string | - | string.max_len: 200<br />  |
-| pre_header |  string | - | string.max_len: 200<br />  |
-| subject |  string | - | string.max_len: 200<br />  |
-| greeting |  string | - | string.max_len: 200<br />  |
-| text |  string | - | string.max_len: 800<br />  |
-| button_text |  string | - | string.max_len: 200<br />  |
-| footer_text |  string | - | string.max_len: 200<br />  |
-
-
-
-
-### SetDefaultVerifyPhoneMessageTextResponse
 
 
 
@@ -1827,7 +1457,7 @@ This is an empty response
 | password_complexity_policy |  bool | - |  |
 | label_policy |  bool | - |  |
 | custom_domain |  bool | - |  |
-| custom_text |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 
 
 
@@ -2068,6 +1698,7 @@ This is an empty response
 | allow_external_idp |  bool | - |  |
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
+| hide_password_reset |  bool | - |  |
 
 
 

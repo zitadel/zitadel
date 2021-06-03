@@ -48,7 +48,7 @@ func (c *Commands) addDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-2B0ps", "Errors.IAM.LoginPolicy.AlreadyExists")
 	}
 
-	return iam_repo.NewLoginPolicyAddedEvent(ctx, iamAgg, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType), nil
+	return iam_repo.NewLoginPolicyAddedEvent(ctx, iamAgg, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.HidePasswordReset, policy.PasswordlessType), nil
 }
 
 func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
@@ -77,7 +77,7 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventst
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-M0sif", "Errors.IAM.LoginPolicy.NotFound")
 	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.AllowUsernamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.HidePasswordReset, policy.PasswordlessType)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
 	}

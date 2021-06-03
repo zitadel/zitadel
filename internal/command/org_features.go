@@ -31,6 +31,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LoginPolicyPasswordless,
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
+		features.LoginPolicyPasswordReset,
 		features.PasswordComplexityPolicy,
 		features.LabelPolicy,
 		features.CustomDomain,
@@ -175,7 +176,10 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	if !features.LoginPolicyUsernameLogin && defaultPolicy.AllowUsernamePassword != existingPolicy.AllowUserNamePassword {
 		policy.AllowUserNamePassword = defaultPolicy.AllowUsernamePassword
 	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel), policy.AllowUserNamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType)
+	if !features.LoginPolicyPasswordReset && defaultPolicy.HidePasswordReset != existingPolicy.HidePasswordReset {
+		policy.HidePasswordReset = defaultPolicy.HidePasswordReset
+	}
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel), policy.AllowUserNamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.HidePasswordReset, policy.PasswordlessType)
 	if hasChanged {
 		events = append(events, changedEvent)
 	}

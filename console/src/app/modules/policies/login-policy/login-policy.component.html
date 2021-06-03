@@ -95,6 +95,26 @@
                 </cnsl-info-section>
             </ng-template>
         </div>
+      <div class="row">
+        <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+                          [(ngModel)]="loginData.hidePasswordReset">
+          {{'POLICY.DATA.HIDEPASSWORDRESET' | translate}}
+        </mat-slide-toggle>
+
+        <ng-container
+          *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) == false; else passwordResetInfo">
+          <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+            'login_policy.hide_password_reset'})}}
+          </cnsl-info-section>
+        </ng-container>
+
+        <ng-template #passwordResetInfo>
+          <cnsl-info-section class="info">
+            {{'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate}}
+          </cnsl-info-section>
+        </ng-template>
+      </div>
+
         <div class="row">
 
             <cnsl-form-field class="form-field" label="Access Code" required="true">
