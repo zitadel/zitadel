@@ -2305,7 +2305,7 @@ message SetDefaultFeaturesRequest {
     bool label_policy = 12;
     bool custom_domain = 13;
     bool login_policy_password_reset = 14;
-    bool custom_text = 14;
+    bool custom_text = 15;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2337,7 +2337,7 @@ message SetOrgFeaturesRequest {
     bool label_policy = 13;
     bool custom_domain = 14;
     bool login_policy_password_reset = 15;
-    bool custom_text = 15;
+    bool custom_text = 16;
 }
 
 message SetOrgFeaturesResponse {
