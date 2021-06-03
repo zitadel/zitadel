@@ -1610,9 +1610,9 @@ This is an empty request
 | password_complexity_policy |  bool | - |  |
 | label_policy |  bool | - |  |
 | custom_domain |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
-| login_policy_password_reset |  bool | - |  |
 
 
 
@@ -1648,9 +1648,9 @@ This is an empty request
 | password_complexity_policy |  bool | - |  |
 | label_policy |  bool | - |  |
 | custom_domain |  bool | - |  |
+| login_policy_password_reset |  bool | - |  |
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
-| login_policy_password_reset |  bool | - |  |
 
 
 
