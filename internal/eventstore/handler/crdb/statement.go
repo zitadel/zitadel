@@ -4,18 +4,23 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
 
-func NewCreateStatement(values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+func NewCreateStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
 
 	return handler.Statement{
+		AggregateType:    aggregateType,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		Execute: func(ex handler.Executer, projectionName string) error {
+			if aggregateType == "" {
+				return handler.ErrNoAggregateType
+			}
 			if projectionName == "" {
 				return handler.ErrNoTable
 			}
@@ -32,15 +37,19 @@ func NewCreateStatement(values []handler.Column, sequence, previousSequence uint
 	}
 }
 
-func NewUpsertStatement(values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+func NewUpsertStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
 
 	return handler.Statement{
+		AggregateType:    aggregateType,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		Execute: func(ex handler.Executer, projectionName string) error {
+			if aggregateType == "" {
+				return handler.ErrNoAggregateType
+			}
 			if projectionName == "" {
 				return handler.ErrNoTable
 			}
@@ -57,7 +66,7 @@ func NewUpsertStatement(values []handler.Column, sequence, previousSequence uint
 	}
 }
 
-func NewUpdateStatement(conditions, values []handler.Column, sequence, previousSequence uint64) handler.Statement {
+func NewUpdateStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values, conditions []handler.Column) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -70,6 +79,9 @@ func NewUpdateStatement(conditions, values []handler.Column, sequence, previousS
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		Execute: func(ex handler.Executer, projectionName string) error {
+			if aggregateType == "" {
+				return handler.ErrNoAggregateType
+			}
 			if projectionName == "" {
 				return handler.ErrNoTable
 			}
@@ -89,15 +101,19 @@ func NewUpdateStatement(conditions, values []handler.Column, sequence, previousS
 	}
 }
 
-func NewDeleteStatement(conditions []handler.Column, sequence, previousSequence uint64) handler.Statement {
+func NewDeleteStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, conditions []handler.Column) handler.Statement {
 	wheres, args := columnsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
 
 	return handler.Statement{
+		AggregateType:    aggregateType,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		Execute: func(ex handler.Executer, projectionName string) error {
+			if aggregateType == "" {
+				return handler.ErrNoAggregateType
+			}
 			if projectionName == "" {
 				return handler.ErrNoTable
 			}
@@ -114,8 +130,9 @@ func NewDeleteStatement(conditions []handler.Column, sequence, previousSequence 
 	}
 }
 
-func NewNoOpStatement(sequence, previousSequence uint64) handler.Statement {
+func NewNoOpStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64) handler.Statement {
 	return handler.Statement{
+		AggregateType:    aggregateType,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 	}

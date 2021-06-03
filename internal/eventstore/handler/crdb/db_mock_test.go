@@ -129,34 +129,22 @@ func expectSavePointRelease() func(sqlmock.Sqlmock) {
 	}
 }
 
-func expectCurrentSequence(tableName, projection string, seq uint64) func(sqlmock.Sqlmock) {
+func expectCurrentSequence(tableName, projection string, seq uint64, aggregateType string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
-SELECT 
-	IF\(
-		EXISTS\(SELECT current_sequence FROM seq\),
-		\(SELECT current_sequence FROM seq\),
-		0
-	\) AS current_sequence`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE`).
 			WithArgs(
 				projection,
 			).
 			WillReturnRows(
-				sqlmock.NewRows([]string{"current_sequence"}).
-					AddRow(seq),
+				sqlmock.NewRows([]string{"current_sequence", "aggregate_type"}).
+					AddRow(seq, aggregateType),
 			)
 	}
 }
 
 func expectCurrentSequenceErr(tableName, projection string, err error) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
-SELECT 
-	IF\(
-		EXISTS\(SELECT current_sequence FROM seq\),
-		\(SELECT current_sequence FROM seq\),
-		0
-	\) AS current_sequence`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE`).
 			WithArgs(
 				projection,
 			).
@@ -164,50 +152,38 @@ SELECT
 	}
 }
 
-func expectCurrentSequenceNotExists(tableName, projection string) func(sqlmock.Sqlmock) {
+func expectCurrentSequenceNoRows(tableName, projection string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
-SELECT 
-	IF\(
-		EXISTS\(SELECT current_sequence FROM seq\),
-		\(SELECT current_sequence FROM seq\),
-		0
-	\) AS current_sequence`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE`).
 			WithArgs(
 				projection,
 			).
 			WillReturnRows(
-				sqlmock.NewRows([]string{"current_sequence"}).
-					AddRow(0),
+				sqlmock.NewRows([]string{"current_sequence", "aggregate_type"}),
 			)
 	}
 }
 
 func expectCurrentSequenceScanErr(tableName, projection string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`WITH seq AS \(SELECT current_sequence FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE\)
-SELECT 
-	IF\(
-		EXISTS\(SELECT current_sequence FROM seq\),
-		\(SELECT current_sequence FROM seq\),
-		0
-	\) AS current_sequence`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type FROM ` + tableName + ` WHERE view_name = \$1 FOR UPDATE`).
 			WithArgs(
 				projection,
 			).
 			WillReturnRows(
-				sqlmock.NewRows([]string{"current_sequence"}).
+				sqlmock.NewRows([]string{"current_sequence", "aggregate_type"}).
 					RowError(0, sql.ErrTxDone).
-					AddRow(0),
+					AddRow(0, "agg"),
 			)
 	}
 }
 
-func expectUpdateCurrentSequence(tableName, projection string, seq uint64) func(sqlmock.Sqlmock) {
+func expectUpdateCurrentSequence(tableName, projection string, seq uint64, aggregateType string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, current_sequence, timestamp\) VALUES \(\$1, \$2, NOW\(\)\)`).
+		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, aggregate_type, current_sequence, timestamp\) VALUES \(\$1, \$2, \$3, NOW\(\)\)`).
 			WithArgs(
 				projection,
+				aggregateType,
 				seq,
 			).
 			WillReturnResult(
@@ -216,22 +192,41 @@ func expectUpdateCurrentSequence(tableName, projection string, seq uint64) func(
 	}
 }
 
-func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, err error) func(sqlmock.Sqlmock) {
+func expectUpdateTwoCurrentSequence(tableName, projection string, seq1, seq2 uint64, aggregateType1, aggregateType2 string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, current_sequence, timestamp\) VALUES \(\$1, \$2, NOW\(\)\)`).
+		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, aggregate_type, current_sequence, timestamp\) VALUES \(\$1, \$2, \$3, NOW\(\)\), \(\$4, \$5, \$6, NOW\(\)\)`).
 			WithArgs(
 				projection,
+				aggregateType1,
+				seq1,
+				projection,
+				aggregateType2,
+				seq2,
+			).
+			WillReturnResult(
+				sqlmock.NewResult(1, 1),
+			)
+	}
+}
+
+func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, err error, aggregateType string) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, aggregate_type, current_sequence, timestamp\) VALUES \(\$1, \$2, \$3, NOW\(\)\)`).
+			WithArgs(
+				projection,
+				aggregateType,
 				seq,
 			).
 			WillReturnError(err)
 	}
 }
 
-func expectUpdateCurrentSequenceNoRows(tableName, projection string, seq uint64) func(sqlmock.Sqlmock) {
+func expectUpdateCurrentSequenceNoRows(tableName, projection string, seq uint64, aggregateType string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, current_sequence, timestamp\) VALUES \(\$1, \$2, NOW\(\)\)`).
+		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, aggregate_type, current_sequence, timestamp\) VALUES \(\$1, \$2, \$3, NOW\(\)\)`).
 			WithArgs(
 				projection,
+				aggregateType,
 				seq,
 			).
 			WillReturnResult(

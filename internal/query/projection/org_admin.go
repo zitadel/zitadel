@@ -262,11 +262,23 @@ func (p *OrgAdminProjection) deleteAdmin(orgID, ownerID string, sequence, previo
 
 func (p *OrgAdminProjection) addAdmin(orgID, userID string, sequence, previousSequence uint64) (handler.Statement, error) {
 	events, err := p.Eventstore.FilterEvents(context.Background(),
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType, user.AggregateType).
-			EventTypes(org.OrgAddedEventType, org.OrgChangedEventType, org.OrgDomainRemovedEventType,
-				user.HumanAddedType, user.HumanEmailChangedType, user.HumanProfileChangedType).
-			AggregateIDs(orgID, userID).
-			SequenceLess(sequence))
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AddQuery().
+			AggregateTypes(org.AggregateType).
+			EventTypes(
+				org.OrgAddedEventType,
+				org.OrgChangedEventType,
+				org.OrgDomainRemovedEventType).
+			AggregateIDs(orgID).
+			Or().
+			AggregateTypes(user.AggregateType).
+			EventTypes(
+				user.HumanAddedType,
+				user.HumanEmailChangedType,
+				user.HumanProfileChangedType).
+			AggregateIDs(userID).
+			SequenceLess(sequence).
+			Builder())
 	if err != nil {
 		return handler.Statement{}, err
 	}

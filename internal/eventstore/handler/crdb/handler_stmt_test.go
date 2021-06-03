@@ -71,39 +71,17 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
 				},
 				SearchQueryBuilder: eventstore.
-					NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg").
+					NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AddQuery().
+					AggregateTypes("testAgg").
 					SequenceGreater(5).
+					Builder().
 					Limit(5),
 			},
 		},
-		//TODO: discuss about event types in handler first
-		// {
-		// 	name: "aggregates and events",
-		// 	fields: fields{
-		// 		sequenceTable:  "my_sequences",
-		// 		projectionName: "my_projection",
-		// 		aggregates:     []eventstore.AggregateType{"testAgg"},
-		// 		events:         []eventstore.EventType{"testAgg.added"},
-		// 		bulkLimit:      5,
-		// 	},
-		// 	want: want{
-		// 		limit: 5,
-		// 		isErr: func(err error) bool {
-		// 			return err == nil
-		// 		},
-		// 		expectations: []mockExpectation{
-		// 			expectCurrentSequence("my_sequences", "my_projection", 5),
-		// 		},
-		// 		SearchQueryBuilder: eventstore.
-		// 			NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg").
-		// 			EventTypes("testAgg.added").
-		// 			SequenceGreater(5).
-		// 			Limit(5),
-		// 	},
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -210,13 +188,13 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(6, 0),
+					NewNoOpStatement("agg", 6, 0),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -236,18 +214,22 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 7, 6),
+					NewCreateStatement(
+						"agg",
+						7,
+						6,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -262,27 +244,31 @@ func TestStatementHandler_Update(t *testing.T) {
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t),
 				),
-				aggregates: []eventstore.AggregateType{"testAgg"},
+				aggregates: []eventstore.AggregateType{"agg"},
 			},
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 7, 5),
+					NewCreateStatement(
+						"agg",
+						7,
+						5,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "agg"),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
-					expectUpdateCurrentSequenceNoRows("my_sequences", "my_projection", 7),
+					expectUpdateCurrentSequenceNoRows("my_sequences", "my_projection", 7, "agg"),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -297,27 +283,31 @@ func TestStatementHandler_Update(t *testing.T) {
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t),
 				),
-				aggregates: []eventstore.AggregateType{"testAgg"},
+				aggregates: []eventstore.AggregateType{"agg"},
 			},
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 7, 5),
+					NewCreateStatement(
+						"agg",
+						7,
+						5,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "agg"),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "agg"),
 					expectCommitErr(sql.ErrConnDone),
 				},
 				isErr: func(err error) bool {
@@ -337,14 +327,14 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(7, 5),
+					NewNoOpStatement("testAgg", 7, 5),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -364,14 +354,14 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(7, 0),
+					NewNoOpStatement("testAgg", 7, 0),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -385,6 +375,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
+							AggregateType:    "testAgg",
 							Sequence:         6,
 							PreviousSequence: 5,
 						},
@@ -395,15 +386,15 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(7, 0),
+					NewNoOpStatement("testAgg", 7, 0),
 				},
 				reduce: testReduce(),
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -455,10 +446,10 @@ func TestStatementHandler_Update(t *testing.T) {
 
 func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 	type args struct {
-		ctx        context.Context
-		stmtSeq    uint64
-		currentSeq uint64
-		reduce     handler.Reduce
+		ctx       context.Context
+		stmtSeq   uint64
+		sequences currentSequences
+		reduce    handler.Reduce
 	}
 	type want struct {
 		stmtCount int
@@ -475,10 +466,30 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 		want   want
 	}{
 		{
+			name: "no queries",
+			args: args{
+				ctx:    context.Background(),
+				reduce: testReduce(),
+			},
+			fields: fields{
+				aggregates: []eventstore.AggregateType{"testAgg"},
+			},
+			want: want{
+				isErr: func(err error) bool {
+					return errors.Is(err, nil)
+				},
+				stmtCount: 0,
+			},
+		},
+		{
 			name: "eventstore returns err",
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduce(),
+				sequences: currentSequences{
+					"testAgg": 5,
+				},
+				stmtSeq: 6,
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -490,6 +501,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				isErr: func(err error) bool {
 					return errors.Is(err, errFilter)
 				},
+				stmtCount: 0,
 			},
 		},
 		{
@@ -497,6 +509,10 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduce(),
+				sequences: currentSequences{
+					"testAgg": 5,
+				},
+				stmtSeq: 6,
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -515,13 +531,17 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduce(),
+				sequences: currentSequences{
+					"testAgg": 5,
+				},
+				stmtSeq: 10,
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:               "id",
-							Sequence:         1,
+							Sequence:         7,
 							PreviousSequence: 0,
 							CreationDate:     time.Now(),
 							Type:             "test.added",
@@ -531,8 +551,8 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 						},
 						&repository.Event{
 							ID:               "id",
-							Sequence:         2,
-							PreviousSequence: 1,
+							Sequence:         9,
+							PreviousSequence: 7,
 							CreationDate:     time.Now(),
 							Type:             "test.changed",
 							Version:          "v1",
@@ -555,13 +575,17 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduceErr(errReduce),
+				sequences: currentSequences{
+					"testAgg": 5,
+				},
+				stmtSeq: 10,
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:               "id",
-							Sequence:         1,
+							Sequence:         7,
 							PreviousSequence: 0,
 							CreationDate:     time.Now(),
 							Type:             "test.added",
@@ -593,7 +617,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				}),
 				aggregates: tt.fields.aggregates,
 			}
-			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, tt.args.currentSeq, tt.args.reduce)
+			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, tt.args.sequences, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
@@ -612,8 +636,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 		failedEventsTable string
 	}
 	type args struct {
-		stmts      []handler.Statement
-		currentSeq uint64
+		stmts     []handler.Statement
+		sequences currentSequences
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -632,14 +656,20 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val1",
-						},
-					}, 5, 2),
+					NewCreateStatement(
+						"agg",
+						5,
+						2,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val1",
+							},
+						}),
 				},
-				currentSeq: 5,
+				sequences: currentSequences{
+					"agg": 5,
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{},
@@ -653,20 +683,30 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col1",
-							Value: "val1",
-						},
-					}, 5, 0),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col2",
-							Value: "val2",
-						},
-					}, 8, 7),
+					NewCreateStatement(
+						"agg",
+						5,
+						0,
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: "val1",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						8,
+						7,
+						[]handler.Column{
+							{
+								Name:  "col2",
+								Value: "val2",
+							},
+						}),
 				},
-				currentSeq: 2,
+				sequences: currentSequences{
+					"agg": 2,
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{
@@ -686,26 +726,40 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 5, 0),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 6, 5),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 7, 6),
+					NewCreateStatement(
+						"agg",
+						5,
+						0,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						6,
+						5,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						7,
+						6,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
 				},
-				currentSeq: 2,
+				sequences: currentSequences{
+					"agg": 2,
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{
@@ -729,26 +783,40 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col1",
-							Value: "val1",
-						},
-					}, 5, 0),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col2",
-							Value: "val2",
-						},
-					}, 6, 5),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col3",
-							Value: "val3",
-						},
-					}, 7, 6),
+					NewCreateStatement(
+						"agg",
+						5,
+						0,
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: "val1",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						6,
+						5,
+						[]handler.Column{
+							{
+								Name:  "col2",
+								Value: "val2",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						7,
+						6,
+						[]handler.Column{
+							{
+								Name:  "col3",
+								Value: "val3",
+							},
+						}),
 				},
-				currentSeq: 2,
+				sequences: currentSequences{
+					"agg": 2,
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{
@@ -773,26 +841,40 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 5, 0),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 6, 5),
-					NewCreateStatement([]handler.Column{
-						{
-							Name:  "col",
-							Value: "val",
-						},
-					}, 7, 6),
+					NewCreateStatement(
+						"agg",
+						5,
+						0,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						6,
+						5,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
+					NewCreateStatement(
+						"agg",
+						7,
+						6,
+						[]handler.Column{
+							{
+								Name:  "col",
+								Value: "val",
+							},
+						}),
 				},
-				currentSeq: 2,
+				sequences: currentSequences{
+					"agg": 2,
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{
@@ -847,7 +929,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			idx := h.executeStmts(tx, tt.args.stmts, tt.args.currentSeq)
+			idx := h.executeStmts(tx, tt.args.stmts, tt.args.sequences)
 			if idx != tt.want.idx {
 				t.Errorf("unexpected index want: %d got %d", tt.want.idx, idx)
 			}
@@ -886,12 +968,16 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement([]handler.Column{
-					{
-						Name:  "col",
-						Value: "val",
-					},
-				}, 1, 0),
+				stmt: NewCreateStatement(
+					"agg",
+					1,
+					0,
+					[]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -908,12 +994,16 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement([]handler.Column{
-					{
-						Name:  "col",
-						Value: "val",
-					},
-				}, 1, 0),
+				stmt: NewCreateStatement(
+					"agg",
+					1,
+					0,
+					[]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -932,12 +1022,16 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement([]handler.Column{
-					{
-						Name:  "col",
-						Value: "val",
-					},
-				}, 1, 0),
+				stmt: NewCreateStatement(
+					"agg",
+					1,
+					0,
+					[]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -956,7 +1050,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewNoOpStatement(1, 0),
+				stmt: NewNoOpStatement("agg", 1, 0),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -971,12 +1065,16 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement([]handler.Column{
-					{
-						Name:  "col",
-						Value: "val",
-					},
-				}, 1, 0),
+				stmt: NewCreateStatement(
+					"agg",
+					1,
+					0,
+					[]handler.Column{
+						{
+							Name:  "col",
+							Value: "val",
+						},
+					}),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -1038,6 +1136,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 	type fields struct {
 		sequenceTable  string
 		projectionName string
+		aggregates     []eventstore.AggregateType
 	}
 	type args struct {
 		stmt handler.Statement
@@ -1045,7 +1144,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 	type want struct {
 		expectations []mockExpectation
 		isErr        func(error) bool
-		seq          uint64
+		sequences    currentSequences
 	}
 	tests := []struct {
 		name   string
@@ -1076,6 +1175,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_table",
 				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
 				stmt: handler.Statement{},
@@ -1085,9 +1185,11 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceNotExists("my_table", "my_projection"),
+					expectCurrentSequenceNoRows("my_table", "my_projection"),
 				},
-				seq: 0,
+				sequences: currentSequences{
+					"agg": 0,
+				},
 			},
 		},
 		{
@@ -1095,6 +1197,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_table",
 				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
 				stmt: handler.Statement{},
@@ -1106,7 +1209,9 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequenceScanErr("my_table", "my_projection"),
 				},
-				seq: 0,
+				sequences: currentSequences{
+					"agg": 0,
+				},
 			},
 		},
 		{
@@ -1114,6 +1219,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_table",
 				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
 				stmt: handler.Statement{},
@@ -1123,9 +1229,11 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_table", "my_projection", 5),
+					expectCurrentSequence("my_table", "my_projection", 5, "agg"),
 				},
-				seq: 5,
+				sequences: currentSequences{
+					"agg": 5,
+				},
 			},
 		},
 	}
@@ -1136,6 +1244,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					ProjectionName: tt.fields.projectionName,
 				},
 				sequenceTable: tt.fields.sequenceTable,
+				aggregates:    tt.fields.aggregates,
 			}
 
 			client, mock, err := sqlmock.New()
@@ -1157,7 +1266,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			seq, err := h.currentSequence(tx.QueryRow)
+			seq, err := h.currentSequences(tx.Query)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -1171,8 +1280,10 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				t.Errorf("expectations not met: %v", err)
 			}
 
-			if seq != tt.want.seq {
-				t.Errorf("expected sequence %d got %d", tt.want.seq, seq)
+			for _, aggregateType := range tt.fields.aggregates {
+				if seq[aggregateType] != tt.want.sequences[aggregateType] {
+					t.Errorf("unexpected sequence in aggregate type %s: want %d got %d", aggregateType, tt.want.sequences[aggregateType], seq[aggregateType])
+				}
 			}
 		})
 	}
@@ -1182,9 +1293,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 	type fields struct {
 		sequenceTable  string
 		projectionName string
+		aggregates     []eventstore.AggregateType
 	}
 	type args struct {
-		stmt handler.Statement
+		sequences currentSequences
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -1201,10 +1313,11 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_table",
 				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				stmt: handler.Statement{
-					Sequence: 5,
+				sequences: currentSequences{
+					"agg": 5,
 				},
 			},
 			want: want{
@@ -1212,7 +1325,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return errors.Is(err, sql.ErrConnDone)
 				},
 				expectations: []mockExpectation{
-					expectUpdateCurrentSequenceErr("my_table", "my_projection", 5, sql.ErrConnDone),
+					expectUpdateCurrentSequenceErr("my_table", "my_projection", 5, sql.ErrConnDone, "agg"),
 				},
 			},
 		},
@@ -1221,10 +1334,11 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_table",
 				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				stmt: handler.Statement{
-					Sequence: 5,
+				sequences: currentSequences{
+					"agg": 5,
 				},
 			},
 			want: want{
@@ -1232,7 +1346,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return errors.As(err, &errSeqNotUpdated)
 				},
 				expectations: []mockExpectation{
-					expectUpdateCurrentSequenceNoRows("my_table", "my_projection", 5),
+					expectUpdateCurrentSequenceNoRows("my_table", "my_projection", 5, "agg"),
 				},
 			},
 		},
@@ -1241,10 +1355,11 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_table",
 				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				stmt: handler.Statement{
-					Sequence: 5,
+				sequences: currentSequences{
+					"agg": 5,
 				},
 			},
 			want: want{
@@ -1252,7 +1367,29 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectUpdateCurrentSequence("my_table", "my_projection", 5),
+					expectUpdateCurrentSequence("my_table", "my_projection", 5, "agg"),
+				},
+			},
+		},
+		{
+			name: "multiple sequences",
+			fields: fields{
+				sequenceTable:  "my_table",
+				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
+			},
+			args: args{
+				sequences: currentSequences{
+					"agg":  5,
+					"agg2": 6,
+				},
+			},
+			want: want{
+				isErr: func(err error) bool {
+					return err == nil
+				},
+				expectations: []mockExpectation{
+					expectUpdateTwoCurrentSequence("my_table", "my_projection", 5, 6, "agg", "agg2"),
 				},
 			},
 		},
@@ -1264,6 +1401,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					ProjectionName: tt.fields.projectionName,
 				},
 				sequenceTable: tt.fields.sequenceTable,
+				aggregates:    tt.fields.aggregates,
 			}
 
 			client, mock, err := sqlmock.New()
@@ -1283,7 +1421,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 				t.Fatalf("unexpected error in begin: %v", err)
 			}
 
-			err = h.updateCurrentSequence(tx, tt.args.stmt)
+			err = h.updateCurrentSequences(tx, tt.args.sequences)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -1304,7 +1442,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 func testReduce(stmts ...handler.Statement) handler.Reduce {
 	return func(event eventstore.EventReader) ([]handler.Statement, error) {
 		return []handler.Statement{
-			NewNoOpStatement(event.Sequence(), event.PreviousSequence()),
+			NewNoOpStatement(event.Aggregate().Typ, event.Sequence(), event.PreviousSequence()),
 		}, nil
 	}
 }

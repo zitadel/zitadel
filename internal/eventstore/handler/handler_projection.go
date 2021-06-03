@@ -267,8 +267,9 @@ func (h *ProjectionHandler) push(
 	})
 	h.stmts, err = update(ctx, h.stmts, reduce)
 
-	if len(h.stmts) > 0 {
-		h.pushSet = true
+	h.pushSet = len(h.stmts) > 0
+
+	if h.pushSet {
 		h.shouldPush.Reset(h.retryFailedAfter)
 	}
 

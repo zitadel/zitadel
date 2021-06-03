@@ -95,14 +95,20 @@ func NewStatementHandler(
 }
 
 func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64, error) {
-	seq, err := h.currentSequence(h.client.QueryRow)
+	sequences, err := h.currentSequences(h.client.Query)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(seq).Limit(h.bulkLimit)
+	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit)
+	for _, aggregateType := range h.aggregates {
+		queryBuilder.
+			AddQuery().
+			AggregateTypes(aggregateType).
+			SequenceGreater(sequences[aggregateType])
+	}
 
-	return query, h.bulkLimit, nil
+	return queryBuilder, h.bulkLimit, nil
 }
 
 //Update implements handler.Update
@@ -112,7 +118,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		return stmts, err
 	}
 
-	currentSeq, err := h.currentSequence(tx.QueryRow)
+	sequences, err := h.currentSequences(tx.Query)
 	if err != nil {
 		tx.Rollback()
 		return stmts, err
@@ -122,7 +128,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
 	if stmts[0].PreviousSequence == 0 {
-		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, currentSeq, reduce)
+		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
 			return stmts, err
@@ -130,10 +136,10 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		stmts = append(previousStmts, stmts...)
 	}
 
-	lastSuccessfulIdx := h.executeStmts(tx, stmts, currentSeq)
+	lastSuccessfulIdx := h.executeStmts(tx, stmts, sequences)
 
 	if lastSuccessfulIdx >= 0 {
-		seqErr := h.updateCurrentSequence(tx, stmts[lastSuccessfulIdx])
+		seqErr := h.updateCurrentSequences(tx, sequences)
 		if seqErr != nil {
 			tx.Rollback()
 			return stmts, seqErr
@@ -157,12 +163,31 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 
 func (h *StatementHandler) fetchPreviousStmts(
 	ctx context.Context,
-	stmtSeq,
-	currentSeq uint64,
+	stmtSeq uint64,
+	sequences currentSequences,
 	reduce handler.Reduce,
 ) (previousStmts []handler.Statement, err error) {
 
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, h.aggregates...).SequenceGreater(currentSeq).SequenceLess(stmtSeq)
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+	queriesAdded := false
+	for _, aggregateType := range h.aggregates {
+		if stmtSeq <= sequences[aggregateType] {
+			continue
+		}
+
+		query.
+			AddQuery().
+			AggregateTypes(aggregateType).
+			SequenceGreater(sequences[aggregateType]).
+			SequenceLess(stmtSeq)
+
+		queriesAdded = true
+	}
+
+	if !queriesAdded {
+		return nil, nil
+	}
+
 	events, err := h.Eventstore.FilterEvents(ctx, query)
 	if err != nil {
 		return nil, err
@@ -181,21 +206,21 @@ func (h *StatementHandler) fetchPreviousStmts(
 func (h *StatementHandler) executeStmts(
 	tx *sql.Tx,
 	stmts []handler.Statement,
-	currentSeq uint64,
+	sequences currentSequences,
 ) int {
 
 	lastSuccessfulIdx := -1
 	for i, stmt := range stmts {
-		if stmt.Sequence <= currentSeq {
+		if stmt.Sequence <= sequences[stmt.AggregateType] {
 			continue
 		}
-		if stmt.PreviousSequence > currentSeq {
-			logging.LogWithFields("CRDB-jJBJn", "prevSeq", stmt.PreviousSequence, "currentSeq", currentSeq).Warn("sequences do not match")
+		if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequences[stmt.AggregateType] {
+			logging.LogWithFields("CRDB-jJBJn", "projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
 			break
 		}
 		err := h.executeStmt(tx, stmt)
 		if err == nil {
-			currentSeq, lastSuccessfulIdx = stmt.Sequence, i
+			sequences[stmt.AggregateType], lastSuccessfulIdx = stmt.Sequence, i
 			continue
 		}
 
@@ -204,7 +229,7 @@ func (h *StatementHandler) executeStmts(
 			break
 		}
 
-		currentSeq, lastSuccessfulIdx = stmt.Sequence, i
+		sequences[stmt.AggregateType], lastSuccessfulIdx = stmt.Sequence, i
 	}
 	return lastSuccessfulIdx
 }
@@ -229,33 +254,4 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt handler.Statement) error
 	}
 	_, err = tx.Exec("RELEASE push_stmt")
 	return err
-}
-
-func (h *StatementHandler) currentSequence(query func(string, ...interface{}) *sql.Row) (seq uint64, _ error) {
-	row := query(`WITH seq AS (SELECT current_sequence FROM `+h.sequenceTable+` WHERE view_name = $1 FOR UPDATE)
-	SELECT IF(
-		EXISTS(SELECT current_sequence FROM seq),
-		(SELECT current_sequence FROM seq),
-		0
-	) AS current_sequence`, h.ProjectionName)
-	if row.Err() != nil {
-		return 0, row.Err()
-	}
-
-	if err := row.Scan(&seq); err != nil {
-		return 0, err
-	}
-
-	return seq, nil
-}
-
-func (h *StatementHandler) updateCurrentSequence(tx *sql.Tx, stmt handler.Statement) error {
-	res, err := tx.Exec(`UPSERT INTO `+h.sequenceTable+` (view_name, current_sequence, timestamp) VALUES ($1, $2, NOW())`, h.ProjectionName, stmt.Sequence)
-	if err != nil {
-		return err
-	}
-	if rows, _ := res.RowsAffected(); rows != 1 {
-		return errSeqNotUpdated
-	}
-	return nil
 }

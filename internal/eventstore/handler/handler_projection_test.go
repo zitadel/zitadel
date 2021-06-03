@@ -176,8 +176,15 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 		{
 			name: "eventstore returns err",
 			args: args{
-				ctx:    context.Background(),
-				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "test"), 5, nil),
+				ctx: context.Background(),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("test").
+						Builder(),
+					5,
+					nil,
+				),
 				reduce: testReduce(),
 			},
 			fields: fields{
@@ -195,8 +202,15 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 		{
 			name: "no events found",
 			args: args{
-				ctx:    context.Background(),
-				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "test"), 5, nil),
+				ctx: context.Background(),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("test").
+						Builder(),
+					5,
+					nil,
+				),
 				reduce: testReduce(),
 			},
 			fields: fields{
@@ -214,8 +228,15 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 		{
 			name: "found events smaller than limit",
 			args: args{
-				ctx:    context.Background(),
-				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "test"), 5, nil),
+				ctx: context.Background(),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("test").
+						Builder(),
+					5,
+					nil,
+				),
 				reduce: testReduce(),
 			},
 			fields: fields{
@@ -254,8 +275,15 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 		{
 			name: "found events exeed limit",
 			args: args{
-				ctx:    context.Background(),
-				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "test"), 2, nil),
+				ctx: context.Background(),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("test").
+						Builder(),
+					2,
+					nil,
+				),
 				reduce: testReduce(),
 			},
 			fields: fields{
@@ -716,7 +744,14 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 			},
 			args: args{
 				update: testUpdate(t, 2, ErrUpdate),
-				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("testAgg").
+						Builder(),
+					10,
+					nil,
+				),
 				reduce: testReduce(
 					newTestStatement(2, 1),
 				),
@@ -762,7 +797,14 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 			},
 			args: args{
 				update: testUpdate(t, 4, nil),
-				query:  testQuery(eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, "testAgg"), 10, nil),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("testAgg").
+						Builder(),
+					10,
+					nil,
+				),
 				reduce: testReduce(
 					newTestStatement(1, 0),
 					newTestStatement(2, 1),

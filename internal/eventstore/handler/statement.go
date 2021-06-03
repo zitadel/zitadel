@@ -3,16 +3,20 @@ package handler
 import (
 	"database/sql"
 	"errors"
+
+	"github.com/caos/zitadel/internal/eventstore"
 )
 
 var (
-	ErrNoTable      = errors.New("no table")
-	ErrPrevSeqGtSeq = errors.New("prev seq >= seq")
-	ErrNoValues     = errors.New("no values")
-	ErrNoCondition  = errors.New("no condition")
+	ErrNoAggregateType = errors.New("no aggregate")
+	ErrNoTable         = errors.New("no table")
+	ErrPrevSeqGtSeq    = errors.New("prev seq >= seq")
+	ErrNoValues        = errors.New("no values")
+	ErrNoCondition     = errors.New("no condition")
 )
 
 type Statement struct {
+	AggregateType    eventstore.AggregateType
 	Sequence         uint64
 	PreviousSequence uint64
 
