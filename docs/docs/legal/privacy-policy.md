@@ -145,7 +145,7 @@ In particular, the following personal data are part of the processing:
     </td>
   </tr>
   <tr>
-    <td><strong>Data traffic data</strong></td>
+    <td><strong>Usage meta data</strong></td>
     <td>
       <ul>
         <li>User agent</li>
