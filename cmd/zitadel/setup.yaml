@@ -213,7 +213,7 @@ SetUp:
         PreHeader: Telefonnummer verifizieren
         Subject: Telefonnummer verifizieren
         Greeting: Hallo {{.FirstName}} {{.LastName}},
-        Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt;
+        Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst (Code {{.Code}})
         ButtonText: Telefon verifizieren
       - MessageTextType: DomainClaimed
         Language: de
