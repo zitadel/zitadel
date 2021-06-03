@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -69,15 +70,18 @@ func (wm *IAMIDPOIDCConfigWriteModel) Reduce() error {
 }
 
 func (wm *IAMIDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			iam.IDPOIDCConfigAddedEventType,
 			iam.IDPOIDCConfigChangedEventType,
 			iam.IDPConfigReactivatedEventType,
 			iam.IDPConfigDeactivatedEventType,
-			iam.IDPConfigRemovedEventType)
+			iam.IDPConfigRemovedEventType).
+		Builder()
 }
 
 func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(

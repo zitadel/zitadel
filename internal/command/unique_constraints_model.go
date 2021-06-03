@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -173,8 +174,8 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(
-		eventstore.ColumnsEvent,
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().AggregateTypes(
 		iam.AggregateType,
 		org.AggregateType,
 		project.AggregateType,
@@ -225,8 +226,8 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			org.MemberAddedEventType,
 			org.MemberRemovedEventType,
 			project.MemberAddedType,
-			project.MemberRemovedType,
-		)
+			project.MemberRemovedType).
+		Builder()
 }
 
 func (rm *UniqueConstraintReadModel) getUniqueConstraint(aggregateID, objectID, constraintType string) *domain.UniqueConstraintMigration {

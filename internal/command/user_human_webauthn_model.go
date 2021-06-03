@@ -124,9 +124,11 @@ func (wm *HumanWebAuthNWriteModel) appendVerifiedEvent(e *user.HumanWebAuthNVeri
 }
 
 func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanU2FTokenAddedType,
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanU2FTokenAddedType,
@@ -135,7 +137,8 @@ func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPasswordlessTokenSignCountChangedType,
 			user.HumanU2FTokenRemovedType,
 			user.HumanPasswordlessTokenRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		Builder()
 }
 
 type HumanU2FTokensReadModel struct {
@@ -199,13 +202,16 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 }
 
 func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanU2FTokenAddedType,
 			user.HumanU2FTokenVerifiedType,
-			user.HumanU2FTokenRemovedType)
+			user.HumanU2FTokenRemovedType).
+		Builder()
 
 }
 
@@ -279,13 +285,16 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 }
 
 func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanPasswordlessTokenVerifiedType,
-			user.HumanPasswordlessTokenRemovedType)
+			user.HumanPasswordlessTokenRemovedType).
+		Builder()
 
 }
 
@@ -349,13 +358,15 @@ func (wm *HumanU2FLoginReadModel) Reduce() error {
 }
 
 func (rm *HumanU2FLoginReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanU2FTokenBeginLoginType,
-			user.UserRemovedType,
-		)
+			user.UserRemovedType).
+		Builder()
 }
 
 type HumanPasswordlessLoginReadModel struct {
@@ -408,12 +419,14 @@ func (wm *HumanPasswordlessLoginReadModel) Reduce() error {
 }
 
 func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanPasswordlessTokenBeginLoginType,
-			user.UserRemovedType,
-		)
+			user.UserRemovedType).
+		Builder()
 
 }

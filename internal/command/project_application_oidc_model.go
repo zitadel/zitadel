@@ -2,12 +2,13 @@ package command
 
 import (
 	"context"
+	"reflect"
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/project"
-	"reflect"
-	"time"
 )
 
 type OIDCApplicationWriteModel struct {
@@ -201,9 +202,11 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
@@ -213,8 +216,8 @@ func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.OIDCConfigAddedType,
 			project.OIDCConfigChangedType,
 			project.OIDCConfigSecretChangedType,
-			project.ProjectRemovedType,
-		)
+			project.ProjectRemovedType).
+		Builder()
 }
 
 func (wm *OIDCApplicationWriteModel) NewChangedEvent(

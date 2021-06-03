@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -134,9 +135,11 @@ func (wm *APIApplicationWriteModel) appendChangeAPIEvent(e *project.APIConfigCha
 }
 
 func (wm *APIApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
@@ -146,8 +149,8 @@ func (wm *APIApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.APIConfigAddedType,
 			project.APIConfigChangedType,
 			project.APIConfigSecretChangedType,
-			project.ProjectRemovedType,
-		)
+			project.ProjectRemovedType).
+		Builder()
 }
 
 func (wm *APIApplicationWriteModel) NewChangedEvent(

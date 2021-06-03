@@ -45,13 +45,15 @@ func (wm *OrgFeaturesWriteModel) Reduce() error {
 }
 
 func (wm *OrgFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.FeaturesWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.FeaturesWriteModel.AggregateID).
 		EventTypes(
 			org.FeaturesSetEventType,
-			org.FeaturesRemovedEventType,
-		)
+			org.FeaturesRemovedEventType).
+		Builder()
 }
 
 func (wm *OrgFeaturesWriteModel) NewSetEvent(

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -26,9 +27,12 @@ func NewIAMIDPConfigWriteModel(configID string) *IAMIDPConfigWriteModel {
 }
 
 func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(iam.FeaturesSetEventType).
 		EventTypes(
 			iam.IDPConfigAddedEventType,
 			iam.IDPConfigChangedEventType,
@@ -36,8 +40,8 @@ func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			iam.IDPConfigReactivatedEventType,
 			iam.IDPConfigRemovedEventType,
 			iam.IDPOIDCConfigAddedEventType,
-			iam.IDPOIDCConfigChangedEventType,
-		)
+			iam.IDPOIDCConfigChangedEventType).
+		Builder()
 }
 
 func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {

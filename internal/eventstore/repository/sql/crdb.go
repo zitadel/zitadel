@@ -13,9 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/lib/pq"
-
-	//sql import for cockroach
-	_ "github.com/lib/pq"
 )
 
 const (
@@ -158,7 +155,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 
 // handleUniqueConstraints adds or removes unique constraints
 func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
-	if uniqueConstraints == nil || len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {
+	if len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {
 		return nil
 	}
 

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/repository/org"
@@ -39,12 +40,15 @@ func (wm *OrgLabelPolicyWriteModel) Reduce() error {
 }
 
 func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
 		EventTypes(
 			org.LabelPolicyAddedEventType,
-			org.LabelPolicyChangedEventType)
+			org.LabelPolicyChangedEventType).
+		Builder()
 }
 
 func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(

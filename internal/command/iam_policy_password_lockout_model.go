@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -40,12 +41,15 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) Reduce() error {
 }
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
 		EventTypes(
 			iam.PasswordLockoutPolicyAddedEventType,
-			iam.PasswordLockoutPolicyChangedEventType)
+			iam.PasswordLockoutPolicyChangedEventType).
+		Builder()
 }
 
 func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(

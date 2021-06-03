@@ -13,31 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
-type testAggregate struct {
-	id     string
-	events []EventPusher
-}
-
-func (a *testAggregate) ID() string {
-	return a.id
-}
-
-func (a *testAggregate) Type() AggregateType {
-	return "test.aggregate"
-}
-
-func (a *testAggregate) Events() []EventPusher {
-	return a.events
-}
-
-func (a *testAggregate) ResourceOwner() string {
-	return "caos"
-}
-
-func (a *testAggregate) Version() Version {
-	return "v1"
-}
-
 // testEvent implements the Event interface
 type testEvent struct {
 	BaseEvent
@@ -368,8 +343,7 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		aggregates []Aggregate
-		events     []EventPusher
+		events []EventPusher
 	}
 	type res struct {
 		wantErr bool
@@ -892,8 +866,13 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -915,8 +894,13 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -938,8 +922,13 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1016,8 +1005,13 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxSequence,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1034,8 +1028,13 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxSequence,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1052,8 +1051,13 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxSequence,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
 				},
 			},
 			fields: fields{
@@ -1134,8 +1138,13 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 				readModel: &testReducer{
 					t:              t,
@@ -1161,8 +1170,13 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"no.aggregates"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"no.aggregates"},
+						},
+					},
 				},
 				readModel: &testReducer{
 					t:              t,
@@ -1187,7 +1201,15 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 		{
 			name: "found events",
 			args: args{
-				query: NewSearchQueryBuilder(repository.ColumnsEvent, "test.aggregate"),
+				query: &SearchQueryBuilder{
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
+				},
 				readModel: &testReducer{
 					t:              t,
 					expectedLength: 1,
@@ -1214,8 +1236,13 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "append in reducer fails",
 			args: args{
 				query: &SearchQueryBuilder{
-					aggregateTypes: []AggregateType{"test.aggregate"},
-					columns:        repository.ColumnsEvent,
+					columns: repository.ColumnsEvent,
+					queries: []*SearchQuery{
+						{
+							builder:        &SearchQueryBuilder{},
+							aggregateTypes: []AggregateType{"test.aggregate"},
+						},
+					},
 				},
 				readModel: &testReducer{
 					t:              t,
@@ -1271,13 +1298,6 @@ func combineEventLists(lists ...[]*repository.Event) []*repository.Event {
 	events := []*repository.Event{}
 	for _, list := range lists {
 		events = append(events, list...)
-	}
-	return events
-}
-
-func linkEvents(events ...*repository.Event) []*repository.Event {
-	for i := 1; i < len(events); i++ {
-		// events[i].PreviousEvent = events[i-1]
 	}
 	return events
 }
