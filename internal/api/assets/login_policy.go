@@ -120,9 +120,8 @@ func (h *Handler) GetPreviewOrgLabelPolicyLogoDark() Downloader {
 func (h *Handler) GetLabelPolicyLogo() Downloader {
 	return &labelPolicyLogoDownloader{org: h.orgRepo, useID: true}
 }
-
 func (h *Handler) GetLabelPolicyLogoDark() Downloader {
-	return &labelPolicyLogoDownloader{org: h.orgRepo, darkMode: true, useID: true}
+	return &labelPolicyLogoDownloader{org: h.orgRepo, useID: true}
 }
 
 type labelPolicyLogoDownloader struct {
@@ -133,7 +132,7 @@ type labelPolicyLogoDownloader struct {
 	useID         bool
 }
 
-func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context) (string, error) {
+func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context, path string) (string, error) {
 	policy, err := getLabelPolicy(ctx, l.defaultPolicy, l.preview, l.org)
 	if err != nil {
 		return "", nil
@@ -261,7 +260,7 @@ type labelPolicyIconDownloader struct {
 	useID         bool
 }
 
-func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context) (string, error) {
+func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context, path string) (string, error) {
 	policy, err := getLabelPolicy(ctx, l.defaultPolicy, l.preview, l.org)
 	if err != nil {
 		return "", nil
@@ -347,7 +346,7 @@ type labelPolicyFontDownloader struct {
 	useID         bool
 }
 
-func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context) (string, error) {
+func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context, path string) (string, error) {
 	policy, err := getLabelPolicy(ctx, l.defaultPolicy, l.preview, l.org)
 	if err != nil {
 		return "", nil

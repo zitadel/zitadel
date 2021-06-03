@@ -33,7 +33,7 @@ func (h *Handler) GetMyUserAvatar() Downloader {
 
 type myHumanAvatarDownloader struct{}
 
-func (l *myHumanAvatarDownloader) ObjectName(ctx context.Context) (string, error) {
+func (l *myHumanAvatarDownloader) ObjectName(ctx context.Context, path string) (string, error) {
 	return domain.GetHumanAvatarAssetPath(authz.GetCtxData(ctx).UserID), nil
 }
 

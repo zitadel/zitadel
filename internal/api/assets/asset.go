@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/mux"
@@ -51,7 +52,7 @@ type Uploader interface {
 }
 
 type Downloader interface {
-	ObjectName(ctx context.Context) (string, error)
+	ObjectName(ctx context.Context, path string) (string, error)
 	BucketName(ctx context.Context, id string) string
 }
 
@@ -82,7 +83,22 @@ func NewHandler(
 	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
 	router := mux.NewRouter()
 	RegisterRoutes(router, h)
+	router.PathPrefix("/{id}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return router
+}
+
+func (h *Handler) GetFile() Downloader {
+	return &publicFileDownloader{}
+}
+
+type publicFileDownloader struct{}
+
+func (l *publicFileDownloader) ObjectName(_ context.Context, path string) (string, error) {
+	return path, nil
+}
+
+func (l *publicFileDownloader) BucketName(_ context.Context, id string) string {
+	return id
 }
 
 const maxMemory = 10 << 20
@@ -128,9 +144,13 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		ctx := r.Context()
-
-		bucketName := downloader.BucketName(ctx, mux.Vars(r)["id"])
-		objectName, err := downloader.ObjectName(ctx)
+		id := mux.Vars(r)["id"]
+		bucketName := downloader.BucketName(ctx, id)
+		path := ""
+		if id != "" {
+			path = strings.Split(r.RequestURI, id+"/")[1]
+		}
+		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
 			s.ErrorHandler()(w, r, err)
 			return
