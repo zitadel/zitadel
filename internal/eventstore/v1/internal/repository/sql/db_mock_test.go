@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
+	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_root_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
 )
 
 var (
-	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
+	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_aggregate_sequence", "previous_aggregate_root_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
 	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence LIMIT \$2`).String()
 	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence DESC`).String()
 	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 ORDER BY event_sequence LIMIT \$3`).String()
@@ -23,7 +23,7 @@ var (
 	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
 
 	expectedInsertStatement = regexp.MustCompile(`INSERT INTO eventstore\.events ` +
-		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_sequence\) ` +
+		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_aggregate_sequence, previous_aggregate_root_sequence\) ` +
 		`SELECT \$1, \$2, \$3, \$4, COALESCE\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10 ` +
 		`WHERE EXISTS \(` +
 		`SELECT 1 FROM eventstore\.events WHERE aggregate_type = \$11 AND aggregate_id = \$12 HAVING MAX\(event_sequence\) = \$13 OR \(\$14::BIGINT IS NULL AND COUNT\(\*\) = 0\)\) ` +
