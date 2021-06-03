@@ -28,4 +28,4 @@ You agree that we may delete any data on our systems or networks, if CAOS believ
 
 ## Violations of this policy
 
-We may suspend or terminate your use our Services for any violation of this Acceptable Use Policy. You will not be entitled to any Financial Credit or compensation for any interruptions caused by violation of this policy.
+We may suspend or terminate your usage of our Services for any violation of this Acceptable Use Policy. You will not be entitled to any Financial Credit or compensation for any interruptions caused by violation of this policy.

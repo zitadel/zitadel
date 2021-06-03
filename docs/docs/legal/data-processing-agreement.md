@@ -5,7 +5,7 @@ custom_edit_url: null
 
 ## Background
 
-Within the scope of the [**Framework Agreement**](terms-of-service), the **Processor** (CAOS AG) processes **Personal Data** on behalf of the **Customer** (Responsible Party), collectively the **"Parties"**.
+Within the scope of the [**Framework Agreement**](terms-of-service), the **Processor** (CAOS Ltd.) processes **Personal Data** on behalf of the **Customer** (Responsible Party), collectively the **"Parties"**.
 
 This Annex to the Agreement governs the Parties' data protection obligations in addition to the provisions of the Agreement.
 
@@ -122,23 +122,23 @@ The Processor is responsible for taking appropriate technical and organizational
 
 ## Obligations of the processor
 
-## Bound by directions
+### Bound by directions
 
 The Processor processes personal data in accordance with its privacy policy (cf. [Privacy Policy](privacy-policy.md)) and on the documented directions of the Customer. The initial direction result from the Agreement. Subsequent instructions shall be given either in writing, whereby e-mail shall suffice, or orally with immediate written confirmation.
 
 If the Processor is of the opinion that a direction of the Customer violates the Agreement, the GDPR or other data protection provisions of the EU, EU Member States or Switzerland, it shall inform the Customer thereof and shall be entitled to suspend the Processing until the instruction is withdrawn or confirmed.
 
-## Obligation of the processing persons to confidentiality
+###  Obligation of the processing persons to confidentiality
 
 The Processor shall ensure that the persons authorized to process the Personal Data have committed themselves to confidentiality, unless they are already subject to an appropriate statutory duty of confidentiality.
 
-## Technical and organizational measures
+### Technical and organizational measures
 
 The Processor has taken appropriate technical and organizational security measures, maintains them for the duration of the Processing and updates them on an ongoing basis in accordance with the current state of technology.
 
 The technical and organizational security measures are described in more detail in the [annex](#annex-regarding-security-measures) to this appendix.
 
-## Involvement of subcontracted processors
+### Involvement of subcontracted processors
 
 A current and complete list of involved and approved sub-processors can be found at [https://zitadel.ch/trust/](https://zitadel.ch/trust/).
 
@@ -146,19 +146,19 @@ The Processor is entitled to involve additional sub-processors. In this case, th
 
 The Processor obligates itself to impose on all sub-processors, by means of a contract (or in another appropriate manner), the same data protection obligations as are imposed on it by this Annex. In particular, sufficient guarantees shall be provided that the appropriate technical and organizational measures are implemented in such a way that the processing by the sub-processor is carried out in accordance with the legal requirements. If the sub-processor fails to comply with its data protection obligations, the processor shall be liable to the customer for this as for its own conduct.
 
-## Assistance in responding to requests
+### Assistance in responding to requests
 
 The Processor shall support the Customer as far as possible with suitable technical and organizational measures in fulfilling its obligation to respond to requests to exercise the data subject's rights. The parties shall agree separately on the compensation of the Processor for this.
 
-## Further support for the customer
+### Further support for the customer
 
 The Processor shall, taking into account the nature of the processing and the information available to it, assist the Customer in complying with its obligations in connection with the security of the processing, any notifications of personal data breaches, and any data protection impact assessments.
 
-## Deletion or destruction after termination
+### Deletion or destruction after termination
 
 Upon Customer's request, the Processor shall delete personal data received after the end of the agreement, unless there is a legal obligation for the Processor to store or further process such data.
 
-## Information and control rights of the customer
+### Information and control rights of the customer
 
 The Processor shall provide the Customer with all information necessary to demonstrate compliance with the obligations set forth in this annex. It shall enable and contribute to audits, including inspections, carried out by the Customer or an auditor appointed by the Customer.
 

@@ -30,7 +30,7 @@ Based on Article 13 of the Swiss Federal Constitution and the data protection pr
 
 In cooperation with our providers, we make every effort to protect the databases and any of our users data as well as possible against unauthorized access, loss, misuse or falsification. We point out that data transmission over the internet in general may result in security risks. A complete protection of the data against access by third parties is not possible.
 
-This website uses SSL/TLS encryption for security reasons and to protect the transmission of confidential content, such as requests that you send to us as the website operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from "http://" to "https://".
+This website uses TLS encryption for security reasons and to protect the transmission of confidential content, such as requests that you send to us as the website operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from "http://" to "https://".
 
 ## Processing of personal data, legal basis, storage period
 
