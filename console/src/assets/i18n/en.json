@@ -607,6 +607,7 @@
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
       "LOGINPOLICYUSERNAMELOGIN": "Login Policy: Allow login with Username - custom",
+      "LOGINPOLICYPASSWORDRESET": "Login Policy: Hide reset password link - custom",
       "LOGINPOLICYREGISTRATION": "Login Policy: Allow self registration - custom",
       "LOGINPOLICYIDP": "Login Policy: Identity Provider - custom",
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",

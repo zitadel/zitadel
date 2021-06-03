@@ -607,6 +607,7 @@
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
       "LOGINPOLICYUSERNAMELOGIN": "Login Richtlinie: Login mit Username erlauben - benutzerdefiniert",
+      "LOGINPOLICYPASSWORDRESET": "Login Richtlinie: Passwort vergessen Link nicht anzeigen - benutzerdefiniert",
       "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
       "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
       "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",

@@ -67,6 +67,15 @@
         </div>
 
         <div class="row">
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYPASSWORDRESET' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                            [(ngModel)]="features.loginPolicyPasswordReset"
+                            [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+        </div>
+
+        <div class="row">
             <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYREGISTRATION' | translate}}</span>
             <span class="fill-space"></span>
             <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
