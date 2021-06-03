@@ -85,7 +85,7 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		if view.UserAgentID == id {
+		if t.UserAgentID == id {
 			t.Deactivated = true
 		}
 		return nil
