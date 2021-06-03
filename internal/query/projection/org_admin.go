@@ -102,10 +102,10 @@ func (p *OrgAdminProjection) reduceMemberAdded(event eventstore.EventReader) ([]
 	}
 
 	if !isOrgOwner(e.Roles) {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Sequence(), e.PreviousSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousSequence())}, nil
 	}
 
-	stmt, err := p.addAdmin(e.Aggregate().ResourceOwner, e.UserID, e.Sequence(), e.PreviousSequence())
+	stmt, err := p.addAdmin(e, e.Aggregate().ResourceOwner, e.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -121,10 +121,10 @@ func (p *OrgAdminProjection) reduceMemberChanged(event eventstore.EventReader) (
 	}
 
 	if !isOrgOwner(e.Roles) {
-		return []handler.Statement{p.deleteAdmin(e.Aggregate().ID, e.UserID, e.Sequence(), e.PreviousSequence())}, nil
+		return []handler.Statement{p.deleteAdmin(e, e.Aggregate().ID, e.UserID)}, nil
 	}
 
-	stmt, err := p.addAdmin(e.Aggregate().ResourceOwner, e.UserID, e.Sequence(), e.PreviousSequence())
+	stmt, err := p.addAdmin(e, e.Aggregate().ResourceOwner, e.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (p *OrgAdminProjection) reduceMemberRemoved(event eventstore.EventReader) (
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pk6TS", "reduce.wrong.event.type")
 	}
 
-	return []handler.Statement{p.deleteAdmin(e.Aggregate().ID, e.UserID, e.Sequence(), e.PreviousSequence())}, nil
+	return []handler.Statement{p.deleteAdmin(e, e.Aggregate().ID, e.UserID)}, nil
 }
 
 func (p *OrgAdminProjection) reduceOrgChanged(event eventstore.EventReader) ([]handler.Statement, error) {
@@ -155,17 +155,18 @@ func (p *OrgAdminProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Sequence(), e.PreviousSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousSequence(),
+			values,
 			[]handler.Column{
 				handler.NewCol(orgAdminOrgID, e.Aggregate().ResourceOwner),
 			},
-			values,
-			e.Sequence(),
-			e.PreviousSequence(),
 		),
 	}, nil
 }
@@ -179,11 +180,12 @@ func (p *OrgAdminProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 
 	return []handler.Statement{
 		crdb.NewDeleteStatement(
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousSequence(),
 			[]handler.Column{
 				handler.NewCol(orgAdminOrgID, e.Aggregate().ResourceOwner),
 			},
-			e.Sequence(),
-			e.PreviousSequence(),
 		),
 	}, nil
 }
@@ -197,12 +199,15 @@ func (p *OrgAdminProjection) reduceHumanEmailChanged(event eventstore.EventReade
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousSequence(),
+			[]handler.Column{
+				handler.NewCol(orgAdminOwnerEmail, e.EmailAddress),
+			},
 			[]handler.Column{
 				handler.NewCol(orgAdminOwnerID, e.Aggregate().ID),
 			},
-			[]handler.Column{handler.NewCol(orgAdminOwnerEmail, e.EmailAddress)},
-			e.Sequence(),
-			e.PreviousSequence(),
 		),
 	}, nil
 }
@@ -229,17 +234,18 @@ func (p *OrgAdminProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Sequence(), e.PreviousSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousSequence(),
+			values,
 			[]handler.Column{
 				handler.NewCol(orgAdminOwnerID, e.Aggregate().ID),
 			},
-			values,
-			e.Sequence(),
-			e.PreviousSequence(),
 		),
 	}, nil
 }
@@ -253,14 +259,18 @@ func isOrgOwner(roles []string) bool {
 	return false
 }
 
-func (p *OrgAdminProjection) deleteAdmin(orgID, ownerID string, sequence, previousSequence uint64) handler.Statement {
-	return crdb.NewDeleteStatement([]handler.Column{
-		handler.NewCol(orgAdminOrgID, orgID),
-		handler.NewCol(orgAdminOwnerID, ownerID),
-	}, sequence, previousSequence)
+func (p *OrgAdminProjection) deleteAdmin(event eventstore.EventReader, orgID, ownerID string) handler.Statement {
+	return crdb.NewDeleteStatement(
+		event.Aggregate().Typ,
+		event.Sequence(),
+		event.PreviousSequence(),
+		[]handler.Column{
+			handler.NewCol(orgAdminOrgID, orgID),
+			handler.NewCol(orgAdminOwnerID, ownerID),
+		})
 }
 
-func (p *OrgAdminProjection) addAdmin(orgID, userID string, sequence, previousSequence uint64) (handler.Statement, error) {
+func (p *OrgAdminProjection) addAdmin(event eventstore.EventReader, orgID, userID string) (handler.Statement, error) {
 	events, err := p.Eventstore.FilterEvents(context.Background(),
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			AddQuery().
@@ -277,7 +287,7 @@ func (p *OrgAdminProjection) addAdmin(orgID, userID string, sequence, previousSe
 				user.HumanEmailChangedType,
 				user.HumanProfileChangedType).
 			AggregateIDs(userID).
-			SequenceLess(sequence).
+			SequenceLess(event.Sequence()).
 			Builder())
 	if err != nil {
 		return handler.Statement{}, err
@@ -294,17 +304,21 @@ func (p *OrgAdminProjection) addAdmin(orgID, userID string, sequence, previousSe
 
 	p.reduce(admin, events)
 
-	return crdb.NewUpsertStatement([]handler.Column{
-		handler.NewCol(orgAdminOrgID, admin.OrgID),
-		handler.NewCol(orgAdminOrgName, admin.OrgName),
-		handler.NewCol(orgAdminOrgCreationDate, admin.OrgCreationDate),
-		handler.NewCol(orgAdminOwnerID, admin.OwnerID),
-		handler.NewCol(orgAdminOwnerLanguage, admin.OwnerLanguage.String()),
-		handler.NewCol(orgAdminOwnerEmail, admin.OwnerEmailAddress),
-		handler.NewCol(orgAdminOwnerFirstName, admin.OwnerFirstName),
-		handler.NewCol(orgAdminOwnerLastName, admin.OwnerLastName),
-		handler.NewCol(orgAdminOwnerGender, admin.OwnerGender),
-	}, sequence, previousSequence), nil
+	return crdb.NewUpsertStatement(
+		event.Aggregate().Typ,
+		event.Sequence(),
+		event.PreviousSequence(),
+		[]handler.Column{
+			handler.NewCol(orgAdminOrgID, admin.OrgID),
+			handler.NewCol(orgAdminOrgName, admin.OrgName),
+			handler.NewCol(orgAdminOrgCreationDate, admin.OrgCreationDate),
+			handler.NewCol(orgAdminOwnerID, admin.OwnerID),
+			handler.NewCol(orgAdminOwnerLanguage, admin.OwnerLanguage.String()),
+			handler.NewCol(orgAdminOwnerEmail, admin.OwnerEmailAddress),
+			handler.NewCol(orgAdminOwnerFirstName, admin.OwnerFirstName),
+			handler.NewCol(orgAdminOwnerLastName, admin.OwnerLastName),
+			handler.NewCol(orgAdminOwnerGender, admin.OwnerGender),
+		}), nil
 }
 
 func (p *OrgAdminProjection) reduce(admin *OrgAdmin, events []eventstore.EventReader) {

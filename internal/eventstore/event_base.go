@@ -11,7 +11,7 @@ import (
 
 //BaseEvent represents the minimum metadata of an event
 type BaseEvent struct {
-	EventType EventType
+	EventType EventType `json:"-"`
 
 	aggregate Aggregate
 

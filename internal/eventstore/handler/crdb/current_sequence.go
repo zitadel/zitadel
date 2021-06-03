@@ -11,7 +11,7 @@ import (
 type currentSequences map[eventstore.AggregateType]uint64
 
 func (h *StatementHandler) currentSequences(query func(string, ...interface{}) (*sql.Rows, error)) (currentSequences, error) {
-	rows, err := query(`SELECT current_sequence, aggregate_type FROM `+h.sequenceTable+` WHERE view_name = $1 FOR UPDATE)`, h.ProjectionName)
+	rows, err := query(`SELECT current_sequence, aggregate_type FROM `+h.sequenceTable+` WHERE view_name = $1 FOR UPDATE`, h.ProjectionName)
 	if err != nil {
 		return nil, err
 	}

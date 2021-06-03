@@ -76,6 +76,7 @@ func NewUpdateStatement(aggregateType eventstore.AggregateType, sequence, previo
 	wheresPlaceholders := strings.Join(wheres, " AND ")
 
 	return handler.Statement{
+		AggregateType:    aggregateType,
 		Sequence:         sequence,
 		PreviousSequence: previousSequence,
 		Execute: func(ex handler.Executer, projectionName string) error {
