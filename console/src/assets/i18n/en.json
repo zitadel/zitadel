@@ -709,7 +709,7 @@
       "FORCEMFA": "Force MFA",
       "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
       "HIDEPASSWORDRESET": "Hide Password reset",
-      "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process."
+      "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
       "ERRORMSGPOPUP":"Show Error in Dialog",
       "DISABLEWATERMARK":"Disable Watermark"
