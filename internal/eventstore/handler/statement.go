@@ -13,6 +13,7 @@ var (
 	ErrPrevSeqGtSeq    = errors.New("prev seq >= seq")
 	ErrNoValues        = errors.New("no values")
 	ErrNoCondition     = errors.New("no condition")
+	ErrSomeStmtsFailed = errors.New("some statements failed")
 )
 
 type Statement struct {

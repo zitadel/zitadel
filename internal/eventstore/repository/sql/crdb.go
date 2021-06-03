@@ -19,9 +19,26 @@ const (
 	//as soon as stored procedures are possible in crdb
 	// we could move the code to migrations and coll the procedure
 	// traking issue: https://github.com/cockroachdb/cockroach/issues/17511
-	crdbInsert = "WITH data ( " +
+	//
+	//previous_data selects the needed data of the latest event of the aggregate
+	// and buffers it (crdb inmemory)
+	crdbInsert = "WITH previous_data (agg_root_seq, agg_seq, resource_owner) AS (" +
+		"    WITH aggregate_events AS (" +
+		"        SELECT event_sequence, aggregate_id, resource_owner FROM eventstore.events WHERE aggregate_type = $2 ORDER BY event_sequence DESC" +
+		"    )" +
+		"    SELECT * FROM" +
+		"        (SELECT event_sequence AS agg_root_seq FROM aggregate_events ORDER BY event_sequence DESC LIMIT 1)" +
+		//natural left join because it could be the first event of the aggregate but aggregate root exists
+		"        NATURAL LEFT JOIN (SELECT event_sequence AS agg_seq, resource_owner FROM aggregate_events WHERE aggregate_id = $3 ORDER BY event_sequence DESC LIMIT 1)" +
+		"        UNION ALL" +
+		//if first event of the aggregate
+		"        SELECT NULL::INT8, NULL::INT8, NULL::TEXT" +
+		"        LIMIT 1" +
+		")" +
+		"INSERT INTO eventstore.events " +
+		"( " +
 		"    event_type, " +
-		"    aggregate_type, " +
+		"    aggregate_type," +
 		"    aggregate_id, " +
 		"    aggregate_version, " +
 		"    creation_date, " +
@@ -29,63 +46,24 @@ const (
 		"    editor_user, " +
 		"    editor_service, " +
 		"    resource_owner, " +
-		// variables below are calculated
-		"    previous_sequence" +
-		") AS (" +
-		//previous_data selects the needed data of the latest event of the aggregate
-		// and buffers it (crdb inmemory)
-		"    WITH previous_data AS (" +
-		"        SELECT event_sequence AS seq, resource_owner " +
-		"        FROM eventstore.events " +
-		"        WHERE aggregate_type = $2 AND aggregate_id = $3 ORDER BY seq DESC LIMIT 1" +
-		"    )" +
-		// defines the data to be inserted
-		"    SELECT " +
-		"        $1::VARCHAR AS event_type, " +
-		"        $2::VARCHAR AS aggregate_type, " +
-		"        $3::VARCHAR AS aggregate_id, " +
-		"        $4::VARCHAR AS aggregate_version, " +
-		"        NOW() AS creation_date, " +
-		"        $5::JSONB AS event_data, " +
-		"        $6::VARCHAR AS editor_user, " +
-		"        $7::VARCHAR AS editor_service, " +
-		"        CASE WHEN EXISTS (SELECT * FROM previous_data) " +
-		"            THEN (SELECT resource_owner FROM previous_data) " +
-		"            ELSE $8::VARCHAR " +
-		"        end AS resource_owner, " +
-		"        CASE WHEN EXISTS (SELECT * FROM previous_data) " +
-		"            THEN (SELECT seq FROM previous_data) " +
-		"            ELSE NULL " +
-		"        end AS previous_sequence" +
+		"    previous_aggregate_sequence, " +
+		"    previous_aggregate_root_sequence " +
 		") " +
-		"INSERT INTO eventstore.events " +
-		"	( " +
-		"		event_type, " +
-		"		aggregate_type," +
-		"		aggregate_id, " +
-		"		aggregate_version, " +
-		"		creation_date, " +
-		"		event_data, " +
-		"		editor_user, " +
-		"		editor_service, " +
-		"		resource_owner, " +
-		"		previous_sequence " +
-		"	) " +
-		"	( " +
-		"		SELECT " +
-		"			event_type, " +
-		"			aggregate_type," +
-		"			aggregate_id, " +
-		"			aggregate_version, " +
-		"			COALESCE(creation_date, NOW()), " +
-		"			event_data, " +
-		"			editor_user, " +
-		"			editor_service, " +
-		"			resource_owner, " +
-		"			previous_sequence " +
-		"		FROM data " +
-		"	) " +
-		"RETURNING id, event_sequence, previous_sequence, creation_date, resource_owner"
+		// defines the data to be inserted
+		"SELECT " +
+		"    $1::VARCHAR AS event_type, " +
+		"    $2::VARCHAR AS aggregate_type, " +
+		"    $3::VARCHAR AS aggregate_id, " +
+		"    $4::VARCHAR AS aggregate_version, " +
+		"    NOW() AS creation_date, " +
+		"    $5::JSONB AS event_data, " +
+		"    $6::VARCHAR AS editor_user, " +
+		"    $7::VARCHAR AS editor_service, " +
+		"    IFNULL((SELECT resource_owner FROM previous_data), $8::VARCHAR)  AS resource_owner, " +
+		"    (SELECT agg_seq FROM previous_data) AS previous_aggregate_sequence, " +
+		"    (SELECT agg_root_seq FROM previous_data) AS previous_aggregate_root_sequence " +
+		"FROM previous_data " +
+		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_root_sequence, creation_date, resource_owner"
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
 						unique_type,
@@ -114,7 +92,10 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 
-		var previousSequence Sequence
+		var (
+			previousAggregateSequence     Sequence
+			previousAggregateRootSequence Sequence
+		)
 		for _, event := range events {
 			err := tx.QueryRowContext(ctx, crdbInsert,
 				event.Type,
@@ -125,17 +106,17 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-			).Scan(&event.ID, &event.Sequence, &previousSequence, &event.CreationDate, &event.ResourceOwner)
+			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateRootSequence, &event.CreationDate, &event.ResourceOwner)
 
-			event.PreviousSequence = uint64(previousSequence)
+			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
+			event.PreviousAggregateRootSequence = uint64(previousAggregateRootSequence)
 
 			if err != nil {
-				logging.LogWithFields("SQL-IP3js",
+				logging.LogWithFields("SQL-NOqH7",
 					"aggregate", event.AggregateType,
 					"aggregateId", event.AggregateID,
 					"aggregateType", event.AggregateType,
-					"eventType", event.Type).WithError(err).Info("query failed",
-					"seq", event.PreviousSequence)
+					"eventType", event.Type).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
 		}
@@ -225,7 +206,8 @@ func (db *CRDB) eventQuery() string {
 		" creation_date" +
 		", event_type" +
 		", event_sequence" +
-		", previous_sequence" +
+		", previous_aggregate_sequence" +
+		", previous_aggregate_root_sequence" +
 		", event_data" +
 		", editor_service" +
 		", editor_user" +

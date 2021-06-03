@@ -18,7 +18,7 @@ const (
 		" creation_date" +
 		", event_type" +
 		", event_sequence" +
-		", previous_sequence" +
+		", previous_aggregate_sequence" +
 		", event_data" +
 		", editor_service" +
 		", editor_user" +

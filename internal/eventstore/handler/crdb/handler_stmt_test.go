@@ -215,7 +215,7 @@ func TestStatementHandler_Update(t *testing.T) {
 				ctx: context.Background(),
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
+						"testAgg",
 						7,
 						6,
 						[]handler.Column{
@@ -233,7 +233,7 @@ func TestStatementHandler_Update(t *testing.T) {
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, nil)
+					return errors.Is(err, handler.ErrSomeStmtsFailed)
 				},
 				stmtsLen: 1,
 			},
@@ -375,9 +375,9 @@ func TestStatementHandler_Update(t *testing.T) {
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
-							AggregateType:    "testAgg",
-							Sequence:         6,
-							PreviousSequence: 5,
+							AggregateType:             "testAgg",
+							Sequence:                  6,
+							PreviousAggregateSequence: 5,
 						},
 					),
 				),
@@ -540,24 +540,24 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
-							ID:               "id",
-							Sequence:         7,
-							PreviousSequence: 0,
-							CreationDate:     time.Now(),
-							Type:             "test.added",
-							Version:          "v1",
-							AggregateID:      "testid",
-							AggregateType:    "testAgg",
+							ID:                        "id",
+							Sequence:                  7,
+							PreviousAggregateSequence: 0,
+							CreationDate:              time.Now(),
+							Type:                      "test.added",
+							Version:                   "v1",
+							AggregateID:               "testid",
+							AggregateType:             "testAgg",
 						},
 						&repository.Event{
-							ID:               "id",
-							Sequence:         9,
-							PreviousSequence: 7,
-							CreationDate:     time.Now(),
-							Type:             "test.changed",
-							Version:          "v1",
-							AggregateID:      "testid",
-							AggregateType:    "testAgg",
+							ID:                        "id",
+							Sequence:                  9,
+							PreviousAggregateSequence: 7,
+							CreationDate:              time.Now(),
+							Type:                      "test.changed",
+							Version:                   "v1",
+							AggregateID:               "testid",
+							AggregateType:             "testAgg",
 						},
 					),
 				),
@@ -584,14 +584,14 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				eventstore: eventstore.NewEventstore(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
-							ID:               "id",
-							Sequence:         7,
-							PreviousSequence: 0,
-							CreationDate:     time.Now(),
-							Type:             "test.added",
-							Version:          "v1",
-							AggregateID:      "testid",
-							AggregateType:    "testAgg",
+							ID:                        "id",
+							Sequence:                  7,
+							PreviousAggregateSequence: 0,
+							CreationDate:              time.Now(),
+							Type:                      "test.added",
+							Version:                   "v1",
+							AggregateID:               "testid",
+							AggregateType:             "testAgg",
 						},
 					),
 				),
@@ -1442,7 +1442,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 func testReduce(stmts ...handler.Statement) handler.Reduce {
 	return func(event eventstore.EventReader) ([]handler.Statement, error) {
 		return []handler.Statement{
-			NewNoOpStatement(event.Aggregate().Typ, event.Sequence(), event.PreviousSequence()),
+			NewNoOpStatement(event.Aggregate().Typ, event.Sequence(), event.PreviousAggregateSequence()),
 		}, nil
 	}
 }

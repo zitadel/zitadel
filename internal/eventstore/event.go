@@ -36,7 +36,10 @@ type EventReader interface {
 
 	Sequence() uint64
 	CreationDate() time.Time
-	PreviousSequence() uint64
+	//PreviousAggregateSequence returns the previous sequence of the aggregate (e.g. for org.42508134)
+	PreviousAggregateSequence() uint64
+	//PreviousAggregateRootSequence returns the previous sequence of the aggregate root (e.g. for org)
+	PreviousAggregateRootSequence() uint64
 	//DataAsBytes returns the payload of the event. It represent the changed fields by the event
 	DataAsBytes() []byte
 }
