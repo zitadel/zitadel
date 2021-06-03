@@ -124,7 +124,7 @@ func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, eventCount int) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := 0; i < eventCount; i++ {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsLimitFormat).
 		WithArgs(aggregateType, limit).
