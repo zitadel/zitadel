@@ -115,7 +115,7 @@ type MemberCascadeRemovedEvent struct {
 	member.MemberCascadeRemovedEvent
 }
 
-func NewProjectCascadeMemberRemovedEvent(
+func NewProjectMemberCascadeRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID string,

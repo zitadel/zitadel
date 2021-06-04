@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -103,10 +102,11 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 
 func (c *Commands) removeProjectGrantMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID, grantID string, cascade bool) eventstore.EventPusher {
 	if cascade {
-		return org.NewMemberCascadeRemovedEvent(
+		return project.NewProjectGrantMemberCascadeRemovedEvent(
 			ctx,
 			projectAgg,
-			userID)
+			userID,
+			grantID)
 	} else {
 		return project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, userID, grantID)
 	}

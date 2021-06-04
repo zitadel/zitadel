@@ -132,7 +132,7 @@ func NewMemberCascadeRemovedEvent(
 }
 
 func MemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := member.RemovedEventMapper(event)
+	e, err := member.CascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}

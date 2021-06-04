@@ -16,19 +16,19 @@ func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*dom
 		switch membership.MemberType {
 		case domain.MemberTypeIam:
 			iamAgg := iam.NewAggregate()
-			removeEvent := c.removeIAMMember(ctx, &iamAgg.Aggregate, membership.UserID, false)
+			removeEvent := c.removeIAMMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		case domain.MemberTypeOrganisation:
 			iamAgg := org.NewAggregate(membership.AggregateID, membership.ResourceOwner)
-			removeEvent := c.removeOrgMember(ctx, &iamAgg.Aggregate, membership.UserID, false)
+			removeEvent := c.removeOrgMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		case domain.MemberTypeProject:
 			projectAgg := project.NewAggregate(membership.AggregateID, membership.ResourceOwner)
-			removeEvent := c.removeProjectMember(ctx, &projectAgg.Aggregate, membership.UserID, false)
+			removeEvent := c.removeProjectMember(ctx, &projectAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		case domain.MemberTypeProjectGrant:
 			projectAgg := project.NewAggregate(membership.AggregateID, membership.ResourceOwner)
-			removeEvent := c.removeProjectGrantMember(ctx, &projectAgg.Aggregate, membership.UserID, membership.ObjectID, false)
+			removeEvent := c.removeProjectGrantMember(ctx, &projectAgg.Aggregate, membership.UserID, membership.ObjectID, true)
 			events = append(events, removeEvent)
 		}
 	}
