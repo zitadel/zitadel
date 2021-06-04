@@ -91,7 +91,7 @@ func GetTemplateData(apiDomain, href string, text *iam_model.MailTextView, polic
 	}
 	if policy.FontURL != "" {
 		split := strings.Split(policy.FontURL, "/")
-		templateData.FontFamily = split[len(split)-1]
+		templateData.FontFamily = split[len(split)-1] + "," + defaultFontFamily
 		templateData.FontURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.AggregateID, policy.FontURL)
 	}
 	return templateData
