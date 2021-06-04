@@ -12,7 +12,13 @@ type LabelPolicy struct {
 	es_models.ObjectRoot
 	State               int32  `json:"-"`
 	PrimaryColor        string `json:"primaryColor"`
-	SecondaryColor      string `json:"secondaryColor"`
+	BackgroundColor     string `json:"backgroundColor"`
+	FontColor           string `json:"fontColor"`
+	WarnColor           string `json:"warnColor"`
+	PrimaryColorDark    string `json:"primaryColorDark"`
+	BackgroundColorDark string `json:"backgroundColorDark"`
+	FontColorDark       string `json:"fontColorDark"`
+	WarnColorDark       string `json:"warnColorDark"`
 	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix"`
 }
 
@@ -21,7 +27,13 @@ func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
 		ObjectRoot:          policy.ObjectRoot,
 		State:               iam_model.PolicyState(policy.State),
 		PrimaryColor:        policy.PrimaryColor,
-		SecondaryColor:      policy.SecondaryColor,
+		BackgroundColor:     policy.BackgroundColor,
+		WarnColor:           policy.WarnColor,
+		FontColor:           policy.FontColor,
+		PrimaryColorDark:    policy.PrimaryColorDark,
+		BackgroundColorDark: policy.BackgroundColorDark,
+		WarnColorDark:       policy.WarnColorDark,
+		FontColorDark:       policy.FontColorDark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 	}
 }
@@ -31,22 +43,15 @@ func LabelPolicyFromModel(policy *iam_model.LabelPolicy) *LabelPolicy {
 		ObjectRoot:          policy.ObjectRoot,
 		State:               int32(policy.State),
 		PrimaryColor:        policy.PrimaryColor,
-		SecondaryColor:      policy.SecondaryColor,
+		BackgroundColor:     policy.BackgroundColor,
+		WarnColor:           policy.WarnColor,
+		FontColor:           policy.FontColor,
+		PrimaryColorDark:    policy.PrimaryColorDark,
+		BackgroundColorDark: policy.BackgroundColorDark,
+		WarnColorDark:       policy.WarnColorDark,
+		FontColorDark:       policy.FontColorDark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 	}
-}
-
-func (p *LabelPolicy) Changes(changed *LabelPolicy) map[string]interface{} {
-	changes := make(map[string]interface{}, 2)
-
-	if changed.PrimaryColor != p.PrimaryColor {
-		changes["primaryColor"] = changed.PrimaryColor
-	}
-	if changed.SecondaryColor != p.SecondaryColor {
-		changes["secondaryColor"] = changed.SecondaryColor
-	}
-
-	return changes
 }
 
 func (i *IAM) appendAddLabelPolicyEvent(event *es_models.Event) error {

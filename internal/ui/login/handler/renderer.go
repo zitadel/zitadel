@@ -3,10 +3,13 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 	"html/template"
 	"net/http"
 	"path"
+	"strings"
+
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
@@ -25,12 +28,14 @@ const (
 
 type Renderer struct {
 	*renderer.Renderer
-	pathPrefix string
+	pathPrefix    string
+	staticStorage static.Storage
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
+func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string, defaultLanguage language.Tag) *Renderer {
 	r := &Renderer{
-		pathPrefix: pathPrefix,
+		pathPrefix:    pathPrefix,
+		staticStorage: staticStorage,
 	}
 	tmplMapping := map[string]string{
 		tmplError:                    "error.html",
@@ -68,6 +73,35 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"resourceThemeUrl": func(file, theme string) string {
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
+		},
+		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
+			if policy != nil {
+				return true
+			}
+			return false
+		},
+		"hasWatermark": func(policy *domain.LabelPolicy) bool {
+			if policy != nil && policy.DisableWatermark {
+				return false
+			}
+			return true
+		},
+		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
+		},
+		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.LogoURL
+			if darkMode && policy.LogoDarkURL != "" {
+				fileName = policy.LogoDarkURL
+			}
+			if fileName == "" {
+				return ""
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
+		},
+		"avatarResource": func(orgID, avatar string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", false, "filename", avatar))
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
@@ -272,6 +306,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
+		DarkMode:               l.isDarkMode(r),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -282,22 +317,27 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
+		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+	} else {
+		//TODO: How to handle LabelPolicy if no auth req (eg Register)
 	}
 	return baseData
 }
 
 func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
-	var userName, loginName, displayName string
+	var userName, loginName, displayName, avatar string
 	if authReq != nil {
 		userName = authReq.UserName
 		loginName = authReq.LoginName
 		displayName = authReq.DisplayName
+		avatar = authReq.AvatarKey
 	}
 	return profileData{
 		UserName:    userName,
 		LoginName:   loginName,
 		DisplayName: displayName,
+		AvatarKey:   avatar,
 	}
 }
 
@@ -316,7 +356,18 @@ func (l *Login) getTheme(r *http.Request) string {
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
-	return "lgn-dark-theme" //TODO: impl
+	if l.isDarkMode(r) {
+		return "lgn-dark-theme"
+	}
+	return "lgn-light-theme"
+}
+
+func (l *Login) isDarkMode(r *http.Request) bool {
+	cookie, err := r.Cookie("mode")
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(cookie.Value, "dark")
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
@@ -379,6 +430,7 @@ type baseData struct {
 	Title                  string
 	Theme                  string
 	ThemeMode              string
+	DarkMode               bool
 	OrgID                  string
 	OrgName                string
 	PrimaryDomain          string
@@ -388,6 +440,7 @@ type baseData struct {
 	Nonce                  string
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
+	LabelPolicy            *domain.LabelPolicy
 }
 
 type errorData struct {
@@ -408,6 +461,7 @@ type profileData struct {
 	LoginName   string
 	UserName    string
 	DisplayName string
+	AvatarKey   string
 }
 
 type passwordData struct {

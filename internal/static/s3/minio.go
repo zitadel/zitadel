@@ -2,46 +2,34 @@ package s3
 
 import (
 	"context"
-	"fmt"
 	"io"
+	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 type Minio struct {
-	Client   *minio.Client
-	Location string
-}
-
-func NewMinio(config S3Config) (*Minio, error) {
-	minioClient, err := minio.New(config.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
-		Secure: config.SSL,
-		Region: config.Location,
-	})
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Store.NotInitialized")
-	}
-	return &Minio{
-		Client:   minioClient,
-		Location: config.Location,
-	}, nil
+	Client       *minio.Client
+	Location     string
+	BucketPrefix string
 }
 
 func (m *Minio) CreateBucket(ctx context.Context, name, location string) error {
 	if location == "" {
 		location = m.Location
 	}
+	name = m.prefixBucketName(name)
 	exists, err := m.Client.BucketExists(ctx, name)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Bucket.Internal")
+		logging.LogWithFields("MINIO-ADvf3", "bucketname", name).WithError(err).Error("cannot check if bucket exists")
+		return caos_errs.ThrowInternal(err, "MINIO-1b8fs", "Errors.Assets.Bucket.Internal")
 	}
 	if exists {
 		return caos_errs.ThrowAlreadyExists(nil, "MINIO-9n3MK", "Errors.Assets.Bucket.AlreadyExists")
@@ -69,6 +57,7 @@ func (m *Minio) ListBuckets(ctx context.Context) ([]*domain.BucketInfo, error) {
 }
 
 func (m *Minio) RemoveBucket(ctx context.Context, name string) error {
+	name = m.prefixBucketName(name)
 	err := m.Client.RemoveBucket(ctx, name)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "MINIO-338Hs", "Errors.Assets.Bucket.RemoveFailed")
@@ -76,7 +65,14 @@ func (m *Minio) RemoveBucket(ctx context.Context, name string) error {
 	return nil
 }
 
-func (m *Minio) PutObject(ctx context.Context, bucketName, objectName, contentType string, object io.Reader, objectSize int64) (*domain.AssetInfo, error) {
+func (m *Minio) PutObject(ctx context.Context, bucketName, objectName, contentType string, object io.Reader, objectSize int64, createBucketIfNotExisting bool) (*domain.AssetInfo, error) {
+	if createBucketIfNotExisting {
+		err := m.CreateBucket(ctx, bucketName, "")
+		if err != nil && !caos_errs.IsErrorAlreadyExists(err) {
+			return nil, err
+		}
+	}
+	bucketName = m.prefixBucketName(bucketName)
 	info, err := m.Client.PutObject(ctx, bucketName, objectName, object, objectSize, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "MINIO-590sw", "Errors.Assets.Object.PutFailed")
@@ -93,20 +89,36 @@ func (m *Minio) PutObject(ctx context.Context, bucketName, objectName, contentTy
 }
 
 func (m *Minio) GetObjectInfo(ctx context.Context, bucketName, objectName string) (*domain.AssetInfo, error) {
-	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
+	bucketName = m.prefixBucketName(bucketName)
+	objectinfo, err := m.Client.StatObject(ctx, bucketName, objectName, minio.StatObjectOptions{})
 	if err != nil {
+		if errResp := minio.ToErrorResponse(err); errResp.StatusCode == http.StatusNotFound {
+			return nil, caos_errs.ThrowNotFound(err, "MINIO-Gdfh4", "Errors.Assets.Object.GetFailed")
+		}
 		return nil, caos_errs.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
 	}
-	info, err := object.Stat()
+	return m.objectToAssetInfo(bucketName, objectinfo), nil
+}
+
+func (m *Minio) GetObject(ctx context.Context, bucketName, objectName string) (io.Reader, func() (*domain.AssetInfo, error), error) {
+	bucketName = m.prefixBucketName(bucketName)
+	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
+		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-VGDgv", "Errors.Assets.Object.GetFailed")
 	}
-	return m.objectToAssetInfo(bucketName, info), nil
+	info := func() (*domain.AssetInfo, error) {
+		info, err := object.Stat()
+		if err != nil {
+			return nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
+		}
+		return m.objectToAssetInfo(bucketName, info), nil
+	}
+	return object, info, nil
 }
 
 func (m *Minio) GetObjectPresignedURL(ctx context.Context, bucketName, objectName string, expiration time.Duration) (*url.URL, error) {
+	bucketName = m.prefixBucketName(bucketName)
 	reqParams := make(url.Values)
-	reqParams.Set("response-content-disposition", fmt.Sprintf("attachment; filename=\"%s\"", objectName))
 	presignedURL, err := m.Client.PresignedGetObject(ctx, bucketName, objectName, expiration, reqParams)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "MINIO-19Mp0", "Errors.Assets.Object.PresignedTokenFailed")
@@ -115,6 +127,7 @@ func (m *Minio) GetObjectPresignedURL(ctx context.Context, bucketName, objectNam
 }
 
 func (m *Minio) ListObjectInfos(ctx context.Context, bucketName, prefix string, recursive bool) ([]*domain.AssetInfo, error) {
+	bucketName = m.prefixBucketName(bucketName)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -134,6 +147,7 @@ func (m *Minio) ListObjectInfos(ctx context.Context, bucketName, prefix string, 
 }
 
 func (m *Minio) RemoveObject(ctx context.Context, bucketName, objectName string) error {
+	bucketName = m.prefixBucketName(bucketName)
 	err := m.Client.RemoveObject(ctx, bucketName, objectName, minio.RemoveObjectOptions{})
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "MINIO-x85RT", "Errors.Assets.Object.RemoveFailed")
@@ -149,7 +163,12 @@ func (m *Minio) objectToAssetInfo(bucketName string, object minio.ObjectInfo) *d
 		Size:            object.Size,
 		LastModified:    object.LastModified,
 		VersionID:       object.VersionID,
-		Expiration:      object.Expiration,
-		AutheticatedURL: m.Client.EndpointURL().String() + "/" + object.Key,
+		Expiration:      object.Expires,
+		ContentType:     object.ContentType,
+		AutheticatedURL: m.Client.EndpointURL().String() + "/" + bucketName + "/" + object.Key,
 	}
+}
+
+func (m *Minio) prefixBucketName(name string) string {
+	return strings.ToLower(m.BucketPrefix + "-" + name)
 }

@@ -47,6 +47,7 @@ type UserSelection struct {
 	LoginName         string
 	UserSessionState  UserSessionState
 	SelectionPossible bool
+	AvatarKey         string
 }
 
 type UserSessionState int32

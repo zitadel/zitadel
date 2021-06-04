@@ -323,6 +323,17 @@ func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.
 	}, nil
 }
 
+func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHumanAvatarRequest) (*mgmt_pb.RemoveHumanAvatarResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	objectDetails, err := s.command.RemoveHumanAvatar(ctx, ctxData.OrgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveHumanAvatarResponse{
+		Details: object.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
 	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
 	if err != nil {

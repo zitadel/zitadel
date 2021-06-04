@@ -1,0 +1,119 @@
+Services:
+  IAM:
+    Prefix: "/iam"
+    Methods:
+      DefaultLabelPolicyLogo:
+        Path: "/policy/label/logo"
+        HasDarkMode: true
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: iam.policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: iam.policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: iam.policy.read
+      DefaultLabelPolicyIcon:
+        Path: "/policy/label/icon"
+        HasDarkMode: true
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: iam.policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: iam.policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: iam.policy.read
+      DefaultLabelPolicyFont:
+        Path: "/policy/label/font"
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: iam.policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: iam.policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: iam.policy.read
+  Org:
+    Prefix: "/org"
+    Methods:
+      OrgLabelPolicyLogo:
+        Path: "/policy/label/logo"
+        Feature: "label_policy.private_label"
+        HasDarkMode: true
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: policy.read
+      OrgLabelPolicyIcon:
+        Path: "/policy/label/icon"
+        Feature: "label_policy.private_label"
+        HasDarkMode: true
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: policy.read
+      OrgLabelPolicyFont:
+        Path: "/policy/label/font"
+        Feature: "label_policy.private_label"
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: policy.read
+  Users:
+    Prefix: "/users"
+    Methods:
+        MyUserAvatar:
+          Path: "/me/avatar"
+          Features: "label_policy.private_label"
+          Handlers:
+            - Name: Upload
+              Comment:
+              Type: upload
+              Permission: authenticated
+            - Name: Get
+              Comment:
+              Type: download
+              Permission: authenticated

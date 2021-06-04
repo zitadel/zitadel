@@ -18,7 +18,7 @@ func (s *Server) GetLoginPolicy(ctx context.Context, req *mgmt_pb.GetLoginPolicy
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy)}, nil
+	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy), IsDefault: policy.Default}, nil
 }
 
 func (s *Server) GetDefaultLoginPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLoginPolicyRequest) (*mgmt_pb.GetDefaultLoginPolicyResponse, error) {

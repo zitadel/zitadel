@@ -46,7 +46,8 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
 		features.PasswordComplexityPolicy,
-		features.LabelPolicy,
+		features.LabelPolicyPrivateLabel,
+		features.LabelPolicyWatermark,
 		features.CustomDomain,
 	)
 	if !hasChanged {
@@ -61,5 +62,7 @@ func (c *Commands) getDefaultFeatures(ctx context.Context) (*domain.Features, er
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
+	features := writeModelToFeatures(&existingFeatures.FeaturesWriteModel)
+	features.IsDefault = true
+	return features, nil
 }

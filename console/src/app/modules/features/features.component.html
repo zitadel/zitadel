@@ -120,9 +120,17 @@
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICY' | translate}}</span>
+            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYPRIVATELABEL' | translate}}</span>
             <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicy"
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyPrivateLabel"
+                [disabled]="(['iam.features.write'] | hasRole | async) == false">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYWATERMARK' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyWatermark"
                 [disabled]="(['iam.features.write'] | hasRole | async) == false">
             </mat-slide-toggle>
         </div>

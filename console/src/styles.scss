@@ -146,7 +146,6 @@ $dark-accent: mat.define-palette(mat.$pink-palette);
 $dark-warn: mat.define-palette(mat.$red-palette);
 
 $light-theme: mat.define-light-theme($light-primary, $light-accent, $light-warn);
-
 $dark-theme: mat.define-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 $custom-typography: mat.define-typography-config($font-family: 'Lato');

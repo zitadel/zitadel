@@ -24,13 +24,18 @@
     <div class="lgn-account-selection">
         {{ if .Users }}
         {{ $displayLoginNameSuffix := and .OrgID (not .DisplayLoginNameSuffix)}}
+        {{ $orgID := .OrgID }}
         {{ range $user := .Users }}
         {{ $sessionState := (printf "UserSelection.SessionState%v" $user.UserSessionState) }}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
         {{if not $user.SelectionPossible}}disabled title="{{t "Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
-                <div class="lgn-avatar" displayname="{{$user.DisplayName}}">
-                    <span class="initials">A</span>
+                <div class="lgn-avatar" {{if not $user.AvatarKey}}loginname="{{$user.LoginName}}"{{end}}>
+                    {{if $user.AvatarKey}}
+                        <img class="avatar-img" src="{{ avatarResource $orgID $user.AvatarKey }}" alt="user-avatar">
+                    {{else}}
+                        <span class="initials">A</span>
+                    {{end}}
                 </div>
             </div>
             <div class="lgn-names">
@@ -57,7 +62,5 @@
         </button>
     </div>
 </form>
-
-<script src="{{ resourceUrl "scripts/avatar.js" }}"></script>
 
 {{template "main-bottom" .}}

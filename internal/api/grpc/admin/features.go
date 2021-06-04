@@ -71,7 +71,8 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		LoginPolicyUsernameLogin: req.LoginPolicyUsernameLogin,
 		LoginPolicyPasswordReset: req.LoginPolicyPasswordReset,
 		PasswordComplexityPolicy: req.PasswordComplexityPolicy,
-		LabelPolicy:              req.LabelPolicy,
+		LabelPolicyPrivateLabel:  req.LabelPolicy || req.LabelPolicyPrivateLabel,
+		LabelPolicyWatermark:     req.LabelPolicyWatermark,
 		CustomDomain:             req.CustomDomain,
 	}
 }
@@ -90,7 +91,8 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		LoginPolicyUsernameLogin: req.LoginPolicyUsernameLogin,
 		LoginPolicyPasswordReset: req.LoginPolicyPasswordReset,
 		PasswordComplexityPolicy: req.PasswordComplexityPolicy,
-		LabelPolicy:              req.LabelPolicy,
+		LabelPolicyPrivateLabel:  req.LabelPolicy || req.LabelPolicyPrivateLabel,
+		LabelPolicyWatermark:     req.LabelPolicyWatermark,
 		CustomDomain:             req.CustomDomain,
 	}
 }

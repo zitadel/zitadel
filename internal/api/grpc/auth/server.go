@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"google.golang.org/grpc"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/auth/repository"
@@ -8,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/auth"
-	"google.golang.org/grpc"
 )
 
 var _ auth.AuthServiceServer = (*Server)(nil)

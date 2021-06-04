@@ -13,7 +13,7 @@ func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, req *mgmt_pb.G
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetPasswordComplexityPolicyResponse{Policy: policy_grpc.ModelPasswordComplexityPolicyToPb(policy)}, nil
+	return &mgmt_pb.GetPasswordComplexityPolicyResponse{Policy: policy_grpc.ModelPasswordComplexityPolicyToPb(policy), IsDefault: policy.Default}, nil
 }
 
 func (s *Server) GetDefaultPasswordComplexityPolicy(ctx context.Context, req *mgmt_pb.GetDefaultPasswordComplexityPolicyRequest) (*mgmt_pb.GetDefaultPasswordComplexityPolicyResponse, error) {

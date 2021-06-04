@@ -7,12 +7,15 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -23,7 +26,6 @@ import (
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"golang.org/x/text/language"
 )
 
 const (
@@ -50,6 +52,7 @@ type Notification struct {
 	i18n           *i18n.Translator
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
+	apiDomain      string
 }
 
 func newNotification(
@@ -59,6 +62,7 @@ func newNotification(
 	aesCrypto crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
 	statikDir http.FileSystem,
+	apiDomain string,
 ) *Notification {
 	h := &Notification{
 		handler:        handler,
@@ -67,6 +71,7 @@ func newNotification(
 		i18n:           translator,
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
+		apiDomain:      apiDomain,
 	}
 
 	h.subscribe()
@@ -142,12 +147,13 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -157,16 +163,16 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.HumanInitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanInitCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
@@ -180,13 +186,13 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
-
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -196,15 +202,15 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.PasswordCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
@@ -219,12 +225,13 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return nil
 	}
 
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -234,16 +241,16 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.HumanEmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanEmailVerificationCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
@@ -285,25 +292,26 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if user.LastEmail == "" {
 		return nil
 	}
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMailText(ctx, mailTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors)
+	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.UserDomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.UserDomainClaimedSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {
@@ -353,10 +361,10 @@ func getSetNotifyContextData(orgID string) context.Context {
 // Read organization specific colors
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
-	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
+	policy, err := n.view.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
 		// read from default
-		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
+		policy, err = n.view.LabelPolicyByAggregateIDAndState(n.systemDefaults.IamID, labelPolicyTableDef, int32(domain.LabelPolicyStateActive))
 		if err != nil {
 			return nil, err
 		}

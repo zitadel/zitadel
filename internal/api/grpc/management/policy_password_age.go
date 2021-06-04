@@ -14,7 +14,8 @@ func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetPassw
 		return nil, err
 	}
 	return &mgmt_pb.GetPasswordAgePolicyResponse{
-		Policy: policy_grpc.ModelPasswordAgePolicyToPb(policy),
+		Policy:    policy_grpc.ModelPasswordAgePolicyToPb(policy),
+		IsDefault: policy.Default,
 	}, nil
 }
 

@@ -49,8 +49,16 @@ func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
 		PrimaryColor:        wm.PrimaryColor,
-		SecondaryColor:      wm.SecondaryColor,
+		BackgroundColor:     wm.BackgroundColor,
+		WarnColor:           wm.WarnColor,
+		FontColor:           wm.FontColor,
+		PrimaryColorDark:    wm.PrimaryColorDark,
+		BackgroundColorDark: wm.BackgroundColorDark,
+		WarnColorDark:       wm.WarnColorDark,
+		FontColorDark:       wm.FontColorDark,
 		HideLoginNameSuffix: wm.HideLoginNameSuffix,
+		ErrorMsgPopup:       wm.ErrorMsgPopup,
+		DisableWatermark:    wm.DisableWatermark,
 	}
 }
 
@@ -176,6 +184,8 @@ func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
 		LoginPolicyRegistration:  wm.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: wm.LoginPolicyUsernameLogin,
 		PasswordComplexityPolicy: wm.PasswordComplexityPolicy,
-		LabelPolicy:              wm.LabelPolicy,
+		LabelPolicyPrivateLabel:  wm.LabelPolicyPrivateLabel,
+		LabelPolicyWatermark:     wm.LabelPolicyWatermark,
+		CustomDomain:             wm.CustomDomain,
 	}
 }

@@ -5,14 +5,17 @@ Errors:
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
   Assets:
+    EmptyKey: Asset Key ist leer
     Store:
       NotInitialized: Assets Speicher konnte nicht initialisiert werden
+      NotConfigured: Assets Speicher wurde nicht konfiguriert
     Bucket:
       Internal: Interner Fehler beim erstellen eines Buckets
       AlreadyExists: Bucket existiert bereits
       CreateFailed: Bucket konnte nicht erstellt werden
       ListFailed: Buckets konnten nicht gelesen werden
       RemoveFailed: Bucket konnte nicht gelöscht werden
+      SetPublicFailed: Bucket konnte nicht auf public gesetzt werden
     Object:
       PutFailed: Objekt konnte nicht erstellt werden
       GetFaieled: Objekt konnte nicht gelesen werden
@@ -247,6 +250,7 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicyInvalid: Login Policy ist ungültig
     LoginPolicyNotExisting: Login Policy nicht vorhanden
+    IdpProviderInvalid: IDP Provider ist ungültig
     LoginPolicy:
       NotFound: Default Login Policy konnte nicht gefunden
       NotChanged: Default Login Policy wurde nicht verändert
@@ -303,6 +307,16 @@ Errors:
       NotChanged: Default Org IAM Policy wurde nicht verändert
   Policy:
     AlreadyExists: Policy existiert bereits
+    Label:
+      Invalid:
+        PrimaryColor: Primäre Farbe ist kein gültiger Hex Farbwert
+        BackgroundColor: Hintergrund Farbe ist kein gültiger Hex Farbwert
+        WarnColor: Warn Farbe ist kein gültiger Hex Farbwert
+        FontColor: Schrift Farbe ist kein gültiger Hex Farbwert
+        PrimaryColorDark: Primäre Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
+        BackgroundColorDark: Hintergrund Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
+        WarnColorDark: Warn Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
+        FontColorDark: Schrift Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
   UserGrant:
     AlreadyExists: Benutzer Berechtigung existiert bereits
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden
@@ -372,6 +386,9 @@ EventTypes:
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert
+      avatar:
+        added: Avatar hinzugefügt
+        removed: Avatar entfernt
       initialization: 
         code:
           added: Initialisierungscode generiert
@@ -580,7 +597,25 @@ EventTypes:
       label:
         added: Label Richtline hinzugefügt
         changed: Label Richtline geändert
+        activated: Label Richtline aktiviert
         removed: Label Richtline entfernt
+        logo:
+          added: Logo zu Label Richtlinie hinzugefügt
+          removed: Logo von Label Richtlinie entfernt
+          dark:
+            added: Logo (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Logo (dunkler Modus) von Label Richtlinie entfernt
+        icon:
+          added: Icon zu Label Richtlinie hinzugefügt
+          removed: Icon von Label Richtlinie entfernt
+          dark:
+            added: Icon (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Icon (dunkler Modus) von Label Richtlinie entfernt
+        font:
+          added: Schrift zu Label Richtlinie hinzugefügt
+          removed: Schrift von Label Richtlinie entfernt
+        assets:
+          removed: Dateien von Label Richtlinie entfernt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -679,6 +714,27 @@ EventTypes:
         idpprovider:
           added: Idp Provider zu Default Login Policy hinzugefügt
           removed: Idp Provider aus Default Login Policy gelöscht
+      label:
+        added: Label Richtline hinzugefügt
+        changed: Label Richtline geändert
+        activated: Label Richtline aktiviert
+        logo:
+          added: Logo zu Label Richtlinie hinzugefügt
+          removed: Logo von Label Richtlinie entfernt
+          dark:
+            added: Logo (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Logo (dunkler Modus) von Label Richtlinie entfernt
+        icon:
+          added: Icon zu Label Richtlinie hinzugefügt
+          removed: Icon von Label Richtlinie entfernt
+          dark:
+            added: Icon (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Icon (dunkler Modus) von Label Richtlinie entfernt
+        font:
+          added: Schrift zu Label Richtlinie hinzugefügt
+          removed: Schrift von Label Richtlinie entfernt
+        assets:
+          removed: Bilder und Schrift von Label Richtlinie entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
 Application:
