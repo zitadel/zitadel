@@ -89,6 +89,7 @@ func literalsConfigMap(
 			oauth := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/oauth/v2"
 			authorize := "https://" + desired.DNS.Subdomains.Accounts + "." + defaultDomain + "/oauth/v2"
 			console := "https://" + desired.DNS.Subdomains.Console + "." + defaultDomain
+			apiDomain := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain
 
 			literalsConfigMap["ZITADEL_ISSUER"] = issuer
 			literalsConfigMap["ZITADEL_ACCOUNTS"] = accounts
@@ -98,6 +99,7 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ACCOUNTS_DOMAIN"] = accountsDomain
 			literalsConfigMap["ZITADEL_COOKIE_DOMAIN"] = accountsDomain
 			literalsConfigMap["ZITADEL_DEFAULT_DOMAIN"] = defaultDomain
+			literalsConfigMap["ZITADEL_API_DOMAIN"] = apiDomain
 		}
 		if desired.AssetStorage != nil {
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_TYPE"] = desired.AssetStorage.Type
