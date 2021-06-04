@@ -554,6 +554,11 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+    customtext:
+      set: Kundenspezifischer Text wurde gesetzt
+      removed: Kundenspezifischer Text wurde entfernt
+      template:
+        removed: Kundenspezifisches Text Template wurde entfernt
     policy:
       login:
         added: Login Richtlinie hinzugefügt
@@ -676,6 +681,9 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+    customtext:
+      set: Text wurde gesetzt
+      removed: Text wurde entfernt
     policy:
       login:
         added: Default Login Policy hinzugefügt
