@@ -530,6 +530,8 @@ EventTypes:
       added: Organisationsmitglied hinzugefügt
       changed: Organisationsmitglied geändert
       removed: Organisationsmitglied entfernt
+      cascade:
+        removed: Organisationsmitglied kaskadiert entfernt
     iam:
       policy:
         added: System Richtlinie der Organisation hinzugefügt
@@ -591,6 +593,8 @@ EventTypes:
       added: Projektmitglied hinzugefügt
       changed: Projektmitglied geändert
       removed: Projektmitglied entfernt
+      cascade:
+        removed: Projektmitglied kaskadiert entfernt
     role:
       added: Projektrolle hinzugefügt
       changed: Projektrolle geändert
@@ -607,6 +611,8 @@ EventTypes:
         added: Verwaltungszugriffsmitglied hinzugefügt
         changed: Verwaltungszugriffsmitglied geändert
         removed: Verwaltungszugriffsmitglied entfernt
+        cascade:
+          removed: Verwaltungszugriffsmitglied kaskadiert entfernt
     application:
       added: Applikation hinzugefügt
       changed: Applikation geändert
@@ -657,6 +663,8 @@ EventTypes:
       added: ZITADEL Mitglied hinzugefügt
       changed: ZITADEL Mitglied geändert
       removed: ZITADEL Mitglied entfernt
+      cascade:
+        removed: ZITADEL Mitglied kaskadiert entfernt
     idp:
       config:
         added: IDP Konfiguration hinzugefügt
