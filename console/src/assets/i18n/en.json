@@ -104,6 +104,7 @@
     }
   },
   "ACTIONS": {
+    "SET":"Set",
     "SHOW":"Show",
     "HIDE":"Hide",
     "SAVE": "Save",
@@ -613,7 +614,8 @@
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
       "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICY": "Labeling Policy - custom",
+      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
+      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domain Verification - available",
       "CUSTOMTEXT": "Custom texts"
     },
@@ -637,6 +639,28 @@
       "NUMBERERROR": "The password must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
+    "PRIVATELABELING": {
+      "TITLE":"Private Labeling",
+      "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
+      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment. To view those changes, a 'x-preview' scope will have to be added to your login scopes.",
+      "BTN":"Select File",
+      "ACTIVATEPREVIEW":"Set preview as current configuration",
+      "DARK":"Dark Mode",
+      "LIGHT":"Lighg Mode",
+      "CHANGEVIEW":"Change View",
+      "ACTIVATED":"Policy changes are now LIVE",
+      "THEME":"Theme",
+      "COLORS":"Colors",
+      "FONT":"Font",
+      "ADVANCEDBEHAVIOR":"Advanced Behavior",
+      "PREVIEW": {
+        "TITLE":"Login",
+        "SECOND":"login with your ZITADEL-Account.",
+        "ERROR":"User could not be found!",
+        "PRIMARYBUTTON":"next",
+        "SECONDARYBUTTON":"register"
+      }
+    },
     "PWD_AGE": {
       "TITLE": "Password Aging",
       "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
@@ -649,19 +673,18 @@
       "TITLE": "IAM Access Preferences",
       "DESCRIPTION": "Define access properties of your users."
     },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "BTN":"Select File",
+      "DESCRIPTION": "Customize the appearance of the Login",
+      "ACTIVATEPREVIEW":"Activate Configuration"
+    },
     "LOGIN_POLICY": {
       "TITLE": "Login Policy",
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
       "SAVED": "Saved successfully!"
-    },
-    "LABEL": {
-      "TITLE": "Email Labelling Settings",
-      "DESCRIPTION": "Change the look of your emails.",
-      "PRIMARYCOLOR": "Background color",
-      "SECONDARYCOLOR": "Font color",
-      "SAVED": "Saved successfully"
     },
     "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
     "BTN_INSTALL": "Setup",
@@ -687,13 +710,18 @@
       "FORCEMFA": "Force MFA",
       "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
       "HIDEPASSWORDRESET": "Hide Password reset",
-      "FORCEMFA_DESC": "If the option is selected, the user can't reset his password in the login process."
+      "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
+      "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
+      "ERRORMSGPOPUP":"Show Error in Dialog",
+      "DISABLEWATERMARK":"Disable Watermark"
     },
     "RESET": "Reset Policy",
     "CREATECUSTOM": "Create Custom Policy",
     "TOAST": {
       "SET": "Policy set successfully!",
-      "RESETSUCCESS": "Policy reset successfully!"
+      "RESETSUCCESS": "Policy reset successfully!",
+      "UPLOADSUCCESS": "Uploaded successfully!",
+      "UPLOADFAILED":"Upload failed!"
     }
   },
   "ORG_DETAIL": {

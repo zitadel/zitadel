@@ -134,9 +134,13 @@ COPY --from=base /usr/local/bin /usr/local/bin/.
 COPY build/zitadel/generate-grpc.sh build/zitadel/generate-grpc.sh
 COPY internal/protoc internal/protoc
 COPY openapi/statik openapi/statik
+COPY internal/api/assets/generator internal/api/assets/generator
+COPY internal/config internal/config
+COPY internal/errors internal/errors
 
 RUN build/zitadel/generate-grpc.sh \
-    && go generate openapi/statik/generate.go
+    && go generate openapi/statik/generate.go \
+    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/
 
 
 #######################
@@ -162,6 +166,9 @@ COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go ope
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/proto docs/docs/apis/proto
+
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
 
 
 #######################

@@ -73,6 +73,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPhoneCodeAddedType, HumanPhoneCodeAddedEventMapper).
 		RegisterFilterEventMapper(HumanPhoneCodeSentType, HumanPhoneCodeSentEventMapper).
 		RegisterFilterEventMapper(HumanProfileChangedType, HumanProfileChangedEventMapper).
+		RegisterFilterEventMapper(HumanAvatarAddedType, HumanAvatarAddedEventMapper).
+		RegisterFilterEventMapper(HumanAvatarRemovedType, HumanAvatarRemovedEventMapper).
 		RegisterFilterEventMapper(HumanAddressChangedType, HumanAddressChangedEventMapper).
 		RegisterFilterEventMapper(HumanMFAInitSkippedType, HumanMFAInitSkippedEventMapper).
 		RegisterFilterEventMapper(HumanMFAOTPAddedType, HumanOTPAddedEventMapper).

@@ -19,6 +19,7 @@ AssetStorage:
     SecretAccessKey: $ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY
     SSL: $ZITADEL_ASSET_STORAGE_SSL
     Location: $ZITADEL_ASSET_STORAGE_LOCATION
+    BucketPrefix: $ZITADEL_ASSET_STORAGE_BUCKET_PREFIX
 
 Metrics:
   Type: 'otel'
@@ -279,6 +280,10 @@ UI:
       Cache:
         MaxAge: $ZITADEL_CACHE_MAXAGE
         SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+      StaticCache:
+        Type: bigcache
+        Config:
+          MaxCacheSizeInByte: 52428800 #50MB
   Console:
     EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
     ShortCache:
@@ -290,6 +295,7 @@ UI:
     CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 Notification:
+  APIDomain: $ZITADEL_API_DOMAIN
   Repository:
     DefaultLanguage: 'de'
     Domain: $ZITADEL_DEFAULT_DOMAIN

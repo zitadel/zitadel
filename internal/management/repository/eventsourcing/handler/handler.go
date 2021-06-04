@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -30,7 +31,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, staticStorage static.Storage) []query.Handler {
 	return []query.Handler{
 		newProject(
 			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),
@@ -58,7 +59,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newLoginPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
 		newLabelPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
+			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es},
+			staticStorage),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
 			defaults),

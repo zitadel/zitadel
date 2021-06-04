@@ -1,19 +1,12 @@
 @import './error.scss';
 
-@mixin lgn-error-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-error-color($color);
-    }
+@mixin lgn-error-theme() {
+    @include lgn-error-color();
 }
 
-@mixin lgn-error-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $warn: map-get($config, warn);
+@mixin lgn-error-color() {
   
     .lgn-error {
-      color: lgn-color($warn, default);
+      color: var(--zitadel-color-warn);
     }
 }

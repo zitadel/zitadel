@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -130,9 +131,19 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			if err := checkLoginPolicyFeatures(features, requiredFeature); err != nil {
 				return err
 			}
+			continue
 		}
-		if requiredFeature == domain.FeaturePasswordComplexityPolicy && !features.PasswordComplexityPolicy {
-			return MissingFeatureErr(requiredFeature)
+		if requiredFeature == domain.FeaturePasswordComplexityPolicy {
+			if !features.PasswordComplexityPolicy {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
+		if strings.HasPrefix(requiredFeature, domain.FeatureLabelPolicy) {
+			if err := checkLabelPolicyFeatures(features, requiredFeature); err != nil {
+				return err
+			}
+			continue
 		}
 		if requiredFeature == domain.FeatureLabelPolicy && !features.PasswordComplexityPolicy {
 			return MissingFeatureErr(requiredFeature)
@@ -143,6 +154,7 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
+		return MissingFeatureErr(requiredFeature)
 	}
 	return nil
 }
@@ -175,6 +187,20 @@ func checkLoginPolicyFeatures(features *features_view_model.FeaturesView, requir
 		}
 	default:
 		if !features.LoginPolicyFactors && !features.LoginPolicyIDP && !features.LoginPolicyPasswordless && !features.LoginPolicyRegistration && !features.LoginPolicyUsernameLogin {
+			return MissingFeatureErr(requiredFeature)
+		}
+	}
+	return nil
+}
+
+func checkLabelPolicyFeatures(features *features_view_model.FeaturesView, requiredFeature string) error {
+	switch requiredFeature {
+	case domain.FeatureLabelPolicyPrivateLabel:
+		if !features.LabelPolicyPrivateLabel {
+			return MissingFeatureErr(requiredFeature)
+		}
+	case domain.FeatureLabelPolicyWatermark:
+		if !features.LabelPolicyWatermark {
 			return MissingFeatureErr(requiredFeature)
 		}
 	}

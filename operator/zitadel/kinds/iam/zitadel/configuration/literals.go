@@ -89,6 +89,7 @@ func literalsConfigMap(
 			oauth := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/oauth/v2"
 			authorize := "https://" + desired.DNS.Subdomains.Accounts + "." + defaultDomain + "/oauth/v2"
 			console := "https://" + desired.DNS.Subdomains.Console + "." + defaultDomain
+			apiDomain := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain
 
 			literalsConfigMap["ZITADEL_ISSUER"] = issuer
 			literalsConfigMap["ZITADEL_ACCOUNTS"] = accounts
@@ -98,6 +99,14 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ACCOUNTS_DOMAIN"] = accountsDomain
 			literalsConfigMap["ZITADEL_COOKIE_DOMAIN"] = accountsDomain
 			literalsConfigMap["ZITADEL_DEFAULT_DOMAIN"] = defaultDomain
+			literalsConfigMap["ZITADEL_API_DOMAIN"] = apiDomain
+		}
+		if desired.AssetStorage != nil {
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_TYPE"] = desired.AssetStorage.Type
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_ENDPOINT"] = desired.AssetStorage.Endpoint
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_SSL"] = strconv.FormatBool(desired.AssetStorage.SSL)
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_LOCATION"] = desired.AssetStorage.Location
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
 		}
 	}
 
@@ -164,6 +173,23 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 				literalsSecretVars["ZITADEL_TWILIO_SID"] = value
 			}
 		}
+		if desired.AssetStorage != nil {
+			as := desired.AssetStorage
+			if as.AccessKeyID != nil || as.ExistingAccessKeyID != nil {
+				value, err := read.GetSecretValue(k8sClient, as.AccessKeyID, as.ExistingAccessKeyID)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID"] = value
+			}
+			if as.SecretAccessKey != nil || as.ExistingSecretAccessKey != nil {
+				value, err := read.GetSecretValue(k8sClient, as.SecretAccessKey, as.ExistingSecretAccessKey)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
+			}
+		}
 	}
 	return literalsSecretVars, nil
 }
@@ -201,6 +227,7 @@ func literalsConsoleCM(
 	consoleEnv.AuthServiceURL = "https://" + dns.Subdomains.API + "." + dns.Domain
 	consoleEnv.MgmtServiceURL = "https://" + dns.Subdomains.API + "." + dns.Domain
 	consoleEnv.SubServiceURL = "https://" + dns.Subdomains.Subscription + "." + dns.Domain
+	consoleEnv.UploadServiceURL = "https://" + dns.Subdomains.API + "." + dns.Domain
 
 	data, err := json.Marshal(consoleEnv)
 	if err != nil {

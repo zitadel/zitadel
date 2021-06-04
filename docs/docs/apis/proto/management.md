@@ -293,6 +293,16 @@ An sms will be sent to the given phone number to finish the phone verification p
 
 
 
+### RemoveMyAvatar
+
+> **rpc** RemoveMyAvatar([RemoveHumanAvatarRequest](#removehumanavatarrequest))
+[RemoveHumanAvatarResponse](#removehumanavatarresponse)
+
+Removes the avatar number of the human
+
+
+
+
 ### SetHumanInitialPassword
 
 > **rpc** SetHumanInitialPassword([SetHumanInitialPasswordRequest](#sethumaninitialpasswordrequest))
@@ -1581,7 +1591,18 @@ The password lockout policy is not used at the moment
 > **rpc** GetLabelPolicy([GetLabelPolicyRequest](#getlabelpolicyrequest))
 [GetLabelPolicyResponse](#getlabelpolicyresponse)
 
-Returns the label policy of the organisation
+Returns the active label policy of the organisation
+With this policy the private labeling can be configured (colors, etc.)
+
+
+
+
+### GetPreviewLabelPolicy
+
+> **rpc** GetPreviewLabelPolicy([GetPreviewLabelPolicyRequest](#getpreviewlabelpolicyrequest))
+[GetPreviewLabelPolicyResponse](#getpreviewlabelpolicyresponse)
+
+Returns the preview label policy of the organisation
 With this policy the private labeling can be configured (colors, etc.)
 
 
@@ -1616,6 +1637,66 @@ With this policy the private labeling can be configured (colors, etc.)
 
 Changes the custom label policy for the organisation
 With this policy the private labeling can be configured (colors, etc.)
+
+
+
+
+### ActivateCustomLabelPolicy
+
+> **rpc** ActivateCustomLabelPolicy([ActivateCustomLabelPolicyRequest](#activatecustomlabelpolicyrequest))
+[ActivateCustomLabelPolicyResponse](#activatecustomlabelpolicyresponse)
+
+Activates all changes of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyLogo
+
+> **rpc** RemoveCustomLabelPolicyLogo([RemoveCustomLabelPolicyLogoRequest](#removecustomlabelpolicylogorequest))
+[RemoveCustomLabelPolicyLogoResponse](#removecustomlabelpolicylogoresponse)
+
+Removes the logo of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyLogoDark
+
+> **rpc** RemoveCustomLabelPolicyLogoDark([RemoveCustomLabelPolicyLogoDarkRequest](#removecustomlabelpolicylogodarkrequest))
+[RemoveCustomLabelPolicyLogoDarkResponse](#removecustomlabelpolicylogodarkresponse)
+
+Removes the logo dark of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyIcon
+
+> **rpc** RemoveCustomLabelPolicyIcon([RemoveCustomLabelPolicyIconRequest](#removecustomlabelpolicyiconrequest))
+[RemoveCustomLabelPolicyIconResponse](#removecustomlabelpolicyiconresponse)
+
+Removes the icon of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyIconDark
+
+> **rpc** RemoveCustomLabelPolicyIconDark([RemoveCustomLabelPolicyIconDarkRequest](#removecustomlabelpolicyicondarkrequest))
+[RemoveCustomLabelPolicyIconDarkResponse](#removecustomlabelpolicyicondarkresponse)
+
+Removes the logo dark of the label policy
+
+
+
+
+### RemoveCustomLabelPolicyFont
+
+> **rpc** RemoveCustomLabelPolicyFont([RemoveCustomLabelPolicyFontRequest](#removecustomlabelpolicyfontrequest))
+[RemoveCustomLabelPolicyFontResponse](#removecustomlabelpolicyfontresponse)
+
+Removes the font of the label policy
 
 
 
@@ -1895,6 +1976,23 @@ Change OIDC identity provider configuration of the organisation
 ## Messages
 
 
+### ActivateCustomLabelPolicyRequest
+This is an empty request
+
+
+
+
+### ActivateCustomLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddAPIAppRequest
 
 
@@ -1955,9 +2053,16 @@ Change OIDC identity provider configuration of the organisation
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
-| secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | - |  |
+| primary_color |  string | - | string.max_len: 50<br />  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| warn_color |  string | - | string.max_len: 50<br />  |
+| background_color |  string | - | string.max_len: 50<br />  |
+| font_color |  string | - | string.max_len: 50<br />  |
+| primary_color_dark |  string | - | string.max_len: 50<br />  |
+| background_color_dark |  string | - | string.max_len: 50<br />  |
+| warn_color_dark |  string | - | string.max_len: 50<br />  |
+| font_color_dark |  string | - | string.max_len: 50<br />  |
+| disable_watermark |  bool | - |  |
 
 
 
@@ -3354,6 +3459,24 @@ This is an empty request
 
 
 
+### GetPreviewLabelPolicyRequest
+This is an empty request
+
+
+
+
+### GetPreviewLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### GetProjectByIDRequest
 
 
@@ -4531,6 +4654,91 @@ This is an empty request
 
 
 
+### RemoveCustomLabelPolicyFontRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyFontResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyIconDarkRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyIconDarkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyIconRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyIconResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyLogoDarkRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyLogoDarkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveCustomLabelPolicyLogoRequest
+This is an empty request
+
+
+
+
+### RemoveCustomLabelPolicyLogoResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveHumanAuthFactorOTPRequest
 
 
@@ -4566,6 +4774,28 @@ This is an empty request
 
 
 ### RemoveHumanAuthFactorU2FResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveHumanAvatarRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveHumanAvatarResponse
 
 
 
@@ -5530,9 +5760,16 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| primary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
-| secondary_color |  string | - | string.min_len: 1<br /> string.max_len: 50<br />  |
+| primary_color |  string | - | string.max_len: 50<br />  |
 | hide_login_name_suffix |  bool | - |  |
+| warn_color |  string | - | string.max_len: 50<br />  |
+| background_color |  string | - | string.max_len: 50<br />  |
+| font_color |  string | - | string.max_len: 50<br />  |
+| primary_color_dark |  string | - | string.max_len: 50<br />  |
+| background_color_dark |  string | - | string.max_len: 50<br />  |
+| warn_color_dark |  string | - | string.max_len: 50<br />  |
+| font_color_dark |  string | - | string.max_len: 50<br />  |
+| disable_watermark |  bool | - |  |
 
 
 

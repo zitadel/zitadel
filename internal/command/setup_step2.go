@@ -2,15 +2,16 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
 type Step2 struct {
-	DefaultPasswordComplexityPolicy iam_model.PasswordComplexityPolicy
+	DefaultPasswordComplexityPolicy domain.PasswordComplexityPolicy
 }
 
 func (s *Step2) Step() domain.Step {

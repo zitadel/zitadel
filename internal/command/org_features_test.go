@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -15,12 +16,15 @@ import (
 	"github.com/caos/zitadel/internal/repository/features"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/static"
+	"github.com/caos/zitadel/internal/static/mock"
 )
 
 func TestCommandSide_SetOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 		iamDomain  string
+		static     static.Storage
 	}
 	type args struct {
 		ctx           context.Context
@@ -57,7 +61,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -91,7 +96,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -139,6 +145,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -209,7 +223,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					CustomText:               false,
 				},
@@ -260,6 +275,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -358,7 +381,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -408,6 +432,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -516,7 +548,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -566,6 +599,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -684,7 +725,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyUsernameLogin: false,
 					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -790,6 +832,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					//begin setDefaultAuthFactorsInCustomLoginPolicy
 					//orgLabelPolicyWriteModelByID
 					expectFilter(
 						eventFromEventPusher(
@@ -798,6 +841,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -807,10 +858,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"custom",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
 					),
+					//removeLabelPolicy
+					expectFilter(),
+					//end setDefaultAuthFactorsInCustomLoginPolicy
+					//removeCustomDomains
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
@@ -883,6 +946,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 				),
 				iamDomain: "iam-domain",
+				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -897,7 +961,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
+					CustomDomain:             false,
 				},
 			},
 			res: res{
@@ -912,6 +978,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 				iamDomain:  tt.fields.iamDomain,
+				static:     tt.fields.static,
 			}
 			got, err := r.SetOrgFeatures(tt.args.ctx, tt.args.resourceOwner, tt.args.features)
 			if tt.res.err == nil {
@@ -1023,6 +1090,14 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),

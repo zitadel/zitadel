@@ -50,5 +50,7 @@ type OrgRepository interface {
 	GetMessageText(ctx context.Context, orgID, textType, language string) (*iam_model.MessageTextView, error)
 
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 }

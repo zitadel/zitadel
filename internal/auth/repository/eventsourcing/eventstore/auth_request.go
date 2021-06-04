@@ -248,7 +248,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if request.RequestedOrgID == "" {
 		username = user.PreferredLoginName
 	}
-	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -468,7 +468,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if user.State == int32(domain.UserStateInactive) {
 		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
 	}
-	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", user.ResourceOwner)
+	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
 	return nil
 }
 
@@ -511,7 +511,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest,
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(externalIDP.UserID, "", "", "", externalIDP.ResourceOwner)
+	request.SetUserInfo(externalIDP.UserID, "", "", "", "", externalIDP.ResourceOwner)
 	return nil
 }
 
@@ -616,6 +616,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 			DisplayName:       session.DisplayName,
 			UserName:          session.UserName,
 			LoginName:         session.LoginName,
+			AvatarKey:         session.AvatarKey,
 			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 		}
@@ -712,9 +713,9 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 }
 
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
-	policy, err := repo.View.LabelPolicyByAggregateID(orgID)
+	policy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
-		policy, err = repo.View.LabelPolicyByAggregateID(repo.IAMID)
+		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.IAMID, int32(domain.LabelPolicyStateActive))
 		if err != nil {
 			return nil, err
 		}

@@ -2,15 +2,16 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
 type Step6 struct {
-	DefaultLabelPolicy iam_model.LabelPolicy
+	DefaultLabelPolicy domain.LabelPolicy
 }
 
 func (s *Step6) Step() domain.Step {
@@ -24,10 +25,7 @@ func (s *Step6) execute(ctx context.Context, commandSide *Commands) error {
 func (c *Commands) SetupStep6(ctx context.Context, step *Step6) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := c.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(), &domain.LabelPolicy{
-			PrimaryColor:   step.DefaultLabelPolicy.PrimaryColor,
-			SecondaryColor: step.DefaultLabelPolicy.SecondaryColor,
-		})
+		event, err := c.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(), &step.DefaultLabelPolicy)
 		if err != nil {
 			return nil, err
 		}

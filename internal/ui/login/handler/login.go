@@ -11,12 +11,15 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/cache"
+	cache_config "github.com/caos/zitadel/internal/cache/config"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/static"
 	"github.com/caos/zitadel/internal/query"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -32,6 +35,8 @@ type Login struct {
 	parser              *form.Parser
 	command             *command.Commands
 	query               *query.Queries
+	staticStorage       static.Storage
+	staticCache         cache.Cache
 	authRepo            auth_repository.Repository
 	baseURL             string
 	zitadelURL          string
@@ -49,6 +54,7 @@ type Config struct {
 	CSRF                  CSRF
 	UserAgentCookieConfig *middleware.UserAgentCookieConfig
 	Cache                 middleware.CacheConfig
+	StaticCache           cache_config.CacheConfig
 }
 
 type CSRF struct {
@@ -62,7 +68,7 @@ const (
 	handlerPrefix = "/login"
 )
 
-func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
+func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
@@ -73,6 +79,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		zitadelURL:          config.ZitadelURL,
 		command:             command,
 		query:               query,
+		staticStorage:       staticStorage,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
 		iamDomain:           systemDefaults.Domain,
@@ -81,6 +88,9 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 	if localDevMode {
 		prefix = handlerPrefix
 	}
+	login.staticCache, err = config.StaticCache.Config.NewCache()
+	logging.Log("CONFI-dgg31").OnError(err).Panic("unable to create storage cache")
+
 	statikFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-Ga21f").OnError(err).Panic("unable to create filesystem")
 
@@ -92,7 +102,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 	userAgentCookie, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
 	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
-	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
+	login.renderer = CreateRenderer(prefix, statikFS, staticStorage, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	return login, handlerPrefix
 }

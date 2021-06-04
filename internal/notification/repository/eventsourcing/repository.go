@@ -26,7 +26,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 }
 
-func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands) (*EsRepository, error) {
+func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands, apiDomain string) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 	if err != nil {
 		return nil, err
 	}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, systemDefaults, translator, dir)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, systemDefaults, translator, dir, apiDomain)
 
 	return &EsRepository{
 		spool,

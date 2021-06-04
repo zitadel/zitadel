@@ -19,23 +19,23 @@
 @import '../success_label/success_label_theme.scss';
 @import './theming';
 
-@mixin zitadel-lgn-theme($theme-or-color-config) {
-    @include lgn-core-theme($theme-or-color-config);
-    @include lgn-header-theme($theme-or-color-config);
-    @include lgn-button-theme($theme-or-color-config);
-    @include lgn-input-theme($theme-or-color-config);
-    @include lgn-radio-theme($theme-or-color-config);
-    @include lgn-checkbox-theme($theme-or-color-config);
-    @include lgn-label-theme($theme-or-color-config);
-    @include lgn-footer-theme($theme-or-color-config);
-    @include lgn-a-theme($theme-or-color-config);
-    @include lgn-error-theme($theme-or-color-config);
-    @include lgn-qrcode-theme($theme-or-color-config);
-    @include lgn-container-theme($theme-or-color-config);
-    @include lgn-account-selection-theme($theme-or-color-config);
-    @include lgn-avatar-theme($theme-or-color-config);
-    @include lgn-select-theme($theme-or-color-config);
-    @include lgn-list-theme($theme-or-color-config);
-    @include lgn-idp-theme($theme-or-color-config);
-    @include lgn-success-label-theme($theme-or-color-config);
+@mixin zitadel-lgn-theme() {
+    @include lgn-core-theme();
+    @include lgn-header-theme();
+    @include lgn-button-theme();
+    @include lgn-input-theme();
+    @include lgn-radio-theme();
+    @include lgn-checkbox-theme();
+    @include lgn-label-theme();
+    @include lgn-footer-theme();
+    @include lgn-a-theme();
+    @include lgn-error-theme();
+    @include lgn-qrcode-theme();
+    @include lgn-container-theme();
+    @include lgn-account-selection-theme();
+    @include lgn-avatar-theme();
+    @include lgn-select-theme();
+    @include lgn-list-theme();
+    @include lgn-idp-theme();
+    @include lgn-success-label-theme();
 }

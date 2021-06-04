@@ -22,7 +22,9 @@ message Features {
   bool label_policy = 11;
   bool custom_domain = 12;
   bool login_policy_password_reset = 13;
-  bool custom_text = 14;
+  bool label_policy_private_label = 14;
+  bool label_policy_watermark = 15;
+  bool custom_text = 16;
 }
 
 message FeatureTier {

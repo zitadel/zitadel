@@ -75,6 +75,38 @@
         </div>
     </ng-template>
 
+    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+      <div class="p-item card">
+          <div class="avatar">
+              <i class="icon las la-gem"></i>
+          </div>
+          <div class="title">
+              <span>{{'POLICY.PRIVATELABELING_POLICY.TITLE' | translate}}</span>
+              <button mat-icon-button disabled>
+                  <i class="icon las la-check-circle"></i>
+              </button>
+          </div>
+
+          <p class="desc">
+              {{'POLICY.PRIVATELABELING_POLICY.DESCRIPTION' | translate}}</p>
+          <!-- <cnsl-info-section class="warn"
+              *ngIf="type == PolicyGridType.ORG && (['password_complexity_policy'] | hasFeature | async) == false"
+              type="WARN">
+              {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+              'password_complexity_policy'})}}
+          </cnsl-info-section> -->
+
+          <span class="fill-space"></span>
+          <div class="btn-wrapper">
+              <ng-template appHasRole [appHasRole]="['iam.policy.write']">
+                  <button
+                      [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.PRIVATELABEL ]"
+                      mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
+              </ng-template>
+          </div>
+      </div>
+  </ng-template>
+
     <ng-template appHasRole
         [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
@@ -101,40 +133,4 @@
             </div>
         </div>
     </ng-template>
-
-    <ng-container *ngIf="type === PolicyGridType.IAM">
-        <ng-template appHasRole [appHasRole]="['iam.policy.read']">
-            <div class="p-item card">
-                <div class="avatar">
-                    <i class="icon las la-envelope"></i>
-                </div>
-                <div class="title">
-                    <span>{{'POLICY.LABEL.TITLE' | translate}}</span>
-                    <button mat-icon-button disabled>
-                        <i class="icon las la-check-circle"></i>
-                    </button>
-                </div>
-
-                <p class="desc">
-                    {{'POLICY.LABEL.DESCRIPTION' | translate}}</p>
-
-                <cnsl-info-section class="warn"
-                    *ngIf="type == PolicyGridType.ORG && (['label_policy'] | hasFeature | async) == false" type="WARN">
-                    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
-                    'label_policy'})}}
-                </cnsl-info-section>
-
-                <span class="fill-space"></span>
-                <div class="btn-wrapper">
-                    <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                        <button
-                            [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.LABEL ]"
-                            mat-stroked-button
-                            [disabled]="type == PolicyGridType.ORG && (['label_policy'] | hasFeature | async) == false">
-                            {{'POLICY.BTN_EDIT' | translate}}</button>
-                    </ng-template>
-                </div>
-            </div>
-        </ng-template>
-    </ng-container>
 </div>

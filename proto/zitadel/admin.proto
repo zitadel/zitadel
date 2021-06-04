@@ -823,6 +823,28 @@ service AdminService {
         };
     }
 
+    //Returns the preview label policy defined by the administrators of ZITADEL
+    rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label/_preview";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "label policy";
+            tags: "policy";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default label policy";
+                };
+            };
+        };
+    }
+
     //Updates the default label policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
@@ -844,6 +866,73 @@ service AdminService {
                     description: "default label policy updated";
                 };
             };
+        };
+    }
+
+    // Activates all changes of the label policy
+    rpc ActivateLabelPolicy(ActivateLabelPolicyRequest) returns (ActivateLabelPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/label/_activate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo of the label policy
+    rpc RemoveLabelPolicyLogo(RemoveLabelPolicyLogoRequest) returns (RemoveLabelPolicyLogoResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveLabelPolicyLogoDark(RemoveLabelPolicyLogoDarkRequest) returns (RemoveLabelPolicyLogoDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the icon of the label policy
+    rpc RemoveLabelPolicyIcon(RemoveLabelPolicyIconRequest) returns (RemoveLabelPolicyIconResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveLabelPolicyIconDark(RemoveLabelPolicyIconDarkRequest) returns (RemoveLabelPolicyIconDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the font of the label policy
+    rpc RemoveLabelPolicyFont(RemoveLabelPolicyFontRequest) returns (RemoveLabelPolicyFontResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/font"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
         };
     }
 
@@ -2305,7 +2394,9 @@ message SetDefaultFeaturesRequest {
     bool label_policy = 12;
     bool custom_domain = 13;
     bool login_policy_password_reset = 14;
-    bool custom_text = 15;
+    bool label_policy_private_label = 15;
+    bool label_policy_watermark = 16;
+    bool custom_text = 17;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2337,7 +2428,9 @@ message SetOrgFeaturesRequest {
     bool label_policy = 13;
     bool custom_domain = 14;
     bool login_policy_password_reset = 15;
-    bool custom_text = 16;
+    bool label_policy_private_label = 16;
+    bool label_policy_watermark = 17;
+    bool custom_text = 18;
 }
 
 message SetOrgFeaturesResponse {
@@ -2466,28 +2559,19 @@ message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
 }
 
+//This is an empty request
+message GetPreviewLabelPolicyRequest {}
+
+message GetPreviewLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
 message UpdateLabelPolicyRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["primary_color", "secondary_color"]
-		};
-	};
-    
     string primary_color = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 50},
+        (validate.rules).string = {max_len: 50},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "respresents a color scheme"
             example: "\"#353535\"";
-            min_length: 1;
-            max_length: 50;
-        }
-    ];
-    string secondary_color = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 50},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "respresents a color scheme";
-            example: "\"#707070\"";
-            min_length: 1;
             max_length: 50;
         }
     ];
@@ -2496,9 +2580,59 @@ message UpdateLabelPolicyRequest {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
+    string warn_color = 4 [(validate.rules).string = {max_len: 50}];
+    string background_color = 5 [(validate.rules).string = {max_len: 50}];
+    string font_color = 6 [(validate.rules).string = {max_len: 50}];
+    string primary_color_dark = 7 [(validate.rules).string = {max_len: 50}];
+    string background_color_dark = 8 [(validate.rules).string = { max_len: 50}];
+    string warn_color_dark = 9 [(validate.rules).string = { max_len: 50}];
+    string font_color_dark = 10 [(validate.rules).string = { max_len: 50}];
+    bool disable_watermark = 11;
 }
 
 message UpdateLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ActivateLabelPolicyRequest {}
+
+message ActivateLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLogoRequest {}
+
+message RemoveLabelPolicyLogoResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLogoDarkRequest {}
+
+message RemoveLabelPolicyLogoDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyIconRequest {}
+
+message RemoveLabelPolicyIconResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyIconDarkRequest {}
+
+message RemoveLabelPolicyIconDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyFontRequest {}
+
+message RemoveLabelPolicyFontResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

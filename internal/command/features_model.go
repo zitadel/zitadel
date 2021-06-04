@@ -23,7 +23,8 @@ type FeaturesWriteModel struct {
 	LoginPolicyUsernameLogin bool
 	LoginPolicyPasswordReset bool
 	PasswordComplexityPolicy bool
-	LabelPolicy              bool
+	LabelPolicyPrivateLabel  bool
+	LabelPolicyWatermark     bool
 	CustomDomain             bool
 	CustomText               bool
 }
@@ -70,7 +71,13 @@ func (wm *FeaturesWriteModel) Reduce() error {
 				wm.PasswordComplexityPolicy = *e.PasswordComplexityPolicy
 			}
 			if e.LabelPolicy != nil {
-				wm.LabelPolicy = *e.LabelPolicy
+				wm.LabelPolicyPrivateLabel = *e.LabelPolicy
+			}
+			if e.LabelPolicyPrivateLabel != nil {
+				wm.LabelPolicyPrivateLabel = *e.LabelPolicyPrivateLabel
+			}
+			if e.LabelPolicyWatermark != nil {
+				wm.LabelPolicyWatermark = *e.LabelPolicyWatermark
 			}
 			if e.CustomDomain != nil {
 				wm.CustomDomain = *e.CustomDomain

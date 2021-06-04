@@ -158,7 +158,8 @@ export class FeaturesComponent implements OnDestroy {
         req.setLoginPolicyFactors(this.features.loginPolicyFactors);
         req.setLoginPolicyPasswordless(this.features.loginPolicyPasswordless);
         req.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
-        req.setLabelPolicy(this.features.labelPolicy);
+        req.setLabelPolicyPrivateLabel(this.features.labelPolicyPrivateLabel);
+        req.setLabelPolicyWatermark(this.features.labelPolicyWatermark);
         req.setCustomDomain(this.features.customDomain);
         req.setCustomText(this.features.customText);
 
@@ -178,7 +179,8 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setLoginPolicyFactors(this.features.loginPolicyFactors);
         dreq.setLoginPolicyPasswordless(this.features.loginPolicyPasswordless);
         dreq.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
-        dreq.setLabelPolicy(this.features.labelPolicy);
+        dreq.setLabelPolicyPrivateLabel(this.features.labelPolicyPrivateLabel);
+        dreq.setLabelPolicyWatermark(this.features.labelPolicyWatermark);
         dreq.setCustomDomain(this.features.customDomain);
         dreq.setCustomText(this.features.customText);
 
