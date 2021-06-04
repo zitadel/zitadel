@@ -155,9 +155,12 @@ func (p *ProjectGrantMember) processUser(event *es_models.Event) (err error) {
 			p.fillUserData(member, user)
 		}
 		return p.view.PutProjectGrantMembers(members, event)
+	case usr_es_model.UserRemoved:
+		p.view.DeleteProjectGrantMembersByUserID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
+	return nil
 }
 
 func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView) (err error) {

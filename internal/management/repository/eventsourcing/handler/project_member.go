@@ -150,6 +150,8 @@ func (p *ProjectMember) processUser(event *es_models.Event) (err error) {
 			p.fillUserData(member, user)
 		}
 		return p.view.PutProjectMembers(members, event)
+	case usr_es_model.UserRemoved:
+		p.view.DeleteProjectMembersByUserID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event)
 	}
