@@ -12,7 +12,7 @@ const (
 	IAMMemberAdded          models.EventType = "iam.member.added"
 	IAMMemberChanged        models.EventType = "iam.member.changed"
 	IAMMemberRemoved        models.EventType = "iam.member.removed"
-	IAMMemberCascadeRemoved models.EventType = "iam.member.cascade"
+	IAMMemberCascadeRemoved models.EventType = "iam.member.cascade.removed"
 
 	IDPConfigAdded       models.EventType = "iam.idp.config.added"
 	IDPConfigChanged     models.EventType = "iam.idp.config.changed"
