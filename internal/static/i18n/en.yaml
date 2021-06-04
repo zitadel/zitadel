@@ -307,6 +307,16 @@ Errors:
       NotChanged: Org IAM Policy has not been changed
   Policy:
     AlreadyExists: Policy already exists
+    Label:
+      Invalid:
+        PrimaryColor: Primary Color is no valid Hex Color Value
+        BackgroundColor: Background color is no valid Hex color value
+        WarnColor: Warn color is no valid Hex color value
+        FontColor: Font color is no valid Hex color value
+        PrimaryColorDark: Primary Color (dark mode) is no valid Hex color value
+        BackgroundColorDark: Background color (dark mode) is no valid Hex color value
+        WarnColorDark: Warn color (dark mode) is no valid Hex color value
+        FontColorDark: Font color (dark mode) is no valid Hex color value
   UserGrant:
     AlreadyExists: User grant already exists
     NotFound: User grant not found
@@ -376,6 +386,9 @@ EventTypes:
     human:
       added: Person added
       selfregistered: Person registered himself
+        avatar:
+          added: Avatar added
+          removed: Avatar removed
       initialization:
         code:
           added: Initialisation code generated
@@ -584,7 +597,25 @@ EventTypes:
       label:
         added: Label Policy added
         changed: Label Policy changed
+        activated: Label Policy activated
         removed: Label Policy removed
+        logo:
+          added: Logo added to Label Policy
+          removed: Logo removed from Label Policy
+          dark:
+            added: Logo (dark mode) added to Label Policy
+            removed: Logo (dark mode) removed from Label Policy
+        icon:
+          added: Icon added to Label Policy
+          removed: Icon removed from Label Policy
+          dark:
+            added: Icon (dark mode) added to Label Policy
+            removed: Icon (dark mode) removed from Label Policy
+        font:
+          added: Font added to Label Policy
+          removed: Font removed from Label Policy
+        assets:
+          removed: Assets removed from Label Policy
   project:
     added: Project added
     changed: Project changed
@@ -683,6 +714,27 @@ EventTypes:
         idpprovider:
           added: Idp Provider added to Default Login Policy
           removed: Idp Provider removed from Default Login Policy
+      label:
+        added: Label Policy added
+        changed: Label Policy changed
+        activated: Label Policy activated
+        logo:
+          added: Logo added to Label Policy
+          removed: Logo removed from Label Policy
+          dark:
+            added: Logo (dark mode) added to Label Policy
+            removed: Logo (dark mode) removed from Label Policy
+        icon:
+          added: Icon added to Label Policy
+          removed: Icon removed from Label Policy
+          dark:
+            added: Icon (dark mode) added to Label Policy
+            removed: Icon (dark mode) removed from Label Policy
+        font:
+          added: Font added to Label Policy
+          removed: Font removed from Label Policy
+        assets:
+          removed: Assets removed from Label Policy
   key_pair:
     added: Key pair added
 Application:
