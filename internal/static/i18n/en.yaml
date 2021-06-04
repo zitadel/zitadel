@@ -309,11 +309,11 @@ Errors:
     AlreadyExists: Policy already exists
     Label:
       Invalid:
-        PrimaryColor: Primary Color is no valid Hex Color Value
+        PrimaryColor: Primary color is no valid Hex color value
         BackgroundColor: Background color is no valid Hex color value
         WarnColor: Warn color is no valid Hex color value
         FontColor: Font color is no valid Hex color value
-        PrimaryColorDark: Primary Color (dark mode) is no valid Hex color value
+        PrimaryColorDark: Primary color (dark mode) is no valid Hex color value
         BackgroundColorDark: Background color (dark mode) is no valid Hex color value
         WarnColorDark: Warn color (dark mode) is no valid Hex color value
         FontColorDark: Font color (dark mode) is no valid Hex color value
