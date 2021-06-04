@@ -102,7 +102,7 @@ func (p *OrgAdminProjection) reduceMemberAdded(event eventstore.EventReader) ([]
 	}
 
 	if !isOrgOwner(e.Roles) {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateRootSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	stmt, err := p.addAdmin(e, e.Aggregate().ResourceOwner, e.UserID)
@@ -155,14 +155,14 @@ func (p *OrgAdminProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateRootSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
 			e.Aggregate().Typ,
 			e.Sequence(),
-			e.PreviousAggregateRootSequence(),
+			e.PreviousAggregateTypeSequence(),
 			values,
 			[]handler.Column{
 				handler.NewCol(orgAdminOrgID, e.Aggregate().ResourceOwner),
@@ -182,7 +182,7 @@ func (p *OrgAdminProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 		crdb.NewDeleteStatement(
 			e.Aggregate().Typ,
 			e.Sequence(),
-			e.PreviousAggregateRootSequence(),
+			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
 				handler.NewCol(orgAdminOrgID, e.Aggregate().ResourceOwner),
 			},
@@ -201,7 +201,7 @@ func (p *OrgAdminProjection) reduceHumanEmailChanged(event eventstore.EventReade
 		crdb.NewUpdateStatement(
 			e.Aggregate().Typ,
 			e.Sequence(),
-			e.PreviousAggregateRootSequence(),
+			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
 				handler.NewCol(orgAdminOwnerEmail, e.EmailAddress),
 			},
@@ -234,14 +234,14 @@ func (p *OrgAdminProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateRootSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
 			e.Aggregate().Typ,
 			e.Sequence(),
-			e.PreviousAggregateRootSequence(),
+			e.PreviousAggregateTypeSequence(),
 			values,
 			[]handler.Column{
 				handler.NewCol(orgAdminOwnerID, e.Aggregate().ID),
@@ -263,7 +263,7 @@ func (p *OrgAdminProjection) deleteAdmin(event eventstore.EventReader, orgID, ow
 	return crdb.NewDeleteStatement(
 		event.Aggregate().Typ,
 		event.Sequence(),
-		event.PreviousAggregateRootSequence(),
+		event.PreviousAggregateTypeSequence(),
 		[]handler.Column{
 			handler.NewCol(orgAdminOrgID, orgID),
 			handler.NewCol(orgAdminOwnerID, ownerID),
@@ -307,7 +307,7 @@ func (p *OrgAdminProjection) addAdmin(event eventstore.EventReader, orgID, userI
 	return crdb.NewUpsertStatement(
 		event.Aggregate().Typ,
 		event.Sequence(),
-		event.PreviousAggregateRootSequence(),
+		event.PreviousAggregateTypeSequence(),
 		[]handler.Column{
 			handler.NewCol(orgAdminOrgID, admin.OrgID),
 			handler.NewCol(orgAdminOrgName, admin.OrgName),

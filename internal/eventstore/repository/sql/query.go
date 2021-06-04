@@ -93,7 +93,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	}
 	var (
 		previousAggregateSequence     Sequence
-		previousAggregateRootSequence Sequence
+		previousAggregateTypeSequence Sequence
 	)
 	data := make(Data, 0)
 	event := new(repository.Event)
@@ -103,7 +103,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.Type,
 		&event.Sequence,
 		&previousAggregateSequence,
-		&previousAggregateRootSequence,
+		&previousAggregateTypeSequence,
 		&data,
 		&event.EditorService,
 		&event.EditorUser,
@@ -119,7 +119,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	}
 
 	event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-	event.PreviousAggregateRootSequence = uint64(previousAggregateRootSequence)
+	event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
 

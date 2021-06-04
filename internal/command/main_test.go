@@ -141,7 +141,7 @@ func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 		ID:                            "",
 		Sequence:                      0,
 		PreviousAggregateSequence:     0,
-		PreviousAggregateRootSequence: 0,
+		PreviousAggregateTypeSequence: 0,
 		CreationDate:                  time.Time{},
 		Type:                          repository.EventType(event.Type()),
 		Data:                          data,

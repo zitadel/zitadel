@@ -22,14 +22,14 @@ const (
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
 	// and buffers it (crdb inmemory)
-	crdbInsert = "WITH previous_data (agg_root_seq, agg_seq, resource_owner) AS (" +
+	crdbInsert = "WITH previous_data (aggregate_type_sequence, aggregate_sequence, resource_owner) AS (" +
 		"    WITH aggregate_events AS (" +
 		"        SELECT event_sequence, aggregate_id, resource_owner FROM eventstore.events WHERE aggregate_type = $2 ORDER BY event_sequence DESC" +
 		"    )" +
 		"    SELECT * FROM" +
-		"        (SELECT event_sequence AS agg_root_seq FROM aggregate_events ORDER BY event_sequence DESC LIMIT 1)" +
+		"        (SELECT event_sequence AS aggregate_type_sequence FROM aggregate_events ORDER BY event_sequence DESC LIMIT 1)" +
 		//natural left join because it could be the first event of the aggregate but aggregate root exists
-		"        NATURAL LEFT JOIN (SELECT event_sequence AS agg_seq, resource_owner FROM aggregate_events WHERE aggregate_id = $3 ORDER BY event_sequence DESC LIMIT 1)" +
+		"        NATURAL LEFT JOIN (SELECT event_sequence AS aggregate_sequence, resource_owner FROM aggregate_events WHERE aggregate_id = $3 ORDER BY event_sequence DESC LIMIT 1)" +
 		"        UNION ALL" +
 		//if first event of the aggregate
 		"        SELECT NULL::INT8, NULL::INT8, NULL::TEXT" +
@@ -47,7 +47,7 @@ const (
 		"    editor_service, " +
 		"    resource_owner, " +
 		"    previous_aggregate_sequence, " +
-		"    previous_aggregate_root_sequence " +
+		"    previous_aggregate_type_sequence " +
 		") " +
 		// defines the data to be inserted
 		"SELECT " +
@@ -59,11 +59,11 @@ const (
 		"    $5::JSONB AS event_data, " +
 		"    $6::VARCHAR AS editor_user, " +
 		"    $7::VARCHAR AS editor_service, " +
-		"    IFNULL((SELECT resource_owner FROM previous_data), $8::VARCHAR)  AS resource_owner, " +
-		"    (SELECT agg_seq FROM previous_data) AS previous_aggregate_sequence, " +
-		"    (SELECT agg_root_seq FROM previous_data) AS previous_aggregate_root_sequence " +
+		"    IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner, " +
+		"    aggregate_sequence AS previous_aggregate_sequence, " +
+		"    aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
-		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_root_sequence, creation_date, resource_owner"
+		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner"
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
 						unique_type,
@@ -94,7 +94,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 
 		var (
 			previousAggregateSequence     Sequence
-			previousAggregateRootSequence Sequence
+			previousAggregateTypeSequence Sequence
 		)
 		for _, event := range events {
 			err := tx.QueryRowContext(ctx, crdbInsert,
@@ -106,10 +106,10 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateRootSequence, &event.CreationDate, &event.ResourceOwner)
+			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-			event.PreviousAggregateRootSequence = uint64(previousAggregateRootSequence)
+			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
 
 			if err != nil {
 				logging.LogWithFields("SQL-NOqH7",
@@ -207,7 +207,7 @@ func (db *CRDB) eventQuery() string {
 		", event_type" +
 		", event_sequence" +
 		", previous_aggregate_sequence" +
-		", previous_aggregate_root_sequence" +
+		", previous_aggregate_type_sequence" +
 		", event_data" +
 		", editor_service" +
 		", editor_user" +

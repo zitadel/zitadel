@@ -18,7 +18,7 @@ type BaseEvent struct {
 	sequence                      uint64
 	creationDate                  time.Time
 	previousAggregateSequence     uint64
-	previousAggregateRootSequence uint64
+	previousAggregateTypeSequence uint64
 
 	//User who created the event
 	User string `json:"-"`
@@ -67,9 +67,9 @@ func (e *BaseEvent) PreviousAggregateSequence() uint64 {
 	return e.previousAggregateSequence
 }
 
-//PreviousAggregateRootSequence implements EventReader
-func (e *BaseEvent) PreviousAggregateRootSequence() uint64 {
-	return e.previousAggregateRootSequence
+//PreviousAggregateTypeSequence implements EventReader
+func (e *BaseEvent) PreviousAggregateTypeSequence() uint64 {
+	return e.previousAggregateTypeSequence
 }
 
 //BaseEventFromRepo maps a stored event to a BaseEvent
@@ -85,7 +85,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 		creationDate:                  event.CreationDate,
 		sequence:                      event.Sequence,
 		previousAggregateSequence:     event.PreviousAggregateSequence,
-		previousAggregateRootSequence: event.PreviousAggregateRootSequence,
+		previousAggregateTypeSequence: event.PreviousAggregateTypeSequence,
 		Service:                       event.EditorService,
 		User:                          event.EditorUser,
 		Data:                          event.Data,
@@ -93,7 +93,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 }
 
 //NewBaseEventForPush is the constructor for event's which will be pushed into the eventstore
-// the resource owner of the aggregate is only used if it's the first event of this aggregateroot
+// the resource owner of the aggregate is only used if it's the first event of this aggregate type
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{

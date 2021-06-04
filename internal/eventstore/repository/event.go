@@ -16,9 +16,9 @@ type Event struct {
 	// if it's 0 then it's the first event of this aggregate
 	PreviousAggregateSequence uint64
 
-	//PreviousAggregateRootSequence is the sequence of the previous sequence of the aggregate root (e.g. org)
+	//PreviousAggregateTypeSequence is the sequence of the previous sequence of the aggregate root (e.g. org)
 	// the first event of the aggregate has previous aggregate root sequence 0
-	PreviousAggregateRootSequence uint64
+	PreviousAggregateTypeSequence uint64
 
 	//CreationDate is the time the event is created
 	// it's used for human readability.
