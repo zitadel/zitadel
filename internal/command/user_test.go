@@ -934,128 +934,128 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "userid missing, invalid argument error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		orgID:  "org1",
-		//		userID: "",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "user not existing, not found error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		orgID:  "org1",
-		//		userID: "user1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsNotFound,
-		//	},
-		//},
-		//{
-		//	name: "org iam policy not found, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					user.NewHumanAddedEvent(context.Background(),
-		//						&user.NewAggregate("user1", "org1").Aggregate,
-		//						"username",
-		//						"firstname",
-		//						"lastname",
-		//						"nickname",
-		//						"displayname",
-		//						language.German,
-		//						domain.GenderUnspecified,
-		//						"email@test.ch",
-		//						true,
-		//					),
-		//				),
-		//			),
-		//			expectFilter(),
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		orgID:  "org1",
-		//		userID: "user1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "remove user, ok",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					user.NewHumanAddedEvent(context.Background(),
-		//						&user.NewAggregate("user1", "org1").Aggregate,
-		//						"username",
-		//						"firstname",
-		//						"lastname",
-		//						"nickname",
-		//						"displayname",
-		//						language.German,
-		//						domain.GenderUnspecified,
-		//						"email@test.ch",
-		//						true,
-		//					),
-		//				),
-		//			),
-		//			expectFilter(),
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					iam.NewOrgIAMPolicyAddedEvent(context.Background(),
-		//						&user.NewAggregate("user1", "org1").Aggregate,
-		//						true,
-		//					),
-		//				),
-		//			),
-		//			expectPush(
-		//				[]*repository.Event{
-		//					eventFromEventPusher(
-		//						user.NewUserRemovedEvent(context.Background(),
-		//							&user.NewAggregate("user1", "org1").Aggregate,
-		//							"username",
-		//							true,
-		//						),
-		//					),
-		//				},
-		//				uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		orgID:  "org1",
-		//		userID: "user1",
-		//	},
-		//	res: res{
-		//		want: &domain.ObjectDetails{
-		//			ResourceOwner: "org1",
-		//		},
-		//	},
-		//},
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "org iam policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "remove user, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewUserRemovedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									true,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 		{
 			name: "remove user with user memberships, ok",
 			fields: fields{
