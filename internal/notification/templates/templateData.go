@@ -87,7 +87,7 @@ func GetTemplateData(apiDomain, href string, text *iam_model.MailTextView, polic
 		templateData.IncludeLogo = false
 	} else {
 		templateData.IncludeLogo = true
-		templateData.LogoURL = fmt.Sprintf("%s/assets/v1/%s", apiDomain, policy.LogoURL)
+		templateData.LogoURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.AggregateID, policy.LogoURL)
 	}
 	if policy.FontURL != "" {
 		split := strings.Split(policy.FontURL, "/")
