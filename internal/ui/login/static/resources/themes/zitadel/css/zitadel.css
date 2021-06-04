@@ -108,7 +108,7 @@
   --zitadel-color-warn-800: #c62828;
   --zitadel-color-warn-900: #b71c1c;
   --zitadel-font-family: "Lato";
-  --zitadel-color-background: var(--zitadel-color-grey-900);
+  --zitadel-color-background-500: var(--zitadel-color-grey-900);
   --zitadel-color-footer-line: #303131;
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #403e3e;

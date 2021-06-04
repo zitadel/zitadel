@@ -30,7 +30,7 @@ type UserSessionView struct {
 	UserName                     string    `json:"-" gorm:"column:user_name"`
 	LoginName                    string    `json:"-" gorm:"column:login_name"`
 	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
-	AvatarKey                    string    `	json:"-" gorm:"column:avatar_key"`
+	AvatarKey                    string    `json:"-" gorm:"column:avatar_key"`
 	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
 	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
