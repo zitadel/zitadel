@@ -49,6 +49,8 @@ type Uploader interface {
 	Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
 	BucketName(data authz.CtxData) string
+	ContentTypeAllowed(contentType string) bool
+	MaxFileSize() int64
 }
 
 type Downloader interface {
@@ -101,7 +103,7 @@ func (l *publicFileDownloader) BucketName(_ context.Context, id string) string {
 	return id
 }
 
-const maxMemory = 10 << 20
+const maxMemory = 2 << 20
 const paramFile = "file"
 
 func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWriter, *http.Request) {
@@ -118,6 +120,16 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			err = file.Close()
 			logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
 		}()
+		contentType := handler.Header.Get("content-type")
+		size := handler.Size
+		if !uploader.ContentTypeAllowed(contentType) {
+			s.ErrorHandler()(w, r, caos_errs.ThrowInvalidArgument(nil, "UPLOAD-Dbvfs", "invalid content-type"))
+			return
+		}
+		if size > uploader.MaxFileSize() {
+			s.ErrorHandler()(w, r, caos_errs.ThrowInvalidArgumentf(nil, "UPLOAD-Bfb32", "file to big, max file size is %v", uploader.MaxFileSize()))
+			return
+		}
 
 		bucketName := uploader.BucketName(ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
@@ -125,7 +137,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			s.ErrorHandler()(w, r, err)
 			return
 		}
-		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, handler.Header.Get("content-type"), file, handler.Size)
+		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, contentType, file, size)
 		if err != nil {
 			s.ErrorHandler()(w, r, err)
 			return

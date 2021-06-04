@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
@@ -9,10 +10,26 @@ import (
 )
 
 func (h *Handler) UploadMyUserAvatar() Uploader {
-	return &myHumanAvatarUploader{}
+	return &myHumanAvatarUploader{[]string{"image/"}, 1 << 19}
 }
 
-type myHumanAvatarUploader struct{}
+type myHumanAvatarUploader struct {
+	contentTypes []string
+	maxSize      int64
+}
+
+func (l *myHumanAvatarUploader) ContentTypeAllowed(contentType string) bool {
+	for _, ct := range l.contentTypes {
+		if strings.HasPrefix(contentType, ct) {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *myHumanAvatarUploader) MaxFileSize() int64 {
+	return l.maxSize
+}
 
 func (l *myHumanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error) {
 	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil

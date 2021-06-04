@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
@@ -28,25 +29,40 @@ const (
 )
 
 func (h *Handler) UploadDefaultLabelPolicyLogo() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, false, true}
+	return &labelPolicyLogoUploader{h.idGenerator, false, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadDefaultLabelPolicyLogoDark() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, true, true}
+	return &labelPolicyLogoUploader{h.idGenerator, true, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyLogo() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, false, false}
+	return &labelPolicyLogoUploader{h.idGenerator, false, false, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyLogoDark() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, true, false}
+	return &labelPolicyLogoUploader{h.idGenerator, true, false, []string{"image/"}, 1 << 19}
 }
 
 type labelPolicyLogoUploader struct {
 	idGenerator   id.Generator
 	darkMode      bool
 	defaultPolicy bool
+	contentTypes  []string
+	maxSize       int64
+}
+
+func (l *labelPolicyLogoUploader) ContentTypeAllowed(contentType string) bool {
+	for _, ct := range l.contentTypes {
+		if strings.HasPrefix(contentType, ct) {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *labelPolicyLogoUploader) MaxFileSize() int64 {
+	return l.maxSize
 }
 
 func (l *labelPolicyLogoUploader) ObjectName(_ authz.CtxData) (string, error) {
@@ -154,25 +170,40 @@ func (l *labelPolicyLogoDownloader) BucketName(ctx context.Context, id string) s
 }
 
 func (h *Handler) UploadDefaultLabelPolicyIcon() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, false, true}
+	return &labelPolicyIconUploader{h.idGenerator, false, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadDefaultLabelPolicyIconDark() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, true, true}
+	return &labelPolicyIconUploader{h.idGenerator, true, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyIcon() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, false, false}
+	return &labelPolicyIconUploader{h.idGenerator, false, false, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyIconDark() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, true, false}
+	return &labelPolicyIconUploader{h.idGenerator, true, false, []string{"image/"}, 1 << 19}
 }
 
 type labelPolicyIconUploader struct {
 	idGenerator   id.Generator
 	darkMode      bool
 	defaultPolicy bool
+	contentTypes  []string
+	maxSize       int64
+}
+
+func (l *labelPolicyIconUploader) ContentTypeAllowed(contentType string) bool {
+	for _, ct := range l.contentTypes {
+		if strings.HasPrefix(contentType, ct) {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *labelPolicyIconUploader) MaxFileSize() int64 {
+	return l.maxSize
 }
 
 func (l *labelPolicyIconUploader) ObjectName(_ authz.CtxData) (string, error) {
@@ -282,16 +313,31 @@ func (l *labelPolicyIconDownloader) BucketName(ctx context.Context, id string) s
 }
 
 func (h *Handler) UploadDefaultLabelPolicyFont() Uploader {
-	return &labelPolicyFontUploader{h.idGenerator, true}
+	return &labelPolicyFontUploader{h.idGenerator, true, []string{"font/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyFont() Uploader {
-	return &labelPolicyFontUploader{h.idGenerator, false}
+	return &labelPolicyFontUploader{h.idGenerator, false, []string{"font/"}, 1 << 19}
 }
 
 type labelPolicyFontUploader struct {
 	idGenerator   id.Generator
 	defaultPolicy bool
+	contentTypes  []string
+	maxSize       int64
+}
+
+func (l *labelPolicyFontUploader) ContentTypeAllowed(contentType string) bool {
+	for _, ct := range l.contentTypes {
+		if strings.HasPrefix(contentType, ct) {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *labelPolicyFontUploader) MaxFileSize() int64 {
+	return l.maxSize
 }
 
 func (l *labelPolicyFontUploader) ObjectName(_ authz.CtxData) (string, error) {
