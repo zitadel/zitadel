@@ -111,7 +111,7 @@ func (p *ProjectMember) processProjectMember(event *es_models.Event) (err error)
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectMemberRemoved:
+	case proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		err = member.SetData(event)
 		if err != nil {
 			return err

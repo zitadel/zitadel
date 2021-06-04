@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/org"
+
 	"reflect"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -108,6 +110,17 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 		return nil, err
 	}
 	return writeModelToObjectDetails(&m.WriteModel), nil
+}
+
+func (c *Commands) removeProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+	if cascade {
+		return org.NewMemberCascadeRemovedEvent(
+			ctx,
+			projectAgg,
+			userID)
+	} else {
+		return project.NewProjectMemberRemovedEvent(ctx, projectAgg, userID)
+	}
 }
 
 func (c *Commands) projectMemberWriteModelByID(ctx context.Context, projectID, userID, resourceOwner string) (member *ProjectMemberWriteModel, err error) {

@@ -159,6 +159,8 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 		err = i.appendChangeMemberEvent(event)
 	case IAMMemberRemoved:
 		err = i.appendRemoveMemberEvent(event)
+	case IAMMemberCascadeRemoved:
+		err = i.appendRemoveMemberEvent(event)
 	case IDPConfigAdded:
 		return i.appendAddIDPConfigEvent(event)
 	case IDPConfigChanged:

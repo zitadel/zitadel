@@ -169,7 +169,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*domain.UserMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -197,6 +197,14 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 			continue
 		}
 		events = append(events, removeEvent)
+	}
+
+	if len(cascadingUserMemberships) > 0 {
+		membershipEvents, err := c.removeUserMemberships(ctx, cascadingUserMemberships, true)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, membershipEvents...)
 	}
 
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
