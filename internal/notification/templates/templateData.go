@@ -54,7 +54,7 @@ func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]inter
 	data.ButtonText = i18n.Localize(data.ButtonText, nil, langs...)
 }
 
-func GetTemplateData(apiDomain, href string, text *iam_model.MailTextView, policy *iam_model.LabelPolicyView) TemplateData {
+func GetTemplateData(apiDomain, href string, text *iam_model.MessageTextView, policy *iam_model.LabelPolicyView) TemplateData {
 	templateData := TemplateData{
 		Title:           text.Title,
 		PreHeader:       text.PreHeader,
@@ -63,6 +63,7 @@ func GetTemplateData(apiDomain, href string, text *iam_model.MailTextView, polic
 		Text:            html.UnescapeString(text.Text),
 		Href:            href,
 		ButtonText:      text.ButtonText,
+		FooterText:      text.FooterText,
 		PrimaryColor:    defaultPrimaryColor,
 		BackgroundColor: defaultBackgroundColor,
 		FontColor:       defaultFontColor,

@@ -146,7 +146,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
-
+	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -185,6 +185,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
+	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -222,7 +223,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
-
+	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -289,6 +290,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if user.LastEmail == "" {
 		return nil
 	}
+	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err

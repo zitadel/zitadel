@@ -21,7 +21,7 @@ type IAMSetUp struct {
 	Step13 *command.Step13
 	Step14 *command.Step14
 	Step15 *command.Step15
-	Step15 *command.Step16
+	Step16 *command.Step16
 }
 
 func (setup *IAMSetUp) Steps(currentDone domain.Step) ([]command.Step, error) {
