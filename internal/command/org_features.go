@@ -13,8 +13,12 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
+	err := c.checkOrgExists(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	existingFeatures := NewOrgFeaturesWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	err = c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
 		return nil, err
 	}
