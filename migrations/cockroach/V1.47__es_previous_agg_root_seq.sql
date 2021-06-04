@@ -5,6 +5,10 @@ ALTER TABLE eventstore.events
     ADD COLUMN previous_aggregate_root_sequence INT8, 
     ADD CONSTRAINT prev_agg_root_seq_unique UNIQUE(previous_aggregate_root_sequence);
 
+COMMIT;
+
+BEGIN;
+
 -- --------------------------------------------------------
 -- iam
 -- --------------------------------------------------------
