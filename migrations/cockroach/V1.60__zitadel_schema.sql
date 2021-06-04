@@ -14,10 +14,11 @@ CREATE TABLE projections.locks (
 
 CREATE TABLE projections.current_sequences (
     view_name TEXT,
+    aggregate_type TEXT,
     current_sequence BIGINT,
     timestamp TIMESTAMPTZ,
 
-    PRIMARY KEY (view_name)
+    PRIMARY KEY (view_name, aggregate_type)
 );
 
 CREATE TABLE projections.failed_events (
