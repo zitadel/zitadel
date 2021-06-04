@@ -12,7 +12,7 @@ type Step16 struct {
 }
 
 func (s *Step16) Step() domain.Step {
-	return domain.Step15
+	return domain.Step16
 }
 
 func (s *Step16) execute(ctx context.Context, commandSide *Commands) error {
