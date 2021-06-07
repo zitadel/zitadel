@@ -15,7 +15,7 @@ const accessTokenStorageKey = 'access_token';
 
 export enum AssetType {
   LOGO,
-  ICON
+  ICON,
 }
 
 export enum AssetEndpoint {
@@ -43,11 +43,11 @@ export enum AssetEndpoint {
   MGMTICONPREVIEW = 'org/policy/label/icon/_preview',
 }
 
-export const Endpoint = {
+export const ENDPOINT = {
   [Theme.DARK]: {
     [PolicyComponentServiceType.ADMIN]: {
       [AssetType.LOGO]: AssetEndpoint.IAMDARKLOGO,
-      [AssetType.ICON]: AssetEndpoint.IAMDARKICON
+      [AssetType.ICON]: AssetEndpoint.IAMDARKICON,
     },
     [PolicyComponentServiceType.MGMT]: {
       [AssetType.LOGO]: AssetEndpoint.MGMTDARKLOGO,
@@ -62,13 +62,9 @@ export const Endpoint = {
     [PolicyComponentServiceType.MGMT]: {
       [AssetType.LOGO]: AssetEndpoint.MGMTLOGO,
       [AssetType.ICON]: AssetEndpoint.MGMTICON,
-    }
-  }
+    },
+  },
 };
-
-// export function getAssetEndpoint(preview: Preview, theme: Theme, serviceType: PolicyComponentServiceType): AssetEndpoint {
-//   return 
-// }
 
 @Injectable({
   providedIn: 'root',
