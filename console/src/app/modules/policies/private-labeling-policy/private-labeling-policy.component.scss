@@ -180,7 +180,7 @@
           outline: none;
           height: 150px;
           width: 100%;
-          border-radius: 16px;
+          border-radius: .5rem;
           background: if($is-dark-theme, #2d2e30, #fff);
           border: 1px solid if($is-dark-theme, #4a4b4b, #ddd);
           display: flex;
@@ -217,12 +217,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+               (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+               (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);
@@ -280,6 +279,12 @@
           }
         }
 
+        .clr-btn-wrapper {
+          width: 100%;
+          display: flex;
+          justify-content: flex-end;
+        }
+
         .fonts {
           .title {
             display: block;
@@ -288,10 +293,19 @@
 
           .font-preview {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 30px 50px;
+            padding: .5rem;
             text-align: center;
+            border-radius: .5rem;
+            margin-bottom: 1rem;
+
+            .icon {
+              margin-right: 1rem;
+            }
+
+            .fill-space {
+              flex: 1;
+            }
           }
 
           .font-selector {
@@ -299,7 +313,6 @@
             align-items: center;
             flex-wrap: wrap;
             margin: 0 -.25rem;
-            width: 100%;
             padding-bottom: 1rem;
 
             .font {

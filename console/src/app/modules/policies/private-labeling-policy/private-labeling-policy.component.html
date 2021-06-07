@@ -132,19 +132,19 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color [colorType]="ColorType.BACKGROUNDDARK"(previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.BACKGROUNDDARK" (previewChanged)="previewData.backgroundColorDark = $event"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.PRIMARY"(previewChanged)="previewData.primaryColorDark = $event; savePolicy()"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.PRIMARY"(previewChanged)="previewData.primaryColorDark = $event"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.WARN" (previewChanged)="previewData.warnColorDark =  $event; savePolicy()" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+                <cnsl-color  [colorType]="ColorType.WARN" (previewChanged)="previewData.warnColorDark =  $event" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.FONTDARK"(previewChanged)="previewData.fontColorDark = $event; savePolicy()"  name="Font Color Dark" [color]="data.fontColorDark" [previewColor]="previewData.fontColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.FONTDARK"(previewChanged)="previewData.fontColorDark = $event"  name="Font Color Dark" [color]="data.fontColorDark" [previewColor]="previewData.fontColorDark"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -152,22 +152,26 @@
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT" (previewChanged)="previewData.backgroundColor = $event; savePolicy()"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT" (previewChanged)="previewData.backgroundColor = $event"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event; savePolicy()" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.WARN" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event; savePolicy()" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.WARN" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.FONTLIGHT" (previewChanged)="previewData.fontColor = $event; savePolicy()"  name="Font Color" [color]="data.fontColor" [previewColor]="previewData.fontColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.FONTLIGHT" (previewChanged)="previewData.fontColor = $event"  name="Font Color" [color]="data.fontColor" [previewColor]="previewData.fontColor"></cnsl-color>
               </div>
             </div>
           </ng-container>
+
+          <div class="clr-btn-wrapper">
+            <button color="primary" mat-raised-button (click)="savePolicy()">{{'ACTIONS.SAVE' | translate}}</button>
+          </div>
         </mat-expansion-panel>
 
         <mat-expansion-panel class="expansion">
@@ -179,11 +183,12 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div class="fonts">
-            <div class="font-preview">
-              <mat-icon>text_fields</mat-icon>
+            <div class="font-preview mat-elevation-z3" *ngIf="preview == Preview.PREVIEW && previewData.fontUrl || preview == Preview.CURRENT && data.fontUrl">
+              <mat-icon class="icon">text_fields</mat-icon>
               <span>ABC • abc • 123</span>
-              <span>_</span>
-              <span>Upload your favorite font for the UI</span>
+
+              <span class="fill-space"></span>
+              <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn" (click)="deleteFont()"><mat-icon>remove_circle</mat-icon></button>
             </div>
 
             <div class="dropzone" cnslDropzone  (hovered)="toggleHoverFont($event)"
@@ -213,7 +218,7 @@
 
             <ng-container
         *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false">
-          <cnsl-info-section  class="info" type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+          <cnsl-info-section class="info" type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
               'label_policy.private_label'})}}
           </cnsl-info-section>
         </ng-container>

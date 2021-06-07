@@ -17,9 +17,9 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { AssetEndpoint, AssetService } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { DownloadEndpoint, UploadEndpoint, UploadService } from 'src/app/services/upload.service';
 
 import { CnslLinks } from '../../links/links.component';
 import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
@@ -90,7 +90,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
-    private uploadService: UploadService,
+    private assetService: AssetService,
     private sanitizer: DomSanitizer,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
@@ -133,17 +133,17 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (theme === Theme.DARK) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTDARKLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMDARKLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData));
         }
       }
       if (theme === Theme.LIGHT) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTLIGHTLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMLIGHTLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData));
         }
       }
 
@@ -157,11 +157,16 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       formData.append('file', file);
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
-          return this.uploadService.upload(UploadEndpoint.MGMTFONT, formData);
+          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData));
         case PolicyComponentServiceType.ADMIN:
-          return this.uploadService.upload(UploadEndpoint.IAMFONT, formData);
+          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
       }
     }
+  }
+
+  public deleteFont(): void {
+    console.log('deletefont');
+    this.assetService.delete(AssetEndpoint.IAMFONT);
   }
 
   public toggleHoverIcon(theme: Theme, isHovering: boolean): void {
@@ -182,24 +187,37 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (theme === Theme.DARK) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTDARKICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData));
             break;
           case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMDARKICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData));
             break;
         }
       }
       if (theme === Theme.LIGHT) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.MGMTLIGHTICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData));
             break;
           case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMLIGHTICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData));
             break;
         }
       }
     }
+  }
+
+  private handleFontUploadPromise(task: Promise<any>): Promise<any> {
+    return task.then(() => {
+      this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
+      setTimeout(() => {
+        this.getPreviewData().then(data => {
+          if (data.policy) {
+            this.previewData = data.policy;
+          }
+        });
+      }, 1000);
+    }).catch(error => this.toast.showError(error));
   }
 
   private handleUploadPromise(task: Promise<any>): Promise<any> {
@@ -252,29 +270,29 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   private loadImages(): void {
     if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (this.data.logoUrlDark) {
-        this.loadAsset('darkLogo', DownloadEndpoint.IAMDARKLOGOPREVIEW);
+        this.loadAsset('darkLogo', AssetEndpoint.IAMDARKLOGO);
       }
       if (this.data.iconUrlDark) {
-        this.loadAsset('darkIcon', DownloadEndpoint.IAMDARKICONPREVIEW);
+        this.loadAsset('darkIcon', AssetEndpoint.IAMDARKICON);
       }
       if (this.data.logoUrl) {
-        this.loadAsset('logo', DownloadEndpoint.IAMLOGOPREVIEW);
+        this.loadAsset('logo', AssetEndpoint.IAMLOGO);
       }
       if (this.data.iconUrl) {
-        this.loadAsset('icon', DownloadEndpoint.IAMICONPREVIEW);
+        this.loadAsset('icon', AssetEndpoint.IAMICON);
       }
     } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (this.data.logoUrlDark) {
-        this.loadAsset('darkLogo', DownloadEndpoint.MGMTDARKLOGOPREVIEW);
+        this.loadAsset('darkLogo', AssetEndpoint.MGMTDARKLOGO);
       }
       if (this.data.iconUrlDark) {
-        this.loadAsset('darkIcon', DownloadEndpoint.MGMTDARKICONPREVIEW);
+        this.loadAsset('darkIcon', AssetEndpoint.MGMTDARKICON);
       }
       if (this.data.logoUrl) {
-        this.loadAsset('logo', DownloadEndpoint.MGMTLOGOPREVIEW);
+        this.loadAsset('logo', AssetEndpoint.MGMTLOGO);
       }
       if (this.data.iconUrl) {
-        this.loadAsset('icon', DownloadEndpoint.MGMTICONPREVIEW);
+        this.loadAsset('icon', AssetEndpoint.MGMTICON);
       }
     }
   }
@@ -282,29 +300,29 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   private loadPreviewImages(): void {
     if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (this.previewData.logoUrlDark) {
-        this.loadAsset('previewDarkLogo', DownloadEndpoint.IAMDARKLOGOPREVIEW);
+        this.loadAsset('previewDarkLogo', AssetEndpoint.IAMDARKLOGOPREVIEW);
       }
       if (this.previewData.iconUrlDark) {
-        this.loadAsset('previewDarkIcon', DownloadEndpoint.IAMDARKICONPREVIEW);
+        this.loadAsset('previewDarkIcon', AssetEndpoint.IAMDARKICONPREVIEW);
       }
       if (this.previewData.logoUrl) {
-        this.loadAsset('previewLogo', DownloadEndpoint.IAMLOGOPREVIEW);
+        this.loadAsset('previewLogo', AssetEndpoint.IAMLOGOPREVIEW);
       }
       if (this.previewData.iconUrl) {
-        this.loadAsset('previewIcon', DownloadEndpoint.IAMICONPREVIEW);
+        this.loadAsset('previewIcon', AssetEndpoint.IAMICONPREVIEW);
       }
     } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (this.previewData.logoUrlDark) {
-        this.loadAsset('previewDarkLogo', DownloadEndpoint.MGMTDARKLOGOPREVIEW);
+        this.loadAsset('previewDarkLogo', AssetEndpoint.MGMTDARKLOGOPREVIEW);
       }
       if (this.previewData.iconUrlDark) {
-        this.loadAsset('previewDarkIcon', DownloadEndpoint.MGMTDARKICONPREVIEW);
+        this.loadAsset('previewDarkIcon', AssetEndpoint.MGMTDARKICONPREVIEW);
       }
       if (this.previewData.logoUrl) {
-        this.loadAsset('previewLogo', DownloadEndpoint.MGMTLOGOPREVIEW);
+        this.loadAsset('previewLogo', AssetEndpoint.MGMTLOGOPREVIEW);
       }
       if (this.previewData.iconUrl) {
-        this.loadAsset('previewIcon', DownloadEndpoint.MGMTICONPREVIEW);
+        this.loadAsset('previewIcon', AssetEndpoint.MGMTICONPREVIEW);
       }
     }
   }
@@ -340,7 +358,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
-    return this.uploadService.load(`${url}`).then(data => {
+    return this.assetService.load(`${url}`).then(data => {
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();
