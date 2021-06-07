@@ -575,7 +575,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 						},
 					),
 				),
-				static: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				static: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
 			},
 			args: args{
 				ctx:   context.Background(),
