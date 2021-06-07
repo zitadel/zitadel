@@ -386,9 +386,9 @@ EventTypes:
     human:
       added: Person added
       selfregistered: Person registered himself
-        avatar:
-          added: Avatar added
-          removed: Avatar removed
+      avatar:
+        added: Avatar added
+        removed: Avatar removed
       initialization:
         code:
           added: Initialisation code generated
