@@ -423,7 +423,8 @@ func (c *Commands) removeLabelPolicy(ctx context.Context, existingPolicy *OrgLab
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, existingPolicy.AggregateID, domain.LabelPolicyPrefix)
+
+	err = c.RemoveAssetsFolder(ctx, existingPolicy.AggregateID, domain.LabelPolicyPrefix+"/")
 	if err != nil {
 		return nil, err
 	}

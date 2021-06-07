@@ -10,6 +10,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/minio/minio-go/v7"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -19,6 +20,7 @@ type Minio struct {
 	Client       *minio.Client
 	Location     string
 	BucketPrefix string
+	MultiDelete  bool
 }
 
 func (m *Minio) CreateBucket(ctx context.Context, name, location string) error {
@@ -128,15 +130,11 @@ func (m *Minio) GetObjectPresignedURL(ctx context.Context, bucketName, objectNam
 
 func (m *Minio) ListObjectInfos(ctx context.Context, bucketName, prefix string, recursive bool) ([]*domain.AssetInfo, error) {
 	bucketName = m.prefixBucketName(bucketName)
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	objectCh := m.Client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{
-		Prefix:    prefix,
-		Recursive: recursive,
-	})
 	assetInfos := make([]*domain.AssetInfo, 0)
-	for object := range objectCh {
+
+	objects, cancel := m.listObjects(ctx, bucketName, prefix, recursive)
+	defer cancel()
+	for object := range objects {
 		if object.Err != nil {
 			logging.LogWithFields("MINIO-wC8sd", "bucket-name", bucketName, "prefix", prefix).WithError(object.Err).Debug("unable to get object")
 			return nil, caos_errs.ThrowInternal(object.Err, "MINIO-1m09S", "Errors.Assets.Object.ListFailed")
@@ -153,6 +151,47 @@ func (m *Minio) RemoveObject(ctx context.Context, bucketName, objectName string)
 		return caos_errs.ThrowInternal(err, "MINIO-x85RT", "Errors.Assets.Object.RemoveFailed")
 	}
 	return nil
+}
+
+func (m *Minio) RemoveObjects(ctx context.Context, bucketName, path string) error {
+	bucketName = m.prefixBucketName(bucketName)
+	objectsCh := make(chan minio.ObjectInfo)
+	g := new(errgroup.Group)
+
+	g.Go(func() error {
+		defer close(objectsCh)
+		objects, cancel := m.listObjects(ctx, bucketName, path, true)
+		for object := range objects {
+			if object.Err != nil {
+				cancel()
+				return caos_errs.ThrowInternal(object.Err, "MINIO-WQF32", "Errors.Assets.Object.ListFailed")
+			}
+			objectsCh <- object
+		}
+		return nil
+	})
+
+	if m.MultiDelete {
+		for objError := range m.Client.RemoveObjects(ctx, bucketName, objectsCh, minio.RemoveObjectsOptions{GovernanceBypass: true}) {
+			return caos_errs.ThrowInternal(objError.Err, "MINIO-Sfdgr", "Errors.Assets.Object.RemoveFailed")
+		}
+		return g.Wait()
+	}
+	for objectInfo := range objectsCh {
+		if err := m.Client.RemoveObject(ctx, bucketName, objectInfo.Key, minio.RemoveObjectOptions{GovernanceBypass: true}); err != nil {
+			return caos_errs.ThrowInternal(err, "MINIO-GVgew", "Errors.Assets.Object.RemoveFailed")
+		}
+	}
+	return g.Wait()
+}
+
+func (m *Minio) listObjects(ctx context.Context, bucketName, prefix string, recursive bool) (<-chan minio.ObjectInfo, context.CancelFunc) {
+	ctxCancel, cancel := context.WithCancel(ctx)
+
+	return m.Client.ListObjects(ctxCancel, bucketName, minio.ListObjectsOptions{
+		Prefix:    prefix,
+		Recursive: recursive,
+	}), cancel
 }
 
 func (m *Minio) objectToAssetInfo(bucketName string, object minio.ObjectInfo) *domain.AssetInfo {
