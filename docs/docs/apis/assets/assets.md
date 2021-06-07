@@ -1,5 +1,5 @@
 ---
-title: zitadel/admin.proto
+title: zitadel/assets
 ---
 
 ## AssetsService
