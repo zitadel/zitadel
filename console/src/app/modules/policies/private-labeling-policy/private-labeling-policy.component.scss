@@ -256,11 +256,38 @@
               display: flex;
               margin-bottom: 1rem;
 
-              .prev,
-              .curr {
-                height: 50px;
-                object-fit: contain;
+              .img-wrapper {
+                flex: 1;
+                position: relative;
+                min-height: 80px;
+                border: 1px solid if($is-dark-theme, #ffffff20, #00000020);
                 border-radius: .5rem;
+
+                .dl-btn {
+                  position: absolute;
+                  top: -12px;
+                  left: -12px;
+                  cursor: pointer;
+                  visibility: hidden;
+                }
+
+                .prev,
+                .curr {
+                  position: absolute;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  left: 0;
+                  max-height: 80px;
+                  max-width: 120px;
+                  object-fit: contain;
+                  border-radius: .5rem;
+                }
+
+                &:hover {
+                  .dl-btn {
+                    visibility: visible;
+                  }
+                }
               }
 
               .fill-space {

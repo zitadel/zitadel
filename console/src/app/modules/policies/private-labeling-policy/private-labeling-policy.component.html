@@ -64,14 +64,26 @@
               <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkLogo']" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
+                  <div class="img-wrapper" *ngIf="images['previewDarkLogo']" >
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <img matTooltip="Preview" class="prev" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
+                  </div>
                   <span class="fill-space"></span>
-                  <img matTooltip="Current" class="curr" *ngIf="images['darkLogo']" [src]="images['darkLogo']" alt="dark logo"/>
+                  <div class="img-wrapper"  *ngIf="images['darkLogo']">
+                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon> -->
+                    <img matTooltip="Current" class="curr" [src]="images['darkLogo']" alt="dark logo"/>
+                  </div>
                 </div>
                 <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                  <img matTooltip="Preview" class="prev" *ngIf="images['previewLogo']" [src]="images['previewLogo']" alt="logo preview"/>
+                  <div class="img-wrapper"  *ngIf="images['previewLogo']">
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <img matTooltip="Preview" class="prev" [src]="images['previewLogo']" alt="logo preview"/>
+                  </div>
                   <span class="fill-space"></span>
-                  <img matTooltip="Current" class="curr" *ngIf="images['logo']" [src]="images['logo']" alt="logo"/>
+                  <div class="img-wrapper" *ngIf="images['logo']">
+                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon> -->
+                    <img matTooltip="Current" class="curr"  [src]="images['logo']" alt="logo"/>
+                  </div>
                 </div>
               </container>
               <div class="dropzone" cnslDropzone  (hovered)="toggleHoverLogo(theme, $event)"
@@ -92,14 +104,26 @@
               <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <img matTooltip="Preview" class="prev" *ngIf="images['previewDarkIcon']" [src]="images['previewDarkIcon']" alt="dark icon preview"/>
+                  <div class="img-wrapper" *ngIf="images['previewDarkIcon']">
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON, theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <img matTooltip="Preview" class="prev"  [src]="images['previewDarkIcon']" alt="dark icon preview"/>
+                  </div>
                   <span class="fill-space"></span>
-                  <img matTooltip="Current" class="curr" *ngIf="images['darkIcon']" [src]="images['darkIcon']" alt="dark icon"/>
+                  <div class="img-wrapper" *ngIf="images['darkIcon']">
+                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.CURRENT)">remove_circle</mat-icon> -->
+                    <img matTooltip="Current" class="curr"  [src]="images['darkIcon']" alt="dark icon"/>
+                  </div>
                 </div>
                 <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                  <img matTooltip="Preview" class="prev" *ngIf="images['previewIcon']" [src]="images['previewIcon']" alt="icon preview"/>
+                  <div class="img-wrapper" *ngIf="images['previewIcon']">
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <img matTooltip="Preview" class="prev"  [src]="images['previewIcon']" alt="icon preview"/>
+                  </div>
                   <span class="fill-space"></span>
-                  <img matTooltip="Current" class="curr" *ngIf="images['icon']" [src]="images['icon']" alt="icon"/>
+                  <div class="img-wrapper"  *ngIf="images['icon']" >
+                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.CURRENT)">remove_circle</mat-icon> -->
+                    <img matTooltip="Current" class="curr"[src]="images['icon']" alt="icon"/>
+                  </div>
                 </div>
               </container>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"

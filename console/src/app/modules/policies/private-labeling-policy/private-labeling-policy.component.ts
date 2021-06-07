@@ -17,7 +17,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { AssetEndpoint, AssetService } from 'src/app/services/asset.service';
+import { AssetEndpoint, AssetService, AssetType, Endpoint } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -82,6 +82,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public Theme: any = Theme;
   public Preview: any = Preview;
   public ColorType: any = ColorType;
+  public AssetType: any = AssetType;
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
@@ -165,8 +166,73 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public deleteFont(): void {
-    console.log('deletefont');
-    this.assetService.delete(AssetEndpoint.IAMFONT);
+    this.assetService.delete(AssetEndpoint.IAMFONT).then(() => {
+      this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
+      setTimeout(() => {
+        this.loadingImages = true;
+        this.getPreviewData().then(data => {
+
+          if (data.policy) {
+            this.previewData = data.policy;
+            this.loadPreviewImages();
+          }
+        });
+      }, 1000);
+    }).catch(error => this.toast.showError(error));
+  }
+
+  public deleteAsset(type: AssetType, theme: Theme, preview: Preview): Promise<any> {
+    const previewHandler = (prom: Promise<any>) => {
+      return prom.then(() => {
+        this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
+        setTimeout(() => {
+          this.loadingImages = true;
+          this.getPreviewData().then(data => {
+
+            if (data.policy) {
+              this.previewData = data.policy;
+              this.loadPreviewImages();
+            }
+          });
+        }, 1000);
+      }).catch(error => this.toast.showError(error));
+    };
+
+    const handler = (prom: Promise<any>) => {
+      return prom.then(() => {
+        this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
+        setTimeout(() => {
+          this.loadingImages = true;
+          this.getData().then(data => {
+
+            if (data.policy) {
+              this.previewData = data.policy;
+              this.loadImages();
+            }
+          });
+        }, 1000);
+      }).catch(error => this.toast.showError(error));
+    };
+
+    switch (type) {
+      case AssetType.LOGO:
+        switch (preview) {
+          case Preview.PREVIEW:
+            return previewHandler(this.assetService.delete(Endpoint[theme][this.serviceType][type]));
+
+          case Preview.CURRENT:
+            return handler(this.assetService.delete(Endpoint[theme][this.serviceType][type]));
+        }
+
+      case AssetType.ICON:
+        switch (preview) {
+          case Preview.PREVIEW:
+            return previewHandler(this.assetService.delete(Endpoint[theme][this.serviceType][type]));
+
+          case Preview.CURRENT:
+            return handler(this.assetService.delete(Endpoint[theme][this.serviceType][type]));
+        }
+    }
   }
 
   public toggleHoverIcon(theme: Theme, isHovering: boolean): void {

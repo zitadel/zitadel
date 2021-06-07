@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { PolicyComponentServiceType } from '../modules/policies/policy-component-types.enum';
+import { Theme } from '../modules/policies/private-labeling-policy/private-labeling-policy.component';
 import { Org } from '../proto/generated/zitadel/org_pb';
 import { StorageService } from './storage.service';
 
@@ -10,6 +12,11 @@ const orgKey = 'x-zitadel-orgid';
 
 const bearerPrefix = 'Bearer';
 const accessTokenStorageKey = 'access_token';
+
+export enum AssetType {
+  LOGO,
+  ICON
+}
 
 export enum AssetEndpoint {
   IAMFONT = 'iam/policy/label/font',
@@ -35,6 +42,33 @@ export enum AssetEndpoint {
   MGMTDARKICONPREVIEW = 'org/policy/label/icon/dark/_preview',
   MGMTICONPREVIEW = 'org/policy/label/icon/_preview',
 }
+
+export const Endpoint = {
+  [Theme.DARK]: {
+    [PolicyComponentServiceType.ADMIN]: {
+      [AssetType.LOGO]: AssetEndpoint.IAMDARKLOGO,
+      [AssetType.ICON]: AssetEndpoint.IAMDARKICON
+    },
+    [PolicyComponentServiceType.MGMT]: {
+      [AssetType.LOGO]: AssetEndpoint.MGMTDARKLOGO,
+      [AssetType.ICON]: AssetEndpoint.MGMTDARKICON,
+    },
+  },
+  [Theme.LIGHT]: {
+    [PolicyComponentServiceType.ADMIN]: {
+      [AssetType.LOGO]: AssetEndpoint.IAMLOGO,
+      [AssetType.ICON]: AssetEndpoint.IAMICON,
+    },
+    [PolicyComponentServiceType.MGMT]: {
+      [AssetType.LOGO]: AssetEndpoint.MGMTLOGO,
+      [AssetType.ICON]: AssetEndpoint.MGMTICON,
+    }
+  }
+};
+
+// export function getAssetEndpoint(preview: Preview, theme: Theme, serviceType: PolicyComponentServiceType): AssetEndpoint {
+//   return 
+// }
 
 @Injectable({
   providedIn: 'root',
