@@ -33,6 +33,13 @@ func (m *MockStorage) ExpectRemoveObjectNoError() *MockStorage {
 	return m
 }
 
+func (m *MockStorage) ExpectRemoveObjectsNoError() *MockStorage {
+	m.EXPECT().
+		RemoveObjects(gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(nil)
+	return m
+}
+
 func (m *MockStorage) ExpectRemoveObjectError() *MockStorage {
 	m.EXPECT().
 		RemoveObject(gomock.Any(), gomock.Any(), gomock.Any()).
