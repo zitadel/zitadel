@@ -386,9 +386,9 @@ EventTypes:
     human:
       added: Person added
       selfregistered: Person registered himself
-        avatar:
-          added: Avatar added
-          removed: Avatar removed
+      avatar:
+        added: Avatar added
+        removed: Avatar removed
       initialization:
         code:
           added: Initialisation code generated
@@ -547,6 +547,8 @@ EventTypes:
       added: Organization member added
       changed: Organization member changed
       removed: Organization member removed
+      cascade:
+        removeD: Organization member cascade removed
     iam:
       policy:
         added: System policy added
@@ -626,6 +628,8 @@ EventTypes:
       added: Project member added
       changed: Project member changed
       removed: Project member removed
+      cascade:
+        removeD: Project member cascade removed
     role:
       added: Project role added
       changed: Project role changed
@@ -642,6 +646,8 @@ EventTypes:
         added: Management access member added
         changed: Management access member changed
         removed: Management access member removed
+        cascade:
+          removeD: Management access cascade removed
     application:
       added: Application added
       changed: Application changed
@@ -692,6 +698,8 @@ EventTypes:
       added: ZITADEL member added
       changed: ZITADEL member changed
       removed: ZITADEL member removed
+      cascade:
+        removeD: ZITADEL member cascade removed
     idp:
       config:
         added: IDP configuration added

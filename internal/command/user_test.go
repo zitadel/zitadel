@@ -14,6 +14,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/member"
+	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
@@ -914,9 +917,11 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
+			ctx                    context.Context
+			orgID                  string
+			userID                 string
+			cascadeUserMemberships []*domain.UserMembership
+			cascadeUserGrants      []string
 		}
 	)
 	type res struct {
@@ -1051,13 +1056,124 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "remove user with user memberships, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewUserRemovedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									true,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewMemberCascadeRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate,
+									"user1",
+								),
+							),
+							eventFromEventPusher(
+								org.NewMemberCascadeRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"user1",
+								),
+							),
+							eventFromEventPusher(
+								project.NewProjectMemberCascadeRemovedEvent(context.Background(),
+									&project.NewAggregate("project1", "org1").Aggregate,
+									"user1",
+								),
+							),
+							eventFromEventPusher(
+								project.NewProjectGrantMemberCascadeRemovedEvent(context.Background(),
+									&project.NewAggregate("project1", "org1").Aggregate,
+									"user1",
+									"grant1",
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint(domain.IAMID, "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("org1", "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("project1", "user1")),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantMemberUniqueConstraint("project1", "user1", "grant1")),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				cascadeUserMemberships: []*domain.UserMembership{
+					{
+						MemberType:    domain.MemberTypeIam,
+						UserID:        "user1",
+						AggregateID:   "IAM",
+						ResourceOwner: "org1",
+					},
+					{
+						MemberType:    domain.MemberTypeOrganisation,
+						UserID:        "user1",
+						ResourceOwner: "org1",
+						AggregateID:   "org1",
+					},
+					{
+						MemberType:    domain.MemberTypeProject,
+						UserID:        "user1",
+						ResourceOwner: "org1",
+						AggregateID:   "project1",
+					},
+					{
+						MemberType:    domain.MemberTypeProjectGrant,
+						UserID:        "user1",
+						ResourceOwner: "org1",
+						AggregateID:   "project1",
+						ObjectID:      "grant1",
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveUser(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			got, err := r.RemoveUser(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.cascadeUserMemberships, tt.args.cascadeUserGrants...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

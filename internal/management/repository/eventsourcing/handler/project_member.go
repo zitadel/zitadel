@@ -111,7 +111,7 @@ func (p *ProjectMember) processProjectMember(event *es_models.Event) (err error)
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectMemberRemoved:
+	case proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		err = member.SetData(event)
 		if err != nil {
 			return err
@@ -150,6 +150,8 @@ func (p *ProjectMember) processUser(event *es_models.Event) (err error) {
 			p.fillUserData(member, user)
 		}
 		return p.view.PutProjectMembers(members, event)
+	case usr_es_model.UserRemoved:
+		p.view.DeleteProjectMembersByUserID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event)
 	}

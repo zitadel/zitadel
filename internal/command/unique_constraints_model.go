@@ -101,6 +101,8 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.GrantID+e.UserID, project.NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID))
 		case *project.GrantMemberRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.GrantID+e.UserID, project.UniqueProjectGrantMemberType)
+		case *project.GrantMemberCascadeRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.GrantID+e.UserID, project.UniqueProjectGrantMemberType)
 		case *project.RoleAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Key, project.NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID))
 		case *project.RoleRemovedEvent:
@@ -159,13 +161,19 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
 		case *iam.MemberRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
+		case *iam.MemberCascadeRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		case *org.MemberAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
 		case *org.MemberRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
+		case *org.MemberCascadeRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		case *project.MemberAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
 		case *project.MemberRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
+		case *project.MemberCascadeRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		}
 	}
@@ -204,6 +212,7 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantRemovedType,
 			project.GrantMemberAddedType,
 			project.GrantMemberRemovedType,
+			project.GrantMemberCascadeRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType,
 			user.UserV1AddedType,
@@ -222,10 +231,13 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			usergrant.UserGrantCascadeRemovedType,
 			iam.MemberAddedEventType,
 			iam.MemberRemovedEventType,
+			iam.MemberCascadeRemovedEventType,
 			org.MemberAddedEventType,
 			org.MemberRemovedEventType,
+			org.MemberCascadeRemovedEventType,
 			project.MemberAddedType,
 			project.MemberRemovedType,
+			project.MemberCascadeRemovedType,
 		)
 }
 
