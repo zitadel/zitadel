@@ -294,7 +294,7 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_SSL":           "false",
 		"ZITADEL_ASSET_STORAGE_LOCATION":      "",
 		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "",
-		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "",
+		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
 	}
 
 	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
