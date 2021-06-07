@@ -119,6 +119,8 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendChangeMemberEvent(event)
 	case ProjectMemberRemoved:
 		return p.appendRemoveMemberEvent(event)
+	case ProjectMemberCascadeRemoved:
+		return p.appendRemoveMemberEvent(event)
 	case ProjectRoleAdded:
 		return p.appendAddRoleEvent(event)
 	case ProjectRoleChanged:
@@ -162,6 +164,8 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case ProjectGrantMemberChanged:
 		return p.appendChangeGrantMemberEvent(event)
 	case ProjectGrantMemberRemoved:
+		return p.appendRemoveGrantMemberEvent(event)
+	case ProjectGrantMemberCascadeRemoved:
 		return p.appendRemoveGrantMemberEvent(event)
 	}
 	return nil

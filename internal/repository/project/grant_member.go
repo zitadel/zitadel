@@ -12,10 +12,11 @@ import (
 )
 
 var (
-	UniqueProjectGrantMemberType = "project_grant_member"
-	GrantMemberAddedType         = grantEventTypePrefix + member.AddedEventType
-	GrantMemberChangedType       = grantEventTypePrefix + member.ChangedEventType
-	GrantMemberRemovedType       = grantEventTypePrefix + member.RemovedEventType
+	UniqueProjectGrantMemberType  = "project_grant_member"
+	GrantMemberAddedType          = grantEventTypePrefix + member.AddedEventType
+	GrantMemberChangedType        = grantEventTypePrefix + member.ChangedEventType
+	GrantMemberRemovedType        = grantEventTypePrefix + member.RemovedEventType
+	GrantMemberCascadeRemovedType = grantEventTypePrefix + member.CascadeRemovedEventType
 )
 
 func NewAddProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.EventUniqueConstraint {
@@ -168,6 +169,51 @@ func GrantMemberRemovedEventMapper(event *repository.Event) (eventstore.EventRea
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-173fM", "unable to unmarshal label policy")
+	}
+
+	return e, nil
+}
+
+type GrantMemberCascadeRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	UserID  string `json:"userId"`
+	GrantID string `json:"grantId"`
+}
+
+func (e *GrantMemberCascadeRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+}
+
+func NewProjectGrantMemberCascadeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userID,
+	grantID string,
+) *GrantMemberCascadeRemovedEvent {
+	return &GrantMemberCascadeRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GrantMemberCascadeRemovedType,
+		),
+		UserID:  userID,
+		GrantID: grantID,
+	}
+}
+
+func GrantMemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &GrantMemberCascadeRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "PROJECT-3kfs3", "unable to unmarshal label policy")
 	}
 
 	return e, nil
