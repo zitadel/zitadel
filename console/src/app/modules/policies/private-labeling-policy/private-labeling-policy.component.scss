@@ -263,6 +263,7 @@
                 min-height: 80px;
                 border: 1px solid if($is-dark-theme, #ffffff20, #00000020);
                 border-radius: .5rem;
+                max-width: 120px;
 
                 .dl-btn {
                   position: absolute;

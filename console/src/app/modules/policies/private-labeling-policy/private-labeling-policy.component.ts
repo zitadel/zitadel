@@ -17,7 +17,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { AssetEndpoint, AssetService, AssetType, ENDPOINT } from 'src/app/services/asset.service';
+import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -181,7 +181,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }).catch(error => this.toast.showError(error));
   }
 
-  public deleteAsset(type: AssetType, theme: Theme, preview: Preview): any {
+  public deleteAsset(type: AssetType, theme: Theme): any {
     const previewHandler = (prom: Promise<any>) => {
       return prom.then(() => {
         this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
@@ -198,38 +198,37 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       }).catch(error => this.toast.showError(error));
     };
 
-    const handler = (prom: Promise<any>) => {
-      return prom.then(() => {
-        this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
-        setTimeout(() => {
-          this.loadingImages = true;
-          this.getData().then(data => {
-
-            if (data.policy) {
-              this.previewData = data.policy;
-              this.loadImages();
-            }
-          });
-        }, 1000);
-      }).catch(error => this.toast.showError(error));
-    };
-
-    if (type === AssetType.LOGO) {
-      switch (preview) {
-        case Preview.PREVIEW:
-          return previewHandler(this.assetService.delete(ENDPOINT[theme][this.serviceType][type]));
-
-        case Preview.CURRENT:
-          return handler(this.assetService.delete(ENDPOINT[theme][this.serviceType][type]));
-      }
-    } else if (type === AssetType.ICON) {
-      switch (preview) {
-        case Preview.PREVIEW:
-          return previewHandler(this.assetService.delete(ENDPOINT[theme][this.serviceType][type]));
-
-        case Preview.CURRENT:
-          return handler(this.assetService.delete(ENDPOINT[theme][this.serviceType][type]));
-      }
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.ADMIN:
+        if (type === AssetType.LOGO) {
+          if (theme === Theme.DARK) {
+            return previewHandler(this.service.removeLabelPolicyLogoDark());
+          } else if (theme === Theme.LIGHT) {
+            return previewHandler(this.service.removeLabelPolicyLogo());
+          }
+        } else if (type === AssetType.ICON) {
+          if (theme === Theme.DARK) {
+            return previewHandler(this.service.removeLabelPolicyIconDark());
+          } else if (theme === Theme.LIGHT) {
+            return previewHandler(this.service.removeLabelPolicyIcon());
+          }
+        }
+        break;
+      case PolicyComponentServiceType.MGMT:
+        if (type === AssetType.LOGO) {
+          if (theme === Theme.DARK) {
+            return previewHandler(this.service.removeLabelPolicyLogoDark());
+          } else if (theme === Theme.LIGHT) {
+            return previewHandler(this.service.removeLabelPolicyLogo());
+          }
+        } else if (type === AssetType.ICON) {
+          if (theme === Theme.DARK) {
+            return previewHandler(this.service.removeLabelPolicyIconDark());
+          } else if (theme === Theme.LIGHT) {
+            return previewHandler(this.service.removeLabelPolicyIcon());
+          }
+        }
+        break;
     }
   }
 

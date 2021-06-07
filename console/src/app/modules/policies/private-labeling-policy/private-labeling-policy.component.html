@@ -65,7 +65,7 @@
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
                   <div class="img-wrapper" *ngIf="images['previewDarkLogo']" >
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
                     <img matTooltip="Preview" class="prev" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
                   </div>
                   <span class="fill-space"></span>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
                   <div class="img-wrapper"  *ngIf="images['previewLogo']">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
                     <img matTooltip="Preview" class="prev" [src]="images['previewLogo']" alt="logo preview"/>
                   </div>
                   <span class="fill-space"></span>
@@ -105,7 +105,7 @@
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
                   <div class="img-wrapper" *ngIf="images['previewDarkIcon']">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON, theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON, theme)">remove_circle</mat-icon>
                     <img matTooltip="Preview" class="prev"  [src]="images['previewDarkIcon']" alt="dark icon preview"/>
                   </div>
                   <span class="fill-space"></span>
@@ -116,7 +116,7 @@
                 </div>
                 <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
                   <div class="img-wrapper" *ngIf="images['previewIcon']">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.PREVIEW)">remove_circle</mat-icon>
+                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme)">remove_circle</mat-icon>
                     <img matTooltip="Preview" class="prev"  [src]="images['previewIcon']" alt="icon preview"/>
                   </div>
                   <span class="fill-space"></span>
