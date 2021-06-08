@@ -33,7 +33,6 @@ type TemplateData struct {
 	PrimaryColor    string
 	BackgroundColor string
 	FontColor       string
-	IncludeLogo     bool
 	LogoURL         string
 	FontURL         string
 	FontFamily      string
@@ -83,10 +82,8 @@ func GetTemplateData(apiDomain, href string, text *iam_model.MailTextView, polic
 	if apiDomain == "" {
 		return templateData
 	}
-	if policy.LogoURL == "" {
-		templateData.IncludeLogo = false
-	} else {
-		templateData.IncludeLogo = true
+	templateData.LogoURL = ""
+	if policy.LogoURL != "" {
 		templateData.LogoURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.AggregateID, policy.LogoURL)
 	}
 	if policy.FontURL != "" {

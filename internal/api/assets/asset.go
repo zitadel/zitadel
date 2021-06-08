@@ -123,7 +123,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		contentType := handler.Header.Get("content-type")
 		size := handler.Size
 		if !uploader.ContentTypeAllowed(contentType) {
-			s.ErrorHandler()(w, r, caos_errs.ThrowInvalidArgument(nil, "UPLOAD-Dbvfs", "invalid content-type"))
+			s.ErrorHandler()(w, r, caos_errs.ThrowInvalidArgumentf(nil, "UPLOAD-Dbvfs", "invalid content-type: %s", contentType))
 			return
 		}
 		if size > uploader.MaxFileSize() {
