@@ -180,4 +180,26 @@ export class MembershipsComponent implements OnInit {
       });
     }
   }
+
+  getColor(type: Membership.AsObject[] | UserGrant.AsObject[]): string {
+    const gen = type.toString();
+    const colors = [
+      'rgb(201, 115, 88)',
+      'rgb(226, 176, 50)',
+      'rgb(112, 89, 152)',
+    ];
+
+    let hash = 0;
+    if (gen.length === 0) {
+      return colors[hash];
+    }
+    for (let i = 0; i < gen.length; i++) {
+      // tslint:disable-next-line: no-bitwise
+      hash = gen.charCodeAt(i) + ((hash << 5) - hash);
+      // tslint:disable-next-line: no-bitwise
+      hash = hash & hash;
+    }
+    hash = ((hash % colors.length) + colors.length) % colors.length;
+    return colors[hash];
+  }
 }
