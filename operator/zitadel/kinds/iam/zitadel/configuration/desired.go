@@ -41,6 +41,7 @@ type AssetStorage struct {
 	SSL                     bool             `yaml:"ssl,omitempty"`
 	Location                string           `yaml:"location,omitempty"`
 	BucketPrefix            string           `yaml:"bucketPrefix,omitempty"`
+	MultiDelete             bool             `yaml:"multiDelete,omitempty"`
 }
 
 type DNS struct {

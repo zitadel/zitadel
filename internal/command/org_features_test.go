@@ -958,7 +958,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 				),
 				iamDomain: "iam-domain",
-				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
 			},
 			args: args{
 				ctx:           context.Background(),
