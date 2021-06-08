@@ -32,14 +32,59 @@ type CustomLoginText struct {
 	PasswordTitle          string
 	PasswordDescription    string
 	PasswordLabel          string
+	PasswordResetLinkText  string
 	PasswordBackButtonText string
 	PasswordNextButtonText string
 
-	VerifyMFATitle             string
-	VerifyMFADescription       string
+	PasswordResetTitle          string
+	PasswordResetDescription    string
+	PasswordResetNextButtonText string
+
+	InitializeTitle              string
+	InitializeDescription        string
+	InitializeCodeLabel          string
+	InitializeNewPassword        string
+	InitializeNewPasswordConfirm string
+	InitializeResendButtonText   string
+	InitializeNextButtonText     string
+
+	InitializeDoneTitle           string
+	InitializeDoneDescription     string
+	InitializeDoneAbortButtonText string
+	InitializeDoneNextButtonText  string
+
+	InitMFATitle          string
+	InitMFADescription    string
+	InitMFAOTPOption      string
+	InitMFAU2FOption      string
+	InitMFASkipButtonText string
+	InitMFANextButtonText string
+
+	InitMFAOTPTitle       string
+	InitMFAOTPDescription string
+	InitMFAOTPSecretLabel string
+	InitMFAOTPCodeLabel   string
+
+	InitMFAU2FTitle                   string
+	InitMFAU2FDescription             string
+	InitMFAU2FTokenNameLabel          string
+	InitMFAU2FRegisterTokenButtonText string
+
+	InitMFADoneTitle           string
+	InitMFADoneDescription     string
+	InitMFADoneAbortButtonText string
+	InitMFADoneNextButtonText  string
+
+	VerifyMFAOTPTitle          string
+	VerifyMFAOTPDescription    string
 	VerifyMFAOTPCodeLabel      string
 	VerifyMFAOTPNextButtonText string
-	// Back button?
+
+	VerifyMFAU2FTitle                  string
+	VerifyMFAU2FDescription            string
+	VerifyMFAU2FValidateTokenText      string
+	VerifyMFAU2FOtherOptionDescription string
+	VerifyMFAU2FOptionOTPButtonText    string
 
 	RegistrationOptionTitle                    string
 	RegistrationOptionDescription              string
@@ -67,6 +112,11 @@ type CustomLoginText struct {
 	RegisterOrgPasswordLabel        string
 	RegisterOrgPasswordConfirmLabel string
 	RegisterOrgSaveButtonText       string
+
+	PasswordlessTitle                   string
+	PasswordlessDescription             string
+	PasswordlessLoginWithPwButtonText   string
+	PasswordlessValidateTokenButtonText string
 }
 
 func (m *CustomLoginText) IsValid() bool {
