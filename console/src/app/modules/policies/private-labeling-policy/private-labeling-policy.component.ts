@@ -165,8 +165,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public deleteFont(): void {
-    this.assetService.delete(AssetEndpoint.IAMFONT).then(() => {
+  public deleteFont(): Promise<any> {
+    const handler = (prom: Promise<any>) => prom.then(() => {
       this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
       setTimeout(() => {
         this.loadingImages = true;
@@ -179,6 +179,13 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
       }, 1000);
     }).catch(error => this.toast.showError(error));
+
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return handler((this.service as ManagementService).removeLabelPolicyFont());
+      case PolicyComponentServiceType.ADMIN:
+        return handler((this.service as AdminService).removeLabelPolicyFont());
+    }
   }
 
   public deleteAsset(type: AssetType, theme: Theme): any {

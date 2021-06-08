@@ -83,7 +83,15 @@
 
     .top-row {
       display: flex;
-      justify-content: space-between;
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .reset-button {
+        align-self: flex-end;
+        margin-right: 1rem;
+      }
 
       .activate-button {
         border-radius: 50%;
@@ -217,12 +225,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+               (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+               (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);

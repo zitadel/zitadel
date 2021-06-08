@@ -3,7 +3,7 @@
 <div class="wrapper">
   <button class="mat-elevation-z3" [style.background-color]="previewColor" (click)="isOpen = !isOpen" cdkOverlayOrigin #trigger="cdkOverlayOrigin" matTooltip="{{'ACTIONS.SET' | translate}}">  </button>
   
-  <div class="hex-wrapper">
+  <div class="hex-wrapper" (click)="isOpen = !isOpen">
     <i class="las la-hashtag"></i>
     <span class="hex">{{previewColorCropped}}</span> 
   </div>

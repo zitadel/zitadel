@@ -15,13 +15,6 @@
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <ng-template appHasRole [appHasRole]="['policy.delete']">
-        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-            matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
-            {{'POLICY.RESET' | translate}}
-        </button>
-    </ng-template>
-
     <div class="top-row">
       <div>
         <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
@@ -34,6 +27,15 @@
           </button>
         </div>
       </div>
+
+      <span class="fill-space"></span>
+
+      <ng-template appHasRole [appHasRole]="['policy.delete']">
+        <button class="reset-button" *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+            matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
+            {{'POLICY.RESET' | translate}}
+        </button>
+    </ng-template>
 
       <button class="activate-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" mat-raised-button color="primary" (click)="activatePolicy()">
         {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
