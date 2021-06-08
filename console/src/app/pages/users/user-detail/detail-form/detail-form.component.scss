@@ -1,9 +1,53 @@
-
 .content {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   margin: 0 -.5rem;
+
+  &.inner {
+    margin: 0;
+    width: 100%;
+  }
+
+  .camera-wrapper {
+    margin: 0 .5rem;
+    position: relative;
+    border-radius: 50%;
+    transition: all .3s ease-in-out;
+    padding: 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+    transition: all .3s ease;
+
+    .i-wrapper {
+      border-radius: 50%;
+      background-color: #00000030;
+      position: absolute;
+      top: 0;
+      z-index: 1;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        font-size: 3rem;
+        color: white;
+      }
+    }
+
+    &:hover {
+      .i-wrapper {
+        background-color: #00000060;
+      }
+    }
+  }
 
   .formfield {
     flex: 1 1 33%;
