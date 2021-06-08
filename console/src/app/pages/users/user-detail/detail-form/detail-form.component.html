@@ -1,5 +1,13 @@
 <form [formGroup]="profileForm" *ngIf="profileForm" (ngSubmit)="submitForm()">
     <div class="content">
+      <button>
+              <mat-icon></mat-icon>
+            <app-avatar
+            *ngIf="user && user.profile?.displayName && user.profile?.firstName && user?.profile.lastName"
+            class="avatar" [name]="user.profile?.displayName"  [forColor]="username" [size]="80">
+        </app-avatar>
+      </button>
+
         <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
             <input cnslInput formControlName="userName" />
