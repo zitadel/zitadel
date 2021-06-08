@@ -24,7 +24,7 @@
 
     <div class="content" *ngIf="loginData">
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) == false" ngDefaultControl
                 [(ngModel)]="loginData.allowUsernamePassword">
                 {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
@@ -62,7 +62,7 @@
             </ng-template>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
                 {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
@@ -79,7 +79,7 @@
             </ng-template>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false" ngDefaultControl
                 [(ngModel)]="loginData.forceMfa">
                 {{'POLICY.DATA.FORCEMFA' | translate}}
             </mat-slide-toggle>
@@ -96,7 +96,7 @@
             </ng-template>
         </div>
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+        <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) == false" ngDefaultControl
                           [(ngModel)]="loginData.hidePasswordReset">
           {{'POLICY.DATA.HIDEPASSWORDRESET' | translate}}
         </mat-slide-toggle>
