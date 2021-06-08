@@ -51,7 +51,7 @@ This API is intended to configure and manage the IAM itself.
 
 [Latest API Version](https://github.com/caos/zitadel/blob/main/proto/zitadel/admin.proto)
 
-## Assats API
+## Assets API
 
 
 The Assets API allows you to up- and download all kinds of assets. This can be files such as logos, fonts or user avatar.
