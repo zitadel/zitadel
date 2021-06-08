@@ -1559,7 +1559,6 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 		{
 			name: "icon dark added, ok",
 			fields: fields{
-				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -1813,7 +1812,6 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 		{
 			name: "font added, ok",
 			fields: fields{
-				storage: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
