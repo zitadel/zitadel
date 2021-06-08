@@ -81,7 +81,7 @@ export class UploadService {
       });
   }
 
-  public upload(endpoint: UploadEndpoint, body: any): Promise<any> {
+  public upload(endpoint: UploadEndpoint | string, body: any): Promise<any> {
     return this.http.post(`${this.serviceUrl}/assets/v1/${endpoint}`,
       body,
       {

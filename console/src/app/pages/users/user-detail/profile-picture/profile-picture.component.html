@@ -1,0 +1,19 @@
+<span class="title" mat-dialog-title>{{'USER.MACHINE.ADDED.TITLE' | translate}}</span>
+<div mat-dialog-content>
+<div class="dropzone" cnslDropzone  (hovered)="toggleHover($event)"
+(dropped)="onDrop($event)"
+[class.hovering]="isHovering">
+  <label class="file-label">
+    <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDrop($event.target.files)">
+    <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+
+    <i class="icon las la-cloud-upload-alt"></i>
+    <span>{{isHovering ? 'Release': 'Drop your Logo here'}}</span>
+  </label>
+</div>
+</div>
+<div mat-dialog-actions class="action">
+    <button color="primary" mat-raised-button class="ok-button" (click)="closeDialog()">
+        {{'ACTIONS.CLOSE' | translate}}
+    </button>
+</div>

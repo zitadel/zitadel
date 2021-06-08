@@ -49,6 +49,7 @@ import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
 @NgModule({
     declarations: [
@@ -68,6 +69,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         ResendEmailDialogComponent,
         DialogU2FComponent,
         AuthFactorDialogComponent,
+        ProfilePictureComponent,
     ],
     imports: [
         UserDetailRoutingModule,
