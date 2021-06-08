@@ -154,7 +154,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
         take(1),
         tap((res: ListChanges) => {
           const values = res.resultList;
-          console.log(values);
           const mapped = this.mapChanges(values);
           // update source with new values, done loading
           // this._data.next(values);
