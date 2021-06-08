@@ -153,14 +153,14 @@ func (m *Minio) RemoveObject(ctx context.Context, bucketName, objectName string)
 	return nil
 }
 
-func (m *Minio) RemoveObjects(ctx context.Context, bucketName, path string) error {
+func (m *Minio) RemoveObjects(ctx context.Context, bucketName, path string, recursive bool) error {
 	bucketName = m.prefixBucketName(bucketName)
 	objectsCh := make(chan minio.ObjectInfo)
 	g := new(errgroup.Group)
 
 	g.Go(func() error {
 		defer close(objectsCh)
-		objects, cancel := m.listObjects(ctx, bucketName, path, true)
+		objects, cancel := m.listObjects(ctx, bucketName, path, recursive)
 		for object := range objects {
 			if object.Err != nil {
 				cancel()

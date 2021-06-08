@@ -173,17 +173,17 @@ func (mr *MockStorageMockRecorder) RemoveObject(ctx, bucketName, objectName inte
 }
 
 // RemoveObjects mocks base method.
-func (m *MockStorage) RemoveObjects(ctx context.Context, bucketName, path string) error {
+func (m *MockStorage) RemoveObjects(ctx context.Context, bucketName, path string, recursive bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveObjects", ctx, bucketName, path)
+	ret := m.ctrl.Call(m, "RemoveObjects", ctx, bucketName, path, recursive)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemoveObjects indicates an expected call of RemoveObjects.
-func (mr *MockStorageMockRecorder) RemoveObjects(ctx, bucketName, path interface{}) *gomock.Call {
+func (mr *MockStorageMockRecorder) RemoveObjects(ctx, bucketName, path, recursive interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveObjects", reflect.TypeOf((*MockStorage)(nil).RemoveObjects), ctx, bucketName, path)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveObjects", reflect.TypeOf((*MockStorage)(nil).RemoveObjects), ctx, bucketName, path, recursive)
 }
 
 // MockConfig is a mock of Config interface.
