@@ -722,6 +722,7 @@
       "SET": "Richtline erfolgreich gesetzt!",
       "RESETSUCCESS": "Richtline zurückgesetzt!",
       "UPLOADSUCCESS": "Upload erfolgreich",
+      "DELETESUCCESS": "Löschen erfolgreich",
       "UPLOADFAILED":"Upload fehlgeschlagen!"
     }
   },

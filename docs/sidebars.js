@@ -111,6 +111,14 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Assets API Definition',
+      collapsed: false,
+      items: [
+        'apis/assets/assets',
+      ],
+    },
+    {
+      type: 'category',
       label: 'OpenID Connect & OAuth',
       collapsed: false,
       items: [

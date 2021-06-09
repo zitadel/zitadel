@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { PolicyComponentServiceType } from '../modules/policies/policy-component-types.enum';
+import { Theme } from '../modules/policies/private-labeling-policy/private-labeling-policy.component';
 import { Org } from '../proto/generated/zitadel/org_pb';
 import { StorageService } from './storage.service';
 
@@ -11,22 +13,12 @@ const orgKey = 'x-zitadel-orgid';
 const bearerPrefix = 'Bearer';
 const accessTokenStorageKey = 'access_token';
 
-export enum UploadEndpoint {
-  IAMFONT = 'iam/policy/label/font',
-  MGMTFONT = 'org/policy/label/font',
-
-  IAMDARKLOGO = 'iam/policy/label/logo/dark',
-  IAMLIGHTLOGO = 'iam/policy/label/logo',
-  IAMDARKICON = 'iam/policy/label/icon/dark',
-  IAMLIGHTICON = 'iam/policy/label/icon',
-
-  MGMTDARKLOGO = 'org/policy/label/logo/dark',
-  MGMTLIGHTLOGO = 'org/policy/label/logo',
-  MGMTDARKICON = 'org/policy/label/icon/dark',
-  MGMTLIGHTICON = 'org/policy/label/icon',
+export enum AssetType {
+  LOGO,
+  ICON,
 }
 
-export enum DownloadEndpoint {
+export enum AssetEndpoint {
   IAMFONT = 'iam/policy/label/font',
   MGMTFONT = 'org/policy/label/font',
 
@@ -51,10 +43,33 @@ export enum DownloadEndpoint {
   MGMTICONPREVIEW = 'org/policy/label/icon/_preview',
 }
 
+export const ENDPOINT = {
+  [Theme.DARK]: {
+    [PolicyComponentServiceType.ADMIN]: {
+      [AssetType.LOGO]: AssetEndpoint.IAMDARKLOGO,
+      [AssetType.ICON]: AssetEndpoint.IAMDARKICON,
+    },
+    [PolicyComponentServiceType.MGMT]: {
+      [AssetType.LOGO]: AssetEndpoint.MGMTDARKLOGO,
+      [AssetType.ICON]: AssetEndpoint.MGMTDARKICON,
+    },
+  },
+  [Theme.LIGHT]: {
+    [PolicyComponentServiceType.ADMIN]: {
+      [AssetType.LOGO]: AssetEndpoint.IAMLOGO,
+      [AssetType.ICON]: AssetEndpoint.IAMICON,
+    },
+    [PolicyComponentServiceType.MGMT]: {
+      [AssetType.LOGO]: AssetEndpoint.MGMTLOGO,
+      [AssetType.ICON]: AssetEndpoint.MGMTICON,
+    },
+  },
+};
+
 @Injectable({
   providedIn: 'root',
 })
-export class UploadService {
+export class AssetService {
   private serviceUrl: string = '';
   private accessToken: string = '';
   private org!: Org.AsObject;
@@ -81,7 +96,7 @@ export class UploadService {
       });
   }
 
-  public upload(endpoint: UploadEndpoint | string, body: any): Promise<any> {
+  public upload(endpoint: AssetEndpoint, body: any): Promise<any> {
     return this.http.post(`${this.serviceUrl}/assets/v1/${endpoint}`,
       body,
       {
@@ -97,6 +112,16 @@ export class UploadService {
 
       {
         responseType: 'blob',
+        headers: {
+          [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
+          [orgKey]: `${this.org.id}`,
+        },
+      }).toPromise();
+  }
+
+  public delete(endpoint: AssetEndpoint): Promise<any> {
+    return this.http.delete(`${this.serviceUrl}/assets/v1/${endpoint}`,
+      {
         headers: {
           [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
           [orgKey]: `${this.org.id}`,

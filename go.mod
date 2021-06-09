@@ -69,6 +69,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.6
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.34.0

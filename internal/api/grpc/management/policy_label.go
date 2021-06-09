@@ -86,7 +86,7 @@ func (s *Server) ResetLabelPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) RemoveCustomLabelPolicyLogo(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLogoRequest) (*mgmt_pb.RemoveCustomLabelPolicyLogoResponse, error) {
-	policy, err := s.command.RemoveLogoDefaultLabelPolicy(ctx)
+	policy, err := s.command.RemoveLogoLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (s *Server) RemoveCustomLabelPolicyLogo(ctx context.Context, req *mgmt_pb.R
 }
 
 func (s *Server) RemoveCustomLabelPolicyLogoDark(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLogoDarkRequest) (*mgmt_pb.RemoveCustomLabelPolicyLogoDarkResponse, error) {
-	policy, err := s.command.RemoveLogoDarkDefaultLabelPolicy(ctx)
+	policy, err := s.command.RemoveLogoDarkLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (s *Server) RemoveCustomLabelPolicyLogoDark(ctx context.Context, req *mgmt_
 }
 
 func (s *Server) RemoveCustomLabelPolicyIcon(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyIconRequest) (*mgmt_pb.RemoveCustomLabelPolicyIconResponse, error) {
-	policy, err := s.command.RemoveIconDefaultLabelPolicy(ctx)
+	policy, err := s.command.RemoveIconLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (s *Server) RemoveCustomLabelPolicyIcon(ctx context.Context, req *mgmt_pb.R
 }
 
 func (s *Server) RemoveCustomLabelPolicyIconDark(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyIconDarkRequest) (*mgmt_pb.RemoveCustomLabelPolicyIconDarkResponse, error) {
-	policy, err := s.command.RemoveIconDarkDefaultLabelPolicy(ctx)
+	policy, err := s.command.RemoveIconDarkLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (s *Server) RemoveCustomLabelPolicyIconDark(ctx context.Context, req *mgmt_
 }
 
 func (s *Server) RemoveCustomLabelPolicyFont(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyFontRequest) (*mgmt_pb.RemoveCustomLabelPolicyFontResponse, error) {
-	policy, err := s.command.RemoveFontDefaultLabelPolicy(ctx)
+	policy, err := s.command.RemoveFontLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
