@@ -15,8 +15,7 @@
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
-            <app-avatar *ngIf="session && session.displayName" class="small-avatar" [forColor]="session.loginName"
-                [name]="session.displayName ? session.displayName : ''" [size]="32">
+            <app-avatar *ngIf="session && session.displayName" class="small-avatar" [forColor]="session.loginName" [size]="32">
             </app-avatar>
 
             <div class="col">

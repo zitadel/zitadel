@@ -16,9 +16,8 @@ export class AvatarComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    if (!this.credentials) {
-      const split: string[] = this.name.split(' ');
-      this.credentials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : '');
+    if (!this.credentials && this.forColor) {
+      this.credentials = this.getInitials(this.forColor);
       if (!this.color) {
         this.color = this.getColor(this.forColor || '');
       }
@@ -27,6 +26,20 @@ export class AvatarComponent implements OnInit {
     if (this.size > 50) {
       this.fontSize = 32;
     }
+  }
+
+  getInitials(fromName: string): string {
+    const username = fromName.split('@')[0];
+    let separator = '_';
+    if (username.includes('-')) {
+      separator = '-';
+    }
+    if (username.includes('.')) {
+      separator = '.';
+    }
+    const split = username.split(separator);
+    const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : '');
+    return initials;
   }
 
   getColor(userName: string): string {
