@@ -1,11 +1,15 @@
 <span class="title" mat-dialog-title>{{'USER.PROFILE.AVATAR.UPLOADTITLE' | translate}}</span>
 <div mat-dialog-content>
+  <div class="current-pic-wrapper">
+  <img class="pic" [src]="data.profilePic" *ngIf="data.profilePic"/>
+  <button color="warn" (click)="deletePic()" mat-icon-button><mat-icon>remove_circle</mat-icon></button>
+</div>
 <div class="dropzone" cnslDropzone  (hovered)="toggleHover($event)"
 (dropped)="onDrop($event)"
 [class.hovering]="isHovering">
   <label class="file-label">
     <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDrop($event.target.files)">
-    <input class="btn" mat-stroked-button type="button" [value]="'USER.PROFILE.AVATAR.UPLOADBTN' | translate" (click)="selectedFile.click();" />
+    <button class="btn" mat-stroked-button type="button" (click)="selectedFile.click();">{{'USER.PROFILE.AVATAR.UPLOADBTN' | translate}}</button>
 
     <i class="icon las la-cloud-upload-alt"></i>
     <span>{{isHovering ? 'Release': 'Drop your Logo here'}}</span>

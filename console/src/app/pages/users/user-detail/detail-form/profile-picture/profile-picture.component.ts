@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { AssetService } from 'src/app/services/asset.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { UploadService } from 'src/app/services/upload.service';
 
 @Component({
   selector: 'cnsl-profile-picture',
@@ -10,12 +10,11 @@ import { UploadService } from 'src/app/services/upload.service';
 })
 export class ProfilePictureComponent implements OnInit {
   public isHovering: boolean = false;
-
   constructor(
     public dialogRef: MatDialogRef<ProfilePictureComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private toast: ToastService,
-    private uploadService: UploadService) { }
+    private assetService: AssetService) { }
 
   ngOnInit(): void {
   }
@@ -32,13 +31,16 @@ export class ProfilePictureComponent implements OnInit {
       formData.append('file', file);
       // switch (this.serviceType) {
       //   case PolicyComponentServiceType.MGMT:
-      return this.handleUploadPromise(this.uploadService.upload('', formData));
+      return this.handleUploadPromise(this.assetService.upload('users/me/avatar', formData));
       // case PolicyComponentServiceType.ADMIN:
       //   return this.handleUploadPromise(this.uploadService.upload(UploadEndpoint.IAMDARKLOGO, formData));
     }
 
   }
 
+  public deletePic(): void {
+    console.log('delete');
+  }
 
   private handleUploadPromise(task: Promise<any>): Promise<any> {
     return task.then(() => {

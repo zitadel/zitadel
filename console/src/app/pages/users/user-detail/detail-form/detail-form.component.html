@@ -5,9 +5,10 @@
         <div class="i-wrapper">
           <i class="las la-camera"></i>
         </div>
+        <img class="pic" [src]="profilePic" *ngIf="profilePic"/>
           <app-avatar
-          *ngIf="user && user.profile?.displayName && user.profile?.firstName && user?.profile.lastName"
-          class="avatar" [name]="user.profile?.displayName"  [forColor]="username" [size]="80">
+          *ngIf="!profilePic && user && user.profile?.displayName && user.profile?.firstName && user?.profile.lastName"
+          class="avatar" [name]="user.profile?.displayName"  [forColor]="preferredLoginName" [size]="80">
         </app-avatar>
       </button>
 
