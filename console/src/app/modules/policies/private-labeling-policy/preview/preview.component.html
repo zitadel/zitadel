@@ -3,10 +3,8 @@
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}" [style.background]="theme == Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper" [style.color]="theme == Theme.DARK ? policy.fontColorDark : policy.fontColor">
       <img *ngIf="images['previewLogo'] && theme == Theme.LIGHT" [src]="images['previewLogo']" alt="logo-mock" />
-      <img *ngIf="!images['previewLogo'] && theme == Theme.LIGHT" src="../../../../assets/images/zitadel-logo-dark.svg" alt="logo-mock" />
     
       <img *ngIf="images['previewDarkLogo'] && theme == Theme.DARK"  [src]="images['previewDarkLogo']" alt="logo-mock" />
-      <img *ngIf="!images['previewDarkLogo'] && theme == Theme.DARK" src="../../../../assets/images/zitadel-logo-light.svg" alt="logo-mock" />
 
       <h1>{{'POLICY.PRIVATELABELING.PREVIEW.TITLE' | translate}}</h1>
       <p class="desc-text">{{'POLICY.PRIVATELABELING.PREVIEW.SECOND' | translate}}</p>
