@@ -172,8 +172,6 @@
   --zitadel-logo-powered-by: url("../logo-light.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
-  --zitadel-color-qr: var(--zitadel-color-white);
-  --zitadel-color-qr-background: var(--zitadel-color-black);
 }
 
 body {
