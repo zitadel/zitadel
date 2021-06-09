@@ -222,31 +222,34 @@ footer a {
 }
 footer .watermark {
   display: flex;
-  position: relative;
-  width: 100%;
 }
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
 footer .watermark .lgn-logo-watermark {
-  height: 34px;
-  width: 125px;
-  margin: 2px;
+  height: 40px;
+  min-width: 125px;
+  margin: auto 2px;
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
   max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
   height: 100px;
   margin: 0 auto;
-  max-width: 100%;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -623,7 +626,8 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -65px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -1107,31 +1111,34 @@ footer a {
 }
 footer .watermark {
   display: flex;
-  position: relative;
-  width: 100%;
 }
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
 footer .watermark .lgn-logo-watermark {
-  height: 34px;
-  width: 125px;
-  margin: 2px;
+  height: 40px;
+  min-width: 125px;
+  margin: auto 2px;
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
   max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
   height: 100px;
   margin: 0 auto;
-  max-width: 100%;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -1508,7 +1515,8 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -65px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2310,7 +2318,8 @@ i {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -65px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2345,17 +2354,22 @@ i {
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
   max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
   height: 100px;
   margin: 0 auto;
-  max-width: 100%;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 @keyframes shake {
@@ -2709,8 +2723,8 @@ footer a {
   color: var(--zitadel-color-primary);
 }
 footer .lgn-logo-watermark {
-  background: var(--zitadel-logo-powered-by);
-  background-position: auto;
+  background: var(--zitadel-logo-powered-by) no-repeat;
+  background-position: center;
   background-size: contain;
 }
 

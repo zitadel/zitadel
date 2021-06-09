@@ -100,7 +100,8 @@ $lgn-container-bottom-margin: 50px;
     .lgn-left-action {
         position: absolute;
         left: 1rem;
-        top: -65px;
+        top: -75px;
+        transform: translateY(-50%);
     }
 
     .lgn-register-options {
