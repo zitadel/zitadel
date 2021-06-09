@@ -338,62 +338,85 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private loadImages(): void {
+    const promises: Promise<any>[] = [];
     if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (this.data.logoUrlDark) {
-        this.loadAsset('darkLogo', AssetEndpoint.IAMDARKLOGO);
+        promises.push(this.loadAsset('darkLogo', AssetEndpoint.IAMDARKLOGO));
       }
       if (this.data.iconUrlDark) {
-        this.loadAsset('darkIcon', AssetEndpoint.IAMDARKICON);
+        promises.push(this.loadAsset('darkIcon', AssetEndpoint.IAMDARKICON));
       }
       if (this.data.logoUrl) {
-        this.loadAsset('logo', AssetEndpoint.IAMLOGO);
+        promises.push(this.loadAsset('logo', AssetEndpoint.IAMLOGO));
       }
       if (this.data.iconUrl) {
-        this.loadAsset('icon', AssetEndpoint.IAMICON);
+        promises.push(this.loadAsset('icon', AssetEndpoint.IAMICON));
       }
     } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (this.data.logoUrlDark) {
-        this.loadAsset('darkLogo', AssetEndpoint.MGMTDARKLOGO);
+        promises.push(this.loadAsset('darkLogo', AssetEndpoint.MGMTDARKLOGO));
       }
       if (this.data.iconUrlDark) {
-        this.loadAsset('darkIcon', AssetEndpoint.MGMTDARKICON);
+        promises.push(this.loadAsset('darkIcon', AssetEndpoint.MGMTDARKICON));
       }
       if (this.data.logoUrl) {
-        this.loadAsset('logo', AssetEndpoint.MGMTLOGO);
+        promises.push(this.loadAsset('logo', AssetEndpoint.MGMTLOGO));
       }
       if (this.data.iconUrl) {
-        this.loadAsset('icon', AssetEndpoint.MGMTICON);
+        promises.push(this.loadAsset('icon', AssetEndpoint.MGMTICON));
       }
+    }
+
+    if (promises.length) {
+      Promise.all(promises).then(() => {
+        this.loadingImages = false;
+      }).catch(error => {
+        this.loadingImages = false;
+      });
+    } else {
+      this.loadingImages = false;
     }
   }
 
   private loadPreviewImages(): void {
+    const promises: Promise<any>[] = [];
+
     if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (this.previewData.logoUrlDark) {
-        this.loadAsset('previewDarkLogo', AssetEndpoint.IAMDARKLOGOPREVIEW);
+        promises.push(this.loadAsset('previewDarkLogo', AssetEndpoint.IAMDARKLOGOPREVIEW));
       }
       if (this.previewData.iconUrlDark) {
-        this.loadAsset('previewDarkIcon', AssetEndpoint.IAMDARKICONPREVIEW);
+        promises.push(this.loadAsset('previewDarkIcon', AssetEndpoint.IAMDARKICONPREVIEW));
       }
       if (this.previewData.logoUrl) {
-        this.loadAsset('previewLogo', AssetEndpoint.IAMLOGOPREVIEW);
+        promises.push(this.loadAsset('previewLogo', AssetEndpoint.IAMLOGOPREVIEW));
       }
       if (this.previewData.iconUrl) {
-        this.loadAsset('previewIcon', AssetEndpoint.IAMICONPREVIEW);
+        promises.push(this.loadAsset('previewIcon', AssetEndpoint.IAMICONPREVIEW));
       }
     } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (this.previewData.logoUrlDark) {
-        this.loadAsset('previewDarkLogo', AssetEndpoint.MGMTDARKLOGOPREVIEW);
+        promises.push(this.loadAsset('previewDarkLogo', AssetEndpoint.MGMTDARKLOGOPREVIEW));
       }
       if (this.previewData.iconUrlDark) {
-        this.loadAsset('previewDarkIcon', AssetEndpoint.MGMTDARKICONPREVIEW);
+        promises.push(this.loadAsset('previewDarkIcon', AssetEndpoint.MGMTDARKICONPREVIEW));
       }
       if (this.previewData.logoUrl) {
-        this.loadAsset('previewLogo', AssetEndpoint.MGMTLOGOPREVIEW);
+        promises.push(this.loadAsset('previewLogo', AssetEndpoint.MGMTLOGOPREVIEW));
       }
       if (this.previewData.iconUrl) {
-        this.loadAsset('previewIcon', AssetEndpoint.MGMTICONPREVIEW);
+        promises.push(this.loadAsset('previewIcon', AssetEndpoint.MGMTICONPREVIEW));
       }
+    }
+
+    if (promises.length) {
+      Promise.all(promises).then(() => {
+        this.loadingImages = false;
+      }).catch(error => {
+        this.loadingImages = false;
+      });
+    } else {
+      this.loadingImages = false;
     }
   }
 
@@ -432,10 +455,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();
-      this.loadingImages = false;
     }).catch(error => {
       this.toast.showError(error);
-      this.loadingImages = false;
     });
   }
 
