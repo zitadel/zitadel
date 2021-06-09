@@ -18,8 +18,8 @@
       }
 
       .lgn-logo-watermark {
-          background: var(--zitadel-logo-powered-by);
-          background-position: auto;
+          background: var(--zitadel-logo-powered-by) no-repeat;
+          background-position: center;
           background-size: contain;
       }
     }

@@ -1,15 +1,19 @@
-<div class="form-row">
-  <cnsl-form-field class="formfield">
-    <cnsl-label>{{name}} (current {{color}})</cnsl-label>
-    <input cnslInput [(ngModel)]="previewColor" (keydown.enter)="name ? emitPreview(previewColor) : null" />
-  </cnsl-form-field>
-  <button matTooltip="{{'ACTIONS.SET' | translate}}" (click)="emitPreview(previewColor)" mat-icon-button><mat-icon>check</mat-icon></button>
-</div>
-<div class="color-selector">
-  <div *ngFor="let c of colors" class="circle mat-elevation-z3"
-    [ngClass]="{'active': color == c.color || previewColor == c.color}"
-    (click)="emitPreview(c.color)" [ngStyle]="{'background-color': c.color}">
-    <span *ngIf="previewColor == c.color">P</span>
-    <span *ngIf="color == c.color">C</span>
+<p class="name">{{name}} (current {{color}})</p>
+
+<div class="wrapper">
+  <button class="mat-elevation-z3" [style.background-color]="previewColor" (click)="isOpen = !isOpen" cdkOverlayOrigin #trigger="cdkOverlayOrigin" matTooltip="{{'ACTIONS.SET' | translate}}">  </button>
+  
+  <div class="hex-wrapper" (click)="isOpen = !isOpen">
+    <i class="las la-hashtag"></i>
+    <span class="hex">{{previewColorCropped}}</span> 
   </div>
 </div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen"
+  (overlayOutsideClick)="isOpen = false"
+>
+<color-chrome class="picker" [color]="previewColor" (onChangeComplete)="changeComplete($event)"></color-chrome>
+</ng-template>

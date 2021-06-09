@@ -77,6 +77,7 @@
   --zitadel-color-button-selected-background: var(--zitadel-color-grey-900);
   --zitadel-color-button-disabled-selected-background: var(--zitadel-color-grey-800);
   --zitadel-color-raised-button-background: var(--zitadel-color-white);
+  --zitadel-color-white: #ffffff;
   --zitadel-color-black: #000000;
   --zitadel-color-grey-50: #fafafa;
   --zitadel-color-grey-100: #f5f5f5;
@@ -92,8 +93,8 @@
   --zitadel-logo-powered-by: url("../logo-dark.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
-  --zitadel-color-qr: var(--zitadel-color-white);
-  --zitadel-color-qr-background: var(--zitadel-color-black);
+  --zitadel-color-qr: var(--zitadel-color-black);
+  --zitadel-color-qr-background: var(--zitadel-color-white);
 }
 
 .lgn-dark-theme {
@@ -221,30 +222,34 @@ footer a {
 }
 footer .watermark {
   display: flex;
-  position: relative;
-  width: 100%;
 }
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
 footer .watermark .lgn-logo-watermark {
-  height: 34px;
-  width: 125px;
-  margin: 2px;
+  height: 40px;
+  min-width: 125px;
+  margin: auto 2px;
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -310,7 +315,7 @@ footer .watermark .lgn-logo-watermark {
   border-radius: 50%;
 }
 .lgn-icon-button i, .lgn-icon-button .mat-icon {
-  line-height: 24px;
+  line-height: 40px;
 }
 
 .lgn-stroked-button {
@@ -621,7 +626,8 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -1105,30 +1111,34 @@ footer a {
 }
 footer .watermark {
   display: flex;
-  position: relative;
-  width: 100%;
 }
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
 footer .watermark .lgn-logo-watermark {
-  height: 34px;
-  width: 125px;
-  margin: 2px;
+  height: 40px;
+  min-width: 125px;
+  margin: auto 2px;
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -1194,7 +1204,7 @@ footer .watermark .lgn-logo-watermark {
   border-radius: 50%;
 }
 .lgn-icon-button i, .lgn-icon-button .mat-icon {
-  line-height: 24px;
+  line-height: 40px;
 }
 
 .lgn-stroked-button {
@@ -1505,7 +1515,8 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2307,7 +2318,8 @@ i {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2342,16 +2354,22 @@ i {
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 @keyframes shake {
@@ -2705,8 +2723,8 @@ footer a {
   color: var(--zitadel-color-primary);
 }
 footer .lgn-logo-watermark {
-  background: var(--zitadel-logo-powered-by);
-  background-position: auto;
+  background: var(--zitadel-logo-powered-by) no-repeat;
+  background-position: center;
   background-size: contain;
 }
 
