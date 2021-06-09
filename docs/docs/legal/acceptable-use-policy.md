@@ -1,5 +1,6 @@
 ---
 title: Acceptable Use Policy
+custom_edit_url: null
 --- 
 
 This Acceptable Use Policy applies to use of ZITADEL Cloud Subscription Services and all Services under the top-level domain zitadel.ch (“Website”). We may suspend or terminate your use of ZITADEL Cloud Services for any violation of this Acceptable Use Policy. You will not be entitled to any Financial Credit or compensation for any interruptions caused by violation of this policy.

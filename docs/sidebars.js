@@ -159,7 +159,6 @@ module.exports = {
         'legal/service-level-description',
         'legal/support-services',
       ],
-    },
-    'legal/common-definitions',
+    }
   ],
 };

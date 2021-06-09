@@ -6,10 +6,21 @@ custom_edit_url: null
 
 ### Introduction
 
-CAOS Ltd. (**&quot;we&quot;**) offers &quot;Identity and Access Management as service&quot; with the brand name "ZITADEL Cloud Services" (**Services**).
+CAOS Ltd. (**"We", CAOS, CAOS AG**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
 
-The customer relationship (**&quot;Framework Agreement&quot;**) is created by the **Customer** (**&quot;you&quot;**) by creating a user or organisation within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services as you wish (&quot;self service&quot;), i.e. you may book services, options and packages yourself at any time (&quot;booking&quot;) and subsequently terminate them.  
+The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**&quot;you&quot;**) by creating a user or organisation within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**) and subsequently terminate them. 
+
 The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any services.
+
+This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
+* [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
+* [**Service Level Description**](service-level-description) - What service levels do we guarantee you
+* [**Support Service Descriptions**](support-services) - How we provide support services to you
+
+The following policies complement the TOS. When accepting the TOS, you accept these policies.
+* [**Privacy Policy**](privacy-policy) - How we process personal data on our websites and products
+* [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
+* [**Rate Limit Policy**](rate-limit-policy) - How we avoid overloads of our services 
 
 ### Alterations
 
@@ -27,21 +38,21 @@ We provide the Services under the conditions stated on our websites at the time 
 
 ### Modifications of services offered
 
-We are entitled to offer new services, to withdraw existing services (&quot;termination&quot;) or to modify the specifications and prices of existing services (&quot;modification&quot;) at any time. If the modification or termination affects a service that you are using at that time, we will inform you via email that said service will be automatically modified and/or is no longer available after a period of 30 days.
+We are entitled to offer new services, to withdraw existing services (**Termination**) or to modify the specifications and prices of existing services (**Modification**) at any time. If the modification or termination affects a service that you are using at that time, we will inform you via email that said service will be automatically modified and/or is no longer available after a period of 30 days.
 
 ### Modification of services booked by you
 
-You may change or terminate Services booked by you at any time. You may, where applicable, add more Services (e.g. add-ons) to your existing Services at any time.
+You may change or terminate Services or Subscriptions booked by you at any time. You may, where applicable, add more Services (e.g. add-ons) to your existing Services at any time.
 
 ### Due care
 
 We take all appropriate physical and electronic precautions to ensure the security and availability of our infrastructure and the service offered thereupon, in particular to protect against unauthorized access to data, data loss, failures and misuse.
 
-See [Annex](data-processing-agreement#annex-regarding-security-measures) to our data processing agreement for more information.
+The [Annex of the data processing agreement](data-processing-agreement#annex-regarding-security-measures) outlines the measures we take in more detail.
 
 ### Support
 
-We offer technical support for matters directly related to the use of our Services as outlined in the [Description of Support Services](support-services).
+We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](support-services) to this document.
 
 Customers without a Subscription or a Subscription plan that does not include Support Services should post inquiries and issues regarding ZITADEL from customers to our [GitHub Discussions](https://github.com/caos/zitadel/discussions), whenever feasible.
 
