@@ -129,13 +129,27 @@ module.exports = {
   ],
   legal: [
     'legal/introduction',
-    'legal/common-definitions',
     'legal/terms-of-service',
-    'legal/privacy-policy',
     'legal/data-processing-agreement',
-    'legal/support-services',
-    'legal/service-level-description',
-    'legal/acceptable-use-policy', 
-    'legal/rate-limit-policy'
+    {
+      type: 'category',
+      label: 'Policies',
+      collapsed: false,
+      items: [
+        'legal/privacy-policy',
+        'legal/acceptable-use-policy', 
+        'legal/rate-limit-policy'
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Service Descriptions',
+      collapsed: false,
+      items: [
+        'legal/service-level-description',
+        'legal/support-services',
+      ],
+    },
+    'legal/common-definitions',
   ],
 };
