@@ -4,7 +4,10 @@ custom_edit_url: null
 --- 
 
 ## Introduction
-Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document.  Support may only be provided to releases and services that have not yet reached the end of life date. The customer may purchase support services from CAOS AG directly. The following document is an addition to the ZITADEL Cloud terms of service (“Agreement”).
+
+This annex of the [Framework Agreement](terms-of-service) describes the support services offered by us for our Services (ZITADEL Cloud).
+
+Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS AG directly.
 
 ## Support Services
 **Business hours** means 08:00-17:00 Monday - Friday Switzerland time (or as per agreement with the customer). All times exclude public holidays in Switzerland / Kanton St. Gallen.

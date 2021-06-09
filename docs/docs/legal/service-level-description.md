@@ -2,8 +2,9 @@
 title: Service Level
 custom_edit_url: null
 --- 
+## Introduction
 
-This document contains Service Levels for the Subscription Services provided by CAOS to our Customers and is an addition to the ZITADEL Cloud terms of service.
+This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
 
 ## Definitions
 

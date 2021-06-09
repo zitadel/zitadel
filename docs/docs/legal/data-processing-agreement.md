@@ -5,13 +5,17 @@ custom_edit_url: null
 
 ## Background
 
-- Within the scope of the **Agreement,** the **Processor** (CAOS AG) processes **Personal Data** on behalf of the **Customer** (Responsible Party);
-- This Annex to the Agreement governs the Parties&#39; data protection obligations in addition to the provisions of the Agreement.
+Within the scope of the [**Framework Agreement**](terms-of-service), the **Processor** (CAOS AG) processes **Personal Data** on behalf of the **Customer** (Responsible Party), collectively the **"Parties"**. 
+
+This Annex to the Agreement governs the Parties&#39; data protection obligations in addition to the provisions of the Agreement.
 
 ## Subject matter, duration, nature and purpose of the processing as well as type of personal data and categories of data subjects
 
-The subject of the order as well as the type and purpose of the processing result from the agreement. The duration of the Processing shall correspond to the duration of the Agreement, unless otherwise provided for in this Annex or unless individual provisions obviously result in obligations going beyond this.
-In particular, the following personal data are part of the processing:
+This annex reflects the commitment of both parties to abide by the applicable data protection laws for the processing of Personal Data for the purpose of Processor's execution of the Framework Agreement. 
+
+The duration of the Processing shall correspond to the duration of the Agreement, unless otherwise provided for in this Annex or unless individual provisions obviously result in obligations going beyond this.
+
+In particular, the following Personal Data are part of the processing:
 <table>
   <tr>
     <th>Type of personal data</th>
@@ -108,7 +112,8 @@ In particular, the following personal data are part of the processing:
 
 ## Scope and responsibility
 
-Under the Agreement, the Processor shall process Personal Data on behalf of the Customer.  
+Under the Agreement, the Processor shall process Personal Data on behalf of the Customer.
+
 This Annex applies to all processing of Customer&#39;s data (including data of the users of Customer&#39;s organization) with reference to persons (&quot; **Personal Data**&quot;) which is related to the Agreement and which is carried out by the Processor, its employees or agents.
 
 The Customer shall be responsible for compliance with the statutory provisions of the data protection laws, in particular for the lawfulness of the transfer of data to the Processor as well as for the lawfulness of the data processing.

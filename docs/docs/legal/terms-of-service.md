@@ -6,7 +6,7 @@ custom_edit_url: null
 
 ### Introduction
 
-CAOS Ltd. (**"We", CAOS, CAOS AG**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
+CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
 
 The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**&quot;you&quot;**) by creating a user or organisation within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**) and subsequently terminate them. 
 

@@ -143,21 +143,21 @@ module.exports = {
     'legal/data-processing-agreement',
     {
       type: 'category',
+      label: 'Service Descriptions',
+      collapsed: false,
+      items: [
+        'legal/service-level-description',
+        'legal/support-services',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Policies',
       collapsed: false,
       items: [
         'legal/privacy-policy',
         'legal/acceptable-use-policy', 
         'legal/rate-limit-policy'
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Service Descriptions',
-      collapsed: false,
-      items: [
-        'legal/service-level-description',
-        'legal/support-services',
       ],
     }
   ],
