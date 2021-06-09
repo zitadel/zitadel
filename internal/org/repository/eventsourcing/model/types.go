@@ -75,9 +75,6 @@ const (
 	MailTemplateAdded   models.EventType = "org.mail.template.added"
 	MailTemplateChanged models.EventType = "org.mail.template.changed"
 	MailTemplateRemoved models.EventType = "org.mail.template.removed"
-	MailTextAdded       models.EventType = "org.mail.text.added"
-	MailTextChanged     models.EventType = "org.mail.text.changed"
-	MailTextRemoved     models.EventType = "org.mail.text.removed"
 
 	CustomTextSet            models.EventType = "org.customtext.set"
 	CustomTextRemoved        models.EventType = "org.customtext.removed"

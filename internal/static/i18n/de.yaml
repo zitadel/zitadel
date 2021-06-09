@@ -162,11 +162,11 @@ Errors:
       NotChanged: Default Mail Template wurde nicht verändert
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
-    MailText:
-      NotFound: Default Mail Text konnte nicht gefunden werden
-      NotChanged: Default Mail Text wurde nicht verändert
-      AlreadyExists: Default Mail Text existiert bereits
-      Invalid: Default Mail Text ist ungültig
+    CustomMessageText:
+      NotFound: Default Message Text konnte nicht gefunden werden
+      NotChanged: Default Message Text wurde nicht verändert
+      AlreadyExists: Default Message Text existiert bereits
+      Invalid: Default Message Text ist ungültig
     PasswordComplexity:
       NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
@@ -276,11 +276,11 @@ Errors:
       NotChanged: Default Mail Template wurde nicht verändert
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
-    MailText:
-      NotFound: Default Mail Text konnte nicht gefunden werden
-      NotChanged: Default Mail Text wurde nicht verändert
-      AlreadyExists: Default Mail Text existiert bereits
-      Invalid: Default Mail Text ist ungültig
+    CustomMessageText:
+      NotFound: Default Message Text konnte nicht gefunden werden
+      NotChanged: Default Message Text wurde nicht verändert
+      AlreadyExists: Default Message Text existiert bereits
+      Invalid: Default Message Text ist ungültig
     PasswordComplexityPolicy:
       NotFound: Default Password Complexity Policy konnte nicht gefunden werden
       NotExisting: Default Password Complexity Policy existiert nicht

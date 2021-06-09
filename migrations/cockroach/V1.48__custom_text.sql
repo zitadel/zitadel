@@ -50,3 +50,9 @@ GRANT SELECT ON TABLE adminapi.message_texts TO notification;
 GRANT SELECT ON TABLE management.message_texts TO notification;
 ALTER TABLE management.message_texts OWNER TO admin;
 ALTER TABLE adminapi.message_texts OWNER TO admin;
+
+DROP TABLE management.mail_texts;
+DROP TABLE adminapi.mail_texts;
+
+DELETE FROM management.current_sequences where view_name = 'management.mail_texts';
+DELETE FROM adminapi.current_sequences where view_name = 'adminapi.mail_texts';

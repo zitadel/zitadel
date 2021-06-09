@@ -53,8 +53,6 @@ const (
 
 	MailTemplateAdded   models.EventType = "iam.mail.template.added"
 	MailTemplateChanged models.EventType = "iam.mail.template.changed"
-	MailTextAdded       models.EventType = "iam.mail.text.added"
-	MailTextChanged     models.EventType = "iam.mail.text.changed"
 
 	CustomTextSet     models.EventType = "iam.customtext.set"
 	CustomTextRemoved models.EventType = "iam.customtext.removed"
