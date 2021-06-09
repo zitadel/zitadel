@@ -7,3 +7,4 @@ title: Common definitions
 * Personal Data
 * Customer
 * User
+* Subscription

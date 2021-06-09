@@ -17,6 +17,6 @@ You may not:
 6. Collecting any information about ZITADEL Cloud users without the consent of the person identified. This includes phishing, social engineering, scamming, spidering or harvesting information from any Subscription Service or Website
 
 ## Fair Use
-The “fair use” principle applies to the use of our services. We optimize our infrastructure in such a way that sufficient capacity is available to you even during short-term increased demand (“peaks”) and implement mitigation measures, implementing our Rate Limit Policy.  You are nonetheless required to adhere to reasonable use of our resources in order to avoid negatively affecting the services for other customers.
+The “fair use” principle applies to the use of our services. We optimize our infrastructure in such a way that sufficient capacity is available to you even during short-term increased demand (“peaks”) and implement mitigation measures, implementing our [Rate Limit Policy](rate-limit-policy).  You are nonetheless required to adhere to reasonable use of our resources in order to avoid negatively affecting the services for other customers.
 
 You agree that we may delete any data on our systems or networks, if CAOS believes that this data may corrupt our systems, interfere or may compromise other customers' data.
