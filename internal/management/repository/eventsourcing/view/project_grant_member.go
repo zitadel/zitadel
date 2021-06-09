@@ -57,6 +57,10 @@ func (v *View) DeleteProjectGrantMembersByProjectID(projectID string) error {
 	return view.DeleteProjectGrantMembersByProjectID(v.Db, projectGrantMemberTable, projectID)
 }
 
+func (v *View) DeleteProjectGrantMembersByUserID(userID string) error {
+	return view.DeleteProjectGrantMembersByUserID(v.Db, projectGrantMemberTable, userID)
+}
+
 func (v *View) GetLatestProjectGrantMemberSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectGrantMemberTable)
 }

@@ -19,6 +19,7 @@ type Storage interface {
 	ListObjectInfos(ctx context.Context, bucketName, prefix string, recursive bool) ([]*domain.AssetInfo, error)
 	GetObjectPresignedURL(ctx context.Context, bucketName, objectName string, expiration time.Duration) (*url.URL, error)
 	RemoveObject(ctx context.Context, bucketName, objectName string) error
+	RemoveObjects(ctx context.Context, bucketName, path string, recursive bool) error
 }
 type Config interface {
 	NewStorage() (Storage, error)

@@ -4,6 +4,7 @@
   --zitadel-color-background: var(--zitadel-color-background-500);
   --zitadel-color-secondary: var(--zitadel-color-secondary-500);
   --zitadel-color-warn: var(--zitadel-color-warn-500);
+  --zitadel-color-text: var(--zitadel-color-text-500);
   --zitadel-color-primary-50: #eaedfa;
   --zitadel-color-primary-100: #ccd2f2;
   --zitadel-color-primary-200: #aab4ea;
@@ -38,13 +39,33 @@
   --zitadel-color-warn-800: #c62828;
   --zitadel-color-warn-900: #b71c1c;
   --zitadel-font-family: "Lato";
-  --zitadel-color-background-500: var(--zitadel-color-grey-50);
+  --zitadel-color-background-50: rgb(255, 255, 255);
+  --zitadel-color-background-100: rgb(255, 255, 255);
+  --zitadel-color-background-200: rgb(255, 255, 255);
+  --zitadel-color-background-300: rgb(255, 255, 255);
+  --zitadel-color-background-400: rgb(255, 255, 255);
+  --zitadel-color-background-500: rgb(250, 250, 250);
+  --zitadel-color-background-600: rgb(222, 222, 222);
+  --zitadel-color-background-700: rgb(195, 195, 194);
+  --zitadel-color-background-800: rgb(168, 168, 168);
+  --zitadel-color-background-900: rgb(142, 142, 142);
+  --zitadel-color-background-contrast: rgb(0, 0, 0);
   --zitadel-color-footer-line: #e3e8ee;
   --zitadel-color-input-background: #fafafa50;
   --zitadel-color-input-border: #00000040;
   --zitadel-color-input-border-hover: #1a1b1b;
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
-  --zitadel-color-text: rgba(0, 0, 0, 0.87);
+  --zitadel-color-font-50: rgb(0, 0, 0);
+  --zitadel-color-font-100: rgb(0, 0, 0);
+  --zitadel-color-font-200: rgb(0, 0, 0);
+  --zitadel-color-font-300: rgb(0, 0, 0);
+  --zitadel-color-font-400: rgb(0, 0, 0);
+  --zitadel-color-font-500: rgb(0, 0, 0);
+  --zitadel-color-font-600: rgb(0, 0, 0);
+  --zitadel-color-font-700: rgb(0, 0, 0);
+  --zitadel-color-font-800: rgb(0, 0, 0);
+  --zitadel-color-font-900: rgb(0, 0, 0);
+  --zitadel-color-font-contrast: rgb(255, 255, 255);
   --zitadel-color-label: var(--zitadel-color-grey-600);
   --zitadel-color-account-selector-hover: rgba(0, 0, 0, 0.02);
   --zitadel-color-account-selector-active: rgba(0, 0, 0, 0.05);
@@ -72,8 +93,8 @@
   --zitadel-logo-powered-by: url("../logo-dark.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
-  --zitadel-color-qr: var(--zitadel-color-white);
-  --zitadel-color-qr-background: var(--zitadel-color-black);
+  --zitadel-color-qr: var(--zitadel-color-black);
+  --zitadel-color-qr-background: var(--zitadel-color-white);
 }
 
 .lgn-dark-theme {
@@ -108,13 +129,33 @@
   --zitadel-color-warn-800: #c62828;
   --zitadel-color-warn-900: #b71c1c;
   --zitadel-font-family: "Lato";
-  --zitadel-color-background-500: var(--zitadel-color-grey-900);
+  --zitadel-color-background-50: rgb(60, 60, 60);
+  --zitadel-color-background-100: rgb(55, 55, 55);
+  --zitadel-color-background-200: rgb(49, 49, 49);
+  --zitadel-color-background-300: rgb(44, 44, 44);
+  --zitadel-color-background-400: rgb(36, 36, 36);
+  --zitadel-color-background-500: rgb(33, 33, 33);
+  --zitadel-color-background-600: rgb(30, 30, 30);
+  --zitadel-color-background-700: rgb(28, 28, 28);
+  --zitadel-color-background-800: rgb(25, 25, 25);
+  --zitadel-color-background-900: rgb(23, 23, 23);
+  --zitadel-color-background-contrast: rgb(255, 255, 255);
   --zitadel-color-footer-line: #303131;
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #403e3e;
   --zitadel-color-input-border-hover: #aeafb1;
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
-  --zitadel-color-text: var(--zitadel-color-white);
+  --zitadel-color-text-50: rgb(255, 255, 255);
+  --zitadel-color-text-100: rgb(255, 255, 255);
+  --zitadel-color-text-200: rgb(255, 255, 255);
+  --zitadel-color-text-300: rgb(255, 255, 255);
+  --zitadel-color-text-400: rgb(255, 255, 255);
+  --zitadel-color-text-500: rgb(255, 255, 255);
+  --zitadel-color-text-600: rgb(221, 222, 223);
+  --zitadel-color-text-700: rgb(194, 195, 195);
+  --zitadel-color-text-800: rgb(167, 168, 169);
+  --zitadel-color-text-900: rgb(141, 142, 143);
+  --zitadel-color-text-contrast: rgb(0, 0, 0);
   --zitadel-color-label: var(--zitadel-color-grey-600);
   --zitadel-color-account-selector-hover: rgba(255, 255, 255, 0.02);
   --zitadel-color-account-selector-active: rgba(255, 255, 255, 0.05);
@@ -181,30 +222,34 @@ footer a {
 }
 footer .watermark {
   display: flex;
-  position: relative;
-  width: 100%;
 }
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
 footer .watermark .lgn-logo-watermark {
-  height: 34px;
-  width: 125px;
-  margin: 2px;
+  height: 40px;
+  min-width: 125px;
+  margin: auto 2px;
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -270,7 +315,7 @@ footer .watermark .lgn-logo-watermark {
   border-radius: 50%;
 }
 .lgn-icon-button i, .lgn-icon-button .mat-icon {
-  line-height: 24px;
+  line-height: 40px;
 }
 
 .lgn-stroked-button {
@@ -581,7 +626,8 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -1065,30 +1111,34 @@ footer a {
 }
 footer .watermark {
   display: flex;
-  position: relative;
-  width: 100%;
 }
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
 }
 footer .watermark .lgn-logo-watermark {
-  height: 34px;
-  width: 125px;
-  margin: 2px;
+  height: 40px;
+  min-width: 125px;
+  margin: auto 2px;
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -1154,7 +1204,7 @@ footer .watermark .lgn-logo-watermark {
   border-radius: 50%;
 }
 .lgn-icon-button i, .lgn-icon-button .mat-icon {
-  line-height: 24px;
+  line-height: 40px;
 }
 
 .lgn-stroked-button {
@@ -1465,7 +1515,8 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2267,7 +2318,8 @@ i {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -75px;
+  transform: translateY(-50%);
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2302,16 +2354,22 @@ i {
 }
 
 .lgn-header {
-  display: block;
+  display: flex;
   position: relative;
-  margin: 1rem auto 0.5rem auto;
+  margin: auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 250px;
+  max-height: 150px;
+  object-fit: contain;
 }
 
 @keyframes shake {
@@ -2665,8 +2723,8 @@ footer a {
   color: var(--zitadel-color-primary);
 }
 footer .lgn-logo-watermark {
-  background: var(--zitadel-logo-powered-by);
-  background-position: auto;
+  background: var(--zitadel-logo-powered-by) no-repeat;
+  background-position: center;
   background-size: contain;
 }
 

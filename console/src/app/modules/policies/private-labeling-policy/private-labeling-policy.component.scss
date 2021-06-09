@@ -83,7 +83,15 @@
 
     .top-row {
       display: flex;
-      justify-content: space-between;
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .reset-button {
+        align-self: flex-end;
+        margin-right: 1rem;
+      }
 
       .activate-button {
         border-radius: 50%;
@@ -180,7 +188,7 @@
           outline: none;
           height: 150px;
           width: 100%;
-          border-radius: 16px;
+          border-radius: .5rem;
           background: if($is-dark-theme, #2d2e30, #fff);
           border: 1px solid if($is-dark-theme, #4a4b4b, #ddd);
           display: flex;
@@ -257,11 +265,39 @@
               display: flex;
               margin-bottom: 1rem;
 
-              .prev,
-              .curr {
-                height: 50px;
-                object-fit: contain;
+              .img-wrapper {
+                flex: 1;
+                position: relative;
+                min-height: 80px;
+                border: 1px solid if($is-dark-theme, #ffffff20, #00000020);
                 border-radius: .5rem;
+                max-width: 120px;
+
+                .dl-btn {
+                  position: absolute;
+                  top: -12px;
+                  left: -12px;
+                  cursor: pointer;
+                  visibility: hidden;
+                }
+
+                .prev,
+                .curr {
+                  position: absolute;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  left: 0;
+                  max-height: 80px;
+                  max-width: 120px;
+                  object-fit: contain;
+                  border-radius: .5rem;
+                }
+
+                &:hover {
+                  .dl-btn {
+                    visibility: visible;
+                  }
+                }
               }
 
               .fill-space {
@@ -280,6 +316,12 @@
           }
         }
 
+        .clr-btn-wrapper {
+          width: 100%;
+          display: flex;
+          justify-content: flex-end;
+        }
+
         .fonts {
           .title {
             display: block;
@@ -288,10 +330,19 @@
 
           .font-preview {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 30px 50px;
+            padding: .5rem;
             text-align: center;
+            border-radius: .5rem;
+            margin-bottom: 1rem;
+
+            .icon {
+              margin-right: 1rem;
+            }
+
+            .fill-space {
+              flex: 1;
+            }
           }
 
           .font-selector {
@@ -299,7 +350,6 @@
             align-items: center;
             flex-wrap: wrap;
             margin: 0 -.25rem;
-            width: 100%;
             padding-bottom: 1rem;
 
             .font {

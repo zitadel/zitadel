@@ -71,25 +71,29 @@ func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 		u.setRootData(event, model.MemberTypeIam)
 		err = u.setIamMemberData(event)
 	case iam_es_model.IAMMemberChanged,
-		iam_es_model.IAMMemberRemoved:
+		iam_es_model.IAMMemberRemoved,
+		iam_es_model.IAMMemberCascadeRemoved:
 		err = u.setIamMemberData(event)
 	case org_es_model.OrgMemberAdded:
 		u.setRootData(event, model.MemberTypeOrganisation)
 		err = u.setOrgMemberData(event)
 	case org_es_model.OrgMemberChanged,
-		org_es_model.OrgMemberRemoved:
+		org_es_model.OrgMemberRemoved,
+		org_es_model.OrgMemberCascadeRemoved:
 		err = u.setOrgMemberData(event)
 	case proj_es_model.ProjectMemberAdded:
 		u.setRootData(event, model.MemberTypeProject)
 		err = u.setProjectMemberData(event)
 	case proj_es_model.ProjectMemberChanged,
-		proj_es_model.ProjectMemberRemoved:
+		proj_es_model.ProjectMemberRemoved,
+		proj_es_model.ProjectMemberCascadeRemoved:
 		err = u.setProjectMemberData(event)
 	case proj_es_model.ProjectGrantMemberAdded:
 		u.setRootData(event, model.MemberTypeProjectGrant)
 		err = u.setProjectGrantMemberData(event)
 	case proj_es_model.ProjectGrantMemberChanged,
-		proj_es_model.ProjectGrantMemberRemoved:
+		proj_es_model.ProjectGrantMemberRemoved,
+		proj_es_model.ProjectGrantMemberCascadeRemoved:
 		err = u.setProjectGrantMemberData(event)
 	}
 	return err

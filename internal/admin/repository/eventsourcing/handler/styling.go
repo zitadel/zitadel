@@ -174,6 +174,12 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 			cssContent += fmt.Sprintf("--zitadel-color-warn-%v: %s;", i, color)
 		}
 	}
+	if policy.FontColor != "" {
+		palette := m.generateColorPaletteRGBA255(policy.FontColor)
+		for i, color := range palette {
+			cssContent += fmt.Sprintf("--zitadel-color-text-%v: %s;", i, color)
+		}
+	}
 	var fontname string
 	if policy.FontURL != "" {
 		split := strings.Split(policy.FontURL, "/")
@@ -206,7 +212,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 	if policy.FontColorDark != "" {
 		palette := m.generateColorPaletteRGBA255(policy.FontColorDark)
 		for i, color := range palette {
-			cssContent += fmt.Sprintf("--zitadel-color-font-%v: %s;", i, color)
+			cssContent += fmt.Sprintf("--zitadel-color-text-%v: %s;", i, color)
 		}
 	}
 	cssContent += fmt.Sprint("}")

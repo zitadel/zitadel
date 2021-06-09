@@ -57,7 +57,7 @@
             <div class="circle">
                 <app-avatar
                     *ngIf="user.human && user.human.displayName && user.human?.firstName && user.human?.lastName; else cog"
-                    class="avatar" [name]="user.human.displayName" [size]="32">
+                    class="avatar" [name]="user.human.displayName" [forColor]="user?.preferredLoginName" [size]="32">
                 </app-avatar>
                 <ng-template #cog>
                     <div class="sa-icon">

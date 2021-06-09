@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -92,7 +93,8 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewMemberRemovedEvent(ctx, orgAgg, userID))
+	removeEvent := c.removeOrgMember(ctx, orgAgg, userID, false)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +103,17 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 		return nil, err
 	}
 	return writeModelToObjectDetails(&m.WriteModel), nil
+}
+
+func (c *Commands) removeOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+	if cascade {
+		return org.NewMemberCascadeRemovedEvent(
+			ctx,
+			orgAgg,
+			userID)
+	} else {
+		return org.NewMemberRemovedEvent(ctx, orgAgg, userID)
+	}
 }
 
 func (c *Commands) orgMemberWriteModelByID(ctx context.Context, orgID, userID string) (member *OrgMemberWriteModel, err error) {

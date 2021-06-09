@@ -140,7 +140,8 @@ COPY internal/errors internal/errors
 
 RUN build/zitadel/generate-grpc.sh \
     && go generate openapi/statik/generate.go \
-    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/
+    && mkdir -p docs/apis/assets/ \
+    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
 
 #######################
@@ -166,6 +167,7 @@ COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go ope
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/proto docs/docs/apis/proto
+COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/assets docs/docs/apis/assets
 
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go

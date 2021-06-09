@@ -40,6 +40,11 @@ func (wm *IAMMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 				continue
 			}
 			wm.MemberWriteModel.AppendEvents(&e.MemberRemovedEvent)
+		case *iam.MemberCascadeRemovedEvent:
+			if e.UserID != wm.MemberWriteModel.UserID {
+				continue
+			}
+			wm.MemberWriteModel.AppendEvents(&e.MemberCascadeRemovedEvent)
 		}
 	}
 }
@@ -55,5 +60,6 @@ func (wm *IAMMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.MemberAddedEventType,
 			iam.MemberChangedEventType,
-			iam.MemberRemovedEventType)
+			iam.MemberRemovedEventType,
+			iam.MemberCascadeRemovedEventType)
 }
