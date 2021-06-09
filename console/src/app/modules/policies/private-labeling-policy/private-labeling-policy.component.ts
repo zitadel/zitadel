@@ -98,7 +98,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private injector: Injector,
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
-    private storageService: StorageService
+    private storageService: StorageService,
   ) {
     const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
 

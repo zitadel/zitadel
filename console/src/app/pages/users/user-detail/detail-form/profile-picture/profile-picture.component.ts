@@ -6,7 +6,7 @@ import { ToastService } from 'src/app/services/toast.service';
 @Component({
   selector: 'cnsl-profile-picture',
   templateUrl: './profile-picture.component.html',
-  styleUrls: ['./profile-picture.component.scss']
+  styleUrls: ['./profile-picture.component.scss'],
 })
 export class ProfilePictureComponent implements OnInit {
   public isHovering: boolean = false;
@@ -16,10 +16,10 @@ export class ProfilePictureComponent implements OnInit {
     private toast: ToastService,
     private assetService: AssetService) { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
   }
 
-  toggleHover(isHovering: boolean) {
+  public toggleHover(isHovering: boolean): void {
     this.isHovering = isHovering;
   }
 

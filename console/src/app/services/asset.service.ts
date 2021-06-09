@@ -94,7 +94,7 @@ export class AssetService {
   }
 
   public upload(endpoint: AssetEndpoint | string, body: any, orgId?: string): Promise<any> {
-    let headers: any = {
+    const headers: any = {
       [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
     };
 
@@ -106,13 +106,13 @@ export class AssetService {
       this.http.post(`${url}/assets/v1/${endpoint}`,
         body,
         {
-          headers: headers
+          headers: headers,
         }).toPromise(),
     );
   }
 
   public load(endpoint: string, orgId?: string): Promise<any> {
-    let headers: any = {
+    const headers: any = {
       [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
     };
 
@@ -124,7 +124,7 @@ export class AssetService {
       this.http.get(`${url}/assets/v1/${endpoint}`,
         {
           responseType: 'blob',
-          headers: headers
+          headers: headers,
         }).toPromise(),
     );
   }
