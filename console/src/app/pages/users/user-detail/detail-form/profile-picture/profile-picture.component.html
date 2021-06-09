@@ -2,7 +2,7 @@
 <div mat-dialog-content>
   <div class="current-pic-wrapper">
   <img class="pic" [src]="data.profilePic" *ngIf="data.profilePic"/>
-  <button color="warn" (click)="deletePic()" mat-icon-button><mat-icon>remove_circle</mat-icon></button>
+  <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" (click)="deletePic()" mat-icon-button><mat-icon>remove_circle</mat-icon></button>
 </div>
 <div class="dropzone" cnslDropzone  (hovered)="toggleHover($event)"
 (dropped)="onDrop($event)"

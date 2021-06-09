@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { DropzoneModule } from 'src/app/directives/dropzone/dropzone.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
@@ -26,6 +27,7 @@ import { ProfilePictureComponent } from './profile-picture/profile-picture.compo
     TranslateModule,
     MatSelectModule,
     MatButtonModule,
+    MatTooltipModule,
     MatIconModule,
     TranslateModule,
     InputModule,
