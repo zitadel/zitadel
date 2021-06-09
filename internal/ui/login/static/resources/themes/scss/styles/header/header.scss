@@ -6,11 +6,12 @@ $lgn-header-margin: 1rem auto .5rem auto;
     position: relative;
     margin: $lgn-header-margin;
     padding: $lgn-header-padding;
-    width: 100%;
+    max-width: 250px;
 
     .lgn-logo {
         display: block;
-        max-height: 100px;
+        height: 100px;
         margin: 0 auto;
+        max-width: 100%;
     }
 }

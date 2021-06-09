@@ -239,12 +239,13 @@ footer .watermark .lgn-logo-watermark {
   position: relative;
   margin: 1rem auto 0.5rem auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 100%;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -310,7 +311,7 @@ footer .watermark .lgn-logo-watermark {
   border-radius: 50%;
 }
 .lgn-icon-button i, .lgn-icon-button .mat-icon {
-  line-height: 24px;
+  line-height: 40px;
 }
 
 .lgn-stroked-button {
@@ -621,7 +622,7 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -65px;
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -1123,12 +1124,13 @@ footer .watermark .lgn-logo-watermark {
   position: relative;
   margin: 1rem auto 0.5rem auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 100%;
 }
 
 .lgn-button, .lgn-stroked-button, .lgn-icon-button {
@@ -1194,7 +1196,7 @@ footer .watermark .lgn-logo-watermark {
   border-radius: 50%;
 }
 .lgn-icon-button i, .lgn-icon-button .mat-icon {
-  line-height: 24px;
+  line-height: 40px;
 }
 
 .lgn-stroked-button {
@@ -1505,7 +1507,7 @@ a.block {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -65px;
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2307,7 +2309,7 @@ i {
 .content-container .lgn-left-action {
   position: absolute;
   left: 1rem;
-  top: -40px;
+  top: -65px;
 }
 .content-container .lgn-register-options {
   display: flex;
@@ -2346,12 +2348,13 @@ i {
   position: relative;
   margin: 1rem auto 0.5rem auto;
   padding: 0;
-  width: 100%;
+  max-width: 250px;
 }
 .lgn-header .lgn-logo {
   display: block;
-  max-height: 100px;
+  height: 100px;
   margin: 0 auto;
+  max-width: 100%;
 }
 
 @keyframes shake {
