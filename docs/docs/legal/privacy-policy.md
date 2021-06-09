@@ -179,8 +179,8 @@ We use third-party services to provide the website and our offers. An up-to-date
 
 This website uses external payment service providers through whose platforms users and we can make payment transactions. For example via
 
-- Stripe (https://stripe.com/ch/privacy)
-- Bexio AG (https://www.bexio.com/de-CH/datenschutz)
+- Stripe (<https://stripe.com/ch/privacy>)
+- Bexio AG (<https://www.bexio.com/de-CH/datenschutz>)
 
 As an alternative, we offer customers the option to pay by invoice instead of using external payment providers. However, this may require a positive credit check in advance.
 
@@ -216,7 +216,7 @@ Cookies are only used for technical purposes to enable the functionality and eff
 - Session management
 - Single Sign On
 - Rate Limiting
-- DDOS Mitigation
+- DDoS Mitigation
 
 If you do not want us to use cookies during your visit, you can disable their use in your browser settings. In this case, certain parts of our website (e.g. language selection) may not function or may not function fully.
 

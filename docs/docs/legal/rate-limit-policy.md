@@ -8,7 +8,7 @@ This policy is an annex to the [Terms of Service](terms-of-service) and clarifie
 
 ## Why do we rate limit
 
-To ensure the availability of our Services and to avoid slow or failed requests by our Customers, due to overloads, we impose rate limits on certain API. These limits helps us guarantee the performance and availability of ZITADEL Cloud. 
+To ensure the availability of our Services and to avoid slow or failed requests by our Customers, due to overloads, we impose rate limits on certain API. These limits helps us guarantee the performance and availability of ZITADEL Cloud.
 
 ## How is the rate limit implemented
 

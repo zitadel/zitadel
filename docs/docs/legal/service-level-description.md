@@ -13,6 +13,7 @@ This annex of the [Framework Agreement](terms-of-service) describes the service 
 **Downtime Period** means a period of one or more consecutive minutes of Downtime. Partial minutes or intermittent Downtime for a period of less than one minute will not count towards any Downtime Period.
 
 **Downtime** means any period of time in which Core Services are not Available within the Region of the customer’s organization. Downtime excludes any time in which ZITADEL Cloud is not Available because of
+
 - Announced maintenance work
 - Emergency maintenance
 - Force majeure events.
@@ -25,15 +26,18 @@ This annex of the [Framework Agreement](terms-of-service) describes the service 
 
 **Successful Minute** means a minute in which Auth0 is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Requests were made.
 
-Failed Customer Request means Customer Requests that 
+Failed Customer Request means Customer Requests that
+
 - Returns an server error; or
 - is received by ZITADEL Cloud and results in no response where one is expected
 
-This excludes specifically: 
+This excludes specifically:
+
 - Failed Customer Requests due to malformed requests, client-side application errors outside of ZITADEL Cloud’s control
 - Customer Requests that do not reach ZITADEL Cloud Core Services
 
-**Core Services** means the following ZITADEL Cloud Services and API’s: 
+**Core Services** means the following ZITADEL Cloud Services and API’s:
+
 - **Authentication API** Endpoints
 - **OpenID Connect 1.0 / OAuth 2.0 API** Endpoints
 - **Login Service** means the graphical user interface of ZITADEL Cloud for users to Login, Self-Register, and conduct a Password Reset.
@@ -47,7 +51,6 @@ Achieved vs.  Guaranteed| 99.50% | 99.90% | 99.95%
 99.0% - < 99.5% | n/a | 10% | 25%
 95.0% - < 99.0% | 10% | 25% | 50%
 < 95.0% | 50% | 50% | 50%
-
 
 ## Service Levels
 

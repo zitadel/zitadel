@@ -5,13 +5,13 @@ custom_edit_url: null
 
 ## Background
 
-Within the scope of the [**Framework Agreement**](terms-of-service), the **Processor** (CAOS AG) processes **Personal Data** on behalf of the **Customer** (Responsible Party), collectively the **"Parties"**. 
+Within the scope of the [**Framework Agreement**](terms-of-service), the **Processor** (CAOS AG) processes **Personal Data** on behalf of the **Customer** (Responsible Party), collectively the **"Parties"**.
 
 This Annex to the Agreement governs the Parties&#39; data protection obligations in addition to the provisions of the Agreement.
 
 ## Subject matter, duration, nature and purpose of the processing as well as type of personal data and categories of data subjects
 
-This annex reflects the commitment of both parties to abide by the applicable data protection laws for the processing of Personal Data for the purpose of Processor's execution of the Framework Agreement. 
+This annex reflects the commitment of both parties to abide by the applicable data protection laws for the processing of Personal Data for the purpose of Processor's execution of the Framework Agreement.
 
 The duration of the Processing shall correspond to the duration of the Agreement, unless otherwise provided for in this Annex or unless individual provisions obviously result in obligations going beyond this.
 
@@ -122,7 +122,6 @@ The Processor is responsible for taking appropriate technical and organizational
 
 ## Obligations of the processor
 
-
 ## Bound by directions
 
 The Processor processes personal data in accordance with its privacy policy (cf. [Privacy Policy](privacy-policy.md)) and on the documented directions of the Customer. The initial direction result from the Agreement. Subsequent instructions shall be given either in writing, whereby e-mail shall suffice, or orally with immediate written confirmation.
@@ -143,7 +142,7 @@ The technical and organizational security measures are described in more detail 
 
 A current and complete list of involved and approved sub-processors can be found at [https://zitadel.ch/trust/](https://zitadel.ch/trust/).
 
-The Processor is entitled to involve additional sub-processors. In this case, the Processor shall inform the Responsible Party about any intended change regarding sub-processors and update the list at https://zitadel.ch/trust. The Customer has the right to object to such changes. If the Parties are unable to reach a mutual agreement within 90 days of receipt of the objection by the Processor, the Customer may terminate the Agreement extraordinarily.
+The Processor is entitled to involve additional sub-processors. In this case, the Processor shall inform the Responsible Party about any intended change regarding sub-processors and update the list at <https://zitadel.ch/trust>. The Customer has the right to object to such changes. If the Parties are unable to reach a mutual agreement within 90 days of receipt of the objection by the Processor, the Customer may terminate the Agreement extraordinarily.
 
 The Processor obligates itself to impose on all sub-processors, by means of a contract (or in another appropriate manner), the same data protection obligations as are imposed on it by this Annex. In particular, sufficient guarantees shall be provided that the appropriate technical and organizational measures are implemented in such a way that the processing by the sub-processor is carried out in accordance with the legal requirements. If the sub-processor fails to comply with its data protection obligations, the processor shall be liable to the customer for this as for its own conduct.
 
@@ -201,7 +200,7 @@ The following integrity measures exist:
 
 The following measures of availability exist:
 
-1. Operation of the systems in combination with a CDN/DDOS mitigation service
+1. Operation of the systems in combination with a CDN/DDoS mitigation service
 2. High availability operation
 3. Geo-redundant operation over at least two data centers
 
