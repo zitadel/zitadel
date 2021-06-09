@@ -25,7 +25,7 @@
 
     .i-wrapper {
       border-radius: 50%;
-      background-color: #00000030;
+      background-color: #00000050;
       position: absolute;
       top: 0;
       z-index: 1;
@@ -44,7 +44,7 @@
 
     &:hover {
       .i-wrapper {
-        background-color: #00000060;
+        background-color: #00000080;
       }
     }
   }

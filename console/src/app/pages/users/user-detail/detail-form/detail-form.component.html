@@ -1,7 +1,7 @@
 <form [formGroup]="profileForm" *ngIf="profileForm" (ngSubmit)="submitForm()">
     <div class="content">
     <div class="content inner">
-      <button class="camera-wrapper">
+      <button class="camera-wrapper" type="button" (click)="openUploadDialog()">
         <div class="i-wrapper">
           <i class="las la-camera"></i>
         </div>

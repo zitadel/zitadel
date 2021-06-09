@@ -306,7 +306,11 @@
       "DISPLAYNAME": "Display Name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
-      "PASSWORD": "Password"
+      "PASSWORD": "Password",
+      "AVATAR": {
+        "UPLOADTITLE":"Upload your Profile Picture",
+        "UPLOADBTN":"Choose file"
+      }
     },
     "MACHINE": {
       "TITLE": "Service User Details",
