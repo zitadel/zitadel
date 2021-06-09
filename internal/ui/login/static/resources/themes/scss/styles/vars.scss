@@ -91,6 +91,7 @@
   --zitadel-color-raised-button-background: var(--zitadel-color-white);
 
 
+  --zitadel-color-white: #ffffff;
   --zitadel-color-black: #000000;
   --zitadel-color-grey-50: #fafafa;
   --zitadel-color-grey-100: #f5f5f5;
@@ -109,8 +110,8 @@
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
 
-  --zitadel-color-qr: var(--zitadel-color-white);
-  --zitadel-color-qr-background: var(--zitadel-color-black);
+  --zitadel-color-qr: var(--zitadel-color-black);
+  --zitadel-color-qr-background: var(--zitadel-color-white);
 }
 
 .lgn-dark-theme {
@@ -204,4 +205,7 @@
 
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+
+  --zitadel-color-qr: var(--zitadel-color-white);
+  --zitadel-color-qr-background: var(--zitadel-color-black);
 }

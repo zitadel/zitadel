@@ -77,6 +77,7 @@
   --zitadel-color-button-selected-background: var(--zitadel-color-grey-900);
   --zitadel-color-button-disabled-selected-background: var(--zitadel-color-grey-800);
   --zitadel-color-raised-button-background: var(--zitadel-color-white);
+  --zitadel-color-white: #ffffff;
   --zitadel-color-black: #000000;
   --zitadel-color-grey-50: #fafafa;
   --zitadel-color-grey-100: #f5f5f5;
@@ -92,8 +93,8 @@
   --zitadel-logo-powered-by: url("../logo-dark.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
-  --zitadel-color-qr: var(--zitadel-color-white);
-  --zitadel-color-qr-background: var(--zitadel-color-black);
+  --zitadel-color-qr: var(--zitadel-color-black);
+  --zitadel-color-qr-background: var(--zitadel-color-white);
 }
 
 .lgn-dark-theme {
@@ -171,6 +172,8 @@
   --zitadel-logo-powered-by: url("../logo-light.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-qr: var(--zitadel-color-white);
+  --zitadel-color-qr-background: var(--zitadel-color-black);
 }
 
 body {
