@@ -309,7 +309,12 @@
       "PASSWORD": "Passwort",
       "AVATAR": {
         "UPLOADTITLE":"Profilfoto uploaden",
-        "UPLOADBTN":"Datei auswählen"
+        "UPLOADBTN":"Datei auswählen",
+        "UPLOAD":"Hochladen",
+        "CURRENT":"Aktuelles Bild",
+        "PREVIEW":"Vorschau",
+        "DELETESUCCESS":"Erfolgreich gelöscht!",
+        "CROPPERERROR":"Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
       }
     },
     "MACHINE": {

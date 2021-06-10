@@ -42,6 +42,8 @@ import {
   RemoveMyAuthFactorOTPResponse,
   RemoveMyAuthFactorU2FRequest,
   RemoveMyAuthFactorU2FResponse,
+  RemoveMyAvatarRequest,
+  RemoveMyAvatarResponse,
   RemoveMyLinkedIDPRequest,
   RemoveMyLinkedIDPResponse,
   RemoveMyPasswordlessRequest,
@@ -410,6 +412,11 @@ export class GrpcAuthService {
     req.setLinkedUserId(externalUserId);
     req.setIdpId(idpId);
     return this.grpcService.auth.removeMyLinkedIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public removeMyAvatar(): Promise<RemoveMyAvatarResponse.AsObject> {
+    const req = new RemoveMyAvatarRequest();
+    return this.grpcService.auth.removeMyAvatar(req, null).then(resp => resp.toObject());
   }
 
   public listMyLinkedIDPs(

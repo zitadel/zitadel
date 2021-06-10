@@ -7,13 +7,17 @@
 
 .desc {
   color: var(--grey);
-  font-size: .9rem;
+  font-size: 14px;
 }
 
 .current-pic-wrapper {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  margin-bottom: 1rem;
+
+  .fill-space {
+    flex: 1;
+  }
 
   .pic {
     height: 80px;
@@ -24,42 +28,30 @@
   }
 }
 
-.dropzone {
-  margin: 1rem 0;
-  outline: none;
-  height: 150px;
-  border-radius: 16px;
-  border: 1px solid var(--grey);
+.error {
+  color: #f44336;
+  font-size: 14px;
+}
+
+.cropped-preview {
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-direction: column;
-  transition: all .2s ease-in-out;
+  width: 100%;
+  justify-content: space-between;
 
-  .file-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .btn {
-      cursor: pointer;
-      margin-bottom: .5rem;
-    }
+  .pic {
+    height: 80px;
+    width: 80px;
+    object-fit: contain;
+    border-radius: 50%;
+    background-color: #00000030;
   }
+}
 
-  .icon {
-    font-size: 1.5rem;
-    color: var(--grey);
-  }
-
-  .desc {
-    font-size: 14px;
-    color: var(--grey);
-  }
-
-  &.hovering {
-    border-radius: 16px;
-  }
+.cropper {
+  margin: 1rem 0;
+  width: auto;
+  border-radius: .5rem;
 }
 
 .action {
@@ -69,4 +61,8 @@
   .ok-button {
     margin-left: .5rem;
   }
+}
+
+:root {
+  --cropper-outline-color: black !important;
 }

@@ -309,7 +309,12 @@
       "PASSWORD": "Password",
       "AVATAR": {
         "UPLOADTITLE":"Upload your Profile Picture",
-        "UPLOADBTN":"Choose file"
+        "UPLOADBTN":"Choose file",
+        "UPLOAD":"Upload",
+        "CURRENT":"Current Picture",
+        "PREVIEW":"Preview",
+        "DELETESUCCESS":"Deleted successfully!",
+        "CROPPERERROR":"An error while uploading your file failed. Try a different format and size if necessary."
       }
     },
     "MACHINE": {
