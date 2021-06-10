@@ -2891,7 +2891,6 @@ message UpdatePasswordLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message GetDefaultInitMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2920,7 +2919,6 @@ message SetDefaultInitMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message GetDefaultPasswordResetMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2949,7 +2947,6 @@ message SetDefaultPasswordResetMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message GetDefaultVerifyEmailMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -2978,7 +2975,6 @@ message SetDefaultVerifyEmailMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message GetDefaultVerifyPhoneMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3007,7 +3003,6 @@ message SetDefaultVerifyPhoneMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message GetDefaultDomainClaimedMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
