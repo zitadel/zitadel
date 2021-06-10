@@ -81,10 +81,6 @@ const (
 	CustomTextRemoved        models.EventType = "org.customtext.removed"
 	CustomTextMessageRemoved models.EventType = "org.customtext.template.removed"
 
-	CustomTextSet            models.EventType = "org.customtext.set"
-	CustomTextRemoved        models.EventType = "org.customtext.removed"
-	CustomTextMessageRemoved models.EventType = "org.customtext.template.removed"
-
 	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"
 	PasswordComplexityPolicyRemoved models.EventType = "org.policy.password.complexity.removed"

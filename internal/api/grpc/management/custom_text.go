@@ -3,6 +3,8 @@ package management
 import (
 	"context"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	text_grpc "github.com/caos/zitadel/internal/api/grpc/text"
@@ -122,6 +124,42 @@ func (s *Server) SetCustomDomainClaimedMessageText(ctx context.Context, req *mgm
 		return nil, err
 	}
 	return &mgmt_pb.SetCustomDomainClaimedMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) GetCustomLoginTexts(ctx context.Context, req *mgmt_pb.GetCustomLoginTextsRequest) (*mgmt_pb.GetCustomLoginTextsResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *mgmt_pb.GetDefaultLoginTextsRequest) (*mgmt_pb.GetDefaultLoginTextsResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) SetCustomLoginText(ctx context.Context, req *mgmt_pb.SetCustomLoginTextsRequest) (*mgmt_pb.SetCustomLoginTextsResponse, error) {
+	result, err := s.command.SetOrgLoginText(ctx, authz.GetCtxData(ctx).OrgID, SetLoginCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetCustomLoginTextsResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *mgmt_pb.ResetCustomLoginTextsToDefaultRequest) (*mgmt_pb.ResetCustomLoginTextsToDefaultResponse, error) {
+	result, err := s.command.RemoveOrgLoginTexts(ctx, authz.GetCtxData(ctx).OrgID, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ResetCustomLoginTextsToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.EventDate,

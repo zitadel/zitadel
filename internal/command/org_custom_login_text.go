@@ -653,23 +653,27 @@ func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggre
 	return events, existingLoginText, nil
 }
 
-func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string, lang language.Tag) error {
+func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-1B8dw", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-1B8dw", "Errors.ResourceOwnerMissing")
 	}
 	if lang == language.Und {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-5ZZmo", "Errors.CustomMailText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5ZZmo", "Errors.CustomMailText.Invalid")
 	}
 	customText, err := c.orgCustomLoginTextWriteModelByID(ctx, resourceOwner, lang)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomMailText.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomMailText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))
+	err = AppendAndReduce(customText, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
 func (c *Commands) orgCustomLoginTextWriteModelByID(ctx context.Context, orgID string, lang language.Tag) (*OrgCustomLoginTextReadModel, error) {
