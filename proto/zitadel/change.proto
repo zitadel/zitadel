@@ -34,9 +34,15 @@ message Change {
         }
     ];
     string resource_owner_id = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "the organisation the event belongs to";
+        example: "\"69629023906488334\"";
+    }
+    ];
+    string editor_preferred_login_name = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the organisation the event belongs to";
-            example: "\"69629023906488334\"";
+            description: "the preferred login name of the editor";
+            example: "\"gigi@acme.zitadel.ch\"";
         }
     ];
 }

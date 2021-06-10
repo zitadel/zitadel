@@ -25,11 +25,12 @@ func UserChangesToPb(changes []*user_model.UserChange) []*change_pb.Change {
 
 func UserChangeToPb(change *user_model.UserChange) *change_pb.Change {
 	return &change_pb.Change{
-		ChangeDate:        change.ChangeDate,
-		EventType:         message.NewLocalizedEventType(change.EventType),
-		Sequence:          change.Sequence,
-		EditorId:          change.ModifierID,
-		EditorDisplayName: change.ModifierName,
+		ChangeDate:               change.ChangeDate,
+		EventType:                message.NewLocalizedEventType(change.EventType),
+		Sequence:                 change.Sequence,
+		EditorId:                 change.ModifierID,
+		EditorDisplayName:        change.ModifierName,
+		EditorPreferredLoginName: change.ModifierLoginName,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
@@ -44,11 +45,12 @@ func OrgChangesToPb(changes []*org_model.OrgChange) []*change_pb.Change {
 
 func OrgChangeToPb(change *org_model.OrgChange) *change_pb.Change {
 	return &change_pb.Change{
-		ChangeDate:        change.ChangeDate,
-		EventType:         message.NewLocalizedEventType(change.EventType),
-		Sequence:          change.Sequence,
-		EditorId:          change.ModifierId,
-		EditorDisplayName: change.ModifierName,
+		ChangeDate:               change.ChangeDate,
+		EventType:                message.NewLocalizedEventType(change.EventType),
+		Sequence:                 change.Sequence,
+		EditorId:                 change.ModifierId,
+		EditorDisplayName:        change.ModifierName,
+		EditorPreferredLoginName: change.ModifierLoginName,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
@@ -63,11 +65,12 @@ func ProjectChangesToPb(changes []*proj_model.ProjectChange) []*change_pb.Change
 
 func ProjectChangeToPb(change *proj_model.ProjectChange) *change_pb.Change {
 	return &change_pb.Change{
-		ChangeDate:        change.ChangeDate,
-		EventType:         message.NewLocalizedEventType(change.EventType),
-		Sequence:          change.Sequence,
-		EditorId:          change.ModifierId,
-		EditorDisplayName: change.ModifierName,
+		ChangeDate:               change.ChangeDate,
+		EventType:                message.NewLocalizedEventType(change.EventType),
+		Sequence:                 change.Sequence,
+		EditorId:                 change.ModifierId,
+		EditorDisplayName:        change.ModifierName,
+		EditorPreferredLoginName: change.ModifierLoginName,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
@@ -82,11 +85,12 @@ func AppChangesToPb(changes []*proj_model.ApplicationChange) []*change_pb.Change
 
 func AppChangeToPb(change *proj_model.ApplicationChange) *change_pb.Change {
 	return &change_pb.Change{
-		ChangeDate:        change.ChangeDate,
-		EventType:         message.NewLocalizedEventType(change.EventType),
-		Sequence:          change.Sequence,
-		EditorId:          change.ModifierId,
-		EditorDisplayName: change.ModifierName,
+		ChangeDate:               change.ChangeDate,
+		EventType:                message.NewLocalizedEventType(change.EventType),
+		Sequence:                 change.Sequence,
+		EditorId:                 change.ModifierId,
+		EditorDisplayName:        change.ModifierName,
+		EditorPreferredLoginName: change.ModifierLoginName,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
