@@ -172,9 +172,7 @@ You are liable for all damages and costs arising from the illegal or non-contrac
 
 ### Force majeure
 
-You acknowledge that we may be partially or entirely unable to provide our services during
-
-and/or as a result of events beyond our influence. These include events such as natural disasters, war, terrorism, sabotage, attacks on our infrastructure (i.e. DoS/DDoS attacks), failure of electrical or data connections and unexpected official requirements. We are not liable for any damages in such cases.
+You acknowledge that we may be partially or entirely unable to provide our services during and/or as a result of events beyond our influence. These include events such as natural disasters, war, terrorism, sabotage, attacks on our infrastructure (i.e. DoS/DDoS attacks), failure of electrical or data connections and unexpected official requirements. We are not liable for any damages in such cases.
 
 ## Final provision
 

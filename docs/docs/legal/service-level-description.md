@@ -22,9 +22,9 @@ This annex of the [Framework Agreement](terms-of-service) describes the service 
 
 **Successful Minute** means a minute in which ZITADEL cloud is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Request were made.
 
-**Customer Requests** means a HTTP GET request made by a Customer or a Customers’ users to Core Services within the Customer’s organization’s region.
+**Customer Requests** means a HTTP request made by a Customer or a Customers’ users to Core Services within the Customer’s organization’s region.
 
-**Successful Minute** means a minute in which Auth0 is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Requests were made.
+**Successful Minute** means a minute in which ZITADEL Cloud is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Requests were made.
 
 Failed Customer Request means Customer Requests that
 
@@ -65,7 +65,7 @@ OUTPOST | 99.50%
 STARBASE | 99.90%
 FORTRESS | 99.95%
 
-2. If CAOS AG does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document.
+2. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document.
 3. The Customer must request Financial Credit and must notify CAOS Support in writing within 30 days of becoming eligible for Financial Credit and must prove Failed Customer Requests during Downtime Periods. Financial Credit will be made in the form of a monetary credit applied to the next possible subscription invoice of ZITADEL Cloud,  may only be used to book services in the future, and will in no case be paid as a cash equivalent. No further guarantees are provided.
 4. The Service Level commitments apply only to organizations with a subscription plan where a Service Level is applicable and does not include any other organizations of the same customer. The Customer is not entitled to any Financial Credit, if it is in breach of the Agreement at the time of the occurrence of the event giving rise to the credit.
 
