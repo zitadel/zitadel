@@ -212,7 +212,7 @@
               <span>ABC • abc • 123</span>
 
               <span class="fill-space"></span>
-              <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn" (click)="deleteFont()"><mat-icon>remove_circle</mat-icon></button>
+              <button [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false"  matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn" (click)="deleteFont()"><mat-icon>remove_circle</mat-icon></button>
             </div>
 
             <div class="dropzone" cnslDropzone  (hovered)="toggleHoverFont($event)"

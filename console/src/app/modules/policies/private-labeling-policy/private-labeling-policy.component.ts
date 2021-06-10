@@ -3,7 +3,7 @@ import { Component, EventEmitter, Injector, OnDestroy, Type } from '@angular/cor
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import {
   GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
   GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
@@ -19,6 +19,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -93,6 +94,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   private org!: Org.AsObject;
 
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -329,13 +331,18 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
     this.getPreviewData().then(data => {
       console.log('preview', data);
-      this.loadingImages = true;
 
       if (data.policy) {
         this.previewData = data.policy;
         this.loading = false;
 
-        this.loadPreviewImages();
+        this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
+          console.log(canUse);
+          if ((canUse == true && this.serviceType == PolicyComponentServiceType.MGMT) || this.serviceType == PolicyComponentServiceType.ADMIN) {
+            this.loadingImages = true;
+            this.loadPreviewImages();
+          }
+        });
       }
     }).catch(error => {
       this.toast.showError(error);
@@ -348,7 +355,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         this.data = data.policy;
         this.loading = false;
 
-        this.loadImages();
+        this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
+          if ((canUse == true && this.serviceType == PolicyComponentServiceType.MGMT) || this.serviceType == PolicyComponentServiceType.ADMIN) {
+            // this.loadingImages = true;
+            this.loadImages();
+          }
+        });
       }
     }).catch(error => {
       this.toast.showError(error);
