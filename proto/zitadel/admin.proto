@@ -1568,12 +1568,36 @@ service AdminService {
     }
 
     //Sets the default custom text for domain claimed phone message
-    // it impacts all organisations without customized verify phone message text
+    // it impacts all organisations without customized domain claimed message text
     // The Following Variables can be used:
     // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyphone/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default custom texts for login ui
+    rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
+        option (google.api.http) = {
+            get: "/text/login/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for login ui
+    //it impacts all organisations without customized login ui texts
+    rpc SetDefaultLoginText(SetDefaultLoginTextRequest) returns (SetDefaultLoginTextResponse) {
+        option (google.api.http) = {
+            put: "/text/login/{language}";
             body: "*";
         };
 
@@ -3033,6 +3057,35 @@ message SetDefaultDomainClaimedMessageTextRequest {
 }
 
 message SetDefaultDomainClaimedMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDefaultLoginTextsRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultLoginTextsResponse {
+    zitadel.text.v1.LoginCustomText custom_text = 1;
+}
+
+message SetDefaultLoginTextsRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultLoginTextsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
