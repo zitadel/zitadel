@@ -329,44 +329,42 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public fetchData(): void {
     this.loading = true;
 
-    this.getPreviewData().then(data => {
-      console.log('preview', data);
+    this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
+      this.getPreviewData().then(data => {
+        console.log('preview', data);
 
-      if (data.policy) {
-        this.previewData = data.policy;
-        this.loading = false;
+        if (data.policy) {
+          this.previewData = data.policy;
+          this.loading = false;
 
-        this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
-          console.log(canUse);
           if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
             this.serviceType === PolicyComponentServiceType.ADMIN) {
             this.loadingImages = true;
             this.loadPreviewImages();
           }
-        });
-      }
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+        }
+      }).catch(error => {
+        this.toast.showError(error);
+      });
 
-    this.getData().then(data => {
-      console.log('data', data);
+      this.getData().then(data => {
+        console.log('data', data);
 
-      if (data.policy) {
-        this.data = data.policy;
-        this.loading = false;
+        if (data.policy) {
+          this.data = data.policy;
+          this.loading = false;
 
-        this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
           if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
             this.serviceType === PolicyComponentServiceType.ADMIN) {
             // this.loadingImages = true;
             this.loadImages();
           }
-        });
-      }
-    }).catch(error => {
-      this.toast.showError(error);
+        }
+      }).catch(error => {
+        this.toast.showError(error);
+      });
     });
+
   }
 
   private loadImages(): void {
