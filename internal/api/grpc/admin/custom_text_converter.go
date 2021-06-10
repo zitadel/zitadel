@@ -203,5 +203,11 @@ func SetLoginTextToDomain(text *admin_pb.SetDefaultLoginTextsRequest) *domain.Cu
 		result.PasswordlessLoginWithPwButtonText = text.PasswordlessText.LoginWithPwButtonText
 		result.PasswordlessValidateTokenButtonText = text.PasswordlessText.ValidateTokenButtonText
 	}
+	if text.SuccessLoginText != nil {
+		result.SuccessLoginTitle = text.SuccessLoginText.Title
+		result.SuccessLoginAutoRedirectDescription = text.SuccessLoginText.AutoRedirectDescription
+		result.SuccessLoginRedirectedDescription = text.SuccessLoginText.RedirectedDescription
+		result.SuccessLoginNextButtonText = text.SuccessLoginText.NextButtonText
+	}
 	return result
 }

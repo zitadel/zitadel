@@ -1978,6 +1978,7 @@ This is an empty request
 | registration_user_text |  zitadel.text.v1.RegistrationUserScreenText | - |  |
 | registration_org_text |  zitadel.text.v1.RegistrationOrgScreenText | - |  |
 | passwordless_text |  zitadel.text.v1.PasswordlessScreenText | - |  |
+| success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 
 
 

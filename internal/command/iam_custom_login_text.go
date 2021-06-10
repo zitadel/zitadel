@@ -287,6 +287,18 @@ func (c *Commands) setDefaultLoginText(ctx context.Context, iamAgg *eventstore.A
 	if loginText.PasswordlessValidateTokenButtonText != text.PasswordlessValidateTokenButtonText {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, text.PasswordlessValidateTokenButtonText, text.Language))
 	}
+	if loginText.SuccessLoginTitle != text.SuccessLoginTitle {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, text.SuccessLoginTitle, text.Language))
+	}
+	if loginText.SuccessLoginAutoRedirectDescription != text.SuccessLoginAutoRedirectDescription {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, text.SuccessLoginAutoRedirectDescription, text.Language))
+	}
+	if loginText.SuccessLoginRedirectedDescription != text.SuccessLoginRedirectedDescription {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, text.SuccessLoginRedirectedDescription, text.Language))
+	}
+	if loginText.SuccessLoginNextButtonText != text.SuccessLoginNextButtonText {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, text.SuccessLoginNextButtonText, text.Language))
+	}
 	return events, loginText, nil
 }
 

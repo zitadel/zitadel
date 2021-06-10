@@ -3092,6 +3092,7 @@ message SetDefaultLoginTextsRequest {
     zitadel.text.v1.RegistrationUserScreenText registration_user_text = 15;
     zitadel.text.v1.RegistrationOrgScreenText registration_org_text = 16;
     zitadel.text.v1.PasswordlessScreenText passwordless_text = 17;
+    zitadel.text.v1.SuccessLoginScreenText success_login_text = 18;
 }
 
 message SetDefaultLoginTextsResponse {

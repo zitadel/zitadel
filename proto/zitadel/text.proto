@@ -65,6 +65,7 @@ message LoginCustomText {
     RegistrationUserScreenText registration_user_text = 15;
     RegistrationOrgScreenText registration_org_text = 16;
     PasswordlessScreenText passwordless_text = 17;
+    SuccessLoginScreenText success_login_text = 18;
 }
 
 message SelectAccountScreenText {
@@ -204,6 +205,6 @@ message SuccessLoginScreenText {
     // Text to describe that auto redirect should happen after successful login
     string auto_redirect_description = 2 [(validate.rules).string = {max_len: 500}];
     // Text to describe that the window can be closed after redirect
-    string redirect_description = 3 [(validate.rules).string = {max_len: 100}];
+    string redirected_description = 3 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 4 [(validate.rules).string = {max_len: 200}];
 }

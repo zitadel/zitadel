@@ -124,6 +124,12 @@ const (
 	LoginKeyPasswordlessDescription             = LoginKeyPasswordless + "Description"
 	LoginKeyPasswordlessLoginWithPwButtonText   = LoginKeyPasswordless + "LoginWithPwButtonText"
 	LoginKeyPasswordlessValidateTokenButtonText = LoginKeyPasswordless + "ValidateTokenButtonText"
+
+	LoginKeySuccessLogin                        = "SuccessLogin."
+	LoginKeySuccessLoginTitle                   = LoginKeySuccessLogin + "Title"
+	LoginKeySuccessLoginAutoRedirectDescription = LoginKeySuccessLogin + "AutoRedirectDescription"
+	LoginKeySuccessLoginRedirectedDescription   = LoginKeySuccessLogin + "RedirectedDescription"
+	LoginKeySuccessLoginNextButtonText          = LoginKeySuccessLogin + "NextButtonText"
 )
 
 type CustomLoginText struct {
@@ -235,7 +241,7 @@ type CustomLoginText struct {
 
 	SuccessLoginTitle                   string
 	SuccessLoginAutoRedirectDescription string
-	SuccessLoginRedirectDescription     string
+	SuccessLoginRedirectedDescription   string
 	SuccessLoginNextButtonText          string
 }
 

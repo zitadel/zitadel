@@ -622,6 +622,34 @@ func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggre
 			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, loginText.Language))
 		}
 	}
+	if existingLoginText.SuccessLoginTitle != loginText.SuccessLoginTitle {
+		if loginText.SuccessLoginTitle != "" {
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, loginText.SuccessLoginTitle, loginText.Language))
+		} else {
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, loginText.Language))
+		}
+	}
+	if existingLoginText.SuccessLoginAutoRedirectDescription != loginText.SuccessLoginAutoRedirectDescription {
+		if loginText.SuccessLoginAutoRedirectDescription != "" {
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, loginText.SuccessLoginAutoRedirectDescription, loginText.Language))
+		} else {
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, loginText.Language))
+		}
+	}
+	if existingLoginText.SuccessLoginRedirectedDescription != loginText.SuccessLoginRedirectedDescription {
+		if loginText.SuccessLoginRedirectedDescription != "" {
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, loginText.SuccessLoginRedirectedDescription, loginText.Language))
+		} else {
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, loginText.Language))
+		}
+	}
+	if existingLoginText.SuccessLoginNextButtonText != loginText.SuccessLoginNextButtonText {
+		if loginText.SuccessLoginNextButtonText != "" {
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, loginText.SuccessLoginNextButtonText, loginText.Language))
+		} else {
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, loginText.Language))
+		}
+	}
 	return events, existingLoginText, nil
 }
 

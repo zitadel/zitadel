@@ -115,6 +115,11 @@ type CustomLoginTextReadModel struct {
 	PasswordlessDescription             string
 	PasswordlessLoginWithPwButtonText   string
 	PasswordlessValidateTokenButtonText string
+
+	SuccessLoginTitle                   string
+	SuccessLoginAutoRedirectDescription string
+	SuccessLoginRedirectedDescription   string
+	SuccessLoginNextButtonText          string
 }
 
 func (wm *CustomLoginTextReadModel) Reduce() error {
@@ -188,6 +193,10 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordlessScreenSetEvent(e)
 				continue
 			}
+			if strings.HasPrefix(e.Key, domain.LoginKeySuccessLogin) {
+				wm.handleSuccessLoginScreenSetEvent(e)
+				continue
+			}
 			wm.State = domain.PolicyStateActive
 		case *policy.CustomTextRemovedEvent:
 			if e.Key != domain.LoginCustomText || wm.Language != e.Language {
@@ -255,6 +264,10 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordless) {
 				wm.handlePasswordlessScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeySuccessLogin) {
+				wm.handleSuccessLoginScreenRemoveEvent(e)
 				continue
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
@@ -1026,6 +1039,44 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessScreenRemoveEvent(e *polic
 	}
 	if e.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
 		wm.PasswordlessValidateTokenButtonText = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handleSuccessLoginScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeySuccessLoginTitle {
+		wm.SuccessLoginTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeySuccessLoginAutoRedirectDescription {
+		wm.SuccessLoginAutoRedirectDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeySuccessLoginRedirectedDescription {
+		wm.SuccessLoginRedirectedDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeySuccessLoginNextButtonText {
+		wm.SuccessLoginNextButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handleSuccessLoginScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeySuccessLoginTitle {
+		wm.SuccessLoginTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeySuccessLoginAutoRedirectDescription {
+		wm.SuccessLoginAutoRedirectDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeySuccessLoginRedirectedDescription {
+		wm.SuccessLoginRedirectedDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeySuccessLoginNextButtonText {
+		wm.SuccessLoginNextButtonText = ""
 		return
 	}
 }
