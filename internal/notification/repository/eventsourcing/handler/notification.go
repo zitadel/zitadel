@@ -29,19 +29,19 @@ import (
 )
 
 const (
-	notificationTable         = "notification.notifications"
-	NotifyUserID              = "NOTIFICATION"
-	labelPolicyTableOrg       = "management.label_policies"
-	labelPolicyTableDef       = "adminapi.label_policies"
-	mailTemplateTableOrg      = "management.mail_templates"
-	mailTemplateTableDef      = "adminapi.mail_templates"
-	mailTextTableOrg          = "management.mail_texts"
-	mailTextTableDef          = "adminapi.mail_texts"
-	mailTextTypeDomainClaimed = "DomainClaimed"
-	mailTextTypeInitCode      = "InitCode"
-	mailTextTypePasswordReset = "PasswordReset"
-	mailTextTypeVerifyEmail   = "VerifyEmail"
-	mailTextTypeVerifyPhone   = "VerifyPhone"
+	notificationTable            = "notification.notifications"
+	NotifyUserID                 = "NOTIFICATION"
+	labelPolicyTableOrg          = "management.label_policies"
+	labelPolicyTableDef          = "adminapi.label_policies"
+	mailTemplateTableOrg         = "management.mail_templates"
+	mailTemplateTableDef         = "adminapi.mail_templates"
+	messageTextTableOrg          = "management.message_texts"
+	messageTextTableDef          = "adminapi.message_texts"
+	messageTextTypeDomainClaimed = "DomainClaimed"
+	messageTextTypeInitCode      = "InitCode"
+	messageTextTypePasswordReset = "PasswordReset"
+	messageTextTypeVerifyEmail   = "VerifyEmail"
+	messageTextTypeVerifyPhone   = "VerifyPhone"
 )
 
 type Notification struct {
@@ -146,7 +146,6 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
-
 	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
@@ -163,7 +162,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(ctx, mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -202,7 +201,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(ctx, mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -224,7 +223,6 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
-
 	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
@@ -241,7 +239,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMailText(ctx, mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -268,7 +266,11 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(n.i18n, user, phoneCode, n.systemDefaults, n.AesCrypto)
+	text, err := n.getMessageText(user, messageTextTypeVerifyPhone, user.PreferredLanguage)
+	if err != nil {
+		return err
+	}
+	err = types.SendPhoneVerificationCode(text, user, phoneCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -303,7 +305,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(ctx, mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -395,26 +397,29 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 }
 
 // Read organization specific texts
-func (n *Notification) getMailText(ctx context.Context, textType string, lang string) (*iam_model.MailTextView, error) {
+func (n *Notification) getMessageText(user *model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
 	langTag := language.Make(lang)
 	if langTag == language.Und {
-		langTag = n.systemDefaults.DefaultLanguage
+		langTag = language.English
 	}
-	base, _ := langTag.Base()
+	langBase, _ := langTag.Base()
+
+	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, langBase.String(), messageTextTableDef)
+	if err != nil {
+		return nil, err
+	}
+	defaultMessageText.Default = true
+
 	// read from Org
-	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, base.String(), mailTextTableOrg)
+	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, langBase.String(), messageTextTableOrg)
 	if errors.IsNotFound(err) {
-		// read from default
-		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, base.String(), mailTextTableDef)
-		if err != nil {
-			return nil, err
-		}
-		mailText.Default = true
+		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextViewToModel(mailText), err
+	mergedText := mergeMessageTexts(defaultMessageText, orgMessageText)
+	return iam_es_model.MessageTextViewToModel(mergedText), err
 }
 
 func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
@@ -439,4 +444,29 @@ func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
 		return nil, errors.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
 	}
 	return &userCopy, nil
+}
+
+func mergeMessageTexts(defaultText *iam_es_model.MessageTextView, orgText *iam_es_model.MessageTextView) *iam_es_model.MessageTextView {
+	if orgText.Subject == "" {
+		orgText.Subject = defaultText.Subject
+	}
+	if orgText.Title == "" {
+		orgText.Title = defaultText.Title
+	}
+	if orgText.PreHeader == "" {
+		orgText.PreHeader = defaultText.PreHeader
+	}
+	if orgText.Text == "" {
+		orgText.Text = defaultText.Text
+	}
+	if orgText.Greeting == "" {
+		orgText.Greeting = defaultText.Greeting
+	}
+	if orgText.ButtonText == "" {
+		orgText.ButtonText = defaultText.ButtonText
+	}
+	if orgText.FooterText == "" {
+		orgText.FooterText = defaultText.FooterText
+	}
+	return orgText
 }

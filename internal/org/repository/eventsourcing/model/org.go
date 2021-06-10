@@ -26,50 +26,11 @@ type Org struct {
 	OrgIAMPolicy             *iam_es_model.OrgIAMPolicy             `json:"-"`
 	LabelPolicy              *iam_es_model.LabelPolicy              `json:"-"`
 	MailTemplate             *iam_es_model.MailTemplate             `json:"-"`
-	MailTexts                []*iam_es_model.MailText               `json:"-"`
 	IDPs                     []*iam_es_model.IDPConfig              `json:"-"`
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
 	PasswordAgePolicy        *iam_es_model.PasswordAgePolicy        `json:"-"`
 	PasswordLockoutPolicy    *iam_es_model.PasswordLockoutPolicy    `json:"-"`
-}
-
-func OrgFromModel(org *org_model.Org) *Org {
-	members := OrgMembersFromModel(org.Members)
-	domains := OrgDomainsFromModel(org.Domains)
-	idps := iam_es_model.IDPConfigsFromModel(org.IDPs)
-	mailTexts := iam_es_model.MailTextsFromModel(org.MailTexts)
-	converted := &Org{
-		ObjectRoot: org.ObjectRoot,
-		Name:       org.Name,
-		State:      int32(org.State),
-		Domains:    domains,
-		MailTexts:  mailTexts,
-		Members:    members,
-		IDPs:       idps,
-	}
-	if org.OrgIamPolicy != nil {
-		converted.OrgIAMPolicy = iam_es_model.OrgIAMPolicyFromModel(org.OrgIamPolicy)
-	}
-	if org.LoginPolicy != nil {
-		converted.LoginPolicy = iam_es_model.LoginPolicyFromModel(org.LoginPolicy)
-	}
-	if org.LabelPolicy != nil {
-		converted.LabelPolicy = iam_es_model.LabelPolicyFromModel(org.LabelPolicy)
-	}
-	if org.MailTemplate != nil {
-		converted.MailTemplate = iam_es_model.MailTemplateFromModel(org.MailTemplate)
-	}
-	if org.PasswordComplexityPolicy != nil {
-		converted.PasswordComplexityPolicy = iam_es_model.PasswordComplexityPolicyFromModel(org.PasswordComplexityPolicy)
-	}
-	if org.PasswordAgePolicy != nil {
-		converted.PasswordAgePolicy = iam_es_model.PasswordAgePolicyFromModel(org.PasswordAgePolicy)
-	}
-	if org.PasswordLockoutPolicy != nil {
-		converted.PasswordLockoutPolicy = iam_es_model.PasswordLockoutPolicyFromModel(org.PasswordLockoutPolicy)
-	}
-	return converted
 }
 
 func OrgToModel(org *Org) *org_model.Org {
@@ -79,7 +40,6 @@ func OrgToModel(org *Org) *org_model.Org {
 		State:      org_model.OrgState(org.State),
 		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
-		MailTexts:  iam_es_model.MailTextsToModel(org.MailTexts),
 		IDPs:       iam_es_model.IDPConfigsToModel(org.IDPs),
 	}
 	if org.OrgIAMPolicy != nil {
@@ -216,12 +176,6 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendChangeMailTemplateEvent(event)
 	case MailTemplateRemoved:
 		o.appendRemoveMailTemplateEvent(event)
-	case MailTextAdded:
-		err = o.appendAddMailTextEvent(event)
-	case MailTextChanged:
-		err = o.appendChangeMailTextEvent(event)
-	case MailTextRemoved:
-		o.appendRemoveMailTextEvent(event)
 	case LoginPolicySecondFactorAdded:
 		err = o.appendAddSecondFactorToLoginPolicyEvent(event)
 	case LoginPolicySecondFactorRemoved:

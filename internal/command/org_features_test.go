@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -226,6 +227,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -253,6 +266,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyPrivateLabel:  false,
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
+					CustomText:               false,
 				},
 			},
 			res: res{
@@ -370,6 +384,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"test2",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
 							),
 						),
 					),
@@ -531,6 +557,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"test2",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
 							),
 						),
 					),
@@ -702,6 +740,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"org1.iam-domain", true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
 							),
 						),
 					),
@@ -931,6 +981,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -950,6 +1012,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewLabelPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.InitCodeMessageType, language.English),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -1141,6 +1206,18 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"org1.iam-domain",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
 							),
 						),
 					),

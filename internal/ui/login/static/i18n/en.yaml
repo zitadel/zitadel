@@ -235,6 +235,7 @@ Errors:
     RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
+    Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     NotMatchingUserID: User and user in authrequest don't match

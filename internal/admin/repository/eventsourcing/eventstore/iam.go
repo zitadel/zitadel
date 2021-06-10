@@ -2,16 +2,18 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
+
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -347,21 +349,21 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
-	text, err := repo.View.MailTexts(repo.SystemDefaults.IamID)
+func (repo *IAMRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
+	text, err := repo.View.MessageTexts(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(text, true), err
+	return iam_es_model.MessageTextsViewToModel(text, true), err
 }
 
-func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
-	text, err := repo.View.MailTextByIDs(repo.SystemDefaults.IamID, textType, language)
+func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
 	text.Default = true
-	return iam_es_model.MailTextViewToModel(text), err
+	return iam_es_model.MessageTextViewToModel(text), err
 }
 
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {

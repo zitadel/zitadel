@@ -42,3 +42,21 @@ func sendDebugEmail(message providers.Message, config systemdefaults.Notificatio
 	}
 	return provider.HandleMessage(message)
 }
+
+func mapNotifyUserToArgs(user *view_model.NotifyUser) map[string]interface{} {
+	return map[string]interface{}{
+		"UserName":           user.UserName,
+		"FirstName":          user.FirstName,
+		"LastName":           user.LastName,
+		"NickName":           user.NickName,
+		"DisplayName":        user.DisplayName,
+		"LastEmail":          user.LastEmail,
+		"VerifiedEmail":      user.VerifiedEmail,
+		"LastPhone":          user.LastPhone,
+		"VerifiedPhone":      user.VerifiedPhone,
+		"PreferredLoginName": user.PreferredLoginName,
+		"LoginNames":         user.LoginNames,
+		"ChangeDate":         user.ChangeDate,
+		"CreationDate":       user.CreationDate,
+	}
+}

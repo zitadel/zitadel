@@ -42,6 +42,7 @@ type FeaturesView struct {
 	LabelPolicyPrivateLabel  bool          `json:"labelPolicyPrivateLabel" gorm:"column:label_policy_private_label"`
 	LabelPolicyWatermark     bool          `json:"labelPolicyWatermark" gorm:"column:label_policy_watermark"`
 	CustomDomain             bool          `json:"customDomain" gorm:"column:custom_domain"`
+	CustomText               bool          `json:"customText" gorm:"column:custom_text"`
 }
 
 func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
@@ -66,6 +67,7 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		LabelPolicyPrivateLabel:  features.LabelPolicyPrivateLabel,
 		LabelPolicyWatermark:     features.LabelPolicyWatermark,
 		CustomDomain:             features.CustomDomain,
+		CustomText:               features.CustomText,
 	}
 }
 

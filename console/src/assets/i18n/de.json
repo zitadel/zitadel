@@ -611,12 +611,13 @@
       "LOGINPOLICYPASSWORDRESET": "Login Richtlinie: Passwort vergessen Link nicht anzeigen - benutzerdefiniert",
       "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
       "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
-      "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",
+      "LOGINPOLICYFACTORS": "Login Richtlinie: Multifaktoren - benutzerdefiniert",
       "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
       "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
       "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
-      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar"
+      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
+      "CUSTOMTEXT": "Benutzerdefinierte Texte"
     },
     "TIERSTATES": {
       "0": "Aktiv",

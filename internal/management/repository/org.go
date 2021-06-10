@@ -44,8 +44,10 @@ type OrgRepository interface {
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 
-	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
-	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
+	GetMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
+	GetDefaultMessageText(ctx context.Context, textType string, language string) (*iam_model.MessageTextView, error)
+	GetMessageText(ctx context.Context, orgID, textType, language string) (*iam_model.MessageTextView, error)
 
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)

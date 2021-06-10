@@ -145,6 +145,18 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
+		if requiredFeature == domain.FeatureCustomDomain {
+			if !features.CustomDomain {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
+		if requiredFeature == domain.FeatureCustomText {
+			if !features.CustomText {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
 		return MissingFeatureErr(requiredFeature)
 	}
 	return nil

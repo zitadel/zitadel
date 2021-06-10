@@ -548,19 +548,19 @@ func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.Mail
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
-	texts, err := repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+func (repo *OrgRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
+	texts, err := repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(texts, true), err
+	return iam_es_model.MessageTextsViewToModel(texts, true), err
 }
 
-func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+func (repo *OrgRepository) GetMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
 	defaultIn := false
-	texts, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
+	texts, err := repo.View.MessageTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) || len(texts) == 0 {
-		texts, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+		texts, err = repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
 		}
@@ -569,7 +569,31 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+	return iam_es_model.MessageTextsViewToModel(texts, defaultIn), err
+}
+
+func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
+	if err != nil {
+		return nil, err
+	}
+	text.Default = true
+	return iam_es_model.MessageTextViewToModel(text), err
+}
+
+func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(orgID, textType, lang)
+	if errors.IsNotFound(err) {
+		result, err := repo.GetDefaultMessageText(ctx, textType, lang)
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MessageTextViewToModel(text), err
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {

@@ -110,43 +110,6 @@ func (p *MailText) Changes(changed *MailText) map[string]interface{} {
 	return changes
 }
 
-func (i *IAM) appendAddMailTextEvent(event *es_models.Event) error {
-	mailText := &MailText{}
-	err := mailText.SetDataLabel(event)
-	if err != nil {
-		return err
-	}
-	mailText.ObjectRoot.CreationDate = event.CreationDate
-	i.DefaultMailTexts = append(i.DefaultMailTexts, mailText)
-	return nil
-}
-
-func (i *IAM) appendChangeMailTextEvent(event *es_models.Event) error {
-	mailText := &MailText{}
-	err := mailText.SetDataLabel(event)
-	if err != nil {
-		return err
-	}
-	if n, m := GetMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
-		i.DefaultMailTexts[n] = mailText
-	}
-	return nil
-}
-
-func (i *IAM) appendRemoveMailTextEvent(event *es_models.Event) error {
-	mailText := &MailText{}
-	err := mailText.SetDataLabel(event)
-	if err != nil {
-		return err
-	}
-	if n, m := GetMailText(i.DefaultMailTexts, mailText.MailTextType, mailText.Language); m != nil {
-		i.DefaultMailTexts[n] = i.DefaultMailTexts[len(i.DefaultMailTexts)-1]
-		i.DefaultMailTexts[len(i.DefaultMailTexts)-1] = nil
-		i.DefaultMailTexts = i.DefaultMailTexts[:len(i.DefaultMailTexts)-1]
-	}
-	return nil
-}
-
 func (p *MailText) SetDataLabel(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {

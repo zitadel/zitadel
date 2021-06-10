@@ -74,6 +74,7 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		LabelPolicyPrivateLabel:  req.LabelPolicy || req.LabelPolicyPrivateLabel,
 		LabelPolicyWatermark:     req.LabelPolicyWatermark,
 		CustomDomain:             req.CustomDomain,
+		CustomText:               req.CustomText,
 	}
 }
 
@@ -94,5 +95,6 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		LabelPolicyPrivateLabel:  req.LabelPolicy || req.LabelPolicyPrivateLabel,
 		LabelPolicyWatermark:     req.LabelPolicyWatermark,
 		CustomDomain:             req.CustomDomain,
+		CustomText:               req.CustomText,
 	}
 }
