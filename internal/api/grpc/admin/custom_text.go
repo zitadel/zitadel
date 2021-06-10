@@ -128,3 +128,21 @@ func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 		),
 	}, nil
 }
+
+func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *admin_pb.GetDefaultLoginTextsRequest) (*admin_pb.GetDefaultLoginTextsResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) SetDefaultLoginText(ctx context.Context, req *admin_pb.SetDefaultLoginTextsRequest) (*admin_pb.SetDefaultLoginTextsResponse, error) {
+	result, err := s.command.SetDefaultLoginText(ctx, SetLoginTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultLoginTextsResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}

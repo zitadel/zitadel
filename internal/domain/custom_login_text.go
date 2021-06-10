@@ -151,29 +151,29 @@ type CustomLoginText struct {
 	PasswordBackButtonText string
 	PasswordNextButtonText string
 
-	PasswordResetTitle          string
-	PasswordResetDescription    string
-	PasswordResetNextButtonText string
+	ResetPasswordTitle          string
+	ResetPasswordDescription    string
+	ResetPasswordNextButtonText string
 
-	InitializeTitle              string
-	InitializeDescription        string
-	InitializeCodeLabel          string
-	InitializeNewPassword        string
-	InitializeNewPasswordConfirm string
-	InitializeResendButtonText   string
-	InitializeNextButtonText     string
+	InitializeUserTitle                   string
+	InitializeUserDescription             string
+	InitializeUserCodeLabel               string
+	InitializeUserNewPasswordLabel        string
+	InitializeUserNewPasswordConfirmLabel string
+	InitializeUserResendButtonText        string
+	InitializeUserNextButtonText          string
 
 	InitializeDoneTitle           string
 	InitializeDoneDescription     string
 	InitializeDoneAbortButtonText string
 	InitializeDoneNextButtonText  string
 
-	InitMFATitle          string
-	InitMFADescription    string
-	InitMFAOTPOption      string
-	InitMFAU2FOption      string
-	InitMFASkipButtonText string
-	InitMFANextButtonText string
+	InitMFAPromptTitle          string
+	InitMFAPromptDescription    string
+	InitMFAPromptOTPOption      string
+	InitMFAPromptU2FOption      string
+	InitMFAPromptSkipButtonText string
+	InitMFAPromptNextButtonText string
 
 	InitMFAOTPTitle       string
 	InitMFAOTPDescription string
@@ -232,6 +232,11 @@ type CustomLoginText struct {
 	PasswordlessDescription             string
 	PasswordlessLoginWithPwButtonText   string
 	PasswordlessValidateTokenButtonText string
+
+	SuccessLoginTitle                   string
+	SuccessLoginAutoRedirectDescription string
+	SuccessLoginRedirectDescription     string
+	SuccessLoginNextButtonText          string
 }
 
 func (m *CustomLoginText) IsValid() bool {

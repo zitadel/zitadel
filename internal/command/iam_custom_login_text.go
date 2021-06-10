@@ -83,35 +83,35 @@ func (c *Commands) setDefaultLoginText(ctx context.Context, iamAgg *eventstore.A
 	if loginText.PasswordNextButtonText != text.PasswordNextButtonText {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, text.PasswordNextButtonText, text.Language))
 	}
-	if loginText.PasswordResetTitle != text.PasswordResetTitle {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyResetPasswordTitle, text.PasswordResetTitle, text.Language))
+	if loginText.PasswordResetTitle != text.ResetPasswordTitle {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyResetPasswordTitle, text.ResetPasswordTitle, text.Language))
 	}
-	if loginText.PasswordResetDescription != text.PasswordResetDescription {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyResetPasswordDescription, text.PasswordResetDescription, text.Language))
+	if loginText.PasswordResetDescription != text.ResetPasswordDescription {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyResetPasswordDescription, text.ResetPasswordDescription, text.Language))
 	}
-	if loginText.PasswordResetNextButtonText != text.PasswordResetNextButtonText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyResetPasswordNextButtonText, text.PasswordResetNextButtonText, text.Language))
+	if loginText.PasswordResetNextButtonText != text.ResetPasswordNextButtonText {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyResetPasswordNextButtonText, text.ResetPasswordNextButtonText, text.Language))
 	}
-	if loginText.InitializeTitle != text.InitializeTitle {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, text.InitializeTitle, text.Language))
+	if loginText.InitializeTitle != text.InitializeUserTitle {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, text.InitializeUserTitle, text.Language))
 	}
-	if loginText.InitializeDescription != text.InitializeDescription {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, text.InitializeDescription, text.Language))
+	if loginText.InitializeDescription != text.InitializeUserDescription {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, text.InitializeUserDescription, text.Language))
 	}
-	if loginText.InitializeCodeLabel != text.InitializeCodeLabel {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, text.InitializeCodeLabel, text.Language))
+	if loginText.InitializeCodeLabel != text.InitializeUserCodeLabel {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, text.InitializeUserCodeLabel, text.Language))
 	}
-	if loginText.InitializeNewPassword != text.InitializeNewPassword {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPassword, text.InitializeNewPassword, text.Language))
+	if loginText.InitializeNewPassword != text.InitializeUserNewPasswordLabel {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPassword, text.InitializeUserNewPasswordLabel, text.Language))
 	}
-	if loginText.InitializeNewPasswordConfirm != text.InitializeNewPasswordConfirm {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirm, text.InitializeNewPasswordConfirm, text.Language))
+	if loginText.InitializeNewPasswordConfirm != text.InitializeUserNewPasswordConfirmLabel {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirm, text.InitializeUserNewPasswordConfirmLabel, text.Language))
 	}
-	if loginText.InitializeResendButtonText != text.InitializeResendButtonText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, text.InitializeResendButtonText, text.Language))
+	if loginText.InitializeResendButtonText != text.InitializeUserResendButtonText {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, text.InitializeUserResendButtonText, text.Language))
 	}
-	if loginText.InitializeNextButtonText != text.InitializeNextButtonText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, text.InitializeNextButtonText, text.Language))
+	if loginText.InitializeNextButtonText != text.InitializeUserNextButtonText {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, text.InitializeUserNextButtonText, text.Language))
 	}
 	if loginText.InitializeDoneTitle != text.InitializeDoneTitle {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeDoneTitle, text.InitializeDoneTitle, text.Language))
@@ -125,23 +125,23 @@ func (c *Commands) setDefaultLoginText(ctx context.Context, iamAgg *eventstore.A
 	if loginText.InitializeDoneNextButtonText != text.InitializeDoneNextButtonText {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitializeDoneNextButtonText, text.InitializeDoneNextButtonText, text.Language))
 	}
-	if loginText.InitMFATitle != text.InitMFATitle {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, text.InitMFATitle, text.Language))
+	if loginText.InitMFATitle != text.InitMFAPromptTitle {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, text.InitMFAPromptTitle, text.Language))
 	}
-	if loginText.InitMFADescription != text.InitMFADescription {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, text.InitMFADescription, text.Language))
+	if loginText.InitMFADescription != text.InitMFAPromptDescription {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, text.InitMFAPromptDescription, text.Language))
 	}
-	if loginText.InitMFAOTPOption != text.InitMFAOTPOption {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, text.InitMFAOTPOption, text.Language))
+	if loginText.InitMFAOTPOption != text.InitMFAPromptOTPOption {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, text.InitMFAPromptOTPOption, text.Language))
 	}
-	if loginText.InitMFAU2FOption != text.InitMFAU2FOption {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, text.InitMFAU2FOption, text.Language))
+	if loginText.InitMFAU2FOption != text.InitMFAPromptU2FOption {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, text.InitMFAPromptU2FOption, text.Language))
 	}
-	if loginText.InitMFASkipButtonText != text.InitMFASkipButtonText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, text.InitMFASkipButtonText, text.Language))
+	if loginText.InitMFASkipButtonText != text.InitMFAPromptSkipButtonText {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, text.InitMFAPromptSkipButtonText, text.Language))
 	}
-	if loginText.InitMFANextButtonText != text.InitMFANextButtonText {
-		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, text.InitMFANextButtonText, text.Language))
+	if loginText.InitMFANextButtonText != text.InitMFAPromptNextButtonText {
+		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, text.InitMFAPromptNextButtonText, text.Language))
 	}
 	if loginText.InitMFAOTPTitle != text.InitMFAOTPTitle {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, text.InitMFAOTPTitle, text.Language))

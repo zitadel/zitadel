@@ -1595,7 +1595,7 @@ service AdminService {
 
     //Sets the default custom text for login ui
     //it impacts all organisations without customized login ui texts
-    rpc SetDefaultLoginText(SetDefaultLoginTextRequest) returns (SetDefaultLoginTextResponse) {
+    rpc SetDefaultLoginText(SetDefaultLoginTextsRequest) returns (SetDefaultLoginTextsResponse) {
         option (google.api.http) = {
             put: "/text/login/{language}";
             body: "*";
@@ -3076,13 +3076,22 @@ message SetDefaultLoginTextsRequest {
             example: "\"de\""
         }
     ];
-    string title = 2 [(validate.rules).string = {max_len: 200}];
-    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
-    string subject = 4 [(validate.rules).string = {max_len: 200}];
-    string greeting = 5  [(validate.rules).string = {max_len: 200}];
-    string text = 6 [(validate.rules).string = {max_len: 800}];
-    string button_text = 7 [(validate.rules).string = {max_len: 200}];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    zitadel.text.v1.SelectAccountScreenText select_account_text = 2;
+    zitadel.text.v1.LoginScreenText login_text = 3;
+    zitadel.text.v1.PasswordScreenText password_text = 4;
+    zitadel.text.v1.ResetPasswordScreenText reset_password_text = 5;
+    zitadel.text.v1.InitializeUserScreenText initialize_user_text = 6;
+    zitadel.text.v1.InitializeDoneScreenText initialize_done_text = 7;
+    zitadel.text.v1.InitMFAPromptScreenText init_mfa_prompt_text = 8;
+    zitadel.text.v1.InitMFAOTPScreenText init_mfa_otp_text = 9;
+    zitadel.text.v1.InitMFAU2FScreenText init_mfa_u2f_text = 10;
+    zitadel.text.v1.InitMFADoneScreenText init_mfa_done_text = 11;
+    zitadel.text.v1.VerifyMFAOTPScreenText verify_mfa_otp_text = 12;
+    zitadel.text.v1.VerifyMFAU2FScreenText verify_mfa_u2f_text = 13;
+    zitadel.text.v1.RegistrationOptionScreenText registration_option_text = 14;
+    zitadel.text.v1.RegistrationUserScreenText registration_user_text = 15;
+    zitadel.text.v1.RegistrationOrgScreenText registration_org_text = 16;
+    zitadel.text.v1.PasswordlessScreenText passwordless_text = 17;
 }
 
 message SetDefaultLoginTextsResponse {

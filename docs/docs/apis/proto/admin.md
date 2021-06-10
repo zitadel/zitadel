@@ -636,9 +636,30 @@ Returns the custom text for domain claimed message
 [SetDefaultDomainClaimedMessageTextResponse](#setdefaultdomainclaimedmessagetextresponse)
 
 Sets the default custom text for domain claimed phone message
-it impacts all organisations without customized verify phone message text
+it impacts all organisations without customized domain claimed message text
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+
+### GetDefaultLoginTexts
+
+> **rpc** GetDefaultLoginTexts([GetDefaultLoginTextsRequest](#getdefaultlogintextsrequest))
+[GetDefaultLoginTextsResponse](#getdefaultlogintextsresponse)
+
+Returns the default custom texts for login ui
+
+
+
+
+### SetDefaultLoginText
+
+> **rpc** SetDefaultLoginText([SetDefaultLoginTextsRequest](#setdefaultlogintextsrequest))
+[SetDefaultLoginTextsResponse](#setdefaultlogintextsresponse)
+
+Sets the default custom text for login ui
+it impacts all organisations without customized login ui texts
 
 
 
@@ -1049,6 +1070,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultLoginTextsRequest
+This is an empty request
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.LoginCustomText | - |  |
 
 
 
@@ -1902,6 +1945,44 @@ This is an empty request
 
 
 ### SetDefaultInitMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| select_account_text |  zitadel.text.v1.SelectAccountScreenText | - |  |
+| login_text |  zitadel.text.v1.LoginScreenText | - |  |
+| password_text |  zitadel.text.v1.PasswordScreenText | - |  |
+| reset_password_text |  zitadel.text.v1.ResetPasswordScreenText | - |  |
+| initialize_user_text |  zitadel.text.v1.InitializeUserScreenText | - |  |
+| initialize_done_text |  zitadel.text.v1.InitializeDoneScreenText | - |  |
+| init_mfa_prompt_text |  zitadel.text.v1.InitMFAPromptScreenText | - |  |
+| init_mfa_otp_text |  zitadel.text.v1.InitMFAOTPScreenText | - |  |
+| init_mfa_u2f_text |  zitadel.text.v1.InitMFAU2FScreenText | - |  |
+| init_mfa_done_text |  zitadel.text.v1.InitMFADoneScreenText | - |  |
+| verify_mfa_otp_text |  zitadel.text.v1.VerifyMFAOTPScreenText | - |  |
+| verify_mfa_u2f_text |  zitadel.text.v1.VerifyMFAU2FScreenText | - |  |
+| registration_option_text |  zitadel.text.v1.RegistrationOptionScreenText | - |  |
+| registration_user_text |  zitadel.text.v1.RegistrationUserScreenText | - |  |
+| registration_org_text |  zitadel.text.v1.RegistrationOrgScreenText | - |  |
+| passwordless_text |  zitadel.text.v1.PasswordlessScreenText | - |  |
+
+
+
+
+### SetDefaultLoginTextsResponse
 
 
 

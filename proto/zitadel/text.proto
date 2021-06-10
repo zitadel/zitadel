@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 package zitadel.text.v1;
 
@@ -48,39 +49,161 @@ message MessageCustomText {
 
 message LoginCustomText {
     zitadel.v1.ObjectDetails details = 1;
-    string title = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email title"
-        }
-    ];
-    string pre_header = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email pre header"
-        }
-    ];
-    string subject = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email subject"
-        }
-    ];
-    string greeting = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email greeting"
-        }
-    ];
-    string text = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email text"
-        }
-    ];
-    string button_text = 7 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email button_text"
-        }
-    ];
-    string footer_text = 8 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email footer_text"
-        }
-    ];
+    SelectAccountScreenText select_account_text = 2;
+    LoginScreenText login_text = 3;
+    PasswordScreenText password_text = 4;
+    ResetPasswordScreenText reset_password_text = 5;
+    InitializeUserScreenText initialize_user_text = 6;
+    InitializeDoneScreenText initialize_done_text = 7;
+    InitMFAPromptScreenText init_mfa_prompt_text = 8;
+    InitMFAOTPScreenText init_mfa_otp_text = 9;
+    InitMFAU2FScreenText init_mfa_u2f_text = 10;
+    InitMFADoneScreenText init_mfa_done_text = 11;
+    VerifyMFAOTPScreenText verify_mfa_otp_text = 12;
+    VerifyMFAU2FScreenText verify_mfa_u2f_text = 13;
+    RegistrationOptionScreenText registration_option_text = 14;
+    RegistrationUserScreenText registration_user_text = 15;
+    RegistrationOrgScreenText registration_org_text = 16;
+    PasswordlessScreenText passwordless_text = 17;
+}
+
+message SelectAccountScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string other_user = 3 [(validate.rules).string = {max_len: 500}];
+}
+
+message LoginScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string name_label = 3 [(validate.rules).string = {max_len: 200}];
+    string register_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string external_user_description = 6 [(validate.rules).string = {max_len: 500}];
+}
+
+message PasswordScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string password_label = 3 [(validate.rules).string = {max_len: 200}];
+    string reset_link_text = 4 [(validate.rules).string = {max_len: 100}];
+    string back_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 6 [(validate.rules).string = {max_len: 100}];
+}
+
+message ResetPasswordScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
+}
+
+message InitializeUserScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string code_label = 3 [(validate.rules).string = {max_len: 200}];
+    string new_password_label = 4 [(validate.rules).string = {max_len: 200}];
+    string new_password_confirm_label = 5 [(validate.rules).string = {max_len: 200}];
+    string resend_button_text = 6 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 7 [(validate.rules).string = {max_len: 100}];
+}
+
+message InitializeDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string abort_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message InitMFAPromptScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string otp_option = 3 [(validate.rules).string = {max_len: 200}];
+    string u2f_option = 4 [(validate.rules).string = {max_len: 200}];
+    string skip_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 6 [(validate.rules).string = {max_len: 100}];
+}
+
+message InitMFAOTPScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string secret_label = 3 [(validate.rules).string = {max_len: 200}];
+    string code_label = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message InitMFAU2FScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string token_name_label = 3 [(validate.rules).string = {max_len: 200}];
+    string register_token_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message InitMFADoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string abort_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message VerifyMFAOTPScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string code_label = 3 [(validate.rules).string = {max_len: 200}];
+    string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message VerifyMFAU2FScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string validate_token_text = 3 [(validate.rules).string = {max_len: 500}];
+    string other_option_description = 4 [(validate.rules).string = {max_len: 500}];
+    string option_otp_button_text = 5 [(validate.rules).string = {max_len: 100}];
+}
+
+message RegistrationOptionScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string user_name_button_text = 3 [(validate.rules).string = {max_len: 200}];
+    string external_login_description = 4 [(validate.rules).string = {max_len: 500}];
+}
+
+message RegistrationUserScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string firstname_label = 3 [(validate.rules).string = {max_len: 200}];
+    string lastname_label = 4 [(validate.rules).string = {max_len: 200}];
+    string email_label = 5 [(validate.rules).string = {max_len: 200}];
+    string language_label = 6 [(validate.rules).string = {max_len: 200}];
+    string gender_label = 7 [(validate.rules).string = {max_len: 200}];
+    string password_label = 8 [(validate.rules).string = {max_len: 200}];
+    string password_confirm_label = 9 [(validate.rules).string = {max_len: 200}];
+    string save_button_text = 10 [(validate.rules).string = {max_len: 200}];
+}
+
+message RegistrationOrgScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string orgname_label = 3 [(validate.rules).string = {max_len: 200}];
+    string firstname_label = 4 [(validate.rules).string = {max_len: 200}];
+    string lastname_label = 5 [(validate.rules).string = {max_len: 200}];
+    string username_label = 6 [(validate.rules).string = {max_len: 200}];
+    string email_label = 7 [(validate.rules).string = {max_len: 200}];
+    string password_label = 9 [(validate.rules).string = {max_len: 200}];
+    string password_confirm_label = 10 [(validate.rules).string = {max_len: 200}];
+    string save_button_text = 11 [(validate.rules).string = {max_len: 200}];
+}
+
+message PasswordlessScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string login_with_pw_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string validate_token_button_text = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message SuccessLoginScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    // Text to describe that auto redirect should happen after successful login
+    string auto_redirect_description = 2 [(validate.rules).string = {max_len: 500}];
+    // Text to describe that the window can be closed after redirect
+    string redirect_description = 3 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 4 [(validate.rules).string = {max_len: 200}];
 }
