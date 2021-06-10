@@ -117,7 +117,8 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		member.CreationDate = existingMember.CreationDate
 
 		o.setMember(member)
-	case OrgMemberRemoved:
+	case OrgMemberRemoved,
+		OrgMemberCascadeRemoved:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err

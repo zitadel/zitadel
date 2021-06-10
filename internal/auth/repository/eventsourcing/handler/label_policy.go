@@ -98,6 +98,8 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 			return err
 		}
 		err = policy.AppendEvent(event)
+	case model.LabelPolicyRemoved:
+		return m.view.DeleteLabelPolicy(event.AggregateID, event)
 	default:
 		return m.view.ProcessedLabelPolicySequence(event)
 	}

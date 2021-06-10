@@ -15,6 +15,7 @@ type Config struct {
 	SSL             bool
 	Location        string
 	BucketPrefix    string
+	MultiDelete     bool
 }
 
 func (c *Config) NewStorage() (static.Storage, error) {
@@ -30,5 +31,6 @@ func (c *Config) NewStorage() (static.Storage, error) {
 		Client:       minioClient,
 		Location:     c.Location,
 		BucketPrefix: c.BucketPrefix,
+		MultiDelete:  c.MultiDelete,
 	}, nil
 }

@@ -109,7 +109,8 @@ func (m *OrgMember) processOrgMember(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case model.OrgMemberRemoved:
+	case model.OrgMemberRemoved,
+		model.OrgMemberCascadeRemoved:
 		err = member.SetData(event)
 		if err != nil {
 			return err

@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	UniqueMember     = "member"
-	AddedEventType   = "member.added"
-	ChangedEventType = "member.changed"
-	RemovedEventType = "member.removed"
+	UniqueMember            = "member"
+	AddedEventType          = "member.added"
+	ChangedEventType        = "member.changed"
+	RemovedEventType        = "member.removed"
+	CascadeRemovedEventType = "member.cascade.removed"
 )
 
 func NewAddMemberUniqueConstraint(aggregateID, userID string) *eventstore.EventUniqueConstraint {
@@ -142,7 +143,45 @@ func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-Ep4ip", "unable to unmarshal label policy")
+		return nil, errors.ThrowInternal(err, "MEMBER-Ep4ip", "unable to unmarshal label policy")
+	}
+
+	return e, nil
+}
+
+type MemberCascadeRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	UserID string `json:"userId"`
+}
+
+func (e *MemberCascadeRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *MemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+}
+
+func NewCascadeRemovedEvent(
+	base *eventstore.BaseEvent,
+	userID string,
+) *MemberCascadeRemovedEvent {
+
+	return &MemberCascadeRemovedEvent{
+		BaseEvent: *base,
+		UserID:    userID,
+	}
+}
+
+func CascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &MemberCascadeRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "MEMBER-3j9sf", "unable to unmarshal label policy")
 	}
 
 	return e, nil

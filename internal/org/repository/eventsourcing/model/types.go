@@ -25,9 +25,10 @@ const (
 	OrgDomainReserved models.EventType = "org.domain.reserved"
 	OrgDomainReleased models.EventType = "org.domain.released"
 
-	OrgMemberAdded   models.EventType = "org.member.added"
-	OrgMemberChanged models.EventType = "org.member.changed"
-	OrgMemberRemoved models.EventType = "org.member.removed"
+	OrgMemberAdded          models.EventType = "org.member.added"
+	OrgMemberChanged        models.EventType = "org.member.changed"
+	OrgMemberRemoved        models.EventType = "org.member.removed"
+	OrgMemberCascadeRemoved models.EventType = "org.member.cascade.removed"
 
 	OrgIAMPolicyAdded   models.EventType = "org.iam.policy.added"
 	OrgIAMPolicyChanged models.EventType = "org.iam.policy.changed"

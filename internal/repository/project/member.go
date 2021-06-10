@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	MemberAddedType   = projectEventTypePrefix + member.AddedEventType
-	MemberChangedType = projectEventTypePrefix + member.ChangedEventType
-	MemberRemovedType = projectEventTypePrefix + member.RemovedEventType
+	MemberAddedType          = projectEventTypePrefix + member.AddedEventType
+	MemberChangedType        = projectEventTypePrefix + member.ChangedEventType
+	MemberRemovedType        = projectEventTypePrefix + member.RemovedEventType
+	MemberCascadeRemovedType = projectEventTypePrefix + member.CascadeRemovedEventType
 )
 
 type MemberAddedEvent struct {
@@ -108,4 +109,35 @@ func MemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, 
 	}
 
 	return &MemberRemovedEvent{MemberRemovedEvent: *e.(*member.MemberRemovedEvent)}, nil
+}
+
+type MemberCascadeRemovedEvent struct {
+	member.MemberCascadeRemovedEvent
+}
+
+func NewProjectMemberCascadeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userID string,
+) *MemberCascadeRemovedEvent {
+
+	return &MemberCascadeRemovedEvent{
+		MemberCascadeRemovedEvent: *member.NewCascadeRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				MemberCascadeRemovedType,
+			),
+			userID,
+		),
+	}
+}
+
+func MemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.CascadeRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberCascadeRemovedEvent{MemberCascadeRemovedEvent: *e.(*member.MemberCascadeRemovedEvent)}, nil
 }
