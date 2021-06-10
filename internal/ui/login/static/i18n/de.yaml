@@ -200,6 +200,11 @@ ExternalNotFoundOption:
   Link: Verlinken
   AutoRegister: Automatisches registrieren
 
+LoginSuccess:
+  Title: Erfolgreich eingeloggt
+  AutoRedirect: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+  Redirected: Du kannst diese Fenster nun schliessen.
+
 LogoutDone:
   Title: Ausgeloggt
   Description: Du wurdest erfolgreich ausgeloggt.
