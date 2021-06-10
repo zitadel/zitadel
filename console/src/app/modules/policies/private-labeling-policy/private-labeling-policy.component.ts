@@ -317,7 +317,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       }, 1000);
     }).catch(error => this.toast.showError(error));
 
-    if (this.serviceType == PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
+    if (this.serviceType === PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
       return this.savePolicy().then(() => enhTask);
     } else {
       return enhTask;
