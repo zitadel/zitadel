@@ -207,7 +207,7 @@ func RegisterRoutes(router *mux.Router, s {{.Name}}) {
 `
 
 const docsTmpl = `---
-title: zitadel/admin.proto
+title: zitadel/assets
 ---
 
 ## {{.Name}}
