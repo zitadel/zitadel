@@ -13,6 +13,7 @@ import (
 
 var (
 	directory = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
+	assets    = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
 )
 
 func main() {
@@ -22,7 +23,9 @@ func main() {
 	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
 	router, err := os.OpenFile(*directory+"../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
 	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
-	GenerateAssetHandler(configFile, authz, router)
+	docs, err := os.OpenFile(*assets, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	logging.Log("ASSETS-Dfvsd").OnError(err).Fatal("cannot open docs file")
+	GenerateAssetHandler(configFile, authz, router, docs)
 }
 
 type Method struct {
@@ -94,7 +97,7 @@ type Service struct {
 	Methods map[string]Method
 }
 
-func GenerateAssetHandler(configFilePath string, output io.Writer, output2 io.Writer) {
+func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) {
 	conf := new(struct {
 		Services Services
 	})
@@ -104,6 +107,8 @@ func GenerateAssetHandler(configFilePath string, output io.Writer, output2 io.Wr
 	logging.Log("ASSETS-BGbbg").OnError(err).Fatal("cannot parse authz template")
 	tmplRouter, err := template.New("").Parse(routerTmpl)
 	logging.Log("ASSETS-gh4rq").OnError(err).Fatal("cannot parse router template")
+	tmplDocs, err := template.New("").Parse(docsTmpl)
+	logging.Log("ASSETS-FGdgs").OnError(err).Fatal("cannot parse docs template")
 	data := &struct {
 		GoPkgName string
 		Name      string
@@ -115,10 +120,12 @@ func GenerateAssetHandler(configFilePath string, output io.Writer, output2 io.Wr
 		Prefix:    "/assets/v1",
 		Services:  conf.Services,
 	}
-	err = tmplAuthz.Execute(output, data)
+	err = tmplAuthz.Execute(authz, data)
 	logging.Log("ASSETS-BHngj").OnError(err).Fatal("cannot generate authz")
-	err = tmplRouter.Execute(output2, data)
+	err = tmplRouter.Execute(router, data)
 	logging.Log("ASSETS-Bfd41").OnError(err).Fatal("cannot generate router")
+	err = tmplDocs.Execute(docs, data)
+	logging.Log("ASSETS-Bfd41").OnError(err).Fatal("cannot generate docs")
 }
 
 const authzTmpl = `package {{.GoPkgName}}
@@ -197,4 +204,31 @@ func RegisterRoutes(router *mux.Router, s {{.Name}}) {
 	{{ end }}
 	{{ end }}
 }
+`
+
+const docsTmpl = `---
+title: zitadel/assets
+---
+
+## {{.Name}}
+
+	{{ range $service := .Services}}
+	{{ range $methodName, $method := .Methods}}
+	{{ range $handler := .Handlers}}
+
+### {{$handler.Name}}{{$methodName}}()
+
+> {{$handler.Name}}{{$methodName}}()
+
+{{$handler.Method}}: {{$service.Prefix}}{{$method.Path}}{{$handler.PathSuffix}}
+{{ if $method.HasDarkMode }}
+### {{$handler.Name}}{{$methodName}}()
+
+> {{$handler.Name}}{{$methodName}}Dark()
+
+{{$handler.Method}}: {{$service.Prefix}}{{$method.Path}}/dark{{$handler.PathSuffix}}
+ 	{{ end }}
+ 	{{ end }}
+	{{ end }}
+	{{ end }}
 `

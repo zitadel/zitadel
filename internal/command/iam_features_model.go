@@ -64,8 +64,8 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	passwordComplexityPolicy,
 	labelPolicyPrivateLabel,
 	labelPolicyWatermark,
-	customText,
-	customDomain bool,
+	customDomain,
+	customText bool,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)

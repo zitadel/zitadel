@@ -98,8 +98,10 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
+		change.ModifierLoginName = change.ModifierID
 		user, _ := repo.UserByID(ctx, change.ModifierID)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
 			}
@@ -296,6 +298,14 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
+}
+
+func (repo *UserRepo) UserMembershipsByUserID(ctx context.Context, userID string) ([]*usr_model.UserMembershipView, error) {
+	memberships, err := repo.View.UserMembershipsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserMembershipsToModel(memberships), nil
 }
 
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {

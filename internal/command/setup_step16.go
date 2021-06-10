@@ -32,7 +32,7 @@ func (c *Commands) SetupStep16(ctx context.Context, step *Step16) error {
 			events = append(events, mailEvents...)
 		}
 
-		logging.Log("SETUP-4insR").Info("default mail template/text set up")
+		logging.Log("SETUP-4k0LL").Info("default message text set up")
 		return events, nil
 	}
 	return c.setup(ctx, step, fn)

@@ -721,6 +721,7 @@
       "SET": "Policy set successfully!",
       "RESETSUCCESS": "Policy reset successfully!",
       "UPLOADSUCCESS": "Uploaded successfully!",
+      "DELETESUCCESS": "Deleted successfully!",
       "UPLOADFAILED":"Upload failed!"
     }
   },

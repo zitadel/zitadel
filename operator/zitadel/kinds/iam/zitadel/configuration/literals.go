@@ -107,6 +107,7 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_SSL"] = strconv.FormatBool(desired.AssetStorage.SSL)
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_LOCATION"] = desired.AssetStorage.Location
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
+			literalsConfigMap["ZITADEL_ASSET_STORAGE_MULTI_DELETE"] = strconv.FormatBool(desired.AssetStorage.MultiDelete)
 		}
 	}
 

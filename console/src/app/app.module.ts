@@ -25,8 +25,8 @@ import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
 import { OnboardingModule } from 'src/app/modules/onboarding/onboarding.module';
 import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
+import { AssetService } from 'src/app/services/asset.service';
 import { SubscriptionService } from 'src/app/services/subscription.service';
-import { UploadService } from 'src/app/services/upload.service';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -181,7 +181,7 @@ const authConfig: AuthConfig = {
     AuthenticationService,
     GrpcAuthService,
     SubscriptionService,
-    UploadService,
+    AssetService,
     { provide: 'windowObject', useValue: window },
   ],
   bootstrap: [AppComponent],

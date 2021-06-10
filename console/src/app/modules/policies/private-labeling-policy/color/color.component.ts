@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ColorEvent } from 'ngx-color';
 
 import { ColorType } from '../private-labeling-policy.component';
 
@@ -77,6 +78,7 @@ export class ColorComponent implements OnInit {
   ];
 
   public colors: Array<{ name: string; color: string; }> = this.PRIMARY;
+  public isOpen: boolean = false;
 
   @Input() colorType: ColorType = ColorType.PRIMARY;
   @Input() color: string = '';
@@ -89,8 +91,7 @@ export class ColorComponent implements OnInit {
     this.previewChanged.emit(this.previewColor);
   }
 
-  ngOnInit(): void {
-
+  public ngOnInit(): void {
     switch (this.colorType) {
       case ColorType.PRIMARY:
         this.colors = this.PRIMARY;
@@ -114,5 +115,17 @@ export class ColorComponent implements OnInit {
         this.colors = this.PRIMARY;
         break;
     }
+  }
+
+  public changeComplete(event: ColorEvent): void {
+    this.emitPreview(event.color.hex);
+  }
+
+  public get previewColorCropped(): string {
+    let s = this.previewColor;
+    while (s.charAt(0) === '#') {
+      s = s.substring(1);
+    }
+    return s;
   }
 }

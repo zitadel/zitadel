@@ -29,19 +29,19 @@ import (
 )
 
 const (
-	notificationTable         = "notification.notifications"
-	NotifyUserID              = "NOTIFICATION"
-	labelPolicyTableOrg       = "management.label_policies"
-	labelPolicyTableDef       = "adminapi.label_policies"
-	mailTemplateTableOrg      = "management.mail_templates"
-	mailTemplateTableDef      = "adminapi.mail_templates"
-	mailTextTableOrg          = "management.message_texts"
-	mailTextTableDef          = "adminapi.message_texts"
-	mailTextTypeDomainClaimed = "DomainClaimed"
-	mailTextTypeInitCode      = "InitCode"
-	mailTextTypePasswordReset = "PasswordReset"
-	mailTextTypeVerifyEmail   = "VerifyEmail"
-	mailTextTypeVerifyPhone   = "VerifyPhone"
+	notificationTable            = "notification.notifications"
+	NotifyUserID                 = "NOTIFICATION"
+	labelPolicyTableOrg          = "management.label_policies"
+	labelPolicyTableDef          = "adminapi.label_policies"
+	mailTemplateTableOrg         = "management.mail_templates"
+	mailTemplateTableDef         = "adminapi.mail_templates"
+	messageTextTableOrg          = "management.message_texts"
+	messageTextTableDef          = "adminapi.message_texts"
+	messageTextTypeDomainClaimed = "DomainClaimed"
+	messageTextTypeInitCode      = "InitCode"
+	messageTextTypePasswordReset = "PasswordReset"
+	messageTextTypeVerifyEmail   = "VerifyEmail"
+	messageTextTypeVerifyPhone   = "VerifyPhone"
 )
 
 type Notification struct {
@@ -162,7 +162,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(user, mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(user, mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -239,7 +239,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMessageText(user, mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -266,7 +266,11 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(n.i18n, user, phoneCode, n.systemDefaults, n.AesCrypto)
+	text, err := n.getMessageText(user, messageTextTypeVerifyPhone, user.PreferredLanguage)
+	if err != nil {
+		return err
+	}
+	err = types.SendPhoneVerificationCode(text, user, phoneCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -301,7 +305,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(user, mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
@@ -396,17 +400,18 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 func (n *Notification) getMessageText(user *model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
 	langTag := language.Make(lang)
 	if langTag == language.Und {
-		lang = language.English.String()
+		langTag = language.English
 	}
+	langBase, _ := langTag.Base()
 
-	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, lang, mailTextTableDef)
+	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, langBase.String(), messageTextTableDef)
 	if err != nil {
 		return nil, err
 	}
 	defaultMessageText.Default = true
 
 	// read from Org
-	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, lang, mailTextTableOrg)
+	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, langBase.String(), messageTextTableOrg)
 	if errors.IsNotFound(err) {
 		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
 	}

@@ -11,9 +11,9 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-func (c *Commands) SetDefaultMessageText(ctx context.Context, mailText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
+func (c *Commands) SetDefaultMessageText(ctx context.Context, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
 	iamAgg := iam.NewAggregate()
-	events, existingMailText, err := c.setDefaultMessageText(ctx, &iamAgg.Aggregate, mailText)
+	events, existingMessageText, err := c.setDefaultMessageText(ctx, &iamAgg.Aggregate, messageText)
 	if err != nil {
 		return nil, err
 	}
@@ -21,45 +21,45 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, mailText *domain.C
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMailText, pushedEvents...)
+	err = AppendAndReduce(existingMessageText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&existingMailText.WriteModel), nil
+	return writeModelToObjectDetails(&existingMessageText.WriteModel), nil
 }
 
 func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.EventPusher, *IAMCustomMessageTextReadModel, error) {
 	if !msg.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomText.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomMessageText.Invalid")
 	}
 
-	existingMailText, err := c.defaultCustomMessageTextWriteModelByID(ctx, msg.MessageTextType, msg.Language)
+	existingMessageText, err := c.defaultCustomMessageTextWriteModelByID(ctx, msg.MessageTextType, msg.Language)
 	if err != nil {
 		return nil, nil, err
 	}
 	events := make([]eventstore.EventPusher, 0)
-	if existingMailText.Greeting != msg.Greeting {
+	if existingMessageText.Greeting != msg.Greeting {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageGreeting, msg.Greeting, msg.Language))
 	}
-	if existingMailText.Subject != msg.Subject {
+	if existingMessageText.Subject != msg.Subject {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageSubject, msg.Subject, msg.Language))
 	}
-	if existingMailText.Title != msg.Title {
+	if existingMessageText.Title != msg.Title {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageTitle, msg.Title, msg.Language))
 	}
-	if existingMailText.PreHeader != msg.PreHeader {
+	if existingMessageText.PreHeader != msg.PreHeader {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessagePreHeader, msg.PreHeader, msg.Language))
 	}
-	if existingMailText.Text != msg.Text {
+	if existingMessageText.Text != msg.Text {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageText, msg.Text, msg.Language))
 	}
-	if existingMailText.ButtonText != msg.ButtonText {
+	if existingMessageText.ButtonText != msg.ButtonText {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageButtonText, msg.ButtonText, msg.Language))
 	}
-	if existingMailText.FooterText != msg.FooterText {
+	if existingMessageText.FooterText != msg.FooterText {
 		events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageFooterText, msg.FooterText, msg.Language))
 	}
-	return events, existingMailText, nil
+	return events, existingMessageText, nil
 }
 
 func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*IAMCustomMessageTextReadModel, error) {

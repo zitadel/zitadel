@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -100,6 +101,8 @@ func (m *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 			return err
 		}
 		err = policy.AppendEvent(event)
+	case model.LabelPolicyRemoved:
+		return m.view.DeleteLabelPolicy(event.AggregateID, event)
 	case iam_es_model.LabelPolicyActivated, model.LabelPolicyActivated:
 		policy, err = m.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
@@ -135,15 +138,21 @@ func (p *LabelPolicy) CleanUpBucket(policy *iam_model.LabelPolicyView) {
 		return
 	}
 	for _, object := range objects {
-		if !deleteableObject(object, policy) {
+		if !deletableObject(object, policy) {
 			continue
 		}
-		p.static.RemoveObject(ctx, policy.AggregateID, object.Key)
+		err = p.static.RemoveObject(ctx, policy.AggregateID, object.Key)
+		logging.LogWithFields("SPOOL-ASd3g", "aggregate", policy.AggregateID, "key", object.Key).OnError(err).Warn("could not delete asset")
 	}
 }
 
-func deleteableObject(object *domain.AssetInfo, policy *iam_model.LabelPolicyView) bool {
-	if object.Key == policy.LogoURL || object.Key == policy.LogoDarkURL || object.Key == policy.IconURL || object.Key == policy.IconDarkURL || object.Key == policy.FontURL {
+func deletableObject(object *domain.AssetInfo, policy *iam_model.LabelPolicyView) bool {
+	if object.Key == policy.LogoURL ||
+		object.Key == policy.LogoDarkURL ||
+		object.Key == policy.IconURL ||
+		object.Key == policy.IconDarkURL ||
+		object.Key == policy.FontURL ||
+		object.Key == domain.LabelPolicyPrefix+"/css/" {
 		return false
 	}
 	return true

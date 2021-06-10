@@ -1568,7 +1568,7 @@ service AdminService {
     }
 
     //Sets the default custom text for domain claimed phone message
-    // it impacts all organisations without customized domain claimed message text
+    // it impacts all organisations without customized verify phone message text
     // The Following Variables can be used:
     // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {

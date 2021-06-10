@@ -25,9 +25,10 @@ const (
 	OrgDomainReserved models.EventType = "org.domain.reserved"
 	OrgDomainReleased models.EventType = "org.domain.released"
 
-	OrgMemberAdded   models.EventType = "org.member.added"
-	OrgMemberChanged models.EventType = "org.member.changed"
-	OrgMemberRemoved models.EventType = "org.member.removed"
+	OrgMemberAdded          models.EventType = "org.member.added"
+	OrgMemberChanged        models.EventType = "org.member.changed"
+	OrgMemberRemoved        models.EventType = "org.member.removed"
+	OrgMemberCascadeRemoved models.EventType = "org.member.cascade.removed"
 
 	OrgIAMPolicyAdded   models.EventType = "org.iam.policy.added"
 	OrgIAMPolicyChanged models.EventType = "org.iam.policy.changed"
@@ -75,9 +76,10 @@ const (
 	MailTemplateAdded   models.EventType = "org.mail.template.added"
 	MailTemplateChanged models.EventType = "org.mail.template.changed"
 	MailTemplateRemoved models.EventType = "org.mail.template.removed"
-	MailTextAdded       models.EventType = "org.mail.text.added"
-	MailTextChanged     models.EventType = "org.mail.text.changed"
-	MailTextRemoved     models.EventType = "org.mail.text.removed"
+
+	CustomTextSet            models.EventType = "org.customtext.set"
+	CustomTextRemoved        models.EventType = "org.customtext.removed"
+	CustomTextMessageRemoved models.EventType = "org.customtext.template.removed"
 
 	CustomTextSet            models.EventType = "org.customtext.set"
 	CustomTextRemoved        models.EventType = "org.customtext.removed"

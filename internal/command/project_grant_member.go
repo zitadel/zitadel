@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -87,7 +88,8 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, userID, grantID))
+	removeEvent := c.removeProjectGrantMember(ctx, projectAgg, userID, grantID, false)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +98,18 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 		return nil, err
 	}
 	return writeModelToObjectDetails(&m.WriteModel), nil
+}
+
+func (c *Commands) removeProjectGrantMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID, grantID string, cascade bool) eventstore.EventPusher {
+	if cascade {
+		return project.NewProjectGrantMemberCascadeRemovedEvent(
+			ctx,
+			projectAgg,
+			userID,
+			grantID)
+	} else {
+		return project.NewProjectGrantMemberRemovedEvent(ctx, projectAgg, userID, grantID)
+	}
 }
 
 func (c *Commands) projectGrantMemberWriteModelByID(ctx context.Context, projectID, userID, grantID string) (member *ProjectGrantMemberWriteModel, err error) {

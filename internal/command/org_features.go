@@ -13,8 +13,12 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
+	err := c.checkOrgExists(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	existingFeatures := NewOrgFeaturesWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	err = c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
 		return nil, err
 	}
@@ -285,12 +289,15 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 		}
 		events = append(events, assetsEvent)
 	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel),
+	changedEvent, hasChangedEvent := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel),
 		policy.PrimaryColor, policy.BackgroundColor, policy.WarnColor, policy.FontColor,
 		policy.PrimaryColorDark, policy.BackgroundColorDark, policy.WarnColorDark, policy.FontColorDark,
 		policy.HideLoginNameSuffix, policy.ErrorMsgPopup, policy.HideLoginNameSuffix)
-	if hasChanged {
+	if hasChangedEvent {
 		events = append(events, changedEvent)
+	}
+	if len(events) > 0 {
+		events = append(events, org.NewLabelPolicyActivatedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel)))
 	}
 	return events, nil
 }

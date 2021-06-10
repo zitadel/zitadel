@@ -106,10 +106,50 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 		},
 		{
+			name: "org does not exist, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				features: &domain.Features{
+					TierName:                 "Test",
+					State:                    domain.FeaturesStateActive,
+					AuditLogRetention:        time.Hour,
+					LoginPolicyFactors:       false,
+					LoginPolicyIDP:           false,
+					LoginPolicyPasswordless:  false,
+					LoginPolicyRegistration:  false,
+					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
+					PasswordComplexityPolicy: false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
+					CustomDomain:             false,
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "set with default policies, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -240,6 +280,15 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -397,6 +446,15 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -564,6 +622,15 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -741,6 +808,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					//checkOrgExists
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					//NewOrgFeaturesWriteModel
 					expectFilter(),
 					//begin ensureOrgSettingsToFeatures
@@ -946,7 +1023,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 				),
 				iamDomain: "iam-domain",
-				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectNoError(),
+				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
 			},
 			args: args{
 				ctx:           context.Background(),

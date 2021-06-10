@@ -5,13 +5,14 @@ import "github.com/caos/zitadel/internal/eventstore/v1/models"
 const (
 	IAMAggregate models.AggregateType = "iam"
 
-	IAMSetupStarted  models.EventType = "iam.setup.started"
-	IAMSetupDone     models.EventType = "iam.setup.done"
-	GlobalOrgSet     models.EventType = "iam.global.org.set"
-	IAMProjectSet    models.EventType = "iam.project.iam.set"
-	IAMMemberAdded   models.EventType = "iam.member.added"
-	IAMMemberChanged models.EventType = "iam.member.changed"
-	IAMMemberRemoved models.EventType = "iam.member.removed"
+	IAMSetupStarted         models.EventType = "iam.setup.started"
+	IAMSetupDone            models.EventType = "iam.setup.done"
+	GlobalOrgSet            models.EventType = "iam.global.org.set"
+	IAMProjectSet           models.EventType = "iam.project.iam.set"
+	IAMMemberAdded          models.EventType = "iam.member.added"
+	IAMMemberChanged        models.EventType = "iam.member.changed"
+	IAMMemberRemoved        models.EventType = "iam.member.removed"
+	IAMMemberCascadeRemoved models.EventType = "iam.member.cascade.removed"
 
 	IDPConfigAdded       models.EventType = "iam.idp.config.added"
 	IDPConfigChanged     models.EventType = "iam.idp.config.changed"
@@ -53,8 +54,9 @@ const (
 
 	MailTemplateAdded   models.EventType = "iam.mail.template.added"
 	MailTemplateChanged models.EventType = "iam.mail.template.changed"
-	MailTextAdded       models.EventType = "iam.mail.text.added"
-	MailTextChanged     models.EventType = "iam.mail.text.changed"
+
+	CustomTextSet     models.EventType = "iam.customtext.set"
+	CustomTextRemoved models.EventType = "iam.customtext.removed"
 
 	CustomTextSet     models.EventType = "iam.customtext.set"
 	CustomTextRemoved models.EventType = "iam.customtext.removed"

@@ -1,3 +1,4 @@
+import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { ColorChromeModule } from 'ngx-color/chrome';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 
@@ -28,12 +30,14 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     ColorComponent,
   ],
   imports: [
+    ColorChromeModule,
     PrivateLabelingPolicyRoutingModule,
     CommonModule,
     FormsModule,
     InputModule,
     MatButtonModule,
     MatSlideToggleModule,
+    OverlayModule,
     MatIconModule,
     HasRoleModule,
     MatTooltipModule,

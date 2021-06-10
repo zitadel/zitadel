@@ -26,7 +26,7 @@ func (wm *CustomTextWriteModel) Reduce() error {
 			}
 			wm.Text = e.Text
 			wm.State = domain.CustomTextStateActive
-		case *policy.MailTextRemovedEvent:
+		case *policy.CustomTextRemovedEvent:
 			wm.State = domain.CustomTextStateRemoved
 		}
 	}

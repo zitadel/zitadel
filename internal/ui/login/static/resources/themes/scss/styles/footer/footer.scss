@@ -30,8 +30,6 @@ footer {
 
     .watermark {
         display: flex;
-        position: relative;
-        width: 100%;
 
         .powered {
             font-size: 12px;
@@ -39,9 +37,9 @@ footer {
         }
 
         .lgn-logo-watermark {
-            height: 34px;
-            width: 125px;
-            margin: 2px;
+            height: 40px;
+            min-width: 125px;
+            margin: auto 2px;
         }
     }
 
