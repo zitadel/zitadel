@@ -190,6 +190,11 @@ RegistrationOrg:
   PrivacyLinkText: privacy policy
   PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
 
+LoginSuccess:
+  Title: Login successful
+  AutoRedirect: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+  Redirected: You can now close this window.
+
 LogoutDone:
   Title: Logged out
   Description: You have logged out successfully.
