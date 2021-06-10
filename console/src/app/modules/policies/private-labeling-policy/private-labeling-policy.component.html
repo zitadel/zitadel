@@ -72,7 +72,6 @@
                   </div>
                   <span class="fill-space"></span>
                   <div class="img-wrapper"  *ngIf="images['darkLogo']">
-                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon> -->
                     <img matTooltip="Current" class="curr" [src]="images['darkLogo']" alt="dark logo"/>
                   </div>
                 </div>
@@ -83,7 +82,6 @@
                   </div>
                   <span class="fill-space"></span>
                   <div class="img-wrapper" *ngIf="images['logo']">
-                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme, Preview.PREVIEW)">remove_circle</mat-icon> -->
                     <img matTooltip="Current" class="curr"  [src]="images['logo']" alt="logo"/>
                   </div>
                 </div>
@@ -93,10 +91,10 @@
               [class.hovering]="isHoveringOverDarkLogo">
                 <label class="file-label">
                   <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $event.target.files)">
-                  <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFile.click();" />
+                  <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" mat-raised-button type="button" (click)="selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
 
                   <i class="icon las la-cloud-upload-alt"></i>
-                  <span>{{isHoveringOverDarkLogo ? 'Release': 'Drop your Logo here'}}</span>
+                  <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                 </label>
             </div>
             </div>
@@ -133,10 +131,10 @@
               [class.hovering]="isHoveringOverDarkIcon">
               <label class="file-label">
                 <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
-                <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFileIcon.click();" />
+                <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" mat-raised-button type="button" (click)="selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
 
                 <i class="icon las la-cloud-upload-alt"></i>
-                <span>{{isHoveringOverDarkIcon ? 'Release': 'Drop your Logo here'}}</span>
+                <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
               </label>
               </div>
             </div>
@@ -158,19 +156,19 @@
           <ng-container *ngIf="theme==Theme.DARK">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color [colorType]="ColorType.BACKGROUNDDARK" (previewChanged)="previewData.backgroundColorDark = $event"  name="Background Color Dark" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.BACKGROUNDDARK" (previewChanged)="previewData.backgroundColorDark = $event"  name="Background Color" [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.PRIMARY"(previewChanged)="previewData.primaryColorDark = $event"  name="Preview Primary Color Dark" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.PRIMARY"(previewChanged)="previewData.primaryColorDark = $event"  name="Primary Color" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color  [colorType]="ColorType.WARN" (previewChanged)="previewData.warnColorDark =  $event" name="Preview Warn Color Dark" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+                <cnsl-color  [colorType]="ColorType.WARN" (previewChanged)="previewData.warnColorDark =  $event" name="Warn Color" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.FONTDARK"(previewChanged)="previewData.fontColorDark = $event"  name="Font Color Dark" [color]="data.fontColorDark" [previewColor]="previewData.fontColorDark"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.FONTDARK"(previewChanged)="previewData.fontColorDark = $event"  name="Font Color" [color]="data.fontColorDark" [previewColor]="previewData.fontColorDark"></cnsl-color>
               </div>
             </div>
           </ng-container>
@@ -178,15 +176,15 @@
           <ng-container *ngIf="theme==Theme.LIGHT">
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
-                <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT" (previewChanged)="previewData.backgroundColor = $event"  name="Background Color Light" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT" (previewChanged)="previewData.backgroundColor = $event"  name="Background Color" [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event" name="Preview Primary Color Light" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event" name="Primary Color" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.WARN" name="Preview Warn Color Light" (previewChanged)="previewData.warnColor= $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.WARN" name="Warn Color" (previewChanged)="previewData.warnColor= $event" [color]="data.warnColor" [previewColor]="previewData.warnColor"></cnsl-color>
               </div>
 
               <div class="color">
@@ -222,10 +220,10 @@
               [class.hovering]="isHoveringOverFont">
                 <label class="file-label">
                   <input #selectedFontFile style="display: none;"  class="file-input" type="file" (change)="onDropFont($event.target.files)">
-                  <input class="btn" mat-raised-button type="button" [value]="'POLICY.PRIVATELABELING.BTN' | translate" (click)="selectedFontFile.click();" />
+                  <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false"  mat-raised-button type="button" (click)="selectedFontFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
 
                   <i class="icon las la-cloud-upload-alt"></i>
-                  <span >{{isHoveringOverFont ? 'Release': 'Drop your Logo here'}}</span>
+                  <span >{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                 </label>
             </div>
         </div>

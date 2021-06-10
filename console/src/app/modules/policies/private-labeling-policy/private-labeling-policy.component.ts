@@ -303,7 +303,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private handleUploadPromise(task: Promise<any>): Promise<any> {
-    return task.then(() => {
+    const enhTask = task.then(() => {
       this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
       setTimeout(() => {
         this.loadingImages = true;
@@ -316,6 +316,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
       }, 1000);
     }).catch(error => this.toast.showError(error));
+
+    if (this.serviceType == PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
+      return this.savePolicy().then(() => enhTask);
+    } else {
+      return enhTask;
+    }
   }
 
   public fetchData(): void {
@@ -474,7 +480,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public removePolicy(): void {
     if (this.service instanceof ManagementService) {
-      this.service.resetPasswordComplexityPolicyToDefault().then(() => {
+      this.service.resetLabelPolicyToDefault().then(() => {
         this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
         setTimeout(() => {
           this.fetchData();
@@ -485,14 +491,14 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public savePolicy(): void {
+  public savePolicy(): Promise<any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.previewData as LabelPolicy.AsObject).isDefault) {
           const req0 = new AddCustomLabelPolicyRequest();
           this.overwriteValues(req0);
 
-          (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
+          return (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch((error: HttpErrorResponse) => {
             this.toast.showError(error);
@@ -501,22 +507,20 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
           const req1 = new UpdateCustomLabelPolicyRequest();
           this.overwriteValues(req1);
 
-          (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
+          return (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch(error => {
             this.toast.showError(error);
           });
         }
-        break;
       case PolicyComponentServiceType.ADMIN:
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
-        (this.service as AdminService).updateLabelPolicy(req).then(() => {
+        return (this.service as AdminService).updateLabelPolicy(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
           this.toast.showError(error);
         });
-        break;
     }
   }
 

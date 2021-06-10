@@ -15,6 +15,7 @@ import { ProfilePictureComponent } from './profile-picture/profile-picture.compo
   styleUrls: ['./detail-form.component.scss'],
 })
 export class DetailFormComponent implements OnDestroy, OnChanges {
+  @Input() public showEditImage: boolean = false;
   @Input() public preferredLoginName: string = '';
   @Input() public username!: string;
   @Input() public user!: Human.AsObject;

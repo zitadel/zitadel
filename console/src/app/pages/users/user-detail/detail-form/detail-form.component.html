@@ -1,8 +1,8 @@
 <form [formGroup]="profileForm" *ngIf="profileForm" (ngSubmit)="submitForm()">
     <div class="user-form-content">
     <div class="user-form-content inner">
-      <button class="camera-wrapper" type="button" (click)="openUploadDialog()">
-        <div class="i-wrapper">
+      <button class="camera-wrapper" type="button" (click)="showEditImage ? openUploadDialog() : null">
+        <div class="i-wrapper" *ngIf="showEditImage">
           <i class="las la-camera"></i>
         </div>
         <img class="pic" [src]="profilePic" *ngIf="profilePic"/>
