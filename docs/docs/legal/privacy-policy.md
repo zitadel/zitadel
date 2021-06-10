@@ -5,7 +5,7 @@ custom_edit_url: null
 
 ## Introduction
 
-This privacy policy applies to CAOS AG, the websites it operates (including caos.ch and zitadel.ch) and the services and products it provides (including ZITADEL). This privacy policy describes how we process personal data for the provision of this websites and our products.
+This privacy policy applies to CAOS Ltd., the websites it operates (including caos.ch and zitadel.ch) and the services and products it provides (including ZITADEL). This privacy policy describes how we process personal data for the provision of this websites and our products.
 
 If any inconsistencies arise between this Privacy Policy and the otherwise applicable contractual terms, framework agreement, or general terms of service, the provisions of this Privacy Policy shall prevail. This privacy policy covers both existing personal data and personal data collected from you in the future.
 
@@ -14,13 +14,14 @@ The responsible party for the data processing described in this privacy policy i
 CAOS AG  
 Teufener Strasse 19  
 9000 St. Gallen  
-
+SWITZERLAND
 Contact for questions and issues regarding data protection is:
 
 CAOS AG  
 Data Protection Officer  
 Teufener Strasse 19  
-9000 St. Gallen  
+9000 St. Gallen
+SWITZERLAND
 Phone: 043 215 27 44  
 E-mail: legal@caos.ch  
 
@@ -28,7 +29,7 @@ E-mail: legal@caos.ch
 
 Based on Article 13 of the Swiss Federal Constitution and the data protection provisions of the Swiss Confederation (Data Protection Act, DSG), every person has the right to protection of their privacy as well as protection against misuse of their personal data. The operators of these websites and services take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the legal data protection regulations as well as this data protection declaration.
 
-In cooperation with our providers, we make every effort to protect the databases and any of our users data as well as possible against unauthorized access, loss, misuse or falsification. We point out that data transmission over the internet in general may result in security risks. A complete protection of the data against access by third parties is not possible.
+In cooperation with our suppliers, we make every effort to protect the databases and any of our users data as well as possible against unauthorized access, loss, misuse or falsification. We point out that data transmission over the internet in general may result in security risks. A complete protection of the data against access by third parties is not possible.
 
 This website uses SSL/TLS encryption for security reasons and to protect the transmission of confidential content, such as requests that you send to us as the website operator. You can recognize an encrypted connection by the fact that the address line of the browser changes from "http://" to "https://".
 
