@@ -113,6 +113,7 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err
 
 func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
 	return &domain.AuthRequest{
+		CreationDate:  time.Now(),
 		AgentID:       userAgentID,
 		BrowserInfo:   ParseBrowserInfoFromContext(ctx),
 		ApplicationID: authReq.ClientID,
@@ -122,7 +123,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		PossibleLOAs:  ACRValuesToBusiness(authReq.ACRValues),
 		UiLocales:     UILocalesToBusiness(authReq.UILocales),
 		LoginHint:     authReq.LoginHint,
-		MaxAuthAge:    authReq.MaxAge,
+		MaxAuthAge:    MaxAgeToBusiness(authReq.MaxAge),
 		UserID:        userID,
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
@@ -191,6 +192,14 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 		locales[i] = tag.String()
 	}
 	return locales
+}
+
+func MaxAgeToBusiness(maxAge *uint) *time.Duration {
+	if maxAge == nil {
+		return nil
+	}
+	dur := time.Duration(*maxAge) * time.Second
+	return &dur
 }
 
 func ResponseTypeToBusiness(responseType oidc.ResponseType) domain.OIDCResponseType {
