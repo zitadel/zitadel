@@ -6,34 +6,28 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/user/repository/view"
-
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
-)
-
-const (
-	orgOwnerRole = "ORG_OWNER"
 )
 
 type OrgRepository struct {
@@ -107,10 +101,12 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
+		change.ModifierLoginName = change.ModifierId
 		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.HumanView.DisplayName
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name

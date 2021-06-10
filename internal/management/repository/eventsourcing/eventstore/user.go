@@ -98,8 +98,10 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
+		change.ModifierLoginName = change.ModifierID
 		user, _ := repo.UserByID(ctx, change.ModifierID)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
 			}

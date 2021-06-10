@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -25,7 +27,6 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/golang/protobuf/ptypes"
 )
 
 type ProjectRepo struct {
@@ -195,10 +196,12 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
+		change.ModifierLoginName = change.ModifierId
 		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.HumanView.DisplayName
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
@@ -272,10 +275,12 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, projectID strin
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
+		change.ModifierLoginName = change.ModifierId
 		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.HumanView.DisplayName
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
