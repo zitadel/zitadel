@@ -338,7 +338,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
         this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
           console.log(canUse);
-          if ((canUse == true && this.serviceType == PolicyComponentServiceType.MGMT) || this.serviceType == PolicyComponentServiceType.ADMIN) {
+          if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
+            this.serviceType === PolicyComponentServiceType.ADMIN) {
             this.loadingImages = true;
             this.loadPreviewImages();
           }
@@ -356,7 +357,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         this.loading = false;
 
         this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
-          if ((canUse == true && this.serviceType == PolicyComponentServiceType.MGMT) || this.serviceType == PolicyComponentServiceType.ADMIN) {
+          if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
+            this.serviceType === PolicyComponentServiceType.ADMIN) {
             // this.loadingImages = true;
             this.loadImages();
           }
