@@ -34,9 +34,9 @@ type CustomLoginTextReadModel struct {
 	PasswordBackButtonText string
 	PasswordNextButtonText string
 
-	PasswordResetTitle          string
-	PasswordResetDescription    string
-	PasswordResetNextButtonText string
+	ResetPasswordTitle          string
+	ResetPasswordDescription    string
+	ResetPasswordNextButtonText string
 
 	InitializeTitle              string
 	InitializeDescription        string
@@ -51,12 +51,12 @@ type CustomLoginTextReadModel struct {
 	InitializeDoneAbortButtonText string
 	InitializeDoneNextButtonText  string
 
-	InitMFATitle          string
-	InitMFADescription    string
-	InitMFAOTPOption      string
-	InitMFAU2FOption      string
-	InitMFASkipButtonText string
-	InitMFANextButtonText string
+	InitMFAPromptTitle          string
+	InitMFAPromptDescription    string
+	InitMFAPromptOTPOption      string
+	InitMFAPromptU2FOption      string
+	InitMFAPromptSkipButtonText string
+	InitMFAPromptNextButtonText string
 
 	InitMFAOTPTitle       string
 	InitMFAOTPDescription string
@@ -417,30 +417,30 @@ func (wm *CustomLoginTextReadModel) handlePasswordScreenRemoveEvent(e *policy.Cu
 
 func (wm *CustomLoginTextReadModel) handleResetPasswordScreenSetEvent(e *policy.CustomTextSetEvent) {
 	if e.Key == domain.LoginKeyResetPasswordTitle {
-		wm.PasswordResetTitle = e.Text
+		wm.ResetPasswordTitle = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyResetPasswordDescription {
-		wm.PasswordResetDescription = e.Text
+		wm.ResetPasswordDescription = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyResetPasswordNextButtonText {
-		wm.PasswordResetNextButtonText = e.Text
+		wm.ResetPasswordNextButtonText = e.Text
 		return
 	}
 }
 
 func (wm *CustomLoginTextReadModel) handleResetPasswordScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
 	if e.Key == domain.LoginKeyResetPasswordTitle {
-		wm.PasswordResetTitle = ""
+		wm.ResetPasswordTitle = ""
 		return
 	}
 	if e.Key == domain.LoginKeyResetPasswordDescription {
-		wm.PasswordResetDescription = ""
+		wm.ResetPasswordDescription = ""
 		return
 	}
 	if e.Key == domain.LoginKeyResetPasswordNextButtonText {
-		wm.PasswordResetNextButtonText = ""
+		wm.ResetPasswordNextButtonText = ""
 		return
 	}
 }
@@ -547,54 +547,54 @@ func (wm *CustomLoginTextReadModel) handleInitializeDoneScreenRemoveEvent(e *pol
 
 func (wm *CustomLoginTextReadModel) handleInitMFAPromptScreenSetEvent(e *policy.CustomTextSetEvent) {
 	if e.Key == domain.LoginKeyInitMFAPromptTitle {
-		wm.InitMFATitle = e.Text
+		wm.InitMFAPromptTitle = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptDescription {
-		wm.InitMFADescription = e.Text
+		wm.InitMFAPromptDescription = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptOTPOption {
-		wm.InitMFAOTPOption = e.Text
+		wm.InitMFAPromptOTPOption = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptU2FOption {
-		wm.InitMFAU2FOption = e.Text
+		wm.InitMFAPromptU2FOption = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptSkipButtonText {
-		wm.InitMFASkipButtonText = e.Text
+		wm.InitMFAPromptSkipButtonText = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptNextButtonText {
-		wm.InitMFANextButtonText = e.Text
+		wm.InitMFAPromptNextButtonText = e.Text
 		return
 	}
 }
 
 func (wm *CustomLoginTextReadModel) handleInitMFAPromptScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
 	if e.Key == domain.LoginKeyInitMFAPromptTitle {
-		wm.InitMFATitle = ""
+		wm.InitMFAPromptTitle = ""
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptDescription {
-		wm.InitMFADescription = ""
+		wm.InitMFAPromptDescription = ""
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptOTPOption {
-		wm.InitMFAOTPOption = ""
+		wm.InitMFAPromptOTPOption = ""
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptU2FOption {
-		wm.InitMFAU2FOption = ""
+		wm.InitMFAPromptU2FOption = ""
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptSkipButtonText {
-		wm.InitMFASkipButtonText = ""
+		wm.InitMFAPromptSkipButtonText = ""
 		return
 	}
 	if e.Key == domain.LoginKeyInitMFAPromptNextButtonText {
-		wm.InitMFANextButtonText = ""
+		wm.InitMFAPromptNextButtonText = ""
 		return
 	}
 }

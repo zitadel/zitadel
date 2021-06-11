@@ -30,7 +30,7 @@ With this command you can generate the stub for the backend.
 # generates grpc stub
 DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-be --target go-copy -o .
 # generates keys for cryptography
-DOCKER_BUILDKIT=1 docker build --target copy_keys -f build/Dockerfile.dev . -o .keys
+DOCKER_BUILDKIT=1 docker build --target copy-keys -f build/local/Dockerfile.keys . -o .keys
 ```
 
 ## Run

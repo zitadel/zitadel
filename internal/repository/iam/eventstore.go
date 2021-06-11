@@ -57,5 +57,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MailTextAddedEventType, MailTextAddedEventMapper).
 		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper).
 		RegisterFilterEventMapper(CustomTextSetEventType, CustomTextSetEventMapper).
+		RegisterFilterEventMapper(CustomTextRemovedEventType, CustomTextRemovedEventMapper).
 		RegisterFilterEventMapper(FeaturesSetEventType, FeaturesSetEventMapper)
 }

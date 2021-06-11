@@ -189,3 +189,103 @@ SetUp:
         Greeting: Hello {{.FirstName}} {{.LastName}},
         Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
         ButtonText: Login
+  Step17:
+    CustomLoginText:
+      Language: de
+      SelectAccountTitle: Account auswählen
+      SelectAccountDescription: Wähle deinen Account aus.
+      SelectAccountOtherUser: Anderer Benutzer
+      LoginTitle: Anmeldung
+      LoginDescription: Mit ZITADEL-Konto anmelden.
+      LoginNameLabel: Loginname
+      LoginRegisterButtonText: registrieren
+      LoginNextButtonText: weiter
+      LoginExternalUserDescription: Melde dich mit einem externen Benutzer an
+      PasswordTitle: Willkommen zurück!
+      PasswordDescription: Gib deine Benutzerdaten ein.
+      PasswordLabel: Passwort
+      PasswordResetLinkText: Password zurücksetzen
+      PasswordBackButtonText: zurück
+      PasswordNextButtonText: weiter
+      ResetPasswordTitle: Passwort ändern
+      ResetPasswordDescription: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
+      ResetPasswordNextButtonText: weiter
+      InitializeUserTitle: User aktivieren
+      InitializeUserDescription: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine EMail zu verifizieren und ein neues Passwort zu setzen.
+      InitializeUserCodeLabel: Code
+      InitializeUserNewPasswordLabel: Neues Passwort
+      InitializeUserNewPasswordConfirmLabel: Passwort bestätigen
+      InitializeUserResendButtonText: erneut senden
+      InitializeUserNextButtonText: weiter
+      InitializeDoneTitle: User aktiviert
+      InitializeDoneDescription: EMail verifiziert und Passwort erfolgreich gesetzt
+      InitializeDoneAbortButtonText: abbrechen
+      InitializeDoneNextButtonText: weiter
+      InitMFAPromptTitle: Multifaktor hinzufügen
+      InitMFAPromptDescription: Möchtest du einen Mulitfaktor hinzufügen?
+      InitMFAPromptOTPOption: OTP (One Time Password)
+      InitMFAPromptU2FOption: U2F (Universal 2nd Factor)
+      InitMFAPromptSkipButtonText: überspringen
+      InitMFAPromptNextButtonText:
+      InitMFAOTPTitle:
+      InitMFAOTPDescription
+      InitMFAOTPSecretLabel
+      InitMFAOTPCodeLabel
+
+      InitMFAU2FTitle
+      InitMFAU2FDescription
+      InitMFAU2FTokenNameLabel
+      InitMFAU2FRegisterTokenButtonText
+
+      InitMFADoneTitle
+      InitMFADoneDescription
+      InitMFADoneAbortButtonText
+      InitMFADoneNextButtonText
+
+      VerifyMFAOTPTitle
+      VerifyMFAOTPDescription
+      VerifyMFAOTPCodeLabel
+      VerifyMFAOTPNextButtonText
+
+      VerifyMFAU2FTitle
+      VerifyMFAU2FDescription
+      VerifyMFAU2FValidateTokenText
+      VerifyMFAU2FOtherOptionDescription
+      VerifyMFAU2FOptionOTPButtonText
+
+      RegistrationOptionTitle
+      RegistrationOptionDescription
+      RegistrationOptionUserNameButtonText
+      RegistrationOptionExternalLoginDescription
+
+      RegistrationUserTitle
+      RegistrationUserDescription
+      RegistrationUserFirstnameLabel
+      RegistrationUserLastnameLabel
+      RegistrationUserEmailLabel
+      RegistrationUserLanguageLabel
+      RegistrationUserGenderLabel
+      RegistrationUserPasswordLabel
+      RegistrationUserPasswordConfirmLabel
+      RegistrationUserSaveButtonText
+
+      RegisterOrgTitle
+      RegisterOrgDescription
+      RegisterOrgOrgNameLabel
+      RegisterOrgFirstnameLabel
+      RegisterOrgLastnameLabel
+      RegisterOrgUsernameLabel
+      RegisterOrgEmailLabel
+      RegisterOrgPasswordLabel
+      RegisterOrgPasswordConfirmLabel
+      RegisterOrgSaveButtonText
+
+      PasswordlessTitle
+      PasswordlessDescription
+      PasswordlessLoginWithPwButtonText
+      PasswordlessValidateTokenButtonText
+
+      SuccessLoginTitle
+      SuccessLoginAutoRedirectDescription
+      SuccessLoginRedirectedDescription
+      SuccessLoginNextButtonText
