@@ -8,9 +8,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/static"
-
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
@@ -21,6 +18,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
+	"github.com/caos/zitadel/internal/static"
 )
 
 const (
