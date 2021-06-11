@@ -24,7 +24,8 @@ func NewLoginPolicyAddedEvent(
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
-	forceMFA bool,
+	forceMFA,
+	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
@@ -37,6 +38,7 @@ func NewLoginPolicyAddedEvent(
 			allowRegister,
 			allowExternalIDP,
 			forceMFA,
+			hidePasswordReset,
 			passwordlessType),
 	}
 }

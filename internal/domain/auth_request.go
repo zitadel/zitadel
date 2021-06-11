@@ -30,6 +30,8 @@ type AuthRequest struct {
 	UserName               string
 	LoginName              string
 	DisplayName            string
+	AvatarKey              string
+	PresignedAvatar        string
 	UserOrgID              string
 	RequestedOrgID         string
 	RequestedOrgName       string
@@ -109,11 +111,12 @@ func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
 	return a
 }
 
-func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, userOrgID string) {
+func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, avatar, userOrgID string) {
 	a.UserID = userID
 	a.UserName = userName
 	a.LoginName = loginName
 	a.DisplayName = displayName
+	a.AvatarKey = avatar
 	a.UserOrgID = userOrgID
 }
 

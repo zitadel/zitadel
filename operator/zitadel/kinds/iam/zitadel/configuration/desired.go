@@ -18,6 +18,7 @@ type Configuration struct {
 	MigrateEventStoreV1 bool           `yaml:"migrateEventstoreV1"`
 	DNS                 *DNS           `yaml:"dns"`
 	ClusterDNS          string         `yaml:"clusterdns"`
+	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
@@ -28,6 +29,19 @@ func (c *Configuration) Validate() (err error) {
 	}()
 
 	return c.DNS.validate()
+}
+
+type AssetStorage struct {
+	Type                    string           `yaml:"type,omitempty"`
+	Endpoint                string           `yaml:"endpoint,omitempty"`
+	AccessKeyID             *secret.Secret   `yaml:"accessKeyID,omitempty"`
+	ExistingAccessKeyID     *secret.Existing `yaml:"existingAccessKeyID,omitempty"`
+	SecretAccessKey         *secret.Secret   `yaml:"secretAccessKey,omitempty"`
+	ExistingSecretAccessKey *secret.Existing `yaml:"ExistingSecretAccessKey,omitempty"`
+	SSL                     bool             `yaml:"ssl,omitempty"`
+	Location                string           `yaml:"location,omitempty"`
+	BucketPrefix            string           `yaml:"bucketPrefix,omitempty"`
+	MultiDelete             bool             `yaml:"multiDelete,omitempty"`
 }
 
 type DNS struct {

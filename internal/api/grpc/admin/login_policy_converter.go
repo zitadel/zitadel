@@ -15,6 +15,7 @@ func updateLoginPolicyToDomain(p *admin_pb.UpdateLoginPolicyRequest) *domain.Log
 		AllowExternalIDP:      p.AllowExternalIdp,
 		ForceMFA:              p.ForceMfa,
 		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:     p.HidePasswordReset,
 	}
 }
 

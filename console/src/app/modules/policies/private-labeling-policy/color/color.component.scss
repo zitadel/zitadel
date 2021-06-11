@@ -1,0 +1,52 @@
+.name {
+  font-size: 14px;
+  margin-bottom: 0;
+  color: var(--grey);
+}
+
+.wrapper {
+  border-radius: .5rem;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+
+  .hex-wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    color: var(--grey);
+    font-size: 14px;
+    padding: 0 1rem;
+    cursor: pointer;
+
+    .hex {
+      font-size: 16px;
+    }
+  }
+
+  button {
+    cursor: pointer;
+    margin: .5rem 0;
+    border-radius: .5rem;
+    height: 35px;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    border: none;
+    justify-content: space-between;
+  }
+}
+
+.picker {
+  margin: 1rem 0;
+}
+
+// stylelint-disable
+::ng-deep .chrome-picker {
+  border-radius: .5rem !important;
+}
+
+::ng-deep .saturation {
+  border-radius: .5rem .5rem 0 0 !important;
+}
+// stylelint-enable

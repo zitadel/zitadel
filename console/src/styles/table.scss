@@ -1,14 +1,14 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin table-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
-  $warn-color: mat-color($warn, 500);
-  $primary-color: mat-color($primary, 500);
-  $primary-dark: mat-color($primary, A900);
-  $secondary-dark: mat-color($primary, A800);
-  $inv-color: mat-color($primary, A600);
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-dark: mat.get-color-from-palette($primary, A900);
+  $secondary-dark: mat.get-color-from-palette($primary, A800);
+  $inv-color: mat.get-color-from-palette($primary, A600);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
@@ -22,7 +22,7 @@
   .app-label {
     font-size: 12px;
     border-radius: 1rem;
-    color: mat-color($foreground, text);
+    color: mat.get-color-from-palette($foreground, text);
     white-space: nowrap;
     background-color: var(--grey);
     padding: 3px 1rem;

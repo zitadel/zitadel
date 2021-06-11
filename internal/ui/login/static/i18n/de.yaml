@@ -200,6 +200,11 @@ ExternalNotFoundOption:
   Link: Verlinken
   AutoRegister: Automatisches registrieren
 
+LoginSuccess:
+  Title: Erfolgreich eingeloggt
+  AutoRedirect: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+  Redirected: Du kannst diese Fenster nun schliessen.
+
 LogoutDone:
   Title: Ausgeloggt
   Description: Du wurdest erfolgreich ausgeloggt.
@@ -220,6 +225,7 @@ Actions:
   PasswordLogin: Mit Passwort anmelden
 
 Footer:
+  PoweredBy: Powered By
   Tos: AGB
   TosLink: https://zitadel.ch/pdf/agb.pdf
   Privacy: Datenschutzerklärung
@@ -234,6 +240,7 @@ Errors:
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     NotMatchingUserID: User stimm nicht mit User in Auth Request überein

@@ -42,7 +42,7 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(loginData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.renderLogin(w, r, authReq, err)
 		return
 	}
 	if data.Register {

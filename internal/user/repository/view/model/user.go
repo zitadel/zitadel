@@ -74,6 +74,7 @@ type HumanView struct {
 	DisplayName       string         `json:"displayName" gorm:"column:display_name"`
 	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
 	Gender            int32          `json:"gender" gorm:"column:gender"`
+	AvatarKey         string         `json:"storeKey" gorm:"column:avatar_key"`
 	Email             string         `json:"email" gorm:"column:email"`
 	IsEmailVerified   bool           `json:"-" gorm:"column:is_email_verified"`
 	Phone             string         `json:"phone" gorm:"column:phone"`
@@ -158,6 +159,7 @@ func UserToModel(user *UserView) *model.UserView {
 			LastName:               user.LastName,
 			NickName:               user.NickName,
 			DisplayName:            user.DisplayName,
+			AvatarKey:              user.AvatarKey,
 			PreferredLanguage:      user.PreferredLanguage,
 			Gender:                 model.Gender(user.Gender),
 			Email:                  user.Email,
@@ -337,6 +339,10 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.InitializedUserCheckSucceeded,
 		es_model.InitializedHumanCheckSucceeded:
 		u.InitRequired = false
+	case es_model.HumanAvatarAdded:
+		u.setData(event)
+	case es_model.HumanAvatarRemoved:
+		u.AvatarKey = ""
 	}
 	u.ComputeObject()
 	return err

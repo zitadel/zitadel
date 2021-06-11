@@ -190,6 +190,11 @@ RegistrationOrg:
   PrivacyLinkText: privacy policy
   PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
 
+LoginSuccess:
+  Title: Login successful
+  AutoRedirect: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+  Redirected: You can now close this window.
+
 LogoutDone:
   Title: Logged out
   Description: You have logged out successfully.
@@ -220,6 +225,7 @@ Actions:
   PasswordLogin: Login with password
 
 Footer:
+  PoweredBy: Powered By
   Tos: TOS
   TosLink: https://zitadel.ch/pdf/tos.pdf
   Privacy: Privacy policy
@@ -234,6 +240,7 @@ Errors:
     RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
+    Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     NotMatchingUserID: User and user in authrequest don't match

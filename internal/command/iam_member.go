@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -99,7 +100,8 @@ func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) (*domain.
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewMemberRemovedEvent(ctx, iamAgg, userID))
+	removeEvent := c.removeIAMMember(ctx, iamAgg, userID, false)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +111,17 @@ func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) (*domain.
 	}
 
 	return writeModelToObjectDetails(&memberWriteModel.MemberWriteModel.WriteModel), nil
+}
+
+func (c *Commands) removeIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+	if cascade {
+		return iam_repo.NewMemberCascadeRemovedEvent(
+			ctx,
+			iamAgg,
+			userID)
+	} else {
+		return iam_repo.NewMemberRemovedEvent(ctx, iamAgg, userID)
+	}
 }
 
 func (c *Commands) iamMemberWriteModelByID(ctx context.Context, userID string) (member *IAMMemberWriteModel, err error) {

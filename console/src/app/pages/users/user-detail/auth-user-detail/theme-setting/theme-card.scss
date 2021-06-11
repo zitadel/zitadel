@@ -1,9 +1,9 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin theme-card($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, A900);
+  $primary-dark: mat.get-color-from-palette($primary, A900);
   /* stylelint-enable */
 
   .theme-conent,

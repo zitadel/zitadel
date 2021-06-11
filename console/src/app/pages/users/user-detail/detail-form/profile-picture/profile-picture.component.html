@@ -1,0 +1,39 @@
+<span class="title" mat-dialog-title>{{'USER.PROFILE.AVATAR.UPLOADTITLE' | translate}}</span>
+<div mat-dialog-content>
+  <p class="desc">{{'USER.PROFILE.AVATAR.CURRENT' | translate}}</p>
+  <div class="current-pic-wrapper">
+  <img class="pic" [src]="data.profilePic" *ngIf="data.profilePic"/>
+  <span class="fill-space"></span>
+  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDrop($event)">
+    <button class="btn" mat-stroked-button type="button" (click)="selectedFile.click();">{{'USER.PROFILE.AVATAR.UPLOADBTN' | translate}}</button>
+  <button *ngIf="data.profilePic" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" (click)="deletePic()" mat-icon-button><mat-icon>remove_circle</mat-icon></button>
+</div>
+
+<ng-container *ngIf="imageChangedEvent">
+<p class="desc">{{'USER.PROFILE.AVATAR.PREVIEW' | translate}}</p>
+
+<div class="cropped-preview"  *ngIf="croppedImage">
+  <img class="pic" [src]="croppedImage"/>
+  <button color="primary" mat-raised-button (click)="upload()">{{'USER.PROFILE.AVATAR.UPLOAD' | translate}}</button>
+</div>
+
+<p class="error" *ngIf="showCropperError">{{'USER.PROFILE.AVATAR.CROPPERERROR' | translate}}</p>
+
+<image-cropper
+  class="cropper"
+  [imageChangedEvent]="imageChangedEvent"
+  [maintainAspectRatio]="true"
+  [aspectRatio]="4 / 4"
+  [roundCropper]="true"
+  [autoCrop]="true"
+  (imageCropped)="imageCropped($event)"
+  (loadImageFailed)="loadImageFailed()"
+></image-cropper>
+</ng-container>
+
+</div>
+<div mat-dialog-actions class="action">
+    <button color="primary" mat-raised-button class="ok-button" (click)="closeDialog()">
+        {{'ACTIONS.CLOSE' | translate}}
+    </button>
+</div>

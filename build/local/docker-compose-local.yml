@@ -1,0 +1,157 @@
+version: "3.8"
+
+services:
+  db:
+    profiles: ["database"]
+    restart: always
+    networks:
+      - zitadel
+    image: cockroachdb/cockroach:v21.1.0
+    command: start-single-node --insecure --listen-addr=0.0.0.0
+    ports:
+      - 8080:8080
+      - 26257:26257
+  
+  db-migrations:
+    profiles: ["database"]
+    restart: on-failure
+    networks:
+      - zitadel
+    depends_on:
+      - db
+    image: flyway/flyway:latest
+    volumes:
+      - ../../migrations/cockroach:/flyway/sql
+    environment:
+      - FLYWAY_PLACEHOLDERS_eventstorepassword=NULL
+      - FLYWAY_PLACEHOLDERS_managementpassword=NULL
+      - FLYWAY_PLACEHOLDERS_adminapipassword=NULL
+      - FLYWAY_PLACEHOLDERS_authpassword=NULL
+      - FLYWAY_PLACEHOLDERS_notificationpassword=NULL
+      - FLYWAY_PLACEHOLDERS_authzpassword=NULL
+      - FLYWAY_PLACEHOLDERS_queriespassword=NULL
+    command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=5 migrate
+  
+  keys:
+    profiles: ["init-backend"]
+    restart: on-failure
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.keys
+      target: gen-keys
+    volumes:
+      - ../../.:/zitadel
+    env_file:
+      - ./local.env
+
+  backend-setup:
+    profiles: ["init-backend"]
+    restart: on-failure
+    networks:
+      - zitadel
+    depends_on:
+      - keys
+    build:
+      context: ../..
+      dockerfile: build/dockerfile
+      target: dev-go-build
+      args:
+        ENV: dev
+    volumes:
+      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+    env_file:
+      - ./local.env
+    environment: 
+      - ZITADEL_EVENTSTORE_HOST=db
+    command: [ "-setup-files=cmd/zitadel/setup.yaml", "-setup-files=cmd/zitadel/system-defaults.yaml", "-setup-files=cmd/zitadel/authz.yaml", "setup" ]
+  
+  backend-run:
+    profiles: ["backend"]
+    restart: on-failure
+    networks:
+      - zitadel
+    depends_on:
+      - db
+    build:
+      context: ../..
+      dockerfile: build/dockerfile
+      target: dev-go-build
+      args:
+        ENV: dev
+    volumes:
+      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+    env_file:
+      - ./local.env
+    environment: 
+      - ZITADEL_EVENTSTORE_HOST=db
+    ports:
+      - 50002:50002
+      - 50003:50003
+    command: [ "-console=false", "-localDevMode=true", "-config-files=cmd/zitadel/startup.yaml", "-config-files=cmd/zitadel/system-defaults.yaml", "-config-files=cmd/zitadel/authz.yaml", "start" ]
+
+  zitadel-setted-up:
+    profiles: ["setup"]
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.started
+    volumes:
+      - ./environment.json:/environment.json
+    environment:
+      - BE_PORT=50002
+      - FE_PORT=4200
+
+  grpc-web-gateway:
+    profiles: ["frontend"]
+    restart: on-failure
+    logging:
+      driver: none
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.gateway
+    image: grpcweb/grpcwebproxy
+    ports:
+      - "50000:8080"
+    environment:
+      - BKD_HOST=backend-run
+      - BKD_PORT=50001
+  
+  frontend-local-run:
+    profiles: ["frontend"]
+    networks:
+      - zitadel
+    depends_on:
+      - grpc-web-gateway
+    build:
+      context: ../..
+      dockerfile: build/dockerfile
+      target: dev-angular-build
+      args:
+        ENV: dev
+    volumes:
+      - ./environment.json:/console/src/assets/environment.json
+    command: sh -c "ng serve --host 0.0.0.0"
+    ports:
+      - 4200:4200
+
+  client-id:
+    profiles: ["init-frontend"]
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.clientid
+      target: client-id
+    volumes:
+      - ./environment.json:/environment.json
+    environment:
+      - HOST=backend-run
+      - PORT=50002
+
+networks:
+  zitadel: {}

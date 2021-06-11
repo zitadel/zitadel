@@ -20,12 +20,14 @@ import (
 	proj_repo "github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/caos/zitadel/internal/repository/usergrant"
+	"github.com/caos/zitadel/internal/static"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
 type Commands struct {
 	eventstore   *eventstore.Eventstore
+	static       static.Storage
 	idGenerator  id.Generator
 	iamDomain    string
 	zitadelRoles []authz.RoleMapping
@@ -58,9 +60,10 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, authZRepo *authz_repo.EsRepository) (repo *Commands, err error) {
+func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo *authz_repo.EsRepository) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         eventstore,
+		static:             staticStore,
 		idGenerator:        id.SonyFlakeGenerator,
 		iamDomain:          defaults.Domain,
 		zitadelRoles:       authZConfig.RolePermissionMappings,

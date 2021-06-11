@@ -110,7 +110,8 @@ func (m *IAMMember) processIAMMember(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case model.IAMMemberRemoved:
+	case model.IAMMemberRemoved,
+		model.IAMMemberCascadeRemoved:
 		err := member.SetData(event)
 		if err != nil {
 			return err

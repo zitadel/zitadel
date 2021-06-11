@@ -1,7 +1,8 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
+
 @import './component-themes';
 
 // Plus imports for other components in your app.
@@ -41,21 +42,22 @@ $caos-dark-brand: (
   A700: #8795a1,
   A800: #2d2e30,
   A900: #212224,
-  contrast: (
-    50: $black-87-opacity,
-    100: $black-87-opacity,
-    200: $black-87-opacity,
-    300: $black-87-opacity,
-    400: $black-87-opacity,
+  contrast:
+  (
+    50: rgba(black, .87),
+    100: rgba(black, .87),
+    200: rgba(black, .87),
+    300: rgba(black, .87),
+    400: rgba(black, .87),
     500: white,
     600: white,
     700: white,
     800: white,
     900: white,
-    A100: $black-87-opacity,
-    A200: $black-87-opacity,
-    A400: $black-87-opacity,
-    A700: white,
+    A100: rgba(black, .87),
+    A200: rgba(black, .87),
+    A400: rgba(black, .87),
+    A700: white
   )
 );
 
@@ -79,7 +81,8 @@ $caos-light-brand: (
   A700: #8795a1,
   A800: white,
   A900: #fafafa,
-  contrast: (
+  contrast:
+  (
     50: #3d4852,
     100: #3d4852,
     200: #3d4852,
@@ -93,7 +96,7 @@ $caos-light-brand: (
     A100: #3d4852,
     A200: #3d4852,
     A400: #3d4852,
-    A700: white,
+    A700: white
   )
 );
 
@@ -112,49 +115,46 @@ $caos-accent-color: (
   A200: #8bffde,
   A400: #58ffd0,
   A700: #3effc9,
-  contrast: (
-    50: $black-87-opacity,
-    100: $black-87-opacity,
-    200: $black-87-opacity,
-    300: $black-87-opacity,
-    400: $black-87-opacity,
+  contrast:
+  (
+    50: rgba(black, .87),
+    100: rgba(black, .87),
+    200: rgba(black, .87),
+    300: rgba(black, .87),
+    400: rgba(black, .87),
     500: white,
     600: white,
     700: white,
     800: white,
     900: white,
-    A100: $black-87-opacity,
-    A200: $black-87-opacity,
-    A400: $black-87-opacity,
-    A700: white,
+    A100: rgba(black, .87),
+    A200: rgba(black, .87),
+    A400: rgba(black, .87),
+    A700: white
   )
 );
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 
-$light-primary: mat-palette($caos-light-brand);
-$light-accent: mat-palette($caos-accent-color);
-$light-warn: mat-palette($mat-red);
+$light-primary: mat.define-palette($caos-light-brand);
+$light-accent: mat.define-palette($caos-accent-color);
+$light-warn: mat.define-palette(mat.$red-palette);
 
-$dark-primary: mat-palette($caos-dark-brand);
-$dark-accent: mat-palette($mat-pink);
-$dark-warn: mat-palette($mat-red);
+$dark-primary: mat.define-palette($caos-dark-brand);
+$dark-accent: mat.define-palette(mat.$pink-palette);
+$dark-warn: mat.define-palette(mat.$red-palette);
 
-$light-theme: mat-light-theme($light-primary, $light-accent, $light-warn);
+$light-theme: mat.define-light-theme($light-primary, $light-accent, $light-warn);
+$dark-theme: mat.define-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
-$dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
+$custom-typography: mat.define-typography-config($font-family: 'Lato');
 
-$custom-typography:
-  mat-typography-config(
-    $font-family: 'Lato'
-  );
-
-@include mat-core($custom-typography);
+@include mat.core($custom-typography);
 
 // default theme
 @include component-themes($dark-theme);
-@include angular-material-theme($dark-theme);
+@include mat.all-component-themes($dark-theme);
 
 .mat-dialog-container,
 .mat-raised-button,
@@ -164,7 +164,7 @@ $custom-typography:
 
 .light-theme {
   @include component-themes($light-theme);
-  @include angular-material-theme($light-theme);
+  @include mat.all-component-themes($light-theme);
 
   --grey: #697386;
   --color-main: #5469d4;
@@ -202,7 +202,7 @@ $custom-typography:
 
 .dark-theme {
   @include component-themes($dark-theme);
-  @include angular-material-theme($dark-theme);
+  @include mat.all-component-themes($dark-theme);
 
   --color-main: #5282c1;
 
@@ -239,7 +239,7 @@ $custom-typography:
     box-shadow: inset 0 -1px #303131;
   }
 }
-// @include mat-checkbox-theme($candy-app-theme);
+// @include mat.checkbox-theme($candy-app-theme);
 
 /* You can add global styles to this file, and also import other style files */
 
@@ -265,8 +265,13 @@ body {
     sans-serif;
 }
 
+h1 {
+  font-weight: 400;
+}
+
 h2 {
   font-size: 1.3rem;
+  font-weight: 400;
 }
 
 .mat-paginator .mat-select {

@@ -1,9 +1,8 @@
-
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin cnsl-error-theme($theme) {
   $warn: map-get($theme, warn);
-  $warn-color: mat-color($warn, 500);
+  $warn-color: mat.get-color-from-palette($warn, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
   .cnsl-error {

@@ -44,7 +44,7 @@ func (c *Commands) SetupStep12(ctx context.Context, step *Step12) error {
 			LoginPolicyRegistration:  step.LoginPolicyRegistration,
 			LoginPolicyUsernameLogin: step.LoginPolicyUsernameLogin,
 			PasswordComplexityPolicy: step.PasswordComplexityPolicy,
-			LabelPolicy:              step.LabelPolicy,
+			LabelPolicyPrivateLabel:  step.LabelPolicy,
 			CustomDomain:             step.CustomDomain,
 		})
 		if err != nil {

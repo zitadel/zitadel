@@ -5,14 +5,17 @@ Errors:
   IDMissing: ID missing
   ResourceOwnerMissing: Resource Owner Organisation missing
   Assets:
+    EmptyKey: Asset key is empty
     Store:
       NotInitialized: Assets storage not initialized
+      NotConfigured: Assets storage not configured
     Bucket:
       Internal: Internal error on create bucket
       AlreadyExists: Bucket already exists
       CreateFailed: Bucket not created
       ListFailed: Buckets could not be read
       RemoveFailed: Bucket not deleted
+      SetPublicFailed: Could not set bucket to public
     Object:
       PutFailed: Objekt not created
       GetFaieled: Objekt could not be read
@@ -159,11 +162,11 @@ Errors:
       NotChanged: Default Mail Template has not been changed
       AlreadyExists: Default Mail Template already exists
       Invalid: Default Mail Template is invalid
-    MailText:
-      NotFound: Default Mail Text not found
-      NotChanged: Default Mail Text has not been changed
-      AlreadyExists: Default Mail Text already exists
-      Invalid: Default Mail Text is invalid
+    CustomMessageText:
+      NotFound: Default Message Text not found
+      NotChanged: Default Message Text has not been changed
+      AlreadyExists: Default Message Text already exists
+      Invalid: Default Message Text is invalid
     PasswordComplexity:
       NotFound: Password  Complexity Policy not found
       Empty: Password Complexity Policy is empty
@@ -273,11 +276,11 @@ Errors:
       NotChanged: Default Mail Template has not been changed
       AlreadyExists: Default Mail Template already exists
       Invalid: Default Mail Template is invalid
-    MailText:
-      NotFound: Default Mail Text not found
-      NotChanged: Default Mail Text has not been changed
-      AlreadyExists: Default Mail Text already exists
-      Invalid: Default Mail Text is invalid
+    CustomMessageText:
+      NotFound: Default Message Text not found
+      NotChanged: Default Message Text has not been changed
+      AlreadyExists: Default Message Text already exists
+      Invalid: Default Message Text is invalid
     PasswordComplexityPolicy:
       NotFound: Default Private Label Policy not found
       NotExisting: Default Password Complexity Policy not existing
@@ -304,6 +307,16 @@ Errors:
       NotChanged: Org IAM Policy has not been changed
   Policy:
     AlreadyExists: Policy already exists
+    Label:
+      Invalid:
+        PrimaryColor: Primary color is no valid Hex color value
+        BackgroundColor: Background color is no valid Hex color value
+        WarnColor: Warn color is no valid Hex color value
+        FontColor: Font color is no valid Hex color value
+        PrimaryColorDark: Primary color (dark mode) is no valid Hex color value
+        BackgroundColorDark: Background color (dark mode) is no valid Hex color value
+        WarnColorDark: Warn color (dark mode) is no valid Hex color value
+        FontColorDark: Font color (dark mode) is no valid Hex color value
   UserGrant:
     AlreadyExists: User grant already exists
     NotFound: User grant not found
@@ -338,6 +351,10 @@ Errors:
       AlreadyExists: Step done already exists
   Features:
     NotChanged: Feature hat nicht geändert
+  CustomText:
+    AlreadyExists: Custom text already exists
+    Invalid: Custom text invalid
+    NotFound: Custom text not found
 EventTypes:
   user:
     added: User added
@@ -373,6 +390,9 @@ EventTypes:
     human:
       added: Person added
       selfregistered: Person registered himself
+      avatar:
+        added: Avatar added
+        removed: Avatar removed
       initialization:
         code:
           added: Initialisation code generated
@@ -531,6 +551,8 @@ EventTypes:
       added: Organization member added
       changed: Organization member changed
       removed: Organization member removed
+      cascade:
+        removeD: Organization member cascade removed
     iam:
       policy:
         added: System policy added
@@ -581,7 +603,25 @@ EventTypes:
       label:
         added: Label Policy added
         changed: Label Policy changed
+        activated: Label Policy activated
         removed: Label Policy removed
+        logo:
+          added: Logo added to Label Policy
+          removed: Logo removed from Label Policy
+          dark:
+            added: Logo (dark mode) added to Label Policy
+            removed: Logo (dark mode) removed from Label Policy
+        icon:
+          added: Icon added to Label Policy
+          removed: Icon removed from Label Policy
+          dark:
+            added: Icon (dark mode) added to Label Policy
+            removed: Icon (dark mode) removed from Label Policy
+        font:
+          added: Font added to Label Policy
+          removed: Font removed from Label Policy
+        assets:
+          removed: Assets removed from Label Policy
   project:
     added: Project added
     changed: Project changed
@@ -592,6 +632,8 @@ EventTypes:
       added: Project member added
       changed: Project member changed
       removed: Project member removed
+      cascade:
+        removeD: Project member cascade removed
     role:
       added: Project role added
       changed: Project role changed
@@ -608,6 +650,8 @@ EventTypes:
         added: Management access member added
         changed: Management access member changed
         removed: Management access member removed
+        cascade:
+          removeD: Management access cascade removed
     application:
       added: Application added
       changed: Application changed
@@ -658,6 +702,8 @@ EventTypes:
       added: ZITADEL member added
       changed: ZITADEL member changed
       removed: ZITADEL member removed
+      cascade:
+        removeD: ZITADEL member cascade removed
     idp:
       config:
         added: IDP configuration added
@@ -680,6 +726,27 @@ EventTypes:
         idpprovider:
           added: Idp Provider added to Default Login Policy
           removed: Idp Provider removed from Default Login Policy
+      label:
+        added: Label Policy added
+        changed: Label Policy changed
+        activated: Label Policy activated
+        logo:
+          added: Logo added to Label Policy
+          removed: Logo removed from Label Policy
+          dark:
+            added: Logo (dark mode) added to Label Policy
+            removed: Logo (dark mode) removed from Label Policy
+        icon:
+          added: Icon added to Label Policy
+          removed: Icon removed from Label Policy
+          dark:
+            added: Icon (dark mode) added to Label Policy
+            removed: Icon (dark mode) removed from Label Policy
+        font:
+          added: Font added to Label Policy
+          removed: Font removed from Label Policy
+        assets:
+          removed: Assets removed from Label Policy
   key_pair:
     added: Key pair added
 Application:
