@@ -66,6 +66,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplChangeUsernameDone:       "change_username_done.html",
 		tmplLinkUsersDone:            "link_users_done.html",
 		tmplExternalNotFoundOption:   "external_not_found_option.html",
+		tmplLoginSuccess:             "login_success.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -252,7 +253,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.redirectToCallback(w, r, authReq)
+		l.redirectToLoginSuccess(w, r, authReq.ID)
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
 	case *domain.VerifyEMailStep:

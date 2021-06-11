@@ -1014,7 +1014,7 @@ This is an empty response
 
 
 ### GetDefaultDomainClaimedMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -1053,7 +1053,7 @@ This is an empty request
 
 
 ### GetDefaultInitMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -1097,7 +1097,7 @@ This is an empty request
 
 
 ### GetDefaultPasswordResetMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -1119,7 +1119,7 @@ This is an empty request
 
 
 ### GetDefaultVerifyEmailMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -1141,7 +1141,7 @@ This is an empty request
 
 
 ### GetDefaultVerifyPhoneMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
