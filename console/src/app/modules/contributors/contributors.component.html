@@ -14,7 +14,7 @@
                         [ngStyle]="{'z-index': 100 - i}">
                         <app-avatar
                             *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
-                            class="avatar dontcloseonclick"
+                            class="avatar dontcloseonclick" [forColor]="member?.userName"[forColor]="member?.preferredLoginName"
                             [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
                             [size]="32">
                         </app-avatar>

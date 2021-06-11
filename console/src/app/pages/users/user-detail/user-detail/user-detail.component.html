@@ -44,7 +44,7 @@
 
         <ng-template appHasRole [appHasRole]="['user.read$', 'user.read:'+user?.id]">
             <app-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
-                <app-detail-form [disabled]="(canWrite$ | async) == false" [genders]="genders" [languages]="languages"
+                <app-detail-form [preferredLoginName]="user.preferredLoginName" [disabled]="(canWrite$ | async) == false" [genders]="genders" [languages]="languages"
                     [username]="user.userName" [user]="user.human" (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>

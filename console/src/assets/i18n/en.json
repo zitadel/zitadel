@@ -306,7 +306,16 @@
       "DISPLAYNAME": "Display Name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
-      "PASSWORD": "Password"
+      "PASSWORD": "Password",
+      "AVATAR": {
+        "UPLOADTITLE":"Upload your Profile Picture",
+        "UPLOADBTN":"Choose file",
+        "UPLOAD":"Upload",
+        "CURRENT":"Current Picture",
+        "PREVIEW":"Preview",
+        "DELETESUCCESS":"Deleted successfully!",
+        "CROPPERERROR":"An error while uploading your file failed. Try a different format and size if necessary."
+      }
     },
     "MACHINE": {
       "TITLE": "Service User Details",
@@ -642,7 +651,7 @@
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
-      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment. To view those changes, a 'x-preview' scope will have to be added to your login scopes.",
+      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment.",
       "BTN":"Select File",
       "ACTIVATEPREVIEW":"Set preview as current configuration",
       "DARK":"Dark Mode",
@@ -653,6 +662,8 @@
       "COLORS":"Colors",
       "FONT":"Font",
       "ADVANCEDBEHAVIOR":"Advanced Behavior",
+      "DROP":"Drop image here",
+      "RELEASE":"Release",
       "PREVIEW": {
         "TITLE":"Login",
         "SECOND":"login with your ZITADEL-Account.",
