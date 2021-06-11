@@ -502,7 +502,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveOrgMessageTexts(tt.args.ctx, tt.args.resourceOwner, tt.args.mailTextType, tt.args.lang)
+			_, err := r.RemoveOrgMessageTexts(tt.args.ctx, tt.args.resourceOwner, tt.args.mailTextType, tt.args.lang)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

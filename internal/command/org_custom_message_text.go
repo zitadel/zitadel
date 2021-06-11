@@ -93,23 +93,30 @@ func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Agg
 	return events, existingMessageText, nil
 }
 
-func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, messageTextType string, lang language.Tag) error {
+func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, messageTextType string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-3mfsf", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3mfsf", "Errors.ResourceOwnerMissing")
 	}
 	if messageTextType == "" || lang == language.Und {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-j59f", "Errors.CustomMessageText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-j59f", "Errors.CustomMessageText.Invalid")
 	}
 	customText, err := c.orgCustomMessageTextWriteModelByID(ctx, resourceOwner, messageTextType, lang)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.CustomMessageText.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.CustomMessageText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, messageTextType, lang))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, messageTextType, lang))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(customText, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
 func (c *Commands) removeOrgMessageTextsIfExists(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {

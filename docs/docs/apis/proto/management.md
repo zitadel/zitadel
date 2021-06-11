@@ -1722,6 +1722,16 @@ Returns the custom text for initial message
 
 
 
+### GetDefaultInitMessageText
+
+> **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
+[GetDefaultInitMessageTextResponse](#getdefaultinitmessagetextresponse)
+
+Returns the default text for initial message
+
+
+
+
 ### SetCustomInitMessageText
 
 > **rpc** SetCustomInitMessageText([SetCustomInitMessageTextRequest](#setcustominitmessagetextrequest))
@@ -1752,6 +1762,16 @@ The default text of the IAM will trigger after
 [GetCustomPasswordResetMessageTextResponse](#getcustompasswordresetmessagetextresponse)
 
 Returns the custom text for password reset message
+
+
+
+
+### GetDefaultPasswordResetMessageText
+
+> **rpc** GetDefaultPasswordResetMessageText([GetDefaultPasswordResetMessageTextRequest](#getdefaultpasswordresetmessagetextrequest))
+[GetDefaultPasswordResetMessageTextResponse](#getdefaultpasswordresetmessagetextresponse)
+
+Returns the default text for password reset message
 
 
 
@@ -1790,6 +1810,16 @@ Returns the custom text for verify email message
 
 
 
+### GetDefaultVerifyEmailMessageText
+
+> **rpc** GetDefaultVerifyEmailMessageText([GetDefaultVerifyEmailMessageTextRequest](#getdefaultverifyemailmessagetextrequest))
+[GetDefaultVerifyEmailMessageTextResponse](#getdefaultverifyemailmessagetextresponse)
+
+Returns the default text for verify email message
+
+
+
+
 ### SetCustomVerifyEmailMessageText
 
 > **rpc** SetCustomVerifyEmailMessageText([SetCustomVerifyEmailMessageTextRequest](#setcustomverifyemailmessagetextrequest))
@@ -1824,6 +1854,16 @@ Returns the custom text for verify email message
 
 
 
+### GetDefaultVerifyPhoneMessageText
+
+> **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
+[GetDefaultVerifyPhoneMessageTextResponse](#getdefaultverifyphonemessagetextresponse)
+
+Returns the custom text for verify email message
+
+
+
+
 ### SetCustomVerifyPhoneMessageText
 
 > **rpc** SetCustomVerifyPhoneMessageText([SetCustomVerifyPhoneMessageTextRequest](#setcustomverifyphonemessagetextrequest))
@@ -1852,6 +1892,16 @@ The default text of the IAM will trigger after
 
 > **rpc** GetCustomDomainClaimedMessageText([GetCustomDomainClaimedMessageTextRequest](#getcustomdomainclaimedmessagetextrequest))
 [GetCustomDomainClaimedMessageTextResponse](#getcustomdomainclaimedmessagetextresponse)
+
+Returns the custom text for domain claimed message
+
+
+
+
+### GetDefaultDomainClaimedMessageText
+
+> **rpc** GetDefaultDomainClaimedMessageText([GetDefaultDomainClaimedMessageTextRequest](#getdefaultdomainclaimedmessagetextrequest))
+[GetDefaultDomainClaimedMessageTextResponse](#getdefaultdomainclaimedmessagetextresponse)
 
 Returns the custom text for domain claimed message
 
@@ -2929,7 +2979,7 @@ This is an empty request
 
 
 ### GetCustomDomainClaimedMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -2951,7 +3001,7 @@ This is an empty request
 
 
 ### GetCustomInitMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -2973,7 +3023,7 @@ This is an empty request
 
 
 ### GetCustomPasswordResetMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -2995,7 +3045,7 @@ This is an empty request
 
 
 ### GetCustomVerifyEmailMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -3017,7 +3067,7 @@ This is an empty request
 
 
 ### GetCustomVerifyPhoneMessageTextRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -3028,6 +3078,50 @@ This is an empty request
 
 
 ### GetCustomVerifyPhoneMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultDomainClaimedMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultDomainClaimedMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultInitMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultInitMessageTextResponse
 
 
 
@@ -3119,6 +3213,72 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
+
+
+
+
+### GetDefaultPasswordResetMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultVerifyEmailMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultVerifyEmailMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultVerifyPhoneMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultVerifyPhoneMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
@@ -5275,7 +5435,7 @@ This is an empty request
 
 
 ### ResetCustomInitMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -5297,7 +5457,7 @@ This is an empty request
 
 
 ### ResetCustomPasswordResetMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -5319,7 +5479,7 @@ This is an empty request
 
 
 ### ResetCustomVerifyEmailMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -5341,7 +5501,7 @@ This is an empty request
 
 
 ### ResetCustomVerifyPhoneMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
