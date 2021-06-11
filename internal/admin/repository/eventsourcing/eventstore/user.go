@@ -13,10 +13,11 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit    uint64
-	Eventstore     v1.Eventstore
-	View           *view.View
-	SystemDefaults systemdefaults.SystemDefaults
+	SearchLimit     uint64
+	Eventstore      v1.Eventstore
+	View            *view.View
+	SystemDefaults  systemdefaults.SystemDefaults
+	PrefixAvatarURL string
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -34,7 +35,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearch
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      usr_view_model.UsersToModel(users),
+		Result:      usr_view_model.UsersToModel(users, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence

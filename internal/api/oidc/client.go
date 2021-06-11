@@ -160,6 +160,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 				userInfo.SetGender(oidc.Gender(getGender(user.Gender)))
 				locale, _ := language.Parse(user.PreferredLanguage)
 				userInfo.SetLocale(locale)
+				userInfo.SetPicture(user.AvatarURL)
 			} else {
 				userInfo.SetName(user.MachineView.Name)
 			}

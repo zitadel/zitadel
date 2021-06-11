@@ -27,9 +27,10 @@ import (
 
 type UserRepo struct {
 	v1.Eventstore
-	SearchLimit    uint64
-	View           *view.View
-	SystemDefaults systemdefaults.SystemDefaults
+	SearchLimit     uint64
+	View            *view.View
+	SystemDefaults  systemdefaults.SystemDefaults
+	PrefixAvatarURL string
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
@@ -46,18 +47,18 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return model.UserToModel(user), nil
+		return model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return model.UserToModel(user), nil
+			return model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(usr_model.UserStateDeleted) {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
 	}
-	return model.UserToModel(&userCopy), nil
+	return model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest, ensureLimit bool) (*usr_model.UserSearchResponse, error) {
@@ -78,7 +79,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      model.UsersToModel(users),
+		Result:      model.UsersToModel(users, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -118,7 +119,7 @@ func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName st
 	if err != nil {
 		return nil, err
 	}
-	return model.UserToModel(user), nil
+	return model.UserToModel(user, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) (bool, error) {

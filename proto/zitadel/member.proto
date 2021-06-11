@@ -51,6 +51,12 @@ message Member {
             example: "\"Gigi Giraffe\"";
         }
     ];
+    string avatar_url = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
 }
 
 message SearchQuery {

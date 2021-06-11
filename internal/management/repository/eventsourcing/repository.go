@@ -16,6 +16,7 @@ import (
 type Config struct {
 	SearchLimit uint64
 	Domain      string
+	APIDomain   string
 	Eventstore  v1.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
@@ -49,13 +50,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 	}
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, staticStorage)
+	assetsAPI := conf.APIDomain + "/assets/v1/"
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, view, roles, systemDefaults},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults},
-		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, view, roles, systemDefaults, assetsAPI},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},
+		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view, assetsAPI},
 		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
 		FeaturesRepo:  eventstore.FeaturesRepo{es, view, conf.SearchLimit, systemDefaults},
 		view:          view,

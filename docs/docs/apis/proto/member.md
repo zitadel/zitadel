@@ -59,6 +59,7 @@ title: zitadel/member.proto
 | first_name |  string | - |  |
 | last_name |  string | - |  |
 | display_name |  string | - |  |
+| avatar_url |  string | - |  |
 
 
 

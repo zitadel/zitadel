@@ -21,6 +21,7 @@ type UserGrantView struct {
 	ProjectName      string
 	OrgName          string
 	OrgPrimaryDomain string
+	AvatarURL        string
 	RoleKeys         []string
 
 	CreationDate time.Time

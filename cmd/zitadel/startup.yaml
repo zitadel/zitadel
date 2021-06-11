@@ -90,6 +90,7 @@ AuthZ:
 Auth:
   SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
+  APIDomain: $ZITADEL_API_DOMAIN
   Eventstore:
     ServiceName: 'authAPI'
     Repository:
@@ -139,6 +140,7 @@ Auth:
 Admin:
   SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
+  APIDomain: $ZITADEL_API_DOMAIN
   Eventstore:
     ServiceName: 'Admin'
     Repository:
@@ -176,6 +178,7 @@ Admin:
 Mgmt:
   SearchLimit: 1000
   Domain: $ZITADEL_DEFAULT_DOMAIN
+  APIDomain: $ZITADEL_API_DOMAIN
   Eventstore:
     ServiceName: 'ManagementAPI'
     Repository:

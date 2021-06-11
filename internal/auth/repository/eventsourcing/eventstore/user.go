@@ -24,10 +24,11 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit    uint64
-	Eventstore     v1.Eventstore
-	View           *view.View
-	SystemDefaults systemdefaults.SystemDefaults
+	SearchLimit     uint64
+	Eventstore      v1.Eventstore
+	View            *view.View
+	SystemDefaults  systemdefaults.SystemDefaults
+	PrefixAvatarURL string
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -153,18 +154,18 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 	events, err := repo.getUserEvents(ctx, id, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return usr_view_model.UserToModel(user), nil
+		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_view_model.UserToModel(user), nil
+			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
 	}
-	return usr_view_model.UserToModel(&userCopy), nil
+	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
@@ -179,18 +180,18 @@ func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*m
 	events, err := repo.getUserEvents(ctx, user.ID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return usr_view_model.UserToModel(user), nil
+		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_view_model.UserToModel(user), nil
+			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
 	}
-	return usr_view_model.UserToModel(&userCopy), nil
+	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
 	changes, err := repo.getUserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending, retention)
@@ -233,7 +234,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearch
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      usr_view_model.UsersToModel(users),
+		Result:      usr_view_model.UsersToModel(users, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence

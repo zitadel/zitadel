@@ -129,7 +129,9 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -218,11 +220,13 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_view_model.UserView) {
 	grant.UserName = user.UserName
+	grant.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		grant.FirstName = user.FirstName
 		grant.LastName = user.LastName
 		grant.DisplayName = user.FirstName + " " + user.LastName
 		grant.Email = user.Email
+		grant.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		grant.DisplayName = user.MachineView.Name
