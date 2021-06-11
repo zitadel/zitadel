@@ -1,8 +1,9 @@
 package domain
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"golang.org/x/text/language"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Profile struct {
@@ -20,4 +21,11 @@ type Profile struct {
 
 func (p *Profile) IsValid() bool {
 	return p.FirstName != "" && p.LastName != ""
+}
+
+func AvatarURL(prefix, resourceOwner, key string) string {
+	if prefix == "" || resourceOwner == "" || key == "" {
+		return ""
+	}
+	return prefix + resourceOwner + "/" + key
 }

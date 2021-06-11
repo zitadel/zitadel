@@ -2,9 +2,10 @@ package eventstore
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -57,9 +58,11 @@ type AuthRequestRepo struct {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error)
+	PrefixAvatarURL() string
 }
 type userViewProvider interface {
 	UserByID(string) (*user_view_model.UserView, error)
+	PrefixAvatarURL() string
 }
 
 type loginPolicyViewProvider interface {
@@ -616,6 +619,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 			DisplayName:       session.DisplayName,
 			UserName:          session.UserName,
 			LoginName:         session.LoginName,
+			ResourceOwner:     session.ResourceOwner,
 			AvatarKey:         session.AvatarKey,
 			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
@@ -767,7 +771,7 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string)
 	if err != nil {
 		return nil, err
 	}
-	return user_view_model.UserSessionsToModel(session), nil
+	return user_view_model.UserSessionsToModel(session, provider.PrefixAvatarURL()), nil
 }
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
@@ -781,7 +785,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
 		logging.Log("EVENT-Hse6s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return user_view_model.UserSessionToModel(session), nil
+		return user_view_model.UserSessionToModel(session, provider.PrefixAvatarURL()), nil
 	}
 	sessionCopy := *session
 	for _, event := range events {
@@ -806,7 +810,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
-				return user_view_model.UserSessionToModel(session), nil
+				return user_view_model.UserSessionToModel(session, provider.PrefixAvatarURL()), nil
 			}
 			if eventData.UserAgentID != agentID {
 				continue
@@ -817,7 +821,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		err := sessionCopy.AppendEvent(event)
 		logging.Log("EVENT-qbhj3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("error appending event")
 	}
-	return user_view_model.UserSessionToModel(&sessionCopy), nil
+	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
 }
 
 func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, userID string) (*user_model.UserView, error) {
@@ -856,24 +860,24 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-dfg42").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return user_view_model.UserToModel(user), nil
+		return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), nil
 	}
 	if len(events) == 0 {
 		if viewErr != nil {
 			return nil, viewErr
 		}
-		return user_view_model.UserToModel(user), viewErr
+		return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), viewErr
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return user_view_model.UserToModel(user), nil
+			return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), nil
 		}
 	}
 	if userCopy.State == int32(user_model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
 	}
-	return user_view_model.UserToModel(&userCopy), nil
+	return user_view_model.UserToModel(&userCopy, viewProvider.PrefixAvatarURL()), nil
 }
 
 func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {

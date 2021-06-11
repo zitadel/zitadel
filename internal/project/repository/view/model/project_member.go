@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
 )
 
 const (
@@ -32,31 +34,36 @@ type ProjectMemberView struct {
 	Roles              pq.StringArray `json:"roles" gorm:"column:roles"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
+	AvatarKey          string         `json:"-" gorm:"column:avatar_key"`
+	UserResourceOwner  string         `json:"-" gorm:"column:user_resource_owner"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func ProjectMemberToModel(member *ProjectMemberView) *model.ProjectMemberView {
+func ProjectMemberToModel(member *ProjectMemberView, prefixAvatarURL string) *model.ProjectMemberView {
 	return &model.ProjectMemberView{
-		UserID:       member.UserID,
-		ProjectID:    member.ProjectID,
-		UserName:     member.UserName,
-		Email:        member.Email,
-		FirstName:    member.FirstName,
-		LastName:     member.LastName,
-		DisplayName:  member.DisplayName,
-		Roles:        member.Roles,
-		Sequence:     member.Sequence,
-		CreationDate: member.CreationDate,
-		ChangeDate:   member.ChangeDate,
+		UserID:             member.UserID,
+		ProjectID:          member.ProjectID,
+		UserName:           member.UserName,
+		Email:              member.Email,
+		FirstName:          member.FirstName,
+		LastName:           member.LastName,
+		DisplayName:        member.DisplayName,
+		PreferredLoginName: member.PreferredLoginName,
+		AvatarURL:          domain.AvatarURL(prefixAvatarURL, member.UserResourceOwner, member.AvatarKey),
+		UserResourceOwner:  member.UserResourceOwner,
+		Roles:              member.Roles,
+		Sequence:           member.Sequence,
+		CreationDate:       member.CreationDate,
+		ChangeDate:         member.ChangeDate,
 	}
 }
 
-func ProjectMembersToModel(roles []*ProjectMemberView) []*model.ProjectMemberView {
+func ProjectMembersToModel(roles []*ProjectMemberView, prefixAvatarURL string) []*model.ProjectMemberView {
 	result := make([]*model.ProjectMemberView, len(roles))
 	for i, r := range roles {
-		result[i] = ProjectMemberToModel(r)
+		result[i] = ProjectMemberToModel(r, prefixAvatarURL)
 	}
 	return result
 }

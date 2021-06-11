@@ -24,7 +24,6 @@
     <div class="lgn-account-selection">
         {{ if .Users }}
         {{ $displayLoginNameSuffix := and .OrgID (not .DisplayLoginNameSuffix)}}
-        {{ $orgID := .OrgID }}
         {{ range $user := .Users }}
         {{ $sessionState := (printf "UserSelection.SessionState%v" $user.UserSessionState) }}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
@@ -32,7 +31,7 @@
             <div class="left">
                 <div class="lgn-avatar" {{if not $user.AvatarKey}}loginname="{{$user.LoginName}}"{{end}}>
                     {{if $user.AvatarKey}}
-                        <img class="avatar-img" src="{{ avatarResource $orgID $user.AvatarKey }}" alt="user-avatar">
+                        <img class="avatar-img" src="{{ avatarResource $user.ResourceOwner $user.AvatarKey }}" alt="user-avatar">
                     {{else}}
                         <span class="initials">A</span>
                     {{end}}

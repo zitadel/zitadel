@@ -7,6 +7,7 @@ import (
 	"github.com/caos/logging"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -51,7 +52,7 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 	return v, nil
 }
 
-func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
+func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *model.UserSessionView {
 	return &model.UserSessionView{
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
@@ -63,6 +64,7 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		LoginName:                    userSession.LoginName,
 		DisplayName:                  userSession.DisplayName,
 		AvatarKey:                    userSession.AvatarKey,
+		AvatarURL:                    domain.AvatarURL(prefixAvatarURL, userSession.ResourceOwner, userSession.AvatarKey),
 		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
 		PasswordVerification:         userSession.PasswordVerification,
 		PasswordlessVerification:     userSession.PasswordlessVerification,
@@ -75,10 +77,10 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	}
 }
 
-func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionView {
+func UserSessionsToModel(userSessions []*UserSessionView, prefixAvatarURL string) []*model.UserSessionView {
 	result := make([]*model.UserSessionView, len(userSessions))
 	for i, s := range userSessions {
-		result[i] = UserSessionToModel(s)
+		result[i] = UserSessionToModel(s, prefixAvatarURL)
 	}
 	return result
 }
