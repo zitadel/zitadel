@@ -13,7 +13,7 @@
             <div class="row">
                 <app-avatar matTooltip="{{ dayelement.editorDisplayName }}"
                     *ngIf="dayelement.editorDisplayName; else spacer" class="avatar"
-                    [name]="dayelement.editorDisplayName" [size]="32" [forColor]="dayelement?.preferredLoginName">
+                    [name]="dayelement.editorDisplayName" [size]="32" [forColor]="dayelement?.editorPreferredLoginName">
                 </app-avatar>
                 <ng-template #spacer>
                     <div class="spacer"></div>

@@ -2,7 +2,7 @@
     <app-avatar
         *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
         class="avatar"
-        [forColor]="user.preferredLoginName"
+        [forColor]="user.preferredLoginName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
         [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
         [size]="80">
     </app-avatar>
@@ -15,7 +15,7 @@
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
-            <app-avatar *ngIf="session && session.displayName" class="small-avatar" [forColor]="session.loginName" [size]="32">
+            <app-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''" [forColor]="session.loginName" [size]="32">
             </app-avatar>
 
             <div class="col">

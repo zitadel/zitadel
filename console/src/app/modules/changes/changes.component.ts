@@ -190,6 +190,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
               editor: change.editorDisplayName,
               editorId: change.editorId,
               editorDisplayName: change.editorDisplayName,
+              editorPreferredLoginName: change.editorPreferredLoginName,
 
               dates: [change.changeDate],
               // data: [change.data],
@@ -211,6 +212,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
                 editor: change.editorDisplayName,
                 editorId: change.editorId,
                 editorDisplayName: change.editorDisplayName,
+                editorPreferredLoginName: change.editorPreferredLoginName,
 
                 dates: [change.changeDate],
                 // data: [change.data],

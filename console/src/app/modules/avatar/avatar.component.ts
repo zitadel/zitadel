@@ -13,6 +13,7 @@ export class AvatarComponent implements OnInit {
   @Input() active: boolean = false;
   @Input() color: string = '';
   @Input() forColor: string = '';
+  @Input() avatarUrl: string = '';
   constructor() { }
 
   ngOnInit(): void {

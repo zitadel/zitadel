@@ -35,7 +35,7 @@
 
                         <app-avatar
                             *ngIf="user.human && user.human.profile.displayName && user.human?.profile.firstName && user.human?.profile.lastName; else cog"
-                            class="avatar" [name]="user.human.profile.displayName"  [forColor]="user?.preferredLoginName" [size]="32">
+                            class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName" [size]="32">
                         </app-avatar>
                         <ng-template #cog>
                             <div class="sa-icon" *ngIf="user.machine">
