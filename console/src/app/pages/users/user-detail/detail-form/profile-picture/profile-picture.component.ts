@@ -42,7 +42,7 @@ export class ProfilePictureComponent implements OnInit {
     if (file) {
       this.selectedFile = file;
 
-      reader.readAsDataURL(file); //FileStream response from .NET core backend
+      reader.readAsDataURL(file);
       reader.onload = _event => {
         this.croppedImage = reader.result;
       };
