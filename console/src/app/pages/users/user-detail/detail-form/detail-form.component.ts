@@ -25,7 +25,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Output() public submitData: EventEmitter<User> = new EventEmitter<User>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
 
-  public profilePic: any = null;
   public profileForm!: FormGroup;
 
   private sub: Subscription = new Subscription();
@@ -48,8 +47,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
       gender: [{ value: 0, disabled: this.disabled }],
       preferredLanguage: [{ value: '', disabled: this.disabled }],
     });
-
-    this.loadAvatar();
   }
 
   public ngOnChanges(): void {
@@ -84,24 +81,13 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   public openUploadDialog(): void {
     const dialogRef = this.dialog.open(ProfilePictureComponent, {
-      data: {
-        profilePic: this.profilePic,
-      },
+      data: {},
       width: '400px',
     });
 
     dialogRef.afterClosed().subscribe(resp => {
       if (resp) {
       }
-    });
-  }
-
-  public loadAvatar(): Promise<any> {
-    return this.assetService.load(`users/me/avatar`).then(data => {
-      const objectURL = URL.createObjectURL(data);
-      this.profilePic = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-    }).catch(error => {
-      this.toast.showError(error);
     });
   }
 
