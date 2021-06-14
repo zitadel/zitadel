@@ -60,7 +60,7 @@
             <div (clickOutside)="closeAccountCard()" class="icon-container">
                 <app-avatar
                     *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-                    class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount" [forColor]="user?.preferredLoginName"
+                    class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"  [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName"
                     [name]="user.human.profile.displayName ? user.human.profile.displayName : (user.human.profile.firstName + ' '+ user.human.profile.lastName)"
                     [size]="38">
                 </app-avatar>

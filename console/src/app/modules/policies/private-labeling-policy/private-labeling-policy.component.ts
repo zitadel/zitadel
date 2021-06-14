@@ -482,6 +482,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
     return this.assetService.load(`${url}`, this.org.id).then(data => {
+      console.log(data);
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();

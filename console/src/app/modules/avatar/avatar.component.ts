@@ -13,6 +13,7 @@ export class AvatarComponent implements OnInit {
   @Input() active: boolean = false;
   @Input() color: string = '';
   @Input() forColor: string = '';
+  @Input() avatarUrl: string = '';
   constructor() { }
 
   ngOnInit(): void {
@@ -20,6 +21,11 @@ export class AvatarComponent implements OnInit {
       this.credentials = this.getInitials(this.forColor);
       if (!this.color) {
         this.color = this.getColor(this.forColor || '');
+      }
+    } else if (!this.credentials && this.name) {
+      this.credentials = this.getInitials(this.name);
+      if (!this.color) {
+        this.color = this.getColor(this.name || '');
       }
     }
 

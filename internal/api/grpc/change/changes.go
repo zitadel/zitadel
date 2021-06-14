@@ -31,6 +31,7 @@ func UserChangeToPb(change *user_model.UserChange) *change_pb.Change {
 		EditorId:                 change.ModifierID,
 		EditorDisplayName:        change.ModifierName,
 		EditorPreferredLoginName: change.ModifierLoginName,
+		EditorAvatarUrl:          change.ModifierAvatarURL,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
@@ -51,6 +52,7 @@ func OrgChangeToPb(change *org_model.OrgChange) *change_pb.Change {
 		EditorId:                 change.ModifierId,
 		EditorDisplayName:        change.ModifierName,
 		EditorPreferredLoginName: change.ModifierLoginName,
+		EditorAvatarUrl:          change.ModifierAvatarURL,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
@@ -71,6 +73,7 @@ func ProjectChangeToPb(change *proj_model.ProjectChange) *change_pb.Change {
 		EditorId:                 change.ModifierId,
 		EditorDisplayName:        change.ModifierName,
 		EditorPreferredLoginName: change.ModifierLoginName,
+		EditorAvatarUrl:          change.ModifierAvatarURL,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
@@ -91,6 +94,7 @@ func AppChangeToPb(change *proj_model.ApplicationChange) *change_pb.Change {
 		EditorId:                 change.ModifierId,
 		EditorDisplayName:        change.ModifierName,
 		EditorPreferredLoginName: change.ModifierLoginName,
+		EditorAvatarUrl:          change.ModifierAvatarURL,
 		// ResourceOwnerId: change.,TODO: resource owner not returned
 	}
 }
