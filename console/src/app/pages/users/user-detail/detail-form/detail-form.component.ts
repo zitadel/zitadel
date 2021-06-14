@@ -75,7 +75,9 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   public openUploadDialog(): void {
     const dialogRef = this.dialog.open(ProfilePictureComponent, {
-      data: {},
+      data: {
+        profilePic: this.user.profile?.avatarUrl,
+      },
       width: '400px',
     });
 
