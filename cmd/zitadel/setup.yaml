@@ -190,102 +190,218 @@ SetUp:
         Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
         ButtonText: Login
   Step17:
-    CustomLoginText:
-      Language: de
-      SelectAccountTitle: Account auswählen
-      SelectAccountDescription: Wähle deinen Account aus.
-      SelectAccountOtherUser: Anderer Benutzer
-      LoginTitle: Anmeldung
-      LoginDescription: Mit ZITADEL-Konto anmelden.
-      LoginNameLabel: Loginname
-      LoginRegisterButtonText: registrieren
-      LoginNextButtonText: weiter
-      LoginExternalUserDescription: Melde dich mit einem externen Benutzer an
-      PasswordTitle: Willkommen zurück!
-      PasswordDescription: Gib deine Benutzerdaten ein.
-      PasswordLabel: Passwort
-      PasswordResetLinkText: Password zurücksetzen
-      PasswordBackButtonText: zurück
-      PasswordNextButtonText: weiter
-      ResetPasswordTitle: Passwort ändern
-      ResetPasswordDescription: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
-      ResetPasswordNextButtonText: weiter
-      InitializeUserTitle: User aktivieren
-      InitializeUserDescription: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine EMail zu verifizieren und ein neues Passwort zu setzen.
-      InitializeUserCodeLabel: Code
-      InitializeUserNewPasswordLabel: Neues Passwort
-      InitializeUserNewPasswordConfirmLabel: Passwort bestätigen
-      InitializeUserResendButtonText: erneut senden
-      InitializeUserNextButtonText: weiter
-      InitializeDoneTitle: User aktiviert
-      InitializeDoneDescription: EMail verifiziert und Passwort erfolgreich gesetzt
-      InitializeDoneAbortButtonText: abbrechen
-      InitializeDoneNextButtonText: weiter
-      InitMFAPromptTitle: Multifaktor hinzufügen
-      InitMFAPromptDescription: Möchtest du einen Mulitfaktor hinzufügen?
-      InitMFAPromptOTPOption: OTP (One Time Password)
-      InitMFAPromptU2FOption: U2F (Universal 2nd Factor)
-      InitMFAPromptSkipButtonText: überspringen
-      InitMFAPromptNextButtonText:
-      InitMFAOTPTitle:
-      InitMFAOTPDescription
-      InitMFAOTPSecretLabel
-      InitMFAOTPCodeLabel
-
-      InitMFAU2FTitle
-      InitMFAU2FDescription
-      InitMFAU2FTokenNameLabel
-      InitMFAU2FRegisterTokenButtonText
-
-      InitMFADoneTitle
-      InitMFADoneDescription
-      InitMFADoneAbortButtonText
-      InitMFADoneNextButtonText
-
-      VerifyMFAOTPTitle
-      VerifyMFAOTPDescription
-      VerifyMFAOTPCodeLabel
-      VerifyMFAOTPNextButtonText
-
-      VerifyMFAU2FTitle
-      VerifyMFAU2FDescription
-      VerifyMFAU2FValidateTokenText
-      VerifyMFAU2FOtherOptionDescription
-      VerifyMFAU2FOptionOTPButtonText
-
-      RegistrationOptionTitle
-      RegistrationOptionDescription
-      RegistrationOptionUserNameButtonText
-      RegistrationOptionExternalLoginDescription
-
-      RegistrationUserTitle
-      RegistrationUserDescription
-      RegistrationUserFirstnameLabel
-      RegistrationUserLastnameLabel
-      RegistrationUserEmailLabel
-      RegistrationUserLanguageLabel
-      RegistrationUserGenderLabel
-      RegistrationUserPasswordLabel
-      RegistrationUserPasswordConfirmLabel
-      RegistrationUserSaveButtonText
-
-      RegisterOrgTitle
-      RegisterOrgDescription
-      RegisterOrgOrgNameLabel
-      RegisterOrgFirstnameLabel
-      RegisterOrgLastnameLabel
-      RegisterOrgUsernameLabel
-      RegisterOrgEmailLabel
-      RegisterOrgPasswordLabel
-      RegisterOrgPasswordConfirmLabel
-      RegisterOrgSaveButtonText
-
-      PasswordlessTitle
-      PasswordlessDescription
-      PasswordlessLoginWithPwButtonText
-      PasswordlessValidateTokenButtonText
-
-      SuccessLoginTitle
-      SuccessLoginAutoRedirectDescription
-      SuccessLoginRedirectedDescription
-      SuccessLoginNextButtonText
+    DefaultLoginTexts:
+      - CustomLoginText:
+        Language: de
+        SelectAccountScreenText:
+          SelectAccountTitle: Account auswählen
+          SelectAccountDescription: Wähle deinen Account aus.
+          SelectAccountOtherUser: Anderer Benutzer
+        LoginScreenText:
+          LoginTitle: Anmeldung
+          LoginDescription: Mit ZITADEL-Konto anmelden.
+          LoginNameLabel: Loginname
+          LoginRegisterButtonText: registrieren
+          LoginNextButtonText: weiter
+          LoginExternalUserDescription: Melde dich mit einem externen Benutzer an
+        PasswordScreenText:
+          PasswordTitle: Willkommen zurück!
+          PasswordDescription: Gib deine Benutzerdaten ein.
+          PasswordLabel: Passwort
+          PasswordResetLinkText: Password zurücksetzen
+          PasswordBackButtonText: zurück
+          PasswordNextButtonText: weiter
+        ResetPasswordScreenText:
+          ResetPasswordTitle: Passwort ändern
+          ResetPasswordDescription: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
+          ResetPasswordNextButtonText: weiter
+        InitializeUserScreenText:
+          InitializeUserTitle: User aktivieren
+          InitializeUserDescription: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine EMail zu verifizieren und ein neues Passwort zu setzen.
+          InitializeUserCodeLabel: Code
+          InitializeUserNewPasswordLabel: Neues Passwort
+          InitializeUserNewPasswordConfirmLabel: Passwort bestätigen
+          InitializeUserResendButtonText: erneut senden
+          InitializeUserNextButtonText: weiter
+        InitializeDoneScreenText:
+          InitializeDoneTitle: User aktiviert
+          InitializeDoneDescription: EMail verifiziert und Passwort erfolgreich gesetzt
+          InitializeDoneAbortButtonText: abbrechen
+          InitializeDoneNextButtonText: weiter
+        InitMFAPromptScreenText:
+          InitMFAPromptTitle: Multifaktor hinzufügen
+          InitMFAPromptDescription: Möchtest du einen Mulitfaktor hinzufügen?
+          InitMFAPromptOTPOption: OTP (One Time Password)
+          InitMFAPromptU2FOption: U2F (Universal 2nd Factor)
+          InitMFAPromptSkipButtonText: überspringen
+          InitMFAPromptNextButtonText: weiter
+        InitMFAOTPScreenText:
+          InitMFAOTPTitle: Multifaktor Verifizierung
+          InitMFAOTPDescription: Verifiziere deinen Multifaktor. Scanne den Code mit einem Authentifizierungs-App (z.B Google Authenticator) oder kopiere das Secret und gib anschliessend den Code ein.
+          InitMFAOTPSecretLabel: Secret
+          InitMFAOTPCodeLabel: Code
+        InitMFAU2FScreenText:
+          InitMFAU2FTitle: Multifaktor U2F / WebAuthN hinzufügen
+          InitMFAU2FDescription: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
+          InitMFAU2FTokenNameLabel: Name
+          InitMFAU2FRegisterTokenButtonText: Token registrieren
+        InitMFADoneScreenText:
+          InitMFADoneTitle: Multifaktor Verifizierung erstellt
+          InitMFADoneDescription: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden.
+          InitMFADoneAbortButtonText: abbrechen
+          InitMFADoneNextButtonText: weiter
+        VerifyMFAOTPScreenText:
+          VerifyMFAOTPTitle: Multifaktor verifizieren
+          VerifyMFAOTPDescription: Verifiziere deinen Multifaktor - OTP (One Time Password)
+          VerifyMFAOTPCodeLabel: Code
+          VerifyMFAOTPNextButtonText: weiter
+        VerifyMFAU2FScreenText:
+          VerifyMFAU2FTitle: Multifaktor Verifizierung
+          VerifyMFAU2FDescription: Verifiziere deinen Multifaktor U2F / WebAuthN Token
+          VerifyMFAU2FValidateTokenText:
+          VerifyMFAU2FOtherOptionDescription: oder wähle eine andere Option aus
+          VerifyMFAU2FOptionOTPButtonText:
+        RegistrationOptionScreenText:
+          RegistrationOptionTitle: Registrations Möglichkeiten
+          RegistrationOptionDescription: Wähle aus wie du dich registrieren möchtest.
+          RegistrationOptionUserNameButtonText: Mit Benutzername Passwort
+          RegistrationOptionExternalLoginDescription: oder registriere dich mit einem externen Benutzer
+        RegistrationUserScreenText:
+          RegistrationUserTitle: Registration
+          RegistrationUserDescription: Gib deine Benutzerangaben an. Die E-Mail Adresse wird als Benutzernamen verwendet.
+          RegistrationUserFirstnameLabel: Vorname
+          RegistrationUserLastnameLabel: Nachname
+          RegistrationUserEmailLabel: E-Mail
+          RegistrationUserLanguageLabel: Sprache
+          RegistrationUserGenderLabel: Geschlecht
+          RegistrationUserPasswordLabel: Passwort
+          RegistrationUserPasswordConfirmLabel: Passwort wiederholen
+          RegistrationUserSaveButtonText: speichern
+        RegistrationOrgScreenText:
+          RegisterOrgTitle: Organisations Registration
+          RegisterOrgDescription: Gib deinen Organisationsnamen und deine Benutzerangaben an.
+          RegisterOrgOrgNameLabel: Organisationsname
+          RegisterOrgFirstnameLabel: Vorname
+          RegisterOrgLastnameLabel: Nachname
+          RegisterOrgUsernameLabel: Benutzername
+          RegisterOrgEmailLabel: E-Mail
+          RegisterOrgPasswordLabel: Passwort
+          RegisterOrgPasswordConfirmLabel: Passwort wiederholen
+          RegisterOrgSaveButtonText: speichern
+        PasswordlessScreenText:
+          PasswordlessTitle: Passwortlos einloggen
+          PasswordlessDescription: Verifiziere dein Token
+          PasswordlessLoginWithPwButtonText: Mit Passwort anmelden
+          PasswordlessValidateTokenButtonText: Token validieren
+        SuccessLoginScreenText:
+          SuccessLoginTitle: Erfolgreich eingeloggt
+          SuccessLoginAutoRedirectDescription: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+          SuccessLoginRedirectedDescription: Du kannst diese Fenster nun schliessen.
+          SuccessLoginNextButtonText: weiter
+      - CustomLoginText:
+        Language: en
+        SelectAccountScreenText:
+          SelectAccountTitle: Select account
+          SelectAccountDescription: Choose your account
+          SelectAccountOtherUser: Other User
+        LoginScreenText:
+          LoginTitle: Login
+          LoginDescription: Enter your ZITADEL logindata.
+          LoginNameLabel: username
+          LoginRegisterButtonText: register
+          LoginNextButtonText: next
+          LoginExternalUserDescription: Login with an external user.
+        PasswordScreenText:
+          PasswordTitle: Password
+          PasswordDescription: Enter your logindata.
+          PasswordLabel: Password
+          PasswordResetLinkText: reset password
+          PasswordBackButtonText: back
+          PasswordNextButtonText: next
+        ResetPasswordScreenText:
+          ResetPasswordTitle: Change Password
+          ResetPasswordDescription: Change your password. Enter your old and new password.
+          ResetPasswordNextButtonText: next
+        InitializeUserScreenText:
+          InitializeUserTitle: Activate User
+          InitializeUserDescription: You have received a code, which you have to enter in the form below, to verify your email and set your new password.
+          InitializeUserCodeLabel: Code
+          InitializeUserNewPasswordLabel: New Password
+          InitializeUserNewPasswordConfirmLabel: Confirm Password
+          InitializeUserResendButtonText: resend
+          InitializeUserNextButtonText: next
+        InitializeDoneScreenText:
+          InitializeDoneTitle: User activated
+          InitializeDoneDescription: Email verified and Password successfully set
+          InitializeDoneAbortButtonText: abort
+          InitializeDoneNextButtonText: next
+        InitMFAPromptScreenText:
+          InitMFAPromptTitle: Multifactor Setup
+          InitMFAPromptDescription: Would you like to setup multifactor authentication?
+          InitMFAPromptOTPOption: OTP (One Time Password)
+          InitMFAPromptU2FOption: U2F (Universal 2nd Factor)
+          InitMFAPromptSkipButtonText: skip
+          InitMFAPromptNextButtonText: next
+        InitMFAOTPScreenText:
+          InitMFAOTPTitle: Multifactor Verification
+          InitMFAOTPDescription: Verify your multifactor. Scan the code with your authenticator app (e.g Google Authenticator) or copy the secret and insert the generated code below.
+          InitMFAOTPSecretLabel: Secret
+          InitMFAOTPCodeLabel: Code
+        InitMFAU2FScreenText:
+          InitMFAU2FTitle: Multifactor Setup U2F / WebAuthN
+          InitMFAU2FDescription: Add your Token by providing a name and then clicking on the 'Register Token' button below.
+          InitMFAU2FTokenNameLabel: Name
+          InitMFAU2FRegisterTokenButtonText: Register Token
+        InitMFADoneScreenText:
+          InitMFADoneTitle: Multifcator Verification done
+          InitMFADoneDescription: Multifactor verification successfully done. The multifactor has to be entered on each login.
+          InitMFADoneAbortButtonText: abort
+          InitMFADoneNextButtonText: next
+        VerifyMFAOTPScreenText:
+          VerifyMFAOTPTitle: Verify Multificator
+          VerifyMFAOTPDescription: Verify your multifactor - OTP (One Time Password)
+          VerifyMFAOTPCodeLabel: Code
+          VerifyMFAOTPNextButtonText: next
+        VerifyMFAU2FScreenText:
+          VerifyMFAU2FTitle: Verify Multificator
+          VerifyMFAU2FDescription: Verify your multifactor U2F / WebAuthN token
+          VerifyMFAU2FValidateTokenText:
+          VerifyMFAU2FOtherOptionDescription: or choose an other option
+          VerifyMFAU2FOptionOTPButtonText:
+        RegistrationOptionScreenText:
+          RegistrationOptionTitle: Registration Options
+          RegistrationOptionDescription: Choose how you'd like to register
+          RegistrationOptionUserNameButtonText: With username password
+          RegistrationOptionExternalLoginDescription: or register with an external user
+        RegistrationUserScreenText:
+          RegistrationUserTitle: Registration
+          RegistrationUserDescription: Enter your Userdata. Your email address will be used as loginname.
+          RegistrationUserFirstnameLabel: Firstname
+          RegistrationUserLastnameLabel: Lastname
+          RegistrationUserEmailLabel: E-Mail
+          RegistrationUserLanguageLabel: Language
+          RegistrationUserGenderLabel: Gender
+          RegistrationUserPasswordLabel: Password
+          RegistrationUserPasswordConfirmLabel: Password confirmation
+          RegistrationUserSaveButtonText: save
+        RegistrationOrgScreenText:
+          RegisterOrgTitle: Organisation Registration
+          RegisterOrgDescription: Enter your organisationname and userdata.
+          RegisterOrgOrgNameLabel: Organisationname
+          RegisterOrgFirstnameLabel: Firstname
+          RegisterOrgLastnameLabel: Lastname
+          RegisterOrgUsernameLabel: Username
+          RegisterOrgEmailLabel: E-Mail
+          RegisterOrgPasswordLabel: Password
+          RegisterOrgPasswordConfirmLabel: Password confirmation
+          RegisterOrgSaveButtonText: save
+        PasswordlessScreenText:
+          PasswordlessTitle: Login passwordles
+          PasswordlessDescription: Verify your token
+          PasswordlessLoginWithPwButtonText: Login with password
+          PasswordlessValidateTokenButtonText: Validate Token
+        SuccessLoginScreenText:
+          SuccessLoginTitle: Login successful
+          SuccessLoginAutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+          SuccessLoginRedirectedDescription: You can now close this window.
+          SuccessLoginNextButtonText: next
