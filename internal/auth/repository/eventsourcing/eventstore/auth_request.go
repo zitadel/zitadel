@@ -532,6 +532,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			return steps, nil
 		}
 		steps = append(steps, new(domain.LoginStep))
+		if request.Prompt == domain.PromptCreate {
+			return append(steps, &domain.RegistrationStep{}), nil
+		}
 		if request.Prompt == domain.PromptSelectAccount || request.Prompt == domain.PromptUnspecified {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {

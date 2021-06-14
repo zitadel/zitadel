@@ -171,6 +171,8 @@ func PromptToBusiness(prompt oidc.Prompt) domain.Prompt {
 		return domain.PromptConsent
 	case oidc.PromptSelectAccount:
 		return domain.PromptSelectAccount
+	case "create": //this prompt is not final yet, so not implemented in oidc lib
+		return domain.PromptCreate
 	default:
 		return domain.PromptUnspecified
 	}
