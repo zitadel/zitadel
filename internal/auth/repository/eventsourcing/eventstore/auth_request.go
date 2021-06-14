@@ -535,7 +535,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
 		}
-		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount, domain.PromptUnspecified) {
+		if len(request.Prompt) == 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err

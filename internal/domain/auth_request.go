@@ -75,12 +75,10 @@ const (
 	PromptCreate
 )
 
-func IsPrompt(prompt []Prompt, rPrompt ...Prompt) bool {
+func IsPrompt(prompt []Prompt, requestedPrompt Prompt) bool {
 	for _, p := range prompt {
-		for _, rP := range rPrompt {
-			if p == rP {
-				return true
-			}
+		if p == requestedPrompt {
+			return true
 		}
 	}
 	return false
