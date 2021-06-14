@@ -28,7 +28,7 @@ Password:
   HasLowercase: Kleinbuchstaben
   HasNumber: Nummer
   HasSymbol: Symbol
-  Confirmation: Bestätigung überein
+  Confirmation: Bestätigung stimmt überein
 
 UsernameChange:
   Title: Usernamen ändern
