@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DomSanitizer } from '@angular/platform-browser';
 import { AssetService } from 'src/app/services/asset.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -23,7 +24,9 @@ export class ProfilePictureComponent implements OnInit {
     public dialogRef: MatDialogRef<ProfilePictureComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private toast: ToastService,
-    private assetService: AssetService) { }
+    private assetService: AssetService,
+    private sanitizer: DomSanitizer,
+  ) { }
 
   public ngOnInit(): void {
   }
@@ -44,9 +47,8 @@ export class ProfilePictureComponent implements OnInit {
 
       reader.readAsDataURL(file);
       reader.onload = _event => {
-        this.croppedImage = reader.result;
+        this.croppedImage = this.sanitizer.bypassSecurityTrustUrl(reader.result as string);
       };
-      // this.imageChangedFormat = file.type;
     }
   }
 

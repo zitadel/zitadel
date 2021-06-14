@@ -1,11 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { DomSanitizer } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { Gender, Human, User } from 'src/app/proto/generated/zitadel/user_pb';
-import { AssetService } from 'src/app/services/asset.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
@@ -32,9 +29,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private assetService: AssetService,
-    private toast: ToastService,
-    private sanitizer: DomSanitizer,
   ) {
     this.profileForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [
