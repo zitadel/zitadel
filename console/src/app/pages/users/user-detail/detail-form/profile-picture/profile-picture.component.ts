@@ -19,7 +19,6 @@ export class ProfilePictureComponent {
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
   ) {
-    console.log(data);
   }
 
   public onDrop(event: any): Promise<any> | void {
@@ -34,7 +33,6 @@ export class ProfilePictureComponent {
   }
 
   public deletePic(): void {
-    console.log('delete');
     this.authService.removeMyAvatar().then(() => {
       this.toast.showInfo('USER.PROFILE.AVATAR.DELETESUCCESS', true);
       this.data.profilePic = null;
@@ -47,7 +45,6 @@ export class ProfilePictureComponent {
     return task.then(() => {
       this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
       this.assetService.load('users/me/avatar').then(data => {
-        console.log(data);
         const objectURL = URL.createObjectURL(data);
         const pic = this.sanitizer.bypassSecurityTrustUrl(objectURL);
         this.data.profilePic = pic;
