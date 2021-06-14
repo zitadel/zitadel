@@ -523,7 +523,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
 	steps := make([]domain.NextStep, 0)
-	if !checkLoggedIn && request.Prompt == domain.PromptNone {
+	if !checkLoggedIn && domain.IsPrompt(request.Prompt, domain.PromptNone) {
 		return append(steps, &domain.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
@@ -532,15 +532,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			return steps, nil
 		}
 		steps = append(steps, new(domain.LoginStep))
-		if request.Prompt == domain.PromptCreate {
+		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
 		}
-		if request.Prompt == domain.PromptSelectAccount || request.Prompt == domain.PromptUnspecified {
+		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount, domain.PromptUnspecified) {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
 			}
-			if len(users) > 0 || request.Prompt == domain.PromptSelectAccount {
+			if len(users) > 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
 		}

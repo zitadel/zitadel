@@ -18,7 +18,7 @@ type AuthRequest struct {
 	ApplicationID string
 	CallbackURI   string
 	TransferState string
-	Prompt        Prompt
+	Prompt        []Prompt
 	PossibleLOAs  []LevelOfAssurance
 	UiLocales     []string
 	LoginHint     string
@@ -74,6 +74,17 @@ const (
 	PromptSelectAccount
 	PromptCreate
 )
+
+func IsPrompt(prompt []Prompt, rPrompt ...Prompt) bool {
+	for _, p := range prompt {
+		for _, rP := range rPrompt {
+			if p == rP {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 type LevelOfAssurance int
 
