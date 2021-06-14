@@ -22,6 +22,11 @@ export class AvatarComponent implements OnInit {
       if (!this.color) {
         this.color = this.getColor(this.forColor || '');
       }
+    } else if (!this.credentials && this.name) {
+      this.credentials = this.getInitials(this.name);
+      if (!this.color) {
+        this.color = this.getColor(this.name || '');
+      }
     }
 
     if (this.size > 50) {
