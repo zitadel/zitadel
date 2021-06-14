@@ -22,6 +22,7 @@ title: zitadel/change.proto
 | editor_display_name |  string | - |  |
 | resource_owner_id |  string | - |  |
 | editor_preferred_login_name |  string | - |  |
+| editor_avatar_url |  string | - |  |
 
 
 
