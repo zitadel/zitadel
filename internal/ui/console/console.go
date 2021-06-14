@@ -86,7 +86,7 @@ func csp(zitadelDomain string) *middleware.CSP {
 		AddHost("fonts.googleapis.com").
 		AddHost("fonts.gstatic.com").
 		AddHost("maxst.icons8.com") //TODO: host it
-	csp.ImgSrc = csp.ImgSrc.AddScheme("blob")
+	csp.ImgSrc = csp.ImgSrc.AddHost(zitadelDomain).AddScheme("blob")
 	return &csp
 }
 
