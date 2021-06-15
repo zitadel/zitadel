@@ -271,6 +271,7 @@ jobs:
       - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
+        if: github.repository_owner == 'caos'
         with:
           dry_run: false
           semantic_version: 17.0.4
