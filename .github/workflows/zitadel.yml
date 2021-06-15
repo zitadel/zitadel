@@ -87,7 +87,7 @@ jobs:
           file: ./build/dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
-          push: ${{ GITHUB.REPOSITORY_OWNER == 'caos'}}
+          push: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - uses: docker/build-push-action@v2
@@ -173,7 +173,7 @@ jobs:
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: ${{ GITHUB.REPOSITORY_OWNER == 'caos'}}
+          push: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
           cache-from: type=local,src=/tmp/.buildx-cache-new
           build-args: |
             OS=${{ matrix.goos }}
@@ -233,7 +233,7 @@ jobs:
           file: ./build/cr-backup/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: ${{ GITHUB.REPOSITORY_OWNER == 'caos'}}
+          push: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
@@ -271,7 +271,7 @@ jobs:
       - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
-        if: github.repository_owner == 'caos'
+        if: github.event.pull_request.head.repo.full_name == github.repository
         with:
           dry_run: false
           semantic_version: 17.0.4
