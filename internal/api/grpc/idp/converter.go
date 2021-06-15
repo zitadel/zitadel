@@ -33,14 +33,19 @@ func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
 	}
 }
 
-func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
+func IDPConfigToPb(idp domain.IDPConfig) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
-		Id:          idp.AggregateID,
-		State:       IDPStateToPb(idp.State),
-		Name:        idp.Name,
-		StylingType: IDPStylingTypeToPb(idp.StylingType),
-		Config:      IDPViewToConfigPb(idp),
-		Details:     obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, ""), //TODO: resource owner in view
+		Id:          idp.ObjectDetails().AggregateID,
+		State:       IDPStateToPb(idp.IDPConfigState()),
+		Name:        idp.IDPConfigName(),
+		StylingType: IDPStylingTypeToPb(idp.IDPConfigStylingType()),
+		Config:      IDPConfigToConfigPb(idp),
+		Details: obj_grpc.ToViewDetailsPb(
+			idp.ObjectDetails().Sequence,
+			idp.ObjectDetails().CreationDate,
+			idp.ObjectDetails().ChangeDate,
+			"", //TODO: resource owner in view
+		),
 	}
 	return mapped
 }
@@ -130,28 +135,50 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 	}
 }
 
-func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
-		},
+func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
+	if config.IDPConfigOIDCView != nil {
+		return &idp_pb.IDP_OidcConfig{
+			OidcConfig: &idp_pb.OIDCConfig{
+				ClientId:           config.OIDCClientID,
+				Issuer:             config.OIDCIssuer,
+				Scopes:             config.OIDCScopes,
+				DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+				UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+			},
+		}
 	}
+	if config.IDPConfigAuthConnectorView != nil {
+		return &idp_pb.IDP_AuthenticatorConfig{
+			AuthenticatorConfig: &idp_pb.AuthConnectorConfig{
+				BaseUrl:            config.AuthConnectorBaseURL,
+				BackendConnectorId: config.AuthConnectorBackendConnectorID,
+			},
+		}
+	}
+	return nil
 }
 
-func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
-		},
+func IDPConfigToConfigPb(config domain.IDPConfig) idp_pb.IDPConfig {
+	switch c := config.(type) {
+	case *domain.OIDCIDPConfig:
+		return &idp_pb.IDP_OidcConfig{
+			OidcConfig: &idp_pb.OIDCConfig{
+				ClientId:           c.ClientID,
+				Issuer:             c.Issuer,
+				Scopes:             c.Scopes,
+				DisplayNameMapping: MappingFieldToPb(c.IDPDisplayNameMapping),
+				UsernameMapping:    MappingFieldToPb(c.UsernameMapping),
+			},
+		}
+	case *domain.AuthConnectorIDPConfig:
+		return &idp_pb.IDP_AuthenticatorConfig{
+			AuthenticatorConfig: &idp_pb.AuthConnectorConfig{
+				BaseUrl:            c.BaseURL,
+				BackendConnectorId: c.BackendConnectorID,
+			},
+		}
 	}
+	return nil
 }
 
 func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {

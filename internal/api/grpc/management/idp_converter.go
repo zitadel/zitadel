@@ -10,16 +10,7 @@ import (
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
-	return &domain.IDPConfig{
-		Name:        req.Name,
-		OIDCConfig:  addOIDCIDPRequestToDomainOIDCIDPConfig(req),
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
-		Type:        domain.IDPConfigTypeOIDC,
-	}
-}
-
-func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.OIDCIDPConfig {
+func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.OIDCIDPConfig {
 	return &domain.OIDCIDPConfig{
 		ClientID:              req.ClientId,
 		ClientSecretString:    req.ClientSecret,
@@ -27,11 +18,28 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *
 		Scopes:                req.Scopes,
 		IDPDisplayNameMapping: idp_grpc.MappingFieldToDomain(req.DisplayNameMapping),
 		UsernameMapping:       idp_grpc.MappingFieldToDomain(req.UsernameMapping),
+		CommonIDPConfig: domain.CommonIDPConfig{
+			Name:        req.Name,
+			StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+			Type:        domain.IDPConfigTypeOIDC,
+		},
 	}
 }
 
-func updateIDPToDomain(req *mgmt_pb.UpdateOrgIDPRequest) *domain.IDPConfig {
-	return &domain.IDPConfig{
+func addAuthConnectorIDPRequestToDomain(req *mgmt_pb.AddOrgAuthConnectorIDPRequest) *domain.AuthConnectorIDPConfig {
+	return &domain.AuthConnectorIDPConfig{
+		BaseURL:            req.BaseUrl,
+		BackendConnectorID: req.BackendConnectorId,
+		CommonIDPConfig: domain.CommonIDPConfig{
+			Name:        req.Name,
+			StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+			Type:        domain.IDPConfigTypeAuthConnector,
+		},
+	}
+}
+
+func updateIDPToDomain(req *mgmt_pb.UpdateOrgIDPRequest) *domain.CommonIDPConfig {
+	return &domain.CommonIDPConfig{
 		IDPConfigID: req.IdpId,
 		Name:        req.Name,
 		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
@@ -47,6 +55,16 @@ func updateOIDCConfigToDomain(req *mgmt_pb.UpdateOrgIDPOIDCConfigRequest) *domai
 		Scopes:                req.Scopes,
 		IDPDisplayNameMapping: idp_grpc.MappingFieldToDomain(req.DisplayNameMapping),
 		UsernameMapping:       idp_grpc.MappingFieldToDomain(req.UsernameMapping),
+	}
+}
+
+func updateAuthConnectorConfigToDomain(req *mgmt_pb.UpdateOrgIDPAuthConnectorConfigRequest) *domain.AuthConnectorIDPConfig {
+	return &domain.AuthConnectorIDPConfig{
+		CommonIDPConfig: domain.CommonIDPConfig{
+			IDPConfigID: req.IdpId,
+		},
+		BaseURL:            req.BaseUrl,
+		BackendConnectorID: req.BackendConnectorId,
 	}
 }
 

@@ -15,7 +15,8 @@ type IDPConfigReadModel struct {
 	StylingType  domain.IDPConfigStylingType
 	ProviderType domain.IdentityProviderType
 
-	OIDCConfig *OIDCConfigReadModel
+	OIDCConfig          *IDPOIDCConfigReadModel
+	AuthConnectorConfig *IDPAuthConnectorConfigReadModel
 }
 
 func NewIDPConfigReadModel(configID string) *IDPConfigReadModel {
@@ -38,12 +39,19 @@ func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 		case *idpconfig.IDPConfigRemovedEvent:
 			rm.ReadModel.AppendEvents(e)
 		case *idpconfig.OIDCConfigAddedEvent:
-			rm.OIDCConfig = &OIDCConfigReadModel{}
+			rm.OIDCConfig = &IDPOIDCConfigReadModel{}
 			rm.ReadModel.AppendEvents(e)
 			rm.OIDCConfig.AppendEvents(event)
 		case *idpconfig.OIDCConfigChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 			rm.OIDCConfig.AppendEvents(event)
+		case *idpconfig.AuthConnectorConfigAddedEvent:
+			rm.AuthConnectorConfig = &IDPAuthConnectorConfigReadModel{}
+			rm.ReadModel.AppendEvents(e)
+			rm.AuthConnectorConfig.AppendEvents(event)
+		case *idpconfig.AuthConnectorConfigChangedEvent:
+			rm.ReadModel.AppendEvents(e)
+			rm.AuthConnectorConfig.AppendEvents(event)
 		}
 	}
 }
@@ -66,6 +74,11 @@ func (rm *IDPConfigReadModel) Reduce() error {
 
 	if rm.OIDCConfig != nil {
 		if err := rm.OIDCConfig.Reduce(); err != nil {
+			return err
+		}
+	}
+	if rm.AuthConnectorConfig != nil {
+		if err := rm.AuthConnectorConfig.Reduce(); err != nil {
 			return err
 		}
 	}

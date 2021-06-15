@@ -25,28 +25,37 @@ func readModelToIAM(readModel *ReadModel) *model.IAM {
 	}
 }
 
-func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *domain.IDPConfigView {
-	converted := &domain.IDPConfigView{
-		AggregateID:     rm.AggregateID,
-		ChangeDate:      rm.ChangeDate,
-		CreationDate:    rm.CreationDate,
+func readModelToIDPConfigDomain(rm *IAMIDPConfigReadModel) domain.IDPConfig {
+	config := domain.CommonIDPConfig{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  rm.AggregateID,
+			ChangeDate:   rm.ChangeDate,
+			CreationDate: rm.CreationDate,
+			Sequence:     rm.ProcessedSequence,
+		},
 		IDPConfigID:     rm.ConfigID,
 		IDPProviderType: rm.ProviderType,
-		IsOIDC:          rm.OIDCConfig != nil,
-		Name:            rm.Name,
-		Sequence:        rm.ProcessedSequence,
-		State:           rm.State,
-		StylingType:     rm.StylingType,
+		//IsOIDC:          rm.OIDCConfig != nil,
+		Name:        rm.Name,
+		State:       rm.State,
+		StylingType: rm.StylingType,
 	}
 	if rm.OIDCConfig != nil {
-		converted.OIDCClientID = rm.OIDCConfig.ClientID
-		converted.OIDCClientSecret = rm.OIDCConfig.ClientSecret
-		converted.OIDCIDPDisplayNameMapping = rm.OIDCConfig.IDPDisplayNameMapping
-		converted.OIDCIssuer = rm.OIDCConfig.Issuer
-		converted.OIDCScopes = rm.OIDCConfig.Scopes
-		converted.OIDCUsernameMapping = rm.OIDCConfig.UserNameMapping
+		return &domain.OIDCIDPConfig{
+			CommonIDPConfig:       config,
+			ClientID:              rm.OIDCConfig.ClientID,
+			ClientSecret:          rm.OIDCConfig.ClientSecret,
+			IDPDisplayNameMapping: rm.OIDCConfig.IDPDisplayNameMapping,
+			Issuer:                rm.OIDCConfig.Issuer,
+			Scopes:                rm.OIDCConfig.Scopes,
+			UsernameMapping:       rm.OIDCConfig.UserNameMapping,
+		}
 	}
-	return converted
+	return &domain.AuthConnectorIDPConfig{
+		CommonIDPConfig:    config,
+		BaseURL:            rm.AuthConnectorConfig.BaseURL,
+		BackendConnectorID: rm.AuthConnectorConfig.BackendConnectorID,
+	}
 }
 
 func readModelToMember(readModel *MemberReadModel) *model.IAMMember {
@@ -146,7 +155,7 @@ func readModelToIDPConfig(rm *IAMIDPConfigReadModel) *model.IDPConfig {
 	}
 }
 
-func readModelToIDPOIDCConfig(rm *OIDCConfigReadModel) *model.OIDCIDPConfig {
+func readModelToIDPOIDCConfig(rm *IDPOIDCConfigReadModel) *model.OIDCIDPConfig {
 	return &model.OIDCIDPConfig{
 		ObjectRoot:            readModelToObjectRoot(rm.ReadModel),
 		ClientID:              rm.ClientID,

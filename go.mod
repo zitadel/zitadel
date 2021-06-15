@@ -86,3 +86,7 @@ require (
 	k8s.io/client-go v0.19.2
 	sigs.k8s.io/controller-runtime v0.7.0
 )
+
+//replace (
+//	github.com/caos/oidc => /Users/livio/workspaces/go/src/github.com/caos/oidc
+//)

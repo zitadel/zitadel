@@ -2,34 +2,26 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	org_repo "github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
+func (c *Commands) AddIDPConfig(ctx context.Context, config domain.IDPConfig, resourceOwner string) (string, *domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
-	}
-	if config.OIDCConfig == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
+		return "", nil, caos_errs.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
 	}
 
 	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
-
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
-	if err != nil {
-		return nil, err
-	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.EventPusher{
@@ -37,37 +29,78 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			ctx,
 			orgAgg,
 			idpConfigID,
-			config.Name,
-			config.Type,
-			config.StylingType,
+			config.IDPConfigName(),
+			config.IDPConfigType(),
+			config.IDPConfigStylingType(),
 		),
-		org_repo.NewIDPOIDCConfigAddedEvent(
-			ctx,
-			orgAgg,
-			config.OIDCConfig.ClientID,
-			idpConfigID,
-			config.OIDCConfig.Issuer,
-			clientSecret,
-			config.OIDCConfig.IDPDisplayNameMapping,
-			config.OIDCConfig.UsernameMapping,
-			config.OIDCConfig.Scopes...),
 	}
+
+	var configEventCreator configEventCreator
+	switch conf := config.(type) {
+	case *domain.OIDCIDPConfig:
+		configEventCreator = c.addOIDCIDPConfig(conf)
+	case *domain.AuthConnectorIDPConfig:
+		configEventCreator = c.addAuthConnectorIDPConfig(conf)
+	default:
+		return "", nil, errors.ThrowInvalidArgument(nil, "\"Org-eUpQU", "Errors.idp.config.notset")
+	}
+	configEvent, err := configEventCreator(ctx, orgAgg, idpConfigID)
+	if err != nil {
+		return "", nil, err
+	}
+	events = append(events, configEvent)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	err = AppendAndReduce(addedConfig, pushedEvents...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	return writeModelToIDPConfig(&addedConfig.IDPConfigWriteModel), nil
+	return idpConfigID, writeModelToObjectDetails(&addedConfig.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
+func (c *Commands) addOIDCIDPConfig(config *domain.OIDCIDPConfig) configEventCreator {
+	return func(ctx context.Context, agg *eventstore.Aggregate, idpConfigID string) (eventstore.EventPusher, error) {
+		clientSecret, err := crypto.Encrypt([]byte(config.ClientSecretString), c.idpConfigSecretCrypto)
+		if err != nil {
+			return nil, err
+		}
+
+		return org_repo.NewIDPOIDCConfigAddedEvent(
+			ctx,
+			agg,
+			config.ClientID,
+			idpConfigID,
+			config.Issuer,
+			clientSecret,
+			config.IDPDisplayNameMapping,
+			config.UsernameMapping,
+			config.Scopes...,
+		), nil
+	}
+}
+
+func (c *Commands) addAuthConnectorIDPConfig(config *domain.AuthConnectorIDPConfig) configEventCreator {
+	return func(ctx context.Context, agg *eventstore.Aggregate, idpConfigID string) (eventstore.EventPusher, error) {
+		return org_repo.NewIDPAuthConnectorConfigAddedEvent(
+			ctx,
+			agg,
+			idpConfigID,
+			config.BaseURL,
+			config.BackendConnectorID,
+		), nil
+	}
+}
+
+func (c *Commands) ChangeIDPConfig(ctx context.Context, config domain.IDPConfig, resourceOwner string) (*domain.ObjectDetails, error) {
+	if config.ID() == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "Org-Gf9gs", "Errors.IDMissing")
+	}
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Gh8ds", "Errors.ResourceOwnerMissing")
 	}
-	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, config.AggregateID)
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.ID(), resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +112,9 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	changedEvent, hasChanged := existingIDP.NewChangedEvent(
 		ctx,
 		orgAgg,
-		config.IDPConfigID,
-		config.Name,
-		config.StylingType)
+		config.ID(),
+		config.IDPConfigName(),
+		config.IDPConfigStylingType())
 
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
@@ -94,7 +127,7 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToIDPConfig(&existingIDP.IDPConfigWriteModel), nil
+	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
 func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string) (*domain.ObjectDetails, error) {
@@ -177,7 +210,7 @@ func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfi
 	return events, nil
 }
 
-func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string) (*domain.IDPConfig, error) {
+func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string) (domain.IDPConfig, error) {
 	config, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
 		return nil, err

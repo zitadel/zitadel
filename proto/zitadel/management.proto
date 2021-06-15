@@ -2365,6 +2365,19 @@ service ManagementService {
         };
     }
 
+    // Add a new ZITADEL AuthConnector identity provider configuration in the organisation
+    rpc AddOrgAuthConnectorIDP(AddOrgAuthConnectorIDPRequest) returns (AddOrgAuthConnectorIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/auth_connector"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+            feature: "login_policy.idp"
+        };
+    }
+
     // Deactivate identity provider configuration
     // Users will not be able to use this provider for login (e.g Google, Microsoft, AD, etc)
     // Returns error if already deactivated
@@ -2424,6 +2437,19 @@ service ManagementService {
     rpc UpdateOrgIDPOIDCConfig(UpdateOrgIDPOIDCConfigRequest) returns (UpdateOrgIDPOIDCConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/oidc_config"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+            feature: "login_policy.idp"
+        };
+    }
+
+    // Change auth connector identity provider configuration of the organisation
+    rpc UpdateOrgIDPAuthConnectorConfig(UpdateOrgIDPAuthConnectorConfigRequest) returns (UpdateOrgIDPAuthConnectorConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/auth_connector_config"
             body: "*"
         };
 
@@ -4400,6 +4426,42 @@ message AddOrgOIDCIDPResponse {
     string idp_id = 2;
 }
 
+message AddOrgAuthConnectorIDPRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"AuthConnector\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
+    string base_url = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://auth.acme.com\"";
+            description: "the base url where the auth connector is deployed";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string backend_connector_id = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"backend-1\"";
+            description: "the id of the backend the connector uses to request the user info";
+        }
+    ];
+}
+
+message AddOrgAuthConnectorIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
 message DeactivateOrgIDPRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -4491,5 +4553,34 @@ message UpdateOrgIDPOIDCConfigRequest {
 }
 
 message UpdateOrgIDPOIDCConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateOrgIDPAuthConnectorConfigRequest {
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string base_url = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://auth.acme.com\"";
+            description: "the base url where the auth connector is deployed";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string backend_connector_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"backend-1\"";
+            description: "the id of the backend the connector uses to request the user info";
+        }
+    ];
+}
+
+message UpdateOrgIDPAuthConnectorConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }

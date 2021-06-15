@@ -27,17 +27,23 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 	}, nil
 }
 func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRequest) (*mgmt_pb.AddOrgOIDCIDPResponse, error) {
-	config, err := s.command.AddIDPConfig(ctx, addOIDCIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	id, details, err := s.command.AddIDPConfig(ctx, addOIDCIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgOIDCIDPResponse{
-		IdpId: config.AggregateID,
-		Details: object_pb.AddToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		IdpId:   id,
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+func (s *Server) AddOrgAuthConnectorIDP(ctx context.Context, req *mgmt_pb.AddOrgAuthConnectorIDPRequest) (*mgmt_pb.AddOrgAuthConnectorIDPResponse, error) {
+	id, details, err := s.command.AddIDPConfig(ctx, addAuthConnectorIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddOrgAuthConnectorIDPResponse{
+		IdpId:   id,
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
 func (s *Server) DeactivateOrgIDP(ctx context.Context, req *mgmt_pb.DeactivateOrgIDPRequest) (*mgmt_pb.DeactivateOrgIDPResponse, error) {
@@ -70,16 +76,12 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	return &mgmt_pb.RemoveOrgIDPResponse{}, nil
 }
 func (s *Server) UpdateOrgIDP(ctx context.Context, req *mgmt_pb.UpdateOrgIDPRequest) (*mgmt_pb.UpdateOrgIDPResponse, error) {
-	config, err := s.command.ChangeIDPConfig(ctx, updateIDPToDomain(req), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ChangeIDPConfig(ctx, updateIDPToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOrgIDPResponse{
-		Details: object_pb.ChangeToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -94,5 +96,15 @@ func (s *Server) UpdateOrgIDPOIDCConfig(ctx context.Context, req *mgmt_pb.Update
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
+	}, nil
+}
+
+func (s *Server) UpdateOrgIDPAuthConnectorConfig(ctx context.Context, req *mgmt_pb.UpdateOrgIDPAuthConnectorConfigRequest) (*mgmt_pb.UpdateOrgIDPAuthConnectorConfigResponse, error) {
+	details, err := s.command.ChangeIDPAuthConnectorConfig(ctx, updateAuthConnectorConfigToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateOrgIDPAuthConnectorConfigResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }

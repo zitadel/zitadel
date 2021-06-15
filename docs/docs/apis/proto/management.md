@@ -1964,6 +1964,16 @@ Provider must be OIDC compliant
 
 
 
+### AddOrgAuthConnectorIDP
+
+> **rpc** AddOrgAuthConnectorIDP([AddOrgAuthConnectorIDPRequest](#addorgauthconnectoridprequest))
+[AddOrgAuthConnectorIDPResponse](#addorgauthconnectoridpresponse)
+
+Add a new ZITADEL AuthConnector identity provider configuration in the organisation
+
+
+
+
 ### DeactivateOrgIDP
 
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
@@ -2014,6 +2024,16 @@ Change identity provider configuration of the organisation
 [UpdateOrgIDPOIDCConfigResponse](#updateorgidpoidcconfigresponse)
 
 Change OIDC identity provider configuration of the organisation
+
+
+
+
+### UpdateOrgIDPAuthConnectorConfig
+
+> **rpc** UpdateOrgIDPAuthConnectorConfig([UpdateOrgIDPAuthConnectorConfigRequest](#updateorgidpauthconnectorconfigrequest))
+[UpdateOrgIDPAuthConnectorConfigResponse](#updateorgidpauthconnectorconfigresponse)
+
+Change auth connector identity provider configuration of the organisation
 
 
 
@@ -2428,6 +2448,32 @@ This is an empty request
 | client_secret |  string | - |  |
 | none_compliant |  bool | - |  |
 | compliance_problems | repeated zitadel.v1.LocalizedMessage | - |  |
+
+
+
+
+### AddOrgAuthConnectorIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| base_url |  string | - |  |
+| backend_connector_id |  string | - |  |
+
+
+
+
+### AddOrgAuthConnectorIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
 
 
 
@@ -6170,6 +6216,30 @@ This is an empty request
 
 
 ### UpdateOIDCAppConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOrgIDPAuthConnectorConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| base_url |  string | - |  |
+| backend_connector_id |  string | - |  |
+
+
+
+
+### UpdateOrgIDPAuthConnectorConfigResponse
 
 
 

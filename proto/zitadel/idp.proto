@@ -37,6 +37,7 @@ message IDP {
     ];
     oneof config {
         OIDCConfig oidc_config = 7;
+        AuthConnectorConfig authenticator_config = 8;
     }
 }
 
@@ -113,6 +114,7 @@ enum IDPStylingType {
 enum IDPType {
     IDP_TYPE_UNSPECIFIED = 0;
     IDP_TYPE_OIDC = 1;
+    IPD_TYPE_AUTHENTICATOR = 2;
     //PLANNED: IDP_TYPE_SAML
 }
 
@@ -159,6 +161,21 @@ enum OIDCMappingField {
     OIDC_MAPPING_FIELD_UNSPECIFIED = 0;
     OIDC_MAPPING_FIELD_PREFERRED_USERNAME = 1;
     OIDC_MAPPING_FIELD_EMAIL = 2;
+}
+
+message AuthConnectorConfig {
+    string base_url = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://auth.acme.com\"";
+            description: "the base url where the auth connector is deployed";
+        }
+    ];
+    string backend_connector_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"backend-1\"";
+            description: "the id of the backend the connector uses to request the user info";
+        }
+    ];
 }
 
 message IDPIDQuery {

@@ -39,7 +39,7 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.NoChanges")
 	}
 
 	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)

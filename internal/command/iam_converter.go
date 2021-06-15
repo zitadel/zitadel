@@ -120,8 +120,8 @@ func writeModelToPasswordLockoutPolicy(wm *PasswordLockoutPolicyWriteModel) *dom
 	}
 }
 
-func writeModelToIDPConfig(wm *IDPConfigWriteModel) *domain.IDPConfig {
-	return &domain.IDPConfig{
+func writeModelToIDPConfig(wm *IDPConfigWriteModel) domain.IDPConfig {
+	return &domain.CommonIDPConfig{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		IDPConfigID: wm.ConfigID,
 		Name:        wm.Name,

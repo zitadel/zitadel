@@ -1,19 +1,55 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"time"
 )
 
-type IDPConfig struct {
+type IDPConfig interface {
+	ObjectDetails() es_models.ObjectRoot
+	ID() string
+	IDPConfigType() IDPConfigType
+	IDPConfigName() string
+	IDPConfigStylingType() IDPConfigStylingType
+	IDPConfigState() IDPConfigState
+	//Details() *ObjectDetails
+}
+
+type CommonIDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID string
-	Type        IDPConfigType
-	Name        string
-	StylingType IDPConfigStylingType
-	State       IDPConfigState
-	OIDCConfig  *OIDCIDPConfig
+	IDPConfigID     string
+	Type            IDPConfigType
+	Name            string
+	StylingType     IDPConfigStylingType
+	State           IDPConfigState
+	IDPProviderType IdentityProviderType
+	//OIDCConfig  *OIDCIDPConfig
+}
+
+func (c *CommonIDPConfig) ObjectDetails() es_models.ObjectRoot {
+	return c.ObjectRoot
+}
+
+func (c *CommonIDPConfig) ID() string {
+	return c.IDPConfigID
+}
+
+func (c *CommonIDPConfig) IDPConfigType() IDPConfigType {
+	return c.Type
+}
+
+func (c *CommonIDPConfig) IDPConfigName() string {
+	return c.Name
+}
+
+func (c *CommonIDPConfig) IDPConfigStylingType() IDPConfigStylingType {
+	return c.StylingType
+}
+
+func (c *CommonIDPConfig) IDPConfigState() IDPConfigState {
+	return c.State
 }
 
 type IDPConfigView struct {
@@ -38,6 +74,7 @@ type IDPConfigView struct {
 
 type OIDCIDPConfig struct {
 	es_models.ObjectRoot
+	CommonIDPConfig
 	IDPConfigID           string
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
@@ -48,11 +85,43 @@ type OIDCIDPConfig struct {
 	UsernameMapping       OIDCMappingField
 }
 
+func (c *OIDCIDPConfig) ID() string {
+	return c.AggregateID
+}
+
+func (c *OIDCIDPConfig) Details() *ObjectDetails {
+	return &ObjectDetails{
+		Sequence:      c.Sequence,
+		EventDate:     c.ChangeDate,
+		ResourceOwner: c.ResourceOwner,
+	}
+}
+
+type AuthConnectorIDPConfig struct {
+	es_models.ObjectRoot
+	CommonIDPConfig
+	BaseURL            string
+	BackendConnectorID string
+}
+
+func (c *AuthConnectorIDPConfig) ID() string {
+	return c.AggregateID
+}
+
+func (c *AuthConnectorIDPConfig) Details() *ObjectDetails {
+	return &ObjectDetails{
+		Sequence:      c.Sequence,
+		EventDate:     c.ChangeDate,
+		ResourceOwner: c.ResourceOwner,
+	}
+}
+
 type IDPConfigType int32
 
 const (
 	IDPConfigTypeOIDC IDPConfigType = iota
 	IDPConfigTypeSAML
+	IDPConfigTypeAuthConnector
 
 	//count is for validation
 	idpConfigTypeCount

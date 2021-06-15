@@ -13,7 +13,7 @@ func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetIDPByIDResponse{Idp: idp_grpc.IDPViewToPb(idp)}, nil
+	return &admin_pb.GetIDPByIDResponse{Idp: idp_grpc.IDPConfigToPb(idp)}, nil
 }
 
 func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
@@ -28,31 +28,35 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 }
 
 func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest) (*admin_pb.AddOIDCIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
+	id, details, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddOIDCIDPResponse{
-		IdpId: config.AggregateID,
-		Details: object_pb.AddToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		IdpId:   id,
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddAuthConnectorIDP(ctx context.Context, req *admin_pb.AddAuthConnectorIDPRequest) (*admin_pb.AddAuthConnectorIDPResponse, error) {
+	id, details, err := s.command.AddDefaultIDPConfig(ctx, addAuthConnectorIDPRequestToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddAuthConnectorIDPResponse{
+		//IdpId: config.ID(),
+		IdpId:   id,
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) (*admin_pb.UpdateIDPResponse, error) {
-	config, err := s.command.ChangeDefaultIDPConfig(ctx, updateIDPToDomain(req))
+	details, err := s.command.ChangeDefaultIDPConfig(ctx, updateIDPToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateIDPResponse{
-		Details: object_pb.ChangeToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -99,5 +103,15 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
+	}, nil
+}
+
+func (s *Server) UpdateIDPAuthConnectorConfig(ctx context.Context, req *admin_pb.UpdateIDPAuthConnectorConfigRequest) (*admin_pb.UpdateIDPAuthConnectorConfigResponse, error) {
+	details, err := s.command.ChangeDefaultIDPAuthConnectorConfig(ctx, updateAuthConnectorConfigToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateIDPAuthConnectorConfigResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }

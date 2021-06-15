@@ -390,6 +390,41 @@ service AdminService {
         };
     }
 
+    // Adds a new ZITADEL AuthConnector identity provider configuration the IAM
+    rpc AddAuthConnectorIDP(AddAuthConnectorIDPRequest) returns (AddAuthConnectorIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/auth_connector";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "identity provider";
+            tags: "auth connector";
+
+            responses: {
+                key: "200";
+                value: {
+                    description: "idp created";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Updates the specified idp
     // all fields are updated. If no value is provided the field will be empty afterwards.
     rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
@@ -561,6 +596,53 @@ service AdminService {
                 key: "200";
                 value: {
                     description: "oidc config updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+            responses: {
+                key: "409";
+                value: {
+                    description: "precondition failed";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+    //Updates the auth connector configuration of the specified idp
+    // all fields are updated. If no value is provided the field will be empty afterwards.
+    rpc UpdateIDPAuthConnectorConfig(UpdateIDPAuthConnectorConfigRequest) returns (UpdateIDPAuthConnectorConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/auth_connector_config";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "identity provider";
+            tags: "auth connector";
+
+            responses: {
+                key: "200";
+                value: {
+                    description: "auth connector config updated";
                 };
             };
             responses: {
@@ -2221,6 +2303,43 @@ message AddOIDCIDPResponse {
     string idp_id = 2;
 }
 
+message AddAuthConnectorIDPRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"AuthConnector\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
+    string base_url = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://auth.acme.com\"";
+            description: "the base url where the auth connector is deployed";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string backend_connector_id = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"backend-1\"";
+            description: "the id of the backend the connector uses to request the user info";
+        }
+    ];
+}
+
+message AddAuthConnectorIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
 message UpdateIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -2313,10 +2432,10 @@ message RemoveIDPResponse {
 
 message UpdateIDPOIDCConfigRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["idp_id", "issuer", "client_id"]
-		};
-	};
+        json_schema: {
+            required: ["idp_id", "issuer", "client_id"]
+        };
+    };
 
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -2371,6 +2490,35 @@ message UpdateIDPOIDCConfigRequest {
 }
 
 message UpdateIDPOIDCConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateIDPAuthConnectorConfigRequest {
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string base_url = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://auth.acme.com\"";
+            description: "the base url where the auth connector is deployed";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string backend_connector_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"backend-1\"";
+            description: "the id of the backend the connector uses to request the user info";
+        }
+    ];
+}
+
+message UpdateIDPAuthConnectorConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

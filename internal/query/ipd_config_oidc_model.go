@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/idpconfig"
 )
 
-type OIDCConfigReadModel struct {
+type IDPOIDCConfigReadModel struct {
 	eventstore.ReadModel
 
 	IDPConfigID           string
@@ -19,7 +19,7 @@ type OIDCConfigReadModel struct {
 	UserNameMapping       domain.OIDCMappingField
 }
 
-func (rm *OIDCConfigReadModel) Reduce() error {
+func (rm *IDPOIDCConfigReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
 		case *idpconfig.OIDCConfigAddedEvent:
@@ -32,7 +32,7 @@ func (rm *OIDCConfigReadModel) Reduce() error {
 	return rm.ReadModel.Reduce()
 }
 
-func (rm *OIDCConfigReadModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAddedEvent) {
+func (rm *IDPOIDCConfigReadModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAddedEvent) {
 	rm.IDPConfigID = e.IDPConfigID
 	rm.ClientID = e.ClientID
 	rm.ClientSecret = e.ClientSecret
@@ -42,7 +42,7 @@ func (rm *OIDCConfigReadModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAdd
 	rm.UserNameMapping = e.UserNameMapping
 }
 
-func (rm *OIDCConfigReadModel) reduceConfigChangedEvent(e *idpconfig.OIDCConfigChangedEvent) {
+func (rm *IDPOIDCConfigReadModel) reduceConfigChangedEvent(e *idpconfig.OIDCConfigChangedEvent) {
 	if e.ClientID != nil {
 		rm.ClientID = *e.ClientID
 	}

@@ -19,13 +19,22 @@ type IDPConfigView struct {
 	Sequence        uint64
 	IDPProviderType IDPProviderType
 
-	IsOIDC                    bool
+	*IDPConfigOIDCView
+	*IDPConfigAuthConnectorView
+}
+
+type IDPConfigOIDCView struct {
 	OIDCClientID              string
 	OIDCClientSecret          *crypto.CryptoValue
 	OIDCIssuer                string
 	OIDCScopes                []string
 	OIDCIDPDisplayNameMapping OIDCMappingField
 	OIDCUsernameMapping       OIDCMappingField
+}
+
+type IDPConfigAuthConnectorView struct {
+	AuthConnectorBaseURL            string
+	AuthConnectorBackendConnectorID string
 }
 
 type IDPConfigSearchRequest struct {

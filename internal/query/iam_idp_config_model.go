@@ -36,6 +36,10 @@ func (rm *IAMIDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) 
 			rm.IDPConfigReadModel.AppendEvents(&e.OIDCConfigAddedEvent)
 		case *iam.IDPOIDCConfigChangedEvent:
 			rm.IDPConfigReadModel.AppendEvents(&e.OIDCConfigChangedEvent)
+		case *iam.IDPAuthConnectorConfigAddedEvent:
+			rm.IDPConfigReadModel.AppendEvents(&e.AuthConnectorConfigAddedEvent)
+		case *iam.IDPAuthConnectorConfigChangedEvent:
+			rm.IDPConfigReadModel.AppendEvents(&e.AuthConnectorConfigChangedEvent)
 		}
 	}
 }
