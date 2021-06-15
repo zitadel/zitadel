@@ -275,6 +275,6 @@ If you have any questions about our data processing, please email us or contact 
 
 ## Entry into force
 
-This privacy policy is valid from 11.06.2021
+This privacy policy is valid from 16.06.2021
 
-St. Gallen, 11.06.2021
+St. Gallen, 16.06.2021
