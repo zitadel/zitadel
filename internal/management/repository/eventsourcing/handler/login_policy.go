@@ -132,7 +132,7 @@ func (m *LoginPolicy) processLoginPolicy(event *es_models.Event) (err error) {
 }
 
 func (m *LoginPolicy) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
+	logging.LogWithFields("SPOOL-92n8F", "id", event.AggregateID).WithError(err).Warn("something went wrong in login policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLoginPolicyFailedEvent, m.view.ProcessedLoginPolicyFailedEvent, m.view.ProcessedLoginPolicySequence, m.errorCountUntilSkip)
 }
 

@@ -458,11 +458,11 @@ func (wm *CustomLoginTextReadModel) handleInitializeUserScreenSetEvent(e *policy
 		wm.InitializeCodeLabel = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeUserNewPassword {
+	if e.Key == domain.LoginKeyInitializeUserNewPasswordLabel {
 		wm.InitializeNewPassword = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeUserNewPasswordConfirm {
+	if e.Key == domain.LoginKeyInitializeUserNewPasswordConfirmLabel {
 		wm.InitializeNewPasswordConfirm = e.Text
 		return
 	}
@@ -489,11 +489,11 @@ func (wm *CustomLoginTextReadModel) handleInitializeUserScreenRemoveEvent(e *pol
 		wm.InitializeCodeLabel = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeUserNewPassword {
+	if e.Key == domain.LoginKeyInitializeUserNewPasswordLabel {
 		wm.InitializeNewPassword = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeUserNewPasswordConfirm {
+	if e.Key == domain.LoginKeyInitializeUserNewPasswordConfirmLabel {
 		wm.InitializeNewPasswordConfirm = ""
 		return
 	}

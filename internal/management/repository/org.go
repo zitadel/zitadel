@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -48,6 +49,9 @@ type OrgRepository interface {
 	GetMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
 	GetDefaultMessageText(ctx context.Context, textType string, language string) (*iam_model.MessageTextView, error)
 	GetMessageText(ctx context.Context, orgID, textType, language string) (*iam_model.MessageTextView, error)
+
+	GetDefaultLoginTexts(ctx context.Context, template, lang string) (*domain.CustomLoginText, error)
+	GetLoginTexts(ctx context.Context, orgID, template, lang string) (*domain.CustomLoginText, error)
 
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)

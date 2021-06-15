@@ -596,6 +596,30 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 	return iam_es_model.MessageTextViewToModel(text), err
 }
 
+func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, template, lang string) (*domain.CustomLoginText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, template, lang)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
+}
+
+func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, template, lang string) (*domain.CustomLoginText, error) {
+	//defaultIn := false
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, template, lang)
+	if errors.IsNotFound(err) || len(texts) == 0 {
+		texts, err = repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, template, lang)
+		if err != nil {
+			return nil, err
+		}
+		//defaultIn = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
+}
+
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
 	query := org_view.ChangesQuery(orgID, lastSequence, limit, sortAscending, auditLogRetention)
 

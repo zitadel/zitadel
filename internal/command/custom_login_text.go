@@ -117,11 +117,11 @@ func (c *Commands) getInitUserEvents(ctx context.Context, agg *eventstore.Aggreg
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeUserNewPassword, existingText.InitializeNewPassword, text.InitializeUserScreenText.NewPasswordLabel, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeUserNewPasswordLabel, existingText.InitializeNewPassword, text.InitializeUserScreenText.NewPasswordLabel, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeUserNewPasswordConfirm, existingText.InitializeNewPasswordConfirm, text.InitializeUserScreenText.NewPasswordConfirmLabel, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, existingText.InitializeNewPasswordConfirm, text.InitializeUserScreenText.NewPasswordConfirmLabel, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

@@ -25,11 +25,11 @@ func (c *Commands) SetupStep17(ctx context.Context, step *Step17) error {
 		events := make([]eventstore.EventPusher, 0)
 
 		for _, text := range step.DefaultLoginTexts {
-			mailEvents, _, err := c.setDefaultLoginText(ctx, iamAgg, &text)
+			loginTextEvents, _, err := c.setDefaultLoginText(ctx, iamAgg, &text)
 			if err != nil {
 				return nil, err
 			}
-			events = append(events, mailEvents...)
+			events = append(events, loginTextEvents...)
 		}
 
 		logging.Log("SETUP-m9Wrf").Info("default login text set up")

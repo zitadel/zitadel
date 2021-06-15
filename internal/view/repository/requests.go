@@ -75,7 +75,7 @@ func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	return func(db *gorm.DB, object interface{}) error {
 		err := db.Table(table).Save(object).Error
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-AfC7G", "unable to put object to view")
+			return caos_errs.ThrowInternal(err, "VIEW-2m9fs", "unable to put object to view")
 		}
 		return nil
 	}
