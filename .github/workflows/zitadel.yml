@@ -16,7 +16,7 @@ env:
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
   CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts'
-  FULL_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+  FULL_REPO: ${{ github.event.push.repository.full_name }}
 
 jobs:
   refs:
