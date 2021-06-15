@@ -25,6 +25,206 @@ func ModelCustomMsgTextToPb(msg *model.MessageTextView) *text_pb.MessageCustomTe
 	}
 }
 
+func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText {
+	return &text_pb.LoginCustomText{
+		Details: object.ToViewDetailsPb(
+			text.Sequence,
+			text.CreationDate,
+			text.ChangeDate,
+			text.AggregateID,
+		),
+		SelectAccountText:      SelectAccountScreenToPb(text.SelectAccountScreenText),
+		LoginText:              LoginScreenTextToPb(text.LoginScreenText),
+		PasswordText:           PasswordScreenTextToPb(text.PasswordScreenText),
+		ResetPasswordText:      ResetPasswordScreenTextToPb(text.ResetPasswordScreenText),
+		InitializeUserText:     InitializeUserScreenTextToPb(text.InitializeUserScreenText),
+		InitializeDoneText:     InitializeDoneScreenTextToPb(text.InitializeDoneScreenText),
+		InitMfaPromptText:      InitMFAPromptScreenTextToPb(text.InitMFAPromptScreenText),
+		InitMfaOtpText:         InitMFAOTPScreenTextToPb(text.InitMFAOTPScreenText),
+		InitMfaU2FText:         InitMFAU2FScreenTextToPb(text.InitMFAU2FScreenText),
+		InitMfaDoneText:        InitMFADoneScreenTextToPb(text.InitMFADoneScreenText),
+		VerifyMfaOtpText:       VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTPScreenText),
+		VerifyMfaU2FText:       VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2FScreenText),
+		RegistrationOptionText: RegistrationOptionScreenTextToPb(text.RegistrationOptionScreenText),
+		RegistrationUserText:   RegistrationUserScreenTextToPb(text.RegistrationUserScreenText),
+		RegistrationOrgText:    RegistrationOrgScreenTextToPb(text.RegistrationOrgScreenText),
+		PasswordlessText:       PasswordlessScreenTextToPb(text.PasswordlessScreenText),
+		SuccessLoginText:       SuccessLoginScreenTextToPb(text.SuccessLoginScreenText),
+	}
+}
+
+func SelectAccountScreenToPb(text domain.SelectAccountScreenText) *text_pb.SelectAccountScreenText {
+	return &text_pb.SelectAccountScreenText{
+		Title:       text.Title,
+		Description: text.Description,
+		OtherUser:   text.OtherUser,
+	}
+}
+
+func LoginScreenTextToPb(text domain.LoginScreenText) *text_pb.LoginScreenText {
+	return &text_pb.LoginScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		NameLabel:               text.LoginNameLabel,
+		RegisterButtonText:      text.RegisterButtonText,
+		NextButtonText:          text.NextButtonText,
+		ExternalUserDescription: text.ExternalUserDescription,
+	}
+}
+
+func PasswordScreenTextToPb(text domain.PasswordScreenText) *text_pb.PasswordScreenText {
+	return &text_pb.PasswordScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		PasswordLabel:  text.PasswordLabel,
+		ResetLinkText:  text.ResetLinkText,
+		BackButtonText: text.BackButtonText,
+		NextButtonText: text.NextButtonText,
+	}
+}
+
+func ResetPasswordScreenTextToPb(text domain.ResetPasswordScreenText) *text_pb.ResetPasswordScreenText {
+	return &text_pb.ResetPasswordScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		NextButtonText: text.NextButtonText,
+	}
+}
+
+func InitializeUserScreenTextToPb(text domain.InitializeUserScreenText) *text_pb.InitializeUserScreenText {
+	return &text_pb.InitializeUserScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		CodeLabel:               text.CodeLabel,
+		NewPasswordLabel:        text.NewPasswordLabel,
+		NewPasswordConfirmLabel: text.NewPasswordConfirmLabel,
+		ResendButtonText:        text.ResendButtonText,
+		NextButtonText:          text.NextButtonText,
+	}
+}
+
+func InitializeDoneScreenTextToPb(text domain.InitializeDoneScreenText) *text_pb.InitializeDoneScreenText {
+	return &text_pb.InitializeDoneScreenText{
+		Title:           text.Title,
+		Description:     text.Description,
+		AbortButtonText: text.AbortButtonText,
+		NextButtonText:  text.NextButtonText,
+	}
+}
+
+func InitMFAPromptScreenTextToPb(text domain.InitMFAPromptScreenText) *text_pb.InitMFAPromptScreenText {
+	return &text_pb.InitMFAPromptScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		OtpOption:      text.OTPOption,
+		U2FOption:      text.U2FOption,
+		SkipButtonText: text.SkipButtonText,
+		NextButtonText: text.NextButtonText,
+	}
+}
+
+func InitMFAOTPScreenTextToPb(text domain.InitMFAOTPScreenText) *text_pb.InitMFAOTPScreenText {
+	return &text_pb.InitMFAOTPScreenText{
+		Title:       text.Title,
+		Description: text.Description,
+		SecretLabel: text.SecretLabel,
+		CodeLabel:   text.CodeLabel,
+	}
+}
+
+func InitMFAU2FScreenTextToPb(text domain.InitMFAU2FScreenText) *text_pb.InitMFAU2FScreenText {
+	return &text_pb.InitMFAU2FScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		TokenNameLabel:          text.TokenNameLabel,
+		RegisterTokenButtonText: text.RegisterTokenButtonText,
+	}
+}
+
+func InitMFADoneScreenTextToPb(text domain.InitMFADoneScreenText) *text_pb.InitMFADoneScreenText {
+	return &text_pb.InitMFADoneScreenText{
+		Title:           text.Title,
+		Description:     text.Description,
+		AbortButtonText: text.AbortButtonText,
+		NextButtonText:  text.NextButtonText,
+	}
+}
+
+func VerifyMFAOTPScreenTextToPb(text domain.VerifyMFAOTPScreenText) *text_pb.VerifyMFAOTPScreenText {
+	return &text_pb.VerifyMFAOTPScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		CodeLabel:      text.CodeLabel,
+		NextButtonText: text.NextButtonText,
+	}
+}
+
+func VerifyMFAU2FScreenTextToPb(text domain.VerifyMFAU2FScreenText) *text_pb.VerifyMFAU2FScreenText {
+	return &text_pb.VerifyMFAU2FScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		ValidateTokenText:      text.ValidateTokenText,
+		OtherOptionDescription: text.OtherOptionDescription,
+		OptionOtpButtonText:    text.OptionOTPButtonText,
+	}
+}
+
+func RegistrationOptionScreenTextToPb(text domain.RegistrationOptionScreenText) *text_pb.RegistrationOptionScreenText {
+	return &text_pb.RegistrationOptionScreenText{
+		Title:                    text.Title,
+		Description:              text.Description,
+		UserNameButtonText:       text.UserNameButtonText,
+		ExternalLoginDescription: text.ExternalLoginDescription,
+	}
+}
+
+func RegistrationUserScreenTextToPb(text domain.RegistrationUserScreenText) *text_pb.RegistrationUserScreenText {
+	return &text_pb.RegistrationUserScreenText{
+		Title:                text.Title,
+		Description:          text.Description,
+		FirstnameLabel:       text.FirstnameLabel,
+		LastnameLabel:        text.LastnameLabel,
+		EmailLabel:           text.EmailLabel,
+		LanguageLabel:        text.LanguageLabel,
+		GenderLabel:          text.GenderLabel,
+		PasswordLabel:        text.PasswordLabel,
+		PasswordConfirmLabel: text.PasswordConfirmLabel,
+		SaveButtonText:       text.SaveButtonText,
+	}
+}
+
+func RegistrationOrgScreenTextToPb(text domain.RegistrationOrgScreenText) *text_pb.RegistrationOrgScreenText {
+	return &text_pb.RegistrationOrgScreenText{
+		Title:                text.Title,
+		Description:          text.Description,
+		OrgnameLabel:         text.OrgNameLabel,
+		FirstnameLabel:       text.FirstnameLabel,
+		LastnameLabel:        text.LastnameLabel,
+		EmailLabel:           text.EmailLabel,
+		PasswordLabel:        text.PasswordLabel,
+		PasswordConfirmLabel: text.PasswordConfirmLabel,
+		SaveButtonText:       text.SaveButtonText,
+	}
+}
+
+func PasswordlessScreenTextToPb(text domain.PasswordlessScreenText) *text_pb.PasswordlessScreenText {
+	return &text_pb.PasswordlessScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		LoginWithPwButtonText:   text.LoginWithPwButtonText,
+		ValidateTokenButtonText: text.ValidateTokenButtonText,
+	}
+}
+
+func SuccessLoginScreenTextToPb(text domain.SuccessLoginScreenText) *text_pb.SuccessLoginScreenText {
+	return &text_pb.SuccessLoginScreenText{
+		Title:                   text.Title,
+		AutoRedirectDescription: text.AutoRedirectDescription,
+		RedirectedDescription:   text.RedirectedDescription,
+		NextButtonText:          text.NextButtonText,
+	}
+}
+
 func SelectAccountScreenTextPbToDomain(text *text_pb.SelectAccountScreenText) domain.SelectAccountScreenText {
 	if text == nil {
 		return domain.SelectAccountScreenText{}

@@ -253,11 +253,23 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 }
 
 func (s *Server) GetCustomLoginTexts(ctx context.Context, req *mgmt_pb.GetCustomLoginTextsRequest) (*mgmt_pb.GetCustomLoginTextsResponse, error) {
-	return nil, nil
+	msg, err := s.org.GetLoginTexts(ctx, authz.GetCtxData(ctx).OrgID, domain.LoginCustomText, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetCustomLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
 }
 
 func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *mgmt_pb.GetDefaultLoginTextsRequest) (*mgmt_pb.GetDefaultLoginTextsResponse, error) {
-	return nil, nil
+	msg, err := s.org.GetDefaultLoginTexts(ctx, domain.LoginCustomText, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDefaultLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
 }
 
 func (s *Server) SetCustomLoginText(ctx context.Context, req *mgmt_pb.SetCustomLoginTextsRequest) (*mgmt_pb.SetCustomLoginTextsResponse, error) {
