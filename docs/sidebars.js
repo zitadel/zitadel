@@ -10,7 +10,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Administrator',
-      items: ['manuals/admin-managers'],
+      items: ['manuals/admin-managers', 'manuals/admin-policies'],
       collapsed: false,
     },
   ],
