@@ -16,7 +16,6 @@ env:
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
   CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts'
-  FULL_REPO: ${{ github.event.push.repository.full_name }}
 
 jobs:
   refs:
@@ -40,6 +39,8 @@ jobs:
       - name: Set outputs
         id: refs
         run: |
+          echo ${{ github.event.push }}
+
           export BRANCH=${GITHUB_REF#refs/*/}
           echo "branch: ${BRANCH}"
 
