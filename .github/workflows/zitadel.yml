@@ -39,7 +39,7 @@ jobs:
       - name: Set outputs
         id: refs
         run: |
-          echo "${{ toJson(github.event.pull_request) }}"
+          echo "${{ github.event.pull_request.head.repo.full_name }} ${{ toJson(github.event.push) }}"
 
           export BRANCH=${GITHUB_REF#refs/*/}
           echo "branch: ${BRANCH}"
