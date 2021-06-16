@@ -90,7 +90,7 @@ Delegate the right to assign roles to another organization
 
 ## How To Contribute
 
-Details need to be announced, but feel free to contribute already. As long as you are okay with accepting to contribute under this projects OSS [License](./LICENSE) you are fine.
+Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
 
 ## Security
 
