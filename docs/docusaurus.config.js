@@ -105,11 +105,11 @@ module.exports = {
             },
             {
               label: 'Terms and Conditions',
-              href: 'https://zitadel.ch/pdf/tos.pdf',
+              href: 'https://docs.zitadel.ch/docs/legal/terms-of-service',
             },
             {
               label: 'Privacy Policy',
-              href: 'https://zitadel.ch/pdf/privacy.pdf',
+              href: 'https://docs.zitadel.ch/docs/legal/privacy-policy',
             },
           ],
         },
