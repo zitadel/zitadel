@@ -251,7 +251,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		{
 			"prompt none and checkLoggedIn false, callback step",
 			fields{},
-			args{&domain.AuthRequest{Prompt: domain.PromptNone}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptNone}}, false},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -278,7 +278,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewErrUserSession{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -301,7 +301,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
 				&domain.LoginStep{},
 				&domain.SelectUserStep{
@@ -341,7 +341,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount, RequestedOrgID: "orgID1"}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}, RequestedOrgID: "orgID1"}, false},
 			[]domain.NextStep{
 				&domain.LoginStep{},
 				&domain.SelectUserStep{
@@ -370,7 +370,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
 				&domain.LoginStep{},
 				&domain.SelectUserStep{
@@ -848,7 +848,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  domain.PromptNone,
+				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
@@ -880,7 +880,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  domain.PromptNone,
+				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
@@ -912,7 +912,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  domain.PromptNone,
+				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
