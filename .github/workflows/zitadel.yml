@@ -268,7 +268,6 @@ jobs:
       - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
-        if: github.event.pull_request.head.repo.full_name == github.repository
         with:
           dry_run: false
           semantic_version: 17.0.4
