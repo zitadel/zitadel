@@ -523,7 +523,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
 	steps := make([]domain.NextStep, 0)
-	if !checkLoggedIn && request.Prompt == domain.PromptNone {
+	if !checkLoggedIn && domain.IsPrompt(request.Prompt, domain.PromptNone) {
 		return append(steps, &domain.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
@@ -532,15 +532,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			return steps, nil
 		}
 		steps = append(steps, new(domain.LoginStep))
-		if request.Prompt == domain.PromptCreate {
+		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
 		}
-		if request.Prompt == domain.PromptSelectAccount || request.Prompt == domain.PromptUnspecified {
+		if len(request.Prompt) == 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
 			}
-			if len(users) > 0 || request.Prompt == domain.PromptSelectAccount {
+			if len(users) > 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
 		}
@@ -557,7 +557,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
-	if !isInternalLogin && len(request.LinkingUsers) == 0 && !checkVerificationTime(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime) {
+	if !isInternalLogin && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime, request) {
 		selectedIDPConfigID := request.SelectedIDPConfigID
 		if selectedIDPConfigID == "" {
 			selectedIDPConfigID = userSession.SelectedIDPConfigID
@@ -638,7 +638,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 
 	var step domain.NextStep
 	if request.LoginPolicy.PasswordlessType != domain.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
-		if checkVerificationTime(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime) {
+		if checkVerificationTimeMaxAge(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime, request) {
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
@@ -649,7 +649,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 		return &domain.InitPasswordStep{}
 	}
 
-	if checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
+	if checkVerificationTimeMaxAge(userSession.PasswordVerification, repo.PasswordCheckLifeTime, request) {
 		request.PasswordVerified = true
 		request.AuthTime = userSession.PasswordVerification
 		return nil
@@ -686,14 +686,14 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 		fallthrough
 	case domain.MFALevelSecondFactor:
-		if checkVerificationTime(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime) {
+		if checkVerificationTimeMaxAge(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime, request) {
 			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.SecondFactorVerificationType))
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
 	case domain.MFALevelMultiFactor:
-		if checkVerificationTime(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime) {
+		if checkVerificationTimeMaxAge(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime, request) {
 			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.MultiFactorVerificationType))
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
@@ -763,6 +763,16 @@ func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID s
 		return nil, err
 	}
 	return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
+}
+
+func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {
+	if !checkVerificationTime(verificationTime, lifetime) {
+		return false
+	}
+	if request.MaxAuthAge == nil {
+		return true
+	}
+	return verificationTime.After(request.CreationDate.Add(-*request.MaxAuthAge))
 }
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {
