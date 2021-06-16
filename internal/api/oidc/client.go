@@ -80,7 +80,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	}, nil
 }
 
-func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes oidc.Scopes) (oidc.Scopes, error) {
+func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
 	user, err := o.repo.UserByID(ctx, subject)
 	if err != nil {
 		return nil, err
