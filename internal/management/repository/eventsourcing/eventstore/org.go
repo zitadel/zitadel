@@ -596,19 +596,19 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 	return iam_es_model.MessageTextViewToModel(text), err
 }
 
-func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, template, lang string) (*domain.CustomLoginText, error) {
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, template, lang)
+func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
 	if err != nil {
 		return nil, err
 	}
 	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
-func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, template, lang string) (*domain.CustomLoginText, error) {
+func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error) {
 	//defaultIn := false
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, template, lang)
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, domain.LoginCustomText, lang)
 	if errors.IsNotFound(err) || len(texts) == 0 {
-		texts, err = repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, template, lang)
+		texts, err = repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
 		if err != nil {
 			return nil, err
 		}

@@ -366,6 +366,14 @@ func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, 
 	return iam_es_model.MessageTextViewToModel(text), err
 }
 
+func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
+}
+
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
 	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
 	if err != nil {

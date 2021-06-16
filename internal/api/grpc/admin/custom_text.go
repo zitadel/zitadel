@@ -130,7 +130,13 @@ func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 }
 
 func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *admin_pb.GetDefaultLoginTextsRequest) (*admin_pb.GetDefaultLoginTextsResponse, error) {
-	return nil, nil
+	msg, err := s.iam.GetDefaultLoginTexts(ctx, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetDefaultLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
 }
 
 func (s *Server) SetDefaultLoginText(ctx context.Context, req *admin_pb.SetDefaultLoginTextsRequest) (*admin_pb.SetDefaultLoginTextsResponse, error) {
