@@ -76,7 +76,7 @@ Errors:
     Password:
       NotFound: Passoword not found
       Empty: Password is empty
-      Invalid: Passwort is invalid
+      Invalid: Password is invalid
       NotSet: User has not set a password
     PasswordComplexityPolicy:
       NotFound: Password policy not found
@@ -174,9 +174,9 @@ Errors:
       AlreadyExists: Password Complexity Policy already exists
     PasswordLockout:
       NotFound: Password Lockout Policy not found
-      Empty: Passwort Lockout Policy is empty
-      NotExisting: Passwort Lockout Policy doesn't exist
-      AlreadyExists: Passwort Lockout Policy already exists
+      Empty: Password Lockout Policy is empty
+      NotExisting: Password Lockout Policy doesn't exist
+      AlreadyExists: Password Lockout Policy already exists
     PasswordAge:
       NotFound: Password Age Policy not found
       Empty: Password Age Policy is empty

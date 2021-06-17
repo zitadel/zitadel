@@ -1231,7 +1231,7 @@
       },
       "BASIC": {
         "TITLE": "Basic",
-        "DESCRIPTION": "Authentication with Username and Passwort"
+        "DESCRIPTION": "Authentication with Username and Password"
       },
       "IMPLICIT": {
         "TITLE": "Implicit",
