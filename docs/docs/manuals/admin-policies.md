@@ -43,7 +43,7 @@ In the multifactors section you can configure what kind of multifactors should b
 Multifactors: 
 - U2F (Universal Second Factor) with PIN
 
-Secondfacrots: 
+Secondfactors: 
 - OTP (One Time Password)
 - U2F (Universal Second Factor)
 
