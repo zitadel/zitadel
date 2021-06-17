@@ -72,6 +72,8 @@
                         | translate}}<i class="las la-link"></i></a>
                     <a class="short-link" [routerLink]="[ '/iam', 'policy','login']">{{'HOME.IAM_POLICY_LOGIN' |
                         translate}}<i class="las la-link"></i></a>
+                    <a class="short-link" [routerLink]="[ '/iam', 'policy','privatelabel']">{{'HOME.IAM_POLICY_LABEL' |
+                      translate}}<i class="las la-link"></i></a>
                 </ng-template>
 
                 <span class="fill-space"></span>
@@ -134,13 +136,8 @@
                             translate}}<i class="las la-link"></i></a>
                         <a class="short-link" [routerLink]="[ '/org', 'policy','login']">{{'HOME.ORG_POLICY_LOGIN' |
                             translate}}<i class="las la-link"></i></a>
-                    </ng-template>
-                    <ng-template appHasRole [appHasRole]="['policy.read']">
-                        <a class="short-link"
-                            [routerLink]="[ '/org', 'policy','privatelabel']">{{'HOME.ORG_POLICY_LABEL' |
-                            translate}}<i class="las la-link"></i></a>
-                        <a class="short-link" [routerLink]="[ '/org', 'policy','privatelabel']">{{'HOME.ORG_POLICY_LABEL' |
-                            translate}}<i class="las la-link"></i></a>
+                      <a class="short-link" [routerLink]="[ '/org', 'policy','privatelabel']">{{'HOME.ORG_POLICY_LABEL' |
+                        translate}}<i class="las la-link"></i></a>
                     </ng-template>
                 </div>
                 <span class="fill-space"></span>
