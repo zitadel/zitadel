@@ -63,12 +63,15 @@ func SelectAccountScreenToPb(text domain.SelectAccountScreenText) *text_pb.Selec
 
 func LoginScreenTextToPb(text domain.LoginScreenText) *text_pb.LoginScreenText {
 	return &text_pb.LoginScreenText{
-		Title:                   text.Title,
-		Description:             text.Description,
-		NameLabel:               text.LoginNameLabel,
-		RegisterButtonText:      text.RegisterButtonText,
-		NextButtonText:          text.NextButtonText,
-		ExternalUserDescription: text.ExternalUserDescription,
+		Title:                     text.Title,
+		Description:               text.Description,
+		TitleLinkingProcess:       text.TitleLinkingProcess,
+		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
+		LoginNameLabel:            text.LoginNameLabel,
+		RegisterButtonText:        text.RegisterButtonText,
+		NextButtonText:            text.NextButtonText,
+		ExternalUserDescription:   text.ExternalUserDescription,
+		UserMustBeMemberOfOrg:     text.UserMustBeOrgMemberOfOrg,
 	}
 }
 
@@ -241,12 +244,15 @@ func LoginScreenTextPbToDomain(text *text_pb.LoginScreenText) domain.LoginScreen
 		return domain.LoginScreenText{}
 	}
 	return domain.LoginScreenText{
-		Title:                   text.Title,
-		Description:             text.Description,
-		LoginNameLabel:          text.NameLabel,
-		RegisterButtonText:      text.RegisterButtonText,
-		NextButtonText:          text.NextButtonText,
-		ExternalUserDescription: text.ExternalUserDescription,
+		Title:                     text.Title,
+		Description:               text.Description,
+		TitleLinkingProcess:       text.TitleLinkingProcess,
+		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
+		LoginNameLabel:            text.LoginNameLabel,
+		RegisterButtonText:        text.RegisterButtonText,
+		NextButtonText:            text.NextButtonText,
+		ExternalUserDescription:   text.ExternalUserDescription,
+		UserMustBeOrgMemberOfOrg:  text.UserMustBeMemberOfOrg,
 	}
 }
 

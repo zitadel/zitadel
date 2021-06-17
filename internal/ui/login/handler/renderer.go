@@ -300,6 +300,7 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
+	l.renderer.CopyDefaultBundle()
 	baseData := baseData{
 		errorData: errorData{
 			ErrType:    errType,
@@ -322,9 +323,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
-
 		l.addLoginTranslations(authReq.DefaultTranslations)
-		l.addLoginTranslations(authReq.DefaultTranslations)
+		l.addLoginTranslations(authReq.OrgTranslations)
 	} else {
 		//TODO: How to handle LabelPolicy if no auth req (eg Register)
 	}
@@ -413,8 +413,13 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 func (l *Login) addLoginTranslations(customTexts []*domain.CustomText) {
 	for _, text := range customTexts {
 		msg := &i18n2.Message{
-			ID:   text.Key,
-			Zero: text.Text,
+			ID: text.Key,
+			//Zero: text.Text,
+			//One: text.Text,
+			//Two: text.Text,
+			//Few: text.Text,
+			//Many: text.Text,
+			Other: text.Text,
 		}
 		l.renderer.AddMessages(text.Language, msg)
 	}

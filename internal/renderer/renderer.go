@@ -55,6 +55,11 @@ func (r *Renderer) AddLanguageFile(content []byte, filename string) {
 	r.translator.Bundle.ParseMessageFileBytes(content, filename)
 }
 
+func (r *Renderer) CopyDefaultBundle() {
+	defaultBundleCopy := *r.translator.DefaultBundle
+	r.translator.Bundle = &defaultBundleCopy
+}
+
 func (r *Renderer) AddMessages(tag language.Tag, messages ...*go_i18n.Message) {
 	r.translator.Bundle.AddMessages(tag, messages...)
 }

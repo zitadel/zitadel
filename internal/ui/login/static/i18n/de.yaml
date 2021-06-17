@@ -3,11 +3,13 @@ Login:
   Description: Mit ZITADEL-Konto anmelden.
   TitleLinking: Anmeldung für Benutzer Linking
   DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
-  Loginname: Loginname
+  LoginnameLabel: Loginname
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
-  ExternalLogin: Melde dich mit einem externen Benutzer an
+  ExternalUserDescription: Melde dich mit einem externen Benutzer an
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
+  RegisterButtonText: registrieren
+  NextButtonText: weiter
 
 UserSelection:
   Title: Account auswählen

@@ -8,6 +8,8 @@ Login:
   LoginnamePlaceHolder: username@domain
   ExternalLogin: Login with an external user.
   MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organisation.
+  RegisterButtonText: register
+  NextButtonText: next
 
 UserSelection:
   Title: Select account

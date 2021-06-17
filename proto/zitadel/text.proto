@@ -77,10 +77,13 @@ message SelectAccountScreenText {
 message LoginScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
-    string name_label = 3 [(validate.rules).string = {max_len: 200}];
-    string register_button_text = 4 [(validate.rules).string = {max_len: 100}];
-    string next_button_text = 5 [(validate.rules).string = {max_len: 100}];
-    string external_user_description = 6 [(validate.rules).string = {max_len: 500}];
+    string title_linking_process = 3 [(validate.rules).string = {max_len: 200}];
+    string description_linking_process = 4 [(validate.rules).string = {max_len: 500}];
+    string user_must_be_member_of_org = 5 [(validate.rules).string = {max_len: 500}];
+    string login_name_label = 6 [(validate.rules).string = {max_len: 200}];
+    string register_button_text = 7 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 8 [(validate.rules).string = {max_len: 100}];
+    string external_user_description = 9 [(validate.rules).string = {max_len: 500}];
 }
 
 message PasswordScreenText {

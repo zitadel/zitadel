@@ -24,6 +24,7 @@ const (
 )
 
 type Translator struct {
+	DefaultBundle *i18n.Bundle
 	Bundle        *i18n.Bundle
 	cookieName    string
 	cookieHandler *http_util.CookieHandler
@@ -37,7 +38,7 @@ type TranslatorConfig struct {
 func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.Bundle, err = newBundle(dir, config.DefaultLanguage)
+	t.DefaultBundle, err = newBundle(dir, config.DefaultLanguage)
 	if err != nil {
 		return nil, err
 	}

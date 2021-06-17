@@ -14,13 +14,16 @@ const (
 	LoginKeySelectAccountDescription = LoginKeySelectAccount + "Description"
 	LoginKeySelectAccountOtherUser   = LoginKeySelectAccount + "OtherUser"
 
-	LoginKeyLogin                        = "Login."
-	LoginKeyLoginTitle                   = LoginKeyLogin + "Title"
-	LoginKeyLoginDescription             = LoginKeyLogin + "Description"
-	LoginKeyLoginNameLabel               = LoginKeyLogin + "NameLabel"
-	LoginKeyLoginRegisterButtonText      = LoginKeyLogin + "RegisterButtonText"
-	LoginKeyLoginNextButtonText          = LoginKeyLogin + "NextButtonText"
-	LoginKeyLoginExternalUserDescription = LoginKeyLogin + "ExternalUserDescription"
+	LoginKeyLogin                          = "Login."
+	LoginKeyLoginTitle                     = LoginKeyLogin + "Title"
+	LoginKeyLoginDescription               = LoginKeyLogin + "Description"
+	LoginKeyLoginTitleLinkingProcess       = LoginKeyLogin + "TitleLinking"
+	LoginKeyLoginDescriptionLinkingProcess = LoginKeyLogin + "DescriptionLinking"
+	LoginKeyLoginNameLabel                 = LoginKeyLogin + "LoginNameLabel"
+	LoginKeyLoginRegisterButtonText        = LoginKeyLogin + "RegisterButtonText"
+	LoginKeyLoginNextButtonText            = LoginKeyLogin + "NextButtonText"
+	LoginKeyLoginExternalUserDescription   = LoginKeyLogin + "ExternalUserDescription"
+	LoginKeyUserMustBeMemberOfOrg          = LoginKeyLogin + "MustBeMemberOfOrg"
 
 	LoginKeyPassword               = "Password."
 	LoginKeyPasswordTitle          = LoginKeyPassword + "Title"
@@ -169,12 +172,15 @@ type SelectAccountScreenText struct {
 }
 
 type LoginScreenText struct {
-	Title                   string
-	Description             string
-	LoginNameLabel          string
-	RegisterButtonText      string
-	NextButtonText          string
-	ExternalUserDescription string
+	Title                     string
+	Description               string
+	TitleLinkingProcess       string
+	DescriptionLinkingProcess string
+	LoginNameLabel            string
+	RegisterButtonText        string
+	NextButtonText            string
+	ExternalUserDescription   string
+	UserMustBeOrgMemberOfOrg  string
 }
 
 type PasswordScreenText struct {
