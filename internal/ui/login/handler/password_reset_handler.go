@@ -25,10 +25,10 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "Password Reset Done", errType, errMessage)
+	data := l.getUserData(r, authReq, "Password Reset Done", errID, errMessage)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordResetDone], data, nil)
 }
