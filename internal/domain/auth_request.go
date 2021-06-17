@@ -18,11 +18,11 @@ type AuthRequest struct {
 	ApplicationID string
 	CallbackURI   string
 	TransferState string
-	Prompt        Prompt
+	Prompt        []Prompt
 	PossibleLOAs  []LevelOfAssurance
 	UiLocales     []string
 	LoginHint     string
-	MaxAuthAge    uint32
+	MaxAuthAge    *time.Duration
 	Request       Request
 
 	levelOfAssurance       LevelOfAssurance
@@ -72,7 +72,17 @@ const (
 	PromptLogin
 	PromptConsent
 	PromptSelectAccount
+	PromptCreate
 )
+
+func IsPrompt(prompt []Prompt, requestedPrompt Prompt) bool {
+	for _, p := range prompt {
+		if p == requestedPrompt {
+			return true
+		}
+	}
+	return false
+}
 
 type LevelOfAssurance int
 

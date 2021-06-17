@@ -113,6 +113,12 @@ message Profile {
             description: "the gender of the human";
         }
     ];
+    string avatar_url = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
 }
 
 message Email {
@@ -509,6 +515,12 @@ message Session {
         }
     ];
     zitadel.v1.ObjectDetails details = 9;
+    string avatar_url = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
 }
 
 enum SessionState {
@@ -639,6 +651,12 @@ message UserGrant {
     string project_grant_id = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
+        }
+    ];
+    string avatar_url = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
 }

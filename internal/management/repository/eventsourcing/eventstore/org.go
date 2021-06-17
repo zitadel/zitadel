@@ -31,11 +31,12 @@ import (
 )
 
 type OrgRepository struct {
-	SearchLimit    uint64
-	Eventstore     v1.Eventstore
-	View           *mgmt_view.View
-	Roles          []string
-	SystemDefaults systemdefaults.SystemDefaults
+	SearchLimit     uint64
+	Eventstore      v1.Eventstore
+	View            *mgmt_view.View
+	Roles           []string
+	SystemDefaults  systemdefaults.SystemDefaults
+	PrefixAvatarURL string
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -107,6 +108,7 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
@@ -121,7 +123,7 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 	if err != nil {
 		return nil, err
 	}
-	return model.OrgMemberToModel(member), nil
+	return model.OrgMemberToModel(member, repo.PrefixAvatarURL), nil
 }
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
@@ -140,7 +142,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      model.OrgMembersToModel(members),
+		Result:      model.OrgMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -653,18 +655,18 @@ func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return usr_es_model.UserToModel(user), nil
+		return usr_es_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_es_model.UserToModel(user), nil
+			return usr_es_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(usr_es_model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3n8Fs", "Errors.User.NotFound")
 	}
-	return usr_es_model.UserToModel(&userCopy), nil
+	return usr_es_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (r *OrgRepository) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {

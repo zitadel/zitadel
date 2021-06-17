@@ -24,12 +24,19 @@ const (
 	NextStepExternalLogin
 	NextStepGrantRequired
 	NextStepPasswordless
+	NextStepRegistration
 )
 
 type LoginStep struct{}
 
 func (s *LoginStep) Type() NextStepType {
 	return NextStepLogin
+}
+
+type RegistrationStep struct{}
+
+func (s *RegistrationStep) Type() NextStepType {
+	return NextStepRegistration
 }
 
 type SelectUserStep struct {
@@ -48,6 +55,7 @@ type UserSelection struct {
 	UserSessionState  UserSessionState
 	SelectionPossible bool
 	AvatarKey         string
+	ResourceOwner     string
 }
 
 type UserSessionState int32

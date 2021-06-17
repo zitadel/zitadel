@@ -24,6 +24,7 @@ func UserSessionToPb(session *user_model.UserSessionView) *user.Session {
 		LoginName:   session.LoginName,
 		DisplayName: session.DisplayName,
 		AuthState:   SessionStateToPb(session.State),
+		AvatarUrl:   session.AvatarURL,
 		Details: object.ToViewDetailsPb(
 			session.Sequence,
 			session.CreationDate,

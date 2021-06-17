@@ -32,6 +32,7 @@ func UserGrantToPb(grant *usr_grant_model.UserGrantView) *user_pb.UserGrant {
 		ProjectId:      grant.ProjectID,
 		ProjectName:    grant.ProjectName,
 		ProjectGrantId: grant.GrantID,
+		AvatarUrl:      grant.AvatarURL,
 		Details: object.ToViewDetailsPb(
 			grant.Sequence,
 			grant.CreationDate,

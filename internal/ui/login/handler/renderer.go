@@ -8,18 +8,17 @@ import (
 	"path"
 	"strings"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/static"
-
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
+	"github.com/caos/zitadel/internal/static"
 )
 
 const (
@@ -238,6 +237,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			return
 		}
 		l.renderLogin(w, r, authReq, err)
+	case *domain.RegistrationStep:
+		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
 	case *domain.InitPasswordStep:

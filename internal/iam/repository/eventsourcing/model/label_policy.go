@@ -38,22 +38,6 @@ func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
 	}
 }
 
-func LabelPolicyFromModel(policy *iam_model.LabelPolicy) *LabelPolicy {
-	return &LabelPolicy{
-		ObjectRoot:          policy.ObjectRoot,
-		State:               int32(policy.State),
-		PrimaryColor:        policy.PrimaryColor,
-		BackgroundColor:     policy.BackgroundColor,
-		WarnColor:           policy.WarnColor,
-		FontColor:           policy.FontColor,
-		PrimaryColorDark:    policy.PrimaryColorDark,
-		BackgroundColorDark: policy.BackgroundColorDark,
-		WarnColorDark:       policy.WarnColorDark,
-		FontColorDark:       policy.FontColorDark,
-		HideLoginNameSuffix: policy.HideLoginNameSuffix,
-	}
-}
-
 func (i *IAM) appendAddLabelPolicyEvent(event *es_models.Event) error {
 	i.DefaultLabelPolicy = new(LabelPolicy)
 	err := i.DefaultLabelPolicy.SetDataLabel(event)
@@ -71,7 +55,7 @@ func (i *IAM) appendChangeLabelPolicyEvent(event *es_models.Event) error {
 func (p *LabelPolicy) SetDataLabel(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {
-		return errors.ThrowInternal(err, "MODEL-ikjhf", "unable to unmarshal data")
+		return errors.ThrowInternal(err, "MODEL-Gdgwq", "unable to unmarshal data")
 	}
 	return nil
 }

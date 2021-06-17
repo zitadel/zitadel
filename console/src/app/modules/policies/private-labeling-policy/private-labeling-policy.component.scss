@@ -203,13 +203,19 @@
             align-items: center;
 
             .btn {
-              cursor: pointer;
-              border-radius: 6px;
-              padding: .5rem 1rem;
-              background-color: inherit;
-              border: 1px solid if($is-dark-theme, #ffffff20, #000);
-              color: if($is-dark-theme, white, #000);
               margin-bottom: .5rem;
+            }
+
+            .btn:not[disabled] {
+              cursor: pointer;
+            }
+
+            i {
+              font-size: 2.5rem;
+            }
+
+            span {
+              color: var(--grey);
             }
           }
 
@@ -274,6 +280,7 @@
                 max-width: 120px;
 
                 .dl-btn {
+                  z-index: 2;
                   position: absolute;
                   top: -12px;
                   left: -12px;
