@@ -12,7 +12,7 @@ Each policy can be overriden and resetted to the default.
 
 ## Password Complexity
 
-With the password complexity policy you can define how a password should look.
+With the password complexity policy you can define the requirements for a users password.
 
 The following properties can be set: 
 - Minimum Length
