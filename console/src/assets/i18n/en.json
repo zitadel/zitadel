@@ -655,7 +655,7 @@
       "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
       "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment.",
       "BTN":"Select File",
-      "ACTIVATEPREVIEW":"Set preview as current configuration",
+      "ACTIVATEPREVIEW":"Apply configuration",
       "DARK":"Dark Mode",
       "LIGHT":"Lighg Mode",
       "CHANGEVIEW":"Change View",
