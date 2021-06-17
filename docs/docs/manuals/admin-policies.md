@@ -69,7 +69,7 @@ Make sure you click the "Set preview as current configuration" button after you 
 | Logo | Upload your logo for the light and the dark design. |
 | Colors | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color) |
 | Font | Upload your custom font |
-| Hide Loginname suffix | If you enable "hide loginname suffix" your loginname suffix (Domain) will not be shown in the login page |
+| Hide Loginname suffix | If enabled,  your loginname suffix (Domain) will not be shown in the login page |
 | Disable Watermark | If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
 ![Private Labeling](/img/manuals/policies/console_org_private_labeling.png)
