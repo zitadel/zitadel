@@ -625,8 +625,8 @@
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
       "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
-      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
+      "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
+      "LABELPOLICYWATERMARK": "Label Policy - watermark",
       "CUSTOMDOMAIN": "Domain Verification - available",
       "CUSTOMTEXT": "Custom texts"
     },
