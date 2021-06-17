@@ -24,7 +24,7 @@ const (
 )
 
 type Translator struct {
-	bundle        *i18n.Bundle
+	Bundle        *i18n.Bundle
 	cookieName    string
 	cookieHandler *http_util.CookieHandler
 }
@@ -37,7 +37,7 @@ type TranslatorConfig struct {
 func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.bundle, err = newBundle(dir, config.DefaultLanguage)
+	t.Bundle, err = newBundle(dir, config.DefaultLanguage)
 	if err != nil {
 		return nil, err
 	}
@@ -61,14 +61,14 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 		return nil, errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
 	}
 	for _, file := range files {
-		if err := addFileToBundle(dir, bundle, file); err != nil {
-			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to bundle")
+		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
+			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to Bundle")
 		}
 	}
 	return bundle, nil
 }
 
-func addFileToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo) error {
+func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo) error {
 	f, err := dir.Open("/i18n/" + file.Name())
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (t *Translator) Localize(id string, args map[string]interface{}, langs ...s
 }
 
 func (t *Translator) Lang(r *http.Request) language.Tag {
-	matcher := language.NewMatcher(t.bundle.LanguageTags())
+	matcher := language.NewMatcher(t.Bundle.LanguageTags())
 	tag, _ := language.MatchStrings(matcher, t.langsFromRequest(r)...)
 	return tag
 }
@@ -113,7 +113,7 @@ func (t *Translator) localizerFromCtx(ctx context.Context) *i18n.Localizer {
 }
 
 func (t *Translator) localizer(langs ...string) *i18n.Localizer {
-	return i18n.NewLocalizer(t.bundle, langs...)
+	return i18n.NewLocalizer(t.Bundle, langs...)
 }
 
 func (t *Translator) langsFromRequest(r *http.Request) []string {

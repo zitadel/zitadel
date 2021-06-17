@@ -20,6 +20,10 @@ func (v *View) CustomTextsByAggregateIDAndTemplateAndLand(aggregateID, template,
 	return view.GetCustomTexts(v.Db, customTextTable, aggregateID, template, lang)
 }
 
+func (v *View) CustomTextsByAggregateIDAndTemplate(aggregateID, template string) ([]*model.CustomTextView, error) {
+	return view.GetCustomTextsByAggregateIDAndTemplate(v.Db, customTextTable, aggregateID, template)
+}
+
 func (v *View) PutCustomText(template *model.CustomTextView, event *models.Event) error {
 	err := view.PutCustomText(v.Db, customTextTable, template)
 	if err != nil {

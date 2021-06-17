@@ -47,6 +47,8 @@ type AuthRequest struct {
 	LoginPolicy            *LoginPolicy
 	AllowedExternalIDPs    []*IDPProvider
 	LabelPolicy            *LabelPolicy
+	DefaultTranslations    []*CustomText
+	OrgTranslations        []*CustomText
 }
 
 type ExternalUser struct {

@@ -37,6 +37,28 @@ func GetCustomTexts(db *gorm.DB, table string, aggregateID, template, lang strin
 	return texts, nil
 }
 
+func GetCustomTextsByAggregateIDAndTemplate(db *gorm.DB, table string, aggregateID, template string) ([]*model.CustomTextView, error) {
+	texts := make([]*model.CustomTextView, 0)
+	queries := []*iam_model.CustomTextSearchQuery{
+		{
+			Key:    iam_model.CustomTextSearchKeyAggregateID,
+			Value:  aggregateID,
+			Method: domain.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.CustomTextSearchKeyTemplate,
+			Value:  template,
+			Method: domain.SearchMethodEquals,
+		},
+	}
+	query := repository.PrepareSearchQuery(table, model.CustomTextSearchRequest{Queries: queries})
+	_, err := query(db, &texts)
+	if err != nil {
+		return nil, err
+	}
+	return texts, nil
+}
+
 func CustomTextByIDs(db *gorm.DB, table, aggregateID, template, lang, key string) (*model.CustomTextView, error) {
 	customText := new(model.CustomTextView)
 	aggregateIDQuery := &model.CustomTextSearchQuery{Key: iam_model.CustomTextSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}

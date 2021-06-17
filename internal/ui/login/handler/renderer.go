@@ -8,6 +8,8 @@ import (
 	"path"
 	"strings"
 
+	i18n2 "github.com/nicksnyder/go-i18n/v2/i18n"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/static"
 
@@ -320,6 +322,9 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+
+		l.addLoginTranslations(authReq.DefaultTranslations)
+		l.addLoginTranslations(authReq.DefaultTranslations)
 	} else {
 		//TODO: How to handle LabelPolicy if no auth req (eg Register)
 	}
@@ -405,6 +410,16 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
 
+func (l *Login) addLoginTranslations(customTexts []*domain.CustomText) {
+	for _, text := range customTexts {
+		msg := &i18n2.Message{
+			ID:   text.Key,
+			Zero: text.Text,
+		}
+		l.renderer.AddMessages(text.Language, msg)
+	}
+}
+
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -442,6 +457,7 @@ type baseData struct {
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
 	LabelPolicy            *domain.LabelPolicy
+	LoginTexts             []*domain.CustomLoginText
 }
 
 type errorData struct {

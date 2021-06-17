@@ -6,6 +6,8 @@ import (
 	"os"
 	"text/template"
 
+	go_i18n "github.com/nicksnyder/go-i18n/v2/i18n"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 
@@ -47,6 +49,14 @@ func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tmpl
 
 func (r *Renderer) Localize(id string, args map[string]interface{}) string {
 	return r.translator.Localize(id, args)
+}
+
+func (r *Renderer) AddLanguageFile(content []byte, filename string) {
+	r.translator.Bundle.ParseMessageFileBytes(content, filename)
+}
+
+func (r *Renderer) AddMessages(tag language.Tag, messages ...*go_i18n.Message) {
+	r.translator.Bundle.AddMessages(tag, messages...)
 }
 
 func (r *Renderer) LocalizeFromRequest(req *http.Request, id string, args map[string]interface{}) string {

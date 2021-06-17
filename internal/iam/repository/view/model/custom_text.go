@@ -52,17 +52,27 @@ func CustomTextViewFromModel(template *model.CustomTextView) *CustomTextView {
 	}
 }
 
-func CustomTextViewToModel(template *CustomTextView) *model.CustomTextView {
-	lang := language.Make(template.Language)
-	return &model.CustomTextView{
-		AggregateID:  template.AggregateID,
-		Sequence:     template.Sequence,
-		CreationDate: template.CreationDate,
-		ChangeDate:   template.ChangeDate,
-		Template:     template.Template,
-		Language:     lang,
-		Key:          template.Key,
-		Text:         template.Text,
+func CustomTextViewsToDomain(texts []*CustomTextView) []*domain.CustomText {
+	result := make([]*domain.CustomText, len(texts))
+	for i, text := range texts {
+		result[i] = CustomTextViewToDomain(text)
+	}
+	return result
+}
+
+func CustomTextViewToDomain(text *CustomTextView) *domain.CustomText {
+	lang := language.Make(text.Language)
+	return &domain.CustomText{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  text.AggregateID,
+			Sequence:     text.Sequence,
+			CreationDate: text.CreationDate,
+			ChangeDate:   text.ChangeDate,
+		},
+		Template: text.Template,
+		Language: lang,
+		Key:      text.Key,
+		Text:     text.Text,
 	}
 }
 
