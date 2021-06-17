@@ -3,6 +3,8 @@ package migration
 import (
 	"strings"
 
+	"github.com/caos/zitadel/operator/common"
+
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -12,10 +14,12 @@ func getMigrationContainer(
 	migrationUser string,
 	secretPasswordName string,
 	users []string,
+	customImageRegistry string,
 ) corev1.Container {
+
 	return corev1.Container{
 		Name:  "db-migration",
-		Image: "flyway/flyway:7.5.1",
+		Image: common.DockerHubReference(common.FlywayImage, customImageRegistry),
 		Args: []string{
 			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
 			"-locations=filesystem:" + migrationsPath,

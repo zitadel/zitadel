@@ -1,10 +1,13 @@
 package deployment
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/caos/zitadel/operator/common"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -17,6 +20,7 @@ func GetInitContainer(
 	dbSecrets string,
 	users []string,
 	runAsUser int64,
+	customImageRegistry string,
 ) corev1.Container {
 
 	initVolumeMounts := []corev1.VolumeMount{
@@ -47,7 +51,7 @@ func GetInitContainer(
 
 	return corev1.Container{
 		Name:                     "fix-permissions",
-		Image:                    "alpine:3.11",
+		Image:                    common.DockerHubReference(common.AlpineImage, customImageRegistry),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,

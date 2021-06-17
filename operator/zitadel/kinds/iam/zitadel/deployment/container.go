@@ -4,6 +4,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/caos/zitadel/operator/common"
+
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -25,6 +27,7 @@ func GetContainer(
 	users []string,
 	dbSecrets string,
 	command string,
+	customImageRegistry string,
 ) corev1.Container {
 
 	envVars := []corev1.EnvVar{
@@ -107,7 +110,7 @@ func GetContainer(
 			RunAsNonRoot: &runAsNonRoot,
 		},
 		Name:            containerName,
-		Image:           zitadelImage + ":" + version,
+		Image:           common.ZITADELReference(common.ZITADELImage, customImageRegistry, version),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},
