@@ -52,7 +52,7 @@ Secondfactors:
 ### Identity Providers
 
 You can configure all kinds of external identity providers for identity brokering, which support OIDC (OpenID Connect).
-Make a new identity provider configuration and enable it in the list after.
+Create a new identity provider configuration and enable it in the list afterwards.
 
 For a detailed guide about how to configure a new identity provider for identity brokering have a look at our guide:
 [Identity Brokering](../guides/usage/identity-brokering)
