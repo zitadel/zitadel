@@ -162,8 +162,12 @@ func (m *Minio) RemoveObjects(ctx context.Context, bucketName, path string, recu
 		defer close(objectsCh)
 		objects, cancel := m.listObjects(ctx, bucketName, path, recursive)
 		for object := range objects {
-			if object.Err != nil {
+			if err := object.Err; err != nil {
 				cancel()
+				if errResp := minio.ToErrorResponse(err); errResp.StatusCode == http.StatusNotFound {
+					logging.LogWithFields("MINIO-ss8va", "bucketName", bucketName, "path", path).Warn("list objects for remove failed with not found")
+					continue
+				}
 				return caos_errs.ThrowInternal(object.Err, "MINIO-WQF32", "Errors.Assets.Object.ListFailed")
 			}
 			objectsCh <- object
