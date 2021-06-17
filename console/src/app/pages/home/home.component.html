@@ -135,6 +135,13 @@
                         <a class="short-link" [routerLink]="[ '/org', 'policy','login']">{{'HOME.ORG_POLICY_LOGIN' |
                             translate}}<i class="las la-link"></i></a>
                     </ng-template>
+                    <ng-template appHasRole [appHasRole]="['policy.read']">
+                        <a class="short-link"
+                            [routerLink]="[ '/org', 'policy','privatelabel']">{{'HOME.ORG_POLICY_LABEL' |
+                            translate}}<i class="las la-link"></i></a>
+                        <a class="short-link" [routerLink]="[ '/org', 'policy','privatelabel']">{{'HOME.ORG_POLICY_LABEL' |
+                            translate}}<i class="las la-link"></i></a>
+                    </ng-template>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
