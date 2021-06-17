@@ -39,7 +39,7 @@ The Login Policy defines how the login process should look like and which authen
 
 ### Multifactors / Second Factors
 
-In the multifactors section you can configure what kind of multifactors should be allowed.
+In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
 Multifactors: 
 - U2F (Universal Second Factor) with PIN
 
