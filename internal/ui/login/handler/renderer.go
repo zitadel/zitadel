@@ -301,7 +301,7 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
 	baseData := baseData{
 		errorData: errorData{
-			ErrType:    errType,
+			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
 		Lang:                   l.renderer.Lang(r).String(),
@@ -343,14 +343,14 @@ func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 	}
 }
 
-func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
+func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
 		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
-		return localized + " (" + caosErr.ID + ")"
+		return caosErr.ID, localized
 
 	}
-	return err.Error()
+	return "", err.Error()
 }
 
 func (l *Login) getTheme(r *http.Request) string {
@@ -446,7 +446,7 @@ type baseData struct {
 }
 
 type errorData struct {
-	ErrType    string
+	ErrID      string
 	ErrMessage string
 }
 

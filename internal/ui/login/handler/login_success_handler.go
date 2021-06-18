@@ -31,12 +31,12 @@ func (l *Login) handleLoginSuccess(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := loginSuccessData{
-		userData: l.getUserData(r, authReq, "Login Successful", errType, errMessage),
+		userData: l.getUserData(r, authReq, "Login Successful", errID, errMessage),
 	}
 	if authReq != nil {
 		data.RedirectURI = l.oidcAuthCallbackURL
