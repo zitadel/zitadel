@@ -3,7 +3,7 @@ function CheckChangePwPolicy() {
     let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("change-password-confirmation").value;
 
-    if (ComplexityPolicyCheck(policyElement, pwNew) === false) {
+    if (ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) === false) {
         policyElement.setAttribute("color", "warn");
         return false;
     } else {
