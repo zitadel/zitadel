@@ -19,7 +19,7 @@ func getPreContainer(
 	return []corev1.Container{
 		{
 			Name:  "check-db-ready",
-			Image: common.DockerHubReference(common.PostgresImage, customImageRegistry),
+			Image: common.PostgresImage.Reference(customImageRegistry),
 			Command: []string{
 				"sh",
 				"-c",
@@ -31,7 +31,7 @@ func getPreContainer(
 		},
 		{
 			Name:  "create-flyway-user",
-			Image: common.DockerHubReference(common.CockroachImage, customImageRegistry),
+			Image: common.CockroachImage.Reference(customImageRegistry),
 			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
 			VolumeMounts: []corev1.VolumeMount{{
 				Name:      rootUserInternal,

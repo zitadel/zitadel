@@ -19,7 +19,7 @@ func getPostContainers(
 	return []corev1.Container{
 		{
 			Name:    "delete-flyway-user",
-			Image:   common.DockerHubReference(common.CockroachImage, customImageRegistry),
+			Image:   common.CockroachImage.Reference(customImageRegistry),
 			Command: []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{

@@ -51,7 +51,7 @@ func GetInitContainer(
 
 	return corev1.Container{
 		Name:                     "fix-permissions",
-		Image:                    common.DockerHubReference(common.AlpineImage, customImageRegistry),
+		Image:                    common.AlpineImage.Reference(customImageRegistry),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,

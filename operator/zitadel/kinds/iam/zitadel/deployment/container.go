@@ -110,7 +110,7 @@ func GetContainer(
 			RunAsNonRoot: &runAsNonRoot,
 		},
 		Name:            containerName,
-		Image:           common.ZITADELReference(common.ZITADELImage, customImageRegistry, version),
+		Image:           common.ZITADELImage.Reference(customImageRegistry, version),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},

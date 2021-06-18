@@ -39,7 +39,7 @@ func TestDockerHubReference(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range imgs {
-				got := DockerHubReference(imgs[i], tt.args.customImageRegistry)
+				got := imgs[i].Reference(tt.args.customImageRegistry)
 				if err := tt.test(got); err != nil {
 					t.Error(fmt.Errorf("DockerHubReference(%s): %w", imgs[i], err))
 				}
@@ -81,9 +81,9 @@ func TestZITADELReference(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range imgs {
-				got := ZITADELReference(imgs[i], tt.args.customImageRegistry, dummyVersion)
+				got := imgs[i].Reference(tt.args.customImageRegistry, dummyVersion)
 				if err := tt.test(got); err != nil {
-					t.Error(fmt.Errorf("DockerHubReference(%s): %w", imgs[i], err))
+					t.Error(fmt.Errorf("ZITADELReference(%s): %w", imgs[i], err))
 				}
 			}
 		})

@@ -68,7 +68,7 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		image := common.ZITADELReference(common.BackupImage, customImageRegistry, version)
+		image := common.BackupImage.Reference(customImageRegistry, version)
 
 		_, destroyB, err := backup.AdaptFunc(
 			internalMonitor,

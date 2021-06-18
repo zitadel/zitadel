@@ -9,26 +9,27 @@ type dockerhubImage image
 type zitadelImage image
 
 const (
-	CockroachImage dockerhubImage = "cockroachdb/cockroach:v20.2.3"
-	PostgresImage  dockerhubImage = "postgres:9.6.17"
-	FlywayImage    dockerhubImage = "flyway/flyway:7.5.1"
-	AlpineImage    dockerhubImage = "alpine:3.11"
-	ZITADELImage   zitadelImage   = "caos/zitadel"
-	BackupImage    zitadelImage   = "caos/zitadel-crbackup"
+	CockroachImage       dockerhubImage = "cockroachdb/cockroach:v20.2.3"
+	PostgresImage        dockerhubImage = "postgres:9.6.17"
+	FlywayImage          dockerhubImage = "flyway/flyway:7.5.1"
+	AlpineImage          dockerhubImage = "alpine:3.11"
+	ZITADELImage         zitadelImage   = "caos/zitadel"
+	BackupImage          zitadelImage   = "caos/zitadel-crbackup"
+	ZITADELOperatorImage zitadelImage   = "caos/zitadel-operator"
 )
 
-func ZITADELReference(img zitadelImage, customImageRegistry, version string) string {
+func (z zitadelImage) Reference(customImageRegistry, version string) string {
 
 	reg := "ghcr.io"
 	if customImageRegistry != "" {
 		reg = customImageRegistry
 	}
 
-	return concat(image(img), reg, version)
+	return concat(image(z), reg, version)
 }
 
-func DockerHubReference(img dockerhubImage, customImageRegistry string) string {
-	return concat(image(img), customImageRegistry, "")
+func (d dockerhubImage) Reference(customImageRegistry string) string {
+	return concat(image(d), customImageRegistry, "")
 }
 
 func concat(img image, customImageRegistry, version string) string {

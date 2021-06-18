@@ -117,7 +117,7 @@ func Adapter(
 			cockroachSelector,
 			desiredKind.Spec.Force,
 			namespace,
-			common.DockerHubReference(common.CockroachImage, customImageRegistry),
+			common.CockroachImage.Reference(customImageRegistry),
 			serviceAccountName,
 			desiredKind.Spec.ReplicaCount,
 			desiredKind.Spec.StorageCapacity,

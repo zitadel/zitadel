@@ -19,7 +19,7 @@ func getMigrationContainer(
 
 	return corev1.Container{
 		Name:  "db-migration",
-		Image: common.DockerHubReference(common.FlywayImage, customImageRegistry),
+		Image: common.FlywayImage.Reference(customImageRegistry),
 		Args: []string{
 			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
 			"-locations=filesystem:" + migrationsPath,
