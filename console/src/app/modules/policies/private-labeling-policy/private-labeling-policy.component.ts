@@ -309,7 +309,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private handleFontUploadPromise(task: Promise<any>): Promise<any> {
-    return task.then(() => {
+    const enhTask = task.then(() => {
       this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
       setTimeout(() => {
         this.getPreviewData().then(data => {
@@ -319,6 +319,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
       }, 1000);
     }).catch(error => this.toast.showError(error));
+
+    if (this.serviceType === PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
+      return this.savePolicy().then(() => enhTask);
+    } else {
+      return enhTask;
+    }
   }
 
   private handleUploadPromise(task: Promise<any>): Promise<any> {
