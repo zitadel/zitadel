@@ -175,7 +175,7 @@ authorization framework of the identity provider
 | ---- | ------ | ----------- |
 | IDP_TYPE_UNSPECIFIED | 0 | - |
 | IDP_TYPE_OIDC | 1 | - |
-| IPD_TYPE_AUTHENTICATOR | 2 | PLANNED: IDP_TYPE_SAML |
+| IPD_TYPE_AUTH_CONNECTOR | 2 | PLANNED: IDP_TYPE_SAML |
 
 
 

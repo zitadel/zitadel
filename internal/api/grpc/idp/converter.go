@@ -62,7 +62,16 @@ func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb
 	return &idp_pb.IDPLoginPolicyLink{
 		IdpId:   link.IDPConfigID,
 		IdpName: link.Name,
-		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+		IdpType: IDPConfigTypeModelToPb(link.IDPConfigType),
+	}
+}
+
+func IDPConfigTypeModelToPb(configType iam_model.IdpConfigType) idp_pb.IDPType {
+	switch configType {
+	case iam_model.IDPConfigTypeOIDC:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
+	default: //TODO: fix
+		return idp_pb.IDPType_IPD_TYPE_AUTH_CONNECTOR
 	}
 }
 

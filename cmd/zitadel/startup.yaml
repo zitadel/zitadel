@@ -270,6 +270,7 @@ UI:
       ZitadelURL: '$ZITADEL_CONSOLE'
       LanguageCookieName: 'caos.zitadel.login.lang'
       DefaultLanguage: 'de'
+      Issuer: $ZITADEL_ISSUER
       CSRF:
         CookieName: 'caos.zitadel.login.csrf'
         Key:

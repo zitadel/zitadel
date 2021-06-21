@@ -1,17 +1,21 @@
 package handler
 
 import (
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/pkg/op"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"net/http"
-	"strings"
-	"time"
 )
 
 const (
@@ -24,8 +28,9 @@ type externalIDPData struct {
 }
 
 type externalIDPCallbackData struct {
-	State string `schema:"state"`
-	Code  string `schema:"code"`
+	State     string `schema:"state"`
+	Code      string `schema:"code"`
+	Assertion string `schema:"assertion"`
 }
 
 type externalNotFoundOptionFormData struct {
@@ -74,16 +79,25 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	if idpConfig.IDPConfigOIDCView == nil {
-		l.renderError(w, r, authReq, caos_errors.ThrowInternal(nil, "LOGIN-Rio9s", "Errors.User.ExternalIDP.IDPTypeNotImplemented"))
+	if idpConfig.IDPConfigOIDCView != nil {
+		l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
 		return
 	}
-	l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
+	if idpConfig.IDPConfigAuthConnectorView != nil {
+		l.handleAuthConnectorAuthorize(w, r, authReq, idpConfig.IDPConfigAuthConnectorView)
+	}
+	l.renderError(w, r, authReq, caos_errors.ThrowInternal(nil, "LOGIN-Rio9s", "Errors.User.ExternalIDP.IDPTypeNotImplemented"))
 }
 
 func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
 	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
 	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider, rp.WithPrompt(oidc.PromptSelectAccount)), http.StatusFound)
+}
+
+func (l *Login) handleAuthConnectorAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, connectorConfig *iam_model.IDPConfigAuthConnectorView) {
+	const connectorAuthorize = "authorize"
+	url := strings.TrimSuffix(connectorConfig.AuthConnectorBaseURL, "/") + "/" + connectorAuthorize + "?authRequestID=" + authReq.ID + "&connectorID=" + connectorConfig.AuthConnectorBackendConnectorID
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
@@ -104,13 +118,23 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
-	tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
-	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
+	if idpConfig.IDPConfigOIDCView != nil {
+		provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
+		tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
+		if err != nil {
+			l.renderLogin(w, r, authReq, err)
+			return
+		}
+		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 	}
-	l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
+	if idpConfig.IDPConfigAuthConnectorView != nil {
+		profile, err := op.VerifyJWTAssertion(r.Context(), data.Assertion, l.authConnectorVerifier)
+		if err != nil {
+			l.renderLogin(w, r, authReq, err)
+			return
+		}
+		fmt.Println(profile)
+	}
 }
 
 func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelyingParty {
