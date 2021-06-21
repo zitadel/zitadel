@@ -35,7 +35,7 @@
         <p class="error" *ngIf="(stripeCustomer || stripeCustomer == null) && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
         <div class="current-tier">
-            <a [disabled]="!org.id || !customerValid" mat-raised-button [href]="stripeURL" target="_blank"
+            <a [disabled]="!org.id || !customerValid || !stripeURL" mat-raised-button [href]="stripeURL" target="_blank"
                 alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</a>
         </div>
     </ng-container>
