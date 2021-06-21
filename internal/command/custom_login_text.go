@@ -21,7 +21,27 @@ func (c *Commands) getSelectLoginTextEvents(ctx context.Context, agg *eventstore
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountTitleLinkingProcess, existingText.SelectAccountTitleLinkingProcess, text.SelectAccountScreenText.TitleLinkingProcess, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountDescriptionLinkingProcess, existingText.SelectAccountDescriptionLinkingProcess, text.SelectAccountScreenText.DescriptionLinkingProcess, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountOtherUser, existingText.SelectAccountOtherUser, text.SelectAccountScreenText.OtherUser, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountSessionStateActive, existingText.SelectAccountSessionStateActive, text.SelectAccountScreenText.SessionStateActive, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountSessionStateInactive, existingText.SelectAccountSessionStateInactive, text.SelectAccountScreenText.SessionStateInactive, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, existingText.SelectAccountUserMustBeMemberOfOrg, text.SelectAccountScreenText.UserMustBeMemberOfOrg, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -38,6 +58,14 @@ func (c *Commands) getLoginTextEvents(ctx context.Context, agg *eventstore.Aggre
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginTitleLinkingProcess, existingText.LoginTitleLinkingProcess, text.LoginScreenText.TitleLinkingProcess, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginDescriptionLinkingProcess, existingText.LoginDescriptionLinkingProcess, text.LoginScreenText.DescriptionLinkingProcess, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginNameLabel, existingText.LoginNameLabel, text.LoginScreenText.LoginNameLabel, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -51,6 +79,10 @@ func (c *Commands) getLoginTextEvents(ctx context.Context, agg *eventstore.Aggre
 		events = append(events, event)
 	}
 	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginExternalUserDescription, existingText.LoginExternalUserDescription, text.LoginScreenText.ExternalUserDescription, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginUserMustBeMemberOfOrg, existingText.LoginUserMustBeMemberOfOrg, text.LoginScreenText.UserMustBeMemberOfOrg, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -88,15 +120,15 @@ func (c *Commands) getPasswordTextEvents(ctx context.Context, agg *eventstore.Ag
 
 func (c *Commands) getPasswordResetTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
 	events := make([]eventstore.EventPusher, 0)
-	event := c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyResetPasswordTitle, existingText.ResetPasswordTitle, text.ResetPasswordScreenText.Title, text.Language, defaultText)
+	event := c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitPasswordTitle, existingText.InitPasswordTitle, text.InitPasswordScreenText.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyResetPasswordDescription, existingText.ResetPasswordDescription, text.ResetPasswordScreenText.Description, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitPasswordDescription, existingText.InitPasswordDescription, text.InitPasswordScreenText.Description, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyResetPasswordNextButtonText, existingText.ResetPasswordNextButtonText, text.ResetPasswordScreenText.NextButtonText, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitPasswordNextButtonText, existingText.InitPasswordNextButtonText, text.InitPasswordScreenText.NextButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -138,19 +170,19 @@ func (c *Commands) getInitUserEvents(ctx context.Context, agg *eventstore.Aggreg
 
 func (c *Commands) getInitDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
 	events := make([]eventstore.EventPusher, 0)
-	event := c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeDoneTitle, existingText.InitializeDoneTitle, text.InitializeDoneScreenText.Title, text.Language, defaultText)
+	event := c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneTitle, existingText.InitializeDoneTitle, text.InitializeDoneScreenText.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeDoneDescription, existingText.InitializeDoneDescription, text.InitializeDoneScreenText.Description, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneDescription, existingText.InitializeDoneDescription, text.InitializeDoneScreenText.Description, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeDoneAbortButtonText, existingText.InitializeDoneAbortButtonText, text.InitializeDoneScreenText.AbortButtonText, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneAbortButtonText, existingText.InitializeDoneAbortButtonText, text.InitializeDoneScreenText.AbortButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeDoneNextButtonText, existingText.InitializeDoneNextButtonText, text.InitializeDoneScreenText.NextButtonText, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneNextButtonText, existingText.InitializeDoneNextButtonText, text.InitializeDoneScreenText.NextButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

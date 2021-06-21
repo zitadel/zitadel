@@ -7,7 +7,7 @@
     {{ template "user-profile" . }}
 
     {{if .RedirectURI}}
-    <p>{{t "LoginSuccess.AutoRedirect"}}</p>
+    <p>{{t "LoginSuccess.AutoRedirectDescription"}}</p>
 </div>
 
 <form action="{{ .RedirectURI }}" method="GET">
@@ -18,14 +18,14 @@
 
     <div class="lgn-actions">
         <span class="fill-space"></span>
-        <button id="redirect-button" class="lgn-raised-button lgn-primary">{{t "Actions.Next"}}</button>
+        <button id="redirect-button" class="lgn-raised-button lgn-primary">{{t "LoginSuccess.NextButtonText"}}</button>
     </div>
 
 </form>
 
 <script src="{{ resourceUrl "scripts/login_success.js" }}"></script>
 {{else}}
-    <p>{{t "LoginSuccess.Redirected"}}</p>
+    <p>{{t "LoginSuccess.RedirectedDescription"}}</p>
 </div>
 {{end}}
 

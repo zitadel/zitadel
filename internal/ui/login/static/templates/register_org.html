@@ -13,19 +13,19 @@
 
     <div class="lgn-register">
         <div class="lgn-field">
-            <label class="lgn-label" for="orgname">{{t "RegistrationOrg.OrgName"}}</label>
+            <label class="lgn-label" for="orgname">{{t "RegistrationOrg.OrgNameLabel"}}</label>
             <input class="lgn-input" type="text" id="orgname" name="orgname" value="{{ .RegisterOrgName }}" autofocus
                 required>
         </div>
         
         <div class="double-col">
             <div class="lgn-field">
-                <label class="lgn-label" for="firstname">{{t "RegistrationOrg.Firstname"}}</label>
+                <label class="lgn-label" for="firstname">{{t "RegistrationOrg.FirstnameLabel"}}</label>
                 <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
                     value="{{ .Firstname }}" required>
             </div>
             <div class="lgn-field">
-                <label class="lgn-label" for="lastname">{{t "RegistrationOrg.Lastname"}}</label>
+                <label class="lgn-label" for="lastname">{{t "RegistrationOrg.LastnameLabel"}}</label>
                 <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
                     value="{{ .Lastname }}" required>
             </div>
@@ -33,7 +33,7 @@
 
         {{if .UserLoginMustBeDomain}}
         <div class="lgn-field">
-            <label class="lgn-label" for="username">{{t "RegistrationOrg.Username"}}</label>
+            <label class="lgn-label" for="username">{{t "RegistrationOrg.UsernameLabel"}}</label>
             <span id="loginname">
                 <div class="lgn-suffix-wrapper">
                     <input data-iam-domain="{{ .IamDomain }}" class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
@@ -45,20 +45,20 @@
         </div>
         {{end}}
         <div class="lgn-field">
-            <label class="lgn-label" for="email">{{t "RegistrationOrg.Email"}}</label>
+            <label class="lgn-label" for="email">{{t "RegistrationOrg.EmailLabel"}}</label>
             <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}"
                 autofocus required>
         </div>
        <div class="double-col">
             <div class="lgn-field">
-                <label class="lgn-label" for="register-password">{{t "RegistrationOrg.Password"}}</label>
+                <label class="lgn-label" for="register-password">{{t "RegistrationOrg.PasswordLabel"}}</label>
                 <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
                     data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
                     data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="register-password"
                     name="register-password" autocomplete="new-password" required>
             </div>
             <div class="lgn-field">
-                <label class="lgn-label" for="register-password-confirmation">{{t "RegistrationOrg.Password2"}}</label>
+                <label class="lgn-label" for="register-password-confirmation">{{t "RegistrationOrg.PasswordConfirmLabel"}}</label>
                 <input class="lgn-input" type="password" id="register-password-confirmation"
                     name="register-password-confirmation" autocomplete="new-password" required>
             </div>
@@ -68,16 +68,16 @@
         </div>
 
         <div class="lgn-field">
-            <label class="lgn-label" for="register-term-confirmation">{{t "RegistrationOrg.TosAndPrivacy"}}</label>
+            <label class="lgn-label" for="register-term-confirmation">{{t "RegistrationOrg.TosAndPrivacyLabel"}}</label>
             <div class="lgn-checkbox">
                 <input class="lgn-input" type="checkbox" id="register-term-confirmation"
                     name="register-term-confirmation" required>
                 <label class="lgn-label" for="register-term-confirmation">
                     {{t "RegistrationOrg.TosConfirm"}}
                     <a class="tos-link" target="_blank" href="{{t "RegistrationOrg.TosLink"}}" rel="noopener noreferrer">{{t "RegistrationOrg.TosLinkText"}}</a>
-                    {{t "Registration.TosConfirmAnd"}}
-                    <a class="tos-link" target="_blank" href="{{t "Registration.PrivacyLink"}}" rel="noopener noreferrer">
-                    {{t "Registration.PrivacyLinkText"}}
+                    {{t "RegistrationOrg.TosConfirmAnd"}}
+                    <a class="tos-link" target="_blank" href="{{t "RegistrationOrg.PrivacyLink"}}" rel="noopener noreferrer">
+                    {{t "RegistrationOrg.PrivacyLinkText"}}
                     </a>
                 </label>
             </div>
@@ -88,7 +88,7 @@
 
     <div class="lgn-actions">
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "Actions.Save"}}</button>
+        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "RegistrationOrg.SaveButtonText"}}</button>
     </div>
 </form>
 

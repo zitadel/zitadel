@@ -134,13 +134,13 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 		if strings.HasPrefix(text.Key, domain.LoginKeyPassword) {
 			passwordKeyToDomain(text, result)
 		}
-		if strings.HasPrefix(text.Key, domain.LoginKeyResetPassword) {
-			resetPasswordKeyToDomain(text, result)
+		if strings.HasPrefix(text.Key, domain.LoginKeyInitPassword) {
+			initPasswordKeyToDomain(text, result)
 		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyInitializeUser) {
 			initializeUserKeyToDomain(text, result)
 		}
-		if strings.HasPrefix(text.Key, domain.LoginKeyInitializeDone) {
+		if strings.HasPrefix(text.Key, domain.LoginKeyInitUserDone) {
 			initializeDoneKeyToDomain(text, result)
 		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyInitMFAPrompt) {
@@ -187,8 +187,23 @@ func selectAccountKeyToDomain(text *CustomTextView, result *domain.CustomLoginTe
 	if text.Key == domain.LoginKeySelectAccountDescription {
 		result.SelectAccountScreenText.Description = text.Text
 	}
+	if text.Key == domain.LoginKeySelectAccountTitleLinkingProcess {
+		result.SelectAccountScreenText.TitleLinkingProcess = text.Text
+	}
+	if text.Key == domain.LoginKeySelectAccountDescriptionLinkingProcess {
+		result.SelectAccountScreenText.DescriptionLinkingProcess = text.Text
+	}
 	if text.Key == domain.LoginKeySelectAccountOtherUser {
 		result.SelectAccountScreenText.OtherUser = text.Text
+	}
+	if text.Key == domain.LoginKeySelectAccountSessionStateActive {
+		result.SelectAccountScreenText.SessionStateActive = text.Text
+	}
+	if text.Key == domain.LoginKeySelectAccountSessionStateInactive {
+		result.SelectAccountScreenText.SessionStateInactive = text.Text
+	}
+	if text.Key == domain.LoginKeySelectAccountUserMustBeMemberOfOrg {
+		result.SelectAccountScreenText.UserMustBeMemberOfOrg = text.Text
 	}
 }
 
@@ -199,11 +214,20 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLoginDescription {
 		result.LoginScreenText.Description = text.Text
 	}
+	if text.Key == domain.LoginKeyLoginTitleLinkingProcess {
+		result.LoginScreenText.TitleLinkingProcess = text.Text
+	}
+	if text.Key == domain.LoginKeyLoginDescriptionLinkingProcess {
+		result.LoginScreenText.DescriptionLinkingProcess = text.Text
+	}
 	if text.Key == domain.LoginKeyLoginNameLabel {
 		result.LoginScreenText.LoginNameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginExternalUserDescription {
 		result.LoginScreenText.ExternalUserDescription = text.Text
+	}
+	if text.Key == domain.LoginKeyLoginUserMustBeMemberOfOrg {
+		result.LoginScreenText.UserMustBeMemberOfOrg = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginRegisterButtonText {
 		result.LoginScreenText.RegisterButtonText = text.Text
@@ -234,15 +258,15 @@ func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	}
 }
 
-func resetPasswordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyResetPasswordTitle {
-		result.ResetPasswordScreenText.Title = text.Text
+func initPasswordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyInitPasswordTitle {
+		result.InitPasswordScreenText.Title = text.Text
 	}
-	if text.Key == domain.LoginKeyResetPasswordDescription {
-		result.ResetPasswordScreenText.Description = text.Text
+	if text.Key == domain.LoginKeyInitPasswordDescription {
+		result.InitPasswordScreenText.Description = text.Text
 	}
-	if text.Key == domain.LoginKeyResetPasswordNextButtonText {
-		result.ResetPasswordScreenText.NextButtonText = text.Text
+	if text.Key == domain.LoginKeyInitPasswordNextButtonText {
+		result.InitPasswordScreenText.NextButtonText = text.Text
 	}
 }
 
@@ -268,16 +292,16 @@ func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 }
 
 func initializeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyInitializeDone {
+	if text.Key == domain.LoginKeyInitUserDone {
 		result.InitializeDoneScreenText.Title = text.Text
 	}
-	if text.Key == domain.LoginKeyInitializeDoneDescription {
+	if text.Key == domain.LoginKeyInitUserDoneDescription {
 		result.InitializeDoneScreenText.Description = text.Text
 	}
-	if text.Key == domain.LoginKeyInitializeDoneAbortButtonText {
+	if text.Key == domain.LoginKeyInitUserDoneAbortButtonText {
 		result.InitializeDoneScreenText.AbortButtonText = text.Text
 	}
-	if text.Key == domain.LoginKeyInitializeDoneNextButtonText {
+	if text.Key == domain.LoginKeyInitUserDoneNextButtonText {
 		result.InitializeDoneScreenText.NextButtonText = text.Text
 	}
 }

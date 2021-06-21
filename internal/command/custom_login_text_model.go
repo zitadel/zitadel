@@ -16,16 +16,24 @@ type CustomLoginTextReadModel struct {
 	Language language.Tag
 	State    domain.PolicyState
 
-	SelectAccountTitle       string
-	SelectAccountDescription string
-	SelectAccountOtherUser   string
+	SelectAccountTitle                     string
+	SelectAccountDescription               string
+	SelectAccountTitleLinkingProcess       string
+	SelectAccountDescriptionLinkingProcess string
+	SelectAccountOtherUser                 string
+	SelectAccountSessionStateActive        string
+	SelectAccountSessionStateInactive      string
+	SelectAccountUserMustBeMemberOfOrg     string
 
-	LoginTitle                   string
-	LoginDescription             string
-	LoginNameLabel               string
-	LoginRegisterButtonText      string
-	LoginNextButtonText          string
-	LoginExternalUserDescription string
+	LoginTitle                     string
+	LoginDescription               string
+	LoginTitleLinkingProcess       string
+	LoginDescriptionLinkingProcess string
+	LoginNameLabel                 string
+	LoginRegisterButtonText        string
+	LoginNextButtonText            string
+	LoginExternalUserDescription   string
+	LoginUserMustBeMemberOfOrg     string
 
 	PasswordTitle          string
 	PasswordDescription    string
@@ -34,9 +42,13 @@ type CustomLoginTextReadModel struct {
 	PasswordBackButtonText string
 	PasswordNextButtonText string
 
-	ResetPasswordTitle          string
-	ResetPasswordDescription    string
-	ResetPasswordNextButtonText string
+	InitPasswordTitle                   string
+	InitPasswordDescription             string
+	InitPasswordCodeLabel               string
+	InitPasswordNewPasswordLabel        string
+	InitPasswordNewPasswordConfirmLabel string
+	InitPasswordNextButtonText          string
+	InitPasswordResendButtonText        string
 
 	InitializeTitle              string
 	InitializeDescription        string
@@ -141,15 +153,15 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordScreenSetEvent(e)
 				continue
 			}
-			if strings.HasPrefix(e.Key, domain.LoginKeyResetPassword) {
-				wm.handleResetPasswordScreenSetEvent(e)
+			if strings.HasPrefix(e.Key, domain.LoginKeyInitPassword) {
+				wm.handleInitPasswordScreenSetEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyInitializeUser) {
 				wm.handleInitializeUserScreenSetEvent(e)
 				continue
 			}
-			if strings.HasPrefix(e.Key, domain.LoginKeyInitializeDone) {
+			if strings.HasPrefix(e.Key, domain.LoginKeyInitUserDone) {
 				wm.handleInitializeDoneScreenSetEvent(e)
 				continue
 			}
@@ -214,15 +226,15 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordScreenRemoveEvent(e)
 				continue
 			}
-			if strings.HasPrefix(e.Key, domain.LoginKeyResetPassword) {
-				wm.handleResetPasswordScreenRemoveEvent(e)
+			if strings.HasPrefix(e.Key, domain.LoginKeyInitPassword) {
+				wm.handleInitPasswordScreenRemoveEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyInitializeUser) {
 				wm.handleInitializeUserScreenRemoveEvent(e)
 				continue
 			}
-			if strings.HasPrefix(e.Key, domain.LoginKeyInitializeDone) {
+			if strings.HasPrefix(e.Key, domain.LoginKeyInitUserDone) {
 				wm.handleInitializeDoneScreenRemoveEvent(e)
 				continue
 			}
@@ -316,6 +328,14 @@ func (wm *CustomLoginTextReadModel) handleLoginScreenSetEvent(e *policy.CustomTe
 		wm.LoginDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyLoginTitleLinkingProcess {
+		wm.LoginTitleLinkingProcess = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyLoginDescriptionLinkingProcess {
+		wm.LoginDescriptionLinkingProcess = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyLoginNameLabel {
 		wm.LoginNameLabel = e.Text
 		return
@@ -332,6 +352,10 @@ func (wm *CustomLoginTextReadModel) handleLoginScreenSetEvent(e *policy.CustomTe
 		wm.LoginExternalUserDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyLoginUserMustBeMemberOfOrg {
+		wm.LoginUserMustBeMemberOfOrg = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handleLoginScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -341,6 +365,14 @@ func (wm *CustomLoginTextReadModel) handleLoginScreenRemoveEvent(e *policy.Custo
 	}
 	if e.Key == domain.LoginKeyLoginDescription {
 		wm.LoginDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyLoginTitleLinkingProcess {
+		wm.LoginTitleLinkingProcess = ""
+		return
+	}
+	if e.Key == domain.LoginKeyLoginDescriptionLinkingProcess {
+		wm.LoginDescriptionLinkingProcess = ""
 		return
 	}
 	if e.Key == domain.LoginKeyLoginNameLabel {
@@ -357,6 +389,10 @@ func (wm *CustomLoginTextReadModel) handleLoginScreenRemoveEvent(e *policy.Custo
 	}
 	if e.Key == domain.LoginKeyLoginExternalUserDescription {
 		wm.LoginExternalUserDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyLoginUserMustBeMemberOfOrg {
+		wm.LoginUserMustBeMemberOfOrg = ""
 		return
 	}
 }
@@ -415,32 +451,32 @@ func (wm *CustomLoginTextReadModel) handlePasswordScreenRemoveEvent(e *policy.Cu
 	}
 }
 
-func (wm *CustomLoginTextReadModel) handleResetPasswordScreenSetEvent(e *policy.CustomTextSetEvent) {
-	if e.Key == domain.LoginKeyResetPasswordTitle {
-		wm.ResetPasswordTitle = e.Text
+func (wm *CustomLoginTextReadModel) handleInitPasswordScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyInitPasswordTitle {
+		wm.InitPasswordTitle = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyResetPasswordDescription {
-		wm.ResetPasswordDescription = e.Text
+	if e.Key == domain.LoginKeyInitPasswordDescription {
+		wm.InitPasswordDescription = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyResetPasswordNextButtonText {
-		wm.ResetPasswordNextButtonText = e.Text
+	if e.Key == domain.LoginKeyInitPasswordNextButtonText {
+		wm.InitPasswordNextButtonText = e.Text
 		return
 	}
 }
 
-func (wm *CustomLoginTextReadModel) handleResetPasswordScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
-	if e.Key == domain.LoginKeyResetPasswordTitle {
-		wm.ResetPasswordTitle = ""
+func (wm *CustomLoginTextReadModel) handleInitPasswordScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyInitPasswordTitle {
+		wm.InitPasswordTitle = ""
 		return
 	}
-	if e.Key == domain.LoginKeyResetPasswordDescription {
-		wm.ResetPasswordDescription = ""
+	if e.Key == domain.LoginKeyInitPasswordDescription {
+		wm.InitPasswordDescription = ""
 		return
 	}
-	if e.Key == domain.LoginKeyResetPasswordNextButtonText {
-		wm.ResetPasswordNextButtonText = ""
+	if e.Key == domain.LoginKeyInitPasswordNextButtonText {
+		wm.InitPasswordNextButtonText = ""
 		return
 	}
 }
@@ -508,38 +544,38 @@ func (wm *CustomLoginTextReadModel) handleInitializeUserScreenRemoveEvent(e *pol
 }
 
 func (wm *CustomLoginTextReadModel) handleInitializeDoneScreenSetEvent(e *policy.CustomTextSetEvent) {
-	if e.Key == domain.LoginKeyInitializeDoneTitle {
+	if e.Key == domain.LoginKeyInitUserDoneTitle {
 		wm.InitializeDoneTitle = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeDoneDescription {
+	if e.Key == domain.LoginKeyInitUserDoneDescription {
 		wm.InitializeDoneDescription = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeDoneAbortButtonText {
+	if e.Key == domain.LoginKeyInitUserDoneAbortButtonText {
 		wm.InitializeDoneAbortButtonText = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeDoneNextButtonText {
+	if e.Key == domain.LoginKeyInitUserDoneNextButtonText {
 		wm.InitializeDoneNextButtonText = e.Text
 		return
 	}
 }
 
 func (wm *CustomLoginTextReadModel) handleInitializeDoneScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
-	if e.Key == domain.LoginKeyInitializeDoneTitle {
+	if e.Key == domain.LoginKeyInitUserDoneTitle {
 		wm.InitializeDoneTitle = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeDoneDescription {
+	if e.Key == domain.LoginKeyInitUserDoneDescription {
 		wm.InitializeDoneDescription = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeDoneAbortButtonText {
+	if e.Key == domain.LoginKeyInitUserDoneAbortButtonText {
 		wm.InitializeDoneAbortButtonText = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitializeDoneNextButtonText {
+	if e.Key == domain.LoginKeyInitUserDoneNextButtonText {
 		wm.InitializeDoneNextButtonText = ""
 		return
 	}

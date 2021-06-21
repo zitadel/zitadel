@@ -1,11 +1,11 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "MFAVerify.Title"}}</h1>
+    <h1>{{t "VerifyMFAOTP.Title"}}</h1>
 
     {{ template "user-profile" . }}
 
-    <p>{{t "MFAVerify.Description"}}</p>
+    <p>{{t "VerifyMFAOTP.Description"}}</p>
 </div>
 
 <form action="{{ mfaVerifyUrl }}" method="POST">
@@ -16,7 +16,7 @@
     <input type="hidden" name="mfaType" value="{{ .SelectedMFAProvider }}" />
 
     <div class="fields">
-        <label class="lgn-label" for="code">{{t "MFAVerify.Code"}}</label>
+        <label class="lgn-label" for="code">{{t "VerifyMFAOTP.CodeLabel"}}</label>
         <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
     </div>
 
@@ -28,14 +28,14 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </a>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "VerifyMFAOTP.NextButtonText"}}</button>
     </div>
 
     {{ if .MFAProviders }}
         <div class="lgn-mfa-other">
-            <p>{{t "MFA.ChooseOther"}}</p>
+            <p>{{t "MFAProvider.ChooseOther"}}</p>
             {{ range $provider := .MFAProviders}}
-            {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
+            {{ $providerName := (t (printf "MFAProvider.Provider%v" $provider)) }}
             <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}"
                 formnovalidate>{{$providerName}}</button>
             {{ end }}

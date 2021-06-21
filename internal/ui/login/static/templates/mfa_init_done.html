@@ -1,11 +1,11 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "MFAInitDone.Title"}}</h1>
+    <h1>{{t "InitMFADone.Title"}}</h1>
 
     {{ template "user-profile" . }}
 
-    <p>{{t "MFAInitDone.Description"}}</p>
+    <p>{{t "InitMFADone.Description"}}</p>
 </div>
 
 <form action="{{ loginUrl }}" method="POST">
@@ -17,10 +17,10 @@
 
     <div class="lgn-actions">
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+            {{t "InitMFADone.CancelButtonText"}}
         </a>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "InitMFADone.NextButtonText"}}</button>
     </div>
 </form>
 

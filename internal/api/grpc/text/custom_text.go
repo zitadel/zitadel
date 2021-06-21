@@ -36,7 +36,7 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 		SelectAccountText:      SelectAccountScreenToPb(text.SelectAccountScreenText),
 		LoginText:              LoginScreenTextToPb(text.LoginScreenText),
 		PasswordText:           PasswordScreenTextToPb(text.PasswordScreenText),
-		ResetPasswordText:      ResetPasswordScreenTextToPb(text.ResetPasswordScreenText),
+		ResetPasswordText:      ResetPasswordScreenTextToPb(text.InitPasswordScreenText),
 		InitializeUserText:     InitializeUserScreenTextToPb(text.InitializeUserScreenText),
 		InitializeDoneText:     InitializeDoneScreenTextToPb(text.InitializeDoneScreenText),
 		InitMfaPromptText:      InitMFAPromptScreenTextToPb(text.InitMFAPromptScreenText),
@@ -55,9 +55,14 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 
 func SelectAccountScreenToPb(text domain.SelectAccountScreenText) *text_pb.SelectAccountScreenText {
 	return &text_pb.SelectAccountScreenText{
-		Title:       text.Title,
-		Description: text.Description,
-		OtherUser:   text.OtherUser,
+		Title:                     text.Title,
+		Description:               text.Description,
+		TitleLinkingProcess:       text.Title,
+		DescriptionLinkingProcess: text.Description,
+		OtherUser:                 text.OtherUser,
+		SesstionStateActive:       text.SessionStateActive,
+		SesstionStateInactive:     text.SessionStateInactive,
+		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
 	}
 }
 
@@ -71,7 +76,7 @@ func LoginScreenTextToPb(text domain.LoginScreenText) *text_pb.LoginScreenText {
 		RegisterButtonText:        text.RegisterButtonText,
 		NextButtonText:            text.NextButtonText,
 		ExternalUserDescription:   text.ExternalUserDescription,
-		UserMustBeMemberOfOrg:     text.UserMustBeOrgMemberOfOrg,
+		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
 	}
 }
 
@@ -86,7 +91,7 @@ func PasswordScreenTextToPb(text domain.PasswordScreenText) *text_pb.PasswordScr
 	}
 }
 
-func ResetPasswordScreenTextToPb(text domain.ResetPasswordScreenText) *text_pb.ResetPasswordScreenText {
+func ResetPasswordScreenTextToPb(text domain.InitPasswordScreenText) *text_pb.ResetPasswordScreenText {
 	return &text_pb.ResetPasswordScreenText{
 		Title:          text.Title,
 		Description:    text.Description,
@@ -233,9 +238,14 @@ func SelectAccountScreenTextPbToDomain(text *text_pb.SelectAccountScreenText) do
 		return domain.SelectAccountScreenText{}
 	}
 	return domain.SelectAccountScreenText{
-		Title:       text.Title,
-		Description: text.Description,
-		OtherUser:   text.OtherUser,
+		Title:                     text.Title,
+		Description:               text.Description,
+		TitleLinkingProcess:       text.TitleLinkingProcess,
+		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
+		OtherUser:                 text.OtherUser,
+		SessionStateActive:        text.SesstionStateActive,
+		SessionStateInactive:      text.SesstionStateInactive,
+		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
 	}
 }
 
@@ -252,7 +262,7 @@ func LoginScreenTextPbToDomain(text *text_pb.LoginScreenText) domain.LoginScreen
 		RegisterButtonText:        text.RegisterButtonText,
 		NextButtonText:            text.NextButtonText,
 		ExternalUserDescription:   text.ExternalUserDescription,
-		UserMustBeOrgMemberOfOrg:  text.UserMustBeMemberOfOrg,
+		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
 	}
 }
 
@@ -270,11 +280,11 @@ func PasswordScreenTextPbToDomain(text *text_pb.PasswordScreenText) domain.Passw
 	}
 }
 
-func ResetPasswordScreenTextPbToDomain(text *text_pb.ResetPasswordScreenText) domain.ResetPasswordScreenText {
+func ResetPasswordScreenTextPbToDomain(text *text_pb.ResetPasswordScreenText) domain.InitPasswordScreenText {
 	if text == nil {
-		return domain.ResetPasswordScreenText{}
+		return domain.InitPasswordScreenText{}
 	}
-	return domain.ResetPasswordScreenText{
+	return domain.InitPasswordScreenText{
 		Title:          text.Title,
 		Description:    text.Description,
 		NextButtonText: text.NextButtonText,

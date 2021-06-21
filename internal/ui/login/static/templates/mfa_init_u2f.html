@@ -1,9 +1,11 @@
 {{template "main-top" .}}
 
 <div class="head">
+    <h1>{{t "InitMFAU2F.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
-    <p>{{t "MFAInitU2F.Description"}}</p>
+    <p>{{t "InitMFAU2F.Description"}}</p>
 </div>
 
 <form action="{{ mfaInitU2FVerifyUrl }}" method="POST">
@@ -15,14 +17,14 @@
     <input type="hidden" name="credentialData" />
 
     <div class="fields">
-        <p class="wa-no-support lgn-error hidden">{{t "WebAuthN.NotSupported"}}</p>
+        <p class="wa-no-support lgn-error hidden">{{t "InitMFAU2F.NotSupported"}}</p>
         <div class="field">
-            <label class="lgn-label" for="name">{{t "WebAuthN.Name"}}</label>
+            <label class="lgn-label" for="name">{{t "InitMFAU2F.NameLabel"}}</label>
             <input class="lgn-input" type="text" id="name" name="name" autocomplete="off" autofocus>
         </div>
         <div id="wa-error" class="lgn-error hidden">
             <span class="cause"></span>
-            <span>{{t "WebAuthN.Error.Retry"}}</span>
+            <span>{{t "InitMFAU2F.Error.Retry"}}</span>
         </div>
     </div>
 
@@ -35,7 +37,7 @@
         </a>
 
         <span class="fill-space"></span>
-        <a id="btn-register" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.RegisterToken"}}</a>
+        <a id="btn-register" class="lgn-raised-button lgn-primary wa-support">{{t "InitMFAU2F.RegisterTokenButtonText"}}</a>
     </div>
 </form>
 

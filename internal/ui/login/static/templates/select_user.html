@@ -2,13 +2,13 @@
 
 <div class="lgn-head">
     {{if .Linking}}
-    <h1>{{t "UserSelection.TitleLinking"}}</h1>
-    <p>{{t "UserSelection.DescriptionLinking"}}{{if .OrgName}} 
-        {{t "UserSelection.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
+    <h1>{{t "SelectAccount.TitleLinking"}}</h1>
+    <p>{{t "SelectAccount.DescriptionLinking"}}{{if .OrgName}}
+        {{t "SelectAccount.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
     {{else}}
-    <h1>{{t "UserSelection.Title"}}</h1>
-    <p>{{t "UserSelection.Description"}}{{if .OrgName}} 
-        {{t "UserSelection.MustBeMemberOfOrg" "OrgName" .OrgName}}
+    <h1>{{t "SelectAccount.Title"}}</h1>
+    <p>{{t "SelectAccount.Description"}}{{if .OrgName}}
+        {{t "SelectAccount.MustBeMemberOfOrg" "OrgName" .OrgName}}
         {{end}}
     </p>
     {{end}}
@@ -26,7 +26,7 @@
         {{ $displayLoginNameSuffix := and .OrgID (not .DisplayLoginNameSuffix)}}
         {{ $orgID := .OrgID }}
         {{ range $user := .Users }}
-        {{ $sessionState := (printf "UserSelection.SessionState%v" $user.UserSessionState) }}
+        {{ $sessionState := (printf "SelectAccount.SessionState%v" $user.UserSessionState) }}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
         {{if not $user.SelectionPossible}}disabled title="{{t "Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
@@ -37,7 +37,7 @@
                         <span class="initials">A</span>
                     {{end}}
                 </div>
-            </div>
+            </div
             <div class="lgn-names">
                 <p class="lgn-displayname">{{$user.DisplayName}}</p>
                 <p class="lgn-loginname">{{if and $displayLoginNameSuffix $user.SelectionPossible}}{{$user.UserName}}{{else}}{{$user.LoginName}}{{end}}</p>
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="lgn-names">
-                <p>{{t "UserSelection.OtherUser"}}</p>
+                <p>{{t "SelectAccount.OtherUser"}}</p>
             </div>
             <span class="fill-space"></span>
             <i class="lgn-icon-angle-right-solid"></i>

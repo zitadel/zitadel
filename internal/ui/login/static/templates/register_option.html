@@ -19,10 +19,10 @@
     <div class="lgn-register-options">
         {{if .LoginPolicy.AllowUsernamePassword }}
         <button class="lgn-raised-button lgn-primary" name="usernamepassword" value="true"
-            formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
+            formnovalidate>{{t "RegisterOption.RegisterUsernamePasswordButtonText"}}</button>
         {{end}}
 
-        <p>{{t "Registration.ExternalLogin"}}</p>
+        <p>{{t "RegisterOption.ExternalLoginDescription"}}</p>
 
         {{if .LoginPolicy.AllowExternalIDP}}
             {{ $reqid := .AuthReqID}}

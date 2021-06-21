@@ -9,36 +9,82 @@ import (
 const (
 	LoginCustomText = "Login"
 
-	LoginKeySelectAccount            = "SelectAccount."
-	LoginKeySelectAccountTitle       = LoginKeySelectAccount + "Title"
-	LoginKeySelectAccountDescription = LoginKeySelectAccount + "Description"
-	LoginKeySelectAccountOtherUser   = LoginKeySelectAccount + "OtherUser"
-
 	LoginKeyLogin                          = "Login."
 	LoginKeyLoginTitle                     = LoginKeyLogin + "Title"
 	LoginKeyLoginDescription               = LoginKeyLogin + "Description"
 	LoginKeyLoginTitleLinkingProcess       = LoginKeyLogin + "TitleLinking"
 	LoginKeyLoginDescriptionLinkingProcess = LoginKeyLogin + "DescriptionLinking"
 	LoginKeyLoginNameLabel                 = LoginKeyLogin + "LoginNameLabel"
+	LoginKeyLoginUsernamePlaceHolder       = LoginKeyLogin + "UsernamePlaceHolder"
+	LoginKeyLoginLoginnamePlaceHolder      = LoginKeyLogin + "LoginnamePlaceHolder"
 	LoginKeyLoginRegisterButtonText        = LoginKeyLogin + "RegisterButtonText"
 	LoginKeyLoginNextButtonText            = LoginKeyLogin + "NextButtonText"
 	LoginKeyLoginExternalUserDescription   = LoginKeyLogin + "ExternalUserDescription"
-	LoginKeyUserMustBeMemberOfOrg          = LoginKeyLogin + "MustBeMemberOfOrg"
+	LoginKeyLoginUserMustBeMemberOfOrg     = LoginKeyLogin + "MustBeMemberOfOrg"
+
+	LoginKeySelectAccount                          = "SelectAccount."
+	LoginKeySelectAccountTitle                     = LoginKeySelectAccount + "Title"
+	LoginKeySelectAccountDescription               = LoginKeySelectAccount + "Description"
+	LoginKeySelectAccountTitleLinkingProcess       = LoginKeySelectAccount + "TitleLinking"
+	LoginKeySelectAccountDescriptionLinkingProcess = LoginKeySelectAccount + "DescriptionLinking"
+	LoginKeySelectAccountOtherUser                 = LoginKeySelectAccount + "OtherUser"
+	LoginKeySelectAccountSessionStateActive        = LoginKeySelectAccount + "SessionState0"
+	LoginKeySelectAccountSessionStateInactive      = LoginKeySelectAccount + "SessionState1"
+	LoginKeySelectAccountUserMustBeMemberOfOrg     = LoginKeySelectAccount + "MustBeMemberOfOrg"
 
 	LoginKeyPassword               = "Password."
 	LoginKeyPasswordTitle          = LoginKeyPassword + "Title"
 	LoginKeyPasswordDescription    = LoginKeyPassword + "Description"
 	LoginKeyPasswordLabel          = LoginKeyPassword + "PasswordLabel"
+	LoginKeyPasswordMinLength      = LoginKeyPassword + "MinLength"
+	LoginKeyPasswordHasUppercase   = LoginKeyPassword + "HasUppercase"
+	LoginKeyPasswordHasLowercase   = LoginKeyPassword + "HasLowercase"
+	LoginKeyPasswordHasNumber      = LoginKeyPassword + "HasNumber"
+	LoginKeyPasswordHasSymbol      = LoginKeyPassword + "HasSymbol"
 	LoginKeyPasswordResetLinkText  = LoginKeyPassword + "ResetLinkText"
 	LoginKeyPasswordBackButtonText = LoginKeyPassword + "BackButtonText"
 	LoginKeyPasswordNextButtonText = LoginKeyPassword + "NextButtonText"
 
-	LoginKeyResetPassword               = "ResetPassword."
-	LoginKeyResetPasswordTitle          = LoginKeyResetPassword + "Title"
-	LoginKeyResetPasswordDescription    = LoginKeyResetPassword + "Description"
-	LoginKeyResetPasswordNextButtonText = LoginKeyResetPassword + "NextButtonText"
+	LoginKeyUsernameChange         = "UsernameChange."
+	UsernameChangeTitle            = LoginKeyUsernameChange + "Title"
+	UsernameChangeDescription      = LoginKeyUsernameChange + "Description"
+	UsernameChangeUsernameLabel    = LoginKeyUsernameChange + "UsernameLabel"
+	UsernameChangeCancelButtonText = LoginKeyUsernameChange + "CancelButtonText"
+	UsernameChangeNextButtonText   = LoginKeyUsernameChange + "NextButtonText"
 
-	LoginKeyInitializeUser                        = "InitializeUser."
+	LoginKeyUsernameChangeDone       = "UsernameChangeDone."
+	UsernameChangeDoneTitle          = LoginKeyUsernameChangeDone + "Title"
+	UsernameChangeDoneDescription    = LoginKeyUsernameChangeDone + "Description"
+	UsernameChangeDoneNextButtonText = LoginKeyUsernameChangeDone + "NextButtonText"
+
+	LoginKeyInitPassword                 = "InitPassword."
+	LoginKeyInitPasswordTitle            = LoginKeyInitPassword + "Title"
+	LoginKeyInitPasswordDescription      = LoginKeyInitPassword + "Description"
+	LoginKeyInitPasswordCodeLabel        = LoginKeyInitPassword + "CodeLabel"
+	LoginKeyInitPasswordNextButtonText   = LoginKeyInitPassword + "NextButtonText"
+	LoginKeyInitPasswordResendButtonText = LoginKeyInitPassword + "ResendButtonText"
+
+	LoginKeyInitPasswordDone                 = "InitPasswordDone."
+	LoginKeyInitPasswordDoneTitle            = LoginKeyInitPasswordDone + "Title"
+	LoginKeyInitPasswordDoneDescription      = LoginKeyInitPasswordDone + "Description"
+	LoginKeyInitPasswordDoneNextButtonText   = LoginKeyInitPasswordDone + "NextButtonText"
+	LoginKeyInitPasswordDoneCancelButtonText = LoginKeyInitPasswordDone + "CancelButtonText"
+
+	LoginKeyEmailVerification                 = "EmailVerification."
+	LoginKeyEmailVerificationTitle            = LoginKeyEmailVerification + "Title"
+	LoginKeyEmailVerificationDescription      = LoginKeyEmailVerification + "Description"
+	LoginKeyEmailVerificationCodeLabel        = LoginKeyEmailVerification + "CodeLabel"
+	LoginKeyEmailVerificationNextButtonText   = LoginKeyEmailVerification + "NextButtonText"
+	LoginKeyEmailVerificationResendButtonText = LoginKeyEmailVerification + "ResendButtonText"
+
+	LoginKeyEmailVerificationDone                 = "EmailVerificationDone."
+	LoginKeyEmailVerificationDoneTitle            = LoginKeyEmailVerificationDone + "Title"
+	LoginKeyEmailVerificationDoneDescription      = LoginKeyEmailVerificationDone + "Description"
+	LoginKeyEmailVerificationDoneNextButtonText   = LoginKeyEmailVerificationDone + "NextButtonText"
+	LoginKeyEmailVerificationDoneCancelButtonText = LoginKeyEmailVerificationDone + "CancelButtonText"
+	LoginKeyEmailVerificationDoneLoginButtonText  = LoginKeyEmailVerificationDone + "LoginButtonText"
+
+	LoginKeyInitializeUser                        = "InitUser."
 	LoginKeyInitializeUserTitle                   = LoginKeyInitializeUser + "Title"
 	LoginKeyInitializeUserDescription             = LoginKeyInitializeUser + "Description"
 	LoginKeyInitializeUserCodeLabel               = LoginKeyInitializeUser + "CodeLabel"
@@ -47,31 +93,36 @@ const (
 	LoginKeyInitializeUserResendButtonText        = LoginKeyInitializeUser + "ResendButtonText"
 	LoginKeyInitializeUserNextButtonText          = LoginKeyInitializeUser + "NextButtonText"
 
-	LoginKeyInitializeDone                = "InitializeDone."
-	LoginKeyInitializeDoneTitle           = LoginKeyInitializeDone + "Title"
-	LoginKeyInitializeDoneDescription     = LoginKeyInitializeDone + "Description"
-	LoginKeyInitializeDoneAbortButtonText = LoginKeyInitializeDone + "AbortButtonText"
-	LoginKeyInitializeDoneNextButtonText  = LoginKeyInitializeDone + "NextButtonText"
+	LoginKeyInitUserDone                = "InitUserDone."
+	LoginKeyInitUserDoneTitle           = LoginKeyInitUserDone + "Title"
+	LoginKeyInitUserDoneDescription     = LoginKeyInitUserDone + "Description"
+	LoginKeyInitUserDoneAbortButtonText = LoginKeyInitUserDone + "AbortButtonText"
+	LoginKeyInitUserDoneNextButtonText  = LoginKeyInitUserDone + "NextButtonText"
 
 	LoginKeyInitMFAPrompt               = "InitMFAPrompt."
 	LoginKeyInitMFAPromptTitle          = LoginKeyInitMFAPrompt + "Title"
 	LoginKeyInitMFAPromptDescription    = LoginKeyInitMFAPrompt + "Description"
-	LoginKeyInitMFAPromptOTPOption      = LoginKeyInitMFAPrompt + "OTPOption"
-	LoginKeyInitMFAPromptU2FOption      = LoginKeyInitMFAPrompt + "U2FOption"
+	LoginKeyInitMFAPromptOTPOption      = LoginKeyInitMFAPrompt + "Provider0"
+	LoginKeyInitMFAPromptU2FOption      = LoginKeyInitMFAPrompt + "Provider1"
 	LoginKeyInitMFAPromptSkipButtonText = LoginKeyInitMFAPrompt + "SkipButtonText"
 	LoginKeyInitMFAPromptNextButtonText = LoginKeyInitMFAPrompt + "NextButtonText"
 
-	LoginKeyInitMFAOTP            = "InitMFAOTP."
-	LoginKeyInitMFAOTPTitle       = LoginKeyInitMFAOTP + "Title"
-	LoginKeyInitMFAOTPDescription = LoginKeyInitMFAOTP + "Description"
-	LoginKeyInitMFAOTPSecretLabel = LoginKeyInitMFAOTP + "SecretLabel"
-	LoginKeyInitMFAOTPCodeLabel   = LoginKeyInitMFAOTP + "CodeLabel"
+	LoginKeyInitMFAOTP               = "InitMFAOTP."
+	LoginKeyInitMFAOTPTitle          = LoginKeyInitMFAOTP + "Title"
+	LoginKeyInitMFAOTPDescription    = LoginKeyInitMFAOTP + "Description"
+	LoginKeyInitMFAOTPDescriptionOTP = LoginKeyInitMFAOTP + "OTPDescription"
+	LoginKeyInitMFAOTPSecretLabel    = LoginKeyInitMFAOTP + "SecretLabel"
+	LoginKeyInitMFAOTPCodeLabel      = LoginKeyInitMFAOTP + "CodeLabel"
+	LoginKeyInitMFANextButtonText    = LoginKeyInitMFAOTP + "NextButtonText"
+	LoginKeyInitMFACancelButtonText  = LoginKeyInitMFAOTP + "CancelButtonText"
 
 	LoginKeyInitMFAU2F                        = "InitMFAU2F."
 	LoginKeyInitMFAU2FTitle                   = LoginKeyInitMFAU2F + "Title"
 	LoginKeyInitMFAU2FDescription             = LoginKeyInitMFAU2F + "Description"
 	LoginKeyInitMFAU2FTokenNameLabel          = LoginKeyInitMFAU2F + "TokenNameLabel"
+	LoginKeyInitMFAU2FNotSupported            = LoginKeyInitMFAU2F + "NotSupported"
 	LoginKeyInitMFAU2FRegisterTokenButtonText = LoginKeyInitMFAU2F + "RegisterTokenButtonText"
+	LoginKeyInitMFAU2FErrorRetry              = LoginKeyInitMFAU2F + "Error.Retry"
 
 	LoginKeyInitMFADone                = "InitMFADone."
 	LoginKeyInitMFADoneTitle           = LoginKeyInitMFADone + "Title"
@@ -79,60 +130,127 @@ const (
 	LoginKeyInitMFADoneAbortButtonText = LoginKeyInitMFADone + "AbortButtonText"
 	LoginKeyInitMFADoneNextButtonText  = LoginKeyInitMFADone + "NextButtonText"
 
+	LoginKeyMFAProviders            = "MFAProvider."
+	LoginKeyMFAProvidersChooseOther = LoginKeyMFAProviders + "ChooseOther"
+	LoginKeyMFAProvidersOTP         = LoginKeyMFAProviders + "Provider0"
+	LoginKeyMFAProvidersU2F         = LoginKeyMFAProviders + "Provider1"
+
 	LoginKeyVerifyMFAOTP               = "VerifyMFAOTP."
 	LoginKeyVerifyMFAOTPTitle          = LoginKeyVerifyMFAOTP + "Title"
 	LoginKeyVerifyMFAOTPDescription    = LoginKeyVerifyMFAOTP + "Description"
 	LoginKeyVerifyMFAOTPCodeLabel      = LoginKeyVerifyMFAOTP + "CodeLabel"
 	LoginKeyVerifyMFAOTPNextButtonText = LoginKeyVerifyMFAOTP + "NextButtonText"
 
-	LoginKeyVerifyMFAU2F                       = "VerifyMFAU2F."
-	LoginKeyVerifyMFAU2FTitle                  = LoginKeyVerifyMFAU2F + "Title"
-	LoginKeyVerifyMFAU2FDescription            = LoginKeyVerifyMFAU2F + "Description"
-	LoginKeyVerifyMFAU2FValidateTokenText      = LoginKeyVerifyMFAU2F + "ValidateTokenText"
-	LoginKeyVerifyMFAU2FOtherOptionDescription = LoginKeyVerifyMFAU2F + "OtherOptionDescription"
-	LoginKeyVerifyMFAU2FOptionOTPButtonText    = LoginKeyVerifyMFAU2F + "OptionOTPButtonText"
-
-	LoginKeyRegistrationOption                         = "RegistrationOption."
-	LoginKeyRegistrationOptionTitle                    = LoginKeyRegistrationOption + "Title"
-	LoginKeyRegistrationOptionDescription              = LoginKeyRegistrationOption + "Description"
-	LoginKeyRegistrationOptionUserNameButtonText       = LoginKeyRegistrationOption + "UserNameButtonText"
-	LoginKeyRegistrationOptionExternalLoginDescription = LoginKeyRegistrationOption + "ExternalLoginDescription"
-
-	LoginKeyRegistrationUser                     = "RegistrationUser."
-	LoginKeyRegistrationUserTitle                = LoginKeyRegistrationUser + "Title"
-	LoginKeyRegistrationUserDescription          = LoginKeyRegistrationUser + "Description"
-	LoginKeyRegistrationUserFirstnameLabel       = LoginKeyRegistrationUser + "FirstnameLabel"
-	LoginKeyRegistrationUserLastnameLabel        = LoginKeyRegistrationUser + "LastnameLabel"
-	LoginKeyRegistrationUserEmailLabel           = LoginKeyRegistrationUser + "EmailLabel"
-	LoginKeyRegistrationUserLanguageLabel        = LoginKeyRegistrationUser + "LanguageLabel"
-	LoginKeyRegistrationUserGenderLabel          = LoginKeyRegistrationUser + "GenderLabel"
-	LoginKeyRegistrationUserPasswordLabel        = LoginKeyRegistrationUser + "PasswordLabel"
-	LoginKeyRegistrationUserPasswordConfirmLabel = LoginKeyRegistrationUser + "PasswordConfirmLabel"
-	LoginKeyRegistrationUserSaveButtonText       = LoginKeyRegistrationUser + "SaveButtonText"
-
-	LoginKeyRegistrationOrg                 = "RegistrationOrg."
-	LoginKeyRegisterOrgTitle                = LoginKeyRegistrationOrg + "Title"
-	LoginKeyRegisterOrgDescription          = LoginKeyRegistrationOrg + "Description"
-	LoginKeyRegisterOrgOrgNameLabel         = LoginKeyRegistrationOrg + "OrgNameLabel"
-	LoginKeyRegisterOrgFirstnameLabel       = LoginKeyRegistrationOrg + "FirstnameLabel"
-	LoginKeyRegisterOrgLastnameLabel        = LoginKeyRegistrationOrg + "LastnameLabel"
-	LoginKeyRegisterOrgUsernameLabel        = LoginKeyRegistrationOrg + "UsernameLabel"
-	LoginKeyRegisterOrgEmailLabel           = LoginKeyRegistrationOrg + "EmailLabel"
-	LoginKeyRegisterOrgPasswordLabel        = LoginKeyRegistrationOrg + "PasswordLabel"
-	LoginKeyRegisterOrgPasswordConfirmLabel = LoginKeyRegistrationOrg + "PasswordConfirmLabel"
-	LoginKeyRegisterOrgSaveButtonText       = LoginKeyRegistrationOrg + "SaveButtonText"
+	LoginKeyVerifyMFAU2F                  = "VerifyMFAU2F."
+	LoginKeyVerifyMFAU2FTitle             = LoginKeyVerifyMFAU2F + "Title"
+	LoginKeyVerifyMFAU2FDescription       = LoginKeyVerifyMFAU2F + "Description"
+	LoginKeyVerifyMFAU2FNotSupported      = LoginKeyVerifyMFAU2F + "NotSupported"
+	LoginKeyVerifyMFAU2FValidateTokenText = LoginKeyVerifyMFAU2F + "ValidateTokenButtonText"
+	LoginKeyVerifyMFAU2FErrorRetry        = LoginKeyVerifyMFAU2F + "Error.Retry"
 
 	LoginKeyPasswordless                        = "Passwordless."
 	LoginKeyPasswordlessTitle                   = LoginKeyPasswordless + "Title"
 	LoginKeyPasswordlessDescription             = LoginKeyPasswordless + "Description"
 	LoginKeyPasswordlessLoginWithPwButtonText   = LoginKeyPasswordless + "LoginWithPwButtonText"
 	LoginKeyPasswordlessValidateTokenButtonText = LoginKeyPasswordless + "ValidateTokenButtonText"
+	LoginKeyPasswordlessNotSupported            = LoginKeyPasswordless + "NotSupported"
+	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "Error.Retry"
 
-	LoginKeySuccessLogin                        = "SuccessLogin."
+	LoginKeyPasswordChange                        = "PasswordChange."
+	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
+	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
+	LoginKeyPasswordChangeOldPasswordLabel        = LoginKeyPasswordChange + "OldPasswordLabel"
+	LoginKeyPasswordChangeNewPasswordLabel        = LoginKeyPasswordChange + "NewPasswordLabel"
+	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmationLabel"
+	LoginKeyPasswordChangeCancelButtonText        = LoginKeyPasswordChange + "CancelButtonText"
+	LoginKeyPasswordChangeNextButtonText          = LoginKeyPasswordChange + "NextButtonText"
+
+	LoginKeyPasswordChangeDone               = "PasswordChangeDone."
+	LoginKeyPasswordChangeDoneTitle          = LoginKeyPasswordChangeDone + "Title"
+	LoginKeyPasswordChangeDoneDescription    = LoginKeyPasswordChangeDone + "Description"
+	LoginKeyPasswordChangeDoneNextButtonText = LoginKeyPasswordChangeDone + "NextButtonText"
+
+	LoginKeyPasswordResetDone               = "PasswordResetDone."
+	LoginKeyPasswordResetDoneTitle          = LoginKeyPasswordResetDone + "Title"
+	LoginKeyPasswordResetDoneDescription    = LoginKeyPasswordResetDone + "Description"
+	LoginKeyPasswordResetDoneNextButtonText = LoginKeyPasswordResetDone + "NextButtonText"
+
+	LoginKeyRegistrationOption                         = "RegisterOption."
+	LoginKeyRegistrationOptionTitle                    = LoginKeyRegistrationOption + "Title"
+	LoginKeyRegistrationOptionDescription              = LoginKeyRegistrationOption + "Description"
+	LoginKeyRegistrationOptionUserNameButtonText       = LoginKeyRegistrationOption + "RegisterUsernamePasswordButtonText"
+	LoginKeyRegistrationOptionExternalLoginDescription = LoginKeyRegistrationOption + "ExternalLoginDescription"
+
+	LoginKeyRegistrationUser                         = "RegistrationUser."
+	LoginKeyRegistrationUserTitle                    = LoginKeyRegistrationUser + "Title"
+	LoginKeyRegistrationUserDescription              = LoginKeyRegistrationUser + "Description"
+	LoginKeyRegistrationUserFirstnameLabel           = LoginKeyRegistrationUser + "FirstnameLabel"
+	LoginKeyRegistrationUserLastnameLabel            = LoginKeyRegistrationUser + "LastnameLabel"
+	LoginKeyRegistrationUserEmailLabel               = LoginKeyRegistrationUser + "EmailLabel"
+	LoginKeyRegistrationUserUsernameLabel            = LoginKeyRegistrationUser + "UsernameLabel"
+	LoginKeyRegistrationUserLanguageLabel            = LoginKeyRegistrationUser + "LanguageLabel"
+	LoginKeyRegistrationUserPasswordLabel            = LoginKeyRegistrationUser + "PasswordLabel"
+	LoginKeyRegistrationUserPasswordConfirmLabel     = LoginKeyRegistrationUser + "PasswordConfirmLabel"
+	LoginKeyRegistrationUserTOSAndPrivacy            = LoginKeyRegistrationUser + "TosAndPrivacyLabel"
+	LoginKeyRegistrationUserTOSConfirm               = LoginKeyRegistrationUser + "TosConfirm"
+	LoginKeyRegistrationUserTOSLink                  = LoginKeyRegistrationUser + "TosLink"
+	LoginKeyRegistrationUserTOSLinkText              = LoginKeyRegistrationUser + "TosLinkText"
+	LoginKeyRegistrationUserPrivacyConfirm           = LoginKeyRegistrationUser + "TosConfirmAnd"
+	LoginKeyRegistrationUserPrivacyLink              = LoginKeyRegistrationUser + "PrivacyLink"
+	LoginKeyRegistrationUserPrivacyLinkText          = LoginKeyRegistrationUser + "PrivacyLinkText"
+	LoginKeyRegistrationUserExternalLoginDescription = LoginKeyRegistrationUser + "ExternalLogin"
+	LoginKeyRegistrationUserNextButtonText           = LoginKeyRegistrationUser + "NextButtonText"
+	LoginKeyRegistrationUserBackButtonText           = LoginKeyRegistrationUser + "BackButtonText"
+
+	LoginKeyRegistrationOrg                     = "RegistrationOrg."
+	LoginKeyRegisterOrgTitle                    = LoginKeyRegistrationOrg + "Title"
+	LoginKeyRegisterOrgDescription              = LoginKeyRegistrationOrg + "Description"
+	LoginKeyRegisterOrgOrgNameLabel             = LoginKeyRegistrationOrg + "OrgNameLabel"
+	LoginKeyRegisterOrgFirstnameLabel           = LoginKeyRegistrationOrg + "FirstnameLabel"
+	LoginKeyRegisterOrgLastnameLabel            = LoginKeyRegistrationOrg + "LastnameLabel"
+	LoginKeyRegisterOrgUsernameLabel            = LoginKeyRegistrationOrg + "UsernameLabel"
+	LoginKeyRegisterOrgEmailLabel               = LoginKeyRegistrationOrg + "EmailLabel"
+	LoginKeyRegisterOrgPasswordLabel            = LoginKeyRegistrationOrg + "PasswordLabel"
+	LoginKeyRegisterOrgPasswordConfirmLabel     = LoginKeyRegistrationOrg + "PasswordConfirmLabel"
+	LoginKeyRegisterOrgTOSAndPrivacy            = LoginKeyRegistrationOrg + "TosAndPrivacyLabel"
+	LoginKeyRegisterOrgTOSConfirm               = LoginKeyRegistrationOrg + "TosConfirm"
+	LoginKeyRegisterOrgTOSLink                  = LoginKeyRegistrationOrg + "TosLink"
+	LoginKeyRegisterOrgTOSLinkText              = LoginKeyRegistrationOrg + "TosLinkText"
+	LoginKeyRegisterOrgPrivacyConfirm           = LoginKeyRegistrationOrg + "TosConfirmAnd"
+	LoginKeyRegisterOrgPrivacyLink              = LoginKeyRegistrationOrg + "PrivacyLink"
+	LoginKeyRegisterOrgPrivacyLinkText          = LoginKeyRegistrationOrg + "PrivacyLinkText"
+	LoginKeyRegisterOrgExternalLoginDescription = LoginKeyRegistrationOrg + "ExternalLogin"
+	LoginKeyRegisterOrgSaveButtonText           = LoginKeyRegistrationOrg + "SaveButtonText"
+
+	LoginKeyLinkingUserDone                 = "LinkingUsersDone."
+	LoginKeyLinkingUserDoneTitle            = LoginKeyLinkingUserDone + "Title"
+	LoginKeyLinkingUserDoneDescription      = LoginKeyLinkingUserDone + "Description"
+	LoginKeyLinkingUserDoneCancelButtonText = LoginKeyLinkingUserDone + "CancelButtonText"
+	LoginKeyLinkingUserDoneNextButtonText   = LoginKeyLinkingUserDone + "NextButtonText"
+
+	LoginKeyExternalNotFound                       = "ExternalNotFound."
+	LoginKeyExternalNotFoundTitle                  = LoginKeyExternalNotFound + "Title"
+	LoginKeyExternalNotFoundDescription            = LoginKeyExternalNotFound + "Description"
+	LoginKeyExternalNotFoundLinkButtonText         = LoginKeyExternalNotFound + "LinkButtonText"
+	LoginKeyExternalNotFoundAutoRegisterButtonText = LoginKeyExternalNotFound + "AutoRegisterButtonText"
+
+	LoginKeySuccessLogin                        = "LoginSuccess."
 	LoginKeySuccessLoginTitle                   = LoginKeySuccessLogin + "Title"
 	LoginKeySuccessLoginAutoRedirectDescription = LoginKeySuccessLogin + "AutoRedirectDescription"
 	LoginKeySuccessLoginRedirectedDescription   = LoginKeySuccessLogin + "RedirectedDescription"
 	LoginKeySuccessLoginNextButtonText          = LoginKeySuccessLogin + "NextButtonText"
+
+	LoginKeyLogoutDone                = "LogoutDone."
+	LoginKeyLogoutDoneTitle           = LoginKeyLogoutDone + "Title"
+	LoginKeyLogoutDoneDescription     = LoginKeyLogoutDone + "Description"
+	LoginKeyLogoutDoneLoginButtonText = LoginKeyLogoutDone + "LoginButtonText"
+
+	LoginKeyFooter            = "Footer."
+	LoginKeyFooterTos         = LoginKeyFooter + "Tos"
+	LoginKeyFooterTosLink     = LoginKeyFooter + "TosLink"
+	LoginKeyFooterPrivacy     = LoginKeyFooter + "Privacy"
+	LoginKeyFooterPrivacyLink = LoginKeyFooter + "PrivacyLink"
+	LoginKeyFooterHelp        = LoginKeyFooter + "Help"
 )
 
 type CustomLoginText struct {
@@ -145,7 +263,7 @@ type CustomLoginText struct {
 	SelectAccountScreenText      SelectAccountScreenText
 	LoginScreenText              LoginScreenText
 	PasswordScreenText           PasswordScreenText
-	ResetPasswordScreenText      ResetPasswordScreenText
+	InitPasswordScreenText       InitPasswordScreenText
 	InitializeUserScreenText     InitializeUserScreenText
 	InitializeDoneScreenText     InitializeDoneScreenText
 	InitMFAPromptScreenText      InitMFAPromptScreenText
@@ -166,9 +284,14 @@ func (m *CustomLoginText) IsValid() bool {
 }
 
 type SelectAccountScreenText struct {
-	Title       string
-	Description string
-	OtherUser   string
+	Title                     string
+	Description               string
+	TitleLinkingProcess       string
+	DescriptionLinkingProcess string
+	OtherUser                 string
+	SessionStateActive        string
+	SessionStateInactive      string
+	UserMustBeMemberOfOrg     string
 }
 
 type LoginScreenText struct {
@@ -180,7 +303,7 @@ type LoginScreenText struct {
 	RegisterButtonText        string
 	NextButtonText            string
 	ExternalUserDescription   string
-	UserMustBeOrgMemberOfOrg  string
+	UserMustBeMemberOfOrg     string
 }
 
 type PasswordScreenText struct {
@@ -192,7 +315,7 @@ type PasswordScreenText struct {
 	NextButtonText string
 }
 
-type ResetPasswordScreenText struct {
+type InitPasswordScreenText struct {
 	Title          string
 	Description    string
 	NextButtonText string

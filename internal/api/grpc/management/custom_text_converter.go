@@ -91,7 +91,7 @@ func SetLoginCustomTextToDomain(req *mgmt_pb.SetCustomLoginTextsRequest) *domain
 	result.SelectAccountScreenText = text.SelectAccountScreenTextPbToDomain(req.SelectAccountText)
 	result.LoginScreenText = text.LoginScreenTextPbToDomain(req.LoginText)
 	result.PasswordScreenText = text.PasswordScreenTextPbToDomain(req.PasswordText)
-	result.ResetPasswordScreenText = text.ResetPasswordScreenTextPbToDomain(req.ResetPasswordText)
+	result.InitPasswordScreenText = text.ResetPasswordScreenTextPbToDomain(req.ResetPasswordText)
 	result.InitializeUserScreenText = text.InitializeUserScreenTextPbToDomain(req.InitializeUserText)
 	result.InitializeDoneScreenText = text.InitializeDoneScreenTextPbToDomain(req.InitializeDoneText)
 	result.InitMFAPromptScreenText = text.InitMFAPromptScreenTextPbToDomain(req.InitMfaPromptText)
