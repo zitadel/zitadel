@@ -1,8 +1,9 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"golang.org/x/text/language"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Profile struct {
@@ -16,6 +17,7 @@ type Profile struct {
 	Gender             Gender
 	PreferredLoginName string
 	LoginNames         []string
+	AvatarURL          string
 }
 
 func (p *Profile) IsValid() bool {

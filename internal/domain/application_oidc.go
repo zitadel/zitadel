@@ -4,15 +4,22 @@ import (
 	"strings"
 	"time"
 
+	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 const (
-	http           = "http://"
-	httpLocalhost  = "http://localhost:"
-	httpLocalhost2 = "http://localhost/"
-	https          = "https://"
+	http                          = "http://"
+	httpLocalhostWithPort         = "http://localhost:"
+	httpLocalhostWithoutPort      = "http://localhost/"
+	httpLoopbackV4WithPort        = "http://127.0.0.1:"
+	httpLoopbackV4WithoutPort     = "http://127.0.0.1/"
+	httpLoopbackV6WithPort        = "http://[::1]:"
+	httpLoopbackV6WithoutPort     = "http://[::1]/"
+	httpLoopbackV6LongWithPort    = "http://[0:0:0:0:0:0:0:1]:"
+	httpLoopbackV6LongWithoutPort = "http://[0:0:0:0:0:0:0:1]/"
+	https                         = "https://"
 )
 
 type OIDCApp struct {
@@ -37,6 +44,7 @@ type OIDCApp struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
+	AdditionalOrigins        []string
 
 	State AppState
 }
@@ -113,7 +121,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if a.ClockSkew > time.Second*5 || a.ClockSkew < time.Second*0 {
+	if a.ClockSkew > time.Second*5 || a.ClockSkew < time.Second*0 || !a.OriginsValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -123,6 +131,15 @@ func (a *OIDCApp) IsValid() bool {
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(a.GrantTypes, grantType)
 		if !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *OIDCApp) OriginsValid() bool {
+	for _, origin := range a.AdditionalOrigins {
+		if !http_util.IsOrigin(origin) {
 			return false
 		}
 	}
@@ -173,6 +190,7 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 		compliance.NoneCompliant = true
 		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
 	}
+	CheckGrantTypes(compliance, grantTypes)
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
 	} else {
@@ -196,6 +214,13 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 	return compliance
 }
 
+func CheckGrantTypes(compliance *Compliance, grantTypes []OIDCGrantType) {
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeRefreshToken) && !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.GrantType.Refresh.NoAuthCode")
+	}
+}
+
 func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
 	if authMethod != OIDCAuthMethodTypeNone {
 		compliance.NoneCompliant = true
@@ -214,9 +239,15 @@ func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, 
 	if urlsAreHttps(redirectUris) {
 		return
 	}
-	if urlContainsPrefix(redirectUris, http) && appType != OIDCApplicationTypeWeb {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	if urlContainsPrefix(redirectUris, http) {
+		if appType == OIDCApplicationTypeUserAgent {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+		}
+		if appType == OIDCApplicationTypeNative && !onlyLocalhostIsHttp(redirectUris) {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
+		}
 	}
 	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
 		compliance.NoneCompliant = true
@@ -236,7 +267,7 @@ func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationTy
 		if appType == OIDCApplicationTypeNative {
 			if !onlyLocalhostIsHttp(redirectUris) {
 				compliance.NoneCompliant = true
-				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
+				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
 			}
 			return
 		}
@@ -253,13 +284,15 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplic
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if (urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeNative {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpLocalhostOnlyForNative")
-	}
-	if urlContainsPrefix(redirectUris, http) && !(urlContainsPrefix(redirectUris, httpLocalhost) || urlContainsPrefix(redirectUris, httpLocalhost2)) && appType != OIDCApplicationTypeWeb {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	if urlContainsPrefix(redirectUris, http) {
+		if appType == OIDCApplicationTypeUserAgent {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+		}
+		if !onlyLocalhostIsHttp(redirectUris) && appType == OIDCApplicationTypeNative {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
+		}
 	}
 	if !compliance.NoneCompliant {
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.NotAllCombinationsAreAllowed")
@@ -295,11 +328,20 @@ func containsCustom(uris []string) bool {
 
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
-		if strings.HasPrefix(uri, http) {
-			if !strings.HasPrefix(uri, httpLocalhost) && !strings.HasPrefix(uri, httpLocalhost2) {
-				return false
-			}
+		if strings.HasPrefix(uri, http) && !isHTTPLoopbackLocalhost(uri) {
+			return false
 		}
 	}
 	return true
+}
+
+func isHTTPLoopbackLocalhost(uri string) bool {
+	return strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
+		strings.HasPrefix(uri, httpLocalhostWithPort) ||
+		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
+		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
+		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
 }

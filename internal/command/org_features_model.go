@@ -67,9 +67,12 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	loginPolicyPasswordless,
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
+	loginPolicyPasswordReset,
 	passwordComplexityPolicy,
-	labelPolicy,
-	customDomain bool,
+	labelPolicyPrivateLabel,
+	labelPolicyWatermark,
+	customDomain,
+	customText bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -104,14 +107,23 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if wm.LoginPolicyUsernameLogin != loginPolicyUsernameLogin {
 		changes = append(changes, features.ChangeLoginPolicyUsernameLogin(loginPolicyUsernameLogin))
 	}
+	if wm.LoginPolicyPasswordReset != loginPolicyPasswordReset {
+		changes = append(changes, features.ChangeLoginPolicyPasswordReset(loginPolicyPasswordReset))
+	}
 	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
 		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))
 	}
-	if wm.LabelPolicy != labelPolicy {
-		changes = append(changes, features.ChangeLabelPolicy(labelPolicy))
+	if wm.LabelPolicyPrivateLabel != labelPolicyPrivateLabel {
+		changes = append(changes, features.ChangeLabelPolicyPrivateLabel(labelPolicyPrivateLabel))
+	}
+	if wm.LabelPolicyWatermark != labelPolicyWatermark {
+		changes = append(changes, features.ChangeLabelPolicyWatermark(labelPolicyWatermark))
 	}
 	if wm.CustomDomain != customDomain {
 		changes = append(changes, features.ChangeCustomDomain(customDomain))
+	}
+	if wm.CustomText != customText {
+		changes = append(changes, features.ChangeCustomText(customText))
 	}
 
 	if len(changes) == 0 {

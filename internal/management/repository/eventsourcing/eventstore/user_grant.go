@@ -13,8 +13,9 @@ import (
 )
 
 type UserGrantRepo struct {
-	SearchLimit uint64
-	View        *view.View
+	SearchLimit     uint64
+	View            *view.View
+	PrefixAvatarURL string
 }
 
 func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrantView, error) {
@@ -22,7 +23,7 @@ func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*
 	if err != nil {
 		return nil, err
 	}
-	return model.UserGrantToModel(grant), nil
+	return model.UserGrantToModel(grant, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserGrantRepo) UserGrantsByProjectID(ctx context.Context, projectID string) ([]*grant_model.UserGrantView, error) {
@@ -30,7 +31,7 @@ func (repo *UserGrantRepo) UserGrantsByProjectID(ctx context.Context, projectID 
 	if err != nil {
 		return nil, err
 	}
-	return model.UserGrantsToModel(grants), nil
+	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserGrantRepo) UserGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) ([]*grant_model.UserGrantView, error) {
@@ -38,7 +39,7 @@ func (repo *UserGrantRepo) UserGrantsByProjectIDAndRoleKey(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	return model.UserGrantsToModel(grants), nil
+	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserGrantRepo) UserGrantsByProjectAndGrantID(ctx context.Context, projectID, grantID string) ([]*grant_model.UserGrantView, error) {
@@ -46,7 +47,7 @@ func (repo *UserGrantRepo) UserGrantsByProjectAndGrantID(ctx context.Context, pr
 	if err != nil {
 		return nil, err
 	}
-	return model.UserGrantsToModel(grants), nil
+	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserGrantRepo) UserGrantsByUserID(ctx context.Context, userID string) ([]*grant_model.UserGrantView, error) {
@@ -54,7 +55,7 @@ func (repo *UserGrantRepo) UserGrantsByUserID(ctx context.Context, userID string
 	if err != nil {
 		return nil, err
 	}
-	return model.UserGrantsToModel(grants), nil
+	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
@@ -79,7 +80,7 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      model.UserGrantsToModel(grants),
+		Result:      model.UserGrantsToModel(grants, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence

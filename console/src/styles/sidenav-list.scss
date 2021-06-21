@@ -1,14 +1,14 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin sidenav-list-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
-  $primary-color: mat-color($primary, 500);
-  $accent-color: mat-color($accent, 500);
-  $primary-dark: mat-color($primary, A900);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $primary-dark: mat.get-color-from-palette($primary, A900);
   $foreground: map-get($theme, foreground);
-  $sec-dark: mat-color($primary, A800);
+  $sec-dark: mat.get-color-from-palette($primary, A800);
   $is-dark-theme: map-get($theme, is-dark);
   /* stylelint-enable */
 
@@ -22,7 +22,7 @@
   }
 
   .nav-item {
-    color: mat-color($foreground, text) !important;
+    color: mat.get-color-from-palette($foreground, text) !important;
 
     &:hover {
       background-color: if($is-dark-theme, $sec-dark, rgb(84 105 212 / 6%));
@@ -48,7 +48,7 @@
     background-color: $primary-dark;
     border-radius: .5rem;
 
-    @include mat-elevation(5);
+    @include mat.elevation(5);
 
     .active {
       color: $primary-color !important;

@@ -8,4 +8,5 @@ type Repository interface {
 	IAMRepository
 	AdministratorRepository
 	FeaturesRepository
+	UserRepository
 }

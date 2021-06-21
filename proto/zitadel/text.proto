@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.text.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/text";
+
+message MessageCustomText {
+    zitadel.v1.ObjectDetails details = 1;
+    string title = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email title"
+        }
+    ];
+    string pre_header = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email pre header"
+        }
+    ];
+    string subject = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email subject"
+        }
+    ];
+    string greeting = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email greeting"
+        }
+    ];
+    string text = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email text"
+        }
+    ];
+    string button_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email button_text"
+        }
+    ];
+    string footer_text = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "custom text for email footer_text"
+        }
+    ];
+}

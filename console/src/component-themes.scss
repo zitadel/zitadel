@@ -17,7 +17,9 @@
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
+@import 'src/app/modules/zitadel-tier/zitadel-tier.component.scss';
 @import 'src/app/modules/onboarding/onboarding.component.scss';
+@import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
@@ -40,4 +42,6 @@
   @include meta-theme($theme);
   @include info-section-theme($theme);
   @include onboarding-theme($theme);
+  @include tier-theme($theme);
+  @include private-label-theme($theme);
 }

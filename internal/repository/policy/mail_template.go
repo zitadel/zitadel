@@ -29,10 +29,6 @@ func (e *MailTemplateAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func (e *MailTemplateAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewMailTemplateAddedEvent(
 	base *eventstore.BaseEvent,
 	template []byte,
@@ -67,10 +63,6 @@ func (e *MailTemplateChangedEvent) Data() interface{} {
 }
 
 func (e *MailTemplateChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *MailTemplateChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -120,10 +112,6 @@ func (e *MailTemplateRemovedEvent) Data() interface{} {
 }
 
 func (e *MailTemplateRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *MailTemplateRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

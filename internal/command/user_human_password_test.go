@@ -28,6 +28,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 		userID        string
 		resourceOwner string
 		password      string
+		oneTime       bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -72,7 +73,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 		},
 		{
-			name: "change password, ok",
+			name: "change password onetime, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -125,7 +126,6 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -135,6 +135,78 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
+				oneTime:       true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change password no one time, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordChangedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeHash,
+										Algorithm:  "hash",
+										KeyID:      "",
+										Crypted:    []byte("password"),
+									},
+									false,
+									"",
+								),
+							),
+						},
+					),
+				),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				oneTime:       false,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -149,7 +221,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.SetOneTimePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password)
+			got, err := r.SetPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.oneTime)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -385,7 +457,6 @@ func TestCommandSide_SetPassword(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 				secretGenerator: GetMockSecretGenerator(t),
@@ -412,7 +483,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 				userPasswordAlg:          tt.fields.userPasswordAlg,
 				passwordVerificationCode: tt.fields.secretGenerator,
 			}
-			err := r.SetPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
+			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -667,7 +738,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -853,7 +923,6 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 				secretGenerator: GetMockSecretGenerator(t),
@@ -975,7 +1044,6 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 			},
@@ -1157,7 +1225,6 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -1225,7 +1292,6 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								),
 							),
 						},
-						nil,
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),

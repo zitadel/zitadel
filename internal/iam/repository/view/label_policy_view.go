@@ -6,13 +6,15 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+
 	"github.com/jinzhu/gorm"
 )
 
-func GetLabelPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.LabelPolicyView, error) {
+func GetLabelPolicyByAggregateIDAndState(db *gorm.DB, table, aggregateID string, state int32) (*model.LabelPolicyView, error) {
 	policy := new(model.LabelPolicyView)
 	aggregateIDQuery := &model.LabelPolicySearchQuery{Key: iam_model.LabelPolicySearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
+	stateQuery := &model.LabelPolicySearchQuery{Key: iam_model.LabelPolicySearchKeyState, Value: state, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery, stateQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-68G11", "Errors.IAM.LabelPolicy.NotExisting")

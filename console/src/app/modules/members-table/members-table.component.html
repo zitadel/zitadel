@@ -22,7 +22,7 @@
                     <mat-checkbox [disabled]="!canWrite" color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                         <app-avatar *ngIf="row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
-                            [name]="row.displayName" [size]="32">
+                            [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [avatarUrl]="row.avatarUrl|| ''" [forColor]="row?.preferredLoginName" [size]="32">
                         </app-avatar>
                         <ng-template #cog>
                             <div class="sa-icon">

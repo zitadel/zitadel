@@ -1,12 +1,11 @@
-
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin cnsl-label-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat-color($primary, 500);
+  $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $warn: map-get($theme, warn);
-  $warn-color: mat-color($warn, 500);
+  $warn-color: mat.get-color-from-palette($warn, 500);
 
   .cnsl-label {
     display: block;

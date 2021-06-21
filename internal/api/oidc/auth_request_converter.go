@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/domain"
 	"net"
 	"time"
 
@@ -11,7 +10,9 @@ import (
 	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -112,6 +113,7 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err
 
 func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
 	return &domain.AuthRequest{
+		CreationDate:  time.Now(),
 		AgentID:       userAgentID,
 		BrowserInfo:   ParseBrowserInfoFromContext(ctx),
 		ApplicationID: authReq.ClientID,
@@ -121,7 +123,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		PossibleLOAs:  ACRValuesToBusiness(authReq.ACRValues),
 		UiLocales:     UILocalesToBusiness(authReq.UILocales),
 		LoginHint:     authReq.LoginHint,
-		MaxAuthAge:    authReq.MaxAge,
+		MaxAuthAge:    MaxAgeToBusiness(authReq.MaxAge),
 		UserID:        userID,
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
@@ -160,19 +162,23 @@ func IpFromContext(ctx context.Context) net.IP {
 	return net.ParseIP(ipString)
 }
 
-func PromptToBusiness(prompt oidc.Prompt) domain.Prompt {
-	switch prompt {
-	case oidc.PromptNone:
-		return domain.PromptNone
-	case oidc.PromptLogin:
-		return domain.PromptLogin
-	case oidc.PromptConsent:
-		return domain.PromptConsent
-	case oidc.PromptSelectAccount:
-		return domain.PromptSelectAccount
-	default:
-		return domain.PromptUnspecified
+func PromptToBusiness(oidcPrompt []string) []domain.Prompt {
+	prompts := make([]domain.Prompt, len(oidcPrompt))
+	for _, oidcPrompt := range oidcPrompt {
+		switch oidcPrompt {
+		case oidc.PromptNone:
+			prompts = append(prompts, domain.PromptNone)
+		case oidc.PromptLogin:
+			prompts = append(prompts, domain.PromptLogin)
+		case oidc.PromptConsent:
+			prompts = append(prompts, domain.PromptConsent)
+		case oidc.PromptSelectAccount:
+			prompts = append(prompts, domain.PromptSelectAccount)
+		case "create": //this prompt is not final yet, so not implemented in oidc lib
+			prompts = append(prompts, domain.PromptCreate)
+		}
 	}
+	return prompts
 }
 
 func ACRValuesToBusiness(values []string) []domain.LevelOfAssurance {
@@ -188,6 +194,14 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 		locales[i] = tag.String()
 	}
 	return locales
+}
+
+func MaxAgeToBusiness(maxAge *uint) *time.Duration {
+	if maxAge == nil {
+		return nil
+	}
+	dur := time.Duration(*maxAge) * time.Second
+	return &dur
 }
 
 func ResponseTypeToBusiness(responseType oidc.ResponseType) domain.OIDCResponseType {
@@ -254,4 +268,40 @@ func AMRFromMFAType(mfaType domain.MFAType) string {
 	default:
 		return ""
 	}
+}
+
+func RefreshTokenRequestFromBusiness(tokenView *model.RefreshTokenView) op.RefreshTokenRequest {
+	return &RefreshTokenRequest{tokenView}
+}
+
+type RefreshTokenRequest struct {
+	*model.RefreshTokenView
+}
+
+func (r *RefreshTokenRequest) GetAMR() []string {
+	return r.AuthMethodsReferences
+}
+
+func (r *RefreshTokenRequest) GetAudience() []string {
+	return r.Audience
+}
+
+func (r *RefreshTokenRequest) GetAuthTime() time.Time {
+	return r.AuthTime
+}
+
+func (r *RefreshTokenRequest) GetClientID() string {
+	return r.ClientID
+}
+
+func (r *RefreshTokenRequest) GetScopes() []string {
+	return r.Scopes
+}
+
+func (r *RefreshTokenRequest) GetSubject() string {
+	return r.UserID
+}
+
+func (r *RefreshTokenRequest) SetCurrentScopes(scopes []string) {
+	r.Scopes = scopes
 }

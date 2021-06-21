@@ -141,12 +141,12 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 }
 
 func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errID, errMessage),
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
 }

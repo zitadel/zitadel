@@ -16,7 +16,7 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView) error {
+func SendEmailVerificationCode(mailhtml string, text *iam_model.MessageTextView, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView, apiDomain string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -25,29 +25,17 @@ func SendEmailVerificationCode(mailhtml string, text *iam_model.MailTextView, us
 	if err != nil {
 		return err
 	}
-	var args = map[string]interface{}{
-		"FirstName": user.FirstName,
-		"LastName":  user.LastName,
-		"Code":      codeString,
-	}
+
+	var args = mapNotifyUserToArgs(user)
+	args["Code"] = codeString
 
 	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
 	text.Text, err = templates.ParseTemplateText(text.Text, args)
 	text.Text = html.UnescapeString(text.Text)
 
 	emailCodeData := &EmailVerificationCodeData{
-		TemplateData: templates.TemplateData{
-			Title:          text.Title,
-			PreHeader:      text.PreHeader,
-			Subject:        text.Subject,
-			Greeting:       text.Greeting,
-			Text:           html.UnescapeString(text.Text),
-			Href:           url,
-			ButtonText:     text.ButtonText,
-			PrimaryColor:   colors.PrimaryColor,
-			SecondaryColor: colors.SecondaryColor,
-		},
-		URL: url,
+		TemplateData: templates.GetTemplateData(apiDomain, url, text, colors),
+		URL:          url,
 	}
 
 	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)

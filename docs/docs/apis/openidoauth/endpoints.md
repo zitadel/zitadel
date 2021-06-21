@@ -39,7 +39,7 @@ Optional parameters
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`                                                                                                                                                                                                                                                                                                         |
 | max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                               |
 | nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation.                                                                                                                                                                                                                                                                                                          |
-| prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one |
+| prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one <br />`create`: the registration form will be displayed to the user directly |
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well.                                                                                                                                                                                                                                                                          |
 
 Successful Code Response
@@ -138,6 +138,46 @@ curl --request POST \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni...
 ```
+
+### Refresh Token Grant
+
+---
+
+Required request Parameters
+
+| Parameter     | Description                                                                         |
+| ------------- | ----------------------------------------------------------------------------------- |
+| grant_type    | Must be `refresh_token`                                                             |
+| refresh_token | The refresh_token previously issued in the last auth code or refresh token request. |
+| scope         | [Scopes](Scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
+
+Depending on your authorization method you will have to provide additional parameters or headers:
+
+When using `client_secret_basic`
+
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+
+When using `client_secret_post`
+
+Send your `client_id` and `client_secret` as parameters in the body:
+
+| Parameter     | Description                      |
+| ------------- | -------------------------------- |
+| client_id     | client_id of the application     |
+| client_secret | client_secret of the application |
+
+When using `none` (PKCE)
+
+Send your `client_id` as parameter in the body. No authentication is required.
+
+When using `private_key_jwt`
+
+Send a client assertion as JWT for us to validate the signature against the registered public key.
+
+| Parameter             | Description                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
 
 ## introspection_endpoint
 

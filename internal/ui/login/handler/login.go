@@ -2,26 +2,30 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/query"
 	"net"
 	"net/http"
 
 	"github.com/caos/logging"
-	"github.com/gorilla/csrf"
-	"github.com/rakyll/statik/fs"
-	"golang.org/x/text/language"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/cache"
+	cache_config "github.com/caos/zitadel/internal/cache/config"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/gorilla/csrf"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
 )
 
 type Login struct {
@@ -31,11 +35,14 @@ type Login struct {
 	parser              *form.Parser
 	command             *command.Commands
 	query               *query.Queries
+	staticStorage       static.Storage
+	staticCache         cache.Cache
 	authRepo            auth_repository.Repository
 	baseURL             string
 	zitadelURL          string
 	oidcAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
+	iamDomain           string
 }
 
 type Config struct {
@@ -47,6 +54,7 @@ type Config struct {
 	CSRF                  CSRF
 	UserAgentCookieConfig *middleware.UserAgentCookieConfig
 	Cache                 middleware.CacheConfig
+	StaticCache           cache_config.CacheConfig
 }
 
 type CSRF struct {
@@ -60,7 +68,7 @@ const (
 	handlerPrefix = "/login"
 )
 
-func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
+func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, localDevMode bool) (*Login, string) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
@@ -71,13 +79,18 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		zitadelURL:          config.ZitadelURL,
 		command:             command,
 		query:               query,
+		staticStorage:       staticStorage,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
+		iamDomain:           systemDefaults.Domain,
 	}
 	prefix := ""
 	if localDevMode {
 		prefix = handlerPrefix
 	}
+	login.staticCache, err = config.StaticCache.Config.NewCache()
+	logging.Log("CONFI-dgg31").OnError(err).Panic("unable to create storage cache")
+
 	statikFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-Ga21f").OnError(err).Panic("unable to create filesystem")
 
@@ -89,7 +102,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 	userAgentCookie, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
 	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
-	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
+	login.renderer = CreateRenderer(prefix, statikFS, staticStorage, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	return login, handlerPrefix
 }
@@ -146,6 +159,31 @@ func (l *Login) Listen(ctx context.Context) {
 		err := httpServer.Serve(httpListener)
 		logging.Log("APP-oSklt").OnError(err).Panic("unable to start listener")
 	}()
+}
+
+func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
+	users, err := l.authRepo.SearchUsers(ctx, &usr_model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{
+			{
+				Key:    usr_model.UserSearchKeyPreferredLoginName,
+				Method: domain.SearchMethodEndsWithIgnoreCase,
+				Value:  domain.NewIAMDomainName(orgName, l.iamDomain),
+			},
+			{
+				Key:    usr_model.UserSearchKeyResourceOwner,
+				Method: domain.SearchMethodNotEquals,
+				Value:  authz.GetCtxData(ctx).OrgID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Result))
+	for i, user := range users.Result {
+		userIDs[i] = user.ID
+	}
+	return userIDs, nil
 }
 
 func setContext(ctx context.Context, resourceOwner string) context.Context {

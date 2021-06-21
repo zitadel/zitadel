@@ -58,7 +58,8 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
-	forceMFA bool,
+	forceMFA,
+	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
 ) (*iam.LoginPolicyChangedEvent, bool) {
 
@@ -77,6 +78,9 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))
+	}
+	if wm.HidePasswordReset != hidePasswordReset {
+		changes = append(changes, policy.ChangeHidePasswordReset(hidePasswordReset))
 	}
 	if len(changes) == 0 {
 		return nil, false

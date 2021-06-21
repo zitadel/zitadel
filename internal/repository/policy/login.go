@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,6 +23,7 @@ type LoginPolicyAddedEvent struct {
 	AllowRegister         bool                    `json:"allowRegister,omitempty"`
 	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA              bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset     bool                    `json:"hidePasswordReset,omitempty"`
 	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
@@ -33,16 +35,13 @@ func (e *LoginPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func (e *LoginPolicyAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewLoginPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	allowUserNamePassword,
 	allowRegister,
 	allowExternalIDP,
-	forceMFA bool,
+	forceMFA,
+	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
@@ -52,6 +51,7 @@ func NewLoginPolicyAddedEvent(
 		AllowUserNamePassword: allowUserNamePassword,
 		ForceMFA:              forceMFA,
 		PasswordlessType:      passwordlessType,
+		HidePasswordReset:     hidePasswordReset,
 	}
 }
 
@@ -75,6 +75,7 @@ type LoginPolicyChangedEvent struct {
 	AllowRegister         *bool                    `json:"allowRegister,omitempty"`
 	AllowExternalIDP      *bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA              *bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset     *bool                    `json:"hidePasswordReset,omitempty"`
 	PasswordlessType      *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
@@ -86,10 +87,6 @@ func (e *LoginPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *LoginPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *LoginPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -141,6 +138,12 @@ func ChangePasswordlessType(passwordlessType domain.PasswordlessType) func(*Logi
 	}
 }
 
+func ChangeHidePasswordReset(hidePasswordReset bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.HidePasswordReset = &hidePasswordReset
+	}
+}
+
 func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &LoginPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -163,10 +166,6 @@ func (e *LoginPolicyRemovedEvent) Data() interface{} {
 }
 
 func (e *LoginPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *LoginPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

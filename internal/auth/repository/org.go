@@ -12,4 +12,5 @@ type OrgRepository interface {
 	GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 	GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error)
 	GetMyPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
+	GetLabelPolicy(ctx context.Context, orgID string) (*iam_model.LabelPolicyView, error)
 }

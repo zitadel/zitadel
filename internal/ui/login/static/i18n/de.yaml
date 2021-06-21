@@ -28,6 +28,7 @@ Password:
   HasLowercase: Kleinbuchstaben
   HasNumber: Nummer
   HasSymbol: Symbol
+  Confirmation: Bestätigung stimmt überein
 
 UsernameChange:
   Title: Usernamen ändern
@@ -159,9 +160,9 @@ Registration:
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
-  TosLink: https://zitadel.ch/pdf/agb.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: Datenschutzerklärung
-  PrivacyLink: https://zitadel.ch/pdf/datenschutz.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   ExternalLogin: oder registriere dich mit einem externen Benutzer
 
 RegistrationOrg:
@@ -186,9 +187,9 @@ RegistrationOrg:
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
-  TosLink: https://zitadel.ch/pdf/agb.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: Datenschutzerklärung
-  PrivacyLink: https://zitadel.ch/pdf/datenschutz.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
 
 LinkingUsersDone:
   Title: Benutzerlinking
@@ -199,6 +200,11 @@ ExternalNotFoundOption:
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   Link: Verlinken
   AutoRegister: Automatisches registrieren
+
+LoginSuccess:
+  Title: Erfolgreich eingeloggt
+  AutoRedirect: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+  Redirected: Du kannst diese Fenster nun schliessen.
 
 LogoutDone:
   Title: Ausgeloggt
@@ -220,10 +226,11 @@ Actions:
   PasswordLogin: Mit Passwort anmelden
 
 Footer:
+  PoweredBy: Powered By
   Tos: AGB
-  TosLink: https://zitadel.ch/pdf/agb.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   Privacy: Datenschutzerklärung
-  PrivacyLink: https://zitadel.ch/pdf/datenschutz.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   Help: Hilfe
 
 Errors:
@@ -234,6 +241,7 @@ Errors:
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     NotMatchingUserID: User stimm nicht mit User in Auth Request überein

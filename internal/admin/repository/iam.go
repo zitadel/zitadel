@@ -24,11 +24,12 @@ type IAMRepository interface {
 	ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
 
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetDefaultPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 
-	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
-	GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error)
+	GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
+	GetDefaultMessageText(ctx context.Context, textType string, language string) (*iam_model.MessageTextView, error)
 
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 

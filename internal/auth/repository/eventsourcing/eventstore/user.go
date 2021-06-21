@@ -4,18 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/golang/protobuf/ptypes"
-
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	key_model "github.com/caos/zitadel/internal/key/model"
-
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
@@ -24,10 +22,11 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit    uint64
-	Eventstore     v1.Eventstore
-	View           *view.View
-	SystemDefaults systemdefaults.SystemDefaults
+	SearchLimit     uint64
+	Eventstore      v1.Eventstore
+	View            *view.View
+	SystemDefaults  systemdefaults.SystemDefaults
+	PrefixAvatarURL string
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -153,18 +152,18 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 	events, err := repo.getUserEvents(ctx, id, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return usr_view_model.UserToModel(user), nil
+		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_view_model.UserToModel(user), nil
+			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
 	}
-	return usr_view_model.UserToModel(&userCopy), nil
+	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
@@ -179,18 +178,18 @@ func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*m
 	events, err := repo.getUserEvents(ctx, user.ID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return usr_view_model.UserToModel(user), nil
+		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_view_model.UserToModel(user), nil
+			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
 	}
-	return usr_view_model.UserToModel(&userCopy), nil
+	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
 	changes, err := repo.getUserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending, retention)
@@ -199,10 +198,13 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
+		change.ModifierLoginName = change.ModifierID
 		user, _ := repo.UserByID(ctx, change.ModifierID)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
@@ -218,6 +220,26 @@ func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_mo
 		return nil, err
 	}
 	return key_view_model.AuthNKeyToModel(key), nil
+}
+
+func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error) {
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-Gdgsw").OnError(sequenceErr).Warn("could not read latest user sequence")
+	users, count, err := repo.View.SearchUsers(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &model.UserSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: count,
+		Result:      usr_view_model.UsersToModel(users, repo.PrefixAvatarURL),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
 }
 
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {

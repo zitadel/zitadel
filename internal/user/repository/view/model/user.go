@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -18,17 +19,18 @@ import (
 )
 
 const (
-	UserKeyUserID        = "id"
-	UserKeyUserName      = "user_name"
-	UserKeyFirstName     = "first_name"
-	UserKeyLastName      = "last_name"
-	UserKeyNickName      = "nick_name"
-	UserKeyDisplayName   = "display_name"
-	UserKeyEmail         = "email"
-	UserKeyState         = "user_state"
-	UserKeyResourceOwner = "resource_owner"
-	UserKeyLoginNames    = "login_names"
-	UserKeyType          = "user_type"
+	UserKeyUserID             = "id"
+	UserKeyUserName           = "user_name"
+	UserKeyFirstName          = "first_name"
+	UserKeyLastName           = "last_name"
+	UserKeyNickName           = "nick_name"
+	UserKeyDisplayName        = "display_name"
+	UserKeyEmail              = "email"
+	UserKeyState              = "user_state"
+	UserKeyResourceOwner      = "resource_owner"
+	UserKeyLoginNames         = "login_names"
+	UserKeyPreferredLoginName = "preferred_login_name"
+	UserKeyType               = "user_type"
 )
 
 type userType string
@@ -73,6 +75,7 @@ type HumanView struct {
 	DisplayName       string         `json:"displayName" gorm:"column:display_name"`
 	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
 	Gender            int32          `json:"gender" gorm:"column:gender"`
+	AvatarKey         string         `json:"storeKey" gorm:"column:avatar_key"`
 	Email             string         `json:"email" gorm:"column:email"`
 	IsEmailVerified   bool           `json:"-" gorm:"column:is_email_verified"`
 	Phone             string         `json:"phone" gorm:"column:phone"`
@@ -133,7 +136,7 @@ func (m *MachineView) IsZero() bool {
 	return m == nil || m.Name == ""
 }
 
-func UserToModel(user *UserView) *model.UserView {
+func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 	userView := &model.UserView{
 		ID:                 user.ID,
 		UserName:           user.UserName,
@@ -157,6 +160,8 @@ func UserToModel(user *UserView) *model.UserView {
 			LastName:               user.LastName,
 			NickName:               user.NickName,
 			DisplayName:            user.DisplayName,
+			AvatarKey:              user.AvatarKey,
+			AvatarURL:              domain.AvatarURL(prefixAvatarURL, user.ResourceOwner, user.AvatarKey),
 			PreferredLanguage:      user.PreferredLanguage,
 			Gender:                 model.Gender(user.Gender),
 			Email:                  user.Email,
@@ -184,10 +189,10 @@ func UserToModel(user *UserView) *model.UserView {
 	return userView
 }
 
-func UsersToModel(users []*UserView) []*model.UserView {
+func UsersToModel(users []*UserView, prefixAvatarURL string) []*model.UserView {
 	result := make([]*model.UserView, len(users))
 	for i, p := range users {
-		result[i] = UserToModel(p)
+		result[i] = UserToModel(p, prefixAvatarURL)
 	}
 	return result
 }
@@ -273,10 +278,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		es_model.MachineChanged:
 		err = u.setData(event)
 	case es_model.DomainClaimed:
-		u.UsernameChangeRequired = true
+		if u.HumanView != nil {
+			u.HumanView.UsernameChangeRequired = true
+		}
 		err = u.setData(event)
 	case es_model.UserUserNameChanged:
-		u.UsernameChangeRequired = false
+		if u.HumanView != nil {
+			u.HumanView.UsernameChangeRequired = false
+		}
 		err = u.setData(event)
 	case es_model.UserEmailChanged,
 		es_model.HumanEmailChanged:
@@ -332,6 +341,10 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.InitializedUserCheckSucceeded,
 		es_model.InitializedHumanCheckSucceeded:
 		u.InitRequired = false
+	case es_model.HumanAvatarAdded:
+		err = u.setData(event)
+	case es_model.HumanAvatarRemoved:
+		u.AvatarKey = ""
 	}
 	u.ComputeObject()
 	return err

@@ -3,21 +3,19 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"golang.org/x/text/language"
 	"net/http"
 	"time"
 
 	"github.com/caos/logging"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -26,22 +24,24 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 const (
-	notificationTable         = "notification.notifications"
-	NotifyUserID              = "NOTIFICATION"
-	labelPolicyTableOrg       = "management.label_policies"
-	labelPolicyTableDef       = "adminapi.label_policies"
-	mailTemplateTableOrg      = "management.mail_templates"
-	mailTemplateTableDef      = "adminapi.mail_templates"
-	mailTextTableOrg          = "management.mail_texts"
-	mailTextTableDef          = "adminapi.mail_texts"
-	mailTextTypeDomainClaimed = "DomainClaimed"
-	mailTextTypeInitCode      = "InitCode"
-	mailTextTypePasswordReset = "PasswordReset"
-	mailTextTypeVerifyEmail   = "VerifyEmail"
-	mailTextTypeVerifyPhone   = "VerifyPhone"
+	notificationTable            = "notification.notifications"
+	NotifyUserID                 = "NOTIFICATION"
+	labelPolicyTableOrg          = "management.label_policies"
+	labelPolicyTableDef          = "adminapi.label_policies"
+	mailTemplateTableOrg         = "management.mail_templates"
+	mailTemplateTableDef         = "adminapi.mail_templates"
+	messageTextTableOrg          = "management.message_texts"
+	messageTextTableDef          = "adminapi.message_texts"
+	messageTextTypeDomainClaimed = "DomainClaimed"
+	messageTextTypeInitCode      = "InitCode"
+	messageTextTypePasswordReset = "PasswordReset"
+	messageTextTypeVerifyEmail   = "VerifyEmail"
+	messageTextTypeVerifyPhone   = "VerifyPhone"
 )
 
 type Notification struct {
@@ -52,6 +52,7 @@ type Notification struct {
 	i18n           *i18n.Translator
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
+	apiDomain      string
 }
 
 func newNotification(
@@ -61,6 +62,7 @@ func newNotification(
 	aesCrypto crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
 	statikDir http.FileSystem,
+	apiDomain string,
 ) *Notification {
 	h := &Notification{
 		handler:        handler,
@@ -69,6 +71,7 @@ func newNotification(
 		i18n:           translator,
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
+		apiDomain:      apiDomain,
 	}
 
 	h.subscribe()
@@ -143,13 +146,13 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
-
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -159,16 +162,16 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeInitCode, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeInitCode, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.HumanInitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanInitCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
@@ -182,13 +185,13 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil || alreadyHandled {
 		return err
 	}
-
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -198,15 +201,15 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypePasswordReset, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypePasswordReset, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.PasswordCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
@@ -220,13 +223,13 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
-
-	colors, err := n.getLabelPolicy(context.Background())
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
@@ -236,16 +239,16 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeVerifyEmail, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeVerifyEmail, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors)
+	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.HumanEmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanEmailVerificationCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
@@ -263,7 +266,11 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(n.i18n, user, phoneCode, n.systemDefaults, n.AesCrypto)
+	text, err := n.getMessageText(user, messageTextTypeVerifyPhone, user.PreferredLanguage)
+	if err != nil {
+		return err
+	}
+	err = types.SendPhoneVerificationCode(text, user, phoneCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -278,31 +285,35 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	data := make(map[string]string)
 	if err := json.Unmarshal(event.Data, &data); err != nil {
 		logging.Log("HANDLE-Gghq2").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
+		return errors.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
 	}
 	user, err := n.getUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	colors, err := n.getLabelPolicy(context.Background())
+	if user.LastEmail == "" {
+		return nil
+	}
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
 	}
 
-	template, err := n.getMailTemplate(context.Background())
+	template, err := n.getMailTemplate(ctx)
 	if err != nil {
 		return err
 	}
 
-	text, err := n.getMailText(context.Background(), mailTextTypeDomainClaimed, user.PreferredLanguage)
+	text, err := n.getMessageText(user, messageTextTypeDomainClaimed, user.PreferredLanguage)
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors)
+	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
-	return n.command.UserDomainClaimedSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.UserDomainClaimedSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {
@@ -352,10 +363,10 @@ func getSetNotifyContextData(orgID string) context.Context {
 // Read organization specific colors
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
-	policy, err := n.view.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg)
-	if caos_errs.IsNotFound(err) {
+	policy, err := n.view.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg, int32(domain.LabelPolicyStateActive))
+	if errors.IsNotFound(err) {
 		// read from default
-		policy, err = n.view.LabelPolicyByAggregateID(n.systemDefaults.IamID, labelPolicyTableDef)
+		policy, err = n.view.LabelPolicyByAggregateIDAndState(n.systemDefaults.IamID, labelPolicyTableDef, int32(domain.LabelPolicyStateActive))
 		if err != nil {
 			return nil, err
 		}
@@ -386,35 +397,38 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 }
 
 // Read organization specific texts
-func (n *Notification) getMailText(ctx context.Context, textType string, lang string) (*iam_model.MailTextView, error) {
+func (n *Notification) getMessageText(user *model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
 	langTag := language.Make(lang)
 	if langTag == language.Und {
-		langTag = n.systemDefaults.DefaultLanguage
+		langTag = language.English
 	}
-	base, _ := langTag.Base()
+	langBase, _ := langTag.Base()
+
+	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, langBase.String(), messageTextTableDef)
+	if err != nil {
+		return nil, err
+	}
+	defaultMessageText.Default = true
+
 	// read from Org
-	mailText, err := n.view.MailTextByIDs(authz.GetCtxData(ctx).OrgID, textType, base.String(), mailTextTableOrg)
+	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, langBase.String(), messageTextTableOrg)
 	if errors.IsNotFound(err) {
-		// read from default
-		mailText, err = n.view.MailTextByIDs(n.systemDefaults.IamID, textType, base.String(), mailTextTableDef)
-		if err != nil {
-			return nil, err
-		}
-		mailText.Default = true
+		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextViewToModel(mailText), err
+	mergedText := mergeMessageTexts(defaultMessageText, orgMessageText)
+	return iam_es_model.MessageTextViewToModel(mergedText), err
 }
 
-func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error) {
+func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
 	user, usrErr := n.view.NotifyUserByID(userID)
-	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+	if usrErr != nil && !errors.IsNotFound(usrErr) {
 		return nil, usrErr
 	}
 	if user == nil {
-		user = &view_model.NotifyUser{}
+		user = &model.NotifyUser{}
 	}
 	events, err := n.getUserEvents(userID, user.Sequence)
 	if err != nil {
@@ -427,7 +441,32 @@ func (n *Notification) getUserByID(userID string) (*view_model.NotifyUser, error
 		}
 	}
 	if userCopy.State == int32(model.UserStateDeleted) {
-		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
+		return nil, errors.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
 	}
 	return &userCopy, nil
+}
+
+func mergeMessageTexts(defaultText *iam_es_model.MessageTextView, orgText *iam_es_model.MessageTextView) *iam_es_model.MessageTextView {
+	if orgText.Subject == "" {
+		orgText.Subject = defaultText.Subject
+	}
+	if orgText.Title == "" {
+		orgText.Title = defaultText.Title
+	}
+	if orgText.PreHeader == "" {
+		orgText.PreHeader = defaultText.PreHeader
+	}
+	if orgText.Text == "" {
+		orgText.Text = defaultText.Text
+	}
+	if orgText.Greeting == "" {
+		orgText.Greeting = defaultText.Greeting
+	}
+	if orgText.ButtonText == "" {
+		orgText.ButtonText = defaultText.ButtonText
+	}
+	if orgText.FooterText == "" {
+		orgText.FooterText = defaultText.FooterText
+	}
+	return orgText
 }

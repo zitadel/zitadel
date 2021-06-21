@@ -22,9 +22,8 @@
             formnovalidate>{{t "RegisterOption.RegisterUsernamePassword"}}</button>
         {{end}}
 
-        <p>{{t "Registration.ExternalLogin"}}</p>
-
-        {{if .LoginPolicy.AllowExternalIDP}}
+        {{if hasExternalLogin}}
+            <p>{{t "Registration.ExternalLogin"}}</p>
             {{ $reqid := .AuthReqID}}
             {{range $provider := .IDPProviders}}
                 <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}"

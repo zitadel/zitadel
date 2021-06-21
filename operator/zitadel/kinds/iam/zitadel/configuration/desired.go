@@ -1,6 +1,11 @@
 package configuration
 
-import "github.com/caos/orbos/pkg/secret"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/caos/orbos/pkg/secret"
+)
 
 type Configuration struct {
 	Tracing             *Tracing       `yaml:"tracing,omitempty"`
@@ -13,12 +18,51 @@ type Configuration struct {
 	MigrateEventStoreV1 bool           `yaml:"migrateEventstoreV1"`
 	DNS                 *DNS           `yaml:"dns"`
 	ClusterDNS          string         `yaml:"clusterdns"`
+	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
+}
+
+func (c *Configuration) Validate() (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("validating configuration failed: %w", err)
+		}
+	}()
+
+	return c.DNS.validate()
+}
+
+type AssetStorage struct {
+	Type                    string           `yaml:"type,omitempty"`
+	Endpoint                string           `yaml:"endpoint,omitempty"`
+	AccessKeyID             *secret.Secret   `yaml:"accessKeyID,omitempty"`
+	ExistingAccessKeyID     *secret.Existing `yaml:"existingAccessKeyID,omitempty"`
+	SecretAccessKey         *secret.Secret   `yaml:"secretAccessKey,omitempty"`
+	ExistingSecretAccessKey *secret.Existing `yaml:"ExistingSecretAccessKey,omitempty"`
+	SSL                     bool             `yaml:"ssl,omitempty"`
+	Location                string           `yaml:"location,omitempty"`
+	BucketPrefix            string           `yaml:"bucketPrefix,omitempty"`
+	MultiDelete             bool             `yaml:"multiDelete,omitempty"`
 }
 
 type DNS struct {
-	Domain     string      `yaml:"domain"`
-	TlsSecret  string      `yaml:"tlsSecret"`
-	Subdomains *Subdomains `yaml:"subdomains"`
+	Domain        string      `yaml:"domain"`
+	TlsSecret     string      `yaml:"tlsSecret"`
+	ACMEAuthority string      `yaml:"acmeAuthority"`
+	Subdomains    *Subdomains `yaml:"subdomains"`
+}
+
+func (d *DNS) validate() (err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("validating dns failed: %w", err)
+		}
+	}()
+
+	if d.TlsSecret != "" && d.ACMEAuthority != "none" && d.ACMEAuthority != "" {
+		return errors.New("if tls secret is provided, acme authority must be 'none'")
+	}
+	return nil
 }
 
 type Subdomains struct {

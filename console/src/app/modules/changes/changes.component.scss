@@ -1,4 +1,4 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 .change-header {
   display: flex;
@@ -114,7 +114,7 @@
 
         /* stylelint-disable */
         $primary: map-get($theme, primary);
-        $primary-dark: mat-color($primary, A800);
+        $primary-dark: mat.get-color-from-palette($primary, A800);
         /* stylelint-enable */
 
         &.change-item-back {

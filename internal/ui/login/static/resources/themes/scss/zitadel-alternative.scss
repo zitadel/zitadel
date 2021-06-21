@@ -1,6 +1,6 @@
-// This file is meant to show off a possible starting point for an organisation whitelabeling
+@import 'main.scss';
+@import 'bundle.scss';
 
-@import './styles/theming/all';
 
 // Include non-theme styles for core. -> mainly background of the login
 
@@ -122,13 +122,6 @@ $dark-warn: lgn-palette($lgn-alternative-warn);
 
 $light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
 $dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);
-
-$light-theme: lgn-light-theme((
-  color: (
-    primary: $light-primary,
-    accent: $light-accent,
-  )
-));
 
 // Include all theme styles for the components.
 @include zitadel-lgn-theme($dark-theme);

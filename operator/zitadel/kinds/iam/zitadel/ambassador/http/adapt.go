@@ -12,6 +12,7 @@ import (
 
 const (
 	AdminRName     = "admin-rest-v1"
+	Upload         = "assets-v1"
 	MgmtName       = "mgmt-v1"
 	OauthName      = "oauth-v1"
 	AuthRName      = "auth-rest-v1"
@@ -35,6 +36,11 @@ func AdaptFunc(
 	internalMonitor := monitor.WithField("part", "http")
 
 	destroyAdminR, err := mapping.AdaptFuncToDestroy(namespace, AdminRName)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	destroyUpload, err := mapping.AdaptFuncToDestroy(namespace, Upload)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -76,6 +82,7 @@ func AdaptFunc(
 
 	destroyers := []operator.DestroyFunc{
 		operator.ResourceDestroyToZitadelDestroy(destroyAdminR),
+		operator.ResourceDestroyToZitadelDestroy(destroyUpload),
 		operator.ResourceDestroyToZitadelDestroy(destroyMgmtRest),
 		operator.ResourceDestroyToZitadelDestroy(destroyOAuthv2),
 		operator.ResourceDestroyToZitadelDestroy(destroyAuthR),
@@ -110,6 +117,22 @@ func AdaptFunc(
 				false,
 				apiDomain,
 				"/admin/v1",
+				"",
+				httpUrl,
+				30000,
+				30000,
+				cors,
+			)
+			if err != nil {
+				return nil, err
+			}
+
+			queryUpload, err := mapping.AdaptFuncToEnsure(
+				namespace,
+				labels.MustForName(componentLabels, Upload),
+				false,
+				apiDomain,
+				"/assets/v1",
 				"",
 				httpUrl,
 				30000,
@@ -234,6 +257,7 @@ func AdaptFunc(
 
 			queriers := []operator.QueryFunc{
 				operator.ResourceQueryToZitadelQuery(queryAdminR),
+				operator.ResourceQueryToZitadelQuery(queryUpload),
 				operator.ResourceQueryToZitadelQuery(queryMgmtRest),
 				operator.ResourceQueryToZitadelQuery(queryOAuthv2),
 				operator.ResourceQueryToZitadelQuery(queryAuthR),

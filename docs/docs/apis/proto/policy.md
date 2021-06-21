@@ -16,10 +16,22 @@ title: zitadel/policy.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
-| primary_color |  string | - |  |
-| secondary_color |  string | - |  |
-| is_default |  bool | - |  |
-| hide_login_name_suffix |  bool | - |  |
+| primary_color |  string | hex value for primary color |  |
+| is_default |  bool | defines if the organisation's admin changed the policy |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| warn_color |  string | hex value for secondary color |  |
+| background_color |  string | hex value for background color |  |
+| font_color |  string | hex value for font color |  |
+| primary_color_dark |  string | hex value for primary color dark theme |  |
+| background_color_dark |  string | hex value for background color dark theme |  |
+| warn_color_dark |  string | hex value for warn color dark theme |  |
+| font_color_dark |  string | hex value for font color dark theme |  |
+| disable_watermark |  bool | - |  |
+| logo_url |  string | - |  |
+| icon_url |  string | - |  |
+| logo_url_dark |  string | - |  |
+| icon_url_dark |  string | - |  |
+| font_url |  string | - |  |
 
 
 
@@ -37,6 +49,7 @@ title: zitadel/policy.proto
 | force_mfa |  bool | - |  |
 | passwordless_type |  PasswordlessType | - |  |
 | is_default |  bool | - |  |
+| hide_password_reset |  bool | - |  |
 
 
 

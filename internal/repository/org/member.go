@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	MemberAddedEventType   = orgEventTypePrefix + member.AddedEventType
-	MemberChangedEventType = orgEventTypePrefix + member.ChangedEventType
-	MemberRemovedEventType = orgEventTypePrefix + member.RemovedEventType
+	MemberAddedEventType          = orgEventTypePrefix + member.AddedEventType
+	MemberChangedEventType        = orgEventTypePrefix + member.ChangedEventType
+	MemberRemovedEventType        = orgEventTypePrefix + member.RemovedEventType
+	MemberCascadeRemovedEventType = orgEventTypePrefix + member.CascadeRemovedEventType
 )
 
 type MemberAddedEvent struct {
@@ -88,7 +89,6 @@ func NewMemberRemovedEvent(
 	aggregate *eventstore.Aggregate,
 	userID string,
 ) *MemberRemovedEvent {
-
 	return &MemberRemovedEvent{
 		MemberRemovedEvent: *member.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
@@ -108,4 +108,34 @@ func MemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, 
 	}
 
 	return &MemberRemovedEvent{MemberRemovedEvent: *e.(*member.MemberRemovedEvent)}, nil
+}
+
+type MemberCascadeRemovedEvent struct {
+	member.MemberCascadeRemovedEvent
+}
+
+func NewMemberCascadeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userID string,
+) *MemberCascadeRemovedEvent {
+	return &MemberCascadeRemovedEvent{
+		MemberCascadeRemovedEvent: *member.NewCascadeRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				MemberCascadeRemovedEventType,
+			),
+			userID,
+		),
+	}
+}
+
+func MemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := member.CascadeRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MemberCascadeRemovedEvent{MemberCascadeRemovedEvent: *e.(*member.MemberCascadeRemovedEvent)}, nil
 }

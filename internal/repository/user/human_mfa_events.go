@@ -24,10 +24,6 @@ func (e *HumanMFAInitSkippedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func (e *HumanMFAInitSkippedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanMFAInitSkippedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanMFAInitSkippedEvent {
 	return &HumanMFAInitSkippedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

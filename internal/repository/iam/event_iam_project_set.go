@@ -27,10 +27,6 @@ func (e *ProjectSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	return nil
 }
 
-func (e *ProjectSetEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewIAMProjectSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

@@ -28,6 +28,7 @@ Password:
   HasLowercase: Lowercase letter
   HasNumber: Number
   HasSymbol: Symbol
+  Confirmation: Confirmation match
 
 UsernameChange:
   Title: Change Username
@@ -52,7 +53,7 @@ InitPassword:
   NewPasswordConfirm: Confirm Password
 
 InitPasswordDone:
-  Title: Passwortd set
+  Title: Password set
   Description: Password successfully set
 
 InitUser:
@@ -103,7 +104,7 @@ WebAuthN:
     Retry: Retry, create a new challenge or choose a different method.
 
 Passwordless:
-  Title: Login passwordles
+  Title: Login passwordless
   Description: Verify your token
 
 PasswordChange:
@@ -111,7 +112,7 @@ PasswordChange:
   Description: Change your password. Enter your old and new password.
   OldPassword: Old Password
   NewPassword: New Password
-  NewPasswordConfirmation: Passwort confirmation
+  NewPasswordConfirmation: Password confirmation
 
 PasswordChangeDone:
   Title: Change Password
@@ -159,9 +160,9 @@ Registration:
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
-  TosLink: https://zitadel.ch/pdf/tos.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   ExternalLogin: or register with an external user
 
 RegistrationOrg:
@@ -186,9 +187,14 @@ RegistrationOrg:
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
-  TosLink: https://zitadel.ch/pdf/tos.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
+
+LoginSuccess:
+  Title: Login successful
+  AutoRedirect: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+  Redirected: You can now close this window.
 
 LogoutDone:
   Title: Logged out
@@ -220,10 +226,11 @@ Actions:
   PasswordLogin: Login with password
 
 Footer:
+  PoweredBy: Powered By
   Tos: TOS
-  TosLink: https://zitadel.ch/pdf/agb.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   Privacy: Privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   Help: Help
 
 Errors:
@@ -234,6 +241,7 @@ Errors:
     RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
+    Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     NotMatchingUserID: User and user in authrequest don't match
@@ -244,7 +252,7 @@ Errors:
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
-      Invalid: Passwort is invalid
+      Invalid: Password is invalid
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short

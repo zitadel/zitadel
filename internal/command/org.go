@@ -30,7 +30,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human) (*domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, claimedUserIDs []string) (*domain.ObjectDetails, error) {
 	orgIAMPolicy, err := c.getDefaultOrgIAMPolicy(ctx)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.IAM.OrgIAMPolicy.NotFound")
@@ -39,7 +39,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.IAM.PasswordComplexity.NotFound")
 	}
-	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, orgIAMPolicy, pwPolicy)
+	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, orgIAMPolicy, pwPolicy, claimedUserIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string) (*domain.Org, error) {
-	orgAgg, addedOrg, events, err := c.addOrg(ctx, &domain.Org{Name: name})
+func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
+	orgAgg, addedOrg, events, err := c.addOrg(ctx, &domain.Org{Name: name}, claimedUserIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +78,41 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 		return nil, err
 	}
 	return orgWriteModelToOrg(addedOrg), nil
+}
+
+func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
+	if orgID == "" || name == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
+	}
+	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
+	}
+	if orgWriteModel.Name == name {
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
+	}
+	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
+	events := make([]eventstore.EventPusher, 0)
+	events = append(events, org.NewOrgChangedEvent(ctx, orgAgg, orgWriteModel.Name, name))
+	changeDomainEvents, err := c.changeDefaultDomain(ctx, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	if len(changeDomainEvents) > 0 {
+		events = append(events, changeDomainEvents...)
+	}
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
 func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
@@ -126,8 +161,8 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, loginPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.EventPusher, err error) {
-	orgAgg, orgWriteModel, addOrgEvents, err := c.addOrg(ctx, organisation)
+func (c *Commands) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, loginPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy, claimedUserIDs []string) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.EventPusher, err error) {
+	orgAgg, orgWriteModel, addOrgEvents, err := c.addOrg(ctx, organisation, claimedUserIDs)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
@@ -148,7 +183,7 @@ func (c *Commands) setUpOrg(ctx context.Context, organisation *domain.Org, admin
 	return orgAgg, orgWriteModel, human, addedMember, addOrgEvents, nil
 }
 
-func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs ...string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.EventPusher, err error) {
+func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs []string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.EventPusher, err error) {
 	if organisation == nil || !organisation.IsValid() {
 		return nil, nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMM-deLSk", "Errors.Org.Invalid")
 	}
@@ -165,7 +200,7 @@ func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimed
 		org.NewOrgAddedEvent(ctx, orgAgg, organisation.Name),
 	}
 	for _, orgDomain := range organisation.Domains {
-		orgDomainEvents, err := c.addOrgDomain(ctx, orgAgg, NewOrgDomainWriteModel(orgAgg.ID, orgDomain.Domain), orgDomain, claimedUserIDs...)
+		orgDomainEvents, err := c.addOrgDomain(ctx, orgAgg, NewOrgDomainWriteModel(orgAgg.ID, orgDomain.Domain), orgDomain, claimedUserIDs)
 		if err != nil {
 			return nil, nil, nil, err
 		} else {

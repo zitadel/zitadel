@@ -35,10 +35,6 @@ func (e *HumanProfileChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 	return nil
 }
 
-func (e *HumanProfileChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewHumanProfileChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

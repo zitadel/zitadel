@@ -4,6 +4,24 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
+  Assets:
+    EmptyKey: Asset Key ist leer
+    Store:
+      NotInitialized: Assets Speicher konnte nicht initialisiert werden
+      NotConfigured: Assets Speicher wurde nicht konfiguriert
+    Bucket:
+      Internal: Interner Fehler beim erstellen eines Buckets
+      AlreadyExists: Bucket existiert bereits
+      CreateFailed: Bucket konnte nicht erstellt werden
+      ListFailed: Buckets konnten nicht gelesen werden
+      RemoveFailed: Bucket konnte nicht gelöscht werden
+      SetPublicFailed: Bucket konnte nicht auf public gesetzt werden
+    Object:
+      PutFailed: Objekt konnte nicht erstellt werden
+      GetFaieled: Objekt konnte nicht gelesen werden
+      PresignedTokenFailed: Signiertes Token konnte nicht erstellt werden
+      ListFailed: Objektliste konnte nicht gelesen werden
+      RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
   User:
@@ -93,6 +111,9 @@ Errors:
       BeginLoginFailed: Es ist ein Fehler beim WebAuthN Login aufgetreten
       ValidateLoginFailed: Zugangsdaten konnten nicht validiert werden
       CloneWarning: Authentifizierungsdaten wurden möglicherweise geklont
+    RefreshToken:
+      Invalid: Refresh Token ist ungültig
+      NotFound: Refresh Token nicht gefunden
   Org:
     AlreadyExist: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
@@ -100,6 +121,7 @@ Errors:
     AlreadyActive: Organisation ist bereits aktiv
     Empty: Organisation ist leer
     NotFound: Organisation konnte nicht gefunden werden
+    NotChanged: Organisation wurde nicht verändert
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation
@@ -140,11 +162,11 @@ Errors:
       NotChanged: Default Mail Template wurde nicht verändert
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
-    MailText:
-      NotFound: Default Mail Text konnte nicht gefunden werden
-      NotChanged: Default Mail Text wurde nicht verändert
-      AlreadyExists: Default Mail Text existiert bereits
-      Invalid: Default Mail Text ist ungültig
+    CustomMessageText:
+      NotFound: Default Message Text konnte nicht gefunden werden
+      NotChanged: Default Message Text wurde nicht verändert
+      AlreadyExists: Default Message Text existiert bereits
+      Invalid: Default Message Text ist ungültig
     PasswordComplexity:
       NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
@@ -228,6 +250,7 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     LoginPolicyInvalid: Login Policy ist ungültig
     LoginPolicyNotExisting: Login Policy nicht vorhanden
+    IdpProviderInvalid: IDP Provider ist ungültig
     LoginPolicy:
       NotFound: Default Login Policy konnte nicht gefunden
       NotChanged: Default Login Policy wurde nicht verändert
@@ -253,11 +276,11 @@ Errors:
       NotChanged: Default Mail Template wurde nicht verändert
       AlreadyExists: Default Mail Template existiert bereits
       Invalid: Default Mail Template ist ungültig
-    MailText:
-      NotFound: Default Mail Text konnte nicht gefunden werden
-      NotChanged: Default Mail Text wurde nicht verändert
-      AlreadyExists: Default Mail Text existiert bereits
-      Invalid: Default Mail Text ist ungültig
+    CustomMessageText:
+      NotFound: Default Message Text konnte nicht gefunden werden
+      NotChanged: Default Message Text wurde nicht verändert
+      AlreadyExists: Default Message Text existiert bereits
+      Invalid: Default Message Text ist ungültig
     PasswordComplexityPolicy:
       NotFound: Default Password Complexity Policy konnte nicht gefunden werden
       NotExisting: Default Password Complexity Policy existiert nicht
@@ -284,6 +307,16 @@ Errors:
       NotChanged: Default Org IAM Policy wurde nicht verändert
   Policy:
     AlreadyExists: Policy existiert bereits
+    Label:
+      Invalid:
+        PrimaryColor: Primäre Farbe ist kein gültiger Hex Farbwert
+        BackgroundColor: Hintergrund Farbe ist kein gültiger Hex Farbwert
+        WarnColor: Warn Farbe ist kein gültiger Hex Farbwert
+        FontColor: Schrift Farbe ist kein gültiger Hex Farbwert
+        PrimaryColorDark: Primäre Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
+        BackgroundColorDark: Hintergrund Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
+        WarnColorDark: Warn Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
+        FontColorDark: Schrift Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
   UserGrant:
     AlreadyExists: Benutzer Berechtigung existiert bereits
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden
@@ -318,6 +351,10 @@ Errors:
       AlreadyExists: Schritt ausgeführt existiert bereits
   Features:
     NotChanged: Feature hat nicht geändert
+  CustomText:
+    AlreadyExists: Kundenspezifischer Text existiert bereits
+    Invalid: Kundenspezifischer Text ist ungültig
+    NotFound: Kundenspezifischer Text nicht gefunden
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -353,6 +390,9 @@ EventTypes:
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert
+      avatar:
+        added: Avatar hinzugefügt
+        removed: Avatar entfernt
       initialization: 
         code:
           added: Initialisierungscode generiert
@@ -511,6 +551,8 @@ EventTypes:
       added: Organisationsmitglied hinzugefügt
       changed: Organisationsmitglied geändert
       removed: Organisationsmitglied entfernt
+      cascade:
+        removed: Organisationsmitglied kaskadiert entfernt
     iam:
       policy:
         added: System Richtlinie der Organisation hinzugefügt
@@ -531,6 +573,11 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+    customtext:
+      set: Kundenspezifischer Text wurde gesetzt
+      removed: Kundenspezifischer Text wurde entfernt
+      template:
+        removed: Kundenspezifisches Text Template wurde entfernt
     policy:
       login:
         added: Login Richtlinie hinzugefügt
@@ -561,7 +608,25 @@ EventTypes:
       label:
         added: Label Richtline hinzugefügt
         changed: Label Richtline geändert
+        activated: Label Richtline aktiviert
         removed: Label Richtline entfernt
+        logo:
+          added: Logo zu Label Richtlinie hinzugefügt
+          removed: Logo von Label Richtlinie entfernt
+          dark:
+            added: Logo (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Logo (dunkler Modus) von Label Richtlinie entfernt
+        icon:
+          added: Icon zu Label Richtlinie hinzugefügt
+          removed: Icon von Label Richtlinie entfernt
+          dark:
+            added: Icon (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Icon (dunkler Modus) von Label Richtlinie entfernt
+        font:
+          added: Schrift zu Label Richtlinie hinzugefügt
+          removed: Schrift von Label Richtlinie entfernt
+        assets:
+          removed: Dateien von Label Richtlinie entfernt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -572,6 +637,8 @@ EventTypes:
       added: Projektmitglied hinzugefügt
       changed: Projektmitglied geändert
       removed: Projektmitglied entfernt
+      cascade:
+        removed: Projektmitglied kaskadiert entfernt
     role:
       added: Projektrolle hinzugefügt
       changed: Projektrolle geändert
@@ -588,6 +655,8 @@ EventTypes:
         added: Verwaltungszugriffsmitglied hinzugefügt
         changed: Verwaltungszugriffsmitglied geändert
         removed: Verwaltungszugriffsmitglied entfernt
+        cascade:
+          removed: Verwaltungszugriffsmitglied kaskadiert entfernt
     application:
       added: Applikation hinzugefügt
       changed: Applikation geändert
@@ -638,6 +707,8 @@ EventTypes:
       added: ZITADEL Mitglied hinzugefügt
       changed: ZITADEL Mitglied geändert
       removed: ZITADEL Mitglied entfernt
+      cascade:
+        removed: ZITADEL Mitglied kaskadiert entfernt
     idp:
       config:
         added: IDP Konfiguration hinzugefügt
@@ -653,6 +724,9 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+    customtext:
+      set: Text wurde gesetzt
+      removed: Text wurde entfernt
     policy:
       login:
         added: Default Login Policy hinzugefügt
@@ -660,6 +734,27 @@ EventTypes:
         idpprovider:
           added: Idp Provider zu Default Login Policy hinzugefügt
           removed: Idp Provider aus Default Login Policy gelöscht
+      label:
+        added: Label Richtline hinzugefügt
+        changed: Label Richtline geändert
+        activated: Label Richtline aktiviert
+        logo:
+          added: Logo zu Label Richtlinie hinzugefügt
+          removed: Logo von Label Richtlinie entfernt
+          dark:
+            added: Logo (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Logo (dunkler Modus) von Label Richtlinie entfernt
+        icon:
+          added: Icon zu Label Richtlinie hinzugefügt
+          removed: Icon von Label Richtlinie entfernt
+          dark:
+            added: Icon (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Icon (dunkler Modus) von Label Richtlinie entfernt
+        font:
+          added: Schrift zu Label Richtlinie hinzugefügt
+          removed: Schrift von Label Richtlinie entfernt
+        assets:
+          removed: Bilder und Schrift von Label Richtlinie entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
 Application:
@@ -676,11 +771,15 @@ Application:
         RedirectUris:
           CustomNotAllowed: Grant Type Implicit erlaubt keine custom Redirect Uris.
           HttpNotAllowed: Grant Type Implicit erlaubt keine http Redirect Uris.
-          NativeShouldBeHttpLocalhost: Grant Type Implicit erlaubt beim Apptype Native http nur mit localhost (http://localhost)
           HttpLocalhostOnlyForNative: Http://localhost Redirect Uri ist nur für Native Applikationen erlaubt.
       Native:
         AuthMethodType:
           NotNone: Bei Native Applikationen sollte der AuthMethodType none sein.
+        RedirectUris:
+          MustBeHttpLocalhost: Die Weiterleitung muss mit einem eigenen Protokoll, http://127.0.0.1, http://[::1] oder http://localhost beginnen.
       UserAgent:
         AuthMethodType:
           NotNone: Bei einem User Agent sollte der AuthMethodType none sein.
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token nur in Kombination mit Authorization Code erlaubt.

@@ -48,10 +48,6 @@ func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return []*eventstore.EventUniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
 }
 
-func (e *ApplicationAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewApplicationAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -101,10 +97,6 @@ func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 	}
 }
 
-func (e *ApplicationChangedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewApplicationChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -151,10 +143,6 @@ func (e *ApplicationDeactivatedEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
-func (e *ApplicationDeactivatedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewApplicationDeactivatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -194,10 +182,6 @@ func (e *ApplicationReactivatedEvent) Data() interface{} {
 }
 
 func (e *ApplicationReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *ApplicationReactivatedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -242,10 +226,6 @@ func (e *ApplicationRemovedEvent) Data() interface{} {
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
-}
-
-func (e *ApplicationRemovedEvent) Assets() []*eventstore.Asset {
-	return nil
 }
 
 func NewApplicationRemovedEvent(

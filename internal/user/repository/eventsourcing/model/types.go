@@ -95,6 +95,9 @@ const (
 	HumanExternalIDPRemoved        models.EventType = "user.human.externalidp.removed"
 	HumanExternalIDPCascadeRemoved models.EventType = "user.human.externalidp.cascade.removed"
 
+	HumanAvatarAdded   models.EventType = "user.human.avatar.added"
+	HumanAvatarRemoved models.EventType = "user.human.avatar.removed"
+
 	HumanEmailChanged            models.EventType = "user.human.email.changed"
 	HumanEmailVerified           models.EventType = "user.human.email.verified"
 	HumanEmailVerificationFailed models.EventType = "user.human.email.verification.failed"

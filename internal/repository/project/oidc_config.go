@@ -3,12 +3,12 @@ package project
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -39,6 +39,7 @@ type OIDCConfigAddedEvent struct {
 	IDTokenRoleAssertion     bool                       `json:"idTokenRoleAssertion,omitempty"`
 	IDTokenUserinfoAssertion bool                       `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Data() interface{} {
@@ -46,10 +47,6 @@ func (e *OIDCConfigAddedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -72,6 +69,7 @@ func NewOIDCConfigAddedEvent(
 	idTokenRoleAssertion bool,
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
+	additionalOrigins []string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -95,6 +93,7 @@ func NewOIDCConfigAddedEvent(
 		IDTokenRoleAssertion:     idTokenRoleAssertion,
 		IDTokenUserinfoAssertion: idTokenUserinfoAssertion,
 		ClockSkew:                clockSkew,
+		AdditionalOrigins:        additionalOrigins,
 	}
 }
 
@@ -128,6 +127,7 @@ type OIDCConfigChangedEvent struct {
 	IDTokenRoleAssertion     *bool                       `json:"idTokenRoleAssertion,omitempty"`
 	IDTokenUserinfoAssertion *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Data() interface{} {
@@ -135,10 +135,6 @@ func (e *OIDCConfigChangedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -246,6 +242,12 @@ func ChangeClockSkew(clockSkew time.Duration) func(event *OIDCConfigChangedEvent
 	}
 }
 
+func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AdditionalOrigins = &additionalOrigins
+	}
+}
+
 func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -271,10 +273,6 @@ func (e *OIDCConfigSecretChangedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigSecretChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigSecretChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -322,10 +320,6 @@ func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.
 	return nil
 }
 
-func (e *OIDCConfigSecretCheckSucceededEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewOIDCConfigSecretCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -365,10 +359,6 @@ func (e *OIDCConfigSecretCheckFailedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigSecretCheckFailedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 

@@ -2,10 +2,11 @@ package handler
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"strings"
 
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
@@ -149,7 +150,9 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -185,11 +188,13 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 			u.fillProjectData(grant, project)
 		}
 		return u.view.PutUserGrants(grants, event)
-	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectMemberRemoved:
+	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged,
+		proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		member := new(proj_es_model.ProjectMember)
 		member.SetData(event)
 		return u.processMember(event, "PROJECT", event.AggregateID, member.UserID, member.Roles)
-	case proj_es_model.ProjectGrantMemberAdded, proj_es_model.ProjectGrantMemberChanged, proj_es_model.ProjectGrantMemberRemoved:
+	case proj_es_model.ProjectGrantMemberAdded, proj_es_model.ProjectGrantMemberChanged,
+		proj_es_model.ProjectGrantMemberRemoved, proj_es_model.ProjectGrantMemberCascadeRemoved:
 		member := new(proj_es_model.ProjectGrantMember)
 		member.SetData(event)
 		return u.processMember(event, "PROJECT_GRANT", member.GrantID, member.UserID, member.Roles)
@@ -200,10 +205,27 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 
 func (u *UserGrant) processOrg(event *es_models.Event) (err error) {
 	switch event.Type {
-	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged, org_es_model.OrgMemberRemoved:
+	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged,
+		org_es_model.OrgMemberRemoved, org_es_model.OrgMemberCascadeRemoved:
 		member := new(org_es_model.OrgMember)
 		member.SetData(event)
 		return u.processMember(event, "ORG", "", member.UserID, member.Roles)
+	case org_es_model.OrgChanged:
+		grants, err := u.view.UserGrantsByProjectID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		if len(grants) == 0 {
+			return u.view.ProcessedUserGrantSequence(event)
+		}
+		org, err := u.getOrgByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, grant := range grants {
+			u.fillOrgData(grant, org)
+		}
+		return u.view.PutUserGrants(grants, event)
 	default:
 		return u.view.ProcessedUserGrantSequence(event)
 	}
@@ -244,7 +266,8 @@ func (u *UserGrant) processIAMMember(event *es_models.Event, rolePrefix string, 
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
 		return u.view.PutUserGrant(grant, event)
-	case iam_es_model.IAMMemberRemoved:
+	case iam_es_model.IAMMemberRemoved,
+		iam_es_model.IAMMemberCascadeRemoved:
 		member.SetData(event)
 		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
 		if err != nil {
@@ -290,8 +313,11 @@ func (u *UserGrant) processMember(event *es_models.Event, rolePrefix, roleSuffix
 		grant.ChangeDate = event.CreationDate
 		return u.view.PutUserGrant(grant, event)
 	case org_es_model.OrgMemberRemoved,
+		org_es_model.OrgMemberCascadeRemoved,
 		proj_es_model.ProjectMemberRemoved,
-		proj_es_model.ProjectGrantMemberRemoved:
+		proj_es_model.ProjectMemberCascadeRemoved,
+		proj_es_model.ProjectGrantMemberRemoved,
+		proj_es_model.ProjectGrantMemberCascadeRemoved:
 
 		grant, err := u.view.UserGrantByIDs(event.ResourceOwner, u.iamProjectID, userID)
 		if err != nil && !errors.IsNotFound(err) {
@@ -373,11 +399,13 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *model.UserView) {
 	grant.UserName = user.UserName
+	grant.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		grant.FirstName = user.FirstName
 		grant.LastName = user.LastName
 		grant.DisplayName = user.FirstName + " " + user.LastName
 		grant.Email = user.Email
+		grant.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		grant.DisplayName = user.MachineView.Name

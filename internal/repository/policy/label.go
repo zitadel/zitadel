@@ -2,14 +2,33 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/repository/asset"
 )
 
 const (
-	LabelPolicyAddedEventType   = "policy.label.added"
-	LabelPolicyChangedEventType = "policy.label.changed"
+	LabelPolicyAddedEventType     = "policy.label.added"
+	LabelPolicyChangedEventType   = "policy.label.changed"
+	LabelPolicyActivatedEventType = "policy.label.activated"
+
+	LabelPolicyLogoAddedEventType   = "policy.label.logo.added"
+	LabelPolicyLogoRemovedEventType = "policy.label.logo.removed"
+	LabelPolicyIconAddedEventType   = "policy.label.icon.added"
+	LabelPolicyIconRemovedEventType = "policy.label.icon.removed"
+
+	LabelPolicyLogoDarkAddedEventType   = "policy.label.logo.dark.added"
+	LabelPolicyLogoDarkRemovedEventType = "policy.label.logo.dark.removed"
+	LabelPolicyIconDarkAddedEventType   = "policy.label.icon.dark.added"
+	LabelPolicyIconDarkRemovedEventType = "policy.label.icon.dark.removed"
+
+	LabelPolicyFontAddedEventType   = "policy.label.font.added"
+	LabelPolicyFontRemovedEventType = "policy.label.font.removed"
+
+	LabelPolicyAssetsRemovedEventType = "policy.label.assets.removed"
+
 	LabelPolicyRemovedEventType = "policy.label.removed"
 )
 
@@ -17,9 +36,16 @@ type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PrimaryColor        string `json:"primaryColor,omitempty"`
-	SecondaryColor      string `json:"secondaryColor,omitempty"`
+	BackgroundColor     string `json:"backgroundColor,omitempty"`
+	WarnColor           string `json:"warnColor,omitempty"`
+	FontColor           string `json:"fontColor,omitempty"`
+	PrimaryColorDark    string `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark string `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       string `json:"warnColorDark,omitempty"`
+	FontColorDark       string `json:"fontColorDark,omitempty"`
 	HideLoginNameSuffix bool   `json:"hideLoginNameSuffix,omitempty"`
-	LogoDarkThemeID     string
+	ErrorMsgPopup       bool   `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    bool   `json:"disableMsgPopup,omitempty"`
 }
 
 func (e *LabelPolicyAddedEvent) Data() interface{} {
@@ -30,22 +56,34 @@ func (e *LabelPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return nil
 }
 
-func (e *LabelPolicyAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewLabelPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	primaryColor,
-	secondaryColor string,
-	hideLoginNameSuffix bool,
+	backgroundColor,
+	warnColor,
+	fontColor,
+	primaryColorDark,
+	backgroundColorDark,
+	warnColorDark,
+	fontColorDark string,
+	hideLoginNameSuffix,
+	errorMsgPopup,
+	disableWatermark bool,
 ) *LabelPolicyAddedEvent {
 
 	return &LabelPolicyAddedEvent{
 		BaseEvent:           *base,
 		PrimaryColor:        primaryColor,
-		SecondaryColor:      secondaryColor,
+		BackgroundColor:     backgroundColor,
+		WarnColor:           warnColor,
+		FontColor:           fontColor,
+		PrimaryColorDark:    primaryColorDark,
+		BackgroundColorDark: backgroundColorDark,
+		WarnColorDark:       warnColorDark,
+		FontColorDark:       fontColorDark,
 		HideLoginNameSuffix: hideLoginNameSuffix,
+		ErrorMsgPopup:       errorMsgPopup,
+		DisableWatermark:    disableWatermark,
 	}
 }
 
@@ -66,8 +104,16 @@ type LabelPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	PrimaryColor        *string `json:"primaryColor,omitempty"`
-	SecondaryColor      *string `json:"secondaryColor,omitempty"`
+	BackgroundColor     *string `json:"backgroundColor,omitempty"`
+	WarnColor           *string `json:"warnColor,omitempty"`
+	FontColor           *string `json:"fontColor,omitempty"`
+	PrimaryColorDark    *string `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark *string `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       *string `json:"warnColorDark,omitempty"`
+	FontColorDark       *string `json:"fontColorDark,omitempty"`
 	HideLoginNameSuffix *bool   `json:"hideLoginNameSuffix,omitempty"`
+	ErrorMsgPopup       *bool   `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    *bool   `json:"disableWatermark,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) Data() interface{} {
@@ -75,10 +121,6 @@ func (e *LabelPolicyChangedEvent) Data() interface{} {
 }
 
 func (e *LabelPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *LabelPolicyChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -106,15 +148,63 @@ func ChangePrimaryColor(primaryColor string) func(*LabelPolicyChangedEvent) {
 	}
 }
 
-func ChangeSecondaryColor(secondaryColor string) func(*LabelPolicyChangedEvent) {
+func ChangeBackgroundColor(background string) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
-		e.SecondaryColor = &secondaryColor
+		e.BackgroundColor = &background
+	}
+}
+
+func ChangeWarnColor(warnColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.WarnColor = &warnColor
+	}
+}
+
+func ChangeFontColor(fontColor string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.FontColor = &fontColor
+	}
+}
+
+func ChangePrimaryColorDark(primaryColorDark string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.PrimaryColorDark = &primaryColorDark
+	}
+}
+
+func ChangeBackgroundColorDark(backgroundColorDark string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.BackgroundColorDark = &backgroundColorDark
+	}
+}
+
+func ChangeWarnColorDark(warnColorDark string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.WarnColorDark = &warnColorDark
+	}
+}
+
+func ChangeFontColorDark(fontColorDark string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.FontColorDark = &fontColorDark
 	}
 }
 
 func ChangeHideLoginNameSuffix(hideLoginNameSuffix bool) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
 		e.HideLoginNameSuffix = &hideLoginNameSuffix
+	}
+}
+
+func ChangeErrorMsgPopup(errMsgPopup bool) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.ErrorMsgPopup = &errMsgPopup
+	}
+}
+
+func ChangeDisableWatermark(disableWatermark bool) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.DisableWatermark = &disableWatermark
 	}
 }
 
@@ -131,19 +221,39 @@ func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventRea
 	return e, nil
 }
 
+type LabelPolicyActivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *LabelPolicyActivatedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyActivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyActivatedEvent(base *eventstore.BaseEvent) *LabelPolicyActivatedEvent {
+	return &LabelPolicyActivatedEvent{
+		BaseEvent: *base,
+	}
+}
+
+func LabelPolicyActivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LabelPolicyActivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
 type LabelPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
 func (e *LabelPolicyRemovedEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *LabelPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *LabelPolicyRemovedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
@@ -155,6 +265,300 @@ func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedE
 
 func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	return &LabelPolicyRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type LabelPolicyLogoAddedEvent struct {
+	asset.AddedEvent
+}
+
+func (e *LabelPolicyLogoAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyLogoAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyLogoAddedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyLogoAddedEvent {
+	return &LabelPolicyLogoAddedEvent{
+		*asset.NewAddedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyLogoAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLogoAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type LabelPolicyLogoRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *LabelPolicyLogoRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyLogoRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyLogoRemovedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyLogoRemovedEvent {
+	return &LabelPolicyLogoRemovedEvent{
+		*asset.NewRemovedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyLogoRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLogoRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyIconAddedEvent struct {
+	asset.AddedEvent
+}
+
+func (e *LabelPolicyIconAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyIconAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyIconAddedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyIconAddedEvent {
+	return &LabelPolicyIconAddedEvent{
+		*asset.NewAddedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyIconAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyIconAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type LabelPolicyIconRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *LabelPolicyIconRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyIconRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyIconRemovedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyIconRemovedEvent {
+	return &LabelPolicyIconRemovedEvent{
+		*asset.NewRemovedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyIconRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyIconRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyLogoDarkAddedEvent struct {
+	asset.AddedEvent
+}
+
+func (e *LabelPolicyLogoDarkAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyLogoDarkAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyLogoDarkAddedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyLogoDarkAddedEvent {
+	return &LabelPolicyLogoDarkAddedEvent{
+		*asset.NewAddedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyLogoDarkAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLogoDarkAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type LabelPolicyLogoDarkRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *LabelPolicyLogoDarkRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyLogoDarkRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyLogoDarkRemovedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyLogoDarkRemovedEvent {
+	return &LabelPolicyLogoDarkRemovedEvent{
+		*asset.NewRemovedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyLogoDarkRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLogoDarkRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyIconDarkAddedEvent struct {
+	asset.AddedEvent
+}
+
+func (e *LabelPolicyIconDarkAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyIconDarkAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyIconDarkAddedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyIconDarkAddedEvent {
+	return &LabelPolicyIconDarkAddedEvent{
+		*asset.NewAddedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyIconDarkAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyIconDarkAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type LabelPolicyIconDarkRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *LabelPolicyIconDarkRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyIconDarkRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyIconDarkRemovedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyIconDarkRemovedEvent {
+	return &LabelPolicyIconDarkRemovedEvent{
+		*asset.NewRemovedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyIconDarkRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyIconDarkRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyFontAddedEvent struct {
+	asset.AddedEvent
+}
+
+func (e *LabelPolicyFontAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyFontAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyFontAddedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyFontAddedEvent {
+	return &LabelPolicyFontAddedEvent{
+		*asset.NewAddedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyFontAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyFontAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type LabelPolicyFontRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *LabelPolicyFontRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *LabelPolicyFontRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyFontRemovedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyFontRemovedEvent {
+	return &LabelPolicyFontRemovedEvent{
+		*asset.NewRemovedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyFontRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyAssetsRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyAssetsRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyAssetsRemovedEvent {
+	return &LabelPolicyAssetsRemovedEvent{
+		*base,
+	}
+}
+
+func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LabelPolicyAssetsRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

@@ -59,7 +59,7 @@ func (u *UserGrant) ViewModel() string {
 }
 
 func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate}
+	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate, org_es_model.OrgAggregate}
 }
 
 func (u *UserGrant) CurrentSequence() (uint64, error) {
@@ -88,6 +88,8 @@ func (u *UserGrant) Reduce(event *es_models.Event) (err error) {
 		err = u.processUser(event)
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
+	case org_es_model.OrgAggregate:
+		err = u.processOrg(event)
 	}
 	return err
 }
@@ -127,7 +129,9 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -171,6 +175,29 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	}
 }
 
+func (u *UserGrant) processOrg(event *es_models.Event) (err error) {
+	switch event.Type {
+	case org_es_model.OrgChanged:
+		grants, err := u.view.UserGrantsByOrgID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		if len(grants) == 0 {
+			return u.view.ProcessedUserGrantSequence(event)
+		}
+		org, err := u.getOrgByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, grant := range grants {
+			u.fillOrgData(grant, org)
+		}
+		return u.view.PutUserGrants(grants, event)
+	default:
+		return u.view.ProcessedUserGrantSequence(event)
+	}
+}
+
 func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner string) (err error) {
 	user, err := u.getUserByID(grant.UserID)
 	if err != nil {
@@ -193,11 +220,13 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner stri
 
 func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_view_model.UserView) {
 	grant.UserName = user.UserName
+	grant.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		grant.FirstName = user.FirstName
 		grant.LastName = user.LastName
 		grant.DisplayName = user.FirstName + " " + user.LastName
 		grant.Email = user.Email
+		grant.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		grant.DisplayName = user.MachineView.Name

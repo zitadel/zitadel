@@ -1,29 +1,18 @@
 @import '../theming/theming.scss';
 @import './radio.scss';
 
-@mixin lgn-radio-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-radio-color($color);
-    }
+@mixin lgn-radio-theme() {
+    @include lgn-radio-color();
 }
 
-@mixin lgn-radio-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $primary: map-get($config, primary);
-    $warn: map-get($config, warn);
-    $background: map-get($config, background);
-    $foreground: map-get($config, foreground);
-
+@mixin lgn-radio-color() {
     label {
         &::before {
-            border-color: lgn-color($foreground, radio-border);
+            border-color: var(--zitadel-color-input-border);
         }
 
         &::after {
-            background: lgn-color($primary, default);
+            background: var(--zitadel-color-primary);
         }
     }
 
@@ -31,7 +20,7 @@
         opacity: 0;
 
         &:checked + label::before {
-            border-color: lgn-color($primary, default);
+            border-color: var(--zitadel-color-primary);
         }
 
         &:focus + label {
@@ -41,16 +30,16 @@
 
         &:disabled {
             + label::before {
-                border-color: lgn-color($background, disabled-button);
+                border-color: var(--zitadel-color-button-disabled-background);
             }
 
             &:checked {
                 + label::before {
-                    color: lgn-color($background, disabled-selected-button);;
+                    color: var(--zitadel-color-button-selected-background);
                 }
 
                 + label::after {
-                    background:  lgn-color($background, disabled-selected-button);;
+                    background:  var(--zitadel-color-button-disabled-selected-background);
                 }
             }
 

@@ -36,10 +36,6 @@ func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func (e *OIDCConfigAddedEvent) Assets() []*eventstore.Asset {
-	return nil
-}
-
 func NewOIDCConfigAddedEvent(
 	base *eventstore.BaseEvent,
 	clientID,
@@ -95,10 +91,6 @@ func (e *OIDCConfigChangedEvent) Data() interface{} {
 }
 
 func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *OIDCConfigChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
 
