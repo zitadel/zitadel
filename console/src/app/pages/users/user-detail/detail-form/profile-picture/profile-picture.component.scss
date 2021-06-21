@@ -22,7 +22,8 @@
   .pic {
     height: 80px;
     width: 80px;
-    object-fit: contain;
+    object-fit: cover;
+    object-position: center;
     border-radius: 50%;
     background-color: #00000030;
   }

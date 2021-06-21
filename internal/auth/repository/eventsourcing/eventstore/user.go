@@ -4,18 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/golang/protobuf/ptypes"
-
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	key_model "github.com/caos/zitadel/internal/key/model"
-
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
@@ -206,6 +204,7 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name

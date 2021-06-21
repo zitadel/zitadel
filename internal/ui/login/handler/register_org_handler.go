@@ -78,16 +78,16 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerOrgFormData, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if formData == nil {
 		formData = new(registerOrgFormData)
 	}
 
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, "Register", errType, errMessage),
+		baseData:            l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, "0")

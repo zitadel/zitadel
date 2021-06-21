@@ -25,7 +25,14 @@ import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
-import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
+import {
+  IAM_COMPLEXITY_LINK,
+  IAM_LOGIN_POLICY_LINK,
+  IAM_POLICY_LINK,
+  ORG_COMPLEXITY_LINK,
+  ORG_IAM_POLICY_LINK,
+  ORG_LOGIN_POLICY_LINK,
+} from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -114,9 +121,19 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
+          this.nextLinks = [
+            ORG_IAM_POLICY_LINK,
+            ORG_LOGIN_POLICY_LINK,
+            ORG_COMPLEXITY_LINK,
+          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
+          this.nextLinks = [
+            IAM_POLICY_LINK,
+            IAM_LOGIN_POLICY_LINK,
+            IAM_COMPLEXITY_LINK,
+          ];
           break;
       }
 
@@ -292,7 +309,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private handleFontUploadPromise(task: Promise<any>): Promise<any> {
-    return task.then(() => {
+    const enhTask = task.then(() => {
       this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
       setTimeout(() => {
         this.getPreviewData().then(data => {
@@ -302,6 +319,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
       }, 1000);
     }).catch(error => this.toast.showError(error));
+
+    if (this.serviceType === PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
+      return this.savePolicy().then(() => enhTask);
+    } else {
+      return enhTask;
+    }
   }
 
   private handleUploadPromise(task: Promise<any>): Promise<any> {
@@ -482,6 +505,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
     return this.assetService.load(`${url}`, this.org.id).then(data => {
+      console.log(data);
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();

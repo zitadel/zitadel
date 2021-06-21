@@ -28,6 +28,7 @@ type ApplicationChange struct {
 	ModifierId        string               `json:"modifierUser,omitempty"`
 	ModifierName      string               `json:"-"`
 	ModifierLoginName string               `json:"-"`
+	ModifierAvatarURL string               `json:"-"`
 	Data              interface{}          `json:"data,omitempty"`
 }
 

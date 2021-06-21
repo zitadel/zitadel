@@ -96,16 +96,16 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
 
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, "Init Password", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Init Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
