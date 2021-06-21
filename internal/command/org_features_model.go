@@ -80,7 +80,7 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if tierName != "" && wm.TierName != tierName {
 		changes = append(changes, features.ChangeTierName(tierName))
 	}
-	if tierDescription != "" && wm.TierDescription != tierDescription {
+	if wm.TierDescription != tierDescription {
 		changes = append(changes, features.ChangeTierDescription(tierDescription))
 	}
 	if wm.State != state {
