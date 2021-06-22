@@ -1,8 +1,6 @@
 package cmds
 
 import (
-	"github.com/caos/orbos/pkg/git"
-
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 	"github.com/caos/zitadel/pkg/databases"
 
@@ -40,7 +38,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
-		if gitClient.Exists(git.DatabaseFile) {
+		if rv.Gitops {
 			if err := databases.GitOpsInstantBackup(
 				monitor,
 				k8sClient,
@@ -49,7 +47,6 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 			); err != nil {
 				return err
 			}
-
 		} else {
 			if err := databases.CrdInstantBackup(
 				monitor,
