@@ -48,6 +48,7 @@ type CustomLoginTextReadModel struct {
 	PasswordHasLowercase   string
 	PasswordHasNumber      string
 	PasswordHasSymbol      string
+	PasswordConfirmation   string
 
 	UsernameChangeTitle            string
 	UsernameChangeDescription      string
@@ -702,6 +703,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordScreenSetEvent(e *policy.Custo
 		wm.PasswordHasSymbol = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyPasswordConfirmation {
+		wm.PasswordConfirmation = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handlePasswordScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -747,6 +752,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordScreenRemoveEvent(e *policy.Cu
 	}
 	if e.Key == domain.LoginKeyPasswordHasSymbol {
 		wm.PasswordHasSymbol = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordConfirmation {
+		wm.PasswordConfirmation = ""
 		return
 	}
 }

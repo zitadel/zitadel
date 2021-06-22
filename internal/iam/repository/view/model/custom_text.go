@@ -316,6 +316,9 @@ func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordHasSymbol {
 		result.PasswordScreenText.HasSymbol = text.Text
 	}
+	if text.Key == domain.LoginKeyPasswordConfirmation {
+		result.PasswordScreenText.Confirmation = text.Text
+	}
 }
 
 func usernameChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {

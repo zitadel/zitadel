@@ -179,6 +179,10 @@ func (c *Commands) getPasswordTextEvents(ctx context.Context, agg *eventstore.Ag
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordConfirmation, existingText.PasswordConfirmation, text.PasswordScreenText.Confirmation, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	return events
 }
 

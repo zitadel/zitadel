@@ -41,6 +41,7 @@ const (
 	LoginKeyPasswordHasLowercase   = LoginKeyPassword + "HasLowercase"
 	LoginKeyPasswordHasNumber      = LoginKeyPassword + "HasNumber"
 	LoginKeyPasswordHasSymbol      = LoginKeyPassword + "HasSymbol"
+	LoginKeyPasswordConfirmation   = LoginKeyPassword + "Confirmation"
 	LoginKeyPasswordResetLinkText  = LoginKeyPassword + "ResetLinkText"
 	LoginKeyPasswordBackButtonText = LoginKeyPassword + "BackButtonText"
 	LoginKeyPasswordNextButtonText = LoginKeyPassword + "NextButtonText"
@@ -337,6 +338,7 @@ type PasswordScreenText struct {
 	HasLowercase   string
 	HasNumber      string
 	HasSymbol      string
+	Confirmation   string
 }
 
 type UsernameChangeScreenText struct {

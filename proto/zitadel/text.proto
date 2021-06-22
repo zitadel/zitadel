@@ -118,6 +118,7 @@ message PasswordScreenText {
     string has_lowercase = 9 [(validate.rules).string = {max_len: 100}];
     string has_number = 10 [(validate.rules).string = {max_len: 100}];
     string has_symbol = 11 [(validate.rules).string = {max_len: 100}];
+    string confirmation = 12 [(validate.rules).string = {max_len: 100}];
 }
 
 message UsernameChangeScreenText {

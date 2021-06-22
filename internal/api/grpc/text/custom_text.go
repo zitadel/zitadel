@@ -108,6 +108,7 @@ func PasswordScreenTextToPb(text domain.PasswordScreenText) *text_pb.PasswordScr
 		HasLowercase:   text.HasLowercase,
 		HasNumber:      text.HasNumber,
 		HasSymbol:      text.HasSymbol,
+		Confirmation:   text.Confirmation,
 	}
 }
 
@@ -454,6 +455,7 @@ func PasswordScreenTextPbToDomain(text *text_pb.PasswordScreenText) domain.Passw
 		HasLowercase:   text.HasLowercase,
 		HasNumber:      text.HasNumber,
 		HasSymbol:      text.HasSymbol,
+		Confirmation:   text.Confirmation,
 	}
 }
 
