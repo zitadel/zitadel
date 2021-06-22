@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/domain"
-
 	"golang.org/x/text/language"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -82,14 +82,19 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
 		return
 	}
-	authRequest.LoginName = user.PreferredLoginName
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
 	l.renderNextStep(w, r, authRequest)
 }
 
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if formData == nil {
 		formData = new(registerFormData)
@@ -98,7 +103,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		formData.Language = l.renderer.Lang(r).String()
 	}
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerFormData: *formData,
 	}
 

@@ -45,10 +45,12 @@
     "ORG_POLICY_COMPLEXITY": "Password Complexity Settings",
     "ORG_POLICY_IAM": "Organisation Access Properties",
     "ORG_POLICY_LOGIN": "Login Policy",
+    "ORG_POLICY_LABEL": "Private Label Policy",
     "IAM_CREATE_ORG": "Create organisation",
     "IAM_POLICY_COMPLEXITY": "System Password Complexity Settings",
     "IAM_POLICY_IAM": "System Access Properties",
     "IAM_POLICY_LOGIN": "System Login Policy",
+    "IAM_POLICY_LABEL": "System Private Label Policy",
     "USERS": "Create and Manage Your Users",
     "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
     "USERS_HUMANS": "Show human users",
@@ -306,7 +308,16 @@
       "DISPLAYNAME": "Display Name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
-      "PASSWORD": "Password"
+      "PASSWORD": "Password",
+      "AVATAR": {
+        "UPLOADTITLE":"Upload your Profile Picture",
+        "UPLOADBTN":"Choose file",
+        "UPLOAD":"Upload",
+        "CURRENT":"Current Picture",
+        "PREVIEW":"Preview",
+        "DELETESUCCESS":"Deleted successfully!",
+        "CROPPERERROR":"An error while uploading your file failed. Try a different format and size if necessary."
+      }
     },
     "MACHINE": {
       "TITLE": "Service User Details",
@@ -614,8 +625,8 @@
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
       "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
-      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
+      "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
+      "LABELPOLICYWATERMARK": "Label Policy - watermark",
       "CUSTOMDOMAIN": "Domain Verification - available",
       "CUSTOMTEXT": "Custom texts"
     },
@@ -642,9 +653,9 @@
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
-      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment. To view those changes, a 'x-preview' scope will have to be added to your login scopes.",
+      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment.",
       "BTN":"Select File",
-      "ACTIVATEPREVIEW":"Set preview as current configuration",
+      "ACTIVATEPREVIEW":"Apply configuration",
       "DARK":"Dark Mode",
       "LIGHT":"Lighg Mode",
       "CHANGEVIEW":"Change View",
@@ -653,6 +664,8 @@
       "COLORS":"Colors",
       "FONT":"Font",
       "ADVANCEDBEHAVIOR":"Advanced Behavior",
+      "DROP":"Drop image here",
+      "RELEASE":"Release",
       "PREVIEW": {
         "TITLE":"Login",
         "SECOND":"login with your ZITADEL-Account.",
@@ -1218,7 +1231,7 @@
       },
       "BASIC": {
         "TITLE": "Basic",
-        "DESCRIPTION": "Authentication with Username and Passwort"
+        "DESCRIPTION": "Authentication with Username and Password"
       },
       "IMPLICIT": {
         "TITLE": "Implicit",

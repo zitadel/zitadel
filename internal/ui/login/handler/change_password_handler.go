@@ -35,12 +35,12 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := passwordData{
-		baseData:    l.getBaseData(r, authReq, "Change Password", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Change Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)

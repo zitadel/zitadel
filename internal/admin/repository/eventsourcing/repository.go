@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
@@ -18,6 +19,7 @@ type Config struct {
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
 	Domain      string
+	APIDomain   string
 }
 
 type EsRepository struct {
@@ -44,6 +46,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 	}
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, static, localDevMode)
+	assetsAPI := conf.APIDomain + "/assets/v1/"
 
 	return &EsRepository{
 		spooler: spool,
@@ -54,11 +57,12 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 			SystemDefaults: systemDefaults,
 		},
 		IAMRepository: eventstore.IAMRepository{
-			Eventstore:     es,
-			View:           view,
-			SystemDefaults: systemDefaults,
-			SearchLimit:    conf.SearchLimit,
-			Roles:          roles,
+			Eventstore:      es,
+			View:            view,
+			SystemDefaults:  systemDefaults,
+			SearchLimit:     conf.SearchLimit,
+			Roles:           roles,
+			PrefixAvatarURL: assetsAPI,
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,
@@ -70,10 +74,11 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 			SystemDefaults: systemDefaults,
 		},
 		UserRepo: eventstore.UserRepo{
-			Eventstore:     es,
-			View:           view,
-			SearchLimit:    conf.SearchLimit,
-			SystemDefaults: systemDefaults,
+			Eventstore:      es,
+			View:            view,
+			SearchLimit:     conf.SearchLimit,
+			SystemDefaults:  systemDefaults,
+			PrefixAvatarURL: assetsAPI,
 		},
 	}, nil
 }

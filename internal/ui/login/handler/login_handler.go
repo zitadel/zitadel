@@ -64,11 +64,11 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "Login", errType, errMessage)
+	data := l.getUserData(r, authReq, "Login", errID, errMessage)
 	funcs := map[string]interface{}{
 		"hasUsernamePasswordLogin": func() bool {
 			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword

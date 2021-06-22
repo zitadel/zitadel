@@ -115,7 +115,6 @@ export class FeaturesComponent implements OnDestroy {
       this.subService.getLink(this.org.id, window.location.href)
         .then(payload => {
           this.stripeLoading = false;
-          console.log(payload);
           this.stripeURL = payload.redirect_url;
         })
         .catch(error => {

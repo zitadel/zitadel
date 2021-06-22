@@ -28,12 +28,12 @@ func (l *Login) handleRegisterOption(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := registerOptionData{
-		baseData: l.getBaseData(r, authReq, "RegisterOption", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "RegisterOption", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
 		"hasExternalLogin": func() bool {

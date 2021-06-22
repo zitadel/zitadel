@@ -30,6 +30,7 @@ Password:
   HasLowercase: Lowercase letter
   HasNumber: Number
   HasSymbol: Symbol
+  Confirmation: Confirmation match
   ResetLinkText: reset password
   BackButtonText: back
   NextButtonText: next
@@ -56,7 +57,7 @@ InitPassword:
   NextButtonText: next
 
 InitPasswordDone:
-  Title: Passwortd set
+  Title: Password set
   Description: Password successfully set
   NextButtonText: next
   CancelButtonText: cancel
@@ -128,7 +129,7 @@ VerifyMFAU2F:
   ValidateTokenButtonText: Validate Token
 
 Passwordless:
-  Title: Login passwordles
+  Title: Login passwordless
   Description: Verify your token
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   Error:
@@ -139,9 +140,9 @@ Passwordless:
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
-  OldPasswordLabel: Old Password
-  NewPasswordLabel: New Password
-  NewPasswordConfirmationLabel: Passwort confirmation
+  OldPassword: Old Password
+  NewPassword: New Password
+  NewPasswordConfirmation: Password confirmation
   CancelButtonText: cancel
   NextButtonText: next
 
@@ -195,9 +196,9 @@ RegistrationUser:
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
-  TosLink: https://zitadel.ch/pdf/tos.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   ExternalLogin: or register with an external user
   BackButtonText: back
   NextButtonText: next
@@ -216,10 +217,21 @@ RegistrationOrg:
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
-  TosLink: https://zitadel.ch/pdf/tos.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   SaveButtonText: save
+
+LoginSuccess:
+  Title: Login successful
+  AutoRedirect: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+  Redirected: You can now close this window.
+  NextButtonText: next
+
+LogoutDone:
+  Title: Logged out
+  Description: You have logged out successfully.
+  LoginButtonText: login
 
 LinkingUsersDone:
   Title: Userlinking
@@ -233,23 +245,13 @@ ExternalNotFoundOption:
   LinkButtonText: Link
   AutoRegisterButtonText: Auto register
 
-LoginSuccess:
-  Title: Login successful
-  AutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
-  RedirectedDescription: You can now close this window.
-  NextButtonText: next
-
-LogoutDone:
-  Title: Logged out
-  Description: You have logged out successfully.
-  LoginButtonText: login
 
 Footer:
   PoweredBy: Powered By
   Tos: TOS
-  TosLink: https://zitadel.ch/pdf/tos.pdf
+  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   Privacy: Privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   Help: Help
   HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
@@ -272,7 +274,7 @@ Errors:
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
-      Invalid: Passwort is invalid
+      Invalid: Password is invalid
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short

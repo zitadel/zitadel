@@ -19,20 +19,20 @@ type u2fInitData struct {
 }
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage, credentialData string
+	var errID, errMessage, credentialData string
 	var u2f *domain.WebAuthNToken
 	if err == nil {
 		u2f, err = l.command.HumanAddU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, true)
 	}
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if u2f != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(u2f.CredentialCreationData)
 	}
 	data := &u2fInitData{
 		webAuthNData: webAuthNData{
-			userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errType, errMessage),
+			userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		MFAType: model.MFATypeU2F,

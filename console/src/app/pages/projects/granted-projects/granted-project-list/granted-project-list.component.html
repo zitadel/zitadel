@@ -67,7 +67,7 @@
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
-                    [routerLink]="['/granted-projects', row.projectId, 'grant', row.id]"></tr>
+                    [routerLink]="['/granted-projects', row.projectId, 'grant', row.grantId]"></tr>
 
             </table>
             <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">

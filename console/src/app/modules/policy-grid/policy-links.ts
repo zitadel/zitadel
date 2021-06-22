@@ -22,8 +22,8 @@ export const IAM_LOGIN_POLICY_LINK = {
 };
 
 export const IAM_PRIVATELABEL_LINK = {
-  i18nTitle: 'POLICY.LABEL.TITLE',
-  i18nDesc: 'POLICY.LABEL.DESCRIPTION',
+  i18nTitle: 'POLICY.PRIVATELABELING.TITLE',
+  i18nDesc: 'POLICY.PRIVATELABELING.DESCRIPTION',
   routerLink: ['/iam', 'policy', PolicyComponentType.PRIVATELABEL],
   withRole: ['iam.policy.read'],
 };
@@ -51,8 +51,8 @@ export const ORG_LOGIN_POLICY_LINK = {
 
 
 export const ORG_PRIVATELABEL_LINK = {
-  i18nTitle: 'POLICY.LABEL.TITLE',
-  i18nDesc: 'POLICY.LABEL.DESCRIPTION',
+  i18nTitle: 'POLICY.PRIVATELABELING.TITLE',
+  i18nDesc: 'POLICY.PRIVATELABELING.DESCRIPTION',
   routerLink: ['/org', 'policy', PolicyComponentType.PRIVATELABEL],
   withRole: ['policy.read'],
 };

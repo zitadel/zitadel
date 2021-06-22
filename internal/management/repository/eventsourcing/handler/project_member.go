@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -134,7 +135,9 @@ func (p *ProjectMember) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		members, err := p.view.ProjectMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -168,6 +171,9 @@ func (p *ProjectMember) fillData(member *view_model.ProjectMemberView) (err erro
 
 func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_view_model.UserView) error {
 	org, err := p.getOrgByID(context.Background(), user.ResourceOwner)
+	if err != nil {
+		return err
+	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
 		policy, err = p.getDefaultOrgIAMPolicy(context.TODO())
@@ -177,11 +183,13 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 	}
 	member.UserName = user.UserName
 	member.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	member.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.Email = user.Email
 		member.DisplayName = user.DisplayName
+		member.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name

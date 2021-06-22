@@ -23,11 +23,12 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore     v1.Eventstore
-	SearchLimit    uint64
-	View           *admin_view.View
-	SystemDefaults systemdefaults.SystemDefaults
-	Roles          []string
+	Eventstore      v1.Eventstore
+	SearchLimit     uint64
+	View            *admin_view.View
+	SystemDefaults  systemdefaults.SystemDefaults
+	Roles           []string
+	PrefixAvatarURL string
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -35,7 +36,7 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID stri
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.IAMMemberToModel(member), nil
+	return iam_es_model.IAMMemberToModel(member, repo.PrefixAvatarURL), nil
 }
 
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
@@ -53,7 +54,7 @@ func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_mo
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IAMMembersToModel(members),
+		Result:      iam_es_model.IAMMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -340,7 +341,7 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IAMMembersToModel(members),
+		Result:      iam_es_model.IAMMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence

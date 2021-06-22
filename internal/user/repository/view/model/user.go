@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -135,7 +136,7 @@ func (m *MachineView) IsZero() bool {
 	return m == nil || m.Name == ""
 }
 
-func UserToModel(user *UserView) *model.UserView {
+func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 	userView := &model.UserView{
 		ID:                 user.ID,
 		UserName:           user.UserName,
@@ -160,6 +161,7 @@ func UserToModel(user *UserView) *model.UserView {
 			NickName:               user.NickName,
 			DisplayName:            user.DisplayName,
 			AvatarKey:              user.AvatarKey,
+			AvatarURL:              domain.AvatarURL(prefixAvatarURL, user.ResourceOwner, user.AvatarKey),
 			PreferredLanguage:      user.PreferredLanguage,
 			Gender:                 model.Gender(user.Gender),
 			Email:                  user.Email,
@@ -187,10 +189,10 @@ func UserToModel(user *UserView) *model.UserView {
 	return userView
 }
 
-func UsersToModel(users []*UserView) []*model.UserView {
+func UsersToModel(users []*UserView, prefixAvatarURL string) []*model.UserView {
 	result := make([]*model.UserView, len(users))
 	for i, p := range users {
-		result[i] = UserToModel(p)
+		result[i] = UserToModel(p, prefixAvatarURL)
 	}
 	return result
 }
@@ -340,7 +342,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		es_model.InitializedHumanCheckSucceeded:
 		u.InitRequired = false
 	case es_model.HumanAvatarAdded:
-		u.setData(event)
+		err = u.setData(event)
 	case es_model.HumanAvatarRemoved:
 		u.AvatarKey = ""
 	}

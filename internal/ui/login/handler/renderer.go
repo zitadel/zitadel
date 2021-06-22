@@ -10,18 +10,17 @@ import (
 
 	i18n2 "github.com/nicksnyder/go-i18n/v2/i18n"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/static"
-
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
+	"github.com/caos/zitadel/internal/static"
 )
 
 const (
@@ -240,6 +239,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			return
 		}
 		l.renderLogin(w, r, authReq, err)
+	case *domain.RegistrationStep:
+		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
 	case *domain.InitPasswordStep:
@@ -303,7 +304,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	l.renderer.CopyDefaultBundle()
 	baseData := baseData{
 		errorData: errorData{
-			ErrType:    errType,
+			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
 		Lang:                   l.renderer.Lang(r).String(),
@@ -347,14 +348,14 @@ func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 	}
 }
 
-func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
+func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
 		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
-		return localized + " (" + caosErr.ID + ")"
+		return caosErr.ID, localized
 
 	}
-	return err.Error()
+	return "", err.Error()
 }
 
 func (l *Login) getTheme(r *http.Request) string {
@@ -414,11 +415,6 @@ func (l *Login) addLoginTranslations(customTexts []*domain.CustomText) {
 	for _, text := range customTexts {
 		msg := &i18n2.Message{
 			ID: text.Key,
-			//Zero: text.Text,
-			//One: text.Text,
-			//Two: text.Text,
-			//Few: text.Text,
-			//Many: text.Text,
 			Other: text.Text,
 		}
 		l.renderer.AddMessages(text.Language, msg)
@@ -466,7 +462,7 @@ type baseData struct {
 }
 
 type errorData struct {
-	ErrType    string
+	ErrID      string
 	ErrMessage string
 }
 

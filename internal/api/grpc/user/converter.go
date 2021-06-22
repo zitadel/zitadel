@@ -56,6 +56,7 @@ func HumanToPb(view *model.HumanView) *user_pb.Human {
 			DisplayName:       view.DisplayName,
 			PreferredLanguage: view.PreferredLanguage,
 			Gender:            GenderToPb(view.Gender),
+			AvatarUrl:         view.AvatarURL,
 		},
 		Email: &user_pb.Email{
 			Email:           view.Email,
@@ -83,6 +84,7 @@ func ProfileToPb(profile *model.Profile) *user_pb.Profile {
 		DisplayName:       profile.DisplayName,
 		PreferredLanguage: profile.PreferredLanguage.String(),
 		Gender:            GenderToPb(profile.Gender),
+		AvatarUrl:         profile.AvatarURL,
 	}
 }
 

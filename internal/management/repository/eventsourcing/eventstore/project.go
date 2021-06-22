@@ -31,10 +31,11 @@ import (
 
 type ProjectRepo struct {
 	v1.Eventstore
-	SearchLimit uint64
-	View        *view.View
-	Roles       []string
-	IAMID       string
+	SearchLimit     uint64
+	View            *view.View
+	Roles           []string
+	IAMID           string
+	PrefixAvatarURL string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
@@ -136,7 +137,7 @@ func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userI
 	if err != nil {
 		return nil, err
 	}
-	return model.ProjectMemberToModel(member), nil
+	return model.ProjectMemberToModel(member, repo.PrefixAvatarURL), nil
 }
 
 func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
@@ -154,7 +155,7 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      model.ProjectMembersToModel(members),
+		Result:      model.ProjectMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -202,6 +203,7 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
@@ -281,6 +283,7 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, projectID strin
 			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
@@ -442,7 +445,7 @@ func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, 
 	if err != nil {
 		return nil, err
 	}
-	return model.ProjectGrantMemberToModel(member), nil
+	return model.ProjectGrantMemberToModel(member, repo.PrefixAvatarURL), nil
 }
 
 func (repo *ProjectRepo) SearchProjectGrantRoles(ctx context.Context, projectID, grantID string, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
@@ -491,7 +494,7 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      model.ProjectGrantMembersToModel(members),
+		Result:      model.ProjectGrantMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -542,18 +545,18 @@ func (repo *ProjectRepo) userByID(ctx context.Context, id string) (*usr_model.Us
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return usr_es_model.UserToModel(user), nil
+		return usr_es_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_es_model.UserToModel(user), nil
+			return usr_es_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(usr_model.UserStateDeleted) {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2m0Fs", "Errors.User.NotFound")
 	}
-	return usr_es_model.UserToModel(&userCopy), nil
+	return usr_es_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (r *ProjectRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {

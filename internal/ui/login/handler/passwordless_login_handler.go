@@ -23,14 +23,14 @@ type passwordlessFormData struct {
 }
 
 func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage, credentialData string
+	var errID, errMessage, credentialData string
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		webAuthNLogin, err = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
 	}
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if webAuthNLogin != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData)
@@ -41,7 +41,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	}
 	data := &passwordlessData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, "Login Passwordless", errType, errMessage),
+			userData:               l.getUserData(r, authReq, "Login Passwordless", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		passwordLogin,

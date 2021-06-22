@@ -46,9 +46,11 @@
     "ORG_POLICY_COMPLEXITY": "Passwort Komplexität",
     "ORG_POLICY_IAM": "Organisation Zugangseinstellungen",
     "ORG_POLICY_LOGIN": "Login Richtlinie",
+    "ORG_POLICY_LABEL": "Private Label Richtlinie",
     "IAM_POLICY_COMPLEXITY": "Systemweite Passwort Komplexität",
     "IAM_POLICY_IAM": "Systemweite Zugangseinstellungen",
     "IAN_POLICY_LOGIN": "Systemweite Login Richtlinie",
+    "IAN_POLICY_LABEL": "Systemweite Private Label Richtlinie",
     "USERS": "Erstelle und verwalte Deine Benutzer.",
     "USERS_DESC": "Überwache Dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
     "USERS_HUMANS": "Zeige Benutzer",
@@ -306,7 +308,16 @@
       "DISPLAYNAME": "Anzeigename",
       "PREFERRED_LANGUAGE": "Sprache",
       "GENDER": "Geschlecht",
-      "PASSWORD": "Passwort"
+      "PASSWORD": "Passwort",
+      "AVATAR": {
+        "UPLOADTITLE":"Profilfoto uploaden",
+        "UPLOADBTN":"Datei auswählen",
+        "UPLOAD":"Hochladen",
+        "CURRENT":"Aktuelles Bild",
+        "PREVIEW":"Vorschau",
+        "DELETESUCCESS":"Erfolgreich gelöscht!",
+        "CROPPERERROR":"Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
+      }
     },
     "MACHINE": {
       "TITLE": "Details Service-Benutzer",
@@ -642,7 +653,7 @@
     "PRIVATELABELING": {
       "TITLE":"Private Labeling",
       "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
-      "PREVIEW_DESCRIPTION":"Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar. Um die Preview zu Testen muss dem login flow der scope 'x-preview' mitgegeben werden.",
+      "PREVIEW_DESCRIPTION":"Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN":"Datei auswählen",
       "ACTIVATEPREVIEW":"Konfiguration übernehmen",
       "DARK":"Dunkler Modus",
@@ -653,6 +664,8 @@
       "COLORS":"Farben",
       "FONT":"Schrift",
       "ADVANCEDBEHAVIOR":"Erweitertes Verhalten",
+      "DROP":"Bild hier ablegen",
+      "RELEASE":"Jetzt loslassen",
       "PREVIEW": {
         "TITLE":"Anmeldung",
         "SECOND":"mit ZITADEL-Konto anmelden.",

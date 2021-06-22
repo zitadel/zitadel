@@ -3,7 +3,7 @@ import { Component, EventEmitter, Injector, OnDestroy, Type } from '@angular/cor
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import {
   GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
   GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
@@ -15,14 +15,24 @@ import {
   GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
   UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
-import { IAM_COMPLEXITY_LINK, IAM_LOGIN_POLICY_LINK, IAM_POLICY_LINK } from '../../policy-grid/policy-links';
+import {
+  IAM_COMPLEXITY_LINK,
+  IAM_LOGIN_POLICY_LINK,
+  IAM_POLICY_LINK,
+  ORG_COMPLEXITY_LINK,
+  ORG_IAM_POLICY_LINK,
+  ORG_LOGIN_POLICY_LINK,
+} from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -44,6 +54,8 @@ export enum ColorType {
   BACKGROUNDDARK,
   BACKGROUNDLIGHT,
 }
+
+const ORG_STORAGE_KEY = 'organization';
 
 @Component({
   selector: 'app-private-labeling-policy',
@@ -86,23 +98,42 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
+  private org!: Org.AsObject;
 
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
+    private storageService: StorageService,
   ) {
+    const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
+
+    if (org) {
+      this.org = org;
+    }
+
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
+          this.nextLinks = [
+            ORG_IAM_POLICY_LINK,
+            ORG_LOGIN_POLICY_LINK,
+            ORG_COMPLEXITY_LINK,
+          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
+          this.nextLinks = [
+            IAM_POLICY_LINK,
+            IAM_LOGIN_POLICY_LINK,
+            IAM_COMPLEXITY_LINK,
+          ];
           break;
       }
 
@@ -134,17 +165,17 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (theme === Theme.DARK) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData, this.org.id));
         }
       }
       if (theme === Theme.LIGHT) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData));
+            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData, this.org.id));
         }
       }
 
@@ -158,9 +189,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       formData.append('file', file);
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
-          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData));
+          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
         case PolicyComponentServiceType.ADMIN:
-          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
+          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
       }
     }
   }
@@ -257,20 +288,20 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       if (theme === Theme.DARK) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
             break;
           case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData, this.org.id));
             break;
         }
       }
       if (theme === Theme.LIGHT) {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
             break;
           case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData));
+            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData, this.org.id));
             break;
         }
       }
@@ -278,7 +309,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private handleFontUploadPromise(task: Promise<any>): Promise<any> {
-    return task.then(() => {
+    const enhTask = task.then(() => {
       this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
       setTimeout(() => {
         this.getPreviewData().then(data => {
@@ -288,10 +319,16 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
       }, 1000);
     }).catch(error => this.toast.showError(error));
+
+    if (this.serviceType === PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
+      return this.savePolicy().then(() => enhTask);
+    } else {
+      return enhTask;
+    }
   }
 
   private handleUploadPromise(task: Promise<any>): Promise<any> {
-    return task.then(() => {
+    const enhTask = task.then(() => {
       this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
       setTimeout(() => {
         this.loadingImages = true;
@@ -304,37 +341,53 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         });
       }, 1000);
     }).catch(error => this.toast.showError(error));
+
+    if (this.serviceType === PolicyComponentServiceType.MGMT && ((this.previewData as LabelPolicy.AsObject).isDefault)) {
+      return this.savePolicy().then(() => enhTask);
+    } else {
+      return enhTask;
+    }
   }
 
   public fetchData(): void {
     this.loading = true;
 
-    this.getPreviewData().then(data => {
-      console.log('preview', data);
-      this.loadingImages = true;
+    this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
+      this.getPreviewData().then(data => {
+        console.log('preview', data);
 
-      if (data.policy) {
-        this.previewData = data.policy;
-        this.loading = false;
+        if (data.policy) {
+          this.previewData = data.policy;
+          this.loading = false;
 
-        this.loadPreviewImages();
-      }
-    }).catch(error => {
-      this.toast.showError(error);
+          if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
+            this.serviceType === PolicyComponentServiceType.ADMIN) {
+            this.loadingImages = true;
+            this.loadPreviewImages();
+          }
+        }
+      }).catch(error => {
+        this.toast.showError(error);
+      });
+
+      this.getData().then(data => {
+        console.log('data', data);
+
+        if (data.policy) {
+          this.data = data.policy;
+          this.loading = false;
+
+          if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
+            this.serviceType === PolicyComponentServiceType.ADMIN) {
+            // this.loadingImages = true;
+            this.loadImages();
+          }
+        }
+      }).catch(error => {
+        this.toast.showError(error);
+      });
     });
 
-    this.getData().then(data => {
-      console.log('data', data);
-
-      if (data.policy) {
-        this.data = data.policy;
-        this.loading = false;
-
-        this.loadImages();
-      }
-    }).catch(error => {
-      this.toast.showError(error);
-    });
   }
 
   private loadImages(): void {
@@ -451,7 +504,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
-    return this.assetService.load(`${url}`).then(data => {
+    return this.assetService.load(`${url}`, this.org.id).then(data => {
+      console.log(data);
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();
@@ -462,7 +516,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public removePolicy(): void {
     if (this.service instanceof ManagementService) {
-      this.service.resetPasswordComplexityPolicyToDefault().then(() => {
+      this.service.resetLabelPolicyToDefault().then(() => {
         this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
         setTimeout(() => {
           this.fetchData();
@@ -473,14 +527,14 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public savePolicy(): void {
+  public savePolicy(): Promise<any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.previewData as LabelPolicy.AsObject).isDefault) {
           const req0 = new AddCustomLabelPolicyRequest();
           this.overwriteValues(req0);
 
-          (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
+          return (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch((error: HttpErrorResponse) => {
             this.toast.showError(error);
@@ -489,22 +543,20 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
           const req1 = new UpdateCustomLabelPolicyRequest();
           this.overwriteValues(req1);
 
-          (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
+          return (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
           }).catch(error => {
             this.toast.showError(error);
           });
         }
-        break;
       case PolicyComponentServiceType.ADMIN:
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
-        (this.service as AdminService).updateLabelPolicy(req).then(() => {
+        return (this.service as AdminService).updateLabelPolicy(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
           this.toast.showError(error);
         });
-        break;
     }
   }
 
