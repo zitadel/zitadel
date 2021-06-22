@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/gorilla/csrf"
 	"github.com/rakyll/statik/fs"
@@ -112,7 +113,13 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
 	login.renderer = CreateRenderer(prefix, statikFS, staticStorage, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
-	login.authConnectorVerifier = op.NewJWTProfileVerifier(&jwtProfileStorage{authRepo}, config.Issuer, 30*time.Second, time.Second)
+	check := func(request *oidc.JWTTokenRequest) error {
+		//sub, err := authRepo.UserViewProvider.UserByID(request.Subject)
+		//issuer, err := authRepo.UserViewProvider.UserByID(request.Issuer)
+		//if sub.ResourceOwner != issuer.ResourceOwner
+		return nil
+	}
+	login.authConnectorVerifier = op.NewJWTProfileVerifier2(&jwtProfileStorage{authRepo}, config.Issuer, 300*time.Second, time.Second, check)
 	return login, handlerPrefix
 }
 

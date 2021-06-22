@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -128,13 +127,41 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 	}
 	if idpConfig.IDPConfigAuthConnectorView != nil {
-		profile, err := op.VerifyJWTAssertion(r.Context(), data.Assertion, l.authConnectorVerifier)
-		if err != nil {
-			l.renderLogin(w, r, authReq, err)
-			return
-		}
-		fmt.Println(profile)
+		l.handleExternalLoginCallbackAuthConnector(w, r, authReq, data, idpConfig)
 	}
+}
+
+func (l *Login) handleExternalLoginCallbackAuthConnector(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *externalIDPCallbackData, idpConfig *iam_model.IDPConfigView) {
+	ctx := r.Context()
+	profile, err := op.VerifyJWTAssertion(ctx, data.Assertion, l.authConnectorVerifier)
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	user, err := l.authRepo.UserByID(ctx, profile.Subject)
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	if idpConfig.AggregateID != domain.IAMID && user.ResourceOwner != idpConfig.AggregateID {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	if authReq.ID != profile.GetCustomClaim("nonce") {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	externalUser := &domain.ExternalUser{
+		IDPConfigID:    idpConfig.IDPConfigID,
+		ExternalUserID: profile.Subject,
+	}
+	err = l.authRepo.CheckExternalUserLogin(ctx, authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	l.renderNextStep(w, r, authReq)
 }
 
 func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelyingParty {
