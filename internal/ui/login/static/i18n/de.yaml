@@ -132,8 +132,8 @@ Passwordless:
   Title: Passwortlos einloggen
   Description: Verifiziere dein Token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-    Error:
-      Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  Error:
+    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
   LoginWithPwButtonText: Mit Passwort anmelden
   ValidateTokenButtonText: Token validieren
 
