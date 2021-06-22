@@ -52,20 +52,33 @@ message LoginCustomText {
     SelectAccountScreenText select_account_text = 2;
     LoginScreenText login_text = 3;
     PasswordScreenText password_text = 4;
-    ResetPasswordScreenText reset_password_text = 5;
-    InitializeUserScreenText initialize_user_text = 6;
-    InitializeDoneScreenText initialize_done_text = 7;
-    InitMFAPromptScreenText init_mfa_prompt_text = 8;
-    InitMFAOTPScreenText init_mfa_otp_text = 9;
-    InitMFAU2FScreenText init_mfa_u2f_text = 10;
-    InitMFADoneScreenText init_mfa_done_text = 11;
-    VerifyMFAOTPScreenText verify_mfa_otp_text = 12;
-    VerifyMFAU2FScreenText verify_mfa_u2f_text = 13;
-    RegistrationOptionScreenText registration_option_text = 14;
-    RegistrationUserScreenText registration_user_text = 15;
-    RegistrationOrgScreenText registration_org_text = 16;
-    PasswordlessScreenText passwordless_text = 17;
-    SuccessLoginScreenText success_login_text = 18;
+    UsernameChangeScreenText username_change_text = 5;
+    UsernameChangeDoneScreenText username_change_done_text = 6;
+    InitPasswordScreenText init_password_text = 7;
+    InitPasswordDoneScreenText init_password_done_text = 8;
+    EmailVerificationScreenText email_verification_text = 9;
+    EmailVerificationDoneScreenText email_verification_done_text = 10;
+    InitializeUserScreenText initialize_user_text = 11;
+    InitializeUserDoneScreenText initialize_done_text = 12;
+    InitMFAPromptScreenText init_mfa_prompt_text = 13;
+    InitMFAOTPScreenText init_mfa_otp_text = 14;
+    InitMFAU2FScreenText init_mfa_u2f_text = 15;
+    InitMFADoneScreenText init_mfa_done_text = 16;
+    MFAProvidersText mfa_providers_text = 17;
+    VerifyMFAOTPScreenText verify_mfa_otp_text = 18;
+    VerifyMFAU2FScreenText verify_mfa_u2f_text = 19;
+    PasswordlessScreenText passwordless_text = 20;
+    PasswordChangeScreenText password_change_text = 21;
+    PasswordChangeDoneScreenText password_change_done_text = 22;
+    PasswordResetDoneScreenText password_reset_done_text = 23;
+    RegistrationOptionScreenText registration_option_text = 24;
+    RegistrationUserScreenText registration_user_text = 25;
+    RegistrationOrgScreenText registration_org_text = 26;
+    LinkingUserDoneScreenText linking_user_done_text = 27;
+    ExternalUserNotFoundScreenText external_user_not_found_text = 28;
+    SuccessLoginScreenText success_login_text = 29;
+    LogoutDoneScreenText logout_text = 30;
+    FooterText footer_text = 31;
 }
 
 message SelectAccountScreenText {
@@ -89,6 +102,8 @@ message LoginScreenText {
     string register_button_text = 7 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 8 [(validate.rules).string = {max_len: 100}];
     string external_user_description = 9 [(validate.rules).string = {max_len: 500}];
+    string user_name_placeholder = 10 [(validate.rules).string = {max_len: 200}];
+    string login_name_placeholder = 11 [(validate.rules).string = {max_len: 200}];
 }
 
 message PasswordScreenText {
@@ -98,12 +113,58 @@ message PasswordScreenText {
     string reset_link_text = 4 [(validate.rules).string = {max_len: 100}];
     string back_button_text = 5 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 6 [(validate.rules).string = {max_len: 100}];
+    string min_length = 7 [(validate.rules).string = {max_len: 100}];
+    string has_uppercase = 8 [(validate.rules).string = {max_len: 100}];
+    string has_lowercase = 9 [(validate.rules).string = {max_len: 100}];
+    string has_number = 10 [(validate.rules).string = {max_len: 100}];
+    string has_symbol = 11 [(validate.rules).string = {max_len: 100}];
+}
+
+message UsernameChangeScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string username_label = 3 [(validate.rules).string = {max_len: 200}];
+    string cancel_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 5 [(validate.rules).string = {max_len: 100}];
+}
+
+message UsernameChangeDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
 }
 
 message InitPasswordScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
+    string code_label = 3 [(validate.rules).string = {max_len: 200}];
+    string new_password_label = 4 [(validate.rules).string = {max_len: 200}];
+    string new_password_confirm_label = 5 [(validate.rules).string = {max_len: 200}];
+    string next_button_text = 6 [(validate.rules).string = {max_len: 100}];
+    string resend_button_text = 7 [(validate.rules).string = {max_len: 100}];
+}
+
+message InitPasswordDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
     string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string cancel_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message EmailVerificationScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string code_label = 3 [(validate.rules).string = {max_len: 200}];
+    string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string resend_button_text = 5 [(validate.rules).string = {max_len: 100}];
+}
+
+message EmailVerificationDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string cancel_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string login_button_text = 5 [(validate.rules).string = {max_len: 100}];
 }
 
 message InitializeUserScreenText {
@@ -116,7 +177,7 @@ message InitializeUserScreenText {
     string next_button_text = 7 [(validate.rules).string = {max_len: 100}];
 }
 
-message InitializeDoneScreenText {
+message InitializeUserDoneScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string abort_button_text = 3 [(validate.rules).string = {max_len: 100}];
@@ -135,15 +196,20 @@ message InitMFAPromptScreenText {
 message InitMFAOTPScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
-    string secret_label = 3 [(validate.rules).string = {max_len: 200}];
-    string code_label = 4 [(validate.rules).string = {max_len: 200}];
+    string description_otp = 3 [(validate.rules).string = {max_len: 500}];
+    string secret_label = 4 [(validate.rules).string = {max_len: 200}];
+    string code_label = 5 [(validate.rules).string = {max_len: 200}];
+    string next_button_text = 6 [(validate.rules).string = {max_len: 100}];
+    string cancel_button_text = 7 [(validate.rules).string = {max_len: 100}];
 }
 
 message InitMFAU2FScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string token_name_label = 3 [(validate.rules).string = {max_len: 200}];
-    string register_token_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string not_supported = 4 [(validate.rules).string = {max_len: 500}];
+    string register_token_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string error_retry = 6 [(validate.rules).string = {max_len: 500}];
 }
 
 message InitMFADoneScreenText {
@@ -151,6 +217,12 @@ message InitMFADoneScreenText {
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string abort_button_text = 3 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message MFAProvidersText {
+    string choose_other = 1 [(validate.rules).string = {max_len: 500}];
+    string otp = 2 [(validate.rules).string = {max_len: 200}];
+    string u2f = 3 [(validate.rules).string = {max_len: 200}];
 }
 
 message VerifyMFAOTPScreenText {
@@ -164,8 +236,40 @@ message VerifyMFAU2FScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string validate_token_text = 3 [(validate.rules).string = {max_len: 500}];
-    string other_option_description = 4 [(validate.rules).string = {max_len: 500}];
-    string option_otp_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string not_supported = 4 [(validate.rules).string = {max_len: 500}];
+    string error_retry = 5 [(validate.rules).string = {max_len: 500}];
+    string option_otp_button_text = 6 [(validate.rules).string = {max_len: 100}];
+}
+
+message PasswordlessScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string login_with_pw_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string validate_token_button_text = 4 [(validate.rules).string = {max_len: 200}];
+    string not_supported = 5 [(validate.rules).string = {max_len: 500}];
+    string error_retry = 6 [(validate.rules).string = {max_len: 500}];
+}
+
+message PasswordChangeScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string old_password_label = 3 [(validate.rules).string = {max_len: 200}];
+    string new_password_label = 4 [(validate.rules).string = {max_len: 200}];
+    string new_password_confirm_label = 5 [(validate.rules).string = {max_len: 200}];
+    string cancel_button_text = 6 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 7 [(validate.rules).string = {max_len: 100}];
+}
+
+message PasswordChangeDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
+}
+
+message PasswordResetDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
 }
 
 message RegistrationOptionScreenText {
@@ -181,11 +285,21 @@ message RegistrationUserScreenText {
     string firstname_label = 3 [(validate.rules).string = {max_len: 200}];
     string lastname_label = 4 [(validate.rules).string = {max_len: 200}];
     string email_label = 5 [(validate.rules).string = {max_len: 200}];
-    string language_label = 6 [(validate.rules).string = {max_len: 200}];
-    string gender_label = 7 [(validate.rules).string = {max_len: 200}];
-    string password_label = 8 [(validate.rules).string = {max_len: 200}];
-    string password_confirm_label = 9 [(validate.rules).string = {max_len: 200}];
-    string save_button_text = 10 [(validate.rules).string = {max_len: 200}];
+    string username_label = 6 [(validate.rules).string = {max_len: 200}];
+    string language_label = 7 [(validate.rules).string = {max_len: 200}];
+    string gender_label = 8 [(validate.rules).string = {max_len: 200}];
+    string password_label = 9 [(validate.rules).string = {max_len: 200}];
+    string password_confirm_label = 10 [(validate.rules).string = {max_len: 200}];
+    string tos_and_privacy_label = 11 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm = 12 [(validate.rules).string = {max_len: 200}];
+    string tos_link = 13 [(validate.rules).string = {max_len: 200}];
+    string tos_link_text = 14 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 15 [(validate.rules).string = {max_len: 200}];
+    string privacy_link = 16 [(validate.rules).string = {max_len: 200}];
+    string privacy_link_text = 17 [(validate.rules).string = {max_len: 200}];
+    string external_login_description = 18 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 19 [(validate.rules).string = {max_len: 200}];
+    string back_button_text = 20 [(validate.rules).string = {max_len: 200}];
 }
 
 message RegistrationOrgScreenText {
@@ -198,14 +312,29 @@ message RegistrationOrgScreenText {
     string email_label = 7 [(validate.rules).string = {max_len: 200}];
     string password_label = 9 [(validate.rules).string = {max_len: 200}];
     string password_confirm_label = 10 [(validate.rules).string = {max_len: 200}];
-    string save_button_text = 11 [(validate.rules).string = {max_len: 200}];
+    string tos_and_privacy_label = 11 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm = 12 [(validate.rules).string = {max_len: 200}];
+    string tos_link = 13 [(validate.rules).string = {max_len: 200}];
+    string tos_link_text = 14 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 15 [(validate.rules).string = {max_len: 200}];
+    string privacy_link = 16 [(validate.rules).string = {max_len: 200}];
+    string privacy_link_text = 17 [(validate.rules).string = {max_len: 200}];
+    string external_login_description = 18 [(validate.rules).string = {max_len: 500}];
+    string save_button_text = 19 [(validate.rules).string = {max_len: 200}];
 }
 
-message PasswordlessScreenText {
+message LinkingUserDoneScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
-    string login_with_pw_button_text = 3 [(validate.rules).string = {max_len: 100}];
-    string validate_token_button_text = 4 [(validate.rules).string = {max_len: 200}];
+    string cancel_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
+}
+
+message ExternalUserNotFoundScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string link_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string auto_register_button_text = 4 [(validate.rules).string = {max_len: 100}];
 }
 
 message SuccessLoginScreenText {
@@ -215,4 +344,19 @@ message SuccessLoginScreenText {
     // Text to describe that the window can be closed after redirect
     string redirected_description = 3 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message LogoutDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string login_button_text = 3 [(validate.rules).string = {max_len: 200}];
+}
+
+message FooterText {
+    string tos = 1 [(validate.rules).string = {max_len: 200}];
+    string tos_link = 2 [(validate.rules).string = {max_len: 500}];
+    string privacy_policy = 3 [(validate.rules).string = {max_len: 200}];
+    string privacy_policy_link = 4 [(validate.rules).string = {max_len: 500}];
+    string help = 5 [(validate.rules).string = {max_len: 200}];
+    string help_link = 6 [(validate.rules).string = {max_len: 500}];
 }

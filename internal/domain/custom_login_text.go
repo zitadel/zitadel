@@ -45,24 +45,26 @@ const (
 	LoginKeyPasswordBackButtonText = LoginKeyPassword + "BackButtonText"
 	LoginKeyPasswordNextButtonText = LoginKeyPassword + "NextButtonText"
 
-	LoginKeyUsernameChange         = "UsernameChange."
-	UsernameChangeTitle            = LoginKeyUsernameChange + "Title"
-	UsernameChangeDescription      = LoginKeyUsernameChange + "Description"
-	UsernameChangeUsernameLabel    = LoginKeyUsernameChange + "UsernameLabel"
-	UsernameChangeCancelButtonText = LoginKeyUsernameChange + "CancelButtonText"
-	UsernameChangeNextButtonText   = LoginKeyUsernameChange + "NextButtonText"
+	LoginKeyUsernameChange                 = "UsernameChange."
+	LoginKeyUsernameChangeTitle            = LoginKeyUsernameChange + "Title"
+	LoginKeyUsernameChangeDescription      = LoginKeyUsernameChange + "Description"
+	LoginKeyUsernameChangeUsernameLabel    = LoginKeyUsernameChange + "UsernameLabel"
+	LoginKeyUsernameChangeCancelButtonText = LoginKeyUsernameChange + "CancelButtonText"
+	LoginKeyUsernameChangeNextButtonText   = LoginKeyUsernameChange + "NextButtonText"
 
-	LoginKeyUsernameChangeDone       = "UsernameChangeDone."
-	UsernameChangeDoneTitle          = LoginKeyUsernameChangeDone + "Title"
-	UsernameChangeDoneDescription    = LoginKeyUsernameChangeDone + "Description"
-	UsernameChangeDoneNextButtonText = LoginKeyUsernameChangeDone + "NextButtonText"
+	LoginKeyUsernameChangeDone               = "UsernameChangeDone."
+	LoginKeyUsernameChangeDoneTitle          = LoginKeyUsernameChangeDone + "Title"
+	LoginKeyUsernameChangeDoneDescription    = LoginKeyUsernameChangeDone + "Description"
+	LoginKeyUsernameChangeDoneNextButtonText = LoginKeyUsernameChangeDone + "NextButtonText"
 
-	LoginKeyInitPassword                 = "InitPassword."
-	LoginKeyInitPasswordTitle            = LoginKeyInitPassword + "Title"
-	LoginKeyInitPasswordDescription      = LoginKeyInitPassword + "Description"
-	LoginKeyInitPasswordCodeLabel        = LoginKeyInitPassword + "CodeLabel"
-	LoginKeyInitPasswordNextButtonText   = LoginKeyInitPassword + "NextButtonText"
-	LoginKeyInitPasswordResendButtonText = LoginKeyInitPassword + "ResendButtonText"
+	LoginKeyInitPassword                        = "InitPassword."
+	LoginKeyInitPasswordTitle                   = LoginKeyInitPassword + "Title"
+	LoginKeyInitPasswordDescription             = LoginKeyInitPassword + "Description"
+	LoginKeyInitPasswordCodeLabel               = LoginKeyInitPassword + "CodeLabel"
+	LoginKeyInitPasswordNewPasswordLabel        = LoginKeyInitPassword + "NewPasswordLabel"
+	LoginKeyInitPasswordNewPasswordConfirmLabel = LoginKeyInitPassword + "NewPasswordConfirmLabel"
+	LoginKeyInitPasswordNextButtonText          = LoginKeyInitPassword + "NextButtonText"
+	LoginKeyInitPasswordResendButtonText        = LoginKeyInitPassword + "ResendButtonText"
 
 	LoginKeyInitPasswordDone                 = "InitPasswordDone."
 	LoginKeyInitPasswordDoneTitle            = LoginKeyInitPasswordDone + "Title"
@@ -107,14 +109,14 @@ const (
 	LoginKeyInitMFAPromptSkipButtonText = LoginKeyInitMFAPrompt + "SkipButtonText"
 	LoginKeyInitMFAPromptNextButtonText = LoginKeyInitMFAPrompt + "NextButtonText"
 
-	LoginKeyInitMFAOTP               = "InitMFAOTP."
-	LoginKeyInitMFAOTPTitle          = LoginKeyInitMFAOTP + "Title"
-	LoginKeyInitMFAOTPDescription    = LoginKeyInitMFAOTP + "Description"
-	LoginKeyInitMFAOTPDescriptionOTP = LoginKeyInitMFAOTP + "OTPDescription"
-	LoginKeyInitMFAOTPSecretLabel    = LoginKeyInitMFAOTP + "SecretLabel"
-	LoginKeyInitMFAOTPCodeLabel      = LoginKeyInitMFAOTP + "CodeLabel"
-	LoginKeyInitMFANextButtonText    = LoginKeyInitMFAOTP + "NextButtonText"
-	LoginKeyInitMFACancelButtonText  = LoginKeyInitMFAOTP + "CancelButtonText"
+	LoginKeyInitMFAOTP                 = "InitMFAOTP."
+	LoginKeyInitMFAOTPTitle            = LoginKeyInitMFAOTP + "Title"
+	LoginKeyInitMFAOTPDescription      = LoginKeyInitMFAOTP + "Description"
+	LoginKeyInitMFAOTPDescriptionOTP   = LoginKeyInitMFAOTP + "OTPDescription"
+	LoginKeyInitMFAOTPSecretLabel      = LoginKeyInitMFAOTP + "SecretLabel"
+	LoginKeyInitMFAOTPCodeLabel        = LoginKeyInitMFAOTP + "CodeLabel"
+	LoginKeyInitMFAOTPNextButtonText   = LoginKeyInitMFAOTP + "NextButtonText"
+	LoginKeyInitMFAOTPCancelButtonText = LoginKeyInitMFAOTP + "CancelButtonText"
 
 	LoginKeyInitMFAU2F                        = "InitMFAU2F."
 	LoginKeyInitMFAU2FTitle                   = LoginKeyInitMFAU2F + "Title"
@@ -189,9 +191,10 @@ const (
 	LoginKeyRegistrationUserEmailLabel               = LoginKeyRegistrationUser + "EmailLabel"
 	LoginKeyRegistrationUserUsernameLabel            = LoginKeyRegistrationUser + "UsernameLabel"
 	LoginKeyRegistrationUserLanguageLabel            = LoginKeyRegistrationUser + "LanguageLabel"
+	LoginKeyRegistrationUserGenderLabel              = LoginKeyRegistrationUser + "GenderLabel"
 	LoginKeyRegistrationUserPasswordLabel            = LoginKeyRegistrationUser + "PasswordLabel"
 	LoginKeyRegistrationUserPasswordConfirmLabel     = LoginKeyRegistrationUser + "PasswordConfirmLabel"
-	LoginKeyRegistrationUserTOSAndPrivacy            = LoginKeyRegistrationUser + "TosAndPrivacyLabel"
+	LoginKeyRegistrationUserTOSAndPrivacyLabel       = LoginKeyRegistrationUser + "TosAndPrivacyLabel"
 	LoginKeyRegistrationUserTOSConfirm               = LoginKeyRegistrationUser + "TosConfirm"
 	LoginKeyRegistrationUserTOSLink                  = LoginKeyRegistrationUser + "TosLink"
 	LoginKeyRegistrationUserTOSLinkText              = LoginKeyRegistrationUser + "TosLinkText"
@@ -212,7 +215,7 @@ const (
 	LoginKeyRegisterOrgEmailLabel               = LoginKeyRegistrationOrg + "EmailLabel"
 	LoginKeyRegisterOrgPasswordLabel            = LoginKeyRegistrationOrg + "PasswordLabel"
 	LoginKeyRegisterOrgPasswordConfirmLabel     = LoginKeyRegistrationOrg + "PasswordConfirmLabel"
-	LoginKeyRegisterOrgTOSAndPrivacy            = LoginKeyRegistrationOrg + "TosAndPrivacyLabel"
+	LoginKeyRegisterOrgTOSAndPrivacyLabel       = LoginKeyRegistrationOrg + "TosAndPrivacyLabel"
 	LoginKeyRegisterOrgTOSConfirm               = LoginKeyRegistrationOrg + "TosConfirm"
 	LoginKeyRegisterOrgTOSLink                  = LoginKeyRegistrationOrg + "TosLink"
 	LoginKeyRegisterOrgTOSLinkText              = LoginKeyRegistrationOrg + "TosLinkText"
@@ -251,6 +254,7 @@ const (
 	LoginKeyFooterPrivacy     = LoginKeyFooter + "Privacy"
 	LoginKeyFooterPrivacyLink = LoginKeyFooter + "PrivacyLink"
 	LoginKeyFooterHelp        = LoginKeyFooter + "Help"
+	LoginKeyFooterHelpLink    = LoginKeyFooter + "HelpLink"
 )
 
 type CustomLoginText struct {
@@ -260,23 +264,36 @@ type CustomLoginText struct {
 	Default  bool
 	Language language.Tag
 
-	SelectAccountScreenText      SelectAccountScreenText
-	LoginScreenText              LoginScreenText
-	PasswordScreenText           PasswordScreenText
-	InitPasswordScreenText       InitPasswordScreenText
-	InitializeUserScreenText     InitializeUserScreenText
-	InitializeDoneScreenText     InitializeDoneScreenText
-	InitMFAPromptScreenText      InitMFAPromptScreenText
-	InitMFAOTPScreenText         InitMFAOTPScreenText
-	InitMFAU2FScreenText         InitMFAU2FScreenText
-	InitMFADoneScreenText        InitMFADoneScreenText
-	VerifyMFAOTPScreenText       VerifyMFAOTPScreenText
-	VerifyMFAU2FScreenText       VerifyMFAU2FScreenText
-	RegistrationOptionScreenText RegistrationOptionScreenText
-	RegistrationUserScreenText   RegistrationUserScreenText
-	RegistrationOrgScreenText    RegistrationOrgScreenText
-	PasswordlessScreenText       PasswordlessScreenText
-	SuccessLoginScreenText       SuccessLoginScreenText
+	SelectAccountScreenText         SelectAccountScreenText
+	LoginScreenText                 LoginScreenText
+	PasswordScreenText              PasswordScreenText
+	UsernameChangeScreenText        UsernameChangeScreenText
+	UsernameChangeDoneScreenText    UsernameChangeDoneScreenText
+	InitPasswordScreenText          InitPasswordScreenText
+	InitPasswordDoneScreenText      InitPasswordDoneScreenText
+	EmailVerificationScreenText     EmailVerificationScreenText
+	EmailVerificationDoneScreenText EmailVerificationDoneScreenText
+	InitializeUserScreenText        InitializeUserScreenText
+	InitializeDoneScreenText        InitializeUserDoneScreenText
+	InitMFAPromptScreenText         InitMFAPromptScreenText
+	InitMFAOTPScreenText            InitMFAOTPScreenText
+	InitMFAU2FScreenText            InitMFAU2FScreenText
+	InitMFADoneScreenText           InitMFADoneScreenText
+	MFAProvidersText                MFAProvidersText
+	VerifyMFAOTPScreenText          VerifyMFAOTPScreenText
+	VerifyMFAU2FScreenText          VerifyMFAU2FScreenText
+	PasswordlessScreenText          PasswordlessScreenText
+	PasswordChangeScreenText        PasswordChangeScreenText
+	PasswordChangeDoneScreenText    PasswordChangeDoneScreenText
+	PasswordResetDoneScreenText     PasswordResetDoneScreenText
+	RegistrationOptionScreenText    RegistrationOptionScreenText
+	RegistrationUserScreenText      RegistrationUserScreenText
+	RegistrationOrgScreenText       RegistrationOrgScreenText
+	LinkingUserDoneScreenText       LinkingUserDoneScreenText
+	ExternalUserNotFoundScreenText  ExternalUserNotFoundScreenText
+	SuccessLoginScreenText          SuccessLoginScreenText
+	LogoutDoneScreenText            LogoutDoneScreenText
+	FooterText                      FooterText
 }
 
 func (m *CustomLoginText) IsValid() bool {
@@ -300,6 +317,8 @@ type LoginScreenText struct {
 	TitleLinkingProcess       string
 	DescriptionLinkingProcess string
 	LoginNameLabel            string
+	UsernamePlaceholder       string
+	LoginnamePlaceholder      string
 	RegisterButtonText        string
 	NextButtonText            string
 	ExternalUserDescription   string
@@ -313,12 +332,58 @@ type PasswordScreenText struct {
 	ResetLinkText  string
 	BackButtonText string
 	NextButtonText string
+	MinLength      string
+	HasUppercase   string
+	HasLowercase   string
+	HasNumber      string
+	HasSymbol      string
 }
 
-type InitPasswordScreenText struct {
+type UsernameChangeScreenText struct {
+	Title            string
+	Description      string
+	UsernameLabel    string
+	CancelButtonText string
+	NextButtonText   string
+}
+
+type UsernameChangeDoneScreenText struct {
 	Title          string
 	Description    string
 	NextButtonText string
+}
+
+type InitPasswordScreenText struct {
+	Title                   string
+	Description             string
+	CodeLabel               string
+	NewPasswordLabel        string
+	NewPasswordConfirmLabel string
+	NextButtonText          string
+	ResendButtonText        string
+}
+
+type InitPasswordDoneScreenText struct {
+	Title            string
+	Description      string
+	NextButtonText   string
+	CancelButtonText string
+}
+
+type EmailVerificationScreenText struct {
+	Title            string
+	Description      string
+	CodeLabel        string
+	NextButtonText   string
+	ResendButtonText string
+}
+
+type EmailVerificationDoneScreenText struct {
+	Title            string
+	Description      string
+	NextButtonText   string
+	CancelButtonText string
+	LoginButtonText  string
 }
 
 type InitializeUserScreenText struct {
@@ -331,7 +396,7 @@ type InitializeUserScreenText struct {
 	NextButtonText          string
 }
 
-type InitializeDoneScreenText struct {
+type InitializeUserDoneScreenText struct {
 	Title           string
 	Description     string
 	AbortButtonText string
@@ -348,10 +413,13 @@ type InitMFAPromptScreenText struct {
 }
 
 type InitMFAOTPScreenText struct {
-	Title       string
-	Description string
-	SecretLabel string
-	CodeLabel   string
+	Title            string
+	Description      string
+	DescriptionOTP   string
+	SecretLabel      string
+	CodeLabel        string
+	NextButtonText   string
+	CancelButtonText string
 }
 
 type InitMFAU2FScreenText struct {
@@ -359,6 +427,8 @@ type InitMFAU2FScreenText struct {
 	Description             string
 	TokenNameLabel          string
 	RegisterTokenButtonText string
+	NotSupported            string
+	ErrorRetry              string
 }
 
 type InitMFADoneScreenText struct {
@@ -366,6 +436,12 @@ type InitMFADoneScreenText struct {
 	Description     string
 	AbortButtonText string
 	NextButtonText  string
+}
+
+type MFAProvidersText struct {
+	ChooseOther string
+	OTP         string
+	U2F         string
 }
 
 type VerifyMFAOTPScreenText struct {
@@ -376,11 +452,43 @@ type VerifyMFAOTPScreenText struct {
 }
 
 type VerifyMFAU2FScreenText struct {
-	Title                  string
-	Description            string
-	ValidateTokenText      string
-	OtherOptionDescription string
-	OptionOTPButtonText    string
+	Title               string
+	Description         string
+	ValidateTokenText   string
+	OptionOTPButtonText string
+	NotSupported        string
+	ErrorRetry          string
+}
+
+type PasswordlessScreenText struct {
+	Title                   string
+	Description             string
+	LoginWithPwButtonText   string
+	ValidateTokenButtonText string
+	NotSupported            string
+	ErrorRetry              string
+}
+
+type PasswordChangeScreenText struct {
+	Title                   string
+	Description             string
+	OldPasswordLabel        string
+	NewPasswordLabel        string
+	NewPasswordConfirmLabel string
+	CancelButtonText        string
+	NextButtonText          string
+}
+
+type PasswordChangeDoneScreenText struct {
+	Title          string
+	Description    string
+	NextButtonText string
+}
+
+type PasswordResetDoneScreenText struct {
+	Title          string
+	Description    string
+	NextButtonText string
 }
 
 type RegistrationOptionScreenText struct {
@@ -391,36 +499,61 @@ type RegistrationOptionScreenText struct {
 }
 
 type RegistrationUserScreenText struct {
-	Title                string
-	Description          string
-	FirstnameLabel       string
-	LastnameLabel        string
-	EmailLabel           string
-	LanguageLabel        string
-	GenderLabel          string
-	PasswordLabel        string
-	PasswordConfirmLabel string
-	SaveButtonText       string
+	Title                    string
+	Description              string
+	FirstnameLabel           string
+	LastnameLabel            string
+	EmailLabel               string
+	UsernameLabel            string
+	LanguageLabel            string
+	GenderLabel              string
+	PasswordLabel            string
+	PasswordConfirmLabel     string
+	TOSAndPrivacyLabel       string
+	TOSConfirm               string
+	TOSLink                  string
+	TOSLinkText              string
+	PrivacyConfirm           string
+	PrivacyLink              string
+	PrivacyLinkText          string
+	ExternalLoginDescription string
+	NextButtonText           string
+	BackButtonText           string
 }
 
 type RegistrationOrgScreenText struct {
-	Title                string
-	Description          string
-	OrgNameLabel         string
-	FirstnameLabel       string
-	LastnameLabel        string
-	UsernameLabel        string
-	EmailLabel           string
-	PasswordLabel        string
-	PasswordConfirmLabel string
-	SaveButtonText       string
+	Title                    string
+	Description              string
+	OrgNameLabel             string
+	FirstnameLabel           string
+	LastnameLabel            string
+	UsernameLabel            string
+	EmailLabel               string
+	PasswordLabel            string
+	PasswordConfirmLabel     string
+	TOSAndPrivacyLabel       string
+	TOSConfirm               string
+	TOSLink                  string
+	TOSLinkText              string
+	PrivacyConfirm           string
+	PrivacyLink              string
+	PrivacyLinkText          string
+	ExternalLoginDescription string
+	SaveButtonText           string
 }
 
-type PasswordlessScreenText struct {
-	Title                   string
-	Description             string
-	LoginWithPwButtonText   string
-	ValidateTokenButtonText string
+type LinkingUserDoneScreenText struct {
+	Title            string
+	Description      string
+	CancelButtonText string
+	NextButtonText   string
+}
+
+type ExternalUserNotFoundScreenText struct {
+	Title                  string
+	Description            string
+	LinkButtonText         string
+	AutoRegisterButtonText string
 }
 
 type SuccessLoginScreenText struct {
@@ -428,4 +561,19 @@ type SuccessLoginScreenText struct {
 	AutoRedirectDescription string
 	RedirectedDescription   string
 	NextButtonText          string
+}
+
+type LogoutDoneScreenText struct {
+	Title           string
+	Description     string
+	LoginButtonText string
+}
+
+type FooterText struct {
+	TOS               string
+	TOSLink           string
+	PrivacyPolicy     string
+	PrivacyPolicyLink string
+	Help              string
+	HelpLink          string
 }

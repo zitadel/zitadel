@@ -251,6 +251,7 @@ Footer:
   Privacy: Privacy policy
   PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   Help: Help
+  HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
 Errors:
   Internal: An internal error occured

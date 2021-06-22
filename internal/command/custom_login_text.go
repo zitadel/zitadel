@@ -70,6 +70,14 @@ func (c *Commands) getLoginTextEvents(ctx context.Context, agg *eventstore.Aggre
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginUsernamePlaceHolder, existingText.LoginUsernamePlaceholder, text.LoginScreenText.UsernamePlaceholder, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginLoginnamePlaceHolder, existingText.LoginLoginnamePlaceholder, text.LoginScreenText.UsernamePlaceholder, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginRegisterButtonText, existingText.LoginRegisterButtonText, text.LoginScreenText.RegisterButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
