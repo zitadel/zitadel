@@ -238,7 +238,6 @@ message VerifyMFAU2FScreenText {
     string validate_token_text = 3 [(validate.rules).string = {max_len: 500}];
     string not_supported = 4 [(validate.rules).string = {max_len: 500}];
     string error_retry = 5 [(validate.rules).string = {max_len: 500}];
-    string option_otp_button_text = 6 [(validate.rules).string = {max_len: 100}];
 }
 
 message PasswordlessScreenText {

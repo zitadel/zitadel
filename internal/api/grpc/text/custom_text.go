@@ -253,12 +253,11 @@ func VerifyMFAOTPScreenTextToPb(text domain.VerifyMFAOTPScreenText) *text_pb.Ver
 
 func VerifyMFAU2FScreenTextToPb(text domain.VerifyMFAU2FScreenText) *text_pb.VerifyMFAU2FScreenText {
 	return &text_pb.VerifyMFAU2FScreenText{
-		Title:               text.Title,
-		Description:         text.Description,
-		ValidateTokenText:   text.ValidateTokenText,
-		OptionOtpButtonText: text.OptionOTPButtonText,
-		NotSupported:        text.NotSupported,
-		ErrorRetry:          text.ErrorRetry,
+		Title:             text.Title,
+		Description:       text.Description,
+		ValidateTokenText: text.ValidateTokenText,
+		NotSupported:      text.NotSupported,
+		ErrorRetry:        text.ErrorRetry,
 	}
 }
 
@@ -645,12 +644,11 @@ func VerifyMFAU2FScreenTextPbToDomain(text *text_pb.VerifyMFAU2FScreenText) doma
 		return domain.VerifyMFAU2FScreenText{}
 	}
 	return domain.VerifyMFAU2FScreenText{
-		Title:               text.Title,
-		Description:         text.Description,
-		ValidateTokenText:   text.ValidateTokenText,
-		OptionOTPButtonText: text.OptionOtpButtonText,
-		NotSupported:        text.NotSupported,
-		ErrorRetry:          text.ErrorRetry,
+		Title:             text.Title,
+		Description:       text.Description,
+		ValidateTokenText: text.ValidateTokenText,
+		NotSupported:      text.NotSupported,
+		ErrorRetry:        text.ErrorRetry,
 	}
 }
 
