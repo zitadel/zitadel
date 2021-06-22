@@ -37,24 +37,7 @@ func (c *Commands) setDefaultLoginText(ctx context.Context, iamAgg *eventstore.A
 	if err != nil {
 		return nil, nil, err
 	}
-	events := make([]eventstore.EventPusher, 0)
-	events = append(events, c.getSelectLoginTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getLoginTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getPasswordTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getPasswordResetTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getInitUserEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getInitDoneEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getInitMFAPromptEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getInitMFAOTPEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getInitMFAU2FEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getInitMFADoneEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getVerifyMFAOTPEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getVerifyMFAU2FEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getRegistrationOptionEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getRegistrationUserEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getRegistrationOrgEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getPasswordlessEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
-	events = append(events, c.getSuccessLoginEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, false)...)
+	events := c.getAllLoginTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, true)
 	return events, existingLoginText, nil
 }
 

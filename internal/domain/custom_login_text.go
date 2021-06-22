@@ -452,12 +452,11 @@ type VerifyMFAOTPScreenText struct {
 }
 
 type VerifyMFAU2FScreenText struct {
-	Title               string
-	Description         string
-	ValidateTokenText   string
-	OptionOTPButtonText string
-	NotSupported        string
-	ErrorRetry          string
+	Title             string
+	Description       string
+	ValidateTokenText string
+	NotSupported      string
+	ErrorRetry        string
 }
 
 type PasswordlessScreenText struct {
