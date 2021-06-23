@@ -100,10 +100,9 @@ InitMFAU2F:
   TokenNameLabel: Name of the tokens / machine
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Register Token
-  Error:
-    Retry: Retry, create a new challenge or choose a different method.
+  ErrorRetry: Retry, create a new challenge or choose a different method.
 
-MFAInitDone:
+InitMFADone:
   Title: Multifcator Verification done
   Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
   NextButtonText: next
@@ -124,25 +123,23 @@ VerifyMFAU2F:
   Title: Multifactor Verification
   Description: Verify your multifactor U2F / WebAuthN token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  Error:
-    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
   ValidateTokenButtonText: Validate Token
 
 Passwordless:
   Title: Login passwordless
   Description: Verify your token
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  Error:
-    Retry: Retry, create a new challenge or choose a different method.
+  ErrorRetry: Retry, create a new challenge or choose a different method.
   LoginWithPwButtonText: Login with password
   ValidateTokenButtonText: Token validieren
 
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
-  OldPassword: Old Password
-  NewPassword: New Password
-  NewPasswordConfirmation: Password confirmation
+  OldPasswordLabel: Old Password
+  NewPasswordLabel: New Password
+  NewPasswordConfirmationLabel: Password confirmation
   CancelButtonText: cancel
   NextButtonText: next
 
@@ -186,7 +183,7 @@ RegistrationUser:
   LanguageLabel: Language
   German: Deutsch
   English: English
-  Gender: Gender
+  GenderLabel: Gender
   Female: Female
   Male: Male
   Diverse: diverse / X
@@ -224,8 +221,8 @@ RegistrationOrg:
 
 LoginSuccess:
   Title: Login successful
-  AutoRedirect: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
-  Redirected: You can now close this window.
+  AutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+  RedirectedDescription: You can now close this window.
   NextButtonText: next
 
 LogoutDone:

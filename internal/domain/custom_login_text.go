@@ -19,7 +19,7 @@ const (
 	LoginKeyLoginLoginnamePlaceHolder      = LoginKeyLogin + "LoginnamePlaceHolder"
 	LoginKeyLoginRegisterButtonText        = LoginKeyLogin + "RegisterButtonText"
 	LoginKeyLoginNextButtonText            = LoginKeyLogin + "NextButtonText"
-	LoginKeyLoginExternalUserDescription   = LoginKeyLogin + "ExternalUserDescription"
+	LoginKeyLoginExternalUserDescription   = LoginKeyLogin + "ExternalLogin"
 	LoginKeyLoginUserMustBeMemberOfOrg     = LoginKeyLogin + "MustBeMemberOfOrg"
 
 	LoginKeySelectAccount                          = "SelectAccount."
@@ -99,7 +99,7 @@ const (
 	LoginKeyInitUserDone                = "InitUserDone."
 	LoginKeyInitUserDoneTitle           = LoginKeyInitUserDone + "Title"
 	LoginKeyInitUserDoneDescription     = LoginKeyInitUserDone + "Description"
-	LoginKeyInitUserDoneAbortButtonText = LoginKeyInitUserDone + "AbortButtonText"
+	LoginKeyInitUserDoneAbortButtonText = LoginKeyInitUserDone + "CancelButtonText"
 	LoginKeyInitUserDoneNextButtonText  = LoginKeyInitUserDone + "NextButtonText"
 
 	LoginKeyInitMFAPrompt               = "InitMFAPrompt."
@@ -125,12 +125,12 @@ const (
 	LoginKeyInitMFAU2FTokenNameLabel          = LoginKeyInitMFAU2F + "TokenNameLabel"
 	LoginKeyInitMFAU2FNotSupported            = LoginKeyInitMFAU2F + "NotSupported"
 	LoginKeyInitMFAU2FRegisterTokenButtonText = LoginKeyInitMFAU2F + "RegisterTokenButtonText"
-	LoginKeyInitMFAU2FErrorRetry              = LoginKeyInitMFAU2F + "Error.Retry"
+	LoginKeyInitMFAU2FErrorRetry              = LoginKeyInitMFAU2F + "ErrorRetry"
 
 	LoginKeyInitMFADone                = "InitMFADone."
 	LoginKeyInitMFADoneTitle           = LoginKeyInitMFADone + "Title"
 	LoginKeyInitMFADoneDescription     = LoginKeyInitMFADone + "Description"
-	LoginKeyInitMFADoneAbortButtonText = LoginKeyInitMFADone + "AbortButtonText"
+	LoginKeyInitMFADoneAbortButtonText = LoginKeyInitMFADone + "CancelButtonText"
 	LoginKeyInitMFADoneNextButtonText  = LoginKeyInitMFADone + "NextButtonText"
 
 	LoginKeyMFAProviders            = "MFAProvider."
@@ -157,7 +157,7 @@ const (
 	LoginKeyPasswordlessLoginWithPwButtonText   = LoginKeyPasswordless + "LoginWithPwButtonText"
 	LoginKeyPasswordlessValidateTokenButtonText = LoginKeyPasswordless + "ValidateTokenButtonText"
 	LoginKeyPasswordlessNotSupported            = LoginKeyPasswordless + "NotSupported"
-	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "Error.Retry"
+	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "ErrorRetry"
 
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
@@ -265,36 +265,36 @@ type CustomLoginText struct {
 	Default  bool
 	Language language.Tag
 
-	SelectAccountScreenText         SelectAccountScreenText
-	LoginScreenText                 LoginScreenText
-	PasswordScreenText              PasswordScreenText
-	UsernameChangeScreenText        UsernameChangeScreenText
-	UsernameChangeDoneScreenText    UsernameChangeDoneScreenText
-	InitPasswordScreenText          InitPasswordScreenText
-	InitPasswordDoneScreenText      InitPasswordDoneScreenText
-	EmailVerificationScreenText     EmailVerificationScreenText
-	EmailVerificationDoneScreenText EmailVerificationDoneScreenText
-	InitializeUserScreenText        InitializeUserScreenText
-	InitializeDoneScreenText        InitializeUserDoneScreenText
-	InitMFAPromptScreenText         InitMFAPromptScreenText
-	InitMFAOTPScreenText            InitMFAOTPScreenText
-	InitMFAU2FScreenText            InitMFAU2FScreenText
-	InitMFADoneScreenText           InitMFADoneScreenText
-	MFAProvidersText                MFAProvidersText
-	VerifyMFAOTPScreenText          VerifyMFAOTPScreenText
-	VerifyMFAU2FScreenText          VerifyMFAU2FScreenText
-	PasswordlessScreenText          PasswordlessScreenText
-	PasswordChangeScreenText        PasswordChangeScreenText
-	PasswordChangeDoneScreenText    PasswordChangeDoneScreenText
-	PasswordResetDoneScreenText     PasswordResetDoneScreenText
-	RegistrationOptionScreenText    RegistrationOptionScreenText
-	RegistrationUserScreenText      RegistrationUserScreenText
-	RegistrationOrgScreenText       RegistrationOrgScreenText
-	LinkingUserDoneScreenText       LinkingUserDoneScreenText
-	ExternalUserNotFoundScreenText  ExternalUserNotFoundScreenText
-	SuccessLoginScreenText          SuccessLoginScreenText
-	LogoutDoneScreenText            LogoutDoneScreenText
-	FooterText                      FooterText
+	SelectAccount          SelectAccountScreenText
+	Login                  LoginScreenText
+	Password               PasswordScreenText
+	UsernameChange         UsernameChangeScreenText
+	UsernameChangeDone     UsernameChangeDoneScreenText
+	InitPassword           InitPasswordScreenText
+	InitPasswordDone       InitPasswordDoneScreenText
+	EmailVerification      EmailVerificationScreenText
+	EmailVerificationDone  EmailVerificationDoneScreenText
+	InitUser               InitializeUserScreenText
+	InitUserDone           InitializeUserDoneScreenText
+	InitMFAPrompt          InitMFAPromptScreenText
+	InitMFAOTP             InitMFAOTPScreenText
+	InitMFAU2F             InitMFAU2FScreenText
+	InitMFADone            InitMFADoneScreenText
+	MFAProvider            MFAProvidersText
+	VerifyMFAOTP           VerifyMFAOTPScreenText
+	VerifyMFAU2F           VerifyMFAU2FScreenText
+	Passwordless           PasswordlessScreenText
+	PasswordChange         PasswordChangeScreenText
+	PasswordChangeDone     PasswordChangeDoneScreenText
+	PasswordResetDone      PasswordResetDoneScreenText
+	RegisterOption         RegistrationOptionScreenText
+	RegistrationUser       RegistrationUserScreenText
+	RegistrationOrg        RegistrationOrgScreenText
+	LinkingUsersDone       LinkingUserDoneScreenText
+	ExternalNotFoundOption ExternalUserNotFoundScreenText
+	LoginSuccess           SuccessLoginScreenText
+	LogoutDone             LogoutDoneScreenText
+	Footer                 FooterText
 }
 
 func (m *CustomLoginText) IsValid() bool {
@@ -302,28 +302,28 @@ func (m *CustomLoginText) IsValid() bool {
 }
 
 type SelectAccountScreenText struct {
-	Title                     string
-	Description               string
-	TitleLinkingProcess       string
-	DescriptionLinkingProcess string
-	OtherUser                 string
-	SessionStateActive        string
-	SessionStateInactive      string
-	UserMustBeMemberOfOrg     string
+	Title              string
+	Description        string
+	TitleLinking       string
+	DescriptionLinking string
+	OtherUser          string
+	SessionState0      string //active
+	SessionState1      string //inactive
+	MustBeMemberOfOrg  string
 }
 
 type LoginScreenText struct {
-	Title                     string
-	Description               string
-	TitleLinkingProcess       string
-	DescriptionLinkingProcess string
-	LoginNameLabel            string
-	UsernamePlaceholder       string
-	LoginnamePlaceholder      string
-	RegisterButtonText        string
-	NextButtonText            string
-	ExternalUserDescription   string
-	UserMustBeMemberOfOrg     string
+	Title                string
+	Description          string
+	TitleLinking         string
+	DescriptionLinking   string
+	LoginNameLabel       string
+	UsernamePlaceholder  string
+	LoginnamePlaceholder string
+	RegisterButtonText   string
+	NextButtonText       string
+	ExternalLogin        string
+	MustBeMemberOfOrg    string
 }
 
 type PasswordScreenText struct {
@@ -399,17 +399,17 @@ type InitializeUserScreenText struct {
 }
 
 type InitializeUserDoneScreenText struct {
-	Title           string
-	Description     string
-	AbortButtonText string
-	NextButtonText  string
+	Title            string
+	Description      string
+	CancelButtonText string
+	NextButtonText   string
 }
 
 type InitMFAPromptScreenText struct {
 	Title          string
 	Description    string
-	OTPOption      string
-	U2FOption      string
+	Provider0      string //OTP
+	Provider1      string //Provider1
 	SkipButtonText string
 	NextButtonText string
 }
@@ -417,7 +417,7 @@ type InitMFAPromptScreenText struct {
 type InitMFAOTPScreenText struct {
 	Title            string
 	Description      string
-	DescriptionOTP   string
+	OTPDescription   string
 	SecretLabel      string
 	CodeLabel        string
 	NextButtonText   string
@@ -434,16 +434,16 @@ type InitMFAU2FScreenText struct {
 }
 
 type InitMFADoneScreenText struct {
-	Title           string
-	Description     string
-	AbortButtonText string
-	NextButtonText  string
+	Title            string
+	Description      string
+	CancelButtonText string
+	NextButtonText   string
 }
 
 type MFAProvidersText struct {
 	ChooseOther string
-	OTP         string
-	U2F         string
+	Provider0   string //OTP
+	Provider1   string //U2F
 }
 
 type VerifyMFAOTPScreenText struct {
@@ -454,11 +454,11 @@ type VerifyMFAOTPScreenText struct {
 }
 
 type VerifyMFAU2FScreenText struct {
-	Title             string
-	Description       string
-	ValidateTokenText string
-	NotSupported      string
-	ErrorRetry        string
+	Title                   string
+	Description             string
+	ValidateTokenButtonText string
+	NotSupported            string
+	ErrorRetry              string
 }
 
 type PasswordlessScreenText struct {
@@ -493,10 +493,10 @@ type PasswordResetDoneScreenText struct {
 }
 
 type RegistrationOptionScreenText struct {
-	Title                    string
-	Description              string
-	UserNameButtonText       string
-	ExternalLoginDescription string
+	Title                              string
+	Description                        string
+	RegisterUsernamePasswordButtonText string
+	ExternalLoginDescription           string
 }
 
 type RegistrationUserScreenText struct {

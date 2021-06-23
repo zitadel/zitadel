@@ -1585,6 +1585,17 @@ service AdminService {
     //Returns the default custom texts for login ui
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
         option (google.api.http) = {
+            get: "/text/default/login/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom texts for login ui
+    rpc GetCustomLoginTexts(GetCustomLoginTextsRequest) returns (GetCustomLoginTextsResponse) {
+        option (google.api.http) = {
             get: "/text/login/{language}";
         };
 
@@ -1593,9 +1604,9 @@ service AdminService {
         };
     }
 
-    //Sets the default custom text for login ui
+    //Sets the custom text for login ui
     //it impacts all organisations without customized login ui texts
-    rpc SetDefaultLoginText(SetDefaultLoginTextsRequest) returns (SetDefaultLoginTextsResponse) {
+    rpc SetCustomLoginText(SetCustomLoginTextsRequest) returns (SetCustomLoginTextsResponse) {
         option (google.api.http) = {
             put: "/text/login/{language}";
             body: "*";
@@ -3055,7 +3066,6 @@ message SetDefaultDomainClaimedMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message GetDefaultLoginTextsRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3064,7 +3074,15 @@ message GetDefaultLoginTextsResponse {
     zitadel.text.v1.LoginCustomText custom_text = 1;
 }
 
-message SetDefaultLoginTextsRequest {
+message GetCustomLoginTextsRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomLoginTextsResponse {
+    zitadel.text.v1.LoginCustomText custom_text = 1;
+}
+
+message SetCustomLoginTextsRequest {
     string language = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3103,7 +3121,7 @@ message SetDefaultLoginTextsRequest {
     zitadel.text.v1.FooterText footer_text = 31;
 }
 
-message SetDefaultLoginTextsResponse {
+message SetCustomLoginTextsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

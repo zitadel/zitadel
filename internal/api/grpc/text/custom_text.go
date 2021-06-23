@@ -33,36 +33,36 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 			text.ChangeDate,
 			text.AggregateID,
 		),
-		SelectAccountText:         SelectAccountScreenToPb(text.SelectAccountScreenText),
-		LoginText:                 LoginScreenTextToPb(text.LoginScreenText),
-		PasswordText:              PasswordScreenTextToPb(text.PasswordScreenText),
-		UsernameChangeText:        UsernameChangeScreenTextToPb(text.UsernameChangeScreenText),
-		UsernameChangeDoneText:    UsernameChangeDoneScreenTextToPb(text.UsernameChangeDoneScreenText),
-		InitPasswordText:          InitPasswordScreenTextToPb(text.InitPasswordScreenText),
-		InitPasswordDoneText:      InitPasswordDoneScreenTextToPb(text.InitPasswordDoneScreenText),
-		EmailVerificationText:     EmailVerificationScreenTextToPb(text.EmailVerificationScreenText),
-		EmailVerificationDoneText: EmailVerificationDoneScreenTextToPb(text.EmailVerificationDoneScreenText),
-		InitializeUserText:        InitializeUserScreenTextToPb(text.InitializeUserScreenText),
-		InitializeDoneText:        InitializeUserDoneScreenTextToPb(text.InitializeDoneScreenText),
-		InitMfaPromptText:         InitMFAPromptScreenTextToPb(text.InitMFAPromptScreenText),
-		InitMfaOtpText:            InitMFAOTPScreenTextToPb(text.InitMFAOTPScreenText),
-		InitMfaU2FText:            InitMFAU2FScreenTextToPb(text.InitMFAU2FScreenText),
-		InitMfaDoneText:           InitMFADoneScreenTextToPb(text.InitMFADoneScreenText),
-		MfaProvidersText:          MFAProvidersTextToPb(text.MFAProvidersText),
-		VerifyMfaOtpText:          VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTPScreenText),
-		VerifyMfaU2FText:          VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2FScreenText),
-		PasswordlessText:          PasswordlessScreenTextToPb(text.PasswordlessScreenText),
-		PasswordChangeText:        PasswordChangeScreenTextToPb(text.PasswordChangeScreenText),
-		PasswordChangeDoneText:    PasswordChangeDoneScreenTextToPb(text.PasswordChangeDoneScreenText),
-		PasswordResetDoneText:     PasswordResetDoneScreenTextToPb(text.PasswordResetDoneScreenText),
-		RegistrationOptionText:    RegistrationOptionScreenTextToPb(text.RegistrationOptionScreenText),
-		RegistrationUserText:      RegistrationUserScreenTextToPb(text.RegistrationUserScreenText),
-		RegistrationOrgText:       RegistrationOrgScreenTextToPb(text.RegistrationOrgScreenText),
-		LinkingUserDoneText:       LinkingUserDoneScreenTextToPb(text.LinkingUserDoneScreenText),
-		ExternalUserNotFoundText:  ExternalUserNotFoundScreenTextToPb(text.ExternalUserNotFoundScreenText),
-		SuccessLoginText:          SuccessLoginScreenTextToPb(text.SuccessLoginScreenText),
-		LogoutText:                LogoutDoneScreenTextToPb(text.LogoutDoneScreenText),
-		FooterText:                FooterTextToPb(text.FooterText),
+		SelectAccountText:         SelectAccountScreenToPb(text.SelectAccount),
+		LoginText:                 LoginScreenTextToPb(text.Login),
+		PasswordText:              PasswordScreenTextToPb(text.Password),
+		UsernameChangeText:        UsernameChangeScreenTextToPb(text.UsernameChange),
+		UsernameChangeDoneText:    UsernameChangeDoneScreenTextToPb(text.UsernameChangeDone),
+		InitPasswordText:          InitPasswordScreenTextToPb(text.InitPassword),
+		InitPasswordDoneText:      InitPasswordDoneScreenTextToPb(text.InitPasswordDone),
+		EmailVerificationText:     EmailVerificationScreenTextToPb(text.EmailVerification),
+		EmailVerificationDoneText: EmailVerificationDoneScreenTextToPb(text.EmailVerificationDone),
+		InitializeUserText:        InitializeUserScreenTextToPb(text.InitUser),
+		InitializeDoneText:        InitializeUserDoneScreenTextToPb(text.InitUserDone),
+		InitMfaPromptText:         InitMFAPromptScreenTextToPb(text.InitMFAPrompt),
+		InitMfaOtpText:            InitMFAOTPScreenTextToPb(text.InitMFAOTP),
+		InitMfaU2FText:            InitMFAU2FScreenTextToPb(text.InitMFAU2F),
+		InitMfaDoneText:           InitMFADoneScreenTextToPb(text.InitMFADone),
+		MfaProvidersText:          MFAProvidersTextToPb(text.MFAProvider),
+		VerifyMfaOtpText:          VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
+		VerifyMfaU2FText:          VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
+		PasswordlessText:          PasswordlessScreenTextToPb(text.Passwordless),
+		PasswordChangeText:        PasswordChangeScreenTextToPb(text.PasswordChange),
+		PasswordChangeDoneText:    PasswordChangeDoneScreenTextToPb(text.PasswordChangeDone),
+		PasswordResetDoneText:     PasswordResetDoneScreenTextToPb(text.PasswordResetDone),
+		RegistrationOptionText:    RegistrationOptionScreenTextToPb(text.RegisterOption),
+		RegistrationUserText:      RegistrationUserScreenTextToPb(text.RegistrationUser),
+		RegistrationOrgText:       RegistrationOrgScreenTextToPb(text.RegistrationOrg),
+		LinkingUserDoneText:       LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
+		ExternalUserNotFoundText:  ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
+		SuccessLoginText:          SuccessLoginScreenTextToPb(text.LoginSuccess),
+		LogoutText:                LogoutDoneScreenTextToPb(text.LogoutDone),
+		FooterText:                FooterTextToPb(text.Footer),
 	}
 }
 
@@ -70,12 +70,12 @@ func SelectAccountScreenToPb(text domain.SelectAccountScreenText) *text_pb.Selec
 	return &text_pb.SelectAccountScreenText{
 		Title:                     text.Title,
 		Description:               text.Description,
-		TitleLinkingProcess:       text.TitleLinkingProcess,
-		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
+		TitleLinkingProcess:       text.TitleLinking,
+		DescriptionLinkingProcess: text.DescriptionLinking,
 		OtherUser:                 text.OtherUser,
-		SessionStateActive:        text.SessionStateActive,
-		SessionStateInactive:      text.SessionStateInactive,
-		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
+		SessionStateActive:        text.SessionState0,
+		SessionStateInactive:      text.SessionState1,
+		UserMustBeMemberOfOrg:     text.MustBeMemberOfOrg,
 	}
 }
 
@@ -83,15 +83,15 @@ func LoginScreenTextToPb(text domain.LoginScreenText) *text_pb.LoginScreenText {
 	return &text_pb.LoginScreenText{
 		Title:                     text.Title,
 		Description:               text.Description,
-		TitleLinkingProcess:       text.TitleLinkingProcess,
-		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
+		TitleLinkingProcess:       text.TitleLinking,
+		DescriptionLinkingProcess: text.DescriptionLinking,
 		LoginNameLabel:            text.LoginNameLabel,
 		UserNamePlaceholder:       text.UsernamePlaceholder,
 		LoginNamePlaceholder:      text.LoginnamePlaceholder,
 		RegisterButtonText:        text.RegisterButtonText,
 		NextButtonText:            text.NextButtonText,
-		ExternalUserDescription:   text.ExternalUserDescription,
-		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
+		ExternalUserDescription:   text.ExternalLogin,
+		UserMustBeMemberOfOrg:     text.MustBeMemberOfOrg,
 	}
 }
 
@@ -185,10 +185,10 @@ func InitializeUserScreenTextToPb(text domain.InitializeUserScreenText) *text_pb
 
 func InitializeUserDoneScreenTextToPb(text domain.InitializeUserDoneScreenText) *text_pb.InitializeUserDoneScreenText {
 	return &text_pb.InitializeUserDoneScreenText{
-		Title:           text.Title,
-		Description:     text.Description,
-		AbortButtonText: text.AbortButtonText,
-		NextButtonText:  text.NextButtonText,
+		Title:            text.Title,
+		Description:      text.Description,
+		CancelButtonText: text.CancelButtonText,
+		NextButtonText:   text.NextButtonText,
 	}
 }
 
@@ -196,8 +196,8 @@ func InitMFAPromptScreenTextToPb(text domain.InitMFAPromptScreenText) *text_pb.I
 	return &text_pb.InitMFAPromptScreenText{
 		Title:          text.Title,
 		Description:    text.Description,
-		OtpOption:      text.OTPOption,
-		U2FOption:      text.U2FOption,
+		OtpOption:      text.Provider0,
+		U2FOption:      text.Provider1,
 		SkipButtonText: text.SkipButtonText,
 		NextButtonText: text.NextButtonText,
 	}
@@ -207,7 +207,7 @@ func InitMFAOTPScreenTextToPb(text domain.InitMFAOTPScreenText) *text_pb.InitMFA
 	return &text_pb.InitMFAOTPScreenText{
 		Title:            text.Title,
 		Description:      text.Description,
-		DescriptionOtp:   text.DescriptionOTP,
+		DescriptionOtp:   text.OTPDescription,
 		SecretLabel:      text.SecretLabel,
 		CodeLabel:        text.CodeLabel,
 		NextButtonText:   text.NextButtonText,
@@ -228,18 +228,18 @@ func InitMFAU2FScreenTextToPb(text domain.InitMFAU2FScreenText) *text_pb.InitMFA
 
 func InitMFADoneScreenTextToPb(text domain.InitMFADoneScreenText) *text_pb.InitMFADoneScreenText {
 	return &text_pb.InitMFADoneScreenText{
-		Title:           text.Title,
-		Description:     text.Description,
-		AbortButtonText: text.AbortButtonText,
-		NextButtonText:  text.NextButtonText,
+		Title:            text.Title,
+		Description:      text.Description,
+		CancelButtonText: text.CancelButtonText,
+		NextButtonText:   text.NextButtonText,
 	}
 }
 
 func MFAProvidersTextToPb(text domain.MFAProvidersText) *text_pb.MFAProvidersText {
 	return &text_pb.MFAProvidersText{
 		ChooseOther: text.ChooseOther,
-		Otp:         text.OTP,
-		U2F:         text.U2F,
+		Otp:         text.Provider0,
+		U2F:         text.Provider1,
 	}
 }
 
@@ -256,7 +256,7 @@ func VerifyMFAU2FScreenTextToPb(text domain.VerifyMFAU2FScreenText) *text_pb.Ver
 	return &text_pb.VerifyMFAU2FScreenText{
 		Title:             text.Title,
 		Description:       text.Description,
-		ValidateTokenText: text.ValidateTokenText,
+		ValidateTokenText: text.ValidateTokenButtonText,
 		NotSupported:      text.NotSupported,
 		ErrorRetry:        text.ErrorRetry,
 	}
@@ -305,7 +305,7 @@ func RegistrationOptionScreenTextToPb(text domain.RegistrationOptionScreenText) 
 	return &text_pb.RegistrationOptionScreenText{
 		Title:                    text.Title,
 		Description:              text.Description,
-		UserNameButtonText:       text.UserNameButtonText,
+		UserNameButtonText:       text.RegisterUsernamePasswordButtonText,
 		ExternalLoginDescription: text.ExternalLoginDescription,
 	}
 }
@@ -409,14 +409,14 @@ func SelectAccountScreenTextPbToDomain(text *text_pb.SelectAccountScreenText) do
 		return domain.SelectAccountScreenText{}
 	}
 	return domain.SelectAccountScreenText{
-		Title:                     text.Title,
-		Description:               text.Description,
-		TitleLinkingProcess:       text.TitleLinkingProcess,
-		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
-		OtherUser:                 text.OtherUser,
-		SessionStateActive:        text.SessionStateActive,
-		SessionStateInactive:      text.SessionStateInactive,
-		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
+		Title:              text.Title,
+		Description:        text.Description,
+		TitleLinking:       text.TitleLinkingProcess,
+		DescriptionLinking: text.DescriptionLinkingProcess,
+		OtherUser:          text.OtherUser,
+		SessionState0:      text.SessionStateActive,
+		SessionState1:      text.SessionStateInactive,
+		MustBeMemberOfOrg:  text.UserMustBeMemberOfOrg,
 	}
 }
 
@@ -425,17 +425,17 @@ func LoginScreenTextPbToDomain(text *text_pb.LoginScreenText) domain.LoginScreen
 		return domain.LoginScreenText{}
 	}
 	return domain.LoginScreenText{
-		Title:                     text.Title,
-		Description:               text.Description,
-		TitleLinkingProcess:       text.TitleLinkingProcess,
-		DescriptionLinkingProcess: text.DescriptionLinkingProcess,
-		LoginNameLabel:            text.LoginNameLabel,
-		UsernamePlaceholder:       text.UserNamePlaceholder,
-		LoginnamePlaceholder:      text.LoginNamePlaceholder,
-		RegisterButtonText:        text.RegisterButtonText,
-		NextButtonText:            text.NextButtonText,
-		ExternalUserDescription:   text.ExternalUserDescription,
-		UserMustBeMemberOfOrg:     text.UserMustBeMemberOfOrg,
+		Title:                text.Title,
+		Description:          text.Description,
+		TitleLinking:         text.TitleLinkingProcess,
+		DescriptionLinking:   text.DescriptionLinkingProcess,
+		LoginNameLabel:       text.LoginNameLabel,
+		UsernamePlaceholder:  text.UserNamePlaceholder,
+		LoginnamePlaceholder: text.LoginNamePlaceholder,
+		RegisterButtonText:   text.RegisterButtonText,
+		NextButtonText:       text.NextButtonText,
+		ExternalLogin:        text.ExternalUserDescription,
+		MustBeMemberOfOrg:    text.UserMustBeMemberOfOrg,
 	}
 }
 
@@ -556,10 +556,10 @@ func InitializeDoneScreenTextPbToDomain(text *text_pb.InitializeUserDoneScreenTe
 		return domain.InitializeUserDoneScreenText{}
 	}
 	return domain.InitializeUserDoneScreenText{
-		Title:           text.Title,
-		Description:     text.Description,
-		AbortButtonText: text.AbortButtonText,
-		NextButtonText:  text.NextButtonText,
+		Title:            text.Title,
+		Description:      text.Description,
+		CancelButtonText: text.CancelButtonText,
+		NextButtonText:   text.NextButtonText,
 	}
 }
 
@@ -570,8 +570,8 @@ func InitMFAPromptScreenTextPbToDomain(text *text_pb.InitMFAPromptScreenText) do
 	return domain.InitMFAPromptScreenText{
 		Title:          text.Title,
 		Description:    text.Description,
-		OTPOption:      text.OtpOption,
-		U2FOption:      text.U2FOption,
+		Provider0:      text.OtpOption,
+		Provider1:      text.U2FOption,
 		SkipButtonText: text.SkipButtonText,
 		NextButtonText: text.NextButtonText,
 	}
@@ -584,7 +584,7 @@ func InitMFAOTPScreenTextPbToDomain(text *text_pb.InitMFAOTPScreenText) domain.I
 	return domain.InitMFAOTPScreenText{
 		Title:            text.Title,
 		Description:      text.Description,
-		DescriptionOTP:   text.DescriptionOtp,
+		OTPDescription:   text.DescriptionOtp,
 		SecretLabel:      text.SecretLabel,
 		CodeLabel:        text.CodeLabel,
 		NextButtonText:   text.NextButtonText,
@@ -611,10 +611,10 @@ func InitMFADoneScreenTextPbToDomain(text *text_pb.InitMFADoneScreenText) domain
 		return domain.InitMFADoneScreenText{}
 	}
 	return domain.InitMFADoneScreenText{
-		Title:           text.Title,
-		Description:     text.Description,
-		AbortButtonText: text.AbortButtonText,
-		NextButtonText:  text.NextButtonText,
+		Title:            text.Title,
+		Description:      text.Description,
+		CancelButtonText: text.CancelButtonText,
+		NextButtonText:   text.NextButtonText,
 	}
 }
 
@@ -624,8 +624,8 @@ func MFAProvidersTextPbToDomain(text *text_pb.MFAProvidersText) domain.MFAProvid
 	}
 	return domain.MFAProvidersText{
 		ChooseOther: text.ChooseOther,
-		OTP:         text.Otp,
-		U2F:         text.U2F,
+		Provider0:   text.Otp,
+		Provider1:   text.U2F,
 	}
 }
 
@@ -646,11 +646,11 @@ func VerifyMFAU2FScreenTextPbToDomain(text *text_pb.VerifyMFAU2FScreenText) doma
 		return domain.VerifyMFAU2FScreenText{}
 	}
 	return domain.VerifyMFAU2FScreenText{
-		Title:             text.Title,
-		Description:       text.Description,
-		ValidateTokenText: text.ValidateTokenText,
-		NotSupported:      text.NotSupported,
-		ErrorRetry:        text.ErrorRetry,
+		Title:                   text.Title,
+		Description:             text.Description,
+		ValidateTokenButtonText: text.ValidateTokenText,
+		NotSupported:            text.NotSupported,
+		ErrorRetry:              text.ErrorRetry,
 	}
 }
 
@@ -710,10 +710,10 @@ func RegistrationOptionScreenTextPbToDomain(text *text_pb.RegistrationOptionScre
 		return domain.RegistrationOptionScreenText{}
 	}
 	return domain.RegistrationOptionScreenText{
-		Title:                    text.Title,
-		Description:              text.Description,
-		UserNameButtonText:       text.UserNameButtonText,
-		ExternalLoginDescription: text.ExternalLoginDescription,
+		Title:                              text.Title,
+		Description:                        text.Description,
+		RegisterUsernamePasswordButtonText: text.UserNameButtonText,
+		ExternalLoginDescription:           text.ExternalLoginDescription,
 	}
 }
 

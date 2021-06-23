@@ -221,654 +221,654 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 
 func selectAccountKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeySelectAccountTitle {
-		result.SelectAccountScreenText.Title = text.Text
+		result.SelectAccount.Title = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountDescription {
-		result.SelectAccountScreenText.Description = text.Text
+		result.SelectAccount.Description = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountTitleLinkingProcess {
-		result.SelectAccountScreenText.TitleLinkingProcess = text.Text
+		result.SelectAccount.TitleLinking = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountDescriptionLinkingProcess {
-		result.SelectAccountScreenText.DescriptionLinkingProcess = text.Text
+		result.SelectAccount.DescriptionLinking = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountOtherUser {
-		result.SelectAccountScreenText.OtherUser = text.Text
+		result.SelectAccount.OtherUser = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountSessionStateActive {
-		result.SelectAccountScreenText.SessionStateActive = text.Text
+		result.SelectAccount.SessionState0 = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountSessionStateInactive {
-		result.SelectAccountScreenText.SessionStateInactive = text.Text
+		result.SelectAccount.SessionState1 = text.Text
 	}
 	if text.Key == domain.LoginKeySelectAccountUserMustBeMemberOfOrg {
-		result.SelectAccountScreenText.UserMustBeMemberOfOrg = text.Text
+		result.SelectAccount.MustBeMemberOfOrg = text.Text
 	}
 }
 
 func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLoginTitle {
-		result.LoginScreenText.Title = text.Text
+		result.Login.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginDescription {
-		result.LoginScreenText.Description = text.Text
+		result.Login.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginTitleLinkingProcess {
-		result.LoginScreenText.TitleLinkingProcess = text.Text
+		result.Login.TitleLinking = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginDescriptionLinkingProcess {
-		result.LoginScreenText.DescriptionLinkingProcess = text.Text
+		result.Login.DescriptionLinking = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginNameLabel {
-		result.LoginScreenText.LoginNameLabel = text.Text
+		result.Login.LoginNameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginUsernamePlaceHolder {
-		result.LoginScreenText.UsernamePlaceholder = text.Text
+		result.Login.UsernamePlaceholder = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginLoginnamePlaceHolder {
-		result.LoginScreenText.LoginnamePlaceholder = text.Text
+		result.Login.LoginnamePlaceholder = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginExternalUserDescription {
-		result.LoginScreenText.ExternalUserDescription = text.Text
+		result.Login.ExternalLogin = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginUserMustBeMemberOfOrg {
-		result.LoginScreenText.UserMustBeMemberOfOrg = text.Text
+		result.Login.MustBeMemberOfOrg = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginRegisterButtonText {
-		result.LoginScreenText.RegisterButtonText = text.Text
+		result.Login.RegisterButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginNextButtonText {
-		result.LoginScreenText.NextButtonText = text.Text
+		result.Login.NextButtonText = text.Text
 	}
 }
 
 func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
-		result.PasswordScreenText.Title = text.Text
+		result.Password.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordDescription {
-		result.PasswordScreenText.Description = text.Text
+		result.Password.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordLabel {
-		result.PasswordScreenText.PasswordLabel = text.Text
+		result.Password.PasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordResetLinkText {
-		result.PasswordScreenText.ResetLinkText = text.Text
+		result.Password.ResetLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordBackButtonText {
-		result.PasswordScreenText.BackButtonText = text.Text
+		result.Password.BackButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordNextButtonText {
-		result.PasswordScreenText.NextButtonText = text.Text
+		result.Password.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordMinLength {
-		result.PasswordScreenText.MinLength = text.Text
+		result.Password.MinLength = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordHasUppercase {
-		result.PasswordScreenText.HasUppercase = text.Text
+		result.Password.HasUppercase = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordHasLowercase {
-		result.PasswordScreenText.HasLowercase = text.Text
+		result.Password.HasLowercase = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordHasNumber {
-		result.PasswordScreenText.HasNumber = text.Text
+		result.Password.HasNumber = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordHasSymbol {
-		result.PasswordScreenText.HasSymbol = text.Text
+		result.Password.HasSymbol = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordConfirmation {
-		result.PasswordScreenText.Confirmation = text.Text
+		result.Password.Confirmation = text.Text
 	}
 }
 
 func usernameChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyUsernameChangeTitle {
-		result.UsernameChangeScreenText.Title = text.Text
+		result.UsernameChange.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyUsernameChangeDescription {
-		result.UsernameChangeScreenText.Description = text.Text
+		result.UsernameChange.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyUsernameChangeUsernameLabel {
-		result.UsernameChangeScreenText.UsernameLabel = text.Text
+		result.UsernameChange.UsernameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyUsernameChangeCancelButtonText {
-		result.UsernameChangeScreenText.CancelButtonText = text.Text
+		result.UsernameChange.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyUsernameChangeNextButtonText {
-		result.UsernameChangeScreenText.NextButtonText = text.Text
+		result.UsernameChange.NextButtonText = text.Text
 	}
 }
 
 func usernameChangeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyUsernameChangeDoneTitle {
-		result.UsernameChangeDoneScreenText.Title = text.Text
+		result.UsernameChangeDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyUsernameChangeDoneDescription {
-		result.UsernameChangeDoneScreenText.Description = text.Text
+		result.UsernameChangeDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyUsernameChangeDoneNextButtonText {
-		result.UsernameChangeDoneScreenText.NextButtonText = text.Text
+		result.UsernameChangeDone.NextButtonText = text.Text
 	}
 }
 
 func initPasswordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitPasswordTitle {
-		result.InitPasswordScreenText.Title = text.Text
+		result.InitPassword.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordDescription {
-		result.InitPasswordScreenText.Description = text.Text
+		result.InitPassword.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordCodeLabel {
-		result.InitPasswordScreenText.CodeLabel = text.Text
+		result.InitPassword.CodeLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordNewPasswordLabel {
-		result.InitPasswordScreenText.NewPasswordLabel = text.Text
+		result.InitPassword.NewPasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordNewPasswordConfirmLabel {
-		result.InitPasswordScreenText.NewPasswordConfirmLabel = text.Text
+		result.InitPassword.NewPasswordConfirmLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordNextButtonText {
-		result.InitPasswordScreenText.NextButtonText = text.Text
+		result.InitPassword.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordResendButtonText {
-		result.InitPasswordScreenText.ResendButtonText = text.Text
+		result.InitPassword.ResendButtonText = text.Text
 	}
 }
 
 func initPasswordDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitPasswordDoneTitle {
-		result.InitPasswordDoneScreenText.Title = text.Text
+		result.InitPasswordDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordDoneDescription {
-		result.InitPasswordDoneScreenText.Description = text.Text
+		result.InitPasswordDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordDoneNextButtonText {
-		result.InitPasswordDoneScreenText.NextButtonText = text.Text
+		result.InitPasswordDone.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitPasswordDoneCancelButtonText {
-		result.InitPasswordDoneScreenText.CancelButtonText = text.Text
+		result.InitPasswordDone.CancelButtonText = text.Text
 	}
 }
 
 func emailVerificationKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyEmailVerificationTitle {
-		result.EmailVerificationScreenText.Title = text.Text
+		result.EmailVerification.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationDescription {
-		result.EmailVerificationScreenText.Description = text.Text
+		result.EmailVerification.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationCodeLabel {
-		result.EmailVerificationScreenText.CodeLabel = text.Text
+		result.EmailVerification.CodeLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationNextButtonText {
-		result.EmailVerificationScreenText.NextButtonText = text.Text
+		result.EmailVerification.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationResendButtonText {
-		result.EmailVerificationScreenText.ResendButtonText = text.Text
+		result.EmailVerification.ResendButtonText = text.Text
 	}
 }
 
 func emailVerificationDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyEmailVerificationDoneTitle {
-		result.EmailVerificationDoneScreenText.Title = text.Text
+		result.EmailVerificationDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationDoneDescription {
-		result.EmailVerificationDoneScreenText.Description = text.Text
+		result.EmailVerificationDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationDoneNextButtonText {
-		result.EmailVerificationDoneScreenText.NextButtonText = text.Text
+		result.EmailVerificationDone.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationDoneCancelButtonText {
-		result.EmailVerificationDoneScreenText.CancelButtonText = text.Text
+		result.EmailVerificationDone.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyEmailVerificationDoneLoginButtonText {
-		result.EmailVerificationDoneScreenText.LoginButtonText = text.Text
+		result.EmailVerificationDone.LoginButtonText = text.Text
 	}
 }
 
 func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitializeUserTitle {
-		result.InitializeUserScreenText.Title = text.Text
+		result.InitUser.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitializeUserDescription {
-		result.InitializeUserScreenText.Description = text.Text
+		result.InitUser.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitializeUserCodeLabel {
-		result.InitializeUserScreenText.CodeLabel = text.Text
+		result.InitUser.CodeLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitializeUserNewPasswordLabel {
-		result.InitializeUserScreenText.NewPasswordLabel = text.Text
+		result.InitUser.NewPasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitializeUserNewPasswordConfirmLabel {
-		result.InitializeUserScreenText.NewPasswordConfirmLabel = text.Text
+		result.InitUser.NewPasswordConfirmLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitializeUserResendButtonText {
-		result.InitializeUserScreenText.ResendButtonText = text.Text
+		result.InitUser.ResendButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitializeUserNextButtonText {
-		result.InitializeUserScreenText.NextButtonText = text.Text
+		result.InitUser.NextButtonText = text.Text
 	}
 }
 
 func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitUserDone {
-		result.InitializeDoneScreenText.Title = text.Text
+		result.InitUserDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneDescription {
-		result.InitializeDoneScreenText.Description = text.Text
+		result.InitUserDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneAbortButtonText {
-		result.InitializeDoneScreenText.AbortButtonText = text.Text
+		result.InitUserDone.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneNextButtonText {
-		result.InitializeDoneScreenText.NextButtonText = text.Text
+		result.InitUserDone.NextButtonText = text.Text
 	}
 }
 
 func initMFAPromptKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFAPromptTitle {
-		result.InitMFAPromptScreenText.Title = text.Text
+		result.InitMFAPrompt.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAPromptDescription {
-		result.InitMFAPromptScreenText.Description = text.Text
+		result.InitMFAPrompt.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAPromptOTPOption {
-		result.InitMFAPromptScreenText.OTPOption = text.Text
+		result.InitMFAPrompt.Provider0 = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAPromptU2FOption {
-		result.InitMFAPromptScreenText.U2FOption = text.Text
+		result.InitMFAPrompt.Provider1 = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAPromptSkipButtonText {
-		result.InitMFAPromptScreenText.SkipButtonText = text.Text
+		result.InitMFAPrompt.SkipButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAPromptNextButtonText {
-		result.InitMFAPromptScreenText.NextButtonText = text.Text
+		result.InitMFAPrompt.NextButtonText = text.Text
 	}
 }
 
 func initMFAOTPKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFAOTPTitle {
-		result.InitMFAOTPScreenText.Title = text.Text
+		result.InitMFAOTP.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAOTPDescription {
-		result.InitMFAOTPScreenText.Description = text.Text
+		result.InitMFAOTP.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAOTPDescriptionOTP {
-		result.InitMFAOTPScreenText.DescriptionOTP = text.Text
+		result.InitMFAOTP.OTPDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAOTPCodeLabel {
-		result.InitMFAOTPScreenText.CodeLabel = text.Text
+		result.InitMFAOTP.CodeLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAOTPSecretLabel {
-		result.InitMFAOTPScreenText.SecretLabel = text.Text
+		result.InitMFAOTP.SecretLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAOTPNextButtonText {
-		result.InitMFAOTPScreenText.NextButtonText = text.Text
+		result.InitMFAOTP.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAOTPCancelButtonText {
-		result.InitMFAOTPScreenText.CancelButtonText = text.Text
+		result.InitMFAOTP.CancelButtonText = text.Text
 	}
 }
 
 func initMFAU2FKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFAU2FTitle {
-		result.InitMFAU2FScreenText.Title = text.Text
+		result.InitMFAU2F.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAU2FDescription {
-		result.InitMFAU2FScreenText.Description = text.Text
+		result.InitMFAU2F.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAU2FTokenNameLabel {
-		result.InitMFAU2FScreenText.TokenNameLabel = text.Text
+		result.InitMFAU2F.TokenNameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAU2FRegisterTokenButtonText {
-		result.InitMFAU2FScreenText.RegisterTokenButtonText = text.Text
+		result.InitMFAU2F.RegisterTokenButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAU2FNotSupported {
-		result.InitMFAU2FScreenText.NotSupported = text.Text
+		result.InitMFAU2F.NotSupported = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFAU2FErrorRetry {
-		result.InitMFAU2FScreenText.ErrorRetry = text.Text
+		result.InitMFAU2F.ErrorRetry = text.Text
 	}
 }
 
 func initMFADoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFADoneTitle {
-		result.InitMFADoneScreenText.Title = text.Text
+		result.InitMFADone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFADoneDescription {
-		result.InitMFADoneScreenText.Description = text.Text
+		result.InitMFADone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFADoneAbortButtonText {
-		result.InitMFADoneScreenText.AbortButtonText = text.Text
+		result.InitMFADone.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFADoneNextButtonText {
-		result.InitMFADoneScreenText.NextButtonText = text.Text
+		result.InitMFADone.NextButtonText = text.Text
 	}
 }
 
 func mfaProvidersKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyMFAProvidersChooseOther {
-		result.MFAProvidersText.ChooseOther = text.Text
+		result.MFAProvider.ChooseOther = text.Text
 	}
 	if text.Key == domain.LoginKeyMFAProvidersOTP {
-		result.MFAProvidersText.OTP = text.Text
+		result.MFAProvider.Provider0 = text.Text
 	}
 	if text.Key == domain.LoginKeyMFAProvidersU2F {
-		result.MFAProvidersText.U2F = text.Text
+		result.MFAProvider.Provider1 = text.Text
 	}
 }
 
 func verifyMFAOTPKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyVerifyMFAOTPTitle {
-		result.VerifyMFAOTPScreenText.Title = text.Text
+		result.VerifyMFAOTP.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAOTPDescription {
-		result.VerifyMFAOTPScreenText.Description = text.Text
+		result.VerifyMFAOTP.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAOTPCodeLabel {
-		result.VerifyMFAOTPScreenText.CodeLabel = text.Text
+		result.VerifyMFAOTP.CodeLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAOTPNextButtonText {
-		result.VerifyMFAOTPScreenText.NextButtonText = text.Text
+		result.VerifyMFAOTP.NextButtonText = text.Text
 	}
 }
 
 func verifyMFAU2FKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyVerifyMFAU2FTitle {
-		result.VerifyMFAU2FScreenText.Title = text.Text
+		result.VerifyMFAU2F.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAU2FDescription {
-		result.VerifyMFAU2FScreenText.Description = text.Text
+		result.VerifyMFAU2F.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAU2FValidateTokenText {
-		result.VerifyMFAU2FScreenText.ValidateTokenText = text.Text
+		result.VerifyMFAU2F.ValidateTokenButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAU2FNotSupported {
-		result.VerifyMFAU2FScreenText.NotSupported = text.Text
+		result.VerifyMFAU2F.NotSupported = text.Text
 	}
 	if text.Key == domain.LoginKeyVerifyMFAU2FErrorRetry {
-		result.VerifyMFAU2FScreenText.ErrorRetry = text.Text
+		result.VerifyMFAU2F.ErrorRetry = text.Text
 	}
 }
 
 func passwordlessKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordlessTitle {
-		result.PasswordlessScreenText.Title = text.Text
+		result.Passwordless.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordlessDescription {
-		result.PasswordlessScreenText.Description = text.Text
+		result.Passwordless.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordlessLoginWithPwButtonText {
-		result.PasswordlessScreenText.LoginWithPwButtonText = text.Text
+		result.Passwordless.LoginWithPwButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
-		result.PasswordlessScreenText.ValidateTokenButtonText = text.Text
+		result.Passwordless.ValidateTokenButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordlessNotSupported {
-		result.PasswordlessScreenText.NotSupported = text.Text
+		result.Passwordless.NotSupported = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordlessErrorRetry {
-		result.PasswordlessScreenText.ErrorRetry = text.Text
+		result.Passwordless.ErrorRetry = text.Text
 	}
 }
 
 func passwordChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordChangeTitle {
-		result.PasswordChangeScreenText.Title = text.Text
+		result.PasswordChange.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeDescription {
-		result.PasswordChangeScreenText.Description = text.Text
+		result.PasswordChange.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {
-		result.PasswordChangeScreenText.OldPasswordLabel = text.Text
+		result.PasswordChange.OldPasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeNewPasswordLabel {
-		result.PasswordChangeScreenText.NewPasswordLabel = text.Text
+		result.PasswordChange.NewPasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeNewPasswordConfirmLabel {
-		result.PasswordChangeScreenText.NewPasswordConfirmLabel = text.Text
+		result.PasswordChange.NewPasswordConfirmLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeCancelButtonText {
-		result.PasswordChangeScreenText.CancelButtonText = text.Text
+		result.PasswordChange.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeNextButtonText {
-		result.PasswordChangeScreenText.NextButtonText = text.Text
+		result.PasswordChange.NextButtonText = text.Text
 	}
 }
 
 func passwordChangeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordChangeDoneTitle {
-		result.PasswordChangeDoneScreenText.Title = text.Text
+		result.PasswordChangeDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeDoneDescription {
-		result.PasswordChangeDoneScreenText.Description = text.Text
+		result.PasswordChangeDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordChangeDoneNextButtonText {
-		result.PasswordChangeDoneScreenText.NextButtonText = text.Text
+		result.PasswordChangeDone.NextButtonText = text.Text
 	}
 }
 
 func passwordResetDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordResetDoneTitle {
-		result.PasswordResetDoneScreenText.Title = text.Text
+		result.PasswordResetDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordResetDoneDescription {
-		result.PasswordResetDoneScreenText.Description = text.Text
+		result.PasswordResetDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordResetDoneNextButtonText {
-		result.PasswordResetDoneScreenText.NextButtonText = text.Text
+		result.PasswordResetDone.NextButtonText = text.Text
 	}
 }
 
 func registrationOptionKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyRegistrationOptionTitle {
-		result.RegistrationOptionScreenText.Title = text.Text
+		result.RegisterOption.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationOptionDescription {
-		result.RegistrationOptionScreenText.Description = text.Text
+		result.RegisterOption.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationOptionExternalLoginDescription {
-		result.RegistrationOptionScreenText.ExternalLoginDescription = text.Text
+		result.RegisterOption.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationOptionUserNameButtonText {
-		result.RegistrationOptionScreenText.UserNameButtonText = text.Text
+		result.RegisterOption.RegisterUsernamePasswordButtonText = text.Text
 	}
 }
 
 func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyRegistrationUserTitle {
-		result.RegistrationUserScreenText.Title = text.Text
+		result.RegistrationUser.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserDescription {
-		result.RegistrationUserScreenText.Description = text.Text
+		result.RegistrationUser.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserFirstnameLabel {
-		result.RegistrationUserScreenText.FirstnameLabel = text.Text
+		result.RegistrationUser.FirstnameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserLastnameLabel {
-		result.RegistrationUserScreenText.LastnameLabel = text.Text
+		result.RegistrationUser.LastnameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserEmailLabel {
-		result.RegistrationUserScreenText.EmailLabel = text.Text
+		result.RegistrationUser.EmailLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserUsernameLabel {
-		result.RegistrationUserScreenText.UsernameLabel = text.Text
+		result.RegistrationUser.UsernameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserLanguageLabel {
-		result.RegistrationUserScreenText.LanguageLabel = text.Text
+		result.RegistrationUser.LanguageLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserGenderLabel {
-		result.RegistrationUserScreenText.GenderLabel = text.Text
+		result.RegistrationUser.GenderLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPasswordLabel {
-		result.RegistrationUserScreenText.PasswordLabel = text.Text
+		result.RegistrationUser.PasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPasswordConfirmLabel {
-		result.RegistrationUserScreenText.PasswordConfirmLabel = text.Text
+		result.RegistrationUser.PasswordConfirmLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSAndPrivacyLabel {
-		result.RegistrationUserScreenText.TOSAndPrivacyLabel = text.Text
+		result.RegistrationUser.TOSAndPrivacyLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSConfirm {
-		result.RegistrationUserScreenText.TOSConfirm = text.Text
+		result.RegistrationUser.TOSConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSLink {
-		result.RegistrationUserScreenText.TOSLink = text.Text
+		result.RegistrationUser.TOSLink = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSLinkText {
-		result.RegistrationUserScreenText.TOSLinkText = text.Text
+		result.RegistrationUser.TOSLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyConfirm {
-		result.RegistrationUserScreenText.PrivacyConfirm = text.Text
+		result.RegistrationUser.PrivacyConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLink {
-		result.RegistrationUserScreenText.PrivacyLink = text.Text
+		result.RegistrationUser.PrivacyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
-		result.RegistrationUserScreenText.PrivacyLinkText = text.Text
+		result.RegistrationUser.PrivacyLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserExternalLoginDescription {
-		result.RegistrationUserScreenText.ExternalLoginDescription = text.Text
+		result.RegistrationUser.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserNextButtonText {
-		result.RegistrationUserScreenText.NextButtonText = text.Text
+		result.RegistrationUser.NextButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserBackButtonText {
-		result.RegistrationUserScreenText.BackButtonText = text.Text
+		result.RegistrationUser.BackButtonText = text.Text
 	}
 }
 
 func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyRegisterOrgTitle {
-		result.RegistrationOrgScreenText.Title = text.Text
+		result.RegistrationOrg.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgDescription {
-		result.RegistrationOrgScreenText.Description = text.Text
+		result.RegistrationOrg.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgOrgNameLabel {
-		result.RegistrationOrgScreenText.OrgNameLabel = text.Text
+		result.RegistrationOrg.OrgNameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgFirstnameLabel {
-		result.RegistrationOrgScreenText.FirstnameLabel = text.Text
+		result.RegistrationOrg.FirstnameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgLastnameLabel {
-		result.RegistrationOrgScreenText.LastnameLabel = text.Text
+		result.RegistrationOrg.LastnameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgUsernameLabel {
-		result.RegistrationOrgScreenText.UsernameLabel = text.Text
+		result.RegistrationOrg.UsernameLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgEmailLabel {
-		result.RegistrationOrgScreenText.EmailLabel = text.Text
+		result.RegistrationOrg.EmailLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPasswordLabel {
-		result.RegistrationOrgScreenText.PasswordLabel = text.Text
+		result.RegistrationOrg.PasswordLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPasswordConfirmLabel {
-		result.RegistrationOrgScreenText.PasswordConfirmLabel = text.Text
+		result.RegistrationOrg.PasswordConfirmLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSAndPrivacyLabel {
-		result.RegistrationOrgScreenText.TOSAndPrivacyLabel = text.Text
+		result.RegistrationOrg.TOSAndPrivacyLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSConfirm {
-		result.RegistrationOrgScreenText.TOSConfirm = text.Text
+		result.RegistrationOrg.TOSConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSLink {
-		result.RegistrationOrgScreenText.TOSLink = text.Text
+		result.RegistrationOrg.TOSLink = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSLinkText {
-		result.RegistrationOrgScreenText.TOSLinkText = text.Text
+		result.RegistrationOrg.TOSLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyConfirm {
-		result.RegistrationOrgScreenText.PrivacyConfirm = text.Text
+		result.RegistrationOrg.PrivacyConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLink {
-		result.RegistrationOrgScreenText.PrivacyLink = text.Text
+		result.RegistrationOrg.PrivacyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
-		result.RegistrationOrgScreenText.PrivacyLinkText = text.Text
+		result.RegistrationOrg.PrivacyLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgExternalLoginDescription {
-		result.RegistrationOrgScreenText.ExternalLoginDescription = text.Text
+		result.RegistrationOrg.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgSaveButtonText {
-		result.RegistrationOrgScreenText.SaveButtonText = text.Text
+		result.RegistrationOrg.SaveButtonText = text.Text
 	}
 }
 
 func linkingUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLinkingUserDoneTitle {
-		result.LinkingUserDoneScreenText.Title = text.Text
+		result.LinkingUsersDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyLinkingUserDoneDescription {
-		result.LinkingUserDoneScreenText.Description = text.Text
+		result.LinkingUsersDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyLinkingUserDoneCancelButtonText {
-		result.LinkingUserDoneScreenText.CancelButtonText = text.Text
+		result.LinkingUsersDone.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyLinkingUserDoneNextButtonText {
-		result.LinkingUserDoneScreenText.NextButtonText = text.Text
+		result.LinkingUsersDone.NextButtonText = text.Text
 	}
 }
 
 func externalUserNotFoundKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyExternalNotFoundTitle {
-		result.ExternalUserNotFoundScreenText.Title = text.Text
+		result.ExternalNotFoundOption.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundDescription {
-		result.ExternalUserNotFoundScreenText.Description = text.Text
+		result.ExternalNotFoundOption.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundLinkButtonText {
-		result.ExternalUserNotFoundScreenText.LinkButtonText = text.Text
+		result.ExternalNotFoundOption.LinkButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundAutoRegisterButtonText {
-		result.ExternalUserNotFoundScreenText.AutoRegisterButtonText = text.Text
+		result.ExternalNotFoundOption.AutoRegisterButtonText = text.Text
 	}
 }
 
 func successLoginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeySuccessLoginTitle {
-		result.SuccessLoginScreenText.Title = text.Text
+		result.LoginSuccess.Title = text.Text
 	}
 	if text.Key == domain.LoginKeySuccessLoginAutoRedirectDescription {
-		result.SuccessLoginScreenText.AutoRedirectDescription = text.Text
+		result.LoginSuccess.AutoRedirectDescription = text.Text
 	}
 	if text.Key == domain.LoginKeySuccessLoginRedirectedDescription {
-		result.SuccessLoginScreenText.RedirectedDescription = text.Text
+		result.LoginSuccess.RedirectedDescription = text.Text
 	}
 	if text.Key == domain.LoginKeySuccessLoginNextButtonText {
-		result.SuccessLoginScreenText.NextButtonText = text.Text
+		result.LoginSuccess.NextButtonText = text.Text
 	}
 }
 
 func logoutDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLogoutDoneTitle {
-		result.LogoutDoneScreenText.Title = text.Text
+		result.LogoutDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyLogoutDoneDescription {
-		result.LogoutDoneScreenText.Description = text.Text
+		result.LogoutDone.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyLogoutDoneLoginButtonText {
-		result.LogoutDoneScreenText.LoginButtonText = text.Text
+		result.LogoutDone.LoginButtonText = text.Text
 	}
 }
 
 func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterTos {
-		result.FooterText.TOS = text.Text
+		result.Footer.TOS = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterTosLink {
-		result.FooterText.TOSLink = text.Text
+		result.Footer.TOSLink = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterPrivacy {
-		result.FooterText.PrivacyPolicy = text.Text
+		result.Footer.PrivacyPolicy = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterPrivacyLink {
-		result.FooterText.PrivacyPolicyLink = text.Text
+		result.Footer.PrivacyPolicyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterHelp {
-		result.FooterText.Help = text.Text
+		result.Footer.Help = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterHelpLink {
-		result.FooterText.HelpLink = text.Text
+		result.Footer.HelpLink = text.Text
 	}
 }

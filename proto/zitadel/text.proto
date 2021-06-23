@@ -181,7 +181,7 @@ message InitializeUserScreenText {
 message InitializeUserDoneScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
-    string abort_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string cancel_button_text = 3 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
 }
 
@@ -216,7 +216,7 @@ message InitMFAU2FScreenText {
 message InitMFADoneScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
-    string abort_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string cancel_button_text = 3 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 4 [(validate.rules).string = {max_len: 100}];
 }
 

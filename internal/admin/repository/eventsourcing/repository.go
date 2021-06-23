@@ -3,6 +3,9 @@ package eventsourcing
 import (
 	"context"
 
+	"github.com/caos/logging"
+	"github.com/rakyll/statik/fs"
+
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
@@ -48,6 +51,9 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, static, localDevMode)
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
+
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
@@ -55,6 +61,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 			View:           view,
 			SearchLimit:    conf.SearchLimit,
 			SystemDefaults: systemDefaults,
+			LoginDir:       statikLoginFS,
 		},
 		IAMRepository: eventstore.IAMRepository{
 			Eventstore:      es,
@@ -63,6 +70,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 			SearchLimit:     conf.SearchLimit,
 			Roles:           roles,
 			PrefixAvatarURL: assetsAPI,
+			LoginDir:        statikLoginFS,
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,

@@ -11,9 +11,9 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-func (c *Commands) SetDefaultLoginText(ctx context.Context, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
+func (c *Commands) SetCustomIAMLoginText(ctx context.Context, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
 	iamAgg := iam.NewAggregate()
-	events, existingMailText, err := c.setDefaultLoginText(ctx, &iamAgg.Aggregate, loginText)
+	events, existingMailText, err := c.setCustomIAMLoginText(ctx, &iamAgg.Aggregate, loginText)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (c *Commands) SetDefaultLoginText(ctx context.Context, loginText *domain.Cu
 	return writeModelToObjectDetails(&existingMailText.WriteModel), nil
 }
 
-func (c *Commands) setDefaultLoginText(ctx context.Context, iamAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.EventPusher, *IAMCustomLoginTextReadModel, error) {
+func (c *Commands) setCustomIAMLoginText(ctx context.Context, iamAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.EventPusher, *IAMCustomLoginTextReadModel, error) {
 	if !text.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomText.Invalid")
 	}

@@ -32,6 +32,7 @@ type IAMRepository interface {
 	GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
 	GetDefaultMessageText(ctx context.Context, textType string, language string) (*iam_model.MessageTextView, error)
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
+	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 

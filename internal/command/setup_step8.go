@@ -31,7 +31,7 @@ func (c *Commands) SetupStep8(ctx context.Context, step *Step8) error {
 		if err != nil {
 			return nil, err
 		}
-		logging.Log("SETUP-BDhne").Info("added U2F to 2FA login policy")
+		logging.Log("SETUP-BDhne").Info("added Provider1 to 2FA login policy")
 		return []eventstore.EventPusher{event}, nil
 	}
 	return c.setup(ctx, step, fn)

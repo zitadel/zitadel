@@ -101,8 +101,7 @@ InitMFAU2F:
   TokenNameLabel: Name des Tokens / Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Token registrieren
-  Error:
-    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
 InitMFADone:
   Title: Multifaktor Verifizierung erstellt
@@ -125,16 +124,14 @@ VerifyMFAU2F:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  Error:
-    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
   ValidateTokenButtonText: Token validieren
 
 Passwordless:
   Title: Passwortlos einloggen
   Description: Verifiziere dein Token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  Error:
-    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
   LoginWithPwButtonText: Mit Passwort anmelden
   ValidateTokenButtonText: Token validieren
 
