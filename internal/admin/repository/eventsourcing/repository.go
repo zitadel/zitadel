@@ -61,7 +61,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 			View:           view,
 			SearchLimit:    conf.SearchLimit,
 			SystemDefaults: systemDefaults,
-			LoginDir:       statikLoginFS,
 		},
 		IAMRepository: eventstore.IAMRepository{
 			Eventstore:      es,

@@ -3,10 +3,14 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -37,6 +41,7 @@ type OrgRepository struct {
 	Roles           []string
 	SystemDefaults  systemdefaults.SystemDefaults
 	PrefixAvatarURL string
+	LoginDir        http.FileSystem
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -599,11 +604,40 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 }
 
 func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
+	}
+	contents, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
+	}
+	loginTextMap := map[string]interface{}{}
+	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+	}
+
 	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
+	for _, text := range texts {
+		keys := strings.Split(text.Key, ".")
+		screenTextMap, ok := loginTextMap[keys[0]].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		screenTextMap[keys[1]] = text.Text
+	}
+	jsonbody, err := json.Marshal(loginTextMap)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-2n8fs", "Errors.TranslationFile.MergeError")
+	}
+	loginText := new(domain.CustomLoginText)
+	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-2n8fs", "Errors.TranslationFile.MergeError")
+	}
+	return loginText, nil
 }
 
 func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error) {

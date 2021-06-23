@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -14,6 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/logging"
+
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -28,7 +28,6 @@ type OrgRepo struct {
 
 	SearchLimit    uint64
 	SystemDefaults systemdefaults.SystemDefaults
-	LoginDir       http.FileSystem
 }
 
 func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
