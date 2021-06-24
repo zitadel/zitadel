@@ -95,6 +95,8 @@ func GetBackupList(
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/BucketBackup":
 		return bucket.BackupList()(monitor, k8sClient, name, desiredTree)
+	case "databases.caos.ch/S3Backup":
+		return s3.BackupList()(monitor, k8sClient, name, desiredTree)
 	default:
 		return nil, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
 	}

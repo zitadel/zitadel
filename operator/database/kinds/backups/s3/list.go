@@ -49,7 +49,7 @@ func BackupList() core.BackupListFunc {
 func listFilesWithFilter(akid, secretkey, sessionToken string, region string, endpoint string, bucketName, name string) ([]string, error) {
 	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
 		return aws.Endpoint{
-			URL:           endpoint,
+			URL:           "https://" + endpoint,
 			SigningRegion: region,
 		}, nil
 	})
@@ -83,8 +83,22 @@ func listFilesWithFilter(akid, secretkey, sessionToken string, region string, en
 		}
 		for _, value := range output.Contents {
 			if strings.HasPrefix(*value.Key, prefix) {
-				names = append(names, *value.Key)
+				parts := strings.Split(*value.Key, "/")
+				if len(parts) < 2 {
+					continue
+				}
+				found := false
+				for _, name := range names {
+					if name == parts[1] {
+						found = true
+					}
+				}
+				if !found {
+					names = append(names, parts[1])
+				}
+				names = append(names)
 			}
+
 		}
 	}
 	return names, nil

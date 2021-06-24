@@ -61,8 +61,6 @@ func (d *DesiredV0) validateSecrets() error {
 	if err := secret.ValidateSecret(d.Spec.SecretAccessKey, d.Spec.ExistingSecretAccessKey); err != nil {
 		return fmt.Errorf("validating secret access key failed: %w", err)
 	}
-	if err := secret.ValidateSecret(d.Spec.SessionToken, d.Spec.ExistingSessionToken); err != nil {
-		return fmt.Errorf("validating session token failed: %w", err)
-	}
+
 	return nil
 }

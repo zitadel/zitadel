@@ -57,6 +57,9 @@ func listFilesWithFilter(serviceAccountJSON string, bucketName, name string) ([]
 		parts := strings.Split(attrs.Name, "/")
 		found := false
 		for _, name := range names {
+			if len(parts) < 2 {
+				continue
+			}
 			if name == parts[1] {
 				found = true
 			}
