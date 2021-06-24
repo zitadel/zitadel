@@ -641,15 +641,7 @@ func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 }
 
 func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error) {
-	//defaultIn := false
 	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, domain.LoginCustomText, lang)
-	if errors.IsNotFound(err) || len(texts) == 0 {
-		texts, err = repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
-		if err != nil {
-			return nil, err
-		}
-		//defaultIn = true
-	}
 	if err != nil {
 		return nil, err
 	}
