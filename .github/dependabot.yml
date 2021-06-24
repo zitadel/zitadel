@@ -18,7 +18,7 @@ updates:
     interval: weekly
     time: "02:00"
   labels:
-   - "npm"
+   - "gomod"
    - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
