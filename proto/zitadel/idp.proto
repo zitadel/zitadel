@@ -170,10 +170,22 @@ message AuthConnectorConfig {
             description: "the base url where the auth connector is deployed";
         }
     ];
-    string backend_connector_id = 2 [
+    string provider_id = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"backend-1\"";
-            description: "the id of the backend the connector uses to request the user info";
+            description: "the id of the provider which the connector uses to request the user info";
+        }
+    ];
+    string machine_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488953\"";
+            description: "the id of the machine user which the connector uses";
+        }
+    ];
+    string machine_name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"backend-1\"";
+            description: "the name of the machine user which the connector uses";
         }
     ];
 }

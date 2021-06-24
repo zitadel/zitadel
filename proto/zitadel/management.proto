@@ -4442,6 +4442,7 @@ message AddOrgAuthConnectorIDPRequest {
         }
     ];
     string base_url = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://auth.acme.com\"";
             description: "the base url where the auth connector is deployed";
@@ -4449,10 +4450,17 @@ message AddOrgAuthConnectorIDPRequest {
             max_length: 200;
         }
     ];
-    string backend_connector_id = 4 [
+    string provider_id = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"backend-1\"";
-            description: "the id of the backend the connector uses to request the user info";
+            description: "the id of the provider which the connector uses to request the user info";
+        }
+    ];
+    string machine_id = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488953\"";
+            description: "the id of the machine user which the connector uses";
         }
     ];
 }
@@ -4566,6 +4574,7 @@ message UpdateOrgIDPAuthConnectorConfigRequest {
         }
     ];
     string base_url = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://auth.acme.com\"";
             description: "the base url where the auth connector is deployed";
@@ -4573,10 +4582,17 @@ message UpdateOrgIDPAuthConnectorConfigRequest {
             max_length: 200;
         }
     ];
-    string backend_connector_id = 3 [
+    string provider_id = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"backend-1\"";
             description: "the id of the backend the connector uses to request the user info";
+        }
+    ];
+    string machine_id = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488953\"";
+            description: "the id of the machine user which the connector uses";
         }
     ];
 }

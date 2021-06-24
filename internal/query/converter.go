@@ -52,9 +52,10 @@ func readModelToIDPConfigDomain(rm *IAMIDPConfigReadModel) domain.IDPConfig {
 		}
 	}
 	return &domain.AuthConnectorIDPConfig{
-		CommonIDPConfig:    config,
-		BaseURL:            rm.AuthConnectorConfig.BaseURL,
-		BackendConnectorID: rm.AuthConnectorConfig.BackendConnectorID,
+		CommonIDPConfig: config,
+		BaseURL:         rm.AuthConnectorConfig.BaseURL,
+		ProviderID:      rm.AuthConnectorConfig.ProviderID,
+		MachineID:       rm.AuthConnectorConfig.MachineID,
 	}
 }
 

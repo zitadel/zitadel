@@ -55,8 +55,10 @@ func (v *IDPConfigOIDCView) IsZero() bool {
 }
 
 type IDPConfigAuthConnectorView struct {
-	AuthConnectorBaseURL            string `json:"baseUrl" gorm:"column:auth_connector_base_url"`
-	AuthConnectorBackendConnectorID string `json:"backendConnectorId" gorm:"column:auth_connector_backend_connector_id"`
+	AuthConnectorBaseURL     string `json:"baseUrl" gorm:"column:auth_connector_base_url"`
+	AuthConnectorProviderID  string `json:"providerId" gorm:"column:auth_connector_provider_id"`
+	AuthConnectorMachineID   string `json:"machineId" gorm:"column:auth_connector_machine_id"`
+	AuthConnectorMachineName string `json:"-" gorm:"column:auth_connector_machine_name"`
 }
 
 func (v *IDPConfigAuthConnectorView) IsZero() bool {
@@ -87,8 +89,10 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	}
 	if !idp.IDPConfigAuthConnectorView.IsZero() {
 		idpView.IDPConfigAuthConnectorView = &model.IDPConfigAuthConnectorView{
-			AuthConnectorBaseURL:            idp.AuthConnectorBaseURL,
-			AuthConnectorBackendConnectorID: idp.AuthConnectorBackendConnectorID,
+			AuthConnectorBaseURL:     idp.AuthConnectorBaseURL,
+			AuthConnectorProviderID:  idp.AuthConnectorProviderID,
+			AuthConnectorMachineID:   idp.AuthConnectorMachineID,
+			AuthConnectorMachineName: idp.AuthConnectorMachineName,
 		}
 	}
 	return idpView

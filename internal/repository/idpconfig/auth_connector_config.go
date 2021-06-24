@@ -17,9 +17,10 @@ const (
 type AuthConnectorConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID        string `json:"idpConfigId"`
-	BaseURL            string `json:"baseUrl,omitempty"`
-	BackendConnectorID string `json:"backendConnectorId,omitempty"`
+	IDPConfigID string `json:"idpConfigId"`
+	BaseURL     string `json:"baseUrl,omitempty"`
+	ProviderID  string `json:"providerId,omitempty"`
+	MachineID   string `json:"machineId,omitempty"`
 }
 
 func (e *AuthConnectorConfigAddedEvent) Data() interface{} {
@@ -34,14 +35,16 @@ func NewAuthConnectorConfigAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID,
 	baseURL,
-	backendConnectorID string,
+	providerID,
+	machineID string,
 ) *AuthConnectorConfigAddedEvent {
 
 	return &AuthConnectorConfigAddedEvent{
-		BaseEvent:          *base,
-		IDPConfigID:        idpConfigID,
-		BaseURL:            baseURL,
-		BackendConnectorID: backendConnectorID,
+		BaseEvent:   *base,
+		IDPConfigID: idpConfigID,
+		BaseURL:     baseURL,
+		ProviderID:  providerID,
+		MachineID:   machineID,
 	}
 }
 
@@ -63,8 +66,9 @@ type AuthConnectorConfigChangedEvent struct {
 
 	IDPConfigID string `json:"idpConfigId"`
 
-	BaseURL            *string `json:"baseUrl,omitempty"`
-	BackendConnectorID *string `json:"backendConnectorId,omitempty"`
+	BaseURL    *string `json:"baseUrl,omitempty"`
+	ProviderID *string `json:"providerId,omitempty"`
+	MachineID  *string `json:"machineId,omitempty"`
 }
 
 func (e *AuthConnectorConfigChangedEvent) Data() interface{} {
@@ -101,9 +105,15 @@ func ChangeBaseURL(baseURL string) func(*AuthConnectorConfigChangedEvent) {
 	}
 }
 
-func ChangeBackendConnectorID(backendConnectorID string) func(*AuthConnectorConfigChangedEvent) {
+func ChangeProviderID(providerID string) func(*AuthConnectorConfigChangedEvent) {
 	return func(e *AuthConnectorConfigChangedEvent) {
-		e.BackendConnectorID = &backendConnectorID
+		e.ProviderID = &providerID
+	}
+}
+
+func ChangeMachineID(machineID string) func(*AuthConnectorConfigChangedEvent) {
+	return func(e *AuthConnectorConfigChangedEvent) {
+		e.MachineID = &machineID
 	}
 }
 

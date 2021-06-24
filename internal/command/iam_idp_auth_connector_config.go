@@ -27,7 +27,8 @@ func (c *Commands) ChangeDefaultIDPAuthConnectorConfig(ctx context.Context, conf
 		iamAgg,
 		config.IDPConfigID,
 		config.BaseURL,
-		config.BackendConnectorID,
+		config.ProviderID,
+		config.MachineID,
 	)
 	if err != nil {
 		return nil, err

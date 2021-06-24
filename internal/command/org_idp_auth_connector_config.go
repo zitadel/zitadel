@@ -24,13 +24,22 @@ func (c *Commands) ChangeIDPAuthConnectorConfig(ctx context.Context, config *dom
 		return nil, caos_errs.ThrowNotFound(nil, "Org-GFdg2", "Errors.Org.IDPConfig.AlreadyExists")
 	}
 
+	machine, err := c.machineWriteModelByID(ctx, config.MachineID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(machine.UserState) {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-GEgh2", "Errors.User.NotFound")
+	}
+
 	iamAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
 		ctx,
 		iamAgg,
 		config.IDPConfigID,
 		config.BaseURL,
-		config.BackendConnectorID,
+		config.ProviderID,
+		config.MachineID,
 	)
 	if err != nil {
 		return nil, err

@@ -119,7 +119,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		//if sub.ResourceOwner != issuer.ResourceOwner
 		return nil
 	}
-	login.authConnectorVerifier = op.NewJWTProfileVerifier2(&jwtProfileStorage{authRepo}, config.Issuer, 300*time.Second, time.Second, check)
+	login.authConnectorVerifier = op.NewJWTProfileVerifier(&jwtProfileStorage{authRepo}, config.Issuer, 300*time.Second, time.Second, op.SubjectCheck(check))
 	return login, handlerPrefix
 }
 

@@ -33,8 +33,10 @@ type IDPConfigOIDCView struct {
 }
 
 type IDPConfigAuthConnectorView struct {
-	AuthConnectorBaseURL            string
-	AuthConnectorBackendConnectorID string
+	AuthConnectorBaseURL     string
+	AuthConnectorProviderID  string
+	AuthConnectorMachineID   string
+	AuthConnectorMachineName string
 }
 
 type IDPConfigSearchRequest struct {

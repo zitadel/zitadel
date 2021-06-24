@@ -802,7 +802,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
 | base_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| backend_connector_id |  string | - |  |
+| provider_id |  string | - |  |
+| machine_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -2230,8 +2231,9 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| base_url |  string | - |  |
-| backend_connector_id |  string | - |  |
+| base_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| provider_id |  string | - |  |
+| machine_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 

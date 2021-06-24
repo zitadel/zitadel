@@ -23,7 +23,8 @@ func NewIDPAuthConnectorConfigAddedEvent(
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
 	baseURL,
-	backendConnectorID string,
+	providerID,
+	machineID string,
 ) *IDPAuthConnectorConfigAddedEvent {
 
 	return &IDPAuthConnectorConfigAddedEvent{
@@ -35,7 +36,8 @@ func NewIDPAuthConnectorConfigAddedEvent(
 			),
 			idpConfigID,
 			baseURL,
-			backendConnectorID,
+			providerID,
+			machineID,
 		),
 	}
 }

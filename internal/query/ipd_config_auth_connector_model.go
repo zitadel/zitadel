@@ -8,9 +8,10 @@ import (
 type IDPAuthConnectorConfigReadModel struct {
 	eventstore.ReadModel
 
-	IDPConfigID        string
-	BaseURL            string
-	BackendConnectorID string
+	IDPConfigID string
+	BaseURL     string
+	ProviderID  string
+	MachineID   string
 }
 
 func (rm *IDPAuthConnectorConfigReadModel) Reduce() error {
@@ -29,14 +30,18 @@ func (rm *IDPAuthConnectorConfigReadModel) Reduce() error {
 func (rm *IDPAuthConnectorConfigReadModel) reduceConfigAddedEvent(e *idpconfig.AuthConnectorConfigAddedEvent) {
 	rm.IDPConfigID = e.IDPConfigID
 	rm.BaseURL = e.BaseURL
-	rm.BackendConnectorID = e.BackendConnectorID
+	rm.ProviderID = e.ProviderID
+	rm.MachineID = e.MachineID
 }
 
 func (rm *IDPAuthConnectorConfigReadModel) reduceConfigChangedEvent(e *idpconfig.AuthConnectorConfigChangedEvent) {
 	if e.BaseURL != nil {
 		rm.BaseURL = *e.BaseURL
 	}
-	if e.BackendConnectorID != nil {
-		rm.BackendConnectorID = *e.BackendConnectorID
+	if e.ProviderID != nil {
+		rm.ProviderID = *e.ProviderID
+	}
+	if e.MachineID != nil {
+		rm.MachineID = *e.MachineID
 	}
 }

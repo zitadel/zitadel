@@ -86,7 +86,8 @@ func (c *Commands) addDefaultAuthConnectorIDPConfig(config *domain.AuthConnector
 			agg,
 			idpConfigID,
 			config.BaseURL,
-			config.BackendConnectorID,
+			config.ProviderID,
+			config.MachineID,
 		), nil
 	}
 }

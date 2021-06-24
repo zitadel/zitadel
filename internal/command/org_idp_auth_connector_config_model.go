@@ -82,7 +82,8 @@ func (wm *OrgIDPAuthConnectorConfigWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
 	baseURL,
-	backendConnectorID string,
+	providerID,
+	machineID string,
 ) (*org.IDPAuthConnectorConfigChangedEvent, bool, error) {
 
 	changes := make([]idpconfig.AuthConnectorConfigChanges, 0)
@@ -90,8 +91,11 @@ func (wm *OrgIDPAuthConnectorConfigWriteModel) NewChangedEvent(
 	if wm.BaseURL != baseURL {
 		changes = append(changes, idpconfig.ChangeBaseURL(baseURL))
 	}
-	if wm.BackendConnectorID != backendConnectorID {
-		changes = append(changes, idpconfig.ChangeBackendConnectorID(backendConnectorID))
+	if wm.ProviderID != providerID {
+		changes = append(changes, idpconfig.ChangeProviderID(providerID))
+	}
+	if wm.MachineID != machineID {
+		changes = append(changes, idpconfig.ChangeMachineID(machineID))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

@@ -83,12 +83,21 @@ func (c *Commands) addOIDCIDPConfig(config *domain.OIDCIDPConfig) configEventCre
 
 func (c *Commands) addAuthConnectorIDPConfig(config *domain.AuthConnectorIDPConfig) configEventCreator {
 	return func(ctx context.Context, agg *eventstore.Aggregate, idpConfigID string) (eventstore.EventPusher, error) {
+		machine, err := c.machineWriteModelByID(ctx, config.MachineID, agg.ResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		if !isUserStateExists(machine.UserState) {
+			return nil, caos_errs.ThrowNotFound(nil, "Org-Ggrfh", "Errors.User.NotFound")
+		}
+
 		return org_repo.NewIDPAuthConnectorConfigAddedEvent(
 			ctx,
 			agg,
 			idpConfigID,
 			config.BaseURL,
-			config.BackendConnectorID,
+			config.ProviderID,
+			config.MachineID,
 		), nil
 	}
 }

@@ -16,7 +16,9 @@ title: zitadel/idp.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | base_url |  string | - |  |
-| backend_connector_id |  string | - |  |
+| provider_id |  string | - |  |
+| machine_id |  string | - |  |
+| machine_name |  string | - |  |
 
 
 

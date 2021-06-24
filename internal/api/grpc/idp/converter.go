@@ -159,8 +159,10 @@ func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
 	if config.IDPConfigAuthConnectorView != nil {
 		return &idp_pb.IDP_AuthenticatorConfig{
 			AuthenticatorConfig: &idp_pb.AuthConnectorConfig{
-				BaseUrl:            config.AuthConnectorBaseURL,
-				BackendConnectorId: config.AuthConnectorBackendConnectorID,
+				BaseUrl:     config.AuthConnectorBaseURL,
+				ProviderId:  config.AuthConnectorProviderID,
+				MachineId:   config.AuthConnectorMachineID,
+				MachineName: config.AuthConnectorMachineName,
 			},
 		}
 	}
@@ -182,8 +184,10 @@ func IDPConfigToConfigPb(config domain.IDPConfig) idp_pb.IDPConfig {
 	case *domain.AuthConnectorIDPConfig:
 		return &idp_pb.IDP_AuthenticatorConfig{
 			AuthenticatorConfig: &idp_pb.AuthConnectorConfig{
-				BaseUrl:            c.BaseURL,
-				BackendConnectorId: c.BackendConnectorID,
+				BaseUrl:     c.BaseURL,
+				ProviderId:  c.ProviderID,
+				MachineId:   c.MachineID,
+				MachineName: c.MachineName,
 			},
 		}
 	}

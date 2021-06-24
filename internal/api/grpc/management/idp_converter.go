@@ -28,8 +28,9 @@ func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.OIDCID
 
 func addAuthConnectorIDPRequestToDomain(req *mgmt_pb.AddOrgAuthConnectorIDPRequest) *domain.AuthConnectorIDPConfig {
 	return &domain.AuthConnectorIDPConfig{
-		BaseURL:            req.BaseUrl,
-		BackendConnectorID: req.BackendConnectorId,
+		BaseURL:    req.BaseUrl,
+		ProviderID: req.ProviderId,
+		MachineID:  req.MachineId,
 		CommonIDPConfig: domain.CommonIDPConfig{
 			Name:        req.Name,
 			StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
@@ -63,8 +64,9 @@ func updateAuthConnectorConfigToDomain(req *mgmt_pb.UpdateOrgIDPAuthConnectorCon
 		CommonIDPConfig: domain.CommonIDPConfig{
 			IDPConfigID: req.IdpId,
 		},
-		BaseURL:            req.BaseUrl,
-		BackendConnectorID: req.BackendConnectorId,
+		BaseURL:    req.BaseUrl,
+		ProviderID: req.ProviderId,
+		MachineID:  req.MachineId,
 	}
 }
 

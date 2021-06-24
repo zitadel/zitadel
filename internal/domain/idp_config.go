@@ -100,8 +100,10 @@ func (c *OIDCIDPConfig) Details() *ObjectDetails {
 type AuthConnectorIDPConfig struct {
 	es_models.ObjectRoot
 	CommonIDPConfig
-	BaseURL            string
-	BackendConnectorID string
+	BaseURL     string
+	ProviderID  string
+	MachineID   string
+	MachineName string
 }
 
 func (c *AuthConnectorIDPConfig) ID() string {

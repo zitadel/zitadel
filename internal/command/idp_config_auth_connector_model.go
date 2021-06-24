@@ -9,10 +9,11 @@ import (
 type AuthConnectorConfigWriteModel struct {
 	eventstore.WriteModel
 
-	IDPConfigID        string
-	BaseURL            string
-	BackendConnectorID string
-	State              domain.IDPConfigState
+	IDPConfigID string
+	BaseURL     string
+	ProviderID  string
+	MachineID   string
+	State       domain.IDPConfigState
 }
 
 func (wm *AuthConnectorConfigWriteModel) Reduce() error {
@@ -37,7 +38,8 @@ func (wm *AuthConnectorConfigWriteModel) Reduce() error {
 func (wm *AuthConnectorConfigWriteModel) reduceConfigAddedEvent(e *idpconfig.AuthConnectorConfigAddedEvent) {
 	wm.IDPConfigID = e.IDPConfigID
 	wm.BaseURL = e.BaseURL
-	wm.BackendConnectorID = e.BackendConnectorID
+	wm.ProviderID = e.ProviderID
+	wm.MachineID = e.MachineID
 	wm.State = domain.IDPConfigStateActive
 }
 
@@ -45,7 +47,10 @@ func (wm *AuthConnectorConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.A
 	if e.BaseURL != nil {
 		wm.BaseURL = *e.BaseURL
 	}
-	if e.BackendConnectorID != nil {
-		wm.BackendConnectorID = *e.BackendConnectorID
+	if e.ProviderID != nil {
+		wm.ProviderID = *e.ProviderID
+	}
+	if e.MachineID != nil {
+		wm.MachineID = *e.MachineID
 	}
 }

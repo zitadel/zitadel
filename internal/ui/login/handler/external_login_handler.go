@@ -95,7 +95,7 @@ func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, auth
 
 func (l *Login) handleAuthConnectorAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, connectorConfig *iam_model.IDPConfigAuthConnectorView) {
 	const connectorAuthorize = "authorize"
-	url := strings.TrimSuffix(connectorConfig.AuthConnectorBaseURL, "/") + "/" + connectorAuthorize + "?authRequestID=" + authReq.ID + "&connectorID=" + connectorConfig.AuthConnectorBackendConnectorID
+	url := strings.TrimSuffix(connectorConfig.AuthConnectorBaseURL, "/") + "/" + connectorAuthorize + "?authRequestID=" + authReq.ID + "&connectorID=" + connectorConfig.AuthConnectorProviderID
 	http.Redirect(w, r, url, http.StatusFound)
 }
 
@@ -138,28 +138,52 @@ func (l *Login) handleExternalLoginCallbackAuthConnector(w http.ResponseWriter, 
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
+	if authReq.ID != profile.GetCustomClaim("jti") {
+		l.renderLogin(w, r, authReq, caos_errors.ThrowInvalidArgument(nil, "LOGIN-dg4gh", "Errors.User.ExternalIDP.DataInvalid"))
+		return
+	}
+	if profile.Issuer != idpConfig.AuthConnectorMachineID {
+		l.renderLogin(w, r, authReq, caos_errors.ThrowInvalidArgument(nil, "LOGIN-Gdg2d", "Errors.User.ExternalIDP.DataInvalid"))
+		return
+	}
 	user, err := l.authRepo.UserByID(ctx, profile.Subject)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
+	ctx = setContext(ctx, user.ResourceOwner)
 	if idpConfig.AggregateID != domain.IAMID && user.ResourceOwner != idpConfig.AggregateID {
-		l.renderLogin(w, r, authReq, err)
+		l.renderLogin(w, r, authReq, caos_errors.ThrowInvalidArgument(nil, "LOGIN-Vbb25", "Errors.User.ExternalIDP.NotAllowed"))
 		return
 	}
-	if authReq.ID != profile.GetCustomClaim("nonce") {
-		l.renderLogin(w, r, authReq, err)
-		return
-	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(ctx)
 	externalUser := &domain.ExternalUser{
 		IDPConfigID:    idpConfig.IDPConfigID,
 		ExternalUserID: profile.Subject,
 	}
+
+	if len(authReq.LinkingUsers) > 0 {
+		err = l.authRepo.ResetLinkingUsers(ctx, authReq.ID, userAgentID)
+		if err != nil {
+			l.renderLogin(w, r, authReq, err)
+		}
+	}
 	err = l.authRepo.CheckExternalUserLogin(ctx, authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
+		if !errors.IsNotFound(err) {
+			l.renderLogin(w, r, authReq, err)
+			return
+		}
+		err = l.authRepo.SelectUser(ctx, authReq.ID, user.ID, userAgentID)
+		if err != nil {
+			l.renderLogin(w, r, authReq, err)
+			return
+		}
+		err = l.authRepo.LinkExternalUsers(ctx, authReq.ID, userAgentID, domain.BrowserInfoFromRequest(r))
+		if err != nil {
+			l.renderLogin(w, r, authReq, err)
+			return
+		}
 	}
 	l.renderNextStep(w, r, authReq)
 }
