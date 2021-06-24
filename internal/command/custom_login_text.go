@@ -18,7 +18,6 @@ func (c *Commands) getAllLoginTextEvents(ctx context.Context, agg *eventstore.Ag
 	events = append(events, c.getPasswordTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.getUsernameChangeTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.getUsernameChangeDoneTextEvents(ctx, agg, existingText, text, defaultText)...)
-	events = append(events, c.getPasswordTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.getPasswordInitTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.getPasswordInitDoneTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.getEmailVerificationTextEvents(ctx, agg, existingText, text, defaultText)...)
@@ -110,7 +109,7 @@ func (c *Commands) getLoginTextEvents(ctx context.Context, agg *eventstore.Aggre
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginLoginnamePlaceHolder, existingText.LoginLoginnamePlaceholder, text.Login.UsernamePlaceholder, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginLoginnamePlaceHolder, existingText.LoginLoginnamePlaceholder, text.Login.LoginnamePlaceholder, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -375,7 +374,7 @@ func (c *Commands) getInitUserDoneEvents(ctx context.Context, agg *eventstore.Ag
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneAbortButtonText, existingText.InitializeDoneAbortButtonText, text.InitUserDone.CancelButtonText, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneCancelButtonText, existingText.InitializeDoneAbortButtonText, text.InitUserDone.CancelButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -487,7 +486,7 @@ func (c *Commands) getInitMFADoneEvents(ctx context.Context, agg *eventstore.Agg
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitMFADoneAbortButtonText, existingText.InitMFADoneAbortButtonText, text.InitMFADone.CancelButtonText, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitMFADoneCancelButtonText, existingText.InitMFADoneAbortButtonText, text.InitMFADone.CancelButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -922,11 +921,11 @@ func (c *Commands) getLogoutDoneEvents(ctx context.Context, agg *eventstore.Aggr
 
 func (c *Commands) getFooterTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
 	events := make([]eventstore.EventPusher, 0)
-	event := c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterTos, existingText.FooterTOS, text.Footer.TOS, text.Language, defaultText)
+	event := c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterTOS, existingText.FooterTOS, text.Footer.TOS, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterTosLink, existingText.FooterTOSLink, text.Footer.TOSLink, text.Language, defaultText)
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterTOSLink, existingText.FooterTOSLink, text.Footer.TOSLink, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

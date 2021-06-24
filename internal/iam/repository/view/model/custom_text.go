@@ -457,7 +457,7 @@ func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLo
 	if text.Key == domain.LoginKeyInitUserDoneDescription {
 		result.InitUserDone.Description = text.Text
 	}
-	if text.Key == domain.LoginKeyInitUserDoneAbortButtonText {
+	if text.Key == domain.LoginKeyInitUserDoneCancelButtonText {
 		result.InitUserDone.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneNextButtonText {
@@ -538,7 +538,7 @@ func initMFADoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText
 	if text.Key == domain.LoginKeyInitMFADoneDescription {
 		result.InitMFADone.Description = text.Text
 	}
-	if text.Key == domain.LoginKeyInitMFADoneAbortButtonText {
+	if text.Key == domain.LoginKeyInitMFADoneCancelButtonText {
 		result.InitMFADone.CancelButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyInitMFADoneNextButtonText {
@@ -853,10 +853,10 @@ func logoutDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText)
 }
 
 func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyFooterTos {
+	if text.Key == domain.LoginKeyFooterTOS {
 		result.Footer.TOS = text.Text
 	}
-	if text.Key == domain.LoginKeyFooterTosLink {
+	if text.Key == domain.LoginKeyFooterTOSLink {
 		result.Footer.TOSLink = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterPrivacy {

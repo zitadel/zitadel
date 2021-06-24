@@ -1099,7 +1099,7 @@ func (wm *CustomLoginTextReadModel) handleInitializeUserDoneScreenSetEvent(e *po
 		wm.InitializeDoneDescription = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitUserDoneAbortButtonText {
+	if e.Key == domain.LoginKeyInitUserDoneCancelButtonText {
 		wm.InitializeDoneAbortButtonText = e.Text
 		return
 	}
@@ -1118,7 +1118,7 @@ func (wm *CustomLoginTextReadModel) handleInitializeDoneScreenRemoveEvent(e *pol
 		wm.InitializeDoneDescription = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitUserDoneAbortButtonText {
+	if e.Key == domain.LoginKeyInitUserDoneCancelButtonText {
 		wm.InitializeDoneAbortButtonText = ""
 		return
 	}
@@ -1307,7 +1307,7 @@ func (wm *CustomLoginTextReadModel) handleInitMFADoneScreenSetEvent(e *policy.Cu
 		wm.InitMFADoneDescription = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyInitMFADoneAbortButtonText {
+	if e.Key == domain.LoginKeyInitMFADoneCancelButtonText {
 		wm.InitMFADoneAbortButtonText = e.Text
 		return
 	}
@@ -1326,7 +1326,7 @@ func (wm *CustomLoginTextReadModel) handleInitMFADoneScreenRemoveEvent(e *policy
 		wm.InitMFADoneDescription = ""
 		return
 	}
-	if e.Key == domain.LoginKeyInitMFADoneAbortButtonText {
+	if e.Key == domain.LoginKeyInitMFADoneCancelButtonText {
 		wm.InitMFADoneAbortButtonText = ""
 		return
 	}
@@ -2115,11 +2115,11 @@ func (wm *CustomLoginTextReadModel) handleLogoutDoneScreenRemoveEvent(e *policy.
 }
 
 func (wm *CustomLoginTextReadModel) handleFooterTextSetEvent(e *policy.CustomTextSetEvent) {
-	if e.Key == domain.LoginKeyFooterTos {
+	if e.Key == domain.LoginKeyFooterTOS {
 		wm.FooterTOS = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyFooterTosLink {
+	if e.Key == domain.LoginKeyFooterTOSLink {
 		wm.FooterTOSLink = e.Text
 		return
 	}
@@ -2142,11 +2142,11 @@ func (wm *CustomLoginTextReadModel) handleFooterTextSetEvent(e *policy.CustomTex
 }
 
 func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.CustomTextRemovedEvent) {
-	if e.Key == domain.LoginKeyFooterTos {
+	if e.Key == domain.LoginKeyFooterTOS {
 		wm.FooterTOS = ""
 		return
 	}
-	if e.Key == domain.LoginKeyFooterTosLink {
+	if e.Key == domain.LoginKeyFooterTOSLink {
 		wm.FooterTOSLink = ""
 		return
 	}

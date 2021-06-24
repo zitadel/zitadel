@@ -96,11 +96,11 @@ const (
 	LoginKeyInitializeUserResendButtonText        = LoginKeyInitializeUser + "ResendButtonText"
 	LoginKeyInitializeUserNextButtonText          = LoginKeyInitializeUser + "NextButtonText"
 
-	LoginKeyInitUserDone                = "InitUserDone."
-	LoginKeyInitUserDoneTitle           = LoginKeyInitUserDone + "Title"
-	LoginKeyInitUserDoneDescription     = LoginKeyInitUserDone + "Description"
-	LoginKeyInitUserDoneAbortButtonText = LoginKeyInitUserDone + "CancelButtonText"
-	LoginKeyInitUserDoneNextButtonText  = LoginKeyInitUserDone + "NextButtonText"
+	LoginKeyInitUserDone                 = "InitUserDone."
+	LoginKeyInitUserDoneTitle            = LoginKeyInitUserDone + "Title"
+	LoginKeyInitUserDoneDescription      = LoginKeyInitUserDone + "Description"
+	LoginKeyInitUserDoneCancelButtonText = LoginKeyInitUserDone + "CancelButtonText"
+	LoginKeyInitUserDoneNextButtonText   = LoginKeyInitUserDone + "NextButtonText"
 
 	LoginKeyInitMFAPrompt               = "InitMFAPrompt."
 	LoginKeyInitMFAPromptTitle          = LoginKeyInitMFAPrompt + "Title"
@@ -127,11 +127,11 @@ const (
 	LoginKeyInitMFAU2FRegisterTokenButtonText = LoginKeyInitMFAU2F + "RegisterTokenButtonText"
 	LoginKeyInitMFAU2FErrorRetry              = LoginKeyInitMFAU2F + "ErrorRetry"
 
-	LoginKeyInitMFADone                = "InitMFADone."
-	LoginKeyInitMFADoneTitle           = LoginKeyInitMFADone + "Title"
-	LoginKeyInitMFADoneDescription     = LoginKeyInitMFADone + "Description"
-	LoginKeyInitMFADoneAbortButtonText = LoginKeyInitMFADone + "CancelButtonText"
-	LoginKeyInitMFADoneNextButtonText  = LoginKeyInitMFADone + "NextButtonText"
+	LoginKeyInitMFADone                 = "InitMFADone."
+	LoginKeyInitMFADoneTitle            = LoginKeyInitMFADone + "Title"
+	LoginKeyInitMFADoneDescription      = LoginKeyInitMFADone + "Description"
+	LoginKeyInitMFADoneCancelButtonText = LoginKeyInitMFADone + "CancelButtonText"
+	LoginKeyInitMFADoneNextButtonText   = LoginKeyInitMFADone + "NextButtonText"
 
 	LoginKeyMFAProviders            = "MFAProvider."
 	LoginKeyMFAProvidersChooseOther = LoginKeyMFAProviders + "ChooseOther"
@@ -250,8 +250,8 @@ const (
 	LoginKeyLogoutDoneLoginButtonText = LoginKeyLogoutDone + "LoginButtonText"
 
 	LoginKeyFooter            = "Footer."
-	LoginKeyFooterTos         = LoginKeyFooter + "Tos"
-	LoginKeyFooterTosLink     = LoginKeyFooter + "TosLink"
+	LoginKeyFooterTOS         = LoginKeyFooter + "Tos"
+	LoginKeyFooterTOSLink     = LoginKeyFooter + "TosLink"
 	LoginKeyFooterPrivacy     = LoginKeyFooter + "Privacy"
 	LoginKeyFooterPrivacyLink = LoginKeyFooter + "PrivacyLink"
 	LoginKeyFooterHelp        = LoginKeyFooter + "Help"
@@ -409,7 +409,7 @@ type InitMFAPromptScreenText struct {
 	Title          string
 	Description    string
 	Provider0      string //OTP
-	Provider1      string //Provider1
+	Provider1      string //U2F
 	SkipButtonText string
 	NextButtonText string
 }
