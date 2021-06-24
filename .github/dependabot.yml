@@ -5,6 +5,9 @@ updates:
   schedule:
     interval: weekly
     time: "02:00"
+  labels:
+   - "npm"
+   - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
@@ -14,6 +17,9 @@ updates:
   schedule:
     interval: weekly
     time: "02:00"
+  labels:
+   - "npm"
+   - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
