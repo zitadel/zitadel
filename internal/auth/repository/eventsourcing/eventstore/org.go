@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -102,4 +103,15 @@ func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*
 		return nil, err
 	}
 	return iam_view_model.PasswordComplexityViewToModel(policy), err
+}
+
+func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*iam_model.LabelPolicyView, error) {
+	orgPolicy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
+	if errors.IsNotFound(err) {
+		orgPolicy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.LabelPolicyViewToModel(orgPolicy), nil
 }

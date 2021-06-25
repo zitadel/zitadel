@@ -24,21 +24,21 @@ type mfaU2FFormData struct {
 }
 
 func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, err error) {
-	var errType, errMessage, credentialData string
+	var errID, errMessage, credentialData string
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		webAuthNLogin, err = l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
 	}
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if webAuthNLogin != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData)
 	}
 	data := &mfaU2FData{
 		webAuthNData: webAuthNData{
-			userData:               l.getUserData(r, authReq, "Login WebAuthNToken", errType, errMessage),
+			userData:               l.getUserData(r, authReq, "Login WebAuthNToken", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		MFAProviders:     providers,

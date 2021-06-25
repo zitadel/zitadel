@@ -80,6 +80,14 @@ func RemoteIPStringFromRequest(r *http.Request) string {
 	return r.RemoteAddr
 }
 
+func GetAuthorization(r *http.Request) string {
+	return r.Header.Get(Authorization)
+}
+
+func GetOrgID(r *http.Request) string {
+	return r.Header.Get(ZitadelOrgID)
+}
+
 func GetForwardedFor(headers http.Header) (string, bool) {
 	forwarded, ok := headers[ForwardedFor]
 	if ok {

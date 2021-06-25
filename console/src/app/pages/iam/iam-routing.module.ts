@@ -9,119 +9,119 @@ import { EventstoreComponent } from './eventstore/eventstore.component';
 import { IamComponent } from './iam.component';
 
 const routes: Routes = [
-    {
-        path: 'policies',
-        component: IamComponent,
+  {
+    path: 'policies',
+    component: IamComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
+    path: 'eventstore',
+    component: EventstoreComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
+    path: 'members',
+    loadChildren: () => import('./iam-members/iam-members.module').then(m => m.IamMembersModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.member.read'],
+    },
+  },
+  {
+    path: 'features',
+    loadChildren: () => import('src/app/modules/features/features.module').then(m => m.FeaturesModule),
+    // canActivate: [RoleGuard],
+    data: {
+      roles: ['iam.features.read'],
+      serviceType: FeatureServiceType.ADMIN,
+    },
+  },
+  {
+    path: 'idp',
+    children: [
+      {
+        path: 'create',
+        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
-            roles: ['iam.read'],
+          roles: ['iam.idp.write'],
+          serviceType: PolicyComponentServiceType.ADMIN,
         },
-    },
-    {
-        path: 'eventstore',
-        component: EventstoreComponent,
+      },
+      {
+        path: ':id',
+        loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
-            roles: ['iam.read'],
+          roles: ['iam.idp.read'],
+          serviceType: PolicyComponentServiceType.ADMIN,
         },
-    },
-    {
-        path: 'members',
-        loadChildren: () => import('./iam-members/iam-members.module').then(m => m.IamMembersModule),
-        canActivate: [AuthGuard, RoleGuard],
+      },
+    ],
+  },
+  {
+    path: 'policy',
+    children: [
+      {
+        path: PolicyComponentType.AGE,
         data: {
-            roles: ['iam.member.read'],
+          serviceType: PolicyComponentServiceType.ADMIN,
         },
-    },
-    {
-        path: 'features',
-        loadChildren: () => import('src/app/modules/features/features.module').then(m => m.FeaturesModule),
-        // canActivate: [RoleGuard],
+        loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
+          .then(m => m.PasswordAgePolicyModule),
+      },
+      {
+        path: PolicyComponentType.LOCKOUT,
         data: {
-            roles: ['iam.features.read'],
-            serviceType: FeatureServiceType.ADMIN,
+          serviceType: PolicyComponentServiceType.ADMIN,
         },
-    },
-    {
-        path: 'idp',
-        children: [
-            {
-                path: 'create',
-                loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
-                canActivate: [AuthGuard, RoleGuard],
-                data: {
-                    roles: ['iam.idp.write'],
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-            },
-            {
-                path: ':id',
-                loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
-                canActivate: [AuthGuard, RoleGuard],
-                data: {
-                    roles: ['iam.idp.read'],
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-            },
-        ],
-    },
-    {
-        path: 'policy',
-        children: [
-            {
-                path: PolicyComponentType.AGE,
-                data: {
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-                loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
-                    .then(m => m.PasswordAgePolicyModule),
-            },
-            {
-                path: PolicyComponentType.LOCKOUT,
-                data: {
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-                loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
-                    .then(m => m.PasswordLockoutPolicyModule),
-            },
-            {
-                path: PolicyComponentType.COMPLEXITY,
-                data: {
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-                loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
-                    .then(m => m.PasswordComplexityPolicyModule),
-            },
-            {
-                path: PolicyComponentType.IAM,
-                data: {
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-                loadChildren: () => import('src/app/modules/policies/org-iam-policy/org-iam-policy.module')
-                    .then(m => m.OrgIamPolicyModule),
-            },
-            {
-                path: PolicyComponentType.LOGIN,
-                data: {
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-                loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
-                    .then(m => m.LoginPolicyModule),
-            },
-            {
-                path: PolicyComponentType.LABEL,
-                data: {
-                    serviceType: PolicyComponentServiceType.ADMIN,
-                },
-                loadChildren: () => import('src/app/modules/policies/label-policy/label-policy.module')
-                    .then(m => m.LabelPolicyModule),
-            },
-        ],
-    },
+        loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
+          .then(m => m.PasswordLockoutPolicyModule),
+      },
+      {
+        path: PolicyComponentType.PRIVATELABEL,
+        data: {
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+        loadChildren: () => import('src/app/modules/policies/private-labeling-policy/private-labeling-policy.module')
+          .then(m => m.PrivateLabelingPolicyModule),
+      },
+      {
+        path: PolicyComponentType.COMPLEXITY,
+        data: {
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+        loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
+          .then(m => m.PasswordComplexityPolicyModule),
+      },
+      {
+        path: PolicyComponentType.IAM,
+        data: {
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+        loadChildren: () => import('src/app/modules/policies/org-iam-policy/org-iam-policy.module')
+          .then(m => m.OrgIamPolicyModule),
+      },
+      {
+        path: PolicyComponentType.LOGIN,
+        data: {
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+        loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
+          .then(m => m.LoginPolicyModule),
+      },
+    ],
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
 export class IamRoutingModule { }

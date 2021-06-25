@@ -24,6 +24,7 @@ func ProjectMemberToPb(m *proj_model.ProjectMemberView) *member_pb.Member {
 		FirstName:          m.FirstName,
 		LastName:           m.LastName,
 		DisplayName:        m.DisplayName,
+		AvatarUrl:          m.AvatarURL,
 		Details: object.ToViewDetailsPb(
 			m.Sequence,
 			m.CreationDate,

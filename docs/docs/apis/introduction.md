@@ -8,10 +8,11 @@ title: Introduction
 
 ---
 
-ZITADEL provides three API's for different use cases. These API's are built with GRPC and then generate a REST service.
+ZITADEL provides four API's for different use cases. Three API's are built with GRPC and then generate a REST service.
 Each service's proto definition is located in the source control on GitHub.
 As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file.
 We annotate the corresponding REST methods on each possible call as well as the AuthN and AuthZ requirements.
+The last API (assets) is only a REST API because we use multipart form data.
 
 See below for an example with the call **GetMyUser**.
 

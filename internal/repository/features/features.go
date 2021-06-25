@@ -32,7 +32,10 @@ type FeaturesSetEvent struct {
 	LoginPolicyPasswordReset *bool                 `json:"loginPolicyPasswordReset,omitempty"`
 	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
 	LabelPolicy              *bool                 `json:"labelPolicy,omitempty"`
+	LabelPolicyPrivateLabel  *bool                 `json:"labelPolicyPrivateLabel,omitempty"`
+	LabelPolicyWatermark     *bool                 `json:"labelPolicyWatermark,omitempty"`
 	CustomDomain             *bool                 `json:"customDomain,omitempty"`
+	CustomText               *bool                 `json:"customText,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -133,9 +136,15 @@ func ChangePasswordComplexityPolicy(passwordComplexityPolicy bool) func(event *F
 	}
 }
 
-func ChangeLabelPolicy(labelPolicy bool) func(event *FeaturesSetEvent) {
+func ChangeLabelPolicyPrivateLabel(labelPolicyPrivateLabel bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.LabelPolicy = &labelPolicy
+		e.LabelPolicyPrivateLabel = &labelPolicyPrivateLabel
+	}
+}
+
+func ChangeLabelPolicyWatermark(labelPolicyWatermark bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.LabelPolicyWatermark = &labelPolicyWatermark
 	}
 }
 
@@ -145,6 +154,11 @@ func ChangeCustomDomain(customDomain bool) func(event *FeaturesSetEvent) {
 	}
 }
 
+func ChangeCustomText(customText bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.CustomText = &customText
+	}
+}
 func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

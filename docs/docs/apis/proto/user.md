@@ -237,6 +237,7 @@ this query is always equals
 | display_name |  string | - |  |
 | preferred_language |  string | - |  |
 | gender |  Gender | - |  |
+| avatar_url |  string | - |  |
 
 
 
@@ -291,6 +292,7 @@ this query is always equals
 | login_name |  string | - |  |
 | display_name |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
+| avatar_url |  string | - |  |
 
 
 
@@ -357,6 +359,7 @@ UserTypeQuery is always equals
 | project_id |  string | - |  |
 | project_name |  string | - |  |
 | project_grant_id |  string | - |  |
+| avatar_url |  string | - |  |
 
 
 

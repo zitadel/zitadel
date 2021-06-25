@@ -46,9 +46,11 @@
     "ORG_POLICY_COMPLEXITY": "Passwort Komplexität",
     "ORG_POLICY_IAM": "Organisation Zugangseinstellungen",
     "ORG_POLICY_LOGIN": "Login Richtlinie",
+    "ORG_POLICY_LABEL": "Private Label Richtlinie",
     "IAM_POLICY_COMPLEXITY": "Systemweite Passwort Komplexität",
     "IAM_POLICY_IAM": "Systemweite Zugangseinstellungen",
     "IAN_POLICY_LOGIN": "Systemweite Login Richtlinie",
+    "IAN_POLICY_LABEL": "Systemweite Private Label Richtlinie",
     "USERS": "Erstelle und verwalte Deine Benutzer.",
     "USERS_DESC": "Überwache Dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
     "USERS_HUMANS": "Zeige Benutzer",
@@ -104,8 +106,9 @@
     }
   },
   "ACTIONS": {
-      "SHOW":"Aufklappen",
-      "HIDE":"Zuklappen",
+    "SET":"Übernehmen",
+    "SHOW":"Aufklappen",
+    "HIDE":"Zuklappen",
     "SAVE": "Speichern",
     "SAVENOW": "Speichern",
     "NEW": "Neu",
@@ -305,7 +308,16 @@
       "DISPLAYNAME": "Anzeigename",
       "PREFERRED_LANGUAGE": "Sprache",
       "GENDER": "Geschlecht",
-      "PASSWORD": "Passwort"
+      "PASSWORD": "Passwort",
+      "AVATAR": {
+        "UPLOADTITLE":"Profilfoto uploaden",
+        "UPLOADBTN":"Datei auswählen",
+        "UPLOAD":"Hochladen",
+        "CURRENT":"Aktuelles Bild",
+        "PREVIEW":"Vorschau",
+        "DELETESUCCESS":"Erfolgreich gelöscht!",
+        "CROPPERERROR":"Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
+      }
     },
     "MACHINE": {
       "TITLE": "Details Service-Benutzer",
@@ -610,11 +622,13 @@
       "LOGINPOLICYPASSWORDRESET": "Login Richtlinie: Passwort vergessen Link nicht anzeigen - benutzerdefiniert",
       "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
       "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
-      "LOGINPOLICYFACTORS": "Login Richtlinie: Mltifaktoren - benutzerdefiniert",
+      "LOGINPOLICYFACTORS": "Login Richtlinie: Multifaktoren - benutzerdefiniert",
       "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
-      "LABELPOLICY": "Label Richtlinie - benutzerdefiniert",
-      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar"
+      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
+      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
+      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
+      "CUSTOMTEXT": "Benutzerdefinierte Texte"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -636,6 +650,30 @@
       "NUMBERERROR": "Das Password muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
+    "PRIVATELABELING": {
+      "TITLE":"Private Labeling",
+      "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "PREVIEW_DESCRIPTION":"Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
+      "BTN":"Datei auswählen",
+      "ACTIVATEPREVIEW":"Konfiguration übernehmen",
+      "DARK":"Dunkler Modus",
+      "LIGHT":"Heller Modus",
+      "CHANGEVIEW":"Ansicht wechseln",
+      "ACTIVATED":"Richtlinie wurde LIVE geschaltet",
+      "THEME":"Modus",
+      "COLORS":"Farben",
+      "FONT":"Schrift",
+      "ADVANCEDBEHAVIOR":"Erweitertes Verhalten",
+      "DROP":"Bild hier ablegen",
+      "RELEASE":"Jetzt loslassen",
+      "PREVIEW": {
+        "TITLE":"Anmeldung",
+        "SECOND":"mit ZITADEL-Konto anmelden.",
+        "ERROR":"Benutzer konnte nicht gefunden werden!",
+        "PRIMARYBUTTON":"weiter",
+        "SECONDARYBUTTON":"registrieren"
+      }
+    },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",
       "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
@@ -648,18 +686,15 @@
       "TITLE": "Zugangseinstellungen IAM",
       "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
     },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins."
+    },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
-      "SAVED": "Erfolgreich gespeichert."
-    },
-    "LABEL": {
-      "TITLE": "Email Labelling Einstellungen",
-      "DESCRIPTION": "Definieren Sie das Erscheinungsbild Ihrer Benachrichtigungs-Mails",
-      "PRIMARYCOLOR": "Hintergrundfarbe",
-      "SECONDARYCOLOR": "Schriftfarbe",
       "SAVED": "Erfolgreich gespeichert."
     },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
@@ -685,14 +720,20 @@
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "Mfa erzwingen",
       "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
-      "HIDEPASSWORDRESET": "Passwort vergessen, nicht anzeigen",
-      "FORCEMFA_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link."
+      "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
+      "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
+      "HIDELOGINNAMESUFFIX":"Loginname Suffix ausblenden",
+      "ERRORMSGPOPUP":"Fehler als Dialog Fenster",
+      "DISABLEWATERMARK":"Wasserzeichen ausblenden"
     },
     "RESET": "Richtlinie zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
     "TOAST": {
       "SET": "Richtline erfolgreich gesetzt!",
-      "RESETSUCCESS": "Richtline zurückgesetzt!"
+      "RESETSUCCESS": "Richtline zurückgesetzt!",
+      "UPLOADSUCCESS": "Upload erfolgreich",
+      "DELETESUCCESS": "Löschen erfolgreich",
+      "UPLOADFAILED":"Upload fehlgeschlagen!"
     }
   },
   "ORG_DETAIL": {

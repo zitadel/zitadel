@@ -11,9 +11,10 @@ const (
 	ProjectReactivated models.EventType = "project.reactivated"
 	ProjectRemoved     models.EventType = "project.removed"
 
-	ProjectMemberAdded   models.EventType = "project.member.added"
-	ProjectMemberChanged models.EventType = "project.member.changed"
-	ProjectMemberRemoved models.EventType = "project.member.removed"
+	ProjectMemberAdded          models.EventType = "project.member.added"
+	ProjectMemberChanged        models.EventType = "project.member.changed"
+	ProjectMemberRemoved        models.EventType = "project.member.removed"
+	ProjectMemberCascadeRemoved models.EventType = "project.member.cascade.removed"
 
 	ProjectRoleAdded   models.EventType = "project.role.added"
 	ProjectRoleChanged models.EventType = "project.role.changed"
@@ -26,9 +27,10 @@ const (
 	ProjectGrantReactivated    models.EventType = "project.grant.reactivated"
 	ProjectGrantCascadeChanged models.EventType = "project.grant.cascade.changed"
 
-	ProjectGrantMemberAdded   models.EventType = "project.grant.member.added"
-	ProjectGrantMemberChanged models.EventType = "project.grant.member.changed"
-	ProjectGrantMemberRemoved models.EventType = "project.grant.member.removed"
+	ProjectGrantMemberAdded          models.EventType = "project.grant.member.added"
+	ProjectGrantMemberChanged        models.EventType = "project.grant.member.changed"
+	ProjectGrantMemberRemoved        models.EventType = "project.grant.member.removed"
+	ProjectGrantMemberCascadeRemoved models.EventType = "project.grant.member.cascade.removed"
 
 	ApplicationAdded       models.EventType = "project.application.added"
 	ApplicationChanged     models.EventType = "project.application.changed"

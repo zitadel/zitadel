@@ -3,10 +3,10 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 	"html/template"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
@@ -14,9 +14,11 @@ import (
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
+	"github.com/caos/zitadel/internal/static"
 )
 
 const (
@@ -25,12 +27,14 @@ const (
 
 type Renderer struct {
 	*renderer.Renderer
-	pathPrefix string
+	pathPrefix    string
+	staticStorage static.Storage
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
+func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string, defaultLanguage language.Tag) *Renderer {
 	r := &Renderer{
-		pathPrefix: pathPrefix,
+		pathPrefix:    pathPrefix,
+		staticStorage: staticStorage,
 	}
 	tmplMapping := map[string]string{
 		tmplError:                    "error.html",
@@ -61,6 +65,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplChangeUsernameDone:       "change_username_done.html",
 		tmplLinkUsersDone:            "link_users_done.html",
 		tmplExternalNotFoundOption:   "external_not_found_option.html",
+		tmplLoginSuccess:             "login_success.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -68,6 +73,35 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"resourceThemeUrl": func(file, theme string) string {
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
+		},
+		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
+			if policy != nil {
+				return true
+			}
+			return false
+		},
+		"hasWatermark": func(policy *domain.LabelPolicy) bool {
+			if policy != nil && policy.DisableWatermark {
+				return false
+			}
+			return true
+		},
+		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
+		},
+		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.LogoURL
+			if darkMode && policy.LogoDarkURL != "" {
+				fileName = policy.LogoDarkURL
+			}
+			if fileName == "" {
+				return ""
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
+		},
+		"avatarResource": func(orgID, avatar string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", false, "filename", avatar))
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
@@ -203,6 +237,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			return
 		}
 		l.renderLogin(w, r, authReq, err)
+	case *domain.RegistrationStep:
+		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
 	case *domain.InitPasswordStep:
@@ -218,7 +254,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.redirectToCallback(w, r, authReq)
+		l.redirectToLoginSuccess(w, r, authReq.ID)
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
 	case *domain.VerifyEMailStep:
@@ -265,13 +301,14 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
 	baseData := baseData{
 		errorData: errorData{
-			ErrType:    errType,
+			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
 		Lang:                   l.renderer.Lang(r).String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
+		DarkMode:               l.isDarkMode(r),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -282,33 +319,38 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
+		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+	} else {
+		//TODO: How to handle LabelPolicy if no auth req (eg Register)
 	}
 	return baseData
 }
 
 func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
-	var userName, loginName, displayName string
+	var userName, loginName, displayName, avatar string
 	if authReq != nil {
 		userName = authReq.UserName
 		loginName = authReq.LoginName
 		displayName = authReq.DisplayName
+		avatar = authReq.AvatarKey
 	}
 	return profileData{
 		UserName:    userName,
 		LoginName:   loginName,
 		DisplayName: displayName,
+		AvatarKey:   avatar,
 	}
 }
 
-func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
+func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
 		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
-		return localized + " (" + caosErr.ID + ")"
+		return caosErr.ID, localized
 
 	}
-	return err.Error()
+	return "", err.Error()
 }
 
 func (l *Login) getTheme(r *http.Request) string {
@@ -316,7 +358,18 @@ func (l *Login) getTheme(r *http.Request) string {
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
-	return "lgn-dark-theme" //TODO: impl
+	if l.isDarkMode(r) {
+		return "lgn-dark-theme"
+	}
+	return "lgn-light-theme"
+}
+
+func (l *Login) isDarkMode(r *http.Request) bool {
+	cookie, err := r.Cookie("mode")
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(cookie.Value, "dark")
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
@@ -379,6 +432,7 @@ type baseData struct {
 	Title                  string
 	Theme                  string
 	ThemeMode              string
+	DarkMode               bool
 	OrgID                  string
 	OrgName                string
 	PrimaryDomain          string
@@ -388,10 +442,11 @@ type baseData struct {
 	Nonce                  string
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
+	LabelPolicy            *domain.LabelPolicy
 }
 
 type errorData struct {
-	ErrType    string
+	ErrID      string
 	ErrMessage string
 }
 
@@ -408,6 +463,7 @@ type profileData struct {
 	LoginName   string
 	UserName    string
 	DisplayName string
+	AvatarKey   string
 }
 
 type passwordData struct {

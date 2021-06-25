@@ -1,25 +1,26 @@
 package clean
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
 )
 
 func TestBackup_Job1(t *testing.T) {
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
-	version := "testVersion"
 	command := "test"
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	jobName := "testJob"
 	namespace := "testNs"
+	image := "testImage"
 
 	k8sLabels := map[string]string{
 		"app.kubernetes.io/component":  "testComponent",
@@ -47,7 +48,7 @@ func TestBackup_Job1(t *testing.T) {
 						Tolerations:   tolerations,
 						Containers: []corev1.Container{{
 							Name:  jobName,
-							Image: image + ":" + version,
+							Image: image,
 							Command: []string{
 								"/bin/bash",
 								"-c",
@@ -84,19 +85,19 @@ func TestBackup_Job1(t *testing.T) {
 			},
 		}
 
-	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, version, command))
+	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image))
 }
 
 func TestBackup_Job2(t *testing.T) {
 	nodeselector := map[string]string{"test2": "test2"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
-	version := "testVersion2"
 	command := "test2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	jobName := "testJob2"
 	namespace := "testNs2"
+	image := "testImage2"
 	k8sLabels := map[string]string{
 		"app.kubernetes.io/component":  "testComponent2",
 		"app.kubernetes.io/managed-by": "testOp2",
@@ -123,7 +124,7 @@ func TestBackup_Job2(t *testing.T) {
 						Tolerations:   tolerations,
 						Containers: []corev1.Container{{
 							Name:  jobName,
-							Image: image + ":" + version,
+							Image: image,
 							Command: []string{
 								"/bin/bash",
 								"-c",
@@ -160,5 +161,5 @@ func TestBackup_Job2(t *testing.T) {
 			},
 		}
 
-	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, version, command))
+	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image))
 }

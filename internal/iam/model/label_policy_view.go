@@ -1,16 +1,33 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"time"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type LabelPolicyView struct {
-	AggregateID         string
-	PrimaryColor        string
-	SecondaryColor      string
+	AggregateID     string
+	PrimaryColor    string
+	BackgroundColor string
+	WarnColor       string
+	FontColor       string
+	LogoURL         string
+	IconURL         string
+
+	PrimaryColorDark    string
+	BackgroundColorDark string
+	WarnColorDark       string
+	FontColorDark       string
+	LogoDarkURL         string
+	IconDarkURL         string
+	FontURL             string
+
 	HideLoginNameSuffix bool
-	Default             bool
+	ErrorMsgPopup       bool
+	DisableWatermark    bool
+
+	Default bool
 
 	CreationDate time.Time
 	ChangeDate   time.Time
@@ -30,6 +47,7 @@ type LabelPolicySearchKey int32
 const (
 	LabelPolicySearchKeyUnspecified LabelPolicySearchKey = iota
 	LabelPolicySearchKeyAggregateID
+	LabelPolicySearchKeyState
 )
 
 type LabelPolicySearchQuery struct {

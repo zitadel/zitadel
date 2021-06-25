@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"time"
 
-	es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/org/model"
-	"github.com/lib/pq"
+	es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 const (
@@ -33,12 +34,14 @@ type OrgMemberView struct {
 	Roles              pq.StringArray `json:"roles" gorm:"column:roles"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
+	AvatarKey          string         `json:"-" gorm:"column:avatar_key"`
+	UserResourceOwner  string         `json:"-" gorm:"column:user_resource_owner"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func OrgMemberToModel(member *OrgMemberView) *model.OrgMemberView {
+func OrgMemberToModel(member *OrgMemberView, prefixAvatarURL string) *model.OrgMemberView {
 	return &model.OrgMemberView{
 		UserID:             member.UserID,
 		OrgID:              member.OrgID,
@@ -49,16 +52,18 @@ func OrgMemberToModel(member *OrgMemberView) *model.OrgMemberView {
 		DisplayName:        member.DisplayName,
 		PreferredLoginName: member.PreferredLoginName,
 		Roles:              member.Roles,
+		AvatarURL:          domain.AvatarURL(prefixAvatarURL, member.UserResourceOwner, member.AvatarKey),
+		UserResourceOwner:  member.UserResourceOwner,
 		Sequence:           member.Sequence,
 		CreationDate:       member.CreationDate,
 		ChangeDate:         member.ChangeDate,
 	}
 }
 
-func OrgMembersToModel(roles []*OrgMemberView) []*model.OrgMemberView {
+func OrgMembersToModel(roles []*OrgMemberView, prefixAvatarURL string) []*model.OrgMemberView {
 	result := make([]*model.OrgMemberView, len(roles))
 	for i, r := range roles {
-		result[i] = OrgMemberToModel(r)
+		result[i] = OrgMemberToModel(r, prefixAvatarURL)
 	}
 	return result
 }

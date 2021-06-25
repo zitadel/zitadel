@@ -1,58 +1,43 @@
 @import '../theming/theming.scss';
 @import './input.scss';
 
-@mixin lgn-input-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
-
-    @if $color != null {
-        @include lgn-input-color($color);
-    }
+@mixin lgn-input-theme() {
+    @include lgn-input-color();
 }
 
-@mixin lgn-input-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $primary: map-get($config, primary);
-    $warn: map-get($config, warn);
-    $background: map-get($config, background);
-    $foreground: map-get($config, foreground);
+@mixin lgn-input-color() {
 
     .lgn-input:not([disabled]),
     select:not([disabled]), .lgn-select:not([disabled]) {
-      border-color: lgn-color($foreground, input-border);
+      border-color: var(--zitadel-color-input-border);
     }
   
     .lgn-input,
     select, .lgn-select {
-      color: lgn-color($foreground, text);
-      background-color: lgn-color($background, input);
+      color: var(--zitadel-color-text);
+      background-color: var(--zitadel-color-input-background);
 
       &:hover {
-        border-color: lgn-color($foreground, input-border-hover);
+        border-color: var(--zitadel-color-input-border-hover);
       }
 
       &:active {
-        @include _lgn-input-theme-property($config, 'border-color', default);
+        border-color: var(--zitadel-color-input-border);
       }
 
       &:focus {
-        @include _lgn-input-theme-property($config, 'border-color', default);
+        border-color: var(--zitadel-color-input-border);
       }
 
       // overwrite if state is warn
       &[color='warn'] {
-        border-color: lgn-color($warn, default);
+        border-color: var(--zitadel-color-warn);
       }
     }
 
     .lgn-input::placeholder,
     select::placeholder,
     .lgn-select::placeholder {
-        color: lgn-color($foreground, input-placeholder);
+        color: var(--zitadel-color-input-placeholder);
     }    
-  }
-  
-  @mixin _lgn-input-theme-property($theme, $property, $hue) {
-    $primary: map-get($theme, primary);
-    #{$property}: lgn-color($primary, $hue);
   }

@@ -1,8 +1,12 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
+	"context"
+	"net/url"
 	"time"
+
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/static"
 
 	"golang.org/x/text/language"
 
@@ -36,6 +40,9 @@ type HumanView struct {
 	LastName               string
 	NickName               string
 	DisplayName            string
+	AvatarKey              string
+	AvatarURL              string
+	PreSignedAvatar        *url.URL
 	PreferredLanguage      string
 	Gender                 Gender
 	Email                  string
@@ -245,7 +252,25 @@ func (u *UserView) GetProfile() (*Profile, error) {
 		Gender:             u.Gender,
 		PreferredLoginName: u.PreferredLoginName,
 		LoginNames:         u.LoginNames,
+		AvatarURL:          u.AvatarURL,
 	}, nil
+}
+
+func (u *UserView) FillUserAvatar(ctx context.Context, static static.Storage, expiration time.Duration) error {
+	if u.HumanView == nil {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-2k8da", "Errors.User.NotHuman")
+	}
+	if static != nil {
+		if ctx == nil {
+			ctx = context.Background()
+		}
+		presignesAvatarURL, err := static.GetObjectPresignedURL(ctx, u.ResourceOwner, u.AvatarKey, expiration)
+		if err != nil {
+			return err
+		}
+		u.PreSignedAvatar = presignesAvatarURL
+	}
+	return nil
 }
 
 func (u *UserView) GetPhone() (*Phone, error) {

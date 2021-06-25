@@ -2,16 +2,18 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"strings"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
+
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -21,11 +23,12 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore     v1.Eventstore
-	SearchLimit    uint64
-	View           *admin_view.View
-	SystemDefaults systemdefaults.SystemDefaults
-	Roles          []string
+	Eventstore      v1.Eventstore
+	SearchLimit     uint64
+	View            *admin_view.View
+	SystemDefaults  systemdefaults.SystemDefaults
+	Roles           []string
+	PrefixAvatarURL string
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -33,7 +36,7 @@ func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID stri
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.IAMMemberToModel(member), nil
+	return iam_es_model.IAMMemberToModel(member, repo.PrefixAvatarURL), nil
 }
 
 func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
@@ -51,7 +54,7 @@ func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_mo
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IAMMembersToModel(members),
+		Result:      iam_es_model.IAMMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -300,7 +303,15 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 }
 
 func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	policy, err := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *IAMRepository) GetDefaultPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStatePreview))
 	if err != nil {
 		return nil, err
 	}
@@ -330,7 +341,7 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IAMMembersToModel(members),
+		Result:      iam_es_model.IAMMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -339,21 +350,21 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
-	text, err := repo.View.MailTexts(repo.SystemDefaults.IamID)
+func (repo *IAMRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
+	text, err := repo.View.MessageTexts(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(text, true), err
+	return iam_es_model.MessageTextsViewToModel(text, true), err
 }
 
-func (repo *IAMRepository) GetDefaultMailText(ctx context.Context, textType string, language string) (*iam_model.MailTextView, error) {
-	text, err := repo.View.MailTextByIDs(repo.SystemDefaults.IamID, textType, language)
+func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
 	text.Default = true
-	return iam_es_model.MailTextViewToModel(text), err
+	return iam_es_model.MessageTextViewToModel(text), err
 }
 
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {

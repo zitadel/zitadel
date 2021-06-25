@@ -1,11 +1,12 @@
 package command
 
 import (
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
-	"golang.org/x/text/language"
 )
 
 type HumanWriteModel struct {
@@ -19,6 +20,7 @@ type HumanWriteModel struct {
 	DisplayName       string
 	PreferredLanguage language.Tag
 	Gender            domain.Gender
+	Avatar            string
 
 	Email           string
 	IsEmailVerified bool
@@ -74,6 +76,10 @@ func (wm *HumanWriteModel) Reduce() error {
 			wm.reduceHumanPhoneRemovedEvent()
 		case *user.HumanPasswordChangedEvent:
 			wm.reduceHumanPasswordChangedEvent(e)
+		case *user.HumanAvatarAddedEvent:
+			wm.Avatar = e.StoreKey
+		case *user.HumanAvatarRemovedEvent:
+			wm.Avatar = ""
 		case *user.UserLockedEvent:
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateLocked
@@ -114,6 +120,8 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPhoneChangedType,
 			user.HumanPhoneVerifiedType,
 			user.HumanPhoneRemovedType,
+			user.HumanAvatarAddedType,
+			user.HumanAvatarRemovedType,
 			user.HumanPasswordChangedType,
 			user.UserLockedType,
 			user.UserUnlockedType,

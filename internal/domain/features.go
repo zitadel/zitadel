@@ -16,6 +16,9 @@ const (
 	FeatureLoginPolicyPasswordReset = FeatureLoginPolicy + ".password_reset"
 	FeaturePasswordComplexityPolicy = "password_complexity_policy"
 	FeatureLabelPolicy              = "label_policy"
+	FeatureLabelPolicyPrivateLabel  = FeatureLabelPolicy + ".private_label"
+	FeatureLabelPolicyWatermark     = FeatureLabelPolicy + ".watermark"
+	FeatureCustomText               = "custom_text"
 	FeatureCustomDomain             = "custom_domain"
 )
 
@@ -36,8 +39,10 @@ type Features struct {
 	LoginPolicyUsernameLogin bool
 	LoginPolicyPasswordReset bool
 	PasswordComplexityPolicy bool
-	LabelPolicy              bool
+	LabelPolicyPrivateLabel  bool
+	LabelPolicyWatermark     bool
 	CustomDomain             bool
+	CustomText               bool
 }
 
 type FeaturesState int32
