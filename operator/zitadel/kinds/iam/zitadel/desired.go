@@ -12,18 +12,27 @@ import (
 
 type DesiredV0 struct {
 	Common *tree.Common `yaml:",inline"`
-	Spec   *Spec
+	//Configuration for the zitadel deployment
+	Spec *Spec
 }
 
 type Spec struct {
-	Verbose       bool
-	Force         bool
-	ReplicaCount  int                          `yaml:"replicaCount,omitempty"`
+	//Verbose flag to set debug-level to debug
+	Verbose bool
+	//Force flag to apply resources
+	Force bool
+	//Number of replicas for zitadel
+	ReplicaCount int `yaml:"replicaCount,omitempty"`
+	//Configuration for zitadel
 	Configuration *configuration.Configuration `yaml:"configuration"`
-	NodeSelector  map[string]string            `yaml:"nodeSelector,omitempty"`
-	Tolerations   []corev1.Toleration          `yaml:"tolerations,omitempty"`
-	Affinity      *k8s.Affinity                `yaml:"affinity,omitempty"`
-	Resources     *k8s.Resources               `yaml:"resources,omitempty"`
+	//Node-selector to let zitadel only on specific nodes
+	NodeSelector map[string]string `yaml:"nodeSelector,omitempty"`
+	//Tolerations on node-taints for zitadel
+	Tolerations []corev1.Toleration `yaml:"tolerations,omitempty"`
+	//Affinity for zitadel
+	Affinity *k8s.Affinity `yaml:"affinity,omitempty"`
+	//Definition for resource limits and requests for zitadel
+	Resources *k8s.Resources `yaml:"resources,omitempty"`
 }
 
 func (s *Spec) validate() (err error) {

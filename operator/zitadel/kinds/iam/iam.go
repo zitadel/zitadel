@@ -15,6 +15,10 @@ import (
 	core "k8s.io/api/core/v1"
 )
 
+const (
+	zitadelKind = "zitadel.caos.ch/ZITADEL"
+)
+
 func Adapt(
 	monitor mntr.Monitor,
 	operatorLabels *labels.Operator,
@@ -44,7 +48,7 @@ func Adapt(
 	}()
 
 	switch desiredTree.Common.Kind {
-	case "zitadel.caos.ch/ZITADEL":
+	case zitadelKind:
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
 		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
 	default:
