@@ -76,7 +76,3 @@ func TestMigration_GrantUserCommand(t *testing.T) {
 	cmd := grantUserCommand(user, file)
 	assert.Equal(t, cmd, equals)
 }
-
-func TestMigration_Image_Default(t *testing.T) {
-
-}
