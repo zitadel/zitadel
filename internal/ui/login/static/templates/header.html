@@ -1,5 +1,17 @@
 {{define "header"}}
 <header class="lgn-header">
-    <div class="lgn-logo" height="43px" width="160px" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo" ></div>
+    {{ if hasCustomPolicy .LabelPolicy }}
+        {{ $logo := customLogoResource .OrgID .LabelPolicy .DarkMode }}
+        {{if $logo}}
+            <img class="lgn-logo" src="{{$logo}}" alt="Logo">
+        {{end}}
+    {{ else }}
+
+        {{if .DarkMode }}
+            <img class="lgn-logo" src="{{ resourceThemeUrl "logo-light.svg" .Theme }}" alt="Logo">
+        {{else}}
+            <img class="lgn-logo" src="{{ resourceThemeUrl "logo-dark.svg" .Theme }}" alt="Logo">
+        {{end}}
+    {{end}}
 </header>
 {{end}}

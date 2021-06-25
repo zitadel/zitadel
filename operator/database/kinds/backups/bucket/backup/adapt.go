@@ -21,7 +21,6 @@ const (
 	backupNameEnv            = "BACKUP_NAME"
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
-	image                    = "ghcr.io/caos/zitadel-crbackup"
 	rootSecretName           = "cockroachdb.client.root"
 	timeout                  = 15 * time.Minute
 	Normal                   = "backup"
@@ -43,7 +42,7 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	features []string,
-	version string,
+	image string,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -63,8 +62,8 @@ func AdaptFunc(
 		secretName,
 		secretKey,
 		backupName,
-		version,
 		command,
+		image,
 	)
 
 	destroyers := []operator.DestroyFunc{}

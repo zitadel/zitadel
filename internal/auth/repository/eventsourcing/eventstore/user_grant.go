@@ -21,11 +21,12 @@ import (
 )
 
 type UserGrantRepo struct {
-	SearchLimit uint64
-	View        *view.View
-	IamID       string
-	Auth        authz.Config
-	AuthZRepo   *authz_repo.EsRepository
+	SearchLimit     uint64
+	View            *view.View
+	IamID           string
+	Auth            authz.Config
+	AuthZRepo       *authz_repo.EsRepository
+	PrefixAvatarURL string
 }
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
@@ -44,7 +45,7 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      model.UserGrantsToModel(grants),
+		Result:      model.UserGrantsToModel(grants, repo.PrefixAvatarURL),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -234,7 +235,7 @@ func (repo *UserGrantRepo) UserGrantsByProjectAndUserID(projectID, userID string
 	if err != nil {
 		return nil, err
 	}
-	return model.UserGrantsToModel(grants), nil
+	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectOrgSearchResponse, error) {

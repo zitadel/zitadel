@@ -9,11 +9,13 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static"
 )
 
 type Config struct {
 	SearchLimit uint64
 	Domain      string
+	APIDomain   string
 	Eventstore  v1.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
@@ -30,7 +32,7 @@ type EsRepository struct {
 	view *mgmt_view.View
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, queries *query.Queries) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, queries *query.Queries, staticStorage static.Storage) (*EsRepository, error) {
 
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
@@ -46,14 +48,15 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, staticStorage)
+	assetsAPI := conf.APIDomain + "/assets/v1/"
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, view, roles, systemDefaults},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID},
-		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults},
-		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, view, roles, systemDefaults, assetsAPI},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},
+		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view, assetsAPI},
 		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
 		FeaturesRepo:  eventstore.FeaturesRepo{es, view, conf.SearchLimit, systemDefaults},
 		view:          view,

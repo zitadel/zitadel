@@ -65,7 +65,7 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 
 func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2N8fs", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M58wd", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)

@@ -99,9 +99,9 @@ func TestMigration_AdaptFunc(t *testing.T) {
 				Spec: corev1.PodSpec{
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,
-					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
+					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, ""),
 					Containers: []corev1.Container{
-						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users),
+						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, ""),
 					},
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
@@ -163,6 +163,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 		users,
 		nodeselector,
 		tolerations,
+		"",
 	)
 
 	queried := map[string]interface{}{}

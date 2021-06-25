@@ -3,6 +3,7 @@
   "mgmtServiceUrl": "https://api.zitadel.dev",
   "adminServiceUrl":"https://api.zitadel.dev",
   "subscriptionServiceUrl":"https://sub.zitadel.dev",
+  "assetServiceUrl":"https://api.zitadel.dev",
   "issuer": "https://issuer.zitadel.dev",
   "clientid": "70669160379706195@zitadel"
 }

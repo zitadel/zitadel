@@ -101,5 +101,28 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	mailKey := "emailappkey"
 	secrets[mailKey] = conf.Notifications.Email.AppKey
 	existing[mailKey] = conf.Notifications.Email.ExistingAppKey
+
+	if conf.AssetStorage == nil {
+		conf.AssetStorage = &configuration.AssetStorage{}
+	}
+	if conf.AssetStorage.AccessKeyID == nil {
+		conf.AssetStorage.AccessKeyID = &secret.Secret{}
+	}
+	if conf.AssetStorage.ExistingAccessKeyID == nil {
+		conf.AssetStorage.ExistingAccessKeyID = &secret.Existing{}
+	}
+	if conf.AssetStorage.SecretAccessKey == nil {
+		conf.AssetStorage.SecretAccessKey = &secret.Secret{}
+	}
+	if conf.AssetStorage.ExistingSecretAccessKey == nil {
+		conf.AssetStorage.ExistingSecretAccessKey = &secret.Existing{}
+	}
+	accessKey := "accesskeyid"
+	secrets[accessKey] = conf.AssetStorage.AccessKeyID
+	existing[accessKey] = conf.AssetStorage.ExistingAccessKeyID
+
+	secretKey := "secretaccesskey"
+	secrets[secretKey] = conf.AssetStorage.SecretAccessKey
+	existing[secretKey] = conf.AssetStorage.ExistingSecretAccessKey
 	return secrets, existing
 }

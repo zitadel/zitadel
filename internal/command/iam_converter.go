@@ -39,6 +39,7 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 		AllowUsernamePassword: wm.AllowUserNamePassword,
 		AllowRegister:         wm.AllowRegister,
 		AllowExternalIDP:      wm.AllowExternalIDP,
+		HidePasswordReset:     wm.HidePasswordReset,
 		ForceMFA:              wm.ForceMFA,
 		PasswordlessType:      wm.PasswordlessType,
 	}
@@ -48,8 +49,16 @@ func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
 		PrimaryColor:        wm.PrimaryColor,
-		SecondaryColor:      wm.SecondaryColor,
+		BackgroundColor:     wm.BackgroundColor,
+		WarnColor:           wm.WarnColor,
+		FontColor:           wm.FontColor,
+		PrimaryColorDark:    wm.PrimaryColorDark,
+		BackgroundColorDark: wm.BackgroundColorDark,
+		WarnColorDark:       wm.WarnColorDark,
+		FontColorDark:       wm.FontColorDark,
 		HideLoginNameSuffix: wm.HideLoginNameSuffix,
+		ErrorMsgPopup:       wm.ErrorMsgPopup,
+		DisableWatermark:    wm.DisableWatermark,
 	}
 }
 
@@ -57,21 +66,6 @@ func writeModelToMailTemplate(wm *MailTemplateWriteModel) *domain.MailTemplate {
 	return &domain.MailTemplate{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
 		Template:   wm.Template,
-	}
-}
-
-func writeModelToMailText(wm *MailTextWriteModel) *domain.MailText {
-	return &domain.MailText{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-		MailTextType: wm.MailTextType,
-		Language:     wm.Language,
-		Title:        wm.Title,
-		PreHeader:    wm.PreHeader,
-		Subject:      wm.Subject,
-		Greeting:     wm.Greeting,
-		Text:         wm.Text,
-		ButtonText:   wm.ButtonText,
-		State:        wm.State,
 	}
 }
 
@@ -89,18 +83,13 @@ func writeModelToMailTemplatePolicy(wm *MailTemplateWriteModel) *domain.MailTemp
 	}
 }
 
-func writeModelToMailTextPolicy(wm *MailTextWriteModel) *domain.MailText {
-	return &domain.MailText{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-		State:        wm.State,
-		MailTextType: wm.MailTextType,
-		Language:     wm.Language,
-		Title:        wm.Title,
-		PreHeader:    wm.PreHeader,
-		Subject:      wm.Subject,
-		Greeting:     wm.Greeting,
-		Text:         wm.Text,
-		ButtonText:   wm.ButtonText,
+func writeModelToCustomText(wm *CustomTextWriteModel) *domain.CustomText {
+	return &domain.CustomText{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		State:      wm.State,
+		Key:        wm.Key,
+		Language:   wm.Language,
+		Text:       wm.Text,
 	}
 }
 
@@ -175,6 +164,8 @@ func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
 		LoginPolicyRegistration:  wm.LoginPolicyRegistration,
 		LoginPolicyUsernameLogin: wm.LoginPolicyUsernameLogin,
 		PasswordComplexityPolicy: wm.PasswordComplexityPolicy,
-		LabelPolicy:              wm.LabelPolicy,
+		LabelPolicyPrivateLabel:  wm.LabelPolicyPrivateLabel,
+		LabelPolicyWatermark:     wm.LabelPolicyWatermark,
+		CustomDomain:             wm.CustomDomain,
 	}
 }

@@ -52,8 +52,8 @@ func getJobSpecDef(
 	secretName string,
 	secretKey string,
 	backupName string,
-	version string,
 	command string,
+	image string,
 ) batchv1.JobSpec {
 	return batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -63,7 +63,7 @@ func getJobSpecDef(
 				Tolerations:   tolerations,
 				Containers: []corev1.Container{{
 					Name:  backupName,
-					Image: image + ":" + version,
+					Image: image,
 					Command: []string{
 						"/bin/bash",
 						"-c",

@@ -1,4 +1,4 @@
-function ComplexityPolicyCheck(policyElement, pwNew) {
+function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
     let minLength = policyElement.dataset.minlength;
     let upperRegex = policyElement.dataset.hasUppercase;
     let lowerRegex = policyElement.dataset.hasLowercase;
@@ -54,6 +54,14 @@ function ComplexityPolicyCheck(policyElement, pwNew) {
             InvalidPolicy(symbol);
             valid = false;
         }
+    }
+    let confirmation = document.getElementById('confirmation');
+    if (pwNew === pwNewConfirmation && pwNewConfirmation !== "" ) {
+        ValidPolicy(confirmation);
+        valid = true;
+    } else {
+        InvalidPolicy(confirmation);
+        valid = false;
     }
     return valid;
 }

@@ -65,7 +65,8 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
-	forceMFA bool,
+	forceMFA,
+	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
 ) (*org.LoginPolicyChangedEvent, bool) {
 
@@ -81,6 +82,9 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.ForceMFA != forceMFA {
 		changes = append(changes, policy.ChangeForceMFA(forceMFA))
+	}
+	if wm.HidePasswordReset != hidePasswordReset {
+		changes = append(changes, policy.ChangeHidePasswordReset(hidePasswordReset))
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))

@@ -66,6 +66,8 @@ func (l *Login) generatePolicyDescription(r *http.Request, policy *iam_model.Pas
 		hassymbol := l.renderer.LocalizeFromRequest(r, "Password.HasSymbol", nil)
 		description += "<li id=\"symbol\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + hassymbol + "</span></li>"
 	}
+	confirmation := l.renderer.LocalizeFromRequest(r, "Password.Confirmation", nil)
+	description += "<li id=\"confirmation\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + confirmation + "</span></li>"
 
 	description += "</ul>"
 	return description, nil

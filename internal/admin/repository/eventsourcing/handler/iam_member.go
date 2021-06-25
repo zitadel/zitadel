@@ -110,7 +110,8 @@ func (m *IAMMember) processIAMMember(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case model.IAMMemberRemoved:
+	case model.IAMMemberRemoved,
+		model.IAMMemberCascadeRemoved:
 		err := member.SetData(event)
 		if err != nil {
 			return err
@@ -131,7 +132,9 @@ func (m *IAMMember) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		members, err := m.view.IAMMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -164,6 +167,9 @@ func (m *IAMMember) fillData(member *iam_view_model.IAMMemberView) (err error) {
 
 func (m *IAMMember) fillUserData(member *iam_view_model.IAMMemberView, user *view_model.UserView) error {
 	org, err := m.getOrgByID(context.Background(), user.ResourceOwner)
+	if err != nil {
+		return err
+	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
 		policy, err = m.getDefaultOrgIAMPolicy(context.TODO())
@@ -173,11 +179,13 @@ func (m *IAMMember) fillUserData(member *iam_view_model.IAMMemberView, user *vie
 	}
 	member.UserName = user.UserName
 	member.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	member.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.DisplayName = user.FirstName + " " + user.LastName
 		member.Email = user.Email
+		member.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name

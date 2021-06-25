@@ -8,9 +8,15 @@ import (
 type LabelPolicyReadModel struct {
 	eventstore.ReadModel
 
-	PrimaryColor   string
-	SecondaryColor string
-	IsActive       bool
+	PrimaryColor        string
+	BackgroundColor     string
+	WarnColor           string
+	FontColor           string
+	PrimaryColorDark    string
+	BackgroundColorDark string
+	WarnColorDark       string
+	FontColorDark       string
+	IsActive            bool
 }
 
 func (rm *LabelPolicyReadModel) Reduce() error {
@@ -18,14 +24,38 @@ func (rm *LabelPolicyReadModel) Reduce() error {
 		switch e := event.(type) {
 		case *policy.LabelPolicyAddedEvent:
 			rm.PrimaryColor = e.PrimaryColor
-			rm.SecondaryColor = e.SecondaryColor
+			rm.BackgroundColor = e.BackgroundColor
+			rm.FontColor = e.FontColor
+			rm.WarnColor = e.WarnColor
+			rm.PrimaryColorDark = e.PrimaryColorDark
+			rm.BackgroundColorDark = e.BackgroundColorDark
+			rm.FontColorDark = e.FontColorDark
+			rm.WarnColorDark = e.WarnColorDark
 			rm.IsActive = true
 		case *policy.LabelPolicyChangedEvent:
 			if e.PrimaryColor != nil {
 				rm.PrimaryColor = *e.PrimaryColor
 			}
-			if e.SecondaryColor != nil {
-				rm.SecondaryColor = *e.SecondaryColor
+			if e.BackgroundColor != nil {
+				rm.BackgroundColor = *e.BackgroundColor
+			}
+			if e.WarnColor != nil {
+				rm.WarnColor = *e.WarnColor
+			}
+			if e.FontColor != nil {
+				rm.FontColor = *e.FontColor
+			}
+			if e.PrimaryColorDark != nil {
+				rm.PrimaryColorDark = *e.PrimaryColorDark
+			}
+			if e.BackgroundColorDark != nil {
+				rm.BackgroundColorDark = *e.BackgroundColorDark
+			}
+			if e.WarnColorDark != nil {
+				rm.WarnColorDark = *e.WarnColorDark
+			}
+			if e.FontColorDark != nil {
+				rm.FontColorDark = *e.FontColorDark
 			}
 		case *policy.LabelPolicyRemovedEvent:
 			rm.IsActive = false

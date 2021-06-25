@@ -39,6 +39,11 @@ func (wm *ProjectMemberWriteModel) AppendEvents(events ...eventstore.EventReader
 				continue
 			}
 			wm.MemberWriteModel.AppendEvents(&e.MemberRemovedEvent)
+		case *project.MemberCascadeRemovedEvent:
+			if e.UserID != wm.MemberWriteModel.UserID {
+				continue
+			}
+			wm.MemberWriteModel.AppendEvents(&e.MemberCascadeRemovedEvent)
 		}
 	}
 }
@@ -55,6 +60,7 @@ func (wm *ProjectMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.MemberWriteModel.AggregateID).
 		EventTypes(project.MemberAddedType,
 			project.MemberChangedType,
-			project.MemberRemovedType).
+			project.MemberRemovedType,
+			project.MemberCascadeRemovedType).
 		Builder()
 }

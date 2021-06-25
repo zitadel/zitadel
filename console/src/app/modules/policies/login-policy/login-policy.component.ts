@@ -22,10 +22,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { CnslLinks } from '../../links/links.component';
 import {
   IAM_COMPLEXITY_LINK,
-  IAM_LABEL_LINK,
   IAM_POLICY_LINK,
+  IAM_PRIVATELABEL_LINK,
   ORG_COMPLEXITY_LINK,
   ORG_IAM_POLICY_LINK,
+  ORG_PRIVATELABEL_LINK,
 } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
@@ -69,6 +70,7 @@ export class LoginPolicyComponent implements OnDestroy {
           this.nextLinks = [
             ORG_COMPLEXITY_LINK,
             ORG_IAM_POLICY_LINK,
+            ORG_PRIVATELABEL_LINK,
           ];
           break;
         case PolicyComponentServiceType.ADMIN:
@@ -80,7 +82,7 @@ export class LoginPolicyComponent implements OnDestroy {
           this.nextLinks = [
             IAM_COMPLEXITY_LINK,
             IAM_POLICY_LINK,
-            IAM_LABEL_LINK,
+            IAM_PRIVATELABEL_LINK,
           ];
           break;
       }
@@ -96,7 +98,7 @@ export class LoginPolicyComponent implements OnDestroy {
       if (resp.policy) {
         this.loginData = resp.policy;
         this.loading = false;
-        this.disabled = this.isDefault ?? false;
+        this.disabled = this.isDefault;
       }
     });
     this.getIdps().then(resp => {
@@ -143,6 +145,7 @@ export class LoginPolicyComponent implements OnDestroy {
         mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
+        mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
@@ -155,6 +158,7 @@ export class LoginPolicyComponent implements OnDestroy {
         adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
+        adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }

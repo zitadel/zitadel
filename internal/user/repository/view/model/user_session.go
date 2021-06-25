@@ -7,6 +7,7 @@ import (
 	"github.com/caos/logging"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -30,6 +31,7 @@ type UserSessionView struct {
 	UserName                     string    `json:"-" gorm:"column:user_name"`
 	LoginName                    string    `json:"-" gorm:"column:login_name"`
 	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
+	AvatarKey                    string    `json:"-" gorm:"column:avatar_key"`
 	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
 	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
@@ -50,7 +52,7 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 	return v, nil
 }
 
-func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
+func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *model.UserSessionView {
 	return &model.UserSessionView{
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
@@ -61,6 +63,8 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		UserName:                     userSession.UserName,
 		LoginName:                    userSession.LoginName,
 		DisplayName:                  userSession.DisplayName,
+		AvatarKey:                    userSession.AvatarKey,
+		AvatarURL:                    domain.AvatarURL(prefixAvatarURL, userSession.ResourceOwner, userSession.AvatarKey),
 		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
 		PasswordVerification:         userSession.PasswordVerification,
 		PasswordlessVerification:     userSession.PasswordlessVerification,
@@ -73,10 +77,10 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	}
 }
 
-func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionView {
+func UserSessionsToModel(userSessions []*UserSessionView, prefixAvatarURL string) []*model.UserSessionView {
 	result := make([]*model.UserSessionView, len(userSessions))
 	for i, s := range userSessions {
-		result[i] = UserSessionToModel(s)
+		result[i] = UserSessionToModel(s, prefixAvatarURL)
 	}
 	return result
 }

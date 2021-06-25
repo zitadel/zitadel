@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -30,8 +31,8 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults) []query.Handler {
-	return []query.Handler{
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage, localDevMode bool) []query.Handler {
+	handlers := []query.Handler{
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newIAMMember(
@@ -61,11 +62,18 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			defaults),
 		newMailTemplate(
 			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
-		newMailText(
-			handler{view, bulkLimit, configs.cycleDuration("MailText"), errorCount, es}),
+		newMessageText(
+			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
 		newFeatures(
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}
+	if static != nil {
+		handlers = append(handlers, newStyling(
+			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
+			static,
+			localDevMode))
+	}
+	return handlers
 }
 
 func (configs Configs) cycleDuration(viewModel string) time.Duration {

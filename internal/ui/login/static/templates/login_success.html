@@ -1,0 +1,32 @@
+{{template "main-top" .}}
+
+
+<div class="lgn-head">
+    <h1>{{t "LoginSuccess.Title"}}</h1>
+
+    {{ template "user-profile" . }}
+
+    {{if .RedirectURI}}
+    <p>{{t "LoginSuccess.AutoRedirect"}}</p>
+</div>
+
+<form action="{{ .RedirectURI }}" method="GET">
+
+    <input type="hidden" name="id" value="{{ .AuthReqID }}" />
+
+    {{ template "error-message" .}}
+
+    <div class="lgn-actions">
+        <span class="fill-space"></span>
+        <button id="redirect-button" class="lgn-raised-button lgn-primary">{{t "Actions.Next"}}</button>
+    </div>
+
+</form>
+
+<script src="{{ resourceUrl "scripts/login_success.js" }}"></script>
+{{else}}
+    <p>{{t "LoginSuccess.Redirected"}}</p>
+</div>
+{{end}}
+
+{{template "main-bottom" .}}

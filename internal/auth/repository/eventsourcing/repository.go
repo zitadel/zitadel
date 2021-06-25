@@ -24,6 +24,7 @@ import (
 type Config struct {
 	SearchLimit uint64
 	Domain      string
+	APIDomain   string
 	Eventstore  v1.Config
 	AuthRequest cache.Config
 	View        types.SQL
@@ -63,7 +64,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	}
 	idGenerator := id.SonyFlakeGenerator
 
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator)
+	assetsAPI := conf.APIDomain + "/assets/v1/"
+
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator, assetsAPI)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +81,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	locker := spooler.NewLocker(sqlClient)
 
 	userRepo := eventstore.UserRepo{
-		SearchLimit:    conf.SearchLimit,
-		Eventstore:     es,
-		View:           view,
-		SystemDefaults: systemDefaults,
+		SearchLimit:     conf.SearchLimit,
+		Eventstore:      es,
+		View:            view,
+		SystemDefaults:  systemDefaults,
+		PrefixAvatarURL: assetsAPI,
 	}
 	return &EsRepository{
 		spool,

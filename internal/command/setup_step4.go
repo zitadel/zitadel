@@ -2,15 +2,16 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
 type Step4 struct {
-	DefaultPasswordLockoutPolicy iam_model.PasswordLockoutPolicy
+	DefaultPasswordLockoutPolicy domain.PasswordLockoutPolicy
 }
 
 func (s *Step4) Step() domain.Step {

@@ -3,42 +3,40 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/golang/protobuf/ptypes"
 	"strings"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-const (
-	orgOwnerRole = "ORG_OWNER"
-)
-
 type OrgRepository struct {
-	SearchLimit    uint64
-	Eventstore     v1.Eventstore
-	View           *mgmt_view.View
-	Roles          []string
-	SystemDefaults systemdefaults.SystemDefaults
+	SearchLimit     uint64
+	Eventstore      v1.Eventstore
+	View            *mgmt_view.View
+	Roles           []string
+	SystemDefaults  systemdefaults.SystemDefaults
+	PrefixAvatarURL string
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -104,10 +102,13 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	}
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierId
+		change.ModifierLoginName = change.ModifierId
 		user, _ := repo.userByID(ctx, change.ModifierId)
 		if user != nil {
+			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
-				change.ModifierName = user.DisplayName
+				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name
@@ -122,7 +123,7 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 	if err != nil {
 		return nil, err
 	}
-	return model.OrgMemberToModel(member), nil
+	return model.OrgMemberToModel(member, repo.PrefixAvatarURL), nil
 }
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
@@ -141,7 +142,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      model.OrgMembersToModel(members),
+		Result:      model.OrgMembersToModel(members, repo.PrefixAvatarURL),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -195,9 +196,24 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 }
 
 func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.View.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
-		policy, err = repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.LabelPolicyViewToModel(policy), err
+}
+
+func (repo *OrgRepository) GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	policy, err := repo.View.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, int32(domain.LabelPolicyStatePreview))
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return nil, err
 		}
@@ -210,7 +226,15 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.Label
 }
 
 func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, viewErr := repo.View.LabelPolicyByAggregateID(repo.SystemDefaults.IamID)
+	return repo.getDefaultLabelPolicy(ctx, domain.LabelPolicyStateActive)
+}
+
+func (repo *OrgRepository) GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
+	return repo.getDefaultLabelPolicy(ctx, domain.LabelPolicyStatePreview)
+}
+
+func (repo *OrgRepository) getDefaultLabelPolicy(ctx context.Context, state domain.LabelPolicyState) (*iam_model.LabelPolicyView, error) {
+	policy, viewErr := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(state))
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -526,19 +550,19 @@ func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.Mail
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *OrgRepository) GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
-	texts, err := repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+func (repo *OrgRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
+	texts, err := repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(texts, true), err
+	return iam_es_model.MessageTextsViewToModel(texts, true), err
 }
 
-func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error) {
+func (repo *OrgRepository) GetMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
 	defaultIn := false
-	texts, err := repo.View.MailTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
+	texts, err := repo.View.MessageTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) || len(texts) == 0 {
-		texts, err = repo.View.MailTextsByAggregateID(repo.SystemDefaults.IamID)
+		texts, err = repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
 		if err != nil {
 			return nil, err
 		}
@@ -547,7 +571,31 @@ func (repo *OrgRepository) GetMailTexts(ctx context.Context) (*iam_model.MailTex
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTextsViewToModel(texts, defaultIn), err
+	return iam_es_model.MessageTextsViewToModel(texts, defaultIn), err
+}
+
+func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
+	if err != nil {
+		return nil, err
+	}
+	text.Default = true
+	return iam_es_model.MessageTextViewToModel(text), err
+}
+
+func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, lang string) (*iam_model.MessageTextView, error) {
+	text, err := repo.View.MessageTextByIDs(orgID, textType, lang)
+	if errors.IsNotFound(err) {
+		result, err := repo.GetDefaultMessageText(ctx, textType, lang)
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.MessageTextViewToModel(text), err
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
@@ -607,18 +655,18 @@ func (repo *OrgRepository) userByID(ctx context.Context, id string) (*usr_model.
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return usr_es_model.UserToModel(user), nil
+		return usr_es_model.UserToModel(user, repo.PrefixAvatarURL), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_es_model.UserToModel(user), nil
+			return usr_es_model.UserToModel(user, repo.PrefixAvatarURL), nil
 		}
 	}
 	if userCopy.State == int32(usr_es_model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3n8Fs", "Errors.User.NotFound")
 	}
-	return usr_es_model.UserToModel(&userCopy), nil
+	return usr_es_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (r *OrgRepository) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
