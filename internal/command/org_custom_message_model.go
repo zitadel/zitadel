@@ -42,13 +42,16 @@ func (wm *OrgCustomMessageTextReadModel) Reduce() error {
 }
 
 func (wm *OrgCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,
-			org.CustomTextTemplateRemovedEventType)
+			org.CustomTextTemplateRemovedEventType).
+		Builder()
 }
 
 type OrgCustomMessageTemplatesReadModel struct {
@@ -85,11 +88,14 @@ func (wm *OrgCustomMessageTemplatesReadModel) Reduce() error {
 }
 
 func (wm *OrgCustomMessageTemplatesReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.CustomMessageTemplatesReadModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.CustomMessageTemplatesReadModel.AggregateID).
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,
-			org.CustomTextTemplateRemovedEventType)
+			org.CustomTextTemplateRemovedEventType).
+		Builder()
 }
