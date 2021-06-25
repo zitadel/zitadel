@@ -20,6 +20,7 @@ require (
 	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
+	github.com/envoyproxy/protoc-gen-validate v0.6.1 // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.6.0
