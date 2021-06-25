@@ -1,10 +1,11 @@
 package deployment
 
 import (
-	"github.com/stretchr/testify/assert"
-	corev1 "k8s.io/api/core/v1"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func TestDeployment_GetInitContainer(t *testing.T) {
@@ -35,7 +36,7 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 
-	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "")
 
 	assert.Equal(t, equals, init)
 }
@@ -68,7 +69,7 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 		ImagePullPolicy:          corev1.PullIfNotPresent,
 	}
 
-	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "")
 
 	assert.Equal(t, equals, init)
 }
@@ -104,7 +105,7 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 
-	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser)
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "")
 
 	assert.Equal(t, equals, init)
 }

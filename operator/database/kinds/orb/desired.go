@@ -19,8 +19,8 @@ type Spec struct {
 	Tolerations     []corev1.Toleration `json:"tolerations,omitempty" yaml:"tolerations,omitempty"`
 	Version         string              `json:"version,omitempty" yaml:"version,omitempty"`
 	SelfReconciling bool                `json:"selfReconciling" yaml:"selfReconciling"`
-	//Use this registry to pull the Database operator image from
-	//@default: ghcr.io
+	//Use this registry to pull container images from
+	//@default: <multiple public registries>
 	CustomImageRegistry string `json:"customImageRegistry,omitempty" yaml:"customImageRegistry,omitempty"`
 }
 

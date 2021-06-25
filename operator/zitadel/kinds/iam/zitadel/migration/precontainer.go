@@ -1,8 +1,11 @@
 package migration
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	"strings"
+
+	"github.com/caos/zitadel/operator/common"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 func getPreContainer(
@@ -10,11 +13,13 @@ func getPreContainer(
 	dbPort string,
 	migrationUser string,
 	secretPasswordName string,
+	customImageRegistry string,
 ) []corev1.Container {
+
 	return []corev1.Container{
 		{
 			Name:  "check-db-ready",
-			Image: "postgres:9.6.17",
+			Image: common.PostgresImage.Reference(customImageRegistry),
 			Command: []string{
 				"sh",
 				"-c",
@@ -26,7 +31,7 @@ func getPreContainer(
 		},
 		{
 			Name:  "create-flyway-user",
-			Image: "cockroachdb/cockroach:v20.2.3",
+			Image: common.CockroachImage.Reference(customImageRegistry),
 			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
 			VolumeMounts: []corev1.VolumeMount{{
 				Name:      rootUserInternal,
