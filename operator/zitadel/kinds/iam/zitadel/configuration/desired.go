@@ -19,7 +19,7 @@ type Configuration struct {
 	DNS                 *DNS           `yaml:"dns"`
 	ClusterDNS          string         `yaml:"clusterdns"`
 	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
-	Sentry              *Sentry        `yaml:"Sentry,omitempty"`
+	Sentry              *Sentry        `yaml:"sentry,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
