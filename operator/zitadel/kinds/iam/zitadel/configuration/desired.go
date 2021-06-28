@@ -19,6 +19,7 @@ type Configuration struct {
 	DNS                 *DNS           `yaml:"dns"`
 	ClusterDNS          string         `yaml:"clusterdns"`
 	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
+	Sentry              *Sentry        `yaml:"Sentry,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
@@ -141,4 +142,11 @@ type Cache struct {
 	SharedMaxAge      string `yaml:"sharedMaxAge,omitempty"`
 	ShortMaxAge       string `yaml:"shortMaxAge,omitempty"`
 	ShortSharedMaxAge string `yaml:"shortSharedMaxAge,omitempty"`
+}
+
+type Sentry struct {
+	SentryDSN         *secret.Secret   `yaml:"SentryDSN,omitempty"`
+	ExistingSentryDSN *secret.Existing `yaml:"SentryDSN,omitempty"`
+	Environment       string           `yaml:"environment,omitempty"`
+	Version           string           `yaml:"version,omitempty"`
 }
