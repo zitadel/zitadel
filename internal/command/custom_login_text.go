@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) getAllLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
+func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
 	events := make([]eventstore.EventPusher, 0)
 	events = append(events, c.getSelectLoginTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.getLoginTextEvents(ctx, agg, existingText, text, defaultText)...)

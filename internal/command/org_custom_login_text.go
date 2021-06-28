@@ -40,7 +40,7 @@ func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggre
 	if err != nil {
 		return nil, nil, err
 	}
-	events := c.getAllLoginTextEvents(ctx, orgAgg, &existingLoginText.CustomLoginTextReadModel, loginText, false)
+	events := c.createAllLoginTextEvents(ctx, orgAgg, &existingLoginText.CustomLoginTextReadModel, loginText, false)
 	return events, existingLoginText, nil
 }
 

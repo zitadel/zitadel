@@ -97,14 +97,15 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
+	translator := l.getTranslator(authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "Init User", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "Init User", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
 		PasswordSet: passwordSet,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
+	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, nil, userID)
 	if policy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
@@ -121,10 +122,10 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 			data.HasNumber = NumberRegex
 		}
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUser], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	data := l.getUserData(r, authReq, "User Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplInitUserDone], data, nil)
 }

@@ -49,28 +49,28 @@ const (
 
 func (f LabelPolicy) IsValid() error {
 	if !colorRegex.MatchString(f.PrimaryColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.PasswordLabel.Invalid.PrimaryColor")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.Label.Invalid.PrimaryColor")
 	}
 	if !colorRegex.MatchString(f.BackgroundColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-502F1", "Errors.Policy.PasswordLabel.Invalid.BackgroundColor")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-502F1", "Errors.Policy.Label.Invalid.BackgroundColor")
 	}
 	if !colorRegex.MatchString(f.WarnColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-nvw33", "Errors.Policy.PasswordLabel.Invalid.WarnColor")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-nvw33", "Errors.Policy.Label.Invalid.WarnColor")
 	}
 	if !colorRegex.MatchString(f.FontColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-93mSf", "Errors.Policy.PasswordLabel.Invalid.FontColor")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-93mSf", "Errors.Policy.Label.Invalid.FontColor")
 	}
 	if !colorRegex.MatchString(f.PrimaryColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.PasswordLabel.Invalid.PrimaryColorDark")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.Label.Invalid.PrimaryColorDark")
 	}
 	if !colorRegex.MatchString(f.BackgroundColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-llsp2", "Errors.Policy.PasswordLabel.Invalid.BackgroundColorDark")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-llsp2", "Errors.Policy.Label.Invalid.BackgroundColorDark")
 	}
 	if !colorRegex.MatchString(f.WarnColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-2b6sf", "Errors.Policy.PasswordLabel.Invalid.WarnColorDark")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-2b6sf", "Errors.Policy.Label.Invalid.WarnColorDark")
 	}
 	if !colorRegex.MatchString(f.FontColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-3M0fs", "Errors.Policy.PasswordLabel.Invalid.FontColorDark")
+		return caos_errs.ThrowInvalidArgument(nil, "POLICY-3M0fs", "Errors.Policy.Label.Invalid.FontColorDark")
 	}
 	return nil
 }

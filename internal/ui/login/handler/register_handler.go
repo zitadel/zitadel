@@ -96,14 +96,15 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	translator := l.getTranslator(authRequest)
 	if formData == nil {
 		formData = new(registerFormData)
 	}
 	if formData.Language == "" {
-		formData.Language = l.renderer.Lang(r).String()
+		formData.Language = l.renderer.ReqLang(translator, r).String()
 	}
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, translator, "Register", errID, errMessage),
 		registerFormData: *formData,
 	}
 
@@ -118,7 +119,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		resourceOwner = iam.GlobalOrgID
 	}
 
-	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, resourceOwner)
+	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, resourceOwner)
 	if pwPolicy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = pwPolicy.MinLength
@@ -157,7 +158,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			return formData.Gender == g
 		},
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
 func (d registerFormData) toHumanDomain() *domain.Human {

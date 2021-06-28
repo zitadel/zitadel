@@ -77,5 +77,5 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, funcs)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLogin], data, funcs)
 }

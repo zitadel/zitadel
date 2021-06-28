@@ -384,7 +384,7 @@ func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	}
 	loginText := new(domain.CustomLoginText)
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+		return nil, caos_errs.ThrowInternal(err, "TEXT-GHR3Q", "Errors.TranslationFile.ReadError")
 	}
 	return loginText, nil
 }

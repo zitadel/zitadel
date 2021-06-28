@@ -8,10 +8,9 @@ import (
 	"path"
 	"strings"
 
-	i18n2 "github.com/nicksnyder/go-i18n/v2/i18n"
-
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
+	i18n2 "github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -285,13 +284,13 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		msg = err.Error()
 	}
-	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
+	data := l.getBaseData(r, authReq, l.getTranslator(authReq), "Error", "Internal", msg)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, l.getTranslator(authReq), title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -300,14 +299,13 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
-	l.renderer.CopyDefaultBundle()
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, title string, errType, errMessage string) baseData {
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.Lang(r).String(),
+		Lang:                   l.renderer.ReqLang(translator, r).String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
@@ -324,12 +322,19 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
-		l.addLoginTranslations(authReq.DefaultTranslations)
-		l.addLoginTranslations(authReq.OrgTranslations)
 	} else {
 		//TODO: How to handle LabelPolicy if no auth req (eg Register)
 	}
 	return baseData
+}
+
+func (l *Login) getTranslator(authReq *domain.AuthRequest) *i18n.Translator {
+	translator, _ := l.renderer.NewTranslator()
+	if authReq != nil {
+		l.addLoginTranslations(translator, authReq.DefaultTranslations)
+		l.addLoginTranslations(translator, authReq.OrgTranslations)
+	}
+	return translator
 }
 
 func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
@@ -351,7 +356,7 @@ func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
-		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
+		localized := l.renderer.LocalizeFromRequest(l.getTranslator(nil), r, caosErr.Message, nil)
 		return caosErr.ID, localized
 
 	}
@@ -411,13 +416,13 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
 
-func (l *Login) addLoginTranslations(customTexts []*domain.CustomText) {
+func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []*domain.CustomText) {
 	for _, text := range customTexts {
 		msg := &i18n2.Message{
-			ID: text.Key,
+			ID:    text.Key,
 			Other: text.Text,
 		}
-		l.renderer.AddMessages(text.Language, msg)
+		l.renderer.AddMessages(translator, text.Language, msg)
 	}
 }
 

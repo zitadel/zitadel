@@ -69,7 +69,8 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data.baseData = l.getBaseData(r, authReq, "MFA Init Verify", errID, errMessage)
+	translator := l.getTranslator(authReq)
+	data.baseData = l.getBaseData(r, authReq, translator, "MFA Init Verify", errID, errMessage)
 	data.profileData = l.getProfileData(authReq)
 	if data.MFAType == domain.MFATypeOTP {
 		code, err := generateQrCode(data.otpData.Url)
@@ -78,7 +79,7 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 		}
 	}
 
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAInitVerify], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAInitVerify], data, nil)
 }
 
 func generateQrCode(url string) (string, error) {

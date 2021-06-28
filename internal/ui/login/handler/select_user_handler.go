@@ -16,12 +16,13 @@ type userSelectionFormData struct {
 }
 
 func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectionData *domain.SelectUserStep) {
+	translator := l.getTranslator(authReq)
 	data := userSelectionData{
-		baseData: l.getBaseData(r, authReq, "Select User", "", ""),
+		baseData: l.getBaseData(r, authReq, translator, "Select User", "", ""),
 		Users:    selectionData.Users,
 		Linking:  len(authReq.LinkingUsers) > 0,
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplUserSelection], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplUserSelection], data, nil)
 }
 
 func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {

@@ -29,7 +29,7 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 			return true
 		},
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPassword], data, funcs)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplPassword], data, funcs)
 }
 
 func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {

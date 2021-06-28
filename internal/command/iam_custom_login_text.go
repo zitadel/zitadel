@@ -37,7 +37,7 @@ func (c *Commands) setCustomIAMLoginText(ctx context.Context, iamAgg *eventstore
 	if err != nil {
 		return nil, nil, err
 	}
-	events := c.getAllLoginTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, true)
+	events := c.createAllLoginTextEvents(ctx, iamAgg, &existingLoginText.CustomLoginTextReadModel, text, true)
 	return events, existingLoginText, nil
 }
 

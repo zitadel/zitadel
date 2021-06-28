@@ -31,7 +31,7 @@ func (c *Commands) SetupStep7(ctx context.Context, step *Step7) error {
 		if err != nil {
 			return nil, err
 		}
-		logging.Log("SETUP-Dggsg").Info("added Provider0 to 2FA login policy")
+		logging.Log("SETUP-Dggsg").Info("added OTP to 2FA login policy")
 		return []eventstore.EventPusher{event}, nil
 	}
 	return c.setup(ctx, step, fn)
