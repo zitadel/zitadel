@@ -63,7 +63,7 @@ func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, sequences currentS
 	if err != nil {
 		return err
 	}
-	if rows, _ := res.RowsAffected(); rows != 1 {
+	if rows, _ := res.RowsAffected(); rows < 1 {
 		return errSeqNotUpdated
 	}
 	return nil
