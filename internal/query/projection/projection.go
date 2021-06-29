@@ -37,6 +37,6 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 	}
 
 	NewOrgProjection(ctx, projectionConfig)
-	NewOrgAdminProjection(ctx, projectionConfig)
+	NewOrgOwnerProjection(ctx, projectionConfig)
 	return nil
 }
