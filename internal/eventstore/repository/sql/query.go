@@ -49,7 +49,7 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	rows, err := criteria.db().QueryContext(ctx, query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
-		return z_errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+		return z_errors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
 	}
 	defer rows.Close()
 
