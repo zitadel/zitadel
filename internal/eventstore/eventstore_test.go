@@ -1329,8 +1329,8 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 	if want.Version != got.Version {
 		t.Errorf("wrong version got %q want %q", got.Version, want.Version)
 	}
-	if want.PreviousSequence != got.PreviousSequence {
-		t.Errorf("wrong previous sequence got %d want %d", got.PreviousSequence, want.PreviousSequence)
+	if want.PreviousAggregateSequence != got.PreviousAggregateSequence {
+		t.Errorf("wrong previous sequence got %d want %d", got.PreviousAggregateSequence, want.PreviousAggregateSequence)
 	}
 }
 

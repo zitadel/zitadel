@@ -15,9 +15,10 @@ type BaseEvent struct {
 
 	aggregate Aggregate
 
-	sequence         uint64
-	creationDate     time.Time
-	previousSequence uint64
+	sequence                      uint64
+	creationDate                  time.Time
+	previousAggregateSequence     uint64
+	previousAggregateTypeSequence uint64
 
 	//User who created the event
 	User string `json:"-"`
@@ -61,9 +62,14 @@ func (e *BaseEvent) DataAsBytes() []byte {
 	return e.Data
 }
 
-//PreviousSequence returns the sequence of the previous event from the aggregate
-func (e *BaseEvent) PreviousSequence() uint64 {
-	return e.previousSequence
+//PreviousAggregateSequence implements EventReader
+func (e *BaseEvent) PreviousAggregateSequence() uint64 {
+	return e.previousAggregateSequence
+}
+
+//PreviousAggregateTypeSequence implements EventReader
+func (e *BaseEvent) PreviousAggregateTypeSequence() uint64 {
+	return e.previousAggregateTypeSequence
 }
 
 //BaseEventFromRepo maps a stored event to a BaseEvent
@@ -75,18 +81,19 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 			ResourceOwner: event.ResourceOwner,
 			Version:       Version(event.Version),
 		},
-		EventType:        EventType(event.Type),
-		creationDate:     event.CreationDate,
-		sequence:         event.Sequence,
-		previousSequence: event.PreviousSequence,
-		Service:          event.EditorService,
-		User:             event.EditorUser,
-		Data:             event.Data,
+		EventType:                     EventType(event.Type),
+		creationDate:                  event.CreationDate,
+		sequence:                      event.Sequence,
+		previousAggregateSequence:     event.PreviousAggregateSequence,
+		previousAggregateTypeSequence: event.PreviousAggregateTypeSequence,
+		Service:                       event.EditorService,
+		User:                          event.EditorUser,
+		Data:                          event.Data,
 	}
 }
 
 //NewBaseEventForPush is the constructor for event's which will be pushed into the eventstore
-// the resource owner of the aggregate is only used if it's the first event of this aggregateroot
+// the resource owner of the aggregate is only used if it's the first event of this aggregate type
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{

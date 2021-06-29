@@ -25,7 +25,8 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery: config.RequeueEvery.Duration,
+			RequeueEvery:     config.RequeueEvery.Duration,
+			RetryFailedAfter: config.RetryFailedAfter.Duration,
 		},
 		Client:            sqlClient,
 		SequenceTable:     currentSeqTable,

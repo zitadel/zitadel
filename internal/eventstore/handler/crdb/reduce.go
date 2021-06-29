@@ -9,7 +9,7 @@ import (
 func (h *StatementHandler) reduce(event eventstore.EventReader) ([]handler.Statement, error) {
 	reduce, ok := h.reduces[event.Type()]
 	if !ok {
-		return []handler.Statement{NewNoOpStatement(event.Aggregate().Typ, event.Sequence(), event.PreviousSequence())}, nil
+		return []handler.Statement{NewNoOpStatement(event.Aggregate().Typ, event.Sequence(), event.PreviousAggregateTypeSequence())}, nil
 	}
 
 	return reduce(event)
