@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"

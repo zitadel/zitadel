@@ -8,10 +8,15 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
+const (
+	currentSequenceStmtFormat        = `SELECT current_sequence, aggregate_type FROM %s WHERE view_name = $1 FOR UPDATE`
+	updateCurrentSequencesStmtFormat = `UPSERT INTO %s (view_name, aggregate_type, current_sequence, timestamp) VALUES `
+)
+
 type currentSequences map[eventstore.AggregateType]uint64
 
 func (h *StatementHandler) currentSequences(query func(string, ...interface{}) (*sql.Rows, error)) (currentSequences, error) {
-	rows, err := query(`SELECT current_sequence, aggregate_type FROM `+h.sequenceTable+` WHERE view_name = $1 FOR UPDATE`, h.ProjectionName)
+	rows, err := query(h.currentSequenceStmt, h.ProjectionName)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +59,7 @@ func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, sequences currentS
 		values = append(values, h.ProjectionName, aggregate, sequence)
 	}
 
-	res, err := tx.Exec(`UPSERT INTO `+h.sequenceTable+` (view_name, aggregate_type, current_sequence, timestamp) VALUES `+strings.Join(valueQueries, ", "), values...)
+	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", "), values...)
 	if err != nil {
 		return err
 	}

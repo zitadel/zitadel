@@ -68,16 +68,23 @@ func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 		if !h.shouldBulk.Stop() {
 			<-h.shouldBulk.C
 		}
-		logging.LogWithFields("HANDL-mC9Xx", "projection", h.ProjectionName).Debug("starting handler without requeue")
+		logging.LogWithFields("HANDL-mC9Xx", "projection", h.ProjectionName).Info("starting handler without requeue")
 		return h
 	}
-	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Debug("starting handler")
+	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Info("starting handler")
 	return h
 }
 
 func (h *ProjectionHandler) ResetShouldBulk() {
 	if h.requeueAfter > 0 {
 		h.shouldBulk.Reset(h.requeueAfter)
+	}
+}
+
+func (h *ProjectionHandler) triggerShouldPush(after time.Duration) {
+	if !h.pushSet {
+		h.pushSet = true
+		h.shouldPush.Reset(after)
 	}
 }
 
@@ -94,6 +101,12 @@ func (h *ProjectionHandler) Process(
 	unlock Unlock,
 	query SearchQuery,
 ) {
+	//handle panic
+	defer func() {
+		cause := recover()
+		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause).Error("projection handler paniced")
+	}()
+
 	execBulk := h.prepareExecuteBulk(query, reduce, update)
 	for {
 		select {
@@ -104,7 +117,10 @@ func (h *ProjectionHandler) Process(
 			h.shutdown()
 			return
 		case event := <-h.Handler.EventQueue:
-			h.processEvent(ctx, event, reduce)
+			if err := h.processEvent(ctx, event, reduce); err != nil {
+				continue
+			}
+			h.triggerShouldPush(0)
 		case <-h.shouldBulk.C:
 			h.bulk(ctx, lock, execBulk, unlock)
 			h.ResetShouldBulk()
@@ -118,7 +134,10 @@ func (h *ProjectionHandler) Process(
 				h.shutdown()
 				return
 			case event := <-h.Handler.EventQueue:
-				h.processEvent(ctx, event, reduce)
+				if err := h.processEvent(ctx, event, reduce); err != nil {
+					continue
+				}
+				h.triggerShouldPush(0)
 			case <-h.shouldBulk.C:
 				h.bulk(ctx, lock, execBulk, unlock)
 				h.ResetShouldBulk()
@@ -146,9 +165,6 @@ func (h *ProjectionHandler) processEvent(
 
 	h.stmts = append(h.stmts, stmts...)
 
-	h.pushSet = true
-	h.shouldPush.Reset(0)
-
 	return nil
 }
 
@@ -162,7 +178,7 @@ func (h *ProjectionHandler) bulk(
 	defer cancel()
 
 	errs := lock(ctx, h.requeueAfter)
-	//wait until projection is locked or ctx canceled
+	//wait until projection is locked
 	if err, ok := <-errs; err != nil || !ok {
 		logging.Log("HANDL-XDJ4i").OnError(err).Warn("initial lock failed")
 		return err
@@ -216,7 +232,6 @@ func (h *ProjectionHandler) prepareExecuteBulk(
 					return err
 				}
 
-				<-h.shouldPush.C
 				if err = h.push(ctx, update, reduce); err != nil {
 					logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
 					return err
@@ -246,9 +261,11 @@ func (h *ProjectionHandler) fetchBulkStmts(
 		logging.Log("EVENT-ACMMS").WithError(err).Info("Unable to filter events in batch job")
 		return false, err
 	}
+
 	for _, event := range events {
-		err = h.processEvent(ctx, event, reduce)
-		logging.Log("HANDL-QRz8p").OnError(err).Warn("unable to reduce event")
+		if err = h.processEvent(ctx, event, reduce); err != nil {
+			return false, err
+		}
 	}
 
 	return len(events) == int(eventsLimit), nil
@@ -270,8 +287,11 @@ func (h *ProjectionHandler) push(
 	h.pushSet = len(h.stmts) > 0
 
 	if h.pushSet {
-		h.shouldPush.Reset(h.retryFailedAfter)
+		h.triggerShouldPush(h.retryFailedAfter)
+		return nil
 	}
+
+	h.shouldPush.Stop()
 
 	return err
 }

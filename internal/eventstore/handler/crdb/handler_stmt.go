@@ -33,12 +33,14 @@ type StatementHandlerConfig struct {
 type StatementHandler struct {
 	*handler.ProjectionHandler
 
-	client              *sql.DB
-	sequenceTable       string
-	maxFailureCount     uint
-	failureCountStmt    string
-	setFailureCountStmt string
-	lockStmt            string
+	client                  *sql.DB
+	sequenceTable           string
+	currentSequenceStmt     string
+	updateSequencesBaseStmt string
+	maxFailureCount         uint
+	failureCountStmt        string
+	setFailureCountStmt     string
+	lockStmt                string
 
 	aggregates []eventstore.AggregateType
 	reduces    map[eventstore.EventType]handler.Reduce
@@ -67,17 +69,19 @@ func NewStatementHandler(
 	}
 
 	h := StatementHandler{
-		ProjectionHandler:   handler.NewProjectionHandler(config.ProjectionHandlerConfig),
-		client:              config.Client,
-		sequenceTable:       config.SequenceTable,
-		maxFailureCount:     config.MaxFailureCount,
-		failureCountStmt:    fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
-		setFailureCountStmt: fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
-		lockStmt:            fmt.Sprintf(lockStmtFormat, config.LockTable),
-		aggregates:          aggregateTypes,
-		reduces:             reduces,
-		workerName:          workerName,
-		bulkLimit:           config.BulkLimit,
+		ProjectionHandler:       handler.NewProjectionHandler(config.ProjectionHandlerConfig),
+		client:                  config.Client,
+		sequenceTable:           config.SequenceTable,
+		maxFailureCount:         config.MaxFailureCount,
+		currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, config.SequenceTable),
+		updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
+		failureCountStmt:        fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
+		setFailureCountStmt:     fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
+		lockStmt:                fmt.Sprintf(lockStmtFormat, config.LockTable),
+		aggregates:              aggregateTypes,
+		reduces:                 reduces,
+		workerName:              workerName,
+		bulkLimit:               config.BulkLimit,
 	}
 
 	go h.ProjectionHandler.Process(
@@ -139,15 +143,15 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 	lastSuccessfulIdx := h.executeStmts(tx, stmts, sequences)
 
 	if lastSuccessfulIdx >= 0 {
-		seqErr := h.updateCurrentSequences(tx, sequences)
-		if seqErr != nil {
+		err = h.updateCurrentSequences(tx, sequences)
+		if err != nil {
 			tx.Rollback()
-			return stmts, seqErr
+			return stmts, err
 		}
 	}
 
-	if commitErr := tx.Commit(); commitErr != nil {
-		return stmts, commitErr
+	if err = tx.Commit(); err != nil {
+		return stmts, err
 	}
 
 	if lastSuccessfulIdx == -1 {

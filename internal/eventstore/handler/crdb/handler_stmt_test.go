@@ -91,15 +91,16 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			}
 			defer client.Close()
 
-			h := &StatementHandler{
-				ProjectionHandler: &handler.ProjectionHandler{
+			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
+				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 					ProjectionName: tt.fields.projectionName,
 				},
-				sequenceTable: tt.fields.sequenceTable,
-				bulkLimit:     tt.fields.bulkLimit,
-				aggregates:    tt.fields.aggregates,
-				client:        client,
-			}
+				SequenceTable: tt.fields.sequenceTable,
+				BulkLimit:     tt.fields.bulkLimit,
+				Client:        client,
+			})
+
+			h.aggregates = tt.fields.aggregates
 
 			for _, expectation := range tt.want.expectations {
 				expectation(mock)
@@ -411,18 +412,19 @@ func TestStatementHandler_Update(t *testing.T) {
 			}
 			defer client.Close()
 
-			h := &StatementHandler{
-				sequenceTable: "my_sequences",
-				client:        client,
-				ProjectionHandler: handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
+			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
+				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+					ProjectionName: "my_projection",
 					HandlerConfig: handler.HandlerConfig{
 						Eventstore: tt.fields.eventstore,
 					},
-					ProjectionName: "my_projection",
-					RequeueEvery:   0,
-				}),
-				aggregates: tt.fields.aggregates,
-			}
+					RequeueEvery: 0,
+				},
+				SequenceTable: "my_sequences",
+				Client:        client,
+			})
+
+			h.aggregates = tt.fields.aggregates
 
 			for _, expectation := range tt.want.expectations {
 				expectation(mock)
@@ -1239,13 +1241,14 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &StatementHandler{
-				ProjectionHandler: &handler.ProjectionHandler{
+			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
+				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 					ProjectionName: tt.fields.projectionName,
 				},
-				sequenceTable: tt.fields.sequenceTable,
-				aggregates:    tt.fields.aggregates,
-			}
+				SequenceTable: tt.fields.sequenceTable,
+			})
+
+			h.aggregates = tt.fields.aggregates
 
 			client, mock, err := sqlmock.New()
 			if err != nil {
@@ -1396,13 +1399,15 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &StatementHandler{
-				ProjectionHandler: &handler.ProjectionHandler{
+
+			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
+				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 					ProjectionName: tt.fields.projectionName,
 				},
-				sequenceTable: tt.fields.sequenceTable,
-				aggregates:    tt.fields.aggregates,
-			}
+				SequenceTable: tt.fields.sequenceTable,
+			})
+
+			h.aggregates = tt.fields.aggregates
 
 			client, mock, err := sqlmock.New()
 			if err != nil {
