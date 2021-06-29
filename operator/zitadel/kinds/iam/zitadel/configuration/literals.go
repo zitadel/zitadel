@@ -19,6 +19,7 @@ func literalsConfigMap(
 	desired *Configuration,
 	users map[string]string,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
+	version *string,
 	queried map[string]interface{},
 ) map[string]string {
 
@@ -111,7 +112,7 @@ func literalsConfigMap(
 		}
 		if desired.Sentry != nil {
 			literalsConfigMap["SENTRY_ENVIRONMENT"] = desired.Sentry.Environment
-			literalsConfigMap["SENTRY_RELEASE"] = desired.Sentry.Version
+			literalsConfigMap["SENTRY_RELEASE"] = *version
 		}
 	}
 
