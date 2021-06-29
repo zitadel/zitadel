@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -35,6 +37,7 @@ import (
 	"github.com/caos/zitadel/internal/ui/console"
 	"github.com/caos/zitadel/internal/ui/login"
 	"github.com/caos/zitadel/openapi"
+	"github.com/getsentry/sentry-go"
 )
 
 type Config struct {
@@ -89,6 +92,10 @@ const (
 )
 
 func main() {
+	err := sentry.Init(sentry.ClientOptions{})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
 	flag.Var(setupPaths, "setup-files", "paths to the setup files")
 	flag.Parse()
@@ -101,6 +108,7 @@ func main() {
 	default:
 		logging.Log("MAIN-afEQ2").Fatal("please provide an valid argument [start, setup]")
 	}
+	defer sentry.Flush(2 * time.Second)
 }
 
 func startZitadel(configPaths []string) {
