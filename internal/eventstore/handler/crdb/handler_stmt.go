@@ -151,12 +151,16 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 	}
 
 	if lastSuccessfulIdx == -1 {
-		return stmts, nil
+		return stmts, handler.ErrSomeStmtsFailed
 	}
 
 	unexecutedStmts = make([]handler.Statement, len(stmts)-(lastSuccessfulIdx+1))
 	copy(unexecutedStmts, stmts[lastSuccessfulIdx+1:])
 	stmts = nil
+
+	if len(unexecutedStmts) > 0 {
+		return unexecutedStmts, handler.ErrSomeStmtsFailed
+	}
 
 	return unexecutedStmts, nil
 }
@@ -215,7 +219,7 @@ func (h *StatementHandler) executeStmts(
 			continue
 		}
 		if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequences[stmt.AggregateType] {
-			logging.LogWithFields("CRDB-jJBJn", "projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
+			logging.LogWithFields("CRDB-jJBJn", "projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "seq", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
 			break
 		}
 		err := h.executeStmt(tx, stmt)

@@ -234,7 +234,7 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    new(es_models.Event),
 			},
 			res: res{
-				query:    "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query:    "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbRow:    []interface{}{time.Time{}, es_models.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", es_models.AggregateType("user"), "hodor", es_models.Version("")},
 				expected: es_models.Event{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
 			},
@@ -246,7 +246,7 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    new(uint64),
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbErr: errors.IsErrorInvalidArgument,
 			},
 		},
@@ -258,7 +258,7 @@ func Test_prepareColumns(t *testing.T) {
 				dbErr:   sql.ErrConnDone,
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbErr: errors.IsInternal,
 			},
 		},
@@ -429,7 +429,7 @@ func Test_buildQuery(t *testing.T) {
 				queryFactory: es_models.NewSearchQueryFactory("user").OrderDesc(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user")},
 			},
@@ -440,7 +440,7 @@ func Test_buildQuery(t *testing.T) {
 				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence LIMIT $2",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
 				limit:      5,
@@ -452,7 +452,7 @@ func Test_buildQuery(t *testing.T) {
 				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5).OrderDesc(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
 				limit:      5,
