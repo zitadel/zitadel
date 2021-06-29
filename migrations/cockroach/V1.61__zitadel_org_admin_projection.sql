@@ -1,6 +1,6 @@
 use zitadel;
 
-CREATE TABLE projections.org_admins (
+CREATE TABLE projections.org_owners (
     org_id TEXT,
     org_name TEXT,
     org_creation_date TIMESTAMPTZ,

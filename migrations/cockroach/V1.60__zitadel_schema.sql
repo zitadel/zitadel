@@ -16,7 +16,6 @@ CREATE TABLE projections.current_sequences (
     view_name TEXT,
     aggregate_type TEXT,
     current_sequence BIGINT,
-    aggregate_type TEXT,
     timestamp TIMESTAMPTZ,
 
     PRIMARY KEY (view_name, aggregate_type)
