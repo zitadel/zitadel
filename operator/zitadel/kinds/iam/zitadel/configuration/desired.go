@@ -149,4 +149,5 @@ type Sentry struct {
 	ExistingSentryDSN *secret.Existing `yaml:"sentryDSN,omitempty"`
 	Environment       string           `yaml:"environment,omitempty"`
 	Version           string           `yaml:"version,omitempty"`
+	Usage             string           `yaml:"usage,omitempty"`
 }

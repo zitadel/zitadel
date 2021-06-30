@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"log"
+	"os"
 	"time"
 
 	"github.com/caos/logging"
@@ -92,9 +93,11 @@ const (
 )
 
 func main() {
-	err := sentry.Init(sentry.ClientOptions{})
-	if err != nil {
-		log.Fatalf("sentry.Init: %s", err)
+	if os.Getenv("SENTRY_USAGE") == "true" {
+		err := sentry.Init(sentry.ClientOptions{})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
 	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
 	flag.Var(setupPaths, "setup-files", "paths to the setup files")
@@ -108,7 +111,9 @@ func main() {
 	default:
 		logging.Log("MAIN-afEQ2").Fatal("please provide an valid argument [start, setup]")
 	}
-	defer sentry.Flush(2 * time.Second)
+	if os.Getenv("SENTRY_USAGE") == "true" {
+		defer sentry.Flush(2 * time.Second)
+	}
 }
 
 func startZitadel(configPaths []string) {

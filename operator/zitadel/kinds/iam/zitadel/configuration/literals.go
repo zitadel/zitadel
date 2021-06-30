@@ -113,6 +113,7 @@ func literalsConfigMap(
 		if desired.Sentry != nil {
 			literalsConfigMap["SENTRY_ENVIRONMENT"] = desired.Sentry.Environment
 			literalsConfigMap["SENTRY_RELEASE"] = *version
+			literalsConfigMap["SENTRY_USAGE"] = desired.Sentry.Usage
 		}
 	}
 
