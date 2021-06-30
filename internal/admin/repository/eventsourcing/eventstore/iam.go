@@ -28,13 +28,14 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore      v1.Eventstore
-	SearchLimit     uint64
-	View            *admin_view.View
-	SystemDefaults  systemdefaults.SystemDefaults
-	Roles           []string
-	PrefixAvatarURL string
-	LoginDir        http.FileSystem
+	Eventstore              v1.Eventstore
+	SearchLimit             uint64
+	View                    *admin_view.View
+	SystemDefaults          systemdefaults.SystemDefaults
+	Roles                   []string
+	PrefixAvatarURL         string
+	LoginDir                http.FileSystem
+	translationFileContents map[string][]byte
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -374,13 +375,18 @@ func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, 
 }
 
 func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
-	}
-	contents, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+	var contents []byte
+	var ok bool
+	if contents, ok = repo.translationFileContents[lang]; ok {
+		r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if err != nil {
+			return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
+		}
+		contents, err = ioutil.ReadAll(r)
+		if err != nil {
+			return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+		}
+		repo.translationFileContents[lang] = contents
 	}
 	loginText := new(domain.CustomLoginText)
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
