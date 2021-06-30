@@ -35,13 +35,14 @@ import (
 )
 
 type OrgRepository struct {
-	SearchLimit     uint64
-	Eventstore      v1.Eventstore
-	View            *mgmt_view.View
-	Roles           []string
-	SystemDefaults  systemdefaults.SystemDefaults
-	PrefixAvatarURL string
-	LoginDir        http.FileSystem
+	SearchLimit             uint64
+	Eventstore              v1.Eventstore
+	View                    *mgmt_view.View
+	Roles                   []string
+	SystemDefaults          systemdefaults.SystemDefaults
+	PrefixAvatarURL         string
+	LoginDir                http.FileSystem
+	TranslationFileContents map[string][]byte
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -604,13 +605,17 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 }
 
 func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
-	}
-	contents, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
+	var contents []byte
+	var ok bool
+	if contents, ok = repo.TranslationFileContents[lang]; !ok {
+		r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if err != nil {
+			return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
+		}
+		contents, err = ioutil.ReadAll(r)
+		if err != nil {
+			return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
+		}
 	}
 	loginTextMap := map[string]interface{}{}
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
