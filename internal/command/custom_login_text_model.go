@@ -815,7 +815,7 @@ func (wm *CustomLoginTextReadModel) handleUsernameChangeDoneScreenSetEvent(e *po
 		wm.UsernameChangeDoneDescription = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyUsernameChangeNextButtonText {
+	if e.Key == domain.LoginKeyUsernameChangeDoneNextButtonText {
 		wm.UsernameChangeDoneNextButtonText = e.Text
 		return
 	}

@@ -72,5 +72,5 @@ func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventRead
 		return nil, err
 	}
 
-	return &CustomTextSetEvent{CustomTextSetEvent: *e.(*policy.CustomTextSetEvent)}, nil
+	return &CustomTextRemovedEvent{CustomTextRemovedEvent: *e.(*policy.CustomTextRemovedEvent)}, nil
 }
