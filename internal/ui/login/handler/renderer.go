@@ -10,7 +10,6 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
-	i18n2 "github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -418,11 +417,12 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 
 func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []*domain.CustomText) {
 	for _, text := range customTexts {
-		msg := &i18n2.Message{
-			ID:    text.Key,
-			Other: text.Text,
+		msg := i18n.Message{
+			ID:   text.Key,
+			Text: text.Text,
 		}
-		l.renderer.AddMessages(translator, text.Language, msg)
+		err := l.renderer.AddMessages(translator, text.Language, msg)
+		logging.Log("HANDLE-GD3g2").OnError(err).Warn("could no add message to translator")
 	}
 }
 

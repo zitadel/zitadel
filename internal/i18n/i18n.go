@@ -3,20 +3,20 @@ package i18n
 import (
 	"context"
 	"encoding/json"
-	"github.com/BurntSushi/toml"
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"io/ioutil"
 	"net/http"
 	"os"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/errors"
-
+	"github.com/BurntSushi/toml"
 	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 const (
@@ -24,8 +24,7 @@ const (
 )
 
 type Translator struct {
-	DefaultBundle *i18n.Bundle
-	Bundle        *i18n.Bundle
+	bundle        *i18n.Bundle
 	cookieName    string
 	cookieHandler *http_util.CookieHandler
 }
@@ -35,10 +34,15 @@ type TranslatorConfig struct {
 	CookieName      string
 }
 
+type Message struct {
+	ID   string
+	Text string
+}
+
 func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.DefaultBundle, err = newBundle(dir, config.DefaultLanguage)
+	t.bundle, err = newBundle(dir, config.DefaultLanguage)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +87,20 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	return nil
 }
 
+func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
+	if len(messages) == 0 {
+		return nil
+	}
+	i18nMessages := make([]*i18n.Message, len(messages))
+	for i, message := range messages {
+		i18nMessages[i] = &i18n.Message{
+			ID:    message.ID,
+			Other: message.Text,
+		}
+	}
+	return t.bundle.AddMessages(tag, i18nMessages...)
+}
+
 func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[string]interface{}) string {
 	return localize(t.localizerFromRequest(r), id, args)
 }
@@ -96,7 +114,7 @@ func (t *Translator) Localize(id string, args map[string]interface{}, langs ...s
 }
 
 func (t *Translator) Lang(r *http.Request) language.Tag {
-	matcher := language.NewMatcher(t.Bundle.LanguageTags())
+	matcher := language.NewMatcher(t.bundle.LanguageTags())
 	tag, _ := language.MatchStrings(matcher, t.langsFromRequest(r)...)
 	return tag
 }
@@ -114,7 +132,7 @@ func (t *Translator) localizerFromCtx(ctx context.Context) *i18n.Localizer {
 }
 
 func (t *Translator) localizer(langs ...string) *i18n.Localizer {
-	return i18n.NewLocalizer(t.Bundle, langs...)
+	return i18n.NewLocalizer(t.bundle, langs...)
 }
 
 func (t *Translator) langsFromRequest(r *http.Request) []string {

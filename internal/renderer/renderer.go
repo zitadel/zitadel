@@ -6,7 +6,6 @@ import (
 	"os"
 	"text/template"
 
-	i18n2 "github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -59,18 +58,11 @@ func (r *Renderer) Localize(translator *i18n.Translator, id string, args map[str
 	return translator.Localize(id, args)
 }
 
-func (r *Renderer) AddLanguageFile(translator *i18n.Translator, content []byte, filename string) {
+func (r *Renderer) AddMessages(translator *i18n.Translator, tag language.Tag, messages ...i18n.Message) error {
 	if translator == nil {
-		return
+		return nil
 	}
-	translator.Bundle.ParseMessageFileBytes(content, filename)
-}
-
-func (r *Renderer) AddMessages(translator *i18n.Translator, tag language.Tag, messages ...*i18n2.Message) {
-	if translator == nil {
-		return
-	}
-	translator.Bundle.AddMessages(tag, messages...)
+	return translator.AddMessages(tag, messages...)
 }
 
 func (r *Renderer) LocalizeFromRequest(translator *i18n.Translator, req *http.Request, id string, args map[string]interface{}) string {
