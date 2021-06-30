@@ -364,7 +364,7 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			wm.State = domain.PolicyStateActive
 		case *policy.CustomTextRemovedEvent:
-			if e.Key != domain.LoginCustomText || wm.Language != e.Language {
+			if e.Template != domain.LoginCustomText || wm.Language != e.Language {
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeySelectAccount) {
