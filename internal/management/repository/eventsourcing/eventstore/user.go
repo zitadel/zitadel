@@ -42,13 +42,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 		user = new(model.UserView)
 	}
 
-	sequence := user.Sequence
-	currentSequence, err := repo.View.GetLatestUserSequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getUserEvents(ctx, id, sequence)
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
 	}

@@ -139,13 +139,7 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 		policy = new(iam_es_model.LoginPolicyView)
 	}
 
-	sequence := policy.Sequence
-	currentSequence, err := repo.View.GetLatestLoginPolicySequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
 	}
@@ -218,13 +212,7 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
 
-	sequence := policy.Sequence
-	currentSequence, err := repo.View.GetLatestPasswordComplexityPolicySequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-1Mc0s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
@@ -250,13 +238,7 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
 
-	sequence := policy.Sequence
-	currentSequence, err := repo.View.GetLatestPasswordAgePolicySequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-vMyS3", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
@@ -282,13 +264,7 @@ func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 		policy = new(iam_es_model.PasswordLockoutPolicyView)
 	}
 
-	sequence := policy.Sequence
-	currentSequence, err := repo.View.GetLatestPasswordLockoutPolicySequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 	}
@@ -314,13 +290,7 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 		policy = new(iam_es_model.OrgIAMPolicyView)
 	}
 
-	sequence := policy.Sequence
-	currentSequence, err := repo.View.GetLatestOrgIAMPolicySequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, sequence)
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-MkoL0", "Errors.IAM.OrgIAMPolicy.NotFound")
 	}
