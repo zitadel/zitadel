@@ -73,13 +73,13 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if tierName != "" && wm.TierName != tierName {
 		changes = append(changes, features.ChangeTierName(tierName))
 	}
-	if tierDescription != "" && wm.TierDescription != tierDescription {
+	if wm.TierDescription != tierDescription {
 		changes = append(changes, features.ChangeTierDescription(tierDescription))
 	}
 	if wm.State != state {
 		changes = append(changes, features.ChangeState(state))
 	}
-	if stateDescription != "" && wm.StateDescription != stateDescription {
+	if wm.StateDescription != stateDescription {
 		changes = append(changes, features.ChangeStateDescription(stateDescription))
 	}
 	if auditLogRetention != 0 && wm.AuditLogRetention != auditLogRetention {

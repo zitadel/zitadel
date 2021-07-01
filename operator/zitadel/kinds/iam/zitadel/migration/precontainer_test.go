@@ -1,9 +1,10 @@
 package migration
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMigration_CreateUserCommand(t *testing.T) {

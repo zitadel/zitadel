@@ -27,6 +27,7 @@ func Adapt(
 	action string,
 	version *string,
 	features []string,
+	customImageRegistry string,
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
@@ -46,7 +47,17 @@ func Adapt(
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/ZITADEL":
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
-		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
+		return zitadel.AdaptFunc(
+			apiLabels,
+			nodeselector,
+			tolerations,
+			dbClient,
+			namespace,
+			action,
+			version,
+			features,
+			customImageRegistry,
+		)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
 	}

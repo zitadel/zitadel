@@ -9,6 +9,7 @@ import (
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
@@ -32,6 +33,7 @@ func AdaptFunc(
 	tolerations []corev1.Toleration,
 	version string,
 	features []string,
+	customImageRegistry string,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -66,6 +68,8 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
+		image := common.BackupImage.Reference(customImageRegistry, version)
+
 		_, destroyB, err := backup.AdaptFunc(
 			internalMonitor,
 			name,
@@ -81,7 +85,7 @@ func AdaptFunc(
 			nodeselector,
 			tolerations,
 			features,
-			version,
+			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -100,7 +104,7 @@ func AdaptFunc(
 			checkDBReady,
 			secretName,
 			secretKey,
-			version,
+			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -117,7 +121,7 @@ func AdaptFunc(
 			checkDBReady,
 			secretName,
 			secretKey,
-			version,
+			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -183,7 +187,7 @@ func AdaptFunc(
 					nodeselector,
 					tolerations,
 					features,
-					version,
+					image,
 				)
 				if err != nil {
 					return nil, err
@@ -202,7 +206,7 @@ func AdaptFunc(
 					checkDBReady,
 					secretName,
 					secretKey,
-					version,
+					image,
 				)
 				if err != nil {
 					return nil, err
@@ -219,7 +223,7 @@ func AdaptFunc(
 					checkDBReady,
 					secretName,
 					secretKey,
-					version,
+					image,
 				)
 				if err != nil {
 					return nil, err

@@ -48,7 +48,6 @@ export class AuthUserDetailComponent implements OnDestroy {
     this.userService.getMyUser().then(resp => {
       if (resp.user) {
         this.user = resp.user;
-        console.log(resp.user);
       }
       this.loading = false;
     }).catch(error => {
