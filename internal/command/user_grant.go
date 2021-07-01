@@ -92,7 +92,7 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if reflect.DeepEqual(existingUserGrant.RoleKeys, userGrant.RoleKeys) {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
 	}
-	err = c.checkUserGrantPreCondition(ctx, userGrantWriteModelToUserGrant(existingUserGrant))
+	err = c.checkUserGrantPreCondition(ctx, userGrant)
 	if err != nil {
 		return nil, nil, err
 	}
