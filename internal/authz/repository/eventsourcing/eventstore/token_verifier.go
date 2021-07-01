@@ -43,7 +43,13 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 		token.UserID = userID
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.Sequence)
+	sequence := token.Sequence
+	currentSequence, err := repo.View.GetLatestTokenSequence()
+	if err == nil {
+		sequence = currentSequence.CurrentSequence
+	}
+
+	events, esErr := repo.getUserEvents(ctx, userID, sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}

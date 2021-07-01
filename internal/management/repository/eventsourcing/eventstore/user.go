@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
@@ -41,7 +41,14 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 	if caos_errs.IsNotFound(viewErr) {
 		user = new(model.UserView)
 	}
-	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
+
+	sequence := user.Sequence
+	currentSequence, err := repo.View.GetLatestUserSequence()
+	if err == nil {
+		sequence = currentSequence.CurrentSequence
+	}
+
+	events, esErr := repo.getUserEvents(ctx, id, sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
 	}
