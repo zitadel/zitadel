@@ -38,13 +38,7 @@ func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.OrgView
 		org = new(model.OrgView)
 	}
 
-	sequence := org.Sequence
-	currentSequence, err := repo.View.GetLatestOrgSequence()
-	if err == nil {
-		sequence = currentSequence.CurrentSequence
-	}
-
-	events, esErr := repo.getOrgEvents(ctx, id, sequence)
+	events, esErr := repo.getOrgEvents(ctx, id, org.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")
 	}
