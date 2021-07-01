@@ -75,14 +75,14 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 }
 
 func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool) (_ eventstore.EventPusher, _ *UserGrantWriteModel, err error) {
-	err = checkExplicitProjectPermission(ctx, userGrant.ProjectGrantID, userGrant.ProjectID)
-	if err != nil {
-		return nil, nil, err
-	}
 	if userGrant.AggregateID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrant.AggregateID, userGrant.ResourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -92,6 +92,8 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if reflect.DeepEqual(existingUserGrant.RoleKeys, userGrant.RoleKeys) {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
 	}
+	userGrant.ProjectID = existingUserGrant.ProjectID
+	userGrant.ProjectGrantID = existingUserGrant.ProjectGrantID
 	err = c.checkUserGrantPreCondition(ctx, userGrant)
 	if err != nil {
 		return nil, nil, err
