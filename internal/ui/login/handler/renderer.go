@@ -184,6 +184,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"selectedGender": func(g int32) bool {
 			return false
 		},
+		"hasTOSLink": func() bool {
+			return false
+		},
+		"hasPrivacyLink": func() bool {
+			return false
+		},
 		"hasUsernamePasswordLogin": func() bool {
 			return false
 		},
@@ -321,8 +327,9 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+		baseData.PrivacyPolicy = authReq.PrivacyPolicy
 	} else {
-		//TODO: How to handle LabelPolicy if no auth req (eg Register)
+		l.getDefaultPrivacyPolicy(r)
 	}
 	return baseData
 }
@@ -405,7 +412,6 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
-
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -443,6 +449,7 @@ type baseData struct {
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
 	LabelPolicy            *domain.LabelPolicy
+	PrivacyPolicy          *domain.PrivacyPolicy
 }
 
 type errorData struct {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -53,6 +54,20 @@ func PrivacyViewToModel(policy *PrivacyPolicyView) *model.PrivacyPolicyView {
 		TOSLink:      policy.TOSLink,
 		PrivacyLink:  policy.PrivacyLink,
 		Default:      policy.Default,
+	}
+}
+
+func (p *PrivacyPolicyView) ToDomain() *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  p.AggregateID,
+			CreationDate: p.CreationDate,
+			ChangeDate:   p.ChangeDate,
+			Sequence:     p.Sequence,
+		},
+		Default:     p.Default,
+		TOSLink:     p.TOSLink,
+		PrivacyLink: p.PrivacyLink,
 	}
 }
 

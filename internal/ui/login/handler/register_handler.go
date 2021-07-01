@@ -156,6 +156,12 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			}
 			return formData.Gender == g
 		},
+		"hasTOSLink": func() bool {
+			return data.PrivacyPolicy != nil && data.PrivacyPolicy.TOSLink != ""
+		},
+		"hasPrivacyLink": func() bool {
+			return data.PrivacyPolicy != nil && data.PrivacyPolicy.PrivacyLink != ""
+		},
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
 }

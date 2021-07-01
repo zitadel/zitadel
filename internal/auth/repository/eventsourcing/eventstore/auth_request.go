@@ -440,6 +440,11 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *domai
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
+	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.PrivacyPolicy = privacyPolicy
 	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
 	if err != nil {
 		return err
@@ -723,6 +728,21 @@ func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (
 	policy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.IAMID, int32(domain.LabelPolicyStateActive))
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return policy.ToDomain(), err
+}
+
+func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PrivacyPolicyByAggregateID(repo.IAMID)
 		if err != nil {
 			return nil, err
 		}
