@@ -8,7 +8,7 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
@@ -41,7 +41,13 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken st
 		tokenView.UserID = userID
 	}
 
-	events, esErr := r.getUserEvents(ctx, userID, tokenView.Sequence)
+	sequence := tokenView.Sequence
+	currentSequence, err := r.View.GetLatestRefreshTokenSequence()
+	if err == nil {
+		sequence = currentSequence.CurrentSequence
+	}
+
+	events, esErr := r.getUserEvents(ctx, userID, sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
