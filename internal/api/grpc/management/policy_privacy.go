@@ -5,25 +5,24 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetPrivacyPolicy(ctx context.Context, req *mgmt_pb.GetPrivacyPolicyRequest) (*mgmt_pb.GetPrivacyPolicyResponse, error) {
-	//policy, err := s.org.GetPrivacyPolicy(ctx)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return &mgmt_pb.GetPrivacyPolicyResponse{Policy: policy_grpc.ModelPrivacyPolicyToPb(policy), IsDefault: policy.Default}, nil
-	return nil, nil
+func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetPrivacyPolicyRequest) (*mgmt_pb.GetPrivacyPolicyResponse, error) {
+	policy, err := s.org.GetPrivacyPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetPrivacyPolicyResponse{Policy: policy_grpc.ModelPrivacyPolicyToPb(policy)}, nil
 }
 
-func (s *Server) GetDefaultPrivacyPolicy(ctx context.Context, req *mgmt_pb.GetDefaultPrivacyPolicyRequest) (*mgmt_pb.GetDefaultPrivacyPolicyResponse, error) {
-	//policy, err := s.org.GetDefaultPrivacyPolicy(ctx)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return &mgmt_pb.GetDefaultPrivacyPolicyResponse{Policy: policy_grpc.ModelPrivacyPolicyToPb(policy)}, nil
-	return nil, nil
+func (s *Server) GetDefaultPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetDefaultPrivacyPolicyRequest) (*mgmt_pb.GetDefaultPrivacyPolicyResponse, error) {
+	policy, err := s.org.GetDefaultPrivacyPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDefaultPrivacyPolicyResponse{Policy: policy_grpc.ModelPrivacyPolicyToPb(policy)}, nil
 }
 
 func (s *Server) AddCustomPrivacyPolicy(ctx context.Context, req *mgmt_pb.AddCustomPrivacyPolicyRequest) (*mgmt_pb.AddCustomPrivacyPolicyResponse, error) {
