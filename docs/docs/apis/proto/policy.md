@@ -112,6 +112,20 @@ title: zitadel/policy.proto
 
 
 
+### PrivacyPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 
 
 ## Enums

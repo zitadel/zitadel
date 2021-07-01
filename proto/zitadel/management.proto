@@ -1927,6 +1927,70 @@ service ManagementService {
         };
     }
 
+    // Returns the privacy policy of the organisation
+    // With this policy privacy relevant things can be configured (e.g. tos link)
+    rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/privacy"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Returns the default privacy policy of the IAM
+    // With this policy the password strength can be configured
+    rpc GetDefaultPrivacyPolicy(GetDefaultPrivacyPolicyRequest) returns (GetDefaultPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/default/privacy"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Add a custom privacy policy for the organisation
+    // With this policy privacy relevant things can be configured (e.g. tos link)
+    rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/privacy"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "privacy_policy"
+        };
+    }
+
+    // Update the privacy complexity policy for the organisation
+    // With this policy privacy relevant things can be configured (e.g. tos link)
+    rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/privacy"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+            feature: "privacy_policy"
+        };
+    }
+
+    // Removes the privacy policy of the organisation
+    // The default policy of the IAM will trigger after
+    rpc ResetPrivacyPolicyToDefault(ResetPrivacyPolicyToDefaultRequest) returns (ResetPrivacyPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/policies/privacy"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
     // Returns the active label policy of the organisation
     // With this policy the private labeling can be configured (colors, etc.)
     rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
@@ -3970,6 +4034,45 @@ message UpdateCustomPasswordLockoutPolicyResponse {
 message ResetPasswordLockoutPolicyToDefaultRequest {}
 
 message ResetPasswordLockoutPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetPrivacyPolicyRequest {}
+
+message GetPrivacyPolicyResponse {
+    zitadel.policy.v1.PrivacyPolicy policy = 1;
+}
+
+//This is an empty request
+message GetDefaultPrivacyPolicyRequest {}
+
+message GetDefaultPrivacyPolicyResponse {
+    zitadel.policy.v1.PrivacyPolicy policy = 1;
+}
+
+message AddCustomPrivacyPolicyRequest {
+    string tos_link = 1;
+    string privacy_link = 2;
+}
+
+message AddCustomPrivacyPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomPrivacyPolicyRequest {
+    string tos_link = 1;
+    string privacy_link = 2;
+}
+
+message UpdateCustomPrivacyPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ResetPrivacyPolicyToDefaultRequest {}
+
+message ResetPrivacyPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

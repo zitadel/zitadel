@@ -1450,6 +1450,65 @@ service AdminService {
         };
     }
 
+    //Returns the privacy policy defined by the administrators of ZITADEL
+    rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/privacy";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "privacy policy";
+            tags: "privacy";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default password complexity policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default privacy policy of ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/privacy";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "privacy policy";
+            tags: "privacy";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default privacy policy updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Returns the custom text for initial message
     rpc GetDefaultInitMessageText(GetDefaultInitMessageTextRequest) returns (GetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
@@ -2888,6 +2947,22 @@ message UpdatePasswordLockoutPolicyRequest {
 }
 
 message UpdatePasswordLockoutPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetPrivacyPolicyRequest {}
+
+message GetPrivacyPolicyResponse {
+    zitadel.policy.v1.PrivacyPolicy policy = 1;
+}
+
+message UpdatePrivacyPolicyRequest {
+    string tos_link = 1;
+    string privacy_link = 2;
+}
+
+message UpdatePrivacyPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

@@ -528,6 +528,27 @@ it impacts all organisations without a customised policy
 
 
 
+### GetPrivacyPolicy
+
+> **rpc** GetPrivacyPolicy([GetPrivacyPolicyRequest](#getprivacypolicyrequest))
+[GetPrivacyPolicyResponse](#getprivacypolicyresponse)
+
+Returns the privacy policy defined by the administrators of ZITADEL
+
+
+
+
+### UpdatePrivacyPolicy
+
+> **rpc** UpdatePrivacyPolicy([UpdatePrivacyPolicyRequest](#updateprivacypolicyrequest))
+[UpdatePrivacyPolicyResponse](#updateprivacypolicyresponse)
+
+Updates the default privacy policy of ZITADEL
+it impacts all organisations without a customised policy
+
+
+
+
 ### GetDefaultInitMessageText
 
 > **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
@@ -1300,6 +1321,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
+### GetPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -2370,6 +2408,29 @@ This is an empty request
 
 
 ### UpdatePasswordLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdatePrivacyPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+
+
+
+
+### UpdatePrivacyPolicyResponse
 
 
 
