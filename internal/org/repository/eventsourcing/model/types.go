@@ -92,4 +92,8 @@ const (
 	PasswordLockoutPolicyAdded   models.EventType = "org.policy.password.lockout.added"
 	PasswordLockoutPolicyChanged models.EventType = "org.policy.password.lockout.changed"
 	PasswordLockoutPolicyRemoved models.EventType = "org.policy.password.lockout.removed"
+
+	PrivacyPolicyAdded   models.EventType = "org.policy.privacy.added"
+	PrivacyPolicyChanged models.EventType = "org.policy.privacy.changed"
+	PrivacyPolicyRemoved models.EventType = "org.policy.privacy.removed"
 )
