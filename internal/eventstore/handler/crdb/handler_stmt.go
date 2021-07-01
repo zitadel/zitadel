@@ -119,7 +119,7 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement, reduce handler.Reduce) (unexecutedStmts []handler.Statement, err error) {
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
-		return stmts, err
+		return stmts, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
 	sequences, err := h.currentSequences(tx.Query)
@@ -250,16 +250,19 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt handler.Statement) error
 	}
 	_, err := tx.Exec("SAVEPOINT push_stmt")
 	if err != nil {
-		return err
+		return errors.ThrowInternal(err, "CRDB-i1wp6", "unable to create savepoint")
 	}
 	err = stmt.Execute(tx, h.ProjectionName)
 	if err != nil {
 		_, rollbackErr := tx.Exec("ROLLBACK TO SAVEPOINT push_stmt")
 		if rollbackErr != nil {
-			return rollbackErr
+			return errors.ThrowInternal(rollbackErr, "CRDB-zzp3P", "rollback to savepoint failed")
 		}
-		return err
+		return errors.ThrowInternal(err, "CRDB-oRkaN", "unable execute stmt")
 	}
 	_, err = tx.Exec("RELEASE push_stmt")
-	return err
+	if err != nil {
+		return errors.ThrowInternal(err, "CRDB-qWgwT", "unable to release savepoint")
+	}
+	return nil
 }

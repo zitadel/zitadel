@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
 
@@ -34,13 +35,18 @@ func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt handler.Statement, 
 func (h *StatementHandler) failureCount(tx *sql.Tx, seq uint64) (count uint, err error) {
 	row := tx.QueryRow(h.failureCountStmt, h.ProjectionName, seq)
 	if err = row.Err(); err != nil {
-		return 0, err
+		return 0, errors.ThrowInternal(err, "CRDB-Unnex", "unable to update failure count")
 	}
-	err = row.Scan(&count)
-	return count, err
+	if err = row.Scan(&count); err != nil {
+		return 0, errors.ThrowInternal(err, "CRDB-RwSMV", "unable to scann count")
+	}
+	return count, nil
 }
 
 func (h *StatementHandler) setFailureCount(tx *sql.Tx, seq uint64, count uint, err error) error {
 	_, dbErr := tx.Exec(h.setFailureCountStmt, h.ProjectionName, seq, count, err.Error())
-	return dbErr
+	if dbErr != nil {
+		return errors.ThrowInternal(dbErr, "CRDB-4Ht4x", "set failure count failed")
+	}
+	return nil
 }

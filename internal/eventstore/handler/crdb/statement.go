@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
@@ -31,8 +32,10 @@ func NewCreateStatement(aggregateType eventstore.AggregateType, sequence, previo
 				return handler.ErrNoValues
 			}
 			query := "INSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
-			_, err := ex.Exec(query, args...)
-			return err
+			if _, err := ex.Exec(query, args...); err != nil {
+				return errors.ThrowInternal(err, "CRDB-pKtsr", "create failed")
+			}
+			return nil
 		},
 	}
 }
@@ -60,8 +63,10 @@ func NewUpsertStatement(aggregateType eventstore.AggregateType, sequence, previo
 				return handler.ErrNoValues
 			}
 			query := "UPSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
-			_, err := ex.Exec(query, args...)
-			return err
+			if _, err := ex.Exec(query, args...); err != nil {
+				return errors.ThrowInternal(err, "CRDB-KCSi6", "upsert failed")
+			}
+			return nil
 		},
 	}
 }
@@ -96,8 +101,10 @@ func NewUpdateStatement(aggregateType eventstore.AggregateType, sequence, previo
 				return handler.ErrNoCondition
 			}
 			query := "UPDATE " + projectionName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
-			_, err := ex.Exec(query, args...)
-			return err
+			if _, err := ex.Exec(query, args...); err != nil {
+				return errors.ThrowInternal(err, "CRDB-hpHFZ", "update failed")
+			}
+			return nil
 		},
 	}
 }
@@ -125,8 +132,11 @@ func NewDeleteStatement(aggregateType eventstore.AggregateType, sequence, previo
 				return handler.ErrNoCondition
 			}
 			query := "DELETE FROM " + projectionName + " WHERE " + wheresPlaceholders
-			_, err := ex.Exec(query, args...)
-			return err
+
+			if _, err := ex.Exec(query, args...); err != nil {
+				return errors.ThrowInternal(err, "CRDB-I478U", "delete failed")
+			}
+			return nil
 		},
 	}
 }

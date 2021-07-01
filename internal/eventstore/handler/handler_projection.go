@@ -180,15 +180,16 @@ func (h *ProjectionHandler) bulk(
 	errs := lock(ctx, h.requeueAfter)
 	//wait until projection is locked
 	if err, ok := <-errs; err != nil || !ok {
-		logging.Log("HANDL-XDJ4i").OnError(err).Warn("initial lock failed")
+		logging.LogWithFields("HANDL-XDJ4i", "projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
 		return err
 	}
-	go cancelOnErr(ctx, errs, cancel)
+	go h.cancelOnErr(ctx, errs, cancel)
 
 	execErr := executeBulk(ctx)
+	logging.LogWithFields("EVENT-gwiu4", "projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
 
 	unlockErr := unlock()
-	logging.Log("EVENT-boPv1").OnError(unlockErr).Warn("unable to unlock")
+	logging.LogWithFields("EVENT-boPv1", "projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
 
 	if execErr != nil {
 		return execErr
@@ -197,12 +198,12 @@ func (h *ProjectionHandler) bulk(
 	return unlockErr
 }
 
-func cancelOnErr(ctx context.Context, errs <-chan error, cancel func()) {
+func (h *ProjectionHandler) cancelOnErr(ctx context.Context, errs <-chan error, cancel func()) {
 	for {
 		select {
 		case err := <-errs:
 			if err != nil {
-				logging.Log("HANDL-cVop2").WithError(err).Warn("bulk canceled")
+				logging.LogWithFields("HANDL-cVop2", "projection", h.ProjectionName).WithError(err).Warn("bulk canceled")
 				cancel()
 				return
 			}
@@ -229,11 +230,12 @@ func (h *ProjectionHandler) prepareExecuteBulk(
 			default:
 				hasLimitExeeded, err := h.fetchBulkStmts(ctx, query, reduce)
 				if err != nil || len(h.stmts) == 0 {
+					logging.LogWithFields("HANDL-CzQvn", "projection", h.ProjectionName).OnError(err).Warn("unable to fetch stmts")
 					return err
 				}
 
 				if err = h.push(ctx, update, reduce); err != nil {
-					logging.Log("EVENT-EFDwe").WithError(err).Warn("unable to push")
+					logging.LogWithFields("EVENT-EFDwe", "projection", h.ProjectionName).WithError(err).Warn("unable to push")
 					return err
 				}
 
@@ -252,18 +254,19 @@ func (h *ProjectionHandler) fetchBulkStmts(
 ) (limitExeeded bool, err error) {
 	eventQuery, eventsLimit, err := query()
 	if err != nil {
-		logging.Log("HANDL-x6qvs").WithError(err).Warn("unable to create event query")
+		logging.LogWithFields("HANDL-x6qvs", "projection", h.ProjectionName).WithError(err).Warn("unable to create event query")
 		return false, err
 	}
 
 	events, err := h.Eventstore.FilterEvents(ctx, eventQuery)
 	if err != nil {
-		logging.Log("EVENT-ACMMS").WithError(err).Info("Unable to filter events in batch job")
+		logging.LogWithFields("EVENT-ACMMS", "projection", h.ProjectionName).WithError(err).Info("Unable to bulk fetch events")
 		return false, err
 	}
 
 	for _, event := range events {
 		if err = h.processEvent(ctx, event, reduce); err != nil {
+			logging.LogWithFields("HANDL-PaKlz", "projection", h.ProjectionName, "seq", event.Sequence()).WithError(err).Warn("unable to process event in bulk")
 			return false, err
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -32,18 +33,18 @@ func (h *StatementHandler) currentSequences(query func(string, ...interface{}) (
 
 		err = rows.Scan(&sequence, &aggregateType)
 		if err != nil {
-			return nil, err
+			return nil, errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
 		}
 
 		sequences[aggregateType] = sequence
 	}
 
 	if err = rows.Close(); err != nil {
-		return nil, err
+		return nil, errors.ThrowInternal(err, "CRDB-h5i5m", "close rows failed")
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, errors.ThrowInternal(err, "CRDB-O8zig", "errors in scanning rows")
 	}
 
 	return sequences, nil
@@ -61,7 +62,7 @@ func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, sequences currentS
 
 	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", "), values...)
 	if err != nil {
-		return err
+		return errors.ThrowInternal(err, "CRDB-TrH2Z", "unable to exec update sequence")
 	}
 	if rows, _ := res.RowsAffected(); rows < 1 {
 		return errSeqNotUpdated

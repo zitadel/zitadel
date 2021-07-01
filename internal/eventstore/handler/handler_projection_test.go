@@ -469,7 +469,8 @@ func Test_cancelOnErr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			go cancelOnErr(tt.args.ctx, tt.args.errs, tt.cancelMocker.mockCancel)
+			h := &ProjectionHandler{}
+			go h.cancelOnErr(tt.args.ctx, tt.args.errs, tt.cancelMocker.mockCancel)
 			if tt.args.err != nil {
 				tt.args.errs <- tt.args.err
 			}
