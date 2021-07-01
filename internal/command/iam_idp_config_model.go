@@ -32,7 +32,6 @@ func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(iam.FeaturesSetEventType).
 		EventTypes(
 			iam.IDPConfigAddedEventType,
 			iam.IDPConfigChangedEventType,
