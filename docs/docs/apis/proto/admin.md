@@ -1906,6 +1906,7 @@ This is an empty request
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
+| privacy_policy |  bool | - |  |
 
 
 
@@ -2061,6 +2062,7 @@ This is an empty request
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
+| privacy_policy |  bool | - |  |
 
 
 

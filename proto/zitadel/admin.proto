@@ -2456,6 +2456,7 @@ message SetDefaultFeaturesRequest {
     bool label_policy_private_label = 15;
     bool label_policy_watermark = 16;
     bool custom_text = 17;
+    bool privacy_policy = 18;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2490,6 +2491,7 @@ message SetOrgFeaturesRequest {
     bool label_policy_private_label = 16;
     bool label_policy_watermark = 17;
     bool custom_text = 18;
+    bool privacy_policy = 19;
 }
 
 message SetOrgFeaturesResponse {

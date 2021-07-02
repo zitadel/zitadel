@@ -29,6 +29,7 @@ type FeaturesView struct {
 	LabelPolicyWatermark     bool
 	CustomDomain             bool
 	CustomText               bool
+	PrivacyPolicy            bool
 }
 
 func (f *FeaturesView) FeatureList() []string {
@@ -65,6 +66,9 @@ func (f *FeaturesView) FeatureList() []string {
 	}
 	if f.CustomText {
 		list = append(list, domain.FeatureCustomText)
+	}
+	if f.PrivacyPolicy {
+		list = append(list, domain.FeaturePrivacyPolicy)
 	}
 	return list
 }

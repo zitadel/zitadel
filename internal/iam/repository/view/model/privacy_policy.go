@@ -24,7 +24,7 @@ type PrivacyPolicyView struct {
 	AggregateID  string    `json:"-" gorm:"column:aggregate_id;primary_key"`
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-	State        int32     `json:"-" gorm:"column:lockout_policy_state"`
+	State        int32     `json:"-" gorm:"column:state"`
 
 	TOSLink     string `json:"tosLink" gorm:"column:tos_link"`
 	PrivacyLink string `json:"privacyLink" gorm:"column:privacy_link"`

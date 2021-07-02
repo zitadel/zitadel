@@ -327,6 +327,10 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+		if authReq.PrivacyPolicy != nil {
+			baseData.TOSLink = authReq.PrivacyPolicy.TOSLink
+			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
+		}
 	} else {
 		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
 		if err != nil {

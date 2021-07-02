@@ -65,7 +65,8 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	labelPolicyPrivateLabel,
 	labelPolicyWatermark,
 	customDomain,
-	customText bool,
+	customText,
+	privacyPolicy bool,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -115,7 +116,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if wm.CustomText != customText {
 		changes = append(changes, features.ChangeCustomText(customText))
 	}
-
+	if wm.PrivacyPolicy != privacyPolicy {
+		changes = append(changes, features.ChangePrivacyPolicy(privacyPolicy))
+	}
 	if len(changes) == 0 {
 		return nil, false
 	}
