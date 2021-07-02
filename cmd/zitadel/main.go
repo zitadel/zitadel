@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/getsentry/sentry-go"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
@@ -38,7 +39,6 @@ import (
 	"github.com/caos/zitadel/internal/ui/console"
 	"github.com/caos/zitadel/internal/ui/login"
 	"github.com/caos/zitadel/openapi"
-	"github.com/getsentry/sentry-go"
 )
 
 type Config struct {
@@ -93,11 +93,13 @@ const (
 )
 
 func main() {
-	if os.Getenv("SENTRY_USAGE") == "true" {
+	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
+	if enableSentry {
 		err := sentry.Init(sentry.ClientOptions{})
 		if err != nil {
-			log.Fatalf("sentry.Init: %s", err)
+			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
 		}
+		defer sentry.Flush(2 * time.Second)
 	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
 	flag.Var(setupPaths, "setup-files", "paths to the setup files")
@@ -110,9 +112,6 @@ func main() {
 		startSetup(setupPaths.Values())
 	default:
 		logging.Log("MAIN-afEQ2").Fatal("please provide an valid argument [start, setup]")
-	}
-	if os.Getenv("SENTRY_USAGE") == "true" {
-		defer sentry.Flush(2 * time.Second)
 	}
 }
 
