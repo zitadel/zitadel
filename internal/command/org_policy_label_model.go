@@ -30,6 +30,8 @@ func (wm *OrgLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReade
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyAddedEvent)
 		case *org.LabelPolicyChangedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyChangedEvent)
+		case *org.LabelPolicyRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyRemovedEvent)
 		case *org.LabelPolicyLogoAddedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLogoAddedEvent)
 		case *org.LabelPolicyLogoRemovedEvent:
@@ -65,6 +67,7 @@ func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.LabelPolicyAddedEventType,
 			org.LabelPolicyChangedEventType,
+			org.LabelPolicyRemovedEventType,
 			org.LabelPolicyLogoAddedEventType,
 			org.LabelPolicyLogoRemovedEventType,
 			org.LabelPolicyIconAddedEventType,

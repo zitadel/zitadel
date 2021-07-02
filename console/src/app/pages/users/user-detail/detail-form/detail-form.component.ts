@@ -1,11 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { DomSanitizer } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { Gender, Human, User } from 'src/app/proto/generated/zitadel/user_pb';
-import { AssetService } from 'src/app/services/asset.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
@@ -25,7 +22,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Output() public submitData: EventEmitter<User> = new EventEmitter<User>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
 
-  public profilePic: any = null;
   public profileForm!: FormGroup;
 
   private sub: Subscription = new Subscription();
@@ -33,9 +29,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private assetService: AssetService,
-    private toast: ToastService,
-    private sanitizer: DomSanitizer,
   ) {
     this.profileForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [
@@ -48,8 +41,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
       gender: [{ value: 0, disabled: this.disabled }],
       preferredLanguage: [{ value: '', disabled: this.disabled }],
     });
-
-    this.loadAvatar();
   }
 
   public ngOnChanges(): void {
@@ -85,7 +76,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   public openUploadDialog(): void {
     const dialogRef = this.dialog.open(ProfilePictureComponent, {
       data: {
-        profilePic: this.profilePic,
+        profilePic: this.user.profile?.avatarUrl,
       },
       width: '400px',
     });
@@ -93,15 +84,6 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
     dialogRef.afterClosed().subscribe(resp => {
       if (resp) {
       }
-    });
-  }
-
-  public loadAvatar(): Promise<any> {
-    return this.assetService.load(`users/me/avatar`).then(data => {
-      const objectURL = URL.createObjectURL(data);
-      this.profilePic = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-    }).catch(error => {
-      this.toast.showError(error);
     });
   }
 

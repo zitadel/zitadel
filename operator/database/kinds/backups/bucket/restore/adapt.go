@@ -19,7 +19,6 @@ const (
 	secretPath         = "/secrets/sa.json"
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
-	image              = "ghcr.io/caos/zitadel-crbackup"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
 	timeout            = 15 * time.Minute
@@ -38,7 +37,7 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	secretName string,
 	secretKey string,
-	version string,
+	image string,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -60,8 +59,8 @@ func AdaptFunc(
 		tolerations,
 		secretName,
 		secretKey,
-		version,
-		command)
+		command,
+		image)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
 	if err != nil {

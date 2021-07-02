@@ -2,5 +2,6 @@
     matRippleCentered="true"
     [ngStyle]="{'height': size+'px', 'width': size+'px', 'fontSize': (fontSize-1)+'px', 'background': color}"
     [ngClass]="{'active': active}">
-    {{credentials}}
+    <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl"/>
+    <ng-template #creds>{{credentials}}</ng-template>
 </div>

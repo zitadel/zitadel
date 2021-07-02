@@ -65,11 +65,11 @@ func (l *Login) handleOTPVerify(w http.ResponseWriter, r *http.Request, authReq 
 }
 
 func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data.baseData = l.getBaseData(r, authReq, "MFA Init Verify", errType, errMessage)
+	data.baseData = l.getBaseData(r, authReq, "MFA Init Verify", errID, errMessage)
 	data.profileData = l.getProfileData(authReq)
 	if data.MFAType == domain.MFATypeOTP {
 		code, err := generateQrCode(data.otpData.Url)

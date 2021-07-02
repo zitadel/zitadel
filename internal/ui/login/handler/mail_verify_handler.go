@@ -69,15 +69,15 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 }
 
 func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if userID == "" {
 		userID = authReq.UserID
 	}
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "Mail Verification", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Mail Verification", errID, errMessage),
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}

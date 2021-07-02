@@ -90,15 +90,15 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, passwordSet bool, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if authReq != nil {
 		userID = authReq.UserID
 	}
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "Init User", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Init User", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,

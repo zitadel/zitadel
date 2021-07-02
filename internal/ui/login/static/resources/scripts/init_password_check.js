@@ -3,7 +3,7 @@ function CheckInitPwPolicy() {
     let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("passwordconfirm").value;
 
-    if (ComplexityPolicyCheck(policyElement, pwNew) === false) {
+    if (ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) === false) {
         return false;
     }
 

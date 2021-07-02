@@ -20,7 +20,6 @@ export class AccountsCardComponent implements OnInit {
   constructor(public authService: AuthenticationService, private router: Router, private userService: GrpcAuthService) {
     this.userService.listMyUserSessions().then(sessions => {
       this.sessions = sessions.resultList;
-      console.log(sessions.resultList);
       const index = this.sessions.findIndex(user => user.loginName === this.user.preferredLoginName);
       if (index > -1) {
         this.sessions.splice(index, 1);

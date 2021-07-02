@@ -108,6 +108,7 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 			change.ModifierLoginName = user.PreferredLoginName
 			if user.HumanView != nil {
 				change.ModifierName = user.HumanView.DisplayName
+				change.ModifierAvatarURL = user.HumanView.AvatarURL
 			}
 			if user.MachineView != nil {
 				change.ModifierName = user.MachineView.Name

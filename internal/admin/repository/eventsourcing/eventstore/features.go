@@ -33,6 +33,7 @@ func (repo *FeaturesRepo) GetDefaultFeatures(ctx context.Context) (*features_mod
 	if errors.IsNotFound(viewErr) {
 		features = new(model.FeaturesView)
 	}
+
 	events, esErr := repo.getIAMEvents(ctx, features.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")

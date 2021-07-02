@@ -60,7 +60,7 @@
             <div (clickOutside)="closeAccountCard()" class="icon-container">
                 <app-avatar
                     *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-                    class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount" [forColor]="user?.preferredLoginName"
+                    class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"  [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName"
                     [name]="user.human.profile.displayName ? user.human.profile.displayName : (user.human.profile.firstName + ' '+ user.human.profile.lastName)"
                     [size]="38">
                 </app-avatar>
@@ -179,11 +179,11 @@
                         <span class="fill-space"></span>
 
                         <div class="toc-line">
-                            <a class="toc" [href]="language == 'de' ? 'https://zitadel.ch/pdf/agb.pdf' : 'https://zitadel.ch/pdf/tos.pdf'" alt="Terms and Conditions"
+                            <a class="toc" [href]="'https://docs.zitadel.ch/docs/legal/terms-of-service'" alt="Terms and Conditions"
                                 target="_blank">{{'MENU.TOS'
                                 | translate}}</a>
                                 <span class="slash">|</span>
-                            <a class="toc" [href]="language == 'de' ? 'https://zitadel.ch/pdf/datenschutz.pdf' : 'https://zitadel.ch/pdf/privacy.pdf'" alt="Terms and Conditions"
+                            <a class="toc" [href]="'https://docs.zitadel.ch/docs/legal/privacy-policy'" alt="Privacy Policy "
                                 target="_blank">{{'MENU.PRIVACY'
                                 | translate}}</a>
                             <span>&nbsp;&nbsp;&nbsp;</span>
