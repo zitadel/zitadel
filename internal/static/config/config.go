@@ -64,7 +64,7 @@ func newStorageConfig(storageType string, configData []byte) (static.Config, err
 }
 
 var (
-	errNoStorage = errors.ThrowInternal(nil, "STATIC-ashg4", "not configured")
+	errNoStorage = errors.ThrowInternal(nil, "STATIC-ashg4", "Errors.Assets.Store.NotConfigured")
 )
 
 type NoStorage struct{}
