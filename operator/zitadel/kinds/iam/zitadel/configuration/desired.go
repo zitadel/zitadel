@@ -146,7 +146,7 @@ type Cache struct {
 
 type Sentry struct {
 	SentryDSN         *secret.Secret   `yaml:"sentryDSN,omitempty"`
-	ExistingSentryDSN *secret.Existing `yaml:"sentryDSN,omitempty"`
+	ExistingSentryDSN *secret.Existing `yaml:"existingSentryDSN,omitempty"`
 	Environment       string           `yaml:"environment,omitempty"`
 	Version           string           `yaml:"version,omitempty"`
 	Usage             string           `yaml:"usage,omitempty"`
