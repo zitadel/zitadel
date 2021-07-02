@@ -99,6 +99,8 @@ func main() {
 		if err != nil {
 			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
 		}
+		sentry.CaptureMessage("sentry started")
+		logging.Log("MAIN-adgf3").Info("sentry started")
 		defer sentry.Flush(2 * time.Second)
 	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
