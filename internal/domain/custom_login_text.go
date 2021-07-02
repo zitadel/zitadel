@@ -187,6 +187,7 @@ const (
 	LoginKeyRegistrationUser                         = "RegistrationUser."
 	LoginKeyRegistrationUserTitle                    = LoginKeyRegistrationUser + "Title"
 	LoginKeyRegistrationUserDescription              = LoginKeyRegistrationUser + "Description"
+	LoginKeyRegistrationUserDescriptionOrgRegister   = LoginKeyRegistrationUser + "DescriptionOrgRegister"
 	LoginKeyRegistrationUserFirstnameLabel           = LoginKeyRegistrationUser + "FirstnameLabel"
 	LoginKeyRegistrationUserLastnameLabel            = LoginKeyRegistrationUser + "LastnameLabel"
 	LoginKeyRegistrationUserEmailLabel               = LoginKeyRegistrationUser + "EmailLabel"
@@ -502,6 +503,7 @@ type RegistrationOptionScreenText struct {
 type RegistrationUserScreenText struct {
 	Title                    string
 	Description              string
+	DescriptionOrgRegister   string
 	FirstnameLabel           string
 	LastnameLabel            string
 	EmailLabel               string

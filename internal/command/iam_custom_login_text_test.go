@@ -706,6 +706,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
@@ -1175,6 +1180,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					RegistrationUser: domain.RegistrationUserScreenText{
 						Title:                    "Title",
 						Description:              "Description",
+						DescriptionOrgRegister:   "DescriptionOrgRegister",
 						FirstnameLabel:           "FirstnameLabel",
 						LastnameLabel:            "LastnameLabel",
 						EmailLabel:               "EmailLabel",
@@ -1907,6 +1913,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2845,6 +2856,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, language.English,
 								),
 							),
 							eventFromEventPusher(

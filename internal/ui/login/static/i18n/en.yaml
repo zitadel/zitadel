@@ -176,6 +176,7 @@ RegisterOption:
 RegistrationUser:
   Title: Registration
   Description: Enter your Userdata. Your email address will be used as loginname.
+  DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
   FirstnameLabel: Firstname

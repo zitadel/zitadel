@@ -2,7 +2,12 @@
 
 <div class="lgn-head">
     <h1>{{t "RegistrationUser.Title"}}</h1>
+
+    {{if .OrgRegister}}
+    <p>{{t "RegistrationUser.DescriptionOrgRegister"}}</p>
+    {{ else}}
     <p>{{t "RegistrationUser.Description"}}</p>
+    {{end}}
 </div>
 
 

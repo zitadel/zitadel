@@ -687,6 +687,10 @@ func (c *Commands) getRegistrationUserEvents(ctx context.Context, agg *eventstor
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserDescriptionOrgRegister, existingText.RegistrationUserDescriptionOrgRegister, text.RegistrationUser.DescriptionOrgRegister, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.getCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserFirstnameLabel, existingText.RegistrationUserFirstnameLabel, text.RegistrationUser.FirstnameLabel, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)

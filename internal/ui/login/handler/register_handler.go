@@ -36,6 +36,7 @@ type registerData struct {
 	HasNumber                 string
 	HasSymbol                 string
 	ShowUsername              bool
+	OrgRegister               bool
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -143,6 +144,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		return
 	}
 	data.ShowUsername = orgIAMPolicy.UserLoginMustBeDomain
+	data.OrgRegister = orgIAMPolicy.UserLoginMustBeDomain
 
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {

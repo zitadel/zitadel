@@ -282,24 +282,25 @@ message RegistrationOptionScreenText {
 message RegistrationUserScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
-    string firstname_label = 3 [(validate.rules).string = {max_len: 200}];
-    string lastname_label = 4 [(validate.rules).string = {max_len: 200}];
-    string email_label = 5 [(validate.rules).string = {max_len: 200}];
-    string username_label = 6 [(validate.rules).string = {max_len: 200}];
-    string language_label = 7 [(validate.rules).string = {max_len: 200}];
-    string gender_label = 8 [(validate.rules).string = {max_len: 200}];
-    string password_label = 9 [(validate.rules).string = {max_len: 200}];
-    string password_confirm_label = 10 [(validate.rules).string = {max_len: 200}];
-    string tos_and_privacy_label = 11 [(validate.rules).string = {max_len: 200}];
-    string tos_confirm = 12 [(validate.rules).string = {max_len: 200}];
-    string tos_link = 13 [(validate.rules).string = {max_len: 200}];
-    string tos_link_text = 14 [(validate.rules).string = {max_len: 200}];
-    string privacy_confirm = 15 [(validate.rules).string = {max_len: 200}];
-    string privacy_link = 16 [(validate.rules).string = {max_len: 200}];
-    string privacy_link_text = 17 [(validate.rules).string = {max_len: 200}];
-    string external_login_description = 18 [(validate.rules).string = {max_len: 500}];
-    string next_button_text = 19 [(validate.rules).string = {max_len: 200}];
-    string back_button_text = 20 [(validate.rules).string = {max_len: 200}];
+    string description_org_register = 3 [(validate.rules).string = {max_len: 500}];
+    string firstname_label = 4 [(validate.rules).string = {max_len: 200}];
+    string lastname_label = 5 [(validate.rules).string = {max_len: 200}];
+    string email_label = 6 [(validate.rules).string = {max_len: 200}];
+    string username_label = 7 [(validate.rules).string = {max_len: 200}];
+    string language_label = 8 [(validate.rules).string = {max_len: 200}];
+    string gender_label = 9 [(validate.rules).string = {max_len: 200}];
+    string password_label = 10 [(validate.rules).string = {max_len: 200}];
+    string password_confirm_label = 11 [(validate.rules).string = {max_len: 200}];
+    string tos_and_privacy_label = 12 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm = 13 [(validate.rules).string = {max_len: 200}];
+    string tos_link = 14 [(validate.rules).string = {max_len: 200}];
+    string tos_link_text = 15 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 16 [(validate.rules).string = {max_len: 200}];
+    string privacy_link = 17 [(validate.rules).string = {max_len: 200}];
+    string privacy_link_text = 18 [(validate.rules).string = {max_len: 200}];
+    string external_login_description = 19 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 20 [(validate.rules).string = {max_len: 200}];
+    string back_button_text = 21 [(validate.rules).string = {max_len: 200}];
 }
 
 message RegistrationOrgScreenText {

@@ -682,6 +682,9 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyRegistrationUserDescription {
 		result.RegistrationUser.Description = text.Text
 	}
+	if text.Key == domain.LoginKeyRegistrationUserDescriptionOrgRegister {
+		result.RegistrationUser.DescriptionOrgRegister = text.Text
+	}
 	if text.Key == domain.LoginKeyRegistrationUserFirstnameLabel {
 		result.RegistrationUser.FirstnameLabel = text.Text
 	}

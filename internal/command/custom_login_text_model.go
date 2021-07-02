@@ -170,6 +170,7 @@ type CustomLoginTextReadModel struct {
 
 	RegistrationUserTitle                    string
 	RegistrationUserDescription              string
+	RegistrationUserDescriptionOrgRegister   string
 	RegistrationUserFirstnameLabel           string
 	RegistrationUserLastnameLabel            string
 	RegistrationUserEmailLabel               string
@@ -1663,6 +1664,10 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenSetEvent(e *poli
 		wm.RegistrationUserDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyRegistrationUserDescriptionOrgRegister {
+		wm.RegistrationUserDescriptionOrgRegister = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyRegistrationUserFirstnameLabel {
 		wm.RegistrationUserFirstnameLabel = e.Text
 		return
@@ -1744,6 +1749,10 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenRemoveEvent(e *p
 	}
 	if e.Key == domain.LoginKeyRegistrationUserDescription {
 		wm.RegistrationUserDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyRegistrationUserDescriptionOrgRegister {
+		wm.RegistrationUserDescriptionOrgRegister = ""
 		return
 	}
 	if e.Key == domain.LoginKeyRegistrationUserFirstnameLabel {

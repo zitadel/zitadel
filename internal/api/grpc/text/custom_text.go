@@ -314,6 +314,7 @@ func RegistrationUserScreenTextToPb(text domain.RegistrationUserScreenText) *tex
 	return &text_pb.RegistrationUserScreenText{
 		Title:                    text.Title,
 		Description:              text.Description,
+		DescriptionOrgRegister:   text.DescriptionOrgRegister,
 		FirstnameLabel:           text.FirstnameLabel,
 		LastnameLabel:            text.LastnameLabel,
 		EmailLabel:               text.EmailLabel,
@@ -724,6 +725,7 @@ func RegistrationUserScreenTextPbToDomain(text *text_pb.RegistrationUserScreenTe
 	return domain.RegistrationUserScreenText{
 		Title:                    text.Title,
 		Description:              text.Description,
+		DescriptionOrgRegister:   text.DescriptionOrgRegister,
 		FirstnameLabel:           text.FirstnameLabel,
 		LastnameLabel:            text.LastnameLabel,
 		EmailLabel:               text.EmailLabel,

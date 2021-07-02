@@ -723,6 +723,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
@@ -1193,6 +1198,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					RegistrationUser: domain.RegistrationUserScreenText{
 						Title:                    "Title",
 						Description:              "Description",
+						DescriptionOrgRegister:   "DescriptionOrgRegister",
 						FirstnameLabel:           "FirstnameLabel",
 						LastnameLabel:            "LastnameLabel",
 						EmailLabel:               "EmailLabel",
@@ -1925,6 +1931,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2863,6 +2874,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, language.English,
 								),
 							),
 							eventFromEventPusher(
