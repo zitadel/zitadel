@@ -117,15 +117,18 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *project.GrantAddedEvent:
 			if wm.ProjectGrantID == e.GrantID {
 				wm.ProjectGrantExists = true
+				wm.ExistingRoleKeys = e.RoleKeys
 			}
-			wm.ExistingRoleKeys = e.RoleKeys
 		case *project.GrantChangedEvent:
-			wm.ExistingRoleKeys = e.RoleKeys
+			if wm.ProjectGrantID == e.GrantID {
+				wm.ProjectGrantExists = true
+				wm.ExistingRoleKeys = e.RoleKeys
+			}
 		case *project.GrantRemovedEvent:
 			if wm.ProjectGrantID == e.GrantID {
 				wm.ProjectGrantExists = false
+				wm.ExistingRoleKeys = []string{}
 			}
-			wm.ExistingRoleKeys = []string{}
 		case *project.RoleAddedEvent:
 			if wm.ProjectGrantID != "" {
 				continue
