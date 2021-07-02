@@ -132,8 +132,8 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 
 	clauses := make([]string, len(filters))
 	for idx, filter := range filters {
-		subClauses := make([]string, len(filter))
-		for subIdx, f := range filter {
+		subClauses := make([]string, 0, len(filter))
+		for _, f := range filter {
 			value := f.Value
 			switch value.(type) {
 			case []bool, []float64, []int64, []string, []repository.AggregateType, []repository.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]repository.AggregateType, *[]repository.EventType:
@@ -142,10 +142,11 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 				var err error
 				value, err = json.Marshal(value)
 				logging.Log("SQL-BSsNy").OnError(err).Warn("unable to marshal search value")
+				continue
 			}
 
-			subClauses[subIdx] = getCondition(criteria, f)
-			if subClauses[subIdx] == "" {
+			subClauses = append(subClauses, getCondition(criteria, f))
+			if subClauses[len(subClauses)-1] == "" {
 				return "", nil
 			}
 			values = append(values, value)
