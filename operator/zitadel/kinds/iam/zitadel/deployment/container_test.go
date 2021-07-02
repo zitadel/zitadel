@@ -94,6 +94,15 @@ func TestDeployment_GetContainer(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "SENTRY_DSN",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretPasswordsName},
+					Key:                  "SENTRY_DSN",
+				},
+			},
+		},
 	}
 
 	volMounts := []corev1.VolumeMount{
