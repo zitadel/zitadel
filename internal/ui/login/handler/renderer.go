@@ -321,8 +321,19 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+		if authReq.PrivacyPolicy != nil {
+			baseData.TOSLink = authReq.PrivacyPolicy.TOSLink
+			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
+		}
 	} else {
-		//TODO: How to handle LabelPolicy if no auth req (eg Register)
+		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
+		if err != nil {
+			return baseData
+		}
+		if privacyPolicy != nil {
+			baseData.TOSLink = privacyPolicy.TOSLink
+			baseData.PrivacyLink = privacyPolicy.PrivacyLink
+		}
 	}
 	return baseData
 }
@@ -405,7 +416,6 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
-
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -437,6 +447,8 @@ type baseData struct {
 	OrgName                string
 	PrimaryDomain          string
 	DisplayLoginNameSuffix bool
+	TOSLink                string
+	PrivacyLink            string
 	AuthReqID              string
 	CSRF                   template.HTML
 	Nonce                  string

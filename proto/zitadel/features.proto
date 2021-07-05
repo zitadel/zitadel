@@ -25,6 +25,7 @@ message Features {
   bool label_policy_private_label = 14;
   bool label_policy_watermark = 15;
   bool custom_text = 16;
+  bool privacy_policy = 17;
 }
 
 message FeatureTier {
