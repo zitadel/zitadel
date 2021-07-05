@@ -100,6 +100,14 @@ const routes: Routes = [
         loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
           .then(m => m.LoginPolicyModule),
       },
+      {
+        path: PolicyComponentType.MESSAGETEXTS,
+        data: {
+          serviceType: PolicyComponentServiceType.MGMT,
+        },
+        loadChildren: () => import('src/app/modules/policies/message-texts/message-texts.module')
+          .then(m => m.MessageTextsPolicyModule),
+      },
     ],
   },
   {

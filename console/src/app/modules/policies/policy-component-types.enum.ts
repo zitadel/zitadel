@@ -5,6 +5,7 @@ export enum PolicyComponentType {
   IAM = 'iam',
   LOGIN = 'login',
   PRIVATELABEL = 'privatelabel',
+  MESSAGETEXTS = 'messagetexts'
 }
 export enum PolicyComponentServiceType {
   MGMT = 'mgmt',
