@@ -184,12 +184,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"selectedGender": func(g int32) bool {
 			return false
 		},
-		"hasTOSLink": func() bool {
-			return false
-		},
-		"hasPrivacyLink": func() bool {
-			return false
-		},
 		"hasUsernamePasswordLogin": func() bool {
 			return false
 		},

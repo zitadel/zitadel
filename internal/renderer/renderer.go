@@ -15,8 +15,6 @@ import (
 
 const (
 	TranslateFn = "t"
-	TosFunc     = "hasTosLink"
-	PrivacyFunc = "hasPrivacyLink"
 
 	templatesPath = "/templates"
 )

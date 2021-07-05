@@ -28,7 +28,7 @@ func (c *Commands) SetupStep17(ctx context.Context, step *Step17) error {
 			return nil, err
 		}
 
-		logging.Log("SETUP-4k0LL").Info("default message text set up")
+		logging.Log("SETUP-N9sq2").Info("default privacy policy set up")
 		return []eventstore.EventPusher{events}, nil
 	}
 	return c.setup(ctx, step, fn)

@@ -1940,7 +1940,7 @@ service ManagementService {
     }
 
     // Returns the default privacy policy of the IAM
-    // With this policy the password strength can be configured
+    // With this policy the privacy relevant things can be configured (e.g tos link)
     rpc GetDefaultPrivacyPolicy(GetDefaultPrivacyPolicyRequest) returns (GetDefaultPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/privacy"

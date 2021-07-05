@@ -389,7 +389,9 @@ func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_mo
 			return iam_es_model.PrivacyViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.PrivacyViewToModel(policy), nil
+	result := iam_es_model.PrivacyViewToModel(policy)
+	result.Default = true
+	return result, nil
 }
 
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {

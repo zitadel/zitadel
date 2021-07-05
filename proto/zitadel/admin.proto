@@ -1467,7 +1467,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "default password complexity policy";
+                    description: "default privacy policy";
                 };
             };
         };
