@@ -90,7 +90,7 @@ func LoginScreenTextToPb(text domain.LoginScreenText) *text_pb.LoginScreenText {
 		LoginNamePlaceholder:      text.LoginnamePlaceholder,
 		RegisterButtonText:        text.RegisterButtonText,
 		NextButtonText:            text.NextButtonText,
-		ExternalUserDescription:   text.ExternalLogin,
+		ExternalUserDescription:   text.ExternalUserDescription,
 		UserMustBeMemberOfOrg:     text.MustBeMemberOfOrg,
 	}
 }
@@ -426,17 +426,17 @@ func LoginScreenTextPbToDomain(text *text_pb.LoginScreenText) domain.LoginScreen
 		return domain.LoginScreenText{}
 	}
 	return domain.LoginScreenText{
-		Title:                text.Title,
-		Description:          text.Description,
-		TitleLinking:         text.TitleLinkingProcess,
-		DescriptionLinking:   text.DescriptionLinkingProcess,
-		LoginNameLabel:       text.LoginNameLabel,
-		UsernamePlaceholder:  text.UserNamePlaceholder,
-		LoginnamePlaceholder: text.LoginNamePlaceholder,
-		RegisterButtonText:   text.RegisterButtonText,
-		NextButtonText:       text.NextButtonText,
-		ExternalLogin:        text.ExternalUserDescription,
-		MustBeMemberOfOrg:    text.UserMustBeMemberOfOrg,
+		Title:                   text.Title,
+		Description:             text.Description,
+		TitleLinking:            text.TitleLinkingProcess,
+		DescriptionLinking:      text.DescriptionLinkingProcess,
+		LoginNameLabel:          text.LoginNameLabel,
+		UsernamePlaceholder:     text.UserNamePlaceholder,
+		LoginnamePlaceholder:    text.LoginNamePlaceholder,
+		RegisterButtonText:      text.RegisterButtonText,
+		NextButtonText:          text.NextButtonText,
+		ExternalUserDescription: text.ExternalUserDescription,
+		MustBeMemberOfOrg:       text.UserMustBeMemberOfOrg,
 	}
 }
 

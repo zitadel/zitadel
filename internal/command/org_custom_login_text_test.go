@@ -159,7 +159,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1036,17 +1036,17 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						MustBeMemberOfOrg:  "MustBeMemberOfOrg",
 					},
 					Login: domain.LoginScreenText{
-						Title:                "Title",
-						Description:          "Description",
-						TitleLinking:         "TitleLinking",
-						DescriptionLinking:   "DescriptionLinking",
-						LoginNameLabel:       "LoginNameLabel",
-						UsernamePlaceholder:  "UsernamePlaceholder",
-						LoginnamePlaceholder: "LoginnamePlaceholder",
-						RegisterButtonText:   "RegisterButtonText",
-						NextButtonText:       "NextButtonText",
-						ExternalLogin:        "ExternalLogin",
-						MustBeMemberOfOrg:    "MustBeMemberOfOrg",
+						Title:                   "Title",
+						Description:             "Description",
+						TitleLinking:            "TitleLinking",
+						DescriptionLinking:      "DescriptionLinking",
+						LoginNameLabel:          "LoginNameLabel",
+						UsernamePlaceholder:     "UsernamePlaceholder",
+						LoginnamePlaceholder:    "LoginnamePlaceholder",
+						RegisterButtonText:      "RegisterButtonText",
+						NextButtonText:          "NextButtonText",
+						ExternalUserDescription: "ExternalUserDescription",
+						MustBeMemberOfOrg:       "MustBeMemberOfOrg",
 					},
 					Password: domain.PasswordScreenText{
 						Title:          "Title",
@@ -1375,7 +1375,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3321,7 +3321,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5214,7 +5214,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6092,17 +6092,17 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						MustBeMemberOfOrg:  "MustBeMemberOfOrg",
 					},
 					Login: domain.LoginScreenText{
-						Title:                "Title",
-						Description:          "Description",
-						TitleLinking:         "TitleLinking",
-						DescriptionLinking:   "DescriptionLinking",
-						LoginNameLabel:       "LoginNameLabel",
-						UsernamePlaceholder:  "UsernamePlaceholder",
-						LoginnamePlaceholder: "LoginnamePlaceholder",
-						RegisterButtonText:   "RegisterButtonText",
-						NextButtonText:       "NextButtonText",
-						ExternalLogin:        "ExternalLogin",
-						MustBeMemberOfOrg:    "MustBeMemberOfOrg",
+						Title:                   "Title",
+						Description:             "Description",
+						TitleLinking:            "TitleLinking",
+						DescriptionLinking:      "DescriptionLinking",
+						LoginNameLabel:          "LoginNameLabel",
+						UsernamePlaceholder:     "UsernamePlaceholder",
+						LoginnamePlaceholder:    "LoginnamePlaceholder",
+						RegisterButtonText:      "RegisterButtonText",
+						NextButtonText:          "NextButtonText",
+						ExternalUserDescription: "ExternalUserDescription",
+						MustBeMemberOfOrg:       "MustBeMemberOfOrg",
 					},
 					Password: domain.PasswordScreenText{
 						Title:          "Title",

@@ -6,7 +6,7 @@ Login:
   LoginNameLabel: Loginname
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
-  ExternalLogin: Login with an external user.
+  ExternalUserDescription: Login with an external user.
   MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organisation.
   RegisterButtonText: register
   NextButtonText: next

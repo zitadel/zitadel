@@ -142,7 +142,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1018,17 +1018,17 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						MustBeMemberOfOrg:  "MustBeMemberOfOrg",
 					},
 					Login: domain.LoginScreenText{
-						Title:                "Title",
-						Description:          "Description",
-						TitleLinking:         "TitleLinking",
-						DescriptionLinking:   "DescriptionLinking",
-						LoginNameLabel:       "LoginNameLabel",
-						UsernamePlaceholder:  "UsernamePlaceholder",
-						LoginnamePlaceholder: "LoginnamePlaceholder",
-						RegisterButtonText:   "RegisterButtonText",
-						NextButtonText:       "NextButtonText",
-						ExternalLogin:        "ExternalLogin",
-						MustBeMemberOfOrg:    "MustBeMemberOfOrg",
+						Title:                   "Title",
+						Description:             "Description",
+						TitleLinking:            "TitleLinking",
+						DescriptionLinking:      "DescriptionLinking",
+						LoginNameLabel:          "LoginNameLabel",
+						UsernamePlaceholder:     "UsernamePlaceholder",
+						LoginnamePlaceholder:    "LoginnamePlaceholder",
+						RegisterButtonText:      "RegisterButtonText",
+						NextButtonText:          "NextButtonText",
+						ExternalUserDescription: "ExternalUserDescription",
+						MustBeMemberOfOrg:       "MustBeMemberOfOrg",
 					},
 					Password: domain.PasswordScreenText{
 						Title:          "Title",
@@ -1357,7 +1357,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3302,7 +3302,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5195,7 +5195,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalLogin", language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6072,17 +6072,17 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						MustBeMemberOfOrg:  "MustBeMemberOfOrg",
 					},
 					Login: domain.LoginScreenText{
-						Title:                "Title",
-						Description:          "Description",
-						TitleLinking:         "TitleLinking",
-						DescriptionLinking:   "DescriptionLinking",
-						LoginNameLabel:       "LoginNameLabel",
-						UsernamePlaceholder:  "UsernamePlaceholder",
-						LoginnamePlaceholder: "LoginnamePlaceholder",
-						RegisterButtonText:   "RegisterButtonText",
-						NextButtonText:       "NextButtonText",
-						ExternalLogin:        "ExternalLogin",
-						MustBeMemberOfOrg:    "MustBeMemberOfOrg",
+						Title:                   "Title",
+						Description:             "Description",
+						TitleLinking:            "TitleLinking",
+						DescriptionLinking:      "DescriptionLinking",
+						LoginNameLabel:          "LoginNameLabel",
+						UsernamePlaceholder:     "UsernamePlaceholder",
+						LoginnamePlaceholder:    "LoginnamePlaceholder",
+						RegisterButtonText:      "RegisterButtonText",
+						NextButtonText:          "NextButtonText",
+						ExternalUserDescription: "ExternalUserDescription",
+						MustBeMemberOfOrg:       "MustBeMemberOfOrg",
 					},
 					Password: domain.PasswordScreenText{
 						Title:          "Title",

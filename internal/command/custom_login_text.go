@@ -121,7 +121,7 @@ func (c *Commands) createLoginTextEvents(ctx context.Context, agg *eventstore.Ag
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginExternalUserDescription, existingText.LoginExternalUserDescription, text.Login.ExternalLogin, text.Language, defaultText)
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginExternalUserDescription, existingText.LoginExternalUserDescription, text.Login.ExternalUserDescription, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

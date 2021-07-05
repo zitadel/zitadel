@@ -23,7 +23,7 @@
         {{end}}
 
         {{if hasExternalLogin}}
-            <p>{{t "RegisterOption.ExternalLogin"}}</p>
+            <p>{{t "RegisterOption.ExternalLoginDescription"}}</p>
             {{ $reqid := .AuthReqID}}
             {{range $provider := .IDPProviders}}
                 <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}"

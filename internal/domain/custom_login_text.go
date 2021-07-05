@@ -19,7 +19,7 @@ const (
 	LoginKeyLoginLoginnamePlaceHolder      = LoginKeyLogin + "LoginnamePlaceHolder"
 	LoginKeyLoginRegisterButtonText        = LoginKeyLogin + "RegisterButtonText"
 	LoginKeyLoginNextButtonText            = LoginKeyLogin + "NextButtonText"
-	LoginKeyLoginExternalUserDescription   = LoginKeyLogin + "ExternalLogin"
+	LoginKeyLoginExternalUserDescription   = LoginKeyLogin + "ExternalUserDescription"
 	LoginKeyLoginUserMustBeMemberOfOrg     = LoginKeyLogin + "MustBeMemberOfOrg"
 
 	LoginKeySelectAccount                          = "SelectAccount."
@@ -203,7 +203,7 @@ const (
 	LoginKeyRegistrationUserPrivacyConfirm           = LoginKeyRegistrationUser + "TosConfirmAnd"
 	LoginKeyRegistrationUserPrivacyLink              = LoginKeyRegistrationUser + "PrivacyLink"
 	LoginKeyRegistrationUserPrivacyLinkText          = LoginKeyRegistrationUser + "PrivacyLinkText"
-	LoginKeyRegistrationUserExternalLoginDescription = LoginKeyRegistrationUser + "ExternalLogin"
+	LoginKeyRegistrationUserExternalLoginDescription = LoginKeyRegistrationUser + "ExternalUserDescription"
 	LoginKeyRegistrationUserNextButtonText           = LoginKeyRegistrationUser + "NextButtonText"
 	LoginKeyRegistrationUserBackButtonText           = LoginKeyRegistrationUser + "BackButtonText"
 
@@ -224,7 +224,7 @@ const (
 	LoginKeyRegisterOrgPrivacyConfirm           = LoginKeyRegistrationOrg + "TosConfirmAnd"
 	LoginKeyRegisterOrgPrivacyLink              = LoginKeyRegistrationOrg + "PrivacyLink"
 	LoginKeyRegisterOrgPrivacyLinkText          = LoginKeyRegistrationOrg + "PrivacyLinkText"
-	LoginKeyRegisterOrgExternalLoginDescription = LoginKeyRegistrationOrg + "ExternalLogin"
+	LoginKeyRegisterOrgExternalLoginDescription = LoginKeyRegistrationOrg + "ExternalUserDescription"
 	LoginKeyRegisterOrgSaveButtonText           = LoginKeyRegistrationOrg + "SaveButtonText"
 
 	LoginKeyLinkingUserDone                 = "LinkingUsersDone."
@@ -314,17 +314,17 @@ type SelectAccountScreenText struct {
 }
 
 type LoginScreenText struct {
-	Title                string
-	Description          string
-	TitleLinking         string
-	DescriptionLinking   string
-	LoginNameLabel       string
-	UsernamePlaceholder  string
-	LoginnamePlaceholder string
-	RegisterButtonText   string
-	NextButtonText       string
-	ExternalLogin        string
-	MustBeMemberOfOrg    string
+	Title                   string
+	Description             string
+	TitleLinking            string
+	DescriptionLinking      string
+	LoginNameLabel          string
+	UsernamePlaceholder     string
+	LoginnamePlaceholder    string
+	RegisterButtonText      string
+	NextButtonText          string
+	ExternalUserDescription string
+	MustBeMemberOfOrg       string
 }
 
 type PasswordScreenText struct {

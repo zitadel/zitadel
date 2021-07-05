@@ -269,7 +269,7 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 		result.Login.LoginnamePlaceholder = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginExternalUserDescription {
-		result.Login.ExternalLogin = text.Text
+		result.Login.ExternalUserDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyLoginUserMustBeMemberOfOrg {
 		result.Login.MustBeMemberOfOrg = text.Text
