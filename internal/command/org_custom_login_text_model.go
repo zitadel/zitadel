@@ -41,11 +41,14 @@ func (wm *OrgCustomLoginTextReadModel) Reduce() error {
 }
 
 func (wm *OrgCustomLoginTextReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.CustomLoginTextReadModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.CustomLoginTextReadModel.AggregateID).
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,
-			org.CustomTextTemplateRemovedEventType)
+			org.CustomTextTemplateRemovedEventType).
+		Builder()
 }
