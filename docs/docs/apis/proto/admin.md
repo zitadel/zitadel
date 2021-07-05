@@ -797,6 +797,8 @@ Returns the default custom texts for login ui
 
 
 
+    GET: /text/default/login/{language}
+
 
 ### GetCustomLoginTexts
 
@@ -806,6 +808,8 @@ Returns the default custom texts for login ui
 Returns the custom texts for login ui
 
 
+
+    GET: /text/login/{language}
 
 
 ### SetCustomLoginText
@@ -817,6 +821,8 @@ Sets the custom text for login ui
 it impacts all organisations without customized login ui texts
 
 
+
+    PUT: /text/login/{language}
 
 
 ### ListIAMMemberRoles

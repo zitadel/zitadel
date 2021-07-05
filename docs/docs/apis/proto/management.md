@@ -2372,6 +2372,8 @@ Returns the custom texts for login ui
 
 
 
+    GET: /text/login/{language}
+
 
 ### GetDefaultLoginTexts
 
@@ -2381,6 +2383,8 @@ Returns the custom texts for login ui
 Returns the custom texts for login ui
 
 
+
+    GET: /text/default/login/{language}
 
 
 ### SetCustomLoginText
@@ -2393,6 +2397,8 @@ it impacts all organisations without customized login ui texts
 
 
 
+    PUT: /text/login/{language}
+
 
 ### ResetCustomLoginTextToDefault
 
@@ -2403,6 +2409,8 @@ Removes the custom login text of the organisation
 The default text of the IAM will trigger after
 
 
+
+    DELETE: /text/login/{language}
 
 
 ### GetOrgIDPByID
