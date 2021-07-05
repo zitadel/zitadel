@@ -1603,7 +1603,7 @@ With this policy privacy relevant things can be configured (e.g. tos link)
 [GetDefaultPrivacyPolicyResponse](#getdefaultprivacypolicyresponse)
 
 Returns the default privacy policy of the IAM
-With this policy the password strength can be configured
+With this policy the privacy relevant things can be configured (e.g tos link)
 
 
 
