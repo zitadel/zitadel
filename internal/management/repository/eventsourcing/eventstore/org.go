@@ -44,6 +44,7 @@ type OrgRepository struct {
 	PrefixAvatarURL         string
 	LoginDir                http.FileSystem
 	TranslationFileContents map[string][]byte
+	mutex                   sync.Mutex
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -623,24 +624,20 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 }
 
 func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	var contents []byte
-	var ok bool
-	var err error
-	mux := &sync.Mutex{}
-	if contents, ok = repo.TranslationFileContents[lang]; !ok {
-		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang), mux)
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	contents, ok := repo.TranslationFileContents[lang]
+	if !ok {
+		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
 		if err != nil {
 			return nil, err
 		}
 		repo.TranslationFileContents[lang] = contents
 	}
-	loginTextMap := map[string]interface{}{}
-	mux.Lock()
+	loginTextMap := make(map[string]interface{})
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
-		mux.Unlock()
 		return nil, errors.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
 	}
-	mux.Unlock()
 	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
 	if err != nil {
 		return nil, err
@@ -768,16 +765,12 @@ func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-func (repo *OrgRepository) readTranslationFile(filename string, mux *sync.Mutex) ([]byte, error) {
-	mux.Lock()
+func (repo *OrgRepository) readTranslationFile(filename string) ([]byte, error) {
 	r, err := repo.LoginDir.Open(filename)
 	if err != nil {
-		mux.Unlock()
 		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
 	}
 	contents, err := ioutil.ReadAll(r)
-
-	mux.Unlock()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
 	}

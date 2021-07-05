@@ -37,6 +37,7 @@ type IAMRepository struct {
 	PrefixAvatarURL         string
 	LoginDir                http.FileSystem
 	TranslationFileContents map[string][]byte
+	mutex                   sync.Mutex
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -408,24 +409,20 @@ func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_mo
 }
 
 func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	var contents []byte
-	var ok bool
-	var err error
-	mux := &sync.Mutex{}
-	if contents, ok = repo.TranslationFileContents[lang]; !ok {
-		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang), mux)
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	contents, ok := repo.TranslationFileContents[lang]
+	if !ok {
+		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
 		if err != nil {
 			return nil, err
 		}
 		repo.TranslationFileContents[lang] = contents
 	}
 	loginText := new(domain.CustomLoginText)
-	mux.Lock()
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
-		mux.Unlock()
 		return nil, caos_errs.ThrowInternal(err, "TEXT-GHR3Q", "Errors.TranslationFile.ReadError")
 	}
-	mux.Unlock()
 	return loginText, nil
 }
 
@@ -445,15 +442,12 @@ func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-func (repo *IAMRepository) readTranslationFile(filename string, mux *sync.Mutex) ([]byte, error) {
-	mux.Lock()
+func (repo *IAMRepository) readTranslationFile(filename string) ([]byte, error) {
 	r, err := repo.LoginDir.Open(filename)
 	if err != nil {
-		mux.Unlock()
 		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
 	}
 	contents, err := ioutil.ReadAll(r)
-	mux.Unlock()
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
 	}
