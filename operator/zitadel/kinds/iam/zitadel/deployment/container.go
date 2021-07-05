@@ -79,6 +79,13 @@ func GetContainer(
 					Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
 				},
 			}},
+		{Name: "SENTRY_DSN",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "SENTRY_DSN",
+				},
+			}},
 	}
 
 	sort.Strings(users)

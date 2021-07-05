@@ -19,6 +19,7 @@ func literalsConfigMap(
 	desired *Configuration,
 	users map[string]string,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
+	version *string,
 	queried map[string]interface{},
 ) map[string]string {
 
@@ -109,6 +110,11 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_MULTI_DELETE"] = strconv.FormatBool(desired.AssetStorage.MultiDelete)
 		}
+		if desired.Sentry != nil {
+			literalsConfigMap["SENTRY_ENVIRONMENT"] = desired.Sentry.Environment
+			literalsConfigMap["SENTRY_RELEASE"] = *version
+			literalsConfigMap["SENTRY_USAGE"] = desired.Sentry.Usage
+		}
 	}
 
 	db, err := database.GetDatabaseInQueried(queried)
@@ -189,6 +195,16 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 					return nil, err
 				}
 				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
+			}
+		}
+		if desired.Sentry != nil {
+			as := desired.Sentry
+			if as.SentryDSN != nil || as.ExistingSentryDSN != nil {
+				value, err := read.GetSecretValue(k8sClient, as.SentryDSN, as.ExistingSentryDSN)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["SENTRY_DSN"] = value
 			}
 		}
 	}

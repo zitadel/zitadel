@@ -124,5 +124,20 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secretKey := "secretaccesskey"
 	secrets[secretKey] = conf.AssetStorage.SecretAccessKey
 	existing[secretKey] = conf.AssetStorage.ExistingSecretAccessKey
+
+	if conf.Sentry == nil {
+		conf.Sentry = &configuration.Sentry{}
+	}
+	if conf.Sentry.SentryDSN == nil {
+		conf.Sentry.SentryDSN = &secret.Secret{}
+	}
+	if conf.Sentry.ExistingSentryDSN == nil {
+		conf.Sentry.ExistingSentryDSN = &secret.Existing{}
+	}
+
+	SentryDSN := "sentrydsn"
+	secrets[SentryDSN] = conf.Sentry.SentryDSN
+	existing[SentryDSN] = conf.Sentry.ExistingSentryDSN
+
 	return secrets, existing
 }
