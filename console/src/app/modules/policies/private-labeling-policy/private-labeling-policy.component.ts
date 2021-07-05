@@ -379,7 +379,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
           if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
             this.serviceType === PolicyComponentServiceType.ADMIN) {
-            // this.loadingImages = true;
             this.loadImages();
           }
         }
@@ -423,6 +422,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     if (promises.length) {
       Promise.all(promises).then(() => {
         this.loadingImages = false;
+        this.refreshPreview.emit();
       }).catch(error => {
         this.loadingImages = false;
       });
@@ -465,6 +465,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     if (promises.length) {
       Promise.all(promises).then(() => {
         this.loadingImages = false;
+        this.refreshPreview.emit();
       }).catch(error => {
         this.loadingImages = false;
       });

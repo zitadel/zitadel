@@ -223,7 +223,7 @@
                   <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false"  mat-raised-button type="button" (click)="selectedFontFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
 
                   <i class="icon las la-cloud-upload-alt"></i>
-                  <span >{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
+                  <span >{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate): ('POLICY.PRIVATELABELING.DROPFONT' | translate)}}</span>
                 </label>
             </div>
         </div>
