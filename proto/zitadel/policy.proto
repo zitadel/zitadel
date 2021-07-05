@@ -221,3 +221,10 @@ message PasswordLockoutPolicy {
         }
     ];
 }
+
+message PrivacyPolicy {
+    zitadel.v1.ObjectDetails details = 1;
+    string tos_link = 2;
+    string privacy_link = 3;
+    bool is_default = 4;
+}

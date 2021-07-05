@@ -21,6 +21,7 @@ require (
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
 	github.com/envoyproxy/protoc-gen-validate v0.6.1
+	github.com/getsentry/sentry-go v0.11.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.6.0

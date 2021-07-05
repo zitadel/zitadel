@@ -38,6 +38,7 @@ func AdaptFunc(
 	certPath string,
 	secretName string,
 	secretPath string,
+	version *string,
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordName string,
@@ -148,6 +149,7 @@ func AdaptFunc(
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
+						version,
 						queried,
 					),
 				)
@@ -194,6 +196,7 @@ func AdaptFunc(
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
+						version,
 						queried,
 					),
 				),

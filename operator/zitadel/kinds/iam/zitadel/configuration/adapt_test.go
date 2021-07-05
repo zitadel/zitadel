@@ -23,6 +23,7 @@ func SetConfigMap(
 	labels map[string]string,
 	queried map[string]interface{},
 	desired *Configuration,
+	version *string,
 	users map[string]string,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
 ) {
@@ -33,7 +34,7 @@ func SetConfigMap(
 			Name:      cmName,
 			Labels:    labels,
 		},
-		Data: literalsConfigMap(desired, users, certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath, queried),
+		Data: literalsConfigMap(desired, users, certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath, version, queried),
 	})
 }
 
@@ -133,6 +134,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 	getClientID := func() string { return "test" }
 	certPath := "test"
 	secretPath := "test"
+	version := "test"
 	users := map[string]string{
 		"migration":    "migration",
 		"management":   "management",
@@ -162,6 +164,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		labels.MustForNameK8SMap(componentLabels, cmName),
 		queried,
 		desiredEmpty,
+		&version,
 		users,
 		certPath,
 		secretPath,
@@ -212,6 +215,7 @@ func TestConfiguration_Adapt(t *testing.T) {
 		certPath,
 		secretName,
 		secretPath,
+		&version,
 		consoleCMName,
 		secretVarsName,
 		secretPasswordName,
@@ -240,6 +244,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 	getClientID := func() string { return "test2" }
 	certPath := "test2"
 	secretPath := "test2"
+	version := "test"
 	users := map[string]string{
 		"migration":    "migration",
 		"management":   "management",
@@ -269,6 +274,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		labels.MustForNameK8SMap(componentLabels, cmName),
 		queried,
 		desiredFull,
+		&version,
 		users,
 		certPath,
 		secretPath,
@@ -319,6 +325,7 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		certPath,
 		secretName,
 		secretPath,
+		&version,
 		consoleCMName,
 		secretVarsName,
 		secretPasswordName,

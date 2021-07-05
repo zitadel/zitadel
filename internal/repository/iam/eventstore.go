@@ -34,6 +34,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(PasswordComplexityPolicyChangedEventType, PasswordComplexityPolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordLockoutPolicyAddedEventType, PasswordLockoutPolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordLockoutPolicyChangedEventType, PasswordLockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(PrivacyPolicyAddedEventType, PrivacyPolicyAddedEventMapper).
+		RegisterFilterEventMapper(PrivacyPolicyChangedEventType, PrivacyPolicyChangedEventMapper).
 		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).

@@ -1586,6 +1586,61 @@ The password lockout policy is not used at the moment
 
 
 
+### GetPrivacyPolicy
+
+> **rpc** GetPrivacyPolicy([GetPrivacyPolicyRequest](#getprivacypolicyrequest))
+[GetPrivacyPolicyResponse](#getprivacypolicyresponse)
+
+Returns the privacy policy of the organisation
+With this policy privacy relevant things can be configured (e.g. tos link)
+
+
+
+
+### GetDefaultPrivacyPolicy
+
+> **rpc** GetDefaultPrivacyPolicy([GetDefaultPrivacyPolicyRequest](#getdefaultprivacypolicyrequest))
+[GetDefaultPrivacyPolicyResponse](#getdefaultprivacypolicyresponse)
+
+Returns the default privacy policy of the IAM
+With this policy the privacy relevant things can be configured (e.g tos link)
+
+
+
+
+### AddCustomPrivacyPolicy
+
+> **rpc** AddCustomPrivacyPolicy([AddCustomPrivacyPolicyRequest](#addcustomprivacypolicyrequest))
+[AddCustomPrivacyPolicyResponse](#addcustomprivacypolicyresponse)
+
+Add a custom privacy policy for the organisation
+With this policy privacy relevant things can be configured (e.g. tos link)
+
+
+
+
+### UpdateCustomPrivacyPolicy
+
+> **rpc** UpdateCustomPrivacyPolicy([UpdateCustomPrivacyPolicyRequest](#updatecustomprivacypolicyrequest))
+[UpdateCustomPrivacyPolicyResponse](#updatecustomprivacypolicyresponse)
+
+Update the privacy complexity policy for the organisation
+With this policy privacy relevant things can be configured (e.g. tos link)
+
+
+
+
+### ResetPrivacyPolicyToDefault
+
+> **rpc** ResetPrivacyPolicyToDefault([ResetPrivacyPolicyToDefaultRequest](#resetprivacypolicytodefaultrequest))
+[ResetPrivacyPolicyToDefaultResponse](#resetprivacypolicytodefaultresponse)
+
+Removes the privacy policy of the organisation
+The default policy of the IAM will trigger after
+
+
+
+
 ### GetLabelPolicy
 
 > **rpc** GetLabelPolicy([GetLabelPolicyRequest](#getlabelpolicyrequest))
@@ -2217,6 +2272,29 @@ This is an empty request
 
 
 ### AddCustomPasswordLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddCustomPrivacyPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+
+
+
+
+### AddCustomPrivacyPolicyResponse
 
 
 
@@ -3239,6 +3317,23 @@ This is an empty request
 
 
 
+### GetDefaultPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
+
+
+
+
 ### GetDefaultVerifyEmailMessageTextRequest
 
 
@@ -3633,6 +3728,23 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
 | is_default |  bool | - |  |
+
+
+
+
+### GetPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -5607,6 +5719,23 @@ This is an empty request
 
 
 
+### ResetPrivacyPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetPrivacyPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SendHumanResetPasswordNotificationRequest
 
 
@@ -6034,6 +6163,29 @@ This is an empty request
 
 
 ### UpdateCustomPasswordLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateCustomPrivacyPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+
+
+
+
+### UpdateCustomPrivacyPolicyResponse
 
 
 

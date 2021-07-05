@@ -157,6 +157,12 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
+		if requiredFeature == domain.FeaturePrivacyPolicy {
+			if !features.PrivacyPolicy {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
 		return MissingFeatureErr(requiredFeature)
 	}
 	return nil

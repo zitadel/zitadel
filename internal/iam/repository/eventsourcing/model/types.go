@@ -67,6 +67,9 @@ const (
 	PasswordLockoutPolicyAdded   models.EventType = "iam.policy.password.lockout.added"
 	PasswordLockoutPolicyChanged models.EventType = "iam.policy.password.lockout.changed"
 
+	PrivacyPolicyAdded   models.EventType = "iam.policy.privacy.added"
+	PrivacyPolicyChanged models.EventType = "iam.policy.privacy.changed"
+
 	OrgIAMPolicyAdded   models.EventType = "iam.policy.org.iam.added"
 	OrgIAMPolicyChanged models.EventType = "iam.policy.org.iam.changed"
 )

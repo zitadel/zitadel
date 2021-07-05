@@ -160,9 +160,7 @@ Registration:
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
-  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: Datenschutzerklärung
-  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   ExternalLogin: oder registriere dich mit einem externen Benutzer
 
 RegistrationOrg:
@@ -187,9 +185,7 @@ RegistrationOrg:
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
-  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: Datenschutzerklärung
-  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
 
 LinkingUsersDone:
   Title: Benutzerlinking
@@ -228,9 +224,7 @@ Actions:
 Footer:
   PoweredBy: Powered By
   Tos: AGB
-  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   Privacy: Datenschutzerklärung
-  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   Help: Hilfe
 
 Errors:

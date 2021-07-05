@@ -52,3 +52,5 @@ console/src/app/proto/generated/
 **.pb.*.go
 **.gen.go 
 openapi/**/*.json
+/internal/api/assets/authz.go
+/internal/api/assets/router.go

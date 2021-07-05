@@ -222,6 +222,7 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 	secretPath := "test"
 	googleSA := "test"
 	zitadelKeyPath := "test"
+	version := "test"
 	users := map[string]string{
 		"migration":    "migration",
 		"management":   "management",
@@ -297,7 +298,7 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
 	}
 
-	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
+	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, &version, queried)
 
 	assert.Equal(t, equals, literals)
 }
@@ -307,6 +308,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 	secretPath := "test"
 	googleSA := "test"
 	zitadelKeyPath := "test"
+	version := "test"
 	users := map[string]string{
 		"migration":    "migration2",
 		"management":   "management2",
@@ -381,7 +383,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "bucketprefix",
 		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
 	}
-	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
+	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, &version, queried)
 
 	assert.EqualValues(t, equals, literals)
 }
