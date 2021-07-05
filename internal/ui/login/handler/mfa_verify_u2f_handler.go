@@ -44,7 +44,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 		MFAProviders:     providers,
 		SelectedProvider: -1,
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplU2FVerification], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplU2FVerification], data, nil)
 }
 
 func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {

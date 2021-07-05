@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	CustomTextSetEventType = iamEventTypePrefix + policy.CustomTextSetEventType
+	CustomTextSetEventType     = iamEventTypePrefix + policy.CustomTextSetEventType
+	CustomTextRemovedEventType = iamEventTypePrefix + policy.CustomTextRemovedEventType
 )
 
 type CustomTextSetEvent struct {
@@ -43,4 +44,33 @@ func CustomTextSetEventMapper(event *repository.Event) (eventstore.EventReader, 
 	}
 
 	return &CustomTextSetEvent{CustomTextSetEvent: *e.(*policy.CustomTextSetEvent)}, nil
+}
+
+type CustomTextRemovedEvent struct {
+	policy.CustomTextRemovedEvent
+}
+
+func NewCustomTextRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	template,
+	key string,
+	language language.Tag,
+) *CustomTextRemovedEvent {
+	return &CustomTextRemovedEvent{
+		CustomTextRemovedEvent: *policy.NewCustomTextRemovedEvent(
+			eventstore.NewBaseEventForPush(ctx, aggregate, CustomTextRemovedEventType),
+			template,
+			key,
+			language),
+	}
+}
+
+func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.CustomTextRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CustomTextRemovedEvent{CustomTextRemovedEvent: *e.(*policy.CustomTextRemovedEvent)}, nil
 }

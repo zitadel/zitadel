@@ -284,7 +284,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		msg = err.Error()
 	}
 	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
@@ -304,7 +304,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.Lang(r).String(),
+		Lang:                   l.renderer.ReqLang(l.getTranslator(authReq), r).String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
@@ -338,6 +338,15 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	return baseData
 }
 
+func (l *Login) getTranslator(authReq *domain.AuthRequest) *i18n.Translator {
+	translator, _ := l.renderer.NewTranslator()
+	if authReq != nil {
+		l.addLoginTranslations(translator, authReq.DefaultTranslations)
+		l.addLoginTranslations(translator, authReq.OrgTranslations)
+	}
+	return translator
+}
+
 func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 	var userName, loginName, displayName, avatar string
 	if authReq != nil {
@@ -357,7 +366,7 @@ func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
-		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
+		localized := l.renderer.LocalizeFromRequest(l.getTranslator(nil), r, caosErr.Message, nil)
 		return caosErr.ID, localized
 
 	}
@@ -416,6 +425,18 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
+
+func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []*domain.CustomText) {
+	for _, text := range customTexts {
+		msg := i18n.Message{
+			ID:   text.Key,
+			Text: text.Text,
+		}
+		err := l.renderer.AddMessages(translator, text.Language, msg)
+		logging.Log("HANDLE-GD3g2").OnError(err).Warn("could no add message to translator")
+	}
+}
+
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -455,6 +476,7 @@ type baseData struct {
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
 	LabelPolicy            *domain.LabelPolicy
+	LoginTexts             []*domain.CustomLoginText
 }
 
 type errorData struct {

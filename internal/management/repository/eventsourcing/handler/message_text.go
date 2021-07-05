@@ -79,30 +79,36 @@ func (m *MessageText) processMessageText(event *es_models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.CustomTextSet, model.CustomTextSet,
 		iam_es_model.CustomTextRemoved, model.CustomTextRemoved:
-		text := new(iam_model.CustomText)
+		text := new(iam_model.CustomTextView)
 		err = text.SetData(event)
 		if err != nil {
 			return err
 		}
-		message, err = m.view.MessageTextByIDs(event.AggregateID, text.Template, text.Language.String())
+		if !text.IsMessageTemplate() {
+			return m.view.ProcessedMessageTextSequence(event)
+		}
+		message, err = m.view.MessageTextByIDs(event.AggregateID, text.Template, text.Language)
 		if err != nil && !caos_errs.IsNotFound(err) {
 			return err
 		}
 		if caos_errs.IsNotFound(err) {
 			err = nil
 			message = new(iam_model.MessageTextView)
-			message.Language = text.Language.String()
+			message.Language = text.Language
 			message.MessageTextType = text.Template
 			message.CreationDate = event.CreationDate
 		}
 		err = message.AppendEvent(event)
 	case model.CustomTextMessageRemoved:
-		text := new(iam_model.CustomText)
+		text := new(iam_model.CustomTextView)
 		err = text.SetData(event)
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteMessageText(event.AggregateID, text.Template, text.Language.String(), event)
+		if !text.IsMessageTemplate() {
+			return m.view.ProcessedMessageTextSequence(event)
+		}
+		return m.view.DeleteMessageText(event.AggregateID, text.Template, text.Language, event)
 	default:
 		return m.view.ProcessedMessageTextSequence(event)
 	}
@@ -113,7 +119,7 @@ func (m *MessageText) processMessageText(event *es_models.Event) (err error) {
 }
 
 func (m *MessageText) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label text handler")
+	logging.LogWithFields("SPOOL-om8Hu", "id", event.AggregateID).WithError(err).Warn("something went wrong in label text handler")
 	return spooler.HandleError(event, err, m.view.GetLatestMessageTextFailedEvent, m.view.ProcessedMessageTextFailedEvent, m.view.ProcessedMessageTextSequence, m.errorCountUntilSkip)
 }
 

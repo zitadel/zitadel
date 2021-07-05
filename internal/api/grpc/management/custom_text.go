@@ -251,3 +251,51 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 		),
 	}, nil
 }
+
+func (s *Server) GetCustomLoginTexts(ctx context.Context, req *mgmt_pb.GetCustomLoginTextsRequest) (*mgmt_pb.GetCustomLoginTextsResponse, error) {
+	msg, err := s.org.GetLoginTexts(ctx, authz.GetCtxData(ctx).OrgID, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetCustomLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *mgmt_pb.GetDefaultLoginTextsRequest) (*mgmt_pb.GetDefaultLoginTextsResponse, error) {
+	msg, err := s.org.GetDefaultLoginTexts(ctx, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDefaultLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetCustomLoginText(ctx context.Context, req *mgmt_pb.SetCustomLoginTextsRequest) (*mgmt_pb.SetCustomLoginTextsResponse, error) {
+	result, err := s.command.SetOrgLoginText(ctx, authz.GetCtxData(ctx).OrgID, SetLoginCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetCustomLoginTextsResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *mgmt_pb.ResetCustomLoginTextsToDefaultRequest) (*mgmt_pb.ResetCustomLoginTextsToDefaultResponse, error) {
+	result, err := s.command.RemoveOrgLoginTexts(ctx, authz.GetCtxData(ctx).OrgID, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ResetCustomLoginTextsToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}

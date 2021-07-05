@@ -1,6 +1,7 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "LinkingUsersDone.Title"}}</h1>
     {{ template "user-profile" . }}
 
     <p>{{t "LinkingUsersDone.Description"}}</p>
@@ -14,10 +15,10 @@
 
     <div class="lgn-actions">
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+            {{t "LinkingUsersDone.CancelButtonText"}}
         </a>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "LinkingUsersDone.NextButtonText"}}</button>
     </div>
 </form>
 
