@@ -106,8 +106,9 @@ func main() {
 
 			if err != nil {
 				sentry.CurrentHub().Recover(err)
+				sentry.Flush(2 * time.Second)
+				panic(err)
 			}
-			sentry.Flush(2 * time.Second)
 		}()
 	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
