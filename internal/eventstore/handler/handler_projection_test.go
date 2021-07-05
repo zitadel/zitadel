@@ -403,11 +403,11 @@ func TestProjectionHandler_push(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &ProjectionHandler{
-				lockMu:  sync.Mutex{},
-				stmts:   tt.fields.stmts,
-				pushSet: tt.fields.pushSet,
-			}
+			h := NewProjectionHandler(ProjectionHandlerConfig{
+				HandlerConfig: HandlerConfig{},
+			})
+			h.stmts = tt.fields.stmts
+			h.pushSet = tt.fields.pushSet
 			if tt.args.previousLock > 0 {
 				h.lockMu.Lock()
 				go func() {
