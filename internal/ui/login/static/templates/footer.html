@@ -1,4 +1,3 @@
-
 {{define "footer"}}
 <footer>
     {{ if hasWatermark .LabelPolicy }}
@@ -14,6 +13,6 @@
     {{ if .PrivacyLink }}
         <a href="{{.PrivacyLink}}" rel="noopener noreferrer" target="_blank" alt="Privacy Policy">{{t "Footer.Privacy"}}</a>
     {{end}}
-    <a href="https://docs.zitadel.ch/docs/manuals/user-login" target="_black" alt="Help">{{t "Footer.Help"}}</a>
+    <a href="{{t "Footer.HelpLink"}}" target="_black" alt="Help">{{t "Footer.Help"}}</a>
 </footer>
 {{end}}

@@ -68,6 +68,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 		newPrivacyPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
+		newCustomText(
+			handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 	}
 	if static != nil {
 		handlers = append(handlers, newStyling(

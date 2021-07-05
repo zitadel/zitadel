@@ -19,7 +19,7 @@
 
     {{if hasUsernamePasswordLogin }}
     <div class="fields">
-        <label class="lgn-label" for="loginName">{{t "Login.Loginname"}}</label>
+        <label class="lgn-label" for="loginName">{{t "Login.LoginNameLabel"}}</label>
         <div class="lgn-suffix-wrapper">
             <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{if .OrgID }}{{t "Login.UsernamePlaceHolder"}}{{else}}{{t "Login.LoginnamePlaceHolder"}}{{end}}"
             value="{{ .UserName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
@@ -33,16 +33,16 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions lgn-reverse-order">
-        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Login.NextButtonText"}}</button>
         <span class="fill-space"></span>
         {{if .LoginPolicy.AllowRegister}}
-        <button class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Actions.Register"}}</button>
+        <button class="lgn-stroked-button lgn-primary" name="register" value="true" formnovalidate>{{t "Login.RegisterButtonText"}}</button>
         {{end}}
     </div>
 
     {{if hasExternalLogin }}
     <div class="lgn-idp-providers">
-        <p>{{t "Login.ExternalLogin"}}</p>
+        <p>{{t "Login.ExternalUserDescription"}}</p>
 
         {{ $reqid := .AuthReqID}}
         {{range $provider := .IDPProviders}}

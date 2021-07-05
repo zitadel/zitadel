@@ -1,9 +1,10 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "InitMFAPrompt.Title"}}</h1>
     {{ template "user-profile" . }}
 
-    <p>{{t "MFAPrompt.Description"}}</p>
+    <p>{{t "InitMFAPrompt.Description"}}</p>
 </div>
 
 <form action="{{ mfaPromptUrl }}" method="POST">
@@ -14,7 +15,7 @@
 
     <div class="fields">
         {{ range $provider := .MFAProviders}}
-        {{ $providerName := (t (printf "MFAPrompt.Provider%v" $provider)) }}
+        {{ $providerName := (t (printf "InitMFAPrompt.Provider%v" $provider)) }}
             <div class="lgn-radio block">
                 <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
                 <label for="{{ $provider }}">{{ $providerName }}</label>
@@ -29,10 +30,10 @@
         </a>
 
         {{if not .MFARequired}}
-        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
+        <button class="lgn-stroked-button lgn-primary" name="skip" value="true" type="submit" formnovalidate>{{t "InitMFAPrompt.SkipButtonText"}}</button>
         {{end}}
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "InitMFAPrompt.NextButtonText"}}</button>
     </div>
 </form>
 
