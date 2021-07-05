@@ -283,13 +283,13 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		msg = err.Error()
 	}
-	data := l.getBaseData(r, authReq, l.getTranslator(authReq), "Error", "Internal", msg)
+	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, l.getTranslator(authReq), title, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -298,13 +298,13 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, title string, errType, errMessage string) baseData {
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.ReqLang(translator, r).String(),
+		Lang:                   l.renderer.ReqLang(l.getTranslator(authReq), r).String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),

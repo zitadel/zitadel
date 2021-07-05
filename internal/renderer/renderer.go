@@ -21,8 +21,7 @@ const (
 )
 
 type Renderer struct {
-	Templates map[string]*template.Template
-	//translator *i18n.Translator
+	Templates        map[string]*template.Template
 	dir              http.FileSystem
 	translatorConfig i18n.TranslatorConfig
 }

@@ -76,20 +76,20 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	if userID == "" {
 		userID = authReq.UserID
 	}
-	translator := l.getTranslator(authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, translator, "Mail Verification", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Mail Verification", errID, errMessage),
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	translator := l.getTranslator(authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, translator, "Mail Verified", "", ""),
+		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerified], data, nil)
 }

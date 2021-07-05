@@ -103,9 +103,8 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
-	translator := l.getTranslator(authReq)
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, translator, "Init Password", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Init Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -127,6 +126,7 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 			data.HasNumber = NumberRegex
 		}
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 

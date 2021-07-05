@@ -39,9 +39,8 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	translator := l.getTranslator(authReq)
 	data := passwordData{
-		baseData:    l.getBaseData(r, authReq, translator, "Change Password", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Change Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq, authReq.UserOrgID)
@@ -61,6 +60,7 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 			data.HasNumber = NumberRegex
 		}
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangePassword], data, nil)
 }
 

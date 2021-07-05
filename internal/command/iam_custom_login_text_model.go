@@ -29,6 +29,8 @@ func (wm *IAMCustomLoginTextReadModel) AppendEvents(events ...eventstore.EventRe
 		switch e := event.(type) {
 		case *iam.CustomTextSetEvent:
 			wm.CustomLoginTextReadModel.AppendEvents(&e.CustomTextSetEvent)
+		case *iam.CustomTextRemovedEvent:
+			wm.CustomLoginTextReadModel.AppendEvents(&e.CustomTextRemovedEvent)
 		}
 	}
 }

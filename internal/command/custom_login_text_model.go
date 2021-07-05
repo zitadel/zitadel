@@ -243,6 +243,7 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			if e.Template != domain.LoginCustomText || wm.Language != e.Language {
 				continue
 			}
+			wm.State = domain.PolicyStateActive
 			if strings.HasPrefix(e.Key, domain.LoginKeySelectAccount) {
 				wm.handleSelectAccountScreenSetEvent(e)
 				continue
@@ -363,7 +364,6 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handleFooterTextSetEvent(e)
 				continue
 			}
-			wm.State = domain.PolicyStateActive
 		case *policy.CustomTextRemovedEvent:
 			if e.Template != domain.LoginCustomText || wm.Language != e.Language {
 				continue
@@ -831,7 +831,7 @@ func (wm *CustomLoginTextReadModel) handleUsernameChangeDoneRemoveEvent(e *polic
 		wm.UsernameChangeDoneDescription = ""
 		return
 	}
-	if e.Key == domain.LoginKeyUsernameChangeNextButtonText {
+	if e.Key == domain.LoginKeyUsernameChangeDoneNextButtonText {
 		wm.UsernameChangeDoneNextButtonText = ""
 		return
 	}

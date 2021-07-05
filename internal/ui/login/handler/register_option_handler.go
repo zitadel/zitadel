@@ -32,15 +32,15 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	translator := l.getTranslator(authReq)
 	data := registerOptionData{
-		baseData: l.getBaseData(r, authReq, translator, "RegisterOption", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "RegisterOption", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
 		"hasExternalLogin": func() bool {
 			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOption], data, funcs)
 }
 

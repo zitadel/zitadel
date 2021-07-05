@@ -85,9 +85,8 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	if formData == nil {
 		formData = new(registerOrgFormData)
 	}
-	translator := l.getTranslator(authRequest)
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, translator, "Register", errID, errMessage),
+		baseData:            l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, "0")
@@ -113,6 +112,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		data.IamDomain = orgPolicy.IAMDomain
 	}
 
+	translator := l.getTranslator(authRequest)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
 }
 

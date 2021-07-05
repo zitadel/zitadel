@@ -105,7 +105,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		formData.Language = l.renderer.ReqLang(translator, r).String()
 	}
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, translator, "Register", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerFormData: *formData,
 	}
 

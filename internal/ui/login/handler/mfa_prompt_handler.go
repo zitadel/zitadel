@@ -53,9 +53,8 @@ func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq 
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	translator := l.getTranslator(authReq)
 	data := mfaData{
-		baseData:    l.getBaseData(r, authReq, translator, "MFA Prompt", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "MFA Prompt", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 
@@ -74,6 +73,7 @@ func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq 
 		l.handleMFACreation(w, r, authReq, data)
 		return
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAPrompt], data, nil)
 }
 

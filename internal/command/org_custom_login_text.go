@@ -49,14 +49,14 @@ func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-1B8dw", "Errors.ResourceOwnerMissing")
 	}
 	if lang == language.Und {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5ZZmo", "Errors.CustomMailText.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5ZZmo", "Errors.CustomText.Invalid")
 	}
 	customText, err := c.orgCustomLoginTextWriteModelByID(ctx, resourceOwner, lang)
 	if err != nil {
 		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomMailText.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))

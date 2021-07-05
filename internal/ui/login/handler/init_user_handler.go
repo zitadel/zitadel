@@ -97,9 +97,8 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
-	translator := l.getTranslator(authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, translator, "Init User", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Init User", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -122,6 +121,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 			data.HasNumber = NumberRegex
 		}
 	}
+	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
