@@ -114,7 +114,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 									&iam.NewAggregate().Aggregate,
 									"Template",
 									domain.MessageFooterText,
-									"FooterText",
+									"Footer",
 									language.English,
 								),
 							),
@@ -133,7 +133,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 					PreHeader:       "PreHeader",
 					Text:            "Text",
 					ButtonText:      "ButtonText",
-					FooterText:      "FooterText",
+					FooterText:      "Footer",
 				},
 			},
 			res: res{

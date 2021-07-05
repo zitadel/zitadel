@@ -2,7 +2,13 @@ package eventstore
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
+	"sync"
+
+	"github.com/ghodss/yaml"
 
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -23,12 +29,15 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore      v1.Eventstore
-	SearchLimit     uint64
-	View            *admin_view.View
-	SystemDefaults  systemdefaults.SystemDefaults
-	Roles           []string
-	PrefixAvatarURL string
+	Eventstore              v1.Eventstore
+	SearchLimit             uint64
+	View                    *admin_view.View
+	SystemDefaults          systemdefaults.SystemDefaults
+	Roles                   []string
+	PrefixAvatarURL         string
+	LoginDir                http.FileSystem
+	TranslationFileContents map[string][]byte
+	mutex                   sync.Mutex
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -399,10 +408,48 @@ func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_mo
 	return result, nil
 }
 
+func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	contents, ok := repo.TranslationFileContents[lang]
+	if !ok {
+		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if err != nil {
+			return nil, err
+		}
+		repo.TranslationFileContents[lang] = contents
+	}
+	loginText := new(domain.CustomLoginText)
+	if err := yaml.Unmarshal(contents, loginText); err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-GHR3Q", "Errors.TranslationFile.ReadError")
+	}
+	return loginText, nil
+}
+
+func (repo *IAMRepository) GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
+}
+
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
 	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
 	if err != nil {
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *IAMRepository) readTranslationFile(filename string) ([]byte, error) {
+	r, err := repo.LoginDir.Open(filename)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
+	}
+	contents, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+	}
+	return contents, nil
 }

@@ -81,7 +81,8 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerification], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
@@ -89,5 +90,6 @@ func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authR
 		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerified], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerified], data, nil)
 }
