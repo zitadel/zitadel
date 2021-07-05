@@ -1,6 +1,9 @@
 package eventsourcing
 
 import (
+	"github.com/caos/logging"
+	"github.com/rakyll/statik/fs"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -51,9 +54,21 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, staticStorage)
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
+
 	return &EsRepository{
-		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, es, view, roles, systemDefaults, assetsAPI},
+		spooler: spool,
+		OrgRepository: eventstore.OrgRepository{
+			SearchLimit:             conf.SearchLimit,
+			Eventstore:              es,
+			View:                    view,
+			Roles:                   roles,
+			SystemDefaults:          systemDefaults,
+			PrefixAvatarURL:         assetsAPI,
+			LoginDir:                statikLoginFS,
+			TranslationFileContents: make(map[string][]byte),
+		},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI},
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view, assetsAPI},

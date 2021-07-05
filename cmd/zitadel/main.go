@@ -3,8 +3,12 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/caos/logging"
+	"github.com/getsentry/sentry-go"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
@@ -91,6 +95,24 @@ const (
 )
 
 func main() {
+	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
+	if enableSentry {
+		err := sentry.Init(sentry.ClientOptions{})
+		if err != nil {
+			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
+		}
+		sentry.CaptureMessage("sentry started")
+		logging.Log("MAIN-adgf3").Info("sentry started")
+		defer func() {
+			err := recover()
+
+			if err != nil {
+				sentry.CurrentHub().Recover(err)
+				sentry.Flush(2 * time.Second)
+				panic(err)
+			}
+		}()
+	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
 	flag.Var(setupPaths, "setup-files", "paths to the setup files")
 	flag.Parse()

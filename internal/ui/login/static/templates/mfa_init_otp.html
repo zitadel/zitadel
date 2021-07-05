@@ -1,9 +1,11 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "InitMFAOTP.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
-    <p>{{t "MFAInitVerify.Description"}}</p>
+    <p>{{t "InitMFAOTP.Description"}}</p>
 </div>
 
 <form action="{{ mfaInitVerifyUrl }}" method="POST">
@@ -16,13 +18,13 @@
     <input type="hidden" name="secret" value="{{ .Secret }}" />
 
     {{if (eq .MFAType 0) }}
-    <p>{{t "MFAInitVerify.OTPDescription"}}</p>
+    <p>{{t "InitMFAOTP.OTPDescription"}}</p>
     <div class="lgn-qrcode" id="qrcode">
         {{.QrCode}}
     </div>
     <div class="fields">
         <div class="field">
-            <span class="lgn-label" for="secret">{{t "MFAInitVerify.Secret"}}</span>
+            <span class="lgn-label" for="secret">{{t "InitMFAOTP.SecretLabel"}}</span>
             <div class="lgn-row">
                 <span id="secret"> {{.Secret}} </span>
                 <span class="fill-space"></span>
@@ -32,7 +34,7 @@
             </div>
         </div>
         <div class="field">
-            <label class="lgn-label" for="code">{{t "MFAInitVerify.Code"}}</label>
+            <label class="lgn-label" for="code">{{t "InitMFAOTP.CodeLabel"}}</label>
             <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
         </div>
     </div>
@@ -45,10 +47,10 @@
         </a>
         
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+            {{t "InitMFAOTP.CancelButtonText"}}
         </a>
         <span class="fill-space"></span>
-        <button class="lgn-primary lgn-raised-button" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-primary lgn-raised-button" id="submit-button" type="submit">{{t "InitMFAOTP.NextButtonText"}}</button>
     </div>
 </form>
 

@@ -120,7 +120,7 @@ func (m *LabelPolicy) processLabelPolicy(event *es_models.Event) (err error) {
 }
 
 func (m *LabelPolicy) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
+	logging.LogWithFields("SPOOL-66Cs8", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
 }
 
@@ -129,9 +129,6 @@ func (m *LabelPolicy) OnSuccess() error {
 }
 
 func (p *LabelPolicy) CleanUpBucket(policy *iam_model.LabelPolicyView) {
-	if p.static == nil {
-		return
-	}
 	ctx := context.Background()
 	objects, err := p.static.ListObjectInfos(ctx, policy.AggregateID, domain.LabelPolicyPrefix+"/", false)
 	if err != nil {

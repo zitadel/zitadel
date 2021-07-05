@@ -27,6 +27,7 @@ type FeaturesWriteModel struct {
 	LabelPolicyWatermark     bool
 	CustomDomain             bool
 	CustomText               bool
+	PrivacyPolicy            bool
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {

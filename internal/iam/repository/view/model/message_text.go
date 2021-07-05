@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"golang.org/x/text/language"
@@ -11,9 +10,6 @@ import (
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
-	"github.com/caos/logging"
-
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
 )
@@ -103,7 +99,7 @@ func (i *MessageTextView) AppendEvent(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.CustomTextSet, org_es_model.CustomTextSet:
 		i.setRootData(event)
-		customText := new(CustomText)
+		customText := new(CustomTextView)
 		err = customText.SetData(event)
 		if err != nil {
 			return err
@@ -131,7 +127,7 @@ func (i *MessageTextView) AppendEvent(event *models.Event) (err error) {
 		}
 		i.ChangeDate = event.CreationDate
 	case es_model.CustomTextRemoved, org_es_model.CustomTextRemoved:
-		customText := new(CustomText)
+		customText := new(CustomTextView)
 		err = customText.SetData(event)
 		if err != nil {
 			return err
@@ -166,19 +162,4 @@ func (i *MessageTextView) AppendEvent(event *models.Event) (err error) {
 
 func (r *MessageTextView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
-}
-
-type CustomText struct {
-	Template string       `json:"template"`
-	Key      string       `json:"key"`
-	Language language.Tag `json:"language"`
-	Text     string       `json:"text"`
-}
-
-func (r *CustomText) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
-		logging.Log("MODEL-3n9fs").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-5CVaR", "Could not unmarshal data")
-	}
-	return nil
 }

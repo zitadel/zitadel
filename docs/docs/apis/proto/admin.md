@@ -528,6 +528,27 @@ it impacts all organisations without a customised policy
 
 
 
+### GetPrivacyPolicy
+
+> **rpc** GetPrivacyPolicy([GetPrivacyPolicyRequest](#getprivacypolicyrequest))
+[GetPrivacyPolicyResponse](#getprivacypolicyresponse)
+
+Returns the privacy policy defined by the administrators of ZITADEL
+
+
+
+
+### UpdatePrivacyPolicy
+
+> **rpc** UpdatePrivacyPolicy([UpdatePrivacyPolicyRequest](#updateprivacypolicyrequest))
+[UpdatePrivacyPolicyResponse](#updateprivacypolicyresponse)
+
+Updates the default privacy policy of ZITADEL
+it impacts all organisations without a customised policy
+
+
+
+
 ### GetDefaultInitMessageText
 
 > **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
@@ -639,6 +660,37 @@ Sets the default custom text for domain claimed phone message
 it impacts all organisations without customized verify phone message text
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+
+### GetDefaultLoginTexts
+
+> **rpc** GetDefaultLoginTexts([GetDefaultLoginTextsRequest](#getdefaultlogintextsrequest))
+[GetDefaultLoginTextsResponse](#getdefaultlogintextsresponse)
+
+Returns the default custom texts for login ui
+
+
+
+
+### GetCustomLoginTexts
+
+> **rpc** GetCustomLoginTexts([GetCustomLoginTextsRequest](#getcustomlogintextsrequest))
+[GetCustomLoginTextsResponse](#getcustomlogintextsresponse)
+
+Returns the custom texts for login ui
+
+
+
+
+### SetCustomLoginText
+
+> **rpc** SetCustomLoginText([SetCustomLoginTextsRequest](#setcustomlogintextsrequest))
+[SetCustomLoginTextsResponse](#setcustomlogintextsresponse)
+
+Sets the custom text for login ui
+it impacts all organisations without customized login ui texts
 
 
 
@@ -969,6 +1021,28 @@ This is an empty response
 
 
 
+### GetCustomLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.LoginCustomText | - |  |
+
+
+
+
 ### GetCustomOrgIAMPolicyRequest
 
 
@@ -1049,6 +1123,28 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.LoginCustomText | - |  |
 
 
 
@@ -1300,6 +1396,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
+### GetPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -1818,6 +1931,58 @@ This is an empty request
 
 
 
+### SetCustomLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| select_account_text |  zitadel.text.v1.SelectAccountScreenText | - |  |
+| login_text |  zitadel.text.v1.LoginScreenText | - |  |
+| password_text |  zitadel.text.v1.PasswordScreenText | - |  |
+| username_change_text |  zitadel.text.v1.UsernameChangeScreenText | - |  |
+| username_change_done_text |  zitadel.text.v1.UsernameChangeDoneScreenText | - |  |
+| init_password_text |  zitadel.text.v1.InitPasswordScreenText | - |  |
+| init_password_done_text |  zitadel.text.v1.InitPasswordDoneScreenText | - |  |
+| email_verification_text |  zitadel.text.v1.EmailVerificationScreenText | - |  |
+| email_verification_done_text |  zitadel.text.v1.EmailVerificationDoneScreenText | - |  |
+| initialize_user_text |  zitadel.text.v1.InitializeUserScreenText | - |  |
+| initialize_done_text |  zitadel.text.v1.InitializeUserDoneScreenText | - |  |
+| init_mfa_prompt_text |  zitadel.text.v1.InitMFAPromptScreenText | - |  |
+| init_mfa_otp_text |  zitadel.text.v1.InitMFAOTPScreenText | - |  |
+| init_mfa_u2f_text |  zitadel.text.v1.InitMFAU2FScreenText | - |  |
+| init_mfa_done_text |  zitadel.text.v1.InitMFADoneScreenText | - |  |
+| mfa_providers_text |  zitadel.text.v1.MFAProvidersText | - |  |
+| verify_mfa_otp_text |  zitadel.text.v1.VerifyMFAOTPScreenText | - |  |
+| verify_mfa_u2f_text |  zitadel.text.v1.VerifyMFAU2FScreenText | - |  |
+| passwordless_text |  zitadel.text.v1.PasswordlessScreenText | - |  |
+| password_change_text |  zitadel.text.v1.PasswordChangeScreenText | - |  |
+| password_change_done_text |  zitadel.text.v1.PasswordChangeDoneScreenText | - |  |
+| password_reset_done_text |  zitadel.text.v1.PasswordResetDoneScreenText | - |  |
+| registration_option_text |  zitadel.text.v1.RegistrationOptionScreenText | - |  |
+| registration_user_text |  zitadel.text.v1.RegistrationUserScreenText | - |  |
+| registration_org_text |  zitadel.text.v1.RegistrationOrgScreenText | - |  |
+| linking_user_done_text |  zitadel.text.v1.LinkingUserDoneScreenText | - |  |
+| external_user_not_found_text |  zitadel.text.v1.ExternalUserNotFoundScreenText | - |  |
+| success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
+| logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
+| footer_text |  zitadel.text.v1.FooterText | - |  |
+
+
+
+
+### SetCustomLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetDefaultDomainClaimedMessageTextRequest
 
 
@@ -1868,6 +2033,7 @@ This is an empty request
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
+| privacy_policy |  bool | - |  |
 
 
 
@@ -2023,6 +2189,7 @@ This is an empty request
 | label_policy_private_label |  bool | - |  |
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
+| privacy_policy |  bool | - |  |
 
 
 
@@ -2370,6 +2537,29 @@ This is an empty request
 
 
 ### UpdatePasswordLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdatePrivacyPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+
+
+
+
+### UpdatePrivacyPolicyResponse
 
 
 

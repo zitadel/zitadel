@@ -37,6 +37,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
+				middleware.SentryHandler(),
 				middleware.TranslationHandler(lang),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),

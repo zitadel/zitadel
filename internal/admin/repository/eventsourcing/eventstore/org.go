@@ -2,8 +2,9 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -12,6 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/logging"
+
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -36,6 +38,7 @@ func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.OrgView
 	if errors.IsNotFound(viewErr) {
 		org = new(model.OrgView)
 	}
+
 	events, esErr := repo.getOrgEvents(ctx, id, org.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")

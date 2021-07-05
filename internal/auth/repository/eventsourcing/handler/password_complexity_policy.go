@@ -97,7 +97,7 @@ func (p *PasswordComplexityPolicy) processPasswordComplexityPolicy(event *es_mod
 }
 
 func (p *PasswordComplexityPolicy) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordComplexity policy handler")
+	logging.LogWithFields("SPOOL-6M99S", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordComplexity policy handler")
 	return spooler.HandleError(event, err, p.view.GetLatestPasswordComplexityPolicyFailedEvent, p.view.ProcessedPasswordComplexityPolicyFailedEvent, p.view.ProcessedPasswordComplexityPolicySequence, p.errorCountUntilSkip)
 }
 

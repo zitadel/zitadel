@@ -3,10 +3,15 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -31,12 +36,15 @@ import (
 )
 
 type OrgRepository struct {
-	SearchLimit     uint64
-	Eventstore      v1.Eventstore
-	View            *mgmt_view.View
-	Roles           []string
-	SystemDefaults  systemdefaults.SystemDefaults
-	PrefixAvatarURL string
+	SearchLimit             uint64
+	Eventstore              v1.Eventstore
+	View                    *mgmt_view.View
+	Roles                   []string
+	SystemDefaults          systemdefaults.SystemDefaults
+	PrefixAvatarURL         string
+	LoginDir                http.FileSystem
+	TranslationFileContents map[string][]byte
+	mutex                   sync.Mutex
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -526,6 +534,23 @@ func (repo *OrgRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	return iam_es_model.PasswordLockoutViewToModel(policy), nil
 }
 
+func (repo *OrgRepository) GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		return repo.GetDefaultPrivacyPolicy(ctx)
+	}
+	return iam_es_model.PrivacyViewToModel(policy), nil
+}
+
+func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy.Default = true
+	return iam_es_model.PrivacyViewToModel(policy), nil
+}
+
 func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
 	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {
@@ -596,6 +621,52 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 		return nil, err
 	}
 	return iam_es_model.MessageTextViewToModel(text), err
+}
+
+func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	contents, ok := repo.TranslationFileContents[lang]
+	if !ok {
+		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if err != nil {
+			return nil, err
+		}
+		repo.TranslationFileContents[lang] = contents
+	}
+	loginTextMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+	}
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	for _, text := range texts {
+		keys := strings.Split(text.Key, ".")
+		screenTextMap, ok := loginTextMap[keys[0]].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		screenTextMap[keys[1]] = text.Text
+	}
+	jsonbody, err := json.Marshal(loginTextMap)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-2n8fs", "Errors.TranslationFile.MergeError")
+	}
+	loginText := new(domain.CustomLoginText)
+	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-2n8fs", "Errors.TranslationFile.MergeError")
+	}
+	return loginText, nil
+}
+
+func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
@@ -692,4 +763,16 @@ func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *OrgRepository) readTranslationFile(filename string) ([]byte, error) {
+	r, err := repo.LoginDir.Open(filename)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
+	}
+	contents, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
+	}
+	return contents, nil
 }

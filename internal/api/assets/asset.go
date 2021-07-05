@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -84,6 +85,7 @@ func NewHandler(
 
 	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
 	router := mux.NewRouter()
+	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{id}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return router

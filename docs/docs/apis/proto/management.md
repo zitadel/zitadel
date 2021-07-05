@@ -1586,6 +1586,61 @@ The password lockout policy is not used at the moment
 
 
 
+### GetPrivacyPolicy
+
+> **rpc** GetPrivacyPolicy([GetPrivacyPolicyRequest](#getprivacypolicyrequest))
+[GetPrivacyPolicyResponse](#getprivacypolicyresponse)
+
+Returns the privacy policy of the organisation
+With this policy privacy relevant things can be configured (e.g. tos link)
+
+
+
+
+### GetDefaultPrivacyPolicy
+
+> **rpc** GetDefaultPrivacyPolicy([GetDefaultPrivacyPolicyRequest](#getdefaultprivacypolicyrequest))
+[GetDefaultPrivacyPolicyResponse](#getdefaultprivacypolicyresponse)
+
+Returns the default privacy policy of the IAM
+With this policy the privacy relevant things can be configured (e.g tos link)
+
+
+
+
+### AddCustomPrivacyPolicy
+
+> **rpc** AddCustomPrivacyPolicy([AddCustomPrivacyPolicyRequest](#addcustomprivacypolicyrequest))
+[AddCustomPrivacyPolicyResponse](#addcustomprivacypolicyresponse)
+
+Add a custom privacy policy for the organisation
+With this policy privacy relevant things can be configured (e.g. tos link)
+
+
+
+
+### UpdateCustomPrivacyPolicy
+
+> **rpc** UpdateCustomPrivacyPolicy([UpdateCustomPrivacyPolicyRequest](#updatecustomprivacypolicyrequest))
+[UpdateCustomPrivacyPolicyResponse](#updatecustomprivacypolicyresponse)
+
+Update the privacy complexity policy for the organisation
+With this policy privacy relevant things can be configured (e.g. tos link)
+
+
+
+
+### ResetPrivacyPolicyToDefault
+
+> **rpc** ResetPrivacyPolicyToDefault([ResetPrivacyPolicyToDefaultRequest](#resetprivacypolicytodefaultrequest))
+[ResetPrivacyPolicyToDefaultResponse](#resetprivacypolicytodefaultresponse)
+
+Removes the privacy policy of the organisation
+The default policy of the IAM will trigger after
+
+
+
+
 ### GetLabelPolicy
 
 > **rpc** GetLabelPolicy([GetLabelPolicyRequest](#getlabelpolicyrequest))
@@ -1932,6 +1987,48 @@ The default text of the IAM will trigger after
 
 
 
+### GetCustomLoginTexts
+
+> **rpc** GetCustomLoginTexts([GetCustomLoginTextsRequest](#getcustomlogintextsrequest))
+[GetCustomLoginTextsResponse](#getcustomlogintextsresponse)
+
+Returns the custom texts for login ui
+
+
+
+
+### GetDefaultLoginTexts
+
+> **rpc** GetDefaultLoginTexts([GetDefaultLoginTextsRequest](#getdefaultlogintextsrequest))
+[GetDefaultLoginTextsResponse](#getdefaultlogintextsresponse)
+
+Returns the custom texts for login ui
+
+
+
+
+### SetCustomLoginText
+
+> **rpc** SetCustomLoginText([SetCustomLoginTextsRequest](#setcustomlogintextsrequest))
+[SetCustomLoginTextsResponse](#setcustomlogintextsresponse)
+
+Sets the default custom text for login ui
+it impacts all organisations without customized login ui texts
+
+
+
+
+### ResetCustomLoginTextToDefault
+
+> **rpc** ResetCustomLoginTextToDefault([ResetCustomLoginTextsToDefaultRequest](#resetcustomlogintextstodefaultrequest))
+[ResetCustomLoginTextsToDefaultResponse](#resetcustomlogintextstodefaultresponse)
+
+Removes the custom login text of the organisation
+The default text of the IAM will trigger after
+
+
+
+
 ### GetOrgIDPByID
 
 > **rpc** GetOrgIDPByID([GetOrgIDPByIDRequest](#getorgidpbyidrequest))
@@ -2217,6 +2314,29 @@ This is an empty request
 
 
 ### AddCustomPasswordLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddCustomPrivacyPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+
+
+
+
+### AddCustomPrivacyPolicyResponse
 
 
 
@@ -3022,6 +3142,28 @@ This is an empty request
 
 
 
+### GetCustomLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.LoginCustomText | - |  |
+
+
+
+
 ### GetCustomPasswordResetMessageTextRequest
 
 
@@ -3166,6 +3308,28 @@ This is an empty request
 
 
 
+### GetDefaultLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.LoginCustomText | - |  |
+
+
+
+
 ### GetDefaultPasswordAgePolicyRequest
 This is an empty request
 
@@ -3235,6 +3399,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -3633,6 +3814,23 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
 | is_default |  bool | - |  |
+
+
+
+
+### GetPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -5456,6 +5654,28 @@ This is an empty request
 
 
 
+### ResetCustomLoginTextsToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomLoginTextsToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomPasswordResetMessageTextToDefaultRequest
 
 
@@ -5607,6 +5827,23 @@ This is an empty request
 
 
 
+### ResetPrivacyPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetPrivacyPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SendHumanResetPasswordNotificationRequest
 
 
@@ -5678,6 +5915,58 @@ This is an empty request
 
 
 ### SetCustomInitMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetCustomLoginTextsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| select_account_text |  zitadel.text.v1.SelectAccountScreenText | - |  |
+| login_text |  zitadel.text.v1.LoginScreenText | - |  |
+| password_text |  zitadel.text.v1.PasswordScreenText | - |  |
+| username_change_text |  zitadel.text.v1.UsernameChangeScreenText | - |  |
+| username_change_done_text |  zitadel.text.v1.UsernameChangeDoneScreenText | - |  |
+| init_password_text |  zitadel.text.v1.InitPasswordScreenText | - |  |
+| init_password_done_text |  zitadel.text.v1.InitPasswordDoneScreenText | - |  |
+| email_verification_text |  zitadel.text.v1.EmailVerificationScreenText | - |  |
+| email_verification_done_text |  zitadel.text.v1.EmailVerificationDoneScreenText | - |  |
+| initialize_user_text |  zitadel.text.v1.InitializeUserScreenText | - |  |
+| initialize_done_text |  zitadel.text.v1.InitializeUserDoneScreenText | - |  |
+| init_mfa_prompt_text |  zitadel.text.v1.InitMFAPromptScreenText | - |  |
+| init_mfa_otp_text |  zitadel.text.v1.InitMFAOTPScreenText | - |  |
+| init_mfa_u2f_text |  zitadel.text.v1.InitMFAU2FScreenText | - |  |
+| init_mfa_done_text |  zitadel.text.v1.InitMFADoneScreenText | - |  |
+| mfa_providers_text |  zitadel.text.v1.MFAProvidersText | - |  |
+| verify_mfa_otp_text |  zitadel.text.v1.VerifyMFAOTPScreenText | - |  |
+| verify_mfa_u2f_text |  zitadel.text.v1.VerifyMFAU2FScreenText | - |  |
+| passwordless_text |  zitadel.text.v1.PasswordlessScreenText | - |  |
+| password_change_text |  zitadel.text.v1.PasswordChangeScreenText | - |  |
+| password_change_done_text |  zitadel.text.v1.PasswordChangeDoneScreenText | - |  |
+| password_reset_done_text |  zitadel.text.v1.PasswordResetDoneScreenText | - |  |
+| registration_option_text |  zitadel.text.v1.RegistrationOptionScreenText | - |  |
+| registration_user_text |  zitadel.text.v1.RegistrationUserScreenText | - |  |
+| registration_org_text |  zitadel.text.v1.RegistrationOrgScreenText | - |  |
+| linking_user_done_text |  zitadel.text.v1.LinkingUserDoneScreenText | - |  |
+| external_user_not_found_text |  zitadel.text.v1.ExternalUserNotFoundScreenText | - |  |
+| success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
+| logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
+| footer_text |  zitadel.text.v1.FooterText | - |  |
+
+
+
+
+### SetCustomLoginTextsResponse
 
 
 
@@ -6034,6 +6323,29 @@ This is an empty request
 
 
 ### UpdateCustomPasswordLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateCustomPrivacyPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
+
+
+
+
+### UpdateCustomPrivacyPolicyResponse
 
 
 

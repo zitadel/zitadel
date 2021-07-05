@@ -3,13 +3,15 @@ Login:
   Description: Mit ZITADEL-Konto anmelden.
   TitleLinking: Anmeldung für Benutzer Linking
   DescriptionLinking: Gib deine Benutzerdaten ein um den externen Benutzer mit einem ZITADEL Benutzer zu linken.
-  Loginname: Loginname
+  LoginNameLabel: Loginname
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
-  ExternalLogin: Melde dich mit einem externen Benutzer an
+  ExternalUserDescription: Melde dich mit einem externen Benutzer an
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
+  RegisterButtonText: registrieren
+  NextButtonText: weiter
 
-UserSelection:
+SelectAccount:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
   TitleLinking: Account auswählen um zu verlinken
@@ -22,216 +24,228 @@ UserSelection:
 Password:
   Title: Willkommen zurück!
   Description: Gib deine Benutzerdaten ein.
-  Password: Passwort
+  PasswordLabel: Passwort
   MinLength: Mindestlänge
   HasUppercase: Grossbuchstaben
   HasLowercase: Kleinbuchstaben
   HasNumber: Nummer
   HasSymbol: Symbol
   Confirmation: Bestätigung stimmt überein
+  ResetLinkText: Password zurücksetzen
+  BackButtonText: zurück
+  NextButtonText: weiter
 
 UsernameChange:
   Title: Usernamen ändern
   Description: Wähle deinen neuen Benutzernamen
-  Username: Benutzernamen
+  UsernameLabel: Benutzernamen
+  CancelButtonText: abbrechen
+  NextButtonText: weiter
 
 UsernameChangeDone:
   Title: Username geändert
   Description: Der Username wurde erfolgreich geändert.
+  NextButtonText: next
 
-MFAVerify:
-  Title: Multifaktor verifizieren
-  Description: Verifiziere deinen Multifaktor
-  OTP: OTP (One Time Password)
-  Code: Code
-  
-InitPassword: 
+
+InitPassword:
   Title: Passwort setzen
   Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um ein neues Passwort zu setzen.
-  Code: Code
-  NewPassword: Neues Passwort
-  NewPasswordConfirm: Passwort bestätigen
+  CodeLabel: Code
+  NewPasswordLabel: Neues Passwort
+  NewPasswordConfirmLabel: Passwort bestätigen
+  ResendButtonText: erneut senden
+  NextButtonText: weiter
 
 InitPasswordDone:
   Title: Passwort gesetzt
   Description: Passwort erfolgreich gesetzt
+  NextButtonText: weiter
+  CancelButtonText: abbrechen
 
 InitUser:
   Title: User aktivieren
   Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine EMail zu verifizieren und ein neues Passwort zu setzen.
-  Code: Code
-  NewPassword: Neues Passwort
-  NewPasswordConfirm: Passwort bestätigen
+  CodeLabel: Code
+  NewPasswordLabel: Neues Passwort
+  NewPasswordConfirmLabel: Passwort bestätigen
+  NextButtonText: weiter
+  ResendButtonText: erneut senden
 
 InitUserDone:
   Title: User aktiviert
   Description: EMail verifiziert und Passwort erfolgreich gesetzt
+  NextButtonText: weiter
+  CancelButtonText: abbrechen
 
-MFA:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
-  ChooseOther: oder wähle eine andere Option aus
-
-MFAPrompt:
+InitMFAPrompt:
   Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
+  NextButtonText: weiter
+  SkipButtonText: überspringen
 
-MFAInitVerify:
+InitMFAOTP:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor
   OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authenticator) oder kopiere das Secret und gib anschliessend den Code ein.
-  Secret: Secret
-  Code: Code
+  SecretLabel: Secret
+  CodeLabel: Code
+  NextButtonText: weiter
+  CancelButtonText: abbrechen
 
-MFAInitDone:
-  Title: Multifaktor Verifizierung erstellt
-  Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden.
-
-MFAInitU2F:
+InitMFAU2F:
   Title: Multifaktor U2F / WebAuthN hinzufügen
   Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
+  TokenNameLabel: Name des Tokens / Geräts
+  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Token registrieren
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
-MFAVerifyU2F:
+InitMFADone:
+  Title: Multifaktor Verifizierung erstellt
+  Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden.
+  NextButtonText: weiter
+  CancelButtonText: abbrechen
+
+MFAProvider:
+  Provider0: OTP (One Time Password)
+  Provider1: U2F (Universal 2nd Factor)
+  ChooseOther: oder wähle eine andere Option aus
+
+VerifyMFAOTP:
+  Title: Multifaktor verifizieren
+  Description: Verifiziere deinen Multifaktor
+  CodeLabel: Code
+  NextButtonText: next
+
+VerifyMFAU2F:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
-
-WebAuthN:
-  Name: Name des Tokens / Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  Error:
-    Retry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ValidateTokenButtonText: Token validieren
 
 Passwordless:
   Title: Passwortlos einloggen
   Description: Verifiziere dein Token
+  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  LoginWithPwButtonText: Mit Passwort anmelden
+  ValidateTokenButtonText: Token validieren
 
 PasswordChange:
   Title: Passwort ändern
   Description: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
-  OldPassword: Altes Passwort
-  NewPassword: Neues Passwort
-  NewPasswordConfirmation: Passwort Bestätigung
+  OldPasswordLabel: Altes Passwort
+  NewPasswordLabel: Neues Passwort
+  NewPasswordConfirmationLabel: Passwort Bestätigung
+  CancelButtonText: abbrechen
+  NextButtonText: weiter
 
 PasswordChangeDone:
   Title: Passwort ändern
   Description: Das Passwort wurde erfolgreich geändert.
+  NextButtonText: weiter
 
 PasswordResetDone:
   Title: Resetlink versendet
   Description: Prüfe dein E-Mail Postfach, um ein neues Passwort zu setzen.
-
-PasswordSetDone:
-  Title: Passwort gesetzt
-  Description: Das Passwort wurde erfolgreich gesetzt.
+  NextButtonText: weiter
 
 EmailVerification:
   Title: E-Mail Verifizierung
   Description: Du hast ein E-Mail zur Verifizierung deiner E-Mail Adresse bekommen. Gib den Code im untenstehenden Formular ein. Mit erneut versenden, wird dir ein neues E-Mail zugestellt.
-  Code: Code
+  CodeLabel: Code
+  NextButtonText: weiter
+  ResendButtonText: erneut sende
 
 EmailVerificationDone:
   Title: E-Mail Verifizierung
   Description: Deine E-Mail Adresse wurde erfolgreich verifiziert.
+  NextButtonText: weiter
+  CancelButtonText: abbrechen
+  LoginButtonText: anmelden
 
 RegisterOption:
   Title: Registrations Möglichkeiten
   Description: Wähle aus wie du dich registrieren möchtest.
-  RegisterUsernamePassword: Mit Benutzername Passwort
+  RegisterUsernamePasswordButtonText: Mit Benutzername Passwort
+  ExternalLoginDescription: oder registriere dich mit einem externen Benutzer
 
-Registration:
+RegistrationUser:
   Title: Registration
   Description: Gib deine Benutzerangaben an. Die E-Mail Adresse wird als Benutzernamen verwendet.
-  Email: E-Mail
-  Username: Benutzername
-  Firstname: Vorname
-  Lastname: Nachname
-  Language: Sprache
+  DescriptionOrgRegister: Gib deine Benutzerangaben an.
+  EmailLabel: E-Mail
+  UsernameLabel: Benutzername
+  FirstnameLabel: Vorname
+  LastnameLabel: Nachname
+  LanguageLabel: Sprache
   German: Deutsch
   English: English
-  Gender: Geschlecht
+  GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
   Diverse: diverse
-  Password: Passwort
-  Password2: Passwort wiederholen
-  TosAndPrivacy: Allgemeine Geschäftsbedingungen und Datenschutz
+  PasswordLabel: Passwort
+  PasswordConfirmLabel: Passwort wiederholen
+  TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
-  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: Datenschutzerklärung
-  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   ExternalLogin: oder registriere dich mit einem externen Benutzer
+  BackButtonText: zurück
+  NextButtonText: weiter
 
 RegistrationOrg:
   Title: Organisations Registration
   Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
-  OrgName: Organisationsname
-  OrgDomain: Domäne
-  Email: E-Mail
-  Username: Benutzername
-  Firstname: Vorname
-  Lastname: Nachname
-  Language: Sprache
-  German: Deutsch
-  English: English
-  Gender: Geschlecht
-  Female: weiblich
-  Male: männlich
-  Diverse: diverse
-  Password: Passwort
-  Password2: Passwort wiederholen
-  TosAndPrivacy: Allgemeine Geschäftsbedingungen und Datenschutz
+  OrgNameLabel: Organisationsname
+  EmailLabel: E-Mail
+  UsernameLabel: Benutzername
+  FirstnameLabel: Vorname
+  LastnameLabel: Nachname
+  PasswordLabel: Passwort
+  PasswordConfirmLabel: Passwort wiederholen
+  TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
-  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   PrivacyLinkText: Datenschutzerklärung
-  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
+  SaveButtonText: speichern
 
 LinkingUsersDone:
   Title: Benutzerlinking
   Description: Benuzterlinking erledigt.
+  CancelButtonText: abbrechen
+  NextButtonText: weiter
 
 ExternalNotFoundOption:
   Title: Externer Benutzer
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
-  Link: Verlinken
-  AutoRegister: Automatisches registrieren
+  LinkButtonText: Verlinken
+  AutoRegisterButtonText: Automatisches registrieren
 
 LoginSuccess:
   Title: Erfolgreich eingeloggt
-  AutoRedirect: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
-  Redirected: Du kannst diese Fenster nun schliessen.
+  AutoRedirectDescription: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+  RedirectedDescription: Du kannst diese Fenster nun schliessen.
+  NextButtonText: weiter
 
 LogoutDone:
   Title: Ausgeloggt
   Description: Du wurdest erfolgreich ausgeloggt.
-
-Actions:
-  Login: anmelden
-  Next: weiter
-  Back: zurück
-  Resend: erneut senden
-  Skip: überspringen
-  Register: registrieren
-  ForgotPassword: Password zurücksetzen
-  Cancel: Abbrechen
-  Save: speichern
-  RegisterToken: Token registrieren
-  ValidateToken: Token validieren
-  Recreate: erneut erstellen
-  PasswordLogin: Mit Passwort anmelden
+  LoginButtonText: anmelden
 
 Footer:
   PoweredBy: Powered By
   Tos: AGB
-  TosLink: https://docs.zitadel.ch/docs/legal/terms-of-service
   Privacy: Datenschutzerklärung
-  PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
   Help: Hilfe
+  HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten

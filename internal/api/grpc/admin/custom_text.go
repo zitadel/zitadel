@@ -128,3 +128,36 @@ func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 		),
 	}, nil
 }
+
+func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *admin_pb.GetDefaultLoginTextsRequest) (*admin_pb.GetDefaultLoginTextsResponse, error) {
+	msg, err := s.iam.GetDefaultLoginTexts(ctx, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetDefaultLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
+}
+func (s *Server) GetCustomLoginTexts(ctx context.Context, req *admin_pb.GetCustomLoginTextsRequest) (*admin_pb.GetCustomLoginTextsResponse, error) {
+	msg, err := s.iam.GetCustomLoginTexts(ctx, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetCustomLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustomLoginTextsRequest) (*admin_pb.SetCustomLoginTextsResponse, error) {
+	result, err := s.command.SetCustomIAMLoginText(ctx, SetLoginTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetCustomLoginTextsResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}

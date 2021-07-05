@@ -28,6 +28,7 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		LabelPolicyPrivateLabel:  features.LabelPolicyPrivateLabel,
 		LabelPolicyWatermark:     features.LabelPolicyWatermark,
 		CustomText:               features.CustomText,
+		PrivacyPolicy:            features.PrivacyPolicy,
 	}
 }
 
