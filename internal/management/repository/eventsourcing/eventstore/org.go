@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/caos/logging"
@@ -607,21 +608,22 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
 	var contents []byte
 	var ok bool
+	var err error
+	mux := &sync.Mutex{}
 	if contents, ok = repo.TranslationFileContents[lang]; !ok {
-		r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
+		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang), mux)
 		if err != nil {
-			return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
+			return nil, err
 		}
-		contents, err = ioutil.ReadAll(r)
-		if err != nil {
-			return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
-		}
+		repo.TranslationFileContents[lang] = contents
 	}
 	loginTextMap := map[string]interface{}{}
+	mux.Lock()
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
+		mux.Unlock()
 		return nil, errors.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
 	}
-
+	mux.Unlock()
 	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
 	if err != nil {
 		return nil, err
@@ -747,4 +749,20 @@ func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *OrgRepository) readTranslationFile(filename string, mux *sync.Mutex) ([]byte, error) {
+	mux.Lock()
+	r, err := repo.LoginDir.Open(filename)
+	if err != nil {
+		mux.Unlock()
+		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
+	}
+	contents, err := ioutil.ReadAll(r)
+
+	mux.Unlock()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
+	}
+	return contents, nil
 }

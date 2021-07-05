@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/ghodss/yaml"
 
@@ -377,21 +378,22 @@ func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, 
 func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
 	var contents []byte
 	var ok bool
+	var err error
+	mux := &sync.Mutex{}
 	if contents, ok = repo.TranslationFileContents[lang]; !ok {
-		r, err := repo.LoginDir.Open(fmt.Sprintf("/i18n/%s.yaml", lang))
+		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang), mux)
 		if err != nil {
-			return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
-		}
-		contents, err = ioutil.ReadAll(r)
-		if err != nil {
-			return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+			return nil, err
 		}
 		repo.TranslationFileContents[lang] = contents
 	}
 	loginText := new(domain.CustomLoginText)
+	mux.Lock()
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
+		mux.Unlock()
 		return nil, caos_errs.ThrowInternal(err, "TEXT-GHR3Q", "Errors.TranslationFile.ReadError")
 	}
+	mux.Unlock()
 	return loginText, nil
 }
 
@@ -409,4 +411,19 @@ func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *IAMRepository) readTranslationFile(filename string, mux *sync.Mutex) ([]byte, error) {
+	mux.Lock()
+	r, err := repo.LoginDir.Open(filename)
+	if err != nil {
+		mux.Unlock()
+		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
+	}
+	contents, err := ioutil.ReadAll(r)
+	mux.Unlock()
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+	}
+	return contents, nil
 }
