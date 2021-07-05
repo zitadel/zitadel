@@ -20,6 +20,7 @@ type APIApplicationWriteModel struct {
 	ClientSecretString string
 	AuthMethodType     domain.APIAuthMethodType
 	State              domain.AppState
+	api                bool
 }
 
 func NewAPIApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *APIApplicationWriteModel {
@@ -123,6 +124,7 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 }
 
 func (wm *APIApplicationWriteModel) appendAddAPIEvent(e *project.APIConfigAddedEvent) {
+	wm.api = true
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.AuthMethodType = e.AuthMethodType
@@ -173,4 +175,8 @@ func (wm *APIApplicationWriteModel) NewChangedEvent(
 		return nil, false, err
 	}
 	return changeEvent, true, nil
+}
+
+func (wm *APIApplicationWriteModel) IsAPI() bool {
+	return wm.api
 }

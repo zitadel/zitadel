@@ -35,6 +35,7 @@ type OIDCApplicationWriteModel struct {
 	ClockSkew                time.Duration
 	State                    domain.AppState
 	AdditionalOrigins        []string
+	oidc                     bool
 }
 
 func NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *OIDCApplicationWriteModel {
@@ -138,6 +139,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 }
 
 func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAddedEvent) {
+	wm.oidc = true
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.RedirectUris = e.RedirectUris
@@ -292,4 +294,8 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 		return nil, false, err
 	}
 	return changeEvent, true, nil
+}
+
+func (wm *OIDCApplicationWriteModel) IsOIDC() bool {
+	return wm.oidc
 }
