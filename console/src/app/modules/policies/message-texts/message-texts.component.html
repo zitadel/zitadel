@@ -1,38 +1,15 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
 
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
-    <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
-        <ng-template appHasRole [appHasRole]="['policy.delete']">
-            <button *ngIf="!isDefault" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
-                mat-stroked-button>
-                {{'POLICY.RESET' | translate}}
-            </button>
-        </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['policy.write']">
-            <button *ngIf="isDefault" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
-                mat-raised-button>
-                {{'POLICY.CREATECUSTOM' | translate}}
-            </button>
-        </ng-template>
-    </ng-container>
-
-    <div class="content" *ngIf="loginData">
-        
-      <div class="row">
-      </div>
-
-        <div class="row">
-        </div>
+    <div class="content" >
+      <cnsl-edit-text label="one"></cnsl-edit-text>
+      <cnsl-edit-text label="one"></cnsl-edit-text>
     </div>
-
-    <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
-        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
     <div class="divider"></div>
 

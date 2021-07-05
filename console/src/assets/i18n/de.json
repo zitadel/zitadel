@@ -699,6 +699,10 @@
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "SAVED": "Erfolgreich gespeichert."
     },
+    "MESSAGE_TEXTS": {
+      "TITLE":"Email Texte",
+      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails"
+    },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
     "BTN_INSTALL": "Installieren",
     "BTN_EDIT": "Modifizieren",

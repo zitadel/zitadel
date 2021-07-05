@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'cnsl-edit-text',
@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./edit-text.component.scss']
 })
 export class EditTextComponent implements OnInit {
-
+  @Input() label: string = 'hello';
   constructor() { }
 
   ngOnInit(): void {

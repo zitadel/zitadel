@@ -126,4 +126,31 @@
             </div>
         </div>
     </ng-template>
+
+    <ng-template appHasRole
+        [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
+        <div class="p-item card">
+            <div class="avatar">
+              <i class="icon las la-paragraph"></i>
+            </div>
+            <div class="title">
+                <span>{{'POLICY.MESSAGE_TEXTS.TITLE' | translate}}</span>
+                <button mat-icon-button disabled>
+                    <i class="icon las la-check-circle"></i>
+                </button>
+            </div>
+
+            <p class="desc">
+                {{'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate}}</p>
+
+            <span class="fill-space"></span>
+            <div class="btn-wrapper">
+                <ng-template appHasRole [appHasRole]="['policy.write']">
+                    <button
+                        [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.MESSAGE_TEXTS ]"
+                        mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
+                </ng-template>
+            </div>
+        </div>
+    </ng-template>
 </div>

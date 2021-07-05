@@ -4,19 +4,23 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 import {
-  GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
-  UpdateLoginPolicyRequest,
-  UpdateLoginPolicyResponse,
+  GetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPLoginPolicyLink, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddCustomLoginPolicyRequest,
-  GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+  GetCustomDomainClaimedMessageTextRequest,
+  GetCustomInitMessageTextRequest,
+  GetCustomPasswordResetMessageTextRequest,
+  GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
+import { PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
 import {
@@ -37,22 +41,28 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 export class MessageTextsComponent implements OnDestroy {
   public LoginMethodComponentType: any = LoginMethodComponentType;
   public passwordlessTypes: Array<PasswordlessType> = [];
-  public loginData!: LoginPolicy.AsObject;
 
-  private sub: Subscription = new Subscription();
+  public initMsg!: GetCustomInitMessageTextRequest.AsObject | GetDefaultInitMessageTextRequest.AsObject;
+  public verifyEmailMsg!: GetCustomVerifyEmailMessageTextRequest.AsObject | GetDefaultVerifyEmailMessageTextRequest.AsObject;
+  public verifyPhoneMsg!: GetCustomVerifyPhoneMessageTextRequest.AsObject | GetDefaultVerifyPhoneMessageTextRequest.AsObject;
+  public passwordResetMsg!: GetCustomPasswordResetMessageTextRequest.AsObject | GetDefaultPasswordResetMessageTextRequest.AsObject;
+  public domainClaimed!: GetCustomDomainClaimedMessageTextRequest.AsObject | GetDefaultDomainClaimedMessageTextRequest.AsObject;
+
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-  public idps: IDPLoginPolicyLink.AsObject[] = [];
 
   public loading: boolean = false;
   public disabled: boolean = true;
 
   public IDPStylingType: any = IDPStylingType;
   public nextLinks: CnslLinks[] = [];
+
+  private sub: Subscription = new Subscription();
+
   constructor(
     private route: ActivatedRoute,
-    private toast: ToastService,
+    // private toast: ToastService,
     private injector: Injector,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
@@ -86,94 +96,11 @@ export class MessageTextsComponent implements OnDestroy {
 
       return this.route.params;
     })).subscribe(() => {
-      this.fetchData();
-    });
-  }
 
-  private fetchData(): void {
-    this.getData().then(resp => {
-      if (resp.policy) {
-        this.loginData = resp.policy;
-        this.loading = false;
-        this.disabled = this.isDefault;
-      }
     });
   }
 
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
-  }
-
-  private async getData():
-    Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).getLoginPolicy();
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).getLoginPolicy();
-    }
-  }
-
-  private async updateData():
-    Promise<UpdateLoginPolicyResponse.AsObject> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        const mgmtreq = new AddCustomLoginPolicyRequest();
-        mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-        mgmtreq.setAllowRegister(this.loginData.allowRegister);
-        mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-        mgmtreq.setForceMfa(this.loginData.forceMfa);
-        mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-        mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-        if ((this.loginData as LoginPolicy.AsObject).isDefault) {
-          return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
-        } else {
-          return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
-        }
-      case PolicyComponentServiceType.ADMIN:
-        const adminreq = new UpdateLoginPolicyRequest();
-        adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-        adminreq.setAllowRegister(this.loginData.allowRegister);
-        adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-        adminreq.setForceMfa(this.loginData.forceMfa);
-        adminreq.setPasswordlessType(this.loginData.passwordlessType);
-        adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-
-        return (this.service as AdminService).updateLoginPolicy(adminreq);
-    }
-  }
-
-  public savePolicy(): void {
-    this.updateData().then(() => {
-      this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
-      this.loading = true;
-      setTimeout(() => {
-        this.fetchData();
-      }, 2000);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
-  }
-
-  public removePolicy(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).resetLoginPolicyToDefault().then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        this.loading = true;
-        setTimeout(() => {
-          this.fetchData();
-        }, 2000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
-    }
-  }
-
-  public get isDefault(): boolean {
-    if (this.loginData && this.serviceType === PolicyComponentServiceType.MGMT) {
-      return (this.loginData as LoginPolicy.AsObject).isDefault;
-    } else {
-      return false;
-    }
   }
 }
