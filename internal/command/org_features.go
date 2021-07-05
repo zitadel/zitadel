@@ -41,6 +41,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LabelPolicyWatermark,
 		features.CustomDomain,
 		features.CustomText,
+		features.PrivacyPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -134,6 +135,15 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 		}
 		if removeCustomTextEvents != nil {
 			events = append(events, removeCustomTextEvents...)
+		}
+	}
+	if !features.PrivacyPolicy {
+		removePrivacyPolicyEvent, err := c.removePrivacyPolicyIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removePrivacyPolicyEvent != nil {
+			events = append(events, removePrivacyPolicyEvent)
 		}
 	}
 	return events, nil

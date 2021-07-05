@@ -533,6 +533,23 @@ func (repo *OrgRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) 
 	return iam_es_model.PasswordLockoutViewToModel(policy), nil
 }
 
+func (repo *OrgRepository) GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	if errors.IsNotFound(err) {
+		return repo.GetDefaultPrivacyPolicy(ctx)
+	}
+	return iam_es_model.PrivacyViewToModel(policy), nil
+}
+
+func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	policy.Default = true
+	return iam_es_model.PrivacyViewToModel(policy), nil
+}
+
 func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
 	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {

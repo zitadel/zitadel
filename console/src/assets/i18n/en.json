@@ -666,6 +666,8 @@
       "ADVANCEDBEHAVIOR":"Advanced Behavior",
       "DROP":"Drop image here",
       "RELEASE":"Release",
+      "DROPFONT":"Drop fontfile here",
+      "RELEASEFONT":"Release",
       "PREVIEW": {
         "TITLE":"Login",
         "SECOND":"login with your ZITADEL-Account.",

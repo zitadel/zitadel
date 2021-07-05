@@ -24,6 +24,7 @@ func Adapt(
 	tolerations []corev1.Toleration,
 	version string,
 	features []string,
+	customImageRegistry string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -51,6 +52,7 @@ func Adapt(
 			tolerations,
 			version,
 			features,
+			customImageRegistry,
 		)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)

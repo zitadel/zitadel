@@ -96,23 +96,31 @@
             {{ .PasswordPolicyDescription }}
         </div>
 
+        {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "RegistrationUser.TosAndPrivacy"}}</label>
             <div class="lgn-checkbox">
                 <input type="checkbox" id="register-term-confirmation"
                     name="register-term-confirmation" required>
                 <label for="register-term-confirmation">
-                    {{t "RegistrationUser.TosConfirm"}}
-                    <a class="tos-link" target="_blank" href="{{t "RegistrationUser.TosLink"}}" rel="noopener noreferrer">
-                        {{t "RegistrationUser.TosLinkText"}}
-                    </a>
-                    {{t "RegistrationUser.TosConfirmAnd"}}
-                    <a class="tos-link" target="_blank" href="{{t "RegistrationUser.PrivacyLink"}}" rel="noopener noreferrer">
-                    {{t "RegistrationUser.PrivacyLinkText"}}
-                    </a>
+                   {{t "RegistrationUser.TosConfirm"}}
+                    {{ if .TOSLink }}
+                        <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
+                            {{t "RegistrationUser.TosLinkText"}}
+                        </a>
+                    {{end}}
+                    {{ if and .TOSLink .PrivacyLink }}
+                        {{t "RegistrationUser.TosConfirmAnd"}}
+                    {{ end }}
+                    {{ if .PrivacyLink }}
+                        <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
+                        {{t "RegistrationUser.PrivacyLinkText"}}
+                        </a>
+                    {{end}}
                 </label>
             </div>
         </div>
+        {{ end }}
     </div>
 
     {{template "error-message" .}}

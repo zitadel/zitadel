@@ -35,6 +35,7 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 * User interface for administration
 * APIs for Management, Administration, and Authentication
 * Policy configuration and enforcement
+* Private Labeling
 
 ## Run ZITADEL anywhere
 
@@ -87,6 +88,10 @@ Register new applications
 
 Delegate the right to assign roles to another organization
 ![projects_create_org_grant](https://user-images.githubusercontent.com/1366906/118766069-39cb1c80-b87c-11eb-84cf-f5becce4e9b6.gif)
+
+Customize login and console with your design  
+![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
+
 
 ## How To Contribute
 

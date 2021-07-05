@@ -129,9 +129,6 @@ func (m *LabelPolicy) OnSuccess() error {
 }
 
 func (p *LabelPolicy) CleanUpBucket(policy *iam_model.LabelPolicyView) {
-	if p.static == nil {
-		return
-	}
 	ctx := context.Background()
 	objects, err := p.static.ListObjectInfos(ctx, policy.AggregateID, domain.LabelPolicyPrefix+"/", false)
 	if err != nil {
