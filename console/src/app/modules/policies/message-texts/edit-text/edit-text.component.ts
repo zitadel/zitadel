@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'cnsl-edit-text',
@@ -7,6 +8,9 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class EditTextComponent implements OnInit {
   @Input() label: string = 'hello';
+  @Input() current$: Observable<string>;
+
+  private value: string = '';
   constructor() { }
 
   ngOnInit(): void {

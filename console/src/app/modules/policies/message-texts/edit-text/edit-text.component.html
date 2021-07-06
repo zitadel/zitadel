@@ -1,6 +1,11 @@
-<div>
+<div class="flex">
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ label | translate }}</cnsl-label>
-    <textarea cnslInput name="address" formControlName="address"></textarea>
-</cnsl-form-field>
+    <textarea cnslInput [name]="label" [(ngModel)]="value"></textarea>
+  </cnsl-form-field>
+  <div class="actions">
+    <button mat-icon-button><i class="las la-history"></i></button>
+    <button mat-icon-button><i class="las la-undo"></i></button>
+    <button mat-icon-button><i class="las la-check"></i></button>
+  </div>
 </div>

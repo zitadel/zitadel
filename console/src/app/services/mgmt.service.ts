@@ -3,18 +3,6 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
-import {
-  RemoveLabelPolicyFontRequest,
-  RemoveLabelPolicyFontResponse,
-  RemoveLabelPolicyIconDarkRequest,
-  RemoveLabelPolicyIconDarkResponse,
-  RemoveLabelPolicyIconRequest,
-  RemoveLabelPolicyIconResponse,
-  RemoveLabelPolicyLogoDarkRequest,
-  RemoveLabelPolicyLogoDarkResponse,
-  RemoveLabelPolicyLogoRequest,
-  RemoveLabelPolicyLogoResponse,
-} from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -90,10 +78,26 @@ import {
   GenerateOrgDomainValidationResponse,
   GetAppByIDRequest,
   GetAppByIDResponse,
+  GetCustomInitMessageTextRequest,
+  GetCustomInitMessageTextResponse,
+  GetCustomPasswordResetMessageTextRequest,
+  GetCustomPasswordResetMessageTextResponse,
+  GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyEmailMessageTextResponse,
+  GetCustomVerifyPhoneMessageTextRequest,
+  GetCustomVerifyPhoneMessageTextResponse,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultInitMessageTextResponse,
   GetDefaultLabelPolicyRequest,
   GetDefaultLabelPolicyResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
+  GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultPasswordResetMessageTextResponse,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextResponse,
+  GetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextResponse,
   GetFeaturesRequest,
   GetFeaturesResponse,
   GetGrantedProjectByIDRequest,
@@ -214,6 +218,16 @@ import {
   RemoveAppKeyResponse,
   RemoveAppRequest,
   RemoveAppResponse,
+  RemoveCustomLabelPolicyFontRequest,
+  RemoveCustomLabelPolicyFontResponse,
+  RemoveCustomLabelPolicyIconDarkRequest,
+  RemoveCustomLabelPolicyIconDarkResponse,
+  RemoveCustomLabelPolicyIconRequest,
+  RemoveCustomLabelPolicyIconResponse,
+  RemoveCustomLabelPolicyLogoDarkRequest,
+  RemoveCustomLabelPolicyLogoDarkResponse,
+  RemoveCustomLabelPolicyLogoRequest,
+  RemoveCustomLabelPolicyLogoResponse,
   RemoveHumanAuthFactorOTPRequest,
   RemoveHumanAuthFactorOTPResponse,
   RemoveHumanAuthFactorU2FRequest,
@@ -339,6 +353,38 @@ export class ManagementService {
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) { }
+
+  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomInitMessageText(req: GetCustomInitMessageTextRequest): Promise<GetCustomInitMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest): Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomVerifyEmailMessageText(req: GetCustomVerifyEmailMessageTextRequest): Promise<GetCustomVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest): Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomVerifyPhoneMessageText(req: GetCustomVerifyPhoneMessageTextRequest): Promise<GetCustomVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomPasswordResetMessageText(req: GetCustomPasswordResetMessageTextRequest): Promise<GetCustomPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
 
   public listOrgIDPs(
     limit?: number,
@@ -781,35 +827,34 @@ export class ManagementService {
   }
 
   public removeLabelPolicyFont():
-    Promise<RemoveLabelPolicyFontResponse.AsObject> {
-    const req = new RemoveLabelPolicyFontRequest();
+    Promise<RemoveCustomLabelPolicyFontResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyFontRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyFont(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyIcon():
-    Promise<RemoveLabelPolicyIconResponse.AsObject> {
-    const req = new RemoveLabelPolicyIconRequest();
+    Promise<RemoveCustomLabelPolicyIconResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyIconRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyIcon(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyIconDark():
-    Promise<RemoveLabelPolicyIconDarkResponse.AsObject> {
-    const req = new RemoveLabelPolicyIconDarkRequest();
+    Promise<RemoveCustomLabelPolicyIconDarkResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyIconDarkRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyIconDark(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyLogo():
-    Promise<RemoveLabelPolicyLogoResponse.AsObject> {
-    const req = new RemoveLabelPolicyLogoRequest();
+    Promise<RemoveCustomLabelPolicyLogoResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyLogoRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyLogo(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyLogoDark():
-    Promise<RemoveLabelPolicyLogoDarkResponse.AsObject> {
-    const req = new RemoveLabelPolicyLogoDarkRequest();
+    Promise<RemoveCustomLabelPolicyLogoDarkResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyLogoDarkRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyLogoDark(req, null).then(resp => resp.toObject());
   }
-
   public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
     const req = new GetOrgIAMPolicyRequest();
     return this.grpcService.mgmt.getOrgIAMPolicy(req, null).then(resp => resp.toObject());

@@ -1,13 +1,9 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
-    [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-
-    <div class="spinner-wr">
-        <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
-    </div>
+    [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
+    [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
     <div class="content" >
-      <cnsl-edit-text label="one"></cnsl-edit-text>
+      <cnsl-edit-text label="one" [current$]=""></cnsl-edit-text>
       <cnsl-edit-text label="one"></cnsl-edit-text>
     </div>
 
