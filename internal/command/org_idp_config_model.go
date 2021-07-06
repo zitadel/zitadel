@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -26,9 +27,11 @@ func NewOrgIDPConfigWriteModel(configID, orgID string) *OrgIDPConfigWriteModel {
 }
 
 func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			org.IDPConfigAddedEventType,
 			org.IDPConfigChangedEventType,
@@ -36,7 +39,8 @@ func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.IDPConfigReactivatedEventType,
 			org.IDPConfigRemovedEventType,
 			org.IDPOIDCConfigAddedEventType,
-			org.IDPOIDCConfigChangedEventType)
+			org.IDPOIDCConfigChangedEventType).
+		Builder()
 }
 
 func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {

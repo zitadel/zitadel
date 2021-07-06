@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -40,12 +41,15 @@ func (wm *IAMOrgIAMPolicyWriteModel) Reduce() error {
 }
 
 func (wm *IAMOrgIAMPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.PolicyOrgIAMWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.PolicyOrgIAMWriteModel.AggregateID).
 		EventTypes(
 			iam.OrgIAMPolicyAddedEventType,
-			iam.OrgIAMPolicyChangedEventType)
+			iam.OrgIAMPolicyChangedEventType).
+		Builder()
 }
 
 func (wm *IAMOrgIAMPolicyWriteModel) NewChangedEvent(

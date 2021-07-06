@@ -60,7 +60,9 @@ func (wm *UserGrantWriteModel) Reduce() error {
 }
 
 func (wm *UserGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, usergrant.AggregateType).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(usergrant.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(usergrant.UserGrantAddedType,
 			usergrant.UserGrantChangedType,
@@ -68,7 +70,9 @@ func (wm *UserGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 			usergrant.UserGrantDeactivatedType,
 			usergrant.UserGrantReactivatedType,
 			usergrant.UserGrantRemovedType,
-			usergrant.UserGrantCascadeRemovedType)
+			usergrant.UserGrantCascadeRemovedType).
+		Builder()
+
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
@@ -152,20 +156,28 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 }
 
 func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType, project.AggregateType).
-		AggregateIDs(wm.UserID, wm.ProjectID).
-		EventTypes(user.UserV1AddedType,
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.UserID).
+		EventTypes(
+			user.UserV1AddedType,
 			user.HumanAddedType,
 			user.UserV1RegisteredType,
 			user.HumanRegisteredType,
 			user.MachineAddedEventType,
-			user.UserRemovedType,
+			user.UserRemovedType).
+		Or().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.ProjectID).
+		EventTypes(
 			project.ProjectAddedType,
 			project.ProjectRemovedType,
 			project.GrantAddedType,
 			project.GrantChangedType,
 			project.GrantRemovedType,
 			project.RoleAddedType,
-			project.RoleRemovedType)
+			project.RoleRemovedType).
+		Builder()
 	return query
 }

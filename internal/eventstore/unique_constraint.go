@@ -16,8 +16,6 @@ type UniqueConstraintAction int32
 const (
 	UniqueConstraintAdd UniqueConstraintAction = iota
 	UniqueConstraintRemove
-
-	uniqueConstraintActionCount
 )
 
 func NewAddEventUniqueConstraint(

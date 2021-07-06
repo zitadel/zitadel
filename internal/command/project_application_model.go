@@ -94,15 +94,17 @@ func (wm *ApplicationWriteModel) Reduce() error {
 }
 
 func (wm *ApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
 			project.ApplicationDeactivatedType,
 			project.ApplicationReactivatedType,
 			project.ApplicationRemovedType,
-			project.ProjectRemovedType,
-		)
+			project.ProjectRemovedType).
+		Builder()
 }

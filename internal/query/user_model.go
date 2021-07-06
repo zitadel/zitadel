@@ -49,10 +49,19 @@ func (rm *UserReadModel) AppendAndReduce(events ...eventstore.EventReader) error
 }
 
 func (rm *UserReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).AggregateIDs(rm.AggregateID)
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
+		Builder()
 }
 
 func NewUserEventSearchQuery(userID, orgID string, sequence uint64) *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(userID).ResourceOwner(orgID).SequenceGreater(sequence)
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		SequenceGreater(sequence).
+		Builder()
 }

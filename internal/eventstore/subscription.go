@@ -1,9 +1,10 @@
 package eventstore
 
 import (
+	"sync"
+
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"sync"
 )
 
 var (
