@@ -17,6 +17,8 @@ It respondes as soon as ZITADEL started
 
 
 
+    GET: /healthz
+
 
 ### IsOrgUnique
 
@@ -27,6 +29,8 @@ Checks whether an organisation exists by the given parameters
 
 
 
+    GET: /orgs/_is_unique
+
 
 ### GetOrgByID
 
@@ -36,6 +40,8 @@ Checks whether an organisation exists by the given parameters
 Returns an organisation by id
 
 
+
+    GET: /orgs/{id}
 
 
 ### ListOrgs
@@ -48,6 +54,8 @@ all queries need to match (AND)
 
 
 
+    POST: /orgs/_search
+
 
 ### SetUpOrg
 
@@ -59,6 +67,8 @@ and adds the user to the orgs members as ORG_OWNER
 
 
 
+    POST: /orgs/_setup
+
 
 ### GetIDPByID
 
@@ -68,6 +78,8 @@ and adds the user to the orgs members as ORG_OWNER
 Returns a identity provider configuration of the IAM
 
 
+
+    GET: /idps/{id}
 
 
 ### ListIDPs
@@ -79,6 +91,8 @@ Returns all identity provider configurations of the IAM
 
 
 
+    POST: /idps/_search
+
 
 ### AddOIDCIDP
 
@@ -88,6 +102,8 @@ Returns all identity provider configurations of the IAM
 Adds a new oidc identity provider configuration the IAM
 
 
+
+    POST: /idps/oidc
 
 
 ### UpdateIDP
@@ -100,6 +116,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+    PUT: /idps/{idp_id}
+
 
 ### DeactivateIDP
 
@@ -110,6 +128,8 @@ Sets the state of the idp to IDP_STATE_INACTIVE
 the state MUST be IDP_STATE_ACTIVE for this call
 
 
+
+    POST: /idps/{idp_id}/_deactivate
 
 
 ### ReactivateIDP
@@ -122,6 +142,8 @@ the state MUST be IDP_STATE_INACTIVE for this call
 
 
 
+    POST: /idps/{idp_id}/_reactivate
+
 
 ### RemoveIDP
 
@@ -131,6 +153,8 @@ the state MUST be IDP_STATE_INACTIVE for this call
 RemoveIDP deletes the IDP permanetly
 
 
+
+    DELETE: /idps/{idp_id}
 
 
 ### UpdateIDPOIDCConfig
@@ -143,6 +167,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+    PUT: /idps/{idp_id}/oidc_config
+
 
 ### GetDefaultFeatures
 
@@ -152,6 +178,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+
+    GET: /features
 
 
 ### SetDefaultFeatures
@@ -163,6 +191,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+    PUT: /features
+
 
 ### GetOrgFeatures
 
@@ -172,6 +202,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+
+    GET: /orgs/{org_id}/features
 
 
 ### SetOrgFeatures
@@ -183,6 +215,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+    PUT: /orgs/{org_id}/features
+
 
 ### ResetOrgFeatures
 
@@ -193,6 +227,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
 
+    DELETE: /orgs/{org_id}/features
+
 
 ### GetOrgIAMPolicy
 
@@ -202,6 +238,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 Returns the IAM policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/orgiam
 
 
 ### UpdateOrgIAMPolicy
@@ -214,6 +252,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/orgiam
+
 
 ### GetCustomOrgIAMPolicy
 
@@ -223,6 +263,8 @@ it impacts all organisations without a customised policy
 Returns the customised policy or the default if not customised
 
 
+
+    GET: /orgs/{org_id}/policies/orgiam
 
 
 ### AddCustomOrgIAMPolicy
@@ -234,6 +276,8 @@ Defines a custom ORGIAM policy as specified
 
 
 
+    POST: /orgs/{org_id}/policies/orgiam
+
 
 ### UpdateCustomOrgIAMPolicy
 
@@ -243,6 +287,8 @@ Defines a custom ORGIAM policy as specified
 Updates a custom ORGIAM policy as specified
 
 
+
+    PUT: /orgs/{org_id}/policies/orgiam
 
 
 ### ResetCustomOrgIAMPolicyToDefault
@@ -255,6 +301,8 @@ ZITADEL will fallback to the default policy defined by the ZITADEL administrator
 
 
 
+    DELETE: /orgs/{org_id}/policies/orgiam
+
 
 ### GetLabelPolicy
 
@@ -265,6 +313,8 @@ Returns the label policy defined by the administrators of ZITADEL
 
 
 
+    GET: /policies/label
+
 
 ### GetPreviewLabelPolicy
 
@@ -274,6 +324,8 @@ Returns the label policy defined by the administrators of ZITADEL
 Returns the preview label policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/label/_preview
 
 
 ### UpdateLabelPolicy
@@ -286,6 +338,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/label
+
 
 ### ActivateLabelPolicy
 
@@ -295,6 +349,8 @@ it impacts all organisations without a customised policy
 Activates all changes of the label policy
 
 
+
+    POST: /policies/label/_activate
 
 
 ### RemoveLabelPolicyLogo
@@ -306,6 +362,8 @@ Removes the logo of the label policy
 
 
 
+    DELETE: /policies/label/logo
+
 
 ### RemoveLabelPolicyLogoDark
 
@@ -315,6 +373,8 @@ Removes the logo of the label policy
 Removes the logo dark of the label policy
 
 
+
+    DELETE: /policies/label/logo_dark
 
 
 ### RemoveLabelPolicyIcon
@@ -326,6 +386,8 @@ Removes the icon of the label policy
 
 
 
+    DELETE: /policies/label/icon
+
 
 ### RemoveLabelPolicyIconDark
 
@@ -335,6 +397,8 @@ Removes the icon of the label policy
 Removes the logo dark of the label policy
 
 
+
+    DELETE: /policies/label/icon_dark
 
 
 ### RemoveLabelPolicyFont
@@ -346,6 +410,8 @@ Removes the font of the label policy
 
 
 
+    DELETE: /policies/label/font
+
 
 ### GetLoginPolicy
 
@@ -355,6 +421,8 @@ Removes the font of the label policy
 Returns the login policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/login
 
 
 ### UpdateLoginPolicy
@@ -367,6 +435,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/login
+
 
 ### ListLoginPolicyIDPs
 
@@ -377,6 +447,8 @@ Returns the idps linked to the default login policy,
 defined by the administrators of ZITADEL
 
 
+
+    POST: /policies/login/idps/_search
 
 
 ### AddIDPToLoginPolicy
@@ -389,6 +461,8 @@ It impacts all organisations without a customised policy
 
 
 
+    POST: /policies/login/idps
+
 
 ### RemoveIDPFromLoginPolicy
 
@@ -400,6 +474,8 @@ It impacts all organisations without a customised policy
 
 
 
+    DELETE: /policies/login/idps/{idp_id}
+
 
 ### ListLoginPolicySecondFactors
 
@@ -409,6 +485,8 @@ It impacts all organisations without a customised policy
 Returns the available second factors defined by the administrators of ZITADEL
 
 
+
+    POST: /policies/login/second_factors/_search
 
 
 ### AddSecondFactorToLoginPolicy
@@ -421,6 +499,8 @@ It impacts all organisations without a customised policy
 
 
 
+    POST: /policies/login/second_factors
+
 
 ### RemoveSecondFactorFromLoginPolicy
 
@@ -432,6 +512,8 @@ It impacts all organisations without a customised policy
 
 
 
+    DELETE: /policies/login/second_factors/{type}
+
 
 ### ListLoginPolicyMultiFactors
 
@@ -441,6 +523,8 @@ It impacts all organisations without a customised policy
 Returns the available multi factors defined by the administrators of ZITADEL
 
 
+
+    POST: /policies/login/multi_factors/_search
 
 
 ### AddMultiFactorToLoginPolicy
@@ -453,6 +537,8 @@ It impacts all organisations without a customised policy
 
 
 
+    POST: /policies/login/multi_factors
+
 
 ### RemoveMultiFactorFromLoginPolicy
 
@@ -464,6 +550,8 @@ It impacts all organisations without a customised policy
 
 
 
+    DELETE: /policies/login/multi_factors/{type}
+
 
 ### GetPasswordComplexityPolicy
 
@@ -473,6 +561,8 @@ It impacts all organisations without a customised policy
 Returns the password complexity policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/password/complexity
 
 
 ### UpdatePasswordComplexityPolicy
@@ -485,6 +575,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/password/complexity
+
 
 ### GetPasswordAgePolicy
 
@@ -494,6 +586,8 @@ it impacts all organisations without a customised policy
 Returns the password age policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/password/age
 
 
 ### UpdatePasswordAgePolicy
@@ -506,6 +600,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/password/age
+
 
 ### GetPasswordLockoutPolicy
 
@@ -515,6 +611,8 @@ it impacts all organisations without a customised policy
 Returns the password lockout policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/password/lockout
 
 
 ### UpdatePasswordLockoutPolicy
@@ -527,6 +625,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/password/lockout
+
 
 ### GetPrivacyPolicy
 
@@ -536,6 +636,8 @@ it impacts all organisations without a customised policy
 Returns the privacy policy defined by the administrators of ZITADEL
 
 
+
+    GET: /policies/privacy
 
 
 ### UpdatePrivacyPolicy
@@ -548,6 +650,8 @@ it impacts all organisations without a customised policy
 
 
 
+    PUT: /policies/privacy
+
 
 ### GetDefaultInitMessageText
 
@@ -557,6 +661,8 @@ it impacts all organisations without a customised policy
 Returns the custom text for initial message
 
 
+
+    GET: /text/message/init/{language}
 
 
 ### SetDefaultInitMessageText
@@ -571,6 +677,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/init/{language}
+
 
 ### GetDefaultPasswordResetMessageText
 
@@ -580,6 +688,8 @@ The Following Variables can be used:
 Returns the custom text for password reset message
 
 
+
+    GET: /text/message/passwordreset/{language}
 
 
 ### SetDefaultPasswordResetMessageText
@@ -594,6 +704,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/passwordreset/{language}
+
 
 ### GetDefaultVerifyEmailMessageText
 
@@ -603,6 +715,8 @@ The Following Variables can be used:
 Returns the custom text for verify email message
 
 
+
+    GET: /text/message/verifyemail/{language}
 
 
 ### SetDefaultVerifyEmailMessageText
@@ -617,6 +731,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/verifyemail/{language}
+
 
 ### GetDefaultVerifyPhoneMessageText
 
@@ -626,6 +742,8 @@ The Following Variables can be used:
 Returns the custom text for verify phone message
 
 
+
+    GET: /text/message/verifyphone/{language}
 
 
 ### SetDefaultVerifyPhoneMessageText
@@ -640,6 +758,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/verifyphone/{language}
+
 
 ### GetDefaultDomainClaimedMessageText
 
@@ -649,6 +769,8 @@ The Following Variables can be used:
 Returns the custom text for domain claimed message
 
 
+
+    GET: /text/message/domainclaimed/{language}
 
 
 ### SetDefaultDomainClaimedMessageText
@@ -663,6 +785,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/verifyphone/{language}
+
 
 ### GetDefaultLoginTexts
 
@@ -673,6 +797,8 @@ Returns the default custom texts for login ui
 
 
 
+    GET: /text/default/login/{language}
+
 
 ### GetCustomLoginTexts
 
@@ -682,6 +808,8 @@ Returns the default custom texts for login ui
 Returns the custom texts for login ui
 
 
+
+    GET: /text/login/{language}
 
 
 ### SetCustomLoginText
@@ -694,6 +822,8 @@ it impacts all organisations without customized login ui texts
 
 
 
+    PUT: /text/login/{language}
+
 
 ### ListIAMMemberRoles
 
@@ -703,6 +833,8 @@ it impacts all organisations without customized login ui texts
 Returns the IAM roles visible for the requested user
 
 
+
+    POST: /members/roles/_search
 
 
 ### ListIAMMembers
@@ -715,6 +847,8 @@ all queries need to match (ANDed)
 
 
 
+    POST: /members/_search
+
 
 ### AddIAMMember
 
@@ -725,6 +859,8 @@ Adds a user to the membership list of ZITADEL with the given roles
 undefined roles will be dropped
 
 
+
+    POST: /members
 
 
 ### UpdateIAMMember
@@ -737,6 +873,8 @@ The member has only roles provided by this call
 
 
 
+    PUT: /members/{user_id}
+
 
 ### RemoveIAMMember
 
@@ -746,6 +884,8 @@ The member has only roles provided by this call
 Removes the user from the membership list of ZITADEL
 
 
+
+    DELETE: /members/{user_id}
 
 
 ### ListViews
@@ -758,6 +898,8 @@ views are used for search optimisation and optimise request latencies
 they represent the delta of the event happend on the objects
 
 
+
+    POST: /views/_search
 
 
 ### ClearView
@@ -772,6 +914,8 @@ Search requests will return wrong results until all deltas are recomputed
 
 
 
+    POST: /views/{database}/{view_name}
+
 
 ### ListFailedEvents
 
@@ -783,6 +927,8 @@ It's possible that some events need some retries.
 For example if the SMTP-API wasn't able to send an email at the first time
 
 
+
+    POST: /failedevents/_search
 
 
 ### RemoveFailedEvent
@@ -797,6 +943,8 @@ e.g. if the second try of sending an email was successful. the first try produce
 failed event. You can find out if it worked on the `failure_count`
 
 
+
+    DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
 
 
 

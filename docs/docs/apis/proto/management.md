@@ -16,6 +16,8 @@ title: zitadel/management.proto
 
 
 
+    GET: /healthz
+
 
 ### GetOIDCInformation
 
@@ -25,6 +27,8 @@ title: zitadel/management.proto
 
 
 
+
+    GET: /zitadel/docs
 
 
 ### GetIAM
@@ -36,6 +40,8 @@ Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project
 
 
 
+    GET: /iam
+
 
 ### GetUserByID
 
@@ -45,6 +51,8 @@ Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project
 Returns the requested full blown user (human or machine)
 
 
+
+    GET: /users/{id}
 
 
 ### GetUserByLoginNameGlobal
@@ -57,6 +65,8 @@ the login name has to match exactly
 
 
 
+    GET: /global/users/_by_login_name
+
 
 ### ListUsers
 
@@ -67,6 +77,8 @@ Return the users matching the query
 Limit should always be set, there is a default limit set by the service
 
 
+
+    POST: /users/_search
 
 
 ### ListUserChanges
@@ -79,6 +91,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /users/{user_id}/changes/_search
+
 
 ### IsUserUnique
 
@@ -88,6 +102,8 @@ Limit should always be set, there is a default limit set by the service
 Returns if a user with the searched email or username is unique
 
 
+
+    GET: /users/_is_unique
 
 
 ### AddHumanUser
@@ -101,6 +117,8 @@ If a password is given, the user has to change on the next login
 
 
 
+    POST: /users/human
+
 
 ### ImportHumanUser
 
@@ -113,6 +131,8 @@ If a password is given, the user doesn't have to change on the next login
 
 
 
+    POST: /users/human/_import
+
 
 ### AddMachineUser
 
@@ -122,6 +142,8 @@ If a password is given, the user doesn't have to change on the next login
 Create a user of the type machine
 
 
+
+    POST: /users/machine
 
 
 ### DeactivateUser
@@ -135,6 +157,8 @@ returns an error if user state is already deactivated
 
 
 
+    POST: /users/{id}/_deactivate
+
 
 ### ReactivateUser
 
@@ -145,6 +169,8 @@ Changes the user state to active
 returns an error if user state is not deactivated
 
 
+
+    POST: /users/{id}/_reactivate
 
 
 ### LockUser
@@ -158,6 +184,8 @@ returns an error if user state is already locked
 
 
 
+    POST: /users/{id}/_lock
+
 
 ### UnlockUser
 
@@ -169,6 +197,8 @@ returns an error if user state is not locked
 
 
 
+    POST: /users/{id}/_unlock
+
 
 ### RemoveUser
 
@@ -178,6 +208,8 @@ returns an error if user state is not locked
 Changes the user state to deleted
 
 
+
+    DELETE: /users/{id}
 
 
 ### UpdateUserName
@@ -189,6 +221,8 @@ Changes the username
 
 
 
+    GET: /users/{user_id}/username
+
 
 ### GetHumanProfile
 
@@ -198,6 +232,8 @@ Changes the username
 Returns the profile of the human
 
 
+
+    GET: /users/{user_id}/profile
 
 
 ### UpdateHumanProfile
@@ -209,6 +245,8 @@ Changes the profile of the human
 
 
 
+    PUT: /users/{user_id}/profile
+
 
 ### GetHumanEmail
 
@@ -218,6 +256,8 @@ Changes the profile of the human
 GetHumanEmail returns the email and verified state of the human
 
 
+
+    GET: /users/{user_id}/email
 
 
 ### UpdateHumanEmail
@@ -230,6 +270,8 @@ If state is not verified, the user will get a verification email
 
 
 
+    PUT: /users/{user_id}/email
+
 
 ### ResendHumanInitialization
 
@@ -241,6 +283,8 @@ Changes the email address of the user if it is provided
 
 
 
+    POST: /users/{user_id}/_resend_initialization
+
 
 ### ResendHumanEmailVerification
 
@@ -251,6 +295,8 @@ Resends an email to the given email address to finish the email verification pro
 
 
 
+    POST: /users/{user_id}/email/_resend_verification
+
 
 ### GetHumanPhone
 
@@ -260,6 +306,8 @@ Resends an email to the given email address to finish the email verification pro
 Returns the phone and verified state of the human phone
 
 
+
+    GET: /users/{user_id}/phone
 
 
 ### UpdateHumanPhone
@@ -272,6 +320,8 @@ If verified is not set, the user will get an sms to verify the number
 
 
 
+    PUT: /users/{user_id}/phone
+
 
 ### RemoveHumanPhone
 
@@ -281,6 +331,8 @@ If verified is not set, the user will get an sms to verify the number
 Removes the phone number of the human
 
 
+
+    DELETE: /users/{user_id}/phone
 
 
 ### ResendHumanPhoneVerification
@@ -292,6 +344,8 @@ An sms will be sent to the given phone number to finish the phone verification p
 
 
 
+    POST: /users/{user_id}/phone/_resend_verification
+
 
 ### RemoveMyAvatar
 
@@ -302,6 +356,8 @@ Removes the avatar number of the human
 
 
 
+    DELETE: /users/{user_id}/avatar
+
 
 ### SetHumanInitialPassword
 
@@ -311,6 +367,8 @@ Removes the avatar number of the human
 deprecated: use SetHumanPassword
 
 
+
+    POST: /users/{user_id}/password/_initialize
 
 
 ### SetHumanPassword
@@ -323,6 +381,8 @@ Set no_change_required to true if the user does not have to change the password 
 
 
 
+    POST: /users/{user_id}/password
+
 
 ### SendHumanResetPasswordNotification
 
@@ -333,6 +393,8 @@ An email will be sent to the given address to reset the password of the user
 
 
 
+    POST: /users/{user_id}/password/_reset
+
 
 ### ListHumanAuthFactors
 
@@ -342,6 +404,8 @@ An email will be sent to the given address to reset the password of the user
 Returns a list of all factors (second and multi) which are configured on the user
 
 
+
+    POST: /users/{user_id}/auth_factors/_search
 
 
 ### RemoveHumanAuthFactorOTP
@@ -354,6 +418,8 @@ Because only one otp can be configured per user, the configured one will be remo
 
 
 
+    DELETE: /users/{user_id}/auth_factors/otp
+
 
 ### RemoveHumanAuthFactorU2F
 
@@ -363,6 +429,8 @@ Because only one otp can be configured per user, the configured one will be remo
 The u2f (universial second factor) will be removed from the user
 
 
+
+    DELETE: /users/{user_id}/auth_factors/u2f/{token_id}
 
 
 ### ListHumanPasswordless
@@ -374,6 +442,8 @@ Returns all configured passwordless authentications
 
 
 
+    POST: /users/{user_id}/passwordless/_search
+
 
 ### RemoveHumanPasswordless
 
@@ -383,6 +453,8 @@ Returns all configured passwordless authentications
 Removed a configured passwordless authentication
 
 
+
+    DELETE: /users/{user_id}/passwordless/{token_id}
 
 
 ### UpdateMachine
@@ -394,6 +466,8 @@ Changes a machine user
 
 
 
+    PUT: /users/{user_id}/machine
+
 
 ### GetMachineKeyByIDs
 
@@ -403,6 +477,8 @@ Changes a machine user
 Returns a machine key of a (machine) user
 
 
+
+    GET: /users/{user_id}/keys/{key_id}
 
 
 ### ListMachineKeys
@@ -415,6 +491,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /users/{user_id}/keys/_search
+
 
 ### AddMachineKey
 
@@ -425,6 +503,8 @@ Generates a new machine key, details should be stored after return
 
 
 
+    POST: /users/{user_id}/keys
+
 
 ### RemoveMachineKey
 
@@ -434,6 +514,8 @@ Generates a new machine key, details should be stored after return
 Removed a machine key
 
 
+
+    DELETE: /users/{user_id}/keys/{key_id}
 
 
 ### ListHumanLinkedIDPs
@@ -446,6 +528,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /users/{user_id}/idps/_search
+
 
 ### RemoveHumanLinkedIDP
 
@@ -455,6 +539,8 @@ Limit should always be set, there is a default limit set by the service
 Removed a configured identity provider (social login) of a human
 
 
+
+    DELETE: /users/{user_id}/idps/{idp_id}/{linked_user_id}
 
 
 ### ListUserMemberships
@@ -467,6 +553,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /users/{user_id}/memberships/_search
+
 
 ### GetMyOrg
 
@@ -476,6 +564,8 @@ Limit should always be set, there is a default limit set by the service
 Returns the org given in the header
 
 
+
+    GET: /orgs/me
 
 
 ### GetOrgByDomainGlobal
@@ -488,6 +578,8 @@ Domain must match exactly
 
 
 
+    GET: /global/orgs/_by_domain
+
 
 ### ListOrgChanges
 
@@ -499,6 +591,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /orgs/me/changes/_search
+
 
 ### AddOrg
 
@@ -509,6 +603,8 @@ Creates a new organisation
 
 
 
+    POST: /orgs
+
 
 ### UpdateOrg
 
@@ -518,6 +614,8 @@ Creates a new organisation
 Changes my organisation
 
 
+
+    PUT: /orgs/me
 
 
 ### DeactivateOrg
@@ -530,6 +628,8 @@ Users of this organisation will not be able login
 
 
 
+    POST: /orgs/me/_deactivate
+
 
 ### ReactivateOrg
 
@@ -539,6 +639,8 @@ Users of this organisation will not be able login
 Sets the state of my organisation to active
 
 
+
+    POST: /orgs/me/_reactivate
 
 
 ### ListOrgDomains
@@ -551,6 +653,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /orgs/me/domains/_search
+
 
 ### AddOrgDomain
 
@@ -560,6 +664,8 @@ Limit should always be set, there is a default limit set by the service
 Adds a new domain to my organisation
 
 
+
+    POST: /orgs/me/domains
 
 
 ### RemoveOrgDomain
@@ -571,6 +677,8 @@ Removed the domain from my organisation
 
 
 
+    DELETE: /orgs/me/domains/{domain}
+
 
 ### GenerateOrgDomainValidation
 
@@ -580,6 +688,8 @@ Removed the domain from my organisation
 Generates a new file to validate you domain
 
 
+
+    POST: /orgs/me/domains/{domain}/validation/_generate
 
 
 ### ValidateOrgDomain
@@ -592,6 +702,8 @@ Validated domains must be unique
 
 
 
+    POST: /orgs/me/domains/{domain}/validation/_validate
+
 
 ### SetPrimaryOrgDomain
 
@@ -603,6 +715,8 @@ Primary domain is shown as suffix on the preferred username on the users of the 
 
 
 
+    POST: /orgs/me/domains/{domain}/_set_primary
+
 
 ### ListOrgMemberRoles
 
@@ -612,6 +726,8 @@ Primary domain is shown as suffix on the preferred username on the users of the 
 Returns all ZITADEL roles which are for organisation managers
 
 
+
+    POST: /orgs/members/roles/_search
 
 
 ### ListOrgMembers
@@ -624,6 +740,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /orgs/me/members/_search
+
 
 ### AddOrgMember
 
@@ -633,6 +751,8 @@ Limit should always be set, there is a default limit set by the service
 Adds a new organisation manager, which is allowed to administrate ZITADEL
 
 
+
+    POST: /orgs/me/members
 
 
 ### UpdateOrgMember
@@ -644,6 +764,8 @@ Changes the organisation manager
 
 
 
+    PUT: /orgs/me/members/{user_id}
+
 
 ### RemoveOrgMember
 
@@ -653,6 +775,8 @@ Changes the organisation manager
 Removes an organisation manager
 
 
+
+    DELETE: /orgs/me/members/{user_id}
 
 
 ### GetProjectByID
@@ -664,6 +788,8 @@ Returns a project from my organisation (no granted projects)
 
 
 
+    GET: /projects/{id}
+
 
 ### GetGrantedProjectByID
 
@@ -673,6 +799,8 @@ Returns a project from my organisation (no granted projects)
 returns a project my organisation got granted from another organisation
 
 
+
+    GET: /granted_projects/{project_id}/grants/{grant_id}
 
 
 ### ListProjects
@@ -685,6 +813,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/_search
+
 
 ### ListGrantedProjects
 
@@ -695,6 +825,8 @@ returns all projects my organisation got granted from another organisation
 Limit should always be set, there is a default limit set by the service
 
 
+
+    POST: /granted_projects/_search
 
 
 ### ListGrantedProjectRoles
@@ -707,6 +839,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    GET: /granted_projects/{project_id}/grants/{grant_id}/roles/_search
+
 
 ### ListProjectChanges
 
@@ -718,6 +852,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/{project_id}/changes/_search
+
 
 ### AddProject
 
@@ -728,6 +864,8 @@ Adds an new project to the organisation
 
 
 
+    POST: /projects
+
 
 ### UpdateProject
 
@@ -737,6 +875,8 @@ Adds an new project to the organisation
 Changes a project
 
 
+
+    PUT: /projects/{id}
 
 
 ### DeactivateProject
@@ -749,6 +889,8 @@ Returns an error if project is already deactivated
 
 
 
+    POST: /projects/{id}/_deactivate
+
 
 ### ReactivateProject
 
@@ -759,6 +901,8 @@ Sets the state of a project to active
 Returns an error if project is not deactivated
 
 
+
+    POST: /projects/{id}/_reactivate
 
 
 ### RemoveProject
@@ -771,6 +915,8 @@ All project grants, applications and user grants for this project will be remove
 
 
 
+    DELETE: /projects/{id}
+
 
 ### ListProjectRoles
 
@@ -782,6 +928,8 @@ If no limit is requested, default limit will be set, if the limit is higher then
 
 
 
+    POST: /projects/{project_id}/roles/_search
+
 
 ### AddProjectRole
 
@@ -792,6 +940,8 @@ Adds a role to a project, key must be unique in the project
 
 
 
+    POST: /projects/{project_id}/roles
+
 
 ### BulkAddProjectRoles
 
@@ -801,6 +951,8 @@ Adds a role to a project, key must be unique in the project
 add a list of project roles in one request
 
 
+
+    POST: /projects/{project_id}/roles/_bulk
 
 
 ### UpdateProjectRole
@@ -813,6 +965,8 @@ If a key should change, remove the role and create a new
 
 
 
+    PUT: /projects/{project_id}/roles/{role_key}
+
 
 ### RemoveProjectRole
 
@@ -823,6 +977,8 @@ Removes role from UserGrants, ProjectGrants and from Project
 
 
 
+    DELETE: /projects/{project_id}/roles/{role_key}
+
 
 ### ListProjectMemberRoles
 
@@ -832,6 +988,8 @@ Removes role from UserGrants, ProjectGrants and from Project
 Returns all ZITADEL roles which are for project managers
 
 
+
+    POST: /projects/members/roles/_search
 
 
 ### ListProjectMembers
@@ -844,6 +1002,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/{project_id}/members/_search
+
 
 ### AddProjectMember
 
@@ -853,6 +1013,8 @@ Limit should always be set, there is a default limit set by the service
 Adds a new project manager, which is allowed to administrate in ZITADEL
 
 
+
+    POST: /projects/{project_id}/members
 
 
 ### UpdateProjectMember
@@ -864,6 +1026,8 @@ Change project manager, which is allowed to administrate in ZITADEL
 
 
 
+    PUT: /projects/{project_id}/members/{user_id}
+
 
 ### RemoveProjectMember
 
@@ -874,6 +1038,8 @@ Remove project manager, which is allowed to administrate in ZITADEL
 
 
 
+    DELETE: /projects/{project_id}/members/{user_id}
+
 
 ### GetAppByID
 
@@ -883,6 +1049,8 @@ Remove project manager, which is allowed to administrate in ZITADEL
 Returns an application (oidc or api)
 
 
+
+    GET: /projects/{project_id}/apps/{app_id}
 
 
 ### ListApps
@@ -895,6 +1063,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/{project_id}/apps/_search
+
 
 ### ListAppChanges
 
@@ -905,6 +1075,8 @@ Returns the history of the application (each event)
 Limit should always be set, there is a default limit set by the service
 
 
+
+    POST: /projects/{project_id}/apps/{app_id}/changes/_search
 
 
 ### AddOIDCApp
@@ -918,6 +1090,8 @@ Returns a new generated secret if needed (Depending on the configuration)
 
 
 
+    POST: /projects/{project_id}/apps/oidc
+
 
 ### AddAPIApp
 
@@ -930,6 +1104,8 @@ Returns a new generated secret if needed (Depending on the configuration)
 
 
 
+    POST: /projects/{project_id}/apps/api
+
 
 ### UpdateApp
 
@@ -939,6 +1115,8 @@ Returns a new generated secret if needed (Depending on the configuration)
 Changes application
 
 
+
+    PUT: /projects/{project_id}/apps/{app_id}
 
 
 ### UpdateOIDCAppConfig
@@ -950,6 +1128,8 @@ Changes the configuration of the oidc client
 
 
 
+    PUT: /projects/{project_id}/apps/{app_id}/oidc_config
+
 
 ### UpdateAPIAppConfig
 
@@ -959,6 +1139,8 @@ Changes the configuration of the oidc client
 Changes the configuration of the api application
 
 
+
+    PUT: /projects/{project_id}/apps/{app_id}/api_config
 
 
 ### DeactivateApp
@@ -972,6 +1154,8 @@ Returns an error if already deactivated
 
 
 
+    POST: /projects/{project_id}/apps/{app_id}/_deactivate
+
 
 ### ReactivateApp
 
@@ -983,6 +1167,8 @@ Returns an error if not deactivated
 
 
 
+    POST: /projects/{project_id}/apps/{app_id}/_reactivate
+
 
 ### RemoveApp
 
@@ -992,6 +1178,8 @@ Returns an error if not deactivated
 Removed the application
 
 
+
+    DELETE: /projects/{project_id}/apps/{app_id}
 
 
 ### RegenerateOIDCClientSecret
@@ -1003,6 +1191,8 @@ Generates a new client secret for the oidc client, make sure to save the respons
 
 
 
+    POST: /projects/{project_id}/apps/{app_id}/oidc_config/_generate_client_secret
+
 
 ### RegenerateAPIClientSecret
 
@@ -1013,6 +1203,8 @@ Generates a new client secret for the api application, make sure to save the res
 
 
 
+    POST: /projects/{project_id}/apps/{app_id}/api_config/_generate_client_secret
+
 
 ### GetAppKey
 
@@ -1022,6 +1214,8 @@ Generates a new client secret for the api application, make sure to save the res
 Returns an application key
 
 
+
+    GET: /projects/{project_id}/apps/{app_id}/keys/{key_id}
 
 
 ### ListAppKeys
@@ -1034,6 +1228,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/{project_id}/apps/{app_id}/keys/_search
+
 
 ### AddAppKey
 
@@ -1045,6 +1241,8 @@ Will return key details in result, make sure to save it
 
 
 
+    POST: /projects/{project_id}/apps/{app_id}/keys
+
 
 ### RemoveAppKey
 
@@ -1055,6 +1253,8 @@ Removes an app key
 
 
 
+    DELETE: /projects/{project_id}/apps/{app_id}/keys/{key_id}
+
 
 ### GetProjectGrantByID
 
@@ -1064,6 +1264,8 @@ Removes an app key
 Returns a project grant (ProjectGrant = Grant another organisation for my project)
 
 
+
+    GET: /projects/{project_id}/grants/{grant_id}
 
 
 ### ListProjectGrants
@@ -1076,6 +1278,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/{project_id}/grants/_search
+
 
 ### AddProjectGrant
 
@@ -1086,6 +1290,8 @@ Add a new project grant (ProjectGrant = Grant another organisation for my projec
 Project Grant will be listed in granted project of the other organisation
 
 
+
+    POST: /projects/{project_id}/grants
 
 
 ### UpdateProjectGrant
@@ -1098,6 +1304,8 @@ Project Grant will be listed in granted project of the other organisation
 
 
 
+    PUT: /projects/{project_id}/grants/{grant_id}
+
 
 ### DeactivateProjectGrant
 
@@ -1108,6 +1316,8 @@ Set state of project grant to deactivated (ProjectGrant = Grant another organisa
 Returns error if project not active
 
 
+
+    POST: /projects/{project_id}/grants/{grant_id}/_deactivate
 
 
 ### ReactivateProjectGrant
@@ -1120,6 +1330,8 @@ Returns error if project not deactivated
 
 
 
+    POST: /projects/{project_id}/grants/{grant_id}/_reactivate
+
 
 ### RemoveProjectGrant
 
@@ -1130,6 +1342,8 @@ Removes project grant and all user grants for this project grant
 
 
 
+    DELETE: /projects/{project_id}/grants/{grant_id}
+
 
 ### ListProjectGrantMemberRoles
 
@@ -1139,6 +1353,8 @@ Removes project grant and all user grants for this project grant
 Returns all ZITADEL roles which are for project grant managers
 
 
+
+    POST: /projects/grants/members/roles/_search
 
 
 ### ListProjectGrantMembers
@@ -1151,6 +1367,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /projects/{project_id}/grants/{grant_id}/members/_search
+
 
 ### AddProjectGrantMember
 
@@ -1160,6 +1378,8 @@ Limit should always be set, there is a default limit set by the service
 Adds a new project grant manager, which is allowed to administrate in ZITADEL
 
 
+
+    POST: /projects/{project_id}/grants/{grant_id}/members
 
 
 ### UpdateProjectGrantMember
@@ -1171,6 +1391,8 @@ Changes project grant manager, which is allowed to administrate in ZITADEL
 
 
 
+    PUT: /projects/{project_id}/grants/{grant_id}/members/{user_id}
+
 
 ### RemoveProjectGrantMember
 
@@ -1181,6 +1403,8 @@ Removed project grant manager
 
 
 
+    DELETE: /projects/{project_id}/grants/{grant_id}/members/{user_id}
+
 
 ### GetUserGrantByID
 
@@ -1190,6 +1414,8 @@ Removed project grant manager
 Returns a user grant (authorization of a user for a project)
 
 
+
+    GET: /users/{user_id}/grants/{grant_id}
 
 
 ### ListUserGrants
@@ -1202,6 +1428,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /users/grants/_search
+
 
 ### AddUserGrant
 
@@ -1212,6 +1440,8 @@ Creates a new user grant (authorization of a user for a project with specified r
 
 
 
+    POST: /users/{user_id}/grants
+
 
 ### UpdateUserGrant
 
@@ -1221,6 +1451,8 @@ Creates a new user grant (authorization of a user for a project with specified r
 Changes a user grant (authorization of a user for a project with specified roles)
 
 
+
+    PUT: /users/{user_id}/grants/{grant_id}
 
 
 ### DeactivateUserGrant
@@ -1234,6 +1466,8 @@ Returns an error if user grant is already deactivated
 
 
 
+    POST: /users/{user_id}/grants/{grant_id}/_deactivate
+
 
 ### ReactivateUserGrant
 
@@ -1245,6 +1479,8 @@ Returns an error if user grant is not deactivated
 
 
 
+    POST: /users/{user_id}/grants/{grant_id}/_reactivate
+
 
 ### RemoveUserGrant
 
@@ -1254,6 +1490,8 @@ Returns an error if user grant is not deactivated
 Removes a user grant
 
 
+
+    DELETE: /users/{user_id}/grants/{grant_id}
 
 
 ### BulkRemoveUserGrant
@@ -1265,6 +1503,8 @@ remove a list of user grants in one request
 
 
 
+    DELETE: /user_grants/_bulk
+
 
 ### GetFeatures
 
@@ -1275,6 +1515,8 @@ remove a list of user grants in one request
 
 
 
+    GET: /features
+
 
 ### GetOrgIAMPolicy
 
@@ -1284,6 +1526,8 @@ remove a list of user grants in one request
 Returns the org iam policy (this policy is managed by the iam administrator)
 
 
+
+    GET: /policies/orgiam
 
 
 ### GetLoginPolicy
@@ -1296,6 +1540,8 @@ With this policy the login gui can be configured
 
 
 
+    GET: /policies/login
+
 
 ### GetDefaultLoginPolicy
 
@@ -1305,6 +1551,8 @@ With this policy the login gui can be configured
 Returns the default login policy configured in the IAM
 
 
+
+    GET: /policies/default/login
 
 
 ### AddCustomLoginPolicy
@@ -1317,6 +1565,8 @@ With this policy the login gui can be configured
 
 
 
+    POST: /policies/login
+
 
 ### UpdateCustomLoginPolicy
 
@@ -1327,6 +1577,8 @@ Change the custom login policy for the organisation
 With this policy the login gui can be configured
 
 
+
+    PUT: /policies/login
 
 
 ### ResetLoginPolicyToDefault
@@ -1339,6 +1591,8 @@ The default policy of the IAM will trigger after
 
 
 
+    DELETE: /policies/login
+
 
 ### ListLoginPolicyIDPs
 
@@ -1350,6 +1604,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /policies/login/idps/_search
+
 
 ### AddIDPToLoginPolicy
 
@@ -1359,6 +1615,8 @@ Limit should always be set, there is a default limit set by the service
 Add a (preconfigured) identity provider to the custom login policy
 
 
+
+    POST: /policies/login/idps
 
 
 ### RemoveIDPFromLoginPolicy
@@ -1370,6 +1628,8 @@ Remove a identity provider from the custom login policy
 
 
 
+    DELETE: /policies/login/idps/{idp_id}
+
 
 ### ListLoginPolicySecondFactors
 
@@ -1379,6 +1639,8 @@ Remove a identity provider from the custom login policy
 Returns all configured second factors of the custom login policy
 
 
+
+    POST: /policies/login/second_factors/_search
 
 
 ### AddSecondFactorToLoginPolicy
@@ -1390,6 +1652,8 @@ Adds a new second factor to the custom login policy
 
 
 
+    POST: /policies/login/second_factors
+
 
 ### RemoveSecondFactorFromLoginPolicy
 
@@ -1399,6 +1663,8 @@ Adds a new second factor to the custom login policy
 Remove a second factor from the custom login policy
 
 
+
+    DELETE: /policies/login/second_factors/{type}
 
 
 ### ListLoginPolicyMultiFactors
@@ -1410,6 +1676,8 @@ Returns all configured multi factors of the custom login policy
 
 
 
+    POST: /policies/login/auth_factors/_search
+
 
 ### AddMultiFactorToLoginPolicy
 
@@ -1420,6 +1688,8 @@ Adds a new multi factor to the custom login policy
 
 
 
+    POST: /policies/login/multi_factors
+
 
 ### RemoveMultiFactorFromLoginPolicy
 
@@ -1429,6 +1699,8 @@ Adds a new multi factor to the custom login policy
 Remove a multi factor from the custom login policy
 
 
+
+    DELETE: /policies/login/multi_factors/{type}
 
 
 ### GetPasswordComplexityPolicy
@@ -1441,6 +1713,8 @@ With this policy the password strength can be configured
 
 
 
+    GET: /policies/password/complexity
+
 
 ### GetDefaultPasswordComplexityPolicy
 
@@ -1451,6 +1725,8 @@ Returns the default password complexity policy of the IAM
 With this policy the password strength can be configured
 
 
+
+    GET: /policies/default/password/complexity
 
 
 ### AddCustomPasswordComplexityPolicy
@@ -1463,6 +1739,8 @@ With this policy the password strength can be configured
 
 
 
+    POST: /policies/password/complexity
+
 
 ### UpdateCustomPasswordComplexityPolicy
 
@@ -1473,6 +1751,8 @@ Update the custom password complexity policy for the organisation
 With this policy the password strength can be configured
 
 
+
+    PUT: /policies/password/complexity
 
 
 ### ResetPasswordComplexityPolicyToDefault
@@ -1485,6 +1765,8 @@ The default policy of the IAM will trigger after
 
 
 
+    DELETE: /policies/password/complexity
+
 
 ### GetPasswordAgePolicy
 
@@ -1494,6 +1776,8 @@ The default policy of the IAM will trigger after
 The password age policy is not used at the moment
 
 
+
+    GET: /policies/password/age
 
 
 ### GetDefaultPasswordAgePolicy
@@ -1505,6 +1789,8 @@ The password age policy is not used at the moment
 
 
 
+    GET: /policies/default/password/age
+
 
 ### AddCustomPasswordAgePolicy
 
@@ -1514,6 +1800,8 @@ The password age policy is not used at the moment
 The password age policy is not used at the moment
 
 
+
+    POST: /policies/password/age
 
 
 ### UpdateCustomPasswordAgePolicy
@@ -1525,6 +1813,8 @@ The password age policy is not used at the moment
 
 
 
+    PUT: /policies/password/age
+
 
 ### ResetPasswordAgePolicyToDefault
 
@@ -1534,6 +1824,8 @@ The password age policy is not used at the moment
 The password age policy is not used at the moment
 
 
+
+    DELETE: /policies/password/age
 
 
 ### GetPasswordLockoutPolicy
@@ -1545,6 +1837,8 @@ The password lockout policy is not used at the moment
 
 
 
+    GET: /policies/password/lockout
+
 
 ### GetDefaultPasswordLockoutPolicy
 
@@ -1554,6 +1848,8 @@ The password lockout policy is not used at the moment
 The password lockout policy is not used at the moment
 
 
+
+    GET: /policies/default/password/lockout
 
 
 ### AddCustomPasswordLockoutPolicy
@@ -1565,6 +1861,8 @@ The password lockout policy is not used at the moment
 
 
 
+    POST: /policies/password/lockout
+
 
 ### UpdateCustomPasswordLockoutPolicy
 
@@ -1575,6 +1873,8 @@ The password lockout policy is not used at the moment
 
 
 
+    PUT: /policies/password/lockout
+
 
 ### ResetPasswordLockoutPolicyToDefault
 
@@ -1584,6 +1884,8 @@ The password lockout policy is not used at the moment
 The password lockout policy is not used at the moment
 
 
+
+    DELETE: /policies/password/lockout
 
 
 ### GetPrivacyPolicy
@@ -1596,6 +1898,8 @@ With this policy privacy relevant things can be configured (e.g. tos link)
 
 
 
+    GET: /policies/privacy
+
 
 ### GetDefaultPrivacyPolicy
 
@@ -1606,6 +1910,8 @@ Returns the default privacy policy of the IAM
 With this policy the privacy relevant things can be configured (e.g tos link)
 
 
+
+    GET: /policies/default/privacy
 
 
 ### AddCustomPrivacyPolicy
@@ -1618,6 +1924,8 @@ With this policy privacy relevant things can be configured (e.g. tos link)
 
 
 
+    POST: /policies/privacy
+
 
 ### UpdateCustomPrivacyPolicy
 
@@ -1628,6 +1936,8 @@ Update the privacy complexity policy for the organisation
 With this policy privacy relevant things can be configured (e.g. tos link)
 
 
+
+    PUT: /policies/privacy
 
 
 ### ResetPrivacyPolicyToDefault
@@ -1640,6 +1950,8 @@ The default policy of the IAM will trigger after
 
 
 
+    DELETE: /policies/privacy
+
 
 ### GetLabelPolicy
 
@@ -1650,6 +1962,8 @@ Returns the active label policy of the organisation
 With this policy the private labeling can be configured (colors, etc.)
 
 
+
+    GET: /policies/label
 
 
 ### GetPreviewLabelPolicy
@@ -1662,6 +1976,8 @@ With this policy the private labeling can be configured (colors, etc.)
 
 
 
+    GET: /policies/label/_preview
+
 
 ### GetDefaultLabelPolicy
 
@@ -1672,6 +1988,8 @@ Returns the default label policy of the IAM
 With this policy the private labeling can be configured (colors, etc.)
 
 
+
+    GET: /policies/default/label
 
 
 ### AddCustomLabelPolicy
@@ -1684,6 +2002,8 @@ With this policy the private labeling can be configured (colors, etc.)
 
 
 
+    POST: /policies/label
+
 
 ### UpdateCustomLabelPolicy
 
@@ -1695,6 +2015,8 @@ With this policy the private labeling can be configured (colors, etc.)
 
 
 
+    PUT: /policies/label
+
 
 ### ActivateCustomLabelPolicy
 
@@ -1704,6 +2026,8 @@ With this policy the private labeling can be configured (colors, etc.)
 Activates all changes of the label policy
 
 
+
+    POST: /policies/label/_activate
 
 
 ### RemoveCustomLabelPolicyLogo
@@ -1715,6 +2039,8 @@ Removes the logo of the label policy
 
 
 
+    DELETE: /policies/label/logo
+
 
 ### RemoveCustomLabelPolicyLogoDark
 
@@ -1724,6 +2050,8 @@ Removes the logo of the label policy
 Removes the logo dark of the label policy
 
 
+
+    DELETE: /policies/label/logo_dark
 
 
 ### RemoveCustomLabelPolicyIcon
@@ -1735,6 +2063,8 @@ Removes the icon of the label policy
 
 
 
+    DELETE: /policies/label/icon
+
 
 ### RemoveCustomLabelPolicyIconDark
 
@@ -1745,6 +2075,8 @@ Removes the logo dark of the label policy
 
 
 
+    DELETE: /policies/label/icon_dark
+
 
 ### RemoveCustomLabelPolicyFont
 
@@ -1754,6 +2086,8 @@ Removes the logo dark of the label policy
 Removes the font of the label policy
 
 
+
+    DELETE: /policies/label/font
 
 
 ### ResetLabelPolicyToDefault
@@ -1766,6 +2100,8 @@ The default policy of the IAM will trigger after
 
 
 
+    DELETE: /policies/label
+
 
 ### GetCustomInitMessageText
 
@@ -1776,6 +2112,8 @@ Returns the custom text for initial message
 
 
 
+    GET: /text/message/init/{language}
+
 
 ### GetDefaultInitMessageText
 
@@ -1785,6 +2123,8 @@ Returns the custom text for initial message
 Returns the default text for initial message
 
 
+
+    GET: /text/default/message/init/{language}
 
 
 ### SetCustomInitMessageText
@@ -1799,6 +2139,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/init/{language}
+
 
 ### ResetCustomInitMessageTextToDefault
 
@@ -1810,6 +2152,8 @@ The default text of the IAM will trigger after
 
 
 
+    DELETE: /text/message/init/{language}
+
 
 ### GetCustomPasswordResetMessageText
 
@@ -1820,6 +2164,8 @@ Returns the custom text for password reset message
 
 
 
+    GET: /text/message/passwordreset/{language}
+
 
 ### GetDefaultPasswordResetMessageText
 
@@ -1829,6 +2175,8 @@ Returns the custom text for password reset message
 Returns the default text for password reset message
 
 
+
+    GET: /text/default/message/passwordreset/{language}
 
 
 ### SetCustomPasswordResetMessageText
@@ -1843,6 +2191,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/passwordreset/{language}
+
 
 ### ResetCustomPasswordResetMessageTextToDefault
 
@@ -1854,6 +2204,8 @@ The default text of the IAM will trigger after
 
 
 
+    DELETE: /text/message/verifyemail/{language}
+
 
 ### GetCustomVerifyEmailMessageText
 
@@ -1864,6 +2216,8 @@ Returns the custom text for verify email message
 
 
 
+    GET: /text/message/verifyemail/{language}
+
 
 ### GetDefaultVerifyEmailMessageText
 
@@ -1873,6 +2227,8 @@ Returns the custom text for verify email message
 Returns the default text for verify email message
 
 
+
+    GET: /text/default/message/verifyemail/{language}
 
 
 ### SetCustomVerifyEmailMessageText
@@ -1887,6 +2243,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/verifyemail/{language}
+
 
 ### ResetCustomVerifyEmailMessageTextToDefault
 
@@ -1898,6 +2256,8 @@ The default text of the IAM will trigger after
 
 
 
+    DELETE: /text/message/verifyemail/{language}
+
 
 ### GetCustomVerifyPhoneMessageText
 
@@ -1908,6 +2268,8 @@ Returns the custom text for verify email message
 
 
 
+    GET: /text/message/verifyphone/{language}
+
 
 ### GetDefaultVerifyPhoneMessageText
 
@@ -1917,6 +2279,8 @@ Returns the custom text for verify email message
 Returns the custom text for verify email message
 
 
+
+    GET: /text/default/message/verifyphone/{language}
 
 
 ### SetCustomVerifyPhoneMessageText
@@ -1931,6 +2295,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/verifyphone/{language}
+
 
 ### ResetCustomVerifyPhoneMessageTextToDefault
 
@@ -1942,6 +2308,8 @@ The default text of the IAM will trigger after
 
 
 
+    DELETE: /text/message/verifyphone/{language}
+
 
 ### GetCustomDomainClaimedMessageText
 
@@ -1952,6 +2320,8 @@ Returns the custom text for domain claimed message
 
 
 
+    GET: /text/message/domainclaimed/{language}
+
 
 ### GetDefaultDomainClaimedMessageText
 
@@ -1961,6 +2331,8 @@ Returns the custom text for domain claimed message
 Returns the custom text for domain claimed message
 
 
+
+    GET: /text/default/message/domainclaimed/{language}
 
 
 ### SetCustomDomainClaimedMessageCustomText
@@ -1975,6 +2347,8 @@ The Following Variables can be used:
 
 
 
+    PUT: /text/message/domainclaimed/{language}
+
 
 ### ResetCustomDomainClaimedMessageTextToDefault
 
@@ -1986,6 +2360,8 @@ The default text of the IAM will trigger after
 
 
 
+    DELETE: /text/message/domainclaimed/{language}
+
 
 ### GetCustomLoginTexts
 
@@ -1996,6 +2372,8 @@ Returns the custom texts for login ui
 
 
 
+    GET: /text/login/{language}
+
 
 ### GetDefaultLoginTexts
 
@@ -2005,6 +2383,8 @@ Returns the custom texts for login ui
 Returns the custom texts for login ui
 
 
+
+    GET: /text/default/login/{language}
 
 
 ### SetCustomLoginText
@@ -2017,6 +2397,8 @@ it impacts all organisations without customized login ui texts
 
 
 
+    PUT: /text/login/{language}
+
 
 ### ResetCustomLoginTextToDefault
 
@@ -2028,6 +2410,8 @@ The default text of the IAM will trigger after
 
 
 
+    DELETE: /text/login/{language}
+
 
 ### GetOrgIDPByID
 
@@ -2037,6 +2421,8 @@ The default text of the IAM will trigger after
 Returns a identity provider configuration of the organisation
 
 
+
+    GET: /idps/{id}
 
 
 ### ListOrgIDPs
@@ -2049,6 +2435,8 @@ Limit should always be set, there is a default limit set by the service
 
 
 
+    POST: /idps/_search
+
 
 ### AddOrgOIDCIDP
 
@@ -2059,6 +2447,8 @@ Add a new identity provider configuration in the organisation
 Provider must be OIDC compliant
 
 
+
+    POST: /idps/oidc
 
 
 ### DeactivateOrgIDP
@@ -2072,6 +2462,8 @@ Returns error if already deactivated
 
 
 
+    POST: /idps/{idp_id}/_deactivate
+
 
 ### ReactivateOrgIDP
 
@@ -2082,6 +2474,8 @@ Activate identity provider configuration
 Returns error if not deactivated
 
 
+
+    POST: /idps/{idp_id}/_reactivate
 
 
 ### RemoveOrgIDP
@@ -2094,6 +2488,8 @@ Will remove all linked providers of this configuration on the users
 
 
 
+    DELETE: /idps/{idp_id}
+
 
 ### UpdateOrgIDP
 
@@ -2104,6 +2500,8 @@ Change identity provider configuration of the organisation
 
 
 
+    PUT: /idps/{idp_id}
+
 
 ### UpdateOrgIDPOIDCConfig
 
@@ -2113,6 +2511,8 @@ Change identity provider configuration of the organisation
 Change OIDC identity provider configuration of the organisation
 
 
+
+    PUT: /idps/{idp_id}/oidc_config
 
 
 
