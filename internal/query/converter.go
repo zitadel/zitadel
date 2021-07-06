@@ -45,6 +45,8 @@ func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *domain.IDPConfigView {
 		converted.OIDCIssuer = rm.OIDCConfig.Issuer
 		converted.OIDCScopes = rm.OIDCConfig.Scopes
 		converted.OIDCUsernameMapping = rm.OIDCConfig.UserNameMapping
+		converted.OAuthAuthorizationEndpoint = rm.OIDCConfig.AuthorizationEndpoint
+		converted.OAuthTokenEndpoint = rm.OIDCConfig.TokenEndpoint
 	}
 	return converted
 }
