@@ -1,21 +1,9 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-  GetDefaultDomainClaimedMessageTextRequest,
-  GetDefaultInitMessageTextRequest,
-  GetDefaultPasswordResetMessageTextRequest,
-  GetDefaultVerifyEmailMessageTextRequest,
-  GetDefaultVerifyPhoneMessageTextRequest,
-} from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-  GetCustomDomainClaimedMessageTextRequest,
-  GetCustomPasswordResetMessageTextRequest,
-  GetCustomVerifyEmailMessageTextRequest,
-  GetCustomVerifyPhoneMessageTextRequest,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { GetDefaultInitMessageTextRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -36,11 +24,8 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   styleUrls: ['./message-texts.component.scss'],
 })
 export class MessageTextsComponent implements OnDestroy {
-  public defaultInitMsg!: Observable<string>;
-  public verifyEmailMsg!: GetCustomVerifyEmailMessageTextRequest.AsObject | GetDefaultVerifyEmailMessageTextRequest.AsObject;
-  public verifyPhoneMsg!: GetCustomVerifyPhoneMessageTextRequest.AsObject | GetDefaultVerifyPhoneMessageTextRequest.AsObject;
-  public passwordResetMsg!: GetCustomPasswordResetMessageTextRequest.AsObject | GetDefaultPasswordResetMessageTextRequest.AsObject;
-  public domainClaimed!: GetCustomDomainClaimedMessageTextRequest.AsObject | GetDefaultDomainClaimedMessageTextRequest.AsObject;
+  public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
+  public getCustomInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -67,7 +52,17 @@ export class MessageTextsComponent implements OnDestroy {
           ];
 
           const req = new GetDefaultInitMessageTextRequest().setLanguage(this.translate.currentLang);
-
+          // Object.keys((new GetDefaultInitMessageTextResponse()).toObject().customText).keys(key => {})
+          this.getDefaultInitMessageTextMap$ = of(
+            this.service.getDefaultInitMessageText(req).then(res => {
+              if (res.customText) {
+                delete res.customText.details;
+                return Object.assign({}, res.customText as unknown as { [key: string]: string; });
+              } else {
+                return {};
+              }
+            })
+          );
           // this.defaultInitMsg = of(req);
           break;
         case PolicyComponentServiceType.ADMIN:
