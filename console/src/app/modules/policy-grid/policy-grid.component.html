@@ -147,7 +147,7 @@
             <div class="btn-wrapper">
                 <ng-template appHasRole [appHasRole]="['policy.write']">
                     <button
-                        [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.MESSAGE_TEXTS ]"
+                        [routerLink]="[type == PolicyGridType.IAM ? '/iam' : type == PolicyGridType.ORG ?  '/org' : '','policy', PolicyComponentType.MESSAGETEXTS ]"
                         mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
                 </ng-template>
             </div>
