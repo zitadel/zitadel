@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -190,8 +189,18 @@ func TestCommandSide_ChangeDefaultIDPAuthConnectorConfig(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"machine1",
+								"machine1",
+								"",
+								false,
+							),
+						),
+					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -271,7 +280,7 @@ func TestCommandSide_ChangeDefaultIDPAuthConnectorConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "IAM",
 				},
 			},
 		},
