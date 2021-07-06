@@ -51,6 +51,10 @@ func (t *RefreshToken) ViewModel() string {
 	return refreshTokenTable
 }
 
+func (t *RefreshToken) Subscription() *v1.Subscription {
+	return t.subscription
+}
+
 func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user_es_model.UserAggregate, project_es_model.ProjectAggregate}
 }

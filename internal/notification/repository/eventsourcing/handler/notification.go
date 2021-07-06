@@ -92,6 +92,10 @@ func (n *Notification) ViewModel() string {
 	return notificationTable
 }
 
+func (n *Notification) Subscription() *v1.Subscription {
+	return n.subscription
+}
+
 func (_ *Notification) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate}
 }

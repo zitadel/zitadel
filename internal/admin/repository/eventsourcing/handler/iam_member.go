@@ -49,7 +49,6 @@ func (m *IAMMember) subscribe() {
 
 	go func() {
 		for event := range m.subscription.Events {
-
 			query.ReduceEvent(m, event)
 		}
 	}()
@@ -65,6 +64,10 @@ func (m *IAMMember) CurrentSequence() (uint64, error) {
 
 func (m *IAMMember) ViewModel() string {
 	return iamMemberTable
+}
+
+func (m *IAMMember) Subscription() *v1.Subscription {
+	return m.subscription
 }
 
 func (m *IAMMember) AggregateTypes() []es_models.AggregateType {

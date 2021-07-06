@@ -45,6 +45,10 @@ func (m *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }
 
+func (m *IDPConfig) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *IDPConfig) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

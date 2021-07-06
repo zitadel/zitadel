@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
@@ -42,6 +43,10 @@ func (p *PasswordAgePolicy) subscribe() {
 
 func (p *PasswordAgePolicy) ViewModel() string {
 	return passwordAgePolicyTable
+}
+
+func (p *PasswordAgePolicy) Subscription() *v1.Subscription {
+	return p.subscription
 }
 
 func (p *PasswordAgePolicy) AggregateTypes() []es_models.AggregateType {
