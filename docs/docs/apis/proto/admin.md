@@ -115,6 +115,8 @@ Adds a new ZITADEL AuthConnector identity provider configuration the IAM
 
 
 
+    POST: /idps/auth_connector
+
 
 ### UpdateIDP
 
@@ -189,6 +191,8 @@ Updates the auth connector configuration of the specified idp
 all fields are updated. If no value is provided the field will be empty afterwards.
 
 
+
+    PUT: /idps/{idp_id}/auth_connector_config
 
 
 ### GetDefaultFeatures

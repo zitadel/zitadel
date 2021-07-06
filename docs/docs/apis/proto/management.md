@@ -2460,6 +2460,8 @@ Add a new ZITADEL AuthConnector identity provider configuration in the organisat
 
 
 
+    POST: /idps/auth_connector
+
 
 ### DeactivateOrgIDP
 
@@ -2533,6 +2535,8 @@ Change OIDC identity provider configuration of the organisation
 Change auth connector identity provider configuration of the organisation
 
 
+
+    PUT: /idps/{idp_id}/auth_connector_config
 
 
 
