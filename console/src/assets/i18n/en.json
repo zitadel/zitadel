@@ -703,7 +703,12 @@
     },
     "MESSAGE_TEXTS": {
       "TITLE":"Message Texts",
-      "DESCRIPTION": "Define your texts for your notication mails."
+      "DESCRIPTION": "Define your texts for your notication mails.",
+      "TYPES": {
+        "INIT":"Initialization",
+        "VE":"Verify Email",
+        "VP":"Verify Phone"
+      }
     },
     "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
     "BTN_INSTALL": "Setup",

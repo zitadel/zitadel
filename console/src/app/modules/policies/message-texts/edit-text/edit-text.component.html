@@ -1,13 +1,12 @@
-<div>
-  <div *ngFor="let key of (currentMap | keyvalue)" class="flex">
+<div *ngIf="currentMap">
+  <form [formGroup]="form" *ngFor="let key of (current$ | async | keyvalue)" class="flex">
     <cnsl-form-field class="formfield">
       <cnsl-label>{{key.key}}</cnsl-label>
-      <textarea class="text" cnslInput [name]="label" [(ngModel)]="currentMap[key.key]"></textarea>
+      <textarea class="text" cnslInput [formControlName]="key.key" [name]="key.key" ></textarea>
     </cnsl-form-field>
     <div class="actions" *ngIf="(default$ | async) as defaultmap">
-      <button mat-icon-button [disabled]="defaultmap[key.key] == currentMap[key.key]"><i class="las la-history"></i></button>
-      <button mat-icon-button  [disabled]="key.value == currentMap[key.key]"><i class="las la-undo"></i></button>
-      <button mat-icon-button><i class="las la-check"></i></button>
+      <button matTooltip="{{defaultmap[key.key]}}" mat-icon-button [disabled]="form.get(key.key)?.value == defaultmap[key.key]" (click)="form.get(key.key)?.setValue(defaultmap[key.key])"><i class="las la-history"></i></button>
+      <button matTooltip="{{currentMap[key.key]}}" mat-icon-button [disabled]="form.get(key.key)?.value == currentMap[key.key]" (click)="form.get(key.key)?.setValue(currentMap[key.key])"><i class="las la-undo"></i></button>
     </div>
-  </div>
+  </form>
 </div>

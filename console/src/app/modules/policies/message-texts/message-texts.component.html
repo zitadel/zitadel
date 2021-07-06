@@ -2,8 +2,17 @@
     [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
     [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
+    <div class="message-type">
+      <button (click)="setCurrentType(type.key)" [ngClass]="{'active': currentType == type.key}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
+    </div>
     <div class="content" >
-      <cnsl-edit-text *ngIf="getCustomInitMessageTextMap$ && getDefaultInitMessageTextMap$" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$"></cnsl-edit-text>
+      <cnsl-edit-text label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+        $event)"></cnsl-edit-text>
+    </div>
+
+    <div class="actions">
+      <button class="save-button" (click)="saveCurrentMessage()" color="primary" type="submit"
+        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
 
     <div class="divider"></div>

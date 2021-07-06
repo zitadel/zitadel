@@ -1,7 +1,7 @@
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -26,6 +26,7 @@ import { MessageTextsComponent } from './message-texts.component';
     MessageTextsRoutingModule,
     CommonModule,
     InfoSectionModule,
+    ReactiveFormsModule,
     FormsModule,
     InputModule,
     FormFieldModule,
@@ -36,6 +37,7 @@ import { MessageTextsComponent } from './message-texts.component';
     HasRolePipeModule,
     MatTooltipModule,
     TranslateModule,
+    MatTooltipModule,
     DetailLayoutModule,
     MatProgressSpinnerModule,
     LinksModule,

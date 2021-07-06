@@ -3,8 +3,26 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { from, Observable, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { GetDefaultInitMessageTextRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { GetCustomInitMessageTextRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
+  SetDefaultInitMessageTextRequest,
+  SetDefaultVerifyEmailMessageTextRequest,
+  SetDefaultVerifyPhoneMessageTextRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import {
+  GetCustomInitMessageTextRequest,
+  GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyPhoneMessageTextRequest,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest,
+  SetCustomInitMessageTextRequest,
+  SetCustomVerifyEmailMessageTextRequest,
+  SetCustomVerifyPhoneMessageTextRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
+import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -19,6 +37,117 @@ import {
 } from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
+enum MESSAGETYPES {
+  INIT = 'INIT',
+  VERIFYPHONE = 'VP',
+  VERIFYEMAIL = 'VE',
+};
+
+const REQUESTMAP = {
+  [PolicyComponentServiceType.MGMT]: {
+    [MESSAGETYPES.INIT]: {
+      get: new GetDefaultInitMessageTextRequest(),
+      set: new SetCustomInitMessageTextRequest(),
+      getDefault: new GetCustomInitMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomInitMessageTextRequest => {
+        const req = new SetCustomInitMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      }
+    },
+    [MESSAGETYPES.VERIFYEMAIL]: {
+      get: new GetCustomVerifyEmailMessageTextRequest(),
+      set: new SetCustomVerifyEmailMessageTextRequest(),
+      getDefault: new GetDefaultVerifyEmailMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyEmailMessageTextRequest => {
+        const req = new SetCustomVerifyEmailMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      }
+    },
+    [MESSAGETYPES.VERIFYPHONE]: {
+      get: new GetCustomVerifyPhoneMessageTextRequest(),
+      set: new SetCustomVerifyPhoneMessageTextRequest(),
+      getDefault: new GetDefaultVerifyPhoneMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyPhoneMessageTextRequest => {
+        const req = new SetCustomVerifyPhoneMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      }
+    },
+  },
+  [PolicyComponentServiceType.ADMIN]: {
+    [MESSAGETYPES.INIT]: {
+      get: new AdminGetDefaultInitMessageTextRequest(),
+      set: new SetDefaultInitMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultInitMessageTextRequest => {
+        const req = new SetDefaultInitMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      }
+    },
+    [MESSAGETYPES.VERIFYEMAIL]: {
+      get: new AdminGetDefaultVerifyEmailMessageTextRequest(),
+      set: new SetDefaultVerifyEmailMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyEmailMessageTextRequest => {
+        const req = new SetDefaultVerifyEmailMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      }
+    },
+    [MESSAGETYPES.VERIFYPHONE]: {
+      get: new AdminGetDefaultVerifyPhoneMessageTextRequest(),
+      set: new SetDefaultVerifyPhoneMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyPhoneMessageTextRequest => {
+        const req = new SetDefaultVerifyPhoneMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      }
+    },
+  },
+};
 @Component({
   selector: 'app-message-texts',
   templateUrl: './message-texts.component.html',
@@ -28,11 +157,14 @@ export class MessageTextsComponent implements OnDestroy {
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
   public getCustomInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
 
+  public currentType: MESSAGETYPES = MESSAGETYPES.INIT;
+
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public nextLinks: CnslLinks[] = [];
+  public MESSAGETYPES: any = MESSAGETYPES;
 
   private sub: Subscription = new Subscription();
 
@@ -41,6 +173,7 @@ export class MessageTextsComponent implements OnDestroy {
     private injector: Injector,
     private translate: TranslateService,
   ) {
+    console.log(this.MESSAGETYPES);
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
       switch (this.serviceType) {
@@ -52,15 +185,16 @@ export class MessageTextsComponent implements OnDestroy {
             ORG_PRIVATELABEL_LINK,
           ];
 
-          const reqDefaultInit = new GetDefaultInitMessageTextRequest().setLanguage(this.translate.currentLang);
+          const reqDefaultInit = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].getDefault.setLanguage(this.translate.currentLang);
           this.getDefaultInitMessageTextMap$ = from(
             this.stripDetails(this.service.getDefaultInitMessageText(reqDefaultInit))
           );
 
-          const reqCustomInit = new GetCustomInitMessageTextRequest().setLanguage(this.translate.currentLang);
+          const reqCustomInit = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].get.setLanguage(this.translate.currentLang);
           this.getCustomInitMessageTextMap$ = from(
             this.stripDetails(this.service.getCustomInitMessageText(reqCustomInit))
           );
+
           // this.defaultInitMsg = of(req);
           break;
         case PolicyComponentServiceType.ADMIN:
@@ -79,6 +213,17 @@ export class MessageTextsComponent implements OnDestroy {
     });
   }
 
+  public updateCurrentValues(values: { [key: string]: string; }): void {
+    const req = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].setFcn;
+    const mappedValues = req(values);
+
+    console.log(mappedValues.toObject());
+  }
+
+  public saveCurrentMessage(): void {
+    console.log('save');
+  }
+
   private stripDetails(prom: Promise<any>): Promise<any> {
     return prom.then(res => {
       if (res.customText) {
@@ -92,5 +237,10 @@ export class MessageTextsComponent implements OnDestroy {
   }
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  public setCurrentType(key: MESSAGETYPES): void {
+    console.log(key);
+    this.currentType = key;
   }
 }

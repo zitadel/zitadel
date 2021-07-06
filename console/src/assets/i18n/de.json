@@ -701,7 +701,12 @@
     },
     "MESSAGE_TEXTS": {
       "TITLE":"Email Texte",
-      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails"
+      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
+      "TYPES": {
+        "INIT":"Initialisierung",
+        "VE":"Emailverifikation",
+        "VP":"Telefonnummerverifikation"
+      }
     },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
     "BTN_INSTALL": "Installieren",

@@ -1,4 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -11,16 +12,23 @@ export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = 'hello';
   @Input() current$!: Observable<{ [key: string]: string; }>;
   @Input() default$!: Observable<{ [key: string]: string; }>;
-
+  @Output() changedValues: EventEmitter<{ [key: string]: string; }> = new EventEmitter();
   public currentMap: { [key: string]: string; } = {};
   private destroy$: Subject<void> = new Subject();
-
-  constructor() { }
+  public form!: FormGroup;
+  constructor(private fb: FormBuilder) { }
 
   public ngOnInit(): void {
     this.current$.pipe(takeUntil(this.destroy$)).subscribe(value => {
       console.log('current', value);
       this.currentMap = value;
+      this.form = new FormGroup({});
+      Object.keys(value).map(key => {
+        const control = new FormControl(value[key]);
+        this.form.addControl(key, control);
+      });
+
+      this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(values => this.changedValues.emit(values));
     });
   }
 

@@ -2,6 +2,13 @@
   margin: .5rem 0;
 }
 
+.message-type {
+  .active {
+    background: #cbf4c9;
+    color: #0e6245;
+  }
+}
+
 .content {
   padding-top: 1rem;
 }
@@ -11,4 +18,10 @@
   height: 1px;
   background-color: rgba(var(--grey), .5);
   margin: 1rem 0;
+}
+
+.save-button {
+  margin-bottom: 3rem;
+  float: right;
+  display: block;
 }

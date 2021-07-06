@@ -11,6 +11,7 @@
 
   .actions {
     display: flex;
+    flex-direction: column;
     align-self: flex-end;
     margin-bottom: 16px;
   }
