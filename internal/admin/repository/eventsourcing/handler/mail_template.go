@@ -44,12 +44,16 @@ func (m *MailTemplate) ViewModel() string {
 	return mailTemplateTable
 }
 
-func (_ *MailTemplate) AggregateTypes() []es_models.AggregateType {
+func (m *MailTemplate) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
+func (m *MailTemplate) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate}
 }
 
-func (p *MailTemplate) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestMailTemplateSequence()
+func (m *MailTemplate) CurrentSequence() (uint64, error) {
+	sequence, err := m.view.GetLatestMailTemplateSequence()
 	if err != nil {
 		return 0, err
 	}
@@ -99,6 +103,6 @@ func (m *MailTemplate) OnError(event *es_models.Event, err error) error {
 	return spooler.HandleError(event, err, m.view.GetLatestMailTemplateFailedEvent, m.view.ProcessedMailTemplateFailedEvent, m.view.ProcessedMailTemplateSequence, m.errorCountUntilSkip)
 }
 
-func (o *MailTemplate) OnSuccess() error {
-	return spooler.HandleSuccess(o.view.UpdateMailTemplateSpoolerRunTimestamp)
+func (m *MailTemplate) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateMailTemplateSpoolerRunTimestamp)
 }
