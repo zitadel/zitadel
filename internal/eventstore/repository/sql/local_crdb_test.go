@@ -100,11 +100,6 @@ func fillUniqueData(unique_type, field string) error {
 	return err
 }
 
-func fillAssets(id string, asset []byte) error {
-	_, err := testCRDBClient.Exec("INSERT INTO eventstore.assets (id, asset) VALUES ($1, $2)", id, asset)
-	return err
-}
-
 type migrationPaths []string
 
 type version struct {

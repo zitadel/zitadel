@@ -42,14 +42,15 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 ### Self-Managed
 
 You can run an automatically operated **ZITADEL** instance on a CNCF compliant Kubernetes cluster of your choice:
-- [CRD Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/crd)
-- [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
-- [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
+
+* [CRD Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/crd)
+* [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
+* [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
 
 ### CAOS-Managed
 
-- **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
-- **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
+* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
+* **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
 ## Start using ZITADEL
 
@@ -58,6 +59,7 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
 
 ### Client libraries
+
 * [Go](https://github.com/caos/zitadel-go) client library
 * [.NET](https://github.com/caos/zitadel-net) client library
 * [Dart](https://github.com/caos/zitadel-dart) client library
@@ -71,16 +73,19 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 ## Showcase
 
 ### Passwordless Login
+
 Use our login widget to allow easy and sucure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
-- works on all modern platforms, devices, and browsers
-- phishing resistant alternative
-- requires only one gesture by the user
-- easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
+
+* works on all modern platforms, devices, and browsers
+* phishing resistant alternative
+* requires only one gesture by the user
+* easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 ![passwordless-iphone](https://user-images.githubusercontent.com/1366906/118765439-5fa3f180-b87b-11eb-937b-b4acb7854086.gif)
 
 ### Admin Console
+
 Use [Console](https://docs.zitadel.ch/docs/manuals/introduction) or our [APIs](https://docs.zitadel.ch/docs/apis/introduction) to setup organizations, projects and applications.
 
 Register new applications

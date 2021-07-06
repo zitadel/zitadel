@@ -40,6 +40,10 @@ const (
 	customTextTable = "adminapi.custom_texts"
 )
 
+func (m *CustomText) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (m *CustomText) ViewModel() string {
 	return customTextTable
 }

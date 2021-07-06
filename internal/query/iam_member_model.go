@@ -35,9 +35,11 @@ func (rm *IAMMemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 }
 
 func (rm *IAMMemberReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
 		AggregateIDs(rm.iamID).
 		EventData(map[string]interface{}{
 			"userId": rm.userID,
-		})
+		}).Builder()
 }

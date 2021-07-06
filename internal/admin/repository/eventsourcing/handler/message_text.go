@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 
@@ -43,6 +44,10 @@ const (
 
 func (m *MessageText) ViewModel() string {
 	return mailTextTable
+}
+
+func (m *MessageText) Subscription() *v1.Subscription {
+	return m.subscription
 }
 
 func (_ *MessageText) AggregateTypes() []es_models.AggregateType {

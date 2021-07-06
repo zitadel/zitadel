@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/iam"
@@ -41,12 +42,15 @@ func (wm *IAMMailTemplateWriteModel) Reduce() error {
 }
 
 func (wm *IAMMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
 		EventTypes(
 			iam.MailTemplateAddedEventType,
-			iam.MailTemplateChangedEventType)
+			iam.MailTemplateChangedEventType).
+		Builder()
 }
 
 func (wm *IAMMailTemplateWriteModel) NewChangedEvent(

@@ -7,7 +7,10 @@ import (
 )
 
 func KeyPairQuery(latestSequence uint64) *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
 		SequenceGreater(latestSequence).
-		EventTypes(keypair.AddedEventType)
+		EventTypes(keypair.AddedEventType).
+		Builder()
 }

@@ -48,6 +48,10 @@ func (p *LoginPolicy) ViewModel() string {
 	return loginPolicyTable
 }
 
+func (p *LoginPolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *LoginPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

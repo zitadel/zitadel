@@ -2,8 +2,11 @@ package query
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
+
+	"github.com/getsentry/sentry-go"
+
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
 
@@ -27,9 +30,19 @@ type Handler interface {
 	AggregateTypes() []models.AggregateType
 	CurrentSequence() (uint64, error)
 	Eventstore() v1.Eventstore
+
+	Subscription() *v1.Subscription
 }
 
 func ReduceEvent(handler Handler, event *models.Event) {
+	defer func() {
+		err := recover()
+
+		if err != nil {
+			sentry.CurrentHub().Recover(err)
+			handler.Subscription().Unsubscribe()
+		}
+	}()
 	currentSequence, err := handler.CurrentSequence()
 	if err != nil {
 		logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")

@@ -61,6 +61,10 @@ func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable
 }
 
+func (p *ProjectMember) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *ProjectMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
 }
