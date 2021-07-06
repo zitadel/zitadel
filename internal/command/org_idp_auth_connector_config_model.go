@@ -66,15 +66,18 @@ func (wm *OrgIDPAuthConnectorConfigWriteModel) Reduce() error {
 }
 
 func (wm *OrgIDPAuthConnectorConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateIDs(wm.AggregateID).
+		AggregateTypes(org.AggregateType).
 		EventTypes(
 			org.IDPAuthConnectorConfigAddedEventType,
 			org.IDPAuthConnectorConfigChangedEventType,
 			org.IDPConfigReactivatedEventType,
 			org.IDPConfigDeactivatedEventType,
-			org.IDPConfigRemovedEventType)
+			org.IDPConfigRemovedEventType).
+		Builder()
 }
 
 func (wm *OrgIDPAuthConnectorConfigWriteModel) NewChangedEvent(

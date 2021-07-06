@@ -12,7 +12,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/id"
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/repository/idpconfig"
@@ -27,12 +26,13 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
-		config        *domain.IDPConfig
+		config        domain.IDPConfig
 		resourceOwner string
 	}
 	type res struct {
-		want *domain.IDPConfig
-		err  func(error) bool
+		wantID      string
+		wantDetails *domain.ObjectDetails
+		err         func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -49,17 +49,17 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				config: &domain.IDPConfig{
-					Name:        "name1",
-					StylingType: domain.IDPConfigStylingTypeGoogle,
-					OIDCConfig: &domain.OIDCIDPConfig{
-						ClientID:              "clientid1",
-						Issuer:                "issuer",
-						ClientSecretString:    "secret",
-						Scopes:                []string{"scope"},
-						IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
-						UsernameMapping:       domain.OIDCMappingFieldEmail,
+				config: &domain.OIDCIDPConfig{
+					CommonIDPConfig: domain.CommonIDPConfig{
+						Name:        "name1",
+						StylingType: domain.IDPConfigStylingTypeGoogle,
 					},
+					ClientID:              "clientid1",
+					Issuer:                "issuer",
+					ClientSecretString:    "secret",
+					Scopes:                []string{"scope"},
+					IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
+					UsernameMapping:       domain.OIDCMappingFieldEmail,
 				},
 			},
 			res: res{
@@ -72,11 +72,12 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "config1"),
 			},
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				config:        &domain.IDPConfig{},
+				config:        &domain.CommonIDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -125,29 +126,23 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				config: &domain.IDPConfig{
-					Name:        "name1",
-					StylingType: domain.IDPConfigStylingTypeGoogle,
-					OIDCConfig: &domain.OIDCIDPConfig{
-						ClientID:              "clientid1",
-						Issuer:                "issuer",
-						ClientSecretString:    "secret",
-						Scopes:                []string{"scope"},
-						IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
-						UsernameMapping:       domain.OIDCMappingFieldEmail,
+				config: &domain.OIDCIDPConfig{
+					CommonIDPConfig: domain.CommonIDPConfig{
+						Name:        "name1",
+						StylingType: domain.IDPConfigStylingTypeGoogle,
 					},
+					ClientID:              "clientid1",
+					Issuer:                "issuer",
+					ClientSecretString:    "secret",
+					Scopes:                []string{"scope"},
+					IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
+					UsernameMapping:       domain.OIDCMappingFieldEmail,
 				},
 			},
 			res: res{
-				want: &domain.IDPConfig{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					IDPConfigID: "config1",
-					Name:        "name1",
-					StylingType: domain.IDPConfigStylingTypeGoogle,
-					State:       domain.IDPConfigStateActive,
+				wantID: "config1",
+				wantDetails: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -159,7 +154,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 				idGenerator:           tt.fields.idGenerator,
 				idpConfigSecretCrypto: tt.fields.secretCrypto,
 			}
-			got, err := r.AddIDPConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
+			gotID, gotDetails, err := r.AddIDPConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -167,7 +162,8 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assert.Equal(t, tt.res.wantID, gotID)
+				assert.Equal(t, tt.res.wantDetails, gotDetails)
 			}
 		})
 	}
@@ -180,10 +176,10 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		resourceOwner string
-		config        *domain.IDPConfig
+		config        domain.IDPConfig
 	}
 	type res struct {
-		want *domain.IDPConfig
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -201,7 +197,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				config: &domain.IDPConfig{
+				config: &domain.CommonIDPConfig{
 					IDPConfigID: "config1",
 				},
 			},
@@ -218,7 +214,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				config: &domain.IDPConfig{},
+				config: &domain.CommonIDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -235,7 +231,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				config: &domain.IDPConfig{
+				config: &domain.CommonIDPConfig{
 					IDPConfigID: "config1",
 				},
 			},
@@ -290,22 +286,15 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				config: &domain.IDPConfig{
+				config: &domain.CommonIDPConfig{
 					IDPConfigID: "config1",
 					Name:        "name2",
 					StylingType: domain.IDPConfigStylingTypeUnspecified,
 				},
 			},
 			res: res{
-				want: &domain.IDPConfig{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					IDPConfigID: "config1",
-					Name:        "name2",
-					StylingType: domain.IDPConfigStylingTypeUnspecified,
-					State:       domain.IDPConfigStateActive,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},

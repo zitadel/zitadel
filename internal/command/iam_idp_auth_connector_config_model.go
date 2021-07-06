@@ -67,15 +67,18 @@ func (wm *IAMIDPAuthConnectorConfigWriteModel) Reduce() error {
 }
 
 func (wm *IAMIDPAuthConnectorConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateIDs(wm.AggregateID).
+		AggregateTypes(iam.AggregateType).
 		EventTypes(
 			iam.IDPAuthConnectorConfigAddedEventType,
 			iam.IDPAuthConnectorConfigChangedEventType,
 			iam.IDPConfigReactivatedEventType,
 			iam.IDPConfigDeactivatedEventType,
-			iam.IDPConfigRemovedEventType)
+			iam.IDPConfigRemovedEventType).
+		Builder()
 }
 
 func (wm *IAMIDPAuthConnectorConfigWriteModel) NewChangedEvent(

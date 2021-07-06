@@ -18,7 +18,14 @@ func (c *Commands) ChangeDefaultIDPAuthConnectorConfig(ctx context.Context, conf
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-BVfwd", "Errors.IAM.IDPConfig.AlreadyExists")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-BVfwd", "Errors.IAM.IDPConfig.NotFound")
+	}
+	machine, err := c.machineWriteModelByID(ctx, config.MachineID, "")
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(machine.UserState) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-BGf31", "Errors.User.NotFound")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)

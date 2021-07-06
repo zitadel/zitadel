@@ -21,7 +21,7 @@ func (c *Commands) ChangeIDPAuthConnectorConfig(ctx context.Context, config *dom
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-GFdg2", "Errors.Org.IDPConfig.AlreadyExists")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-GFdg2", "Errors.Org.IDPConfig.NotFound")
 	}
 
 	machine, err := c.machineWriteModelByID(ctx, config.MachineID, resourceOwner)
@@ -29,7 +29,7 @@ func (c *Commands) ChangeIDPAuthConnectorConfig(ctx context.Context, config *dom
 		return nil, err
 	}
 	if !isUserStateExists(machine.UserState) {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-GEgh2", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-GEgh2", "Errors.User.NotFound")
 	}
 
 	iamAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
