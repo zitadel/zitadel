@@ -3,20 +3,20 @@ package i18n
 import (
 	"context"
 	"encoding/json"
-	"github.com/BurntSushi/toml"
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"io/ioutil"
 	"net/http"
 	"os"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/errors"
-
+	"github.com/BurntSushi/toml"
 	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 const (
@@ -32,6 +32,11 @@ type Translator struct {
 type TranslatorConfig struct {
 	DefaultLanguage language.Tag
 	CookieName      string
+}
+
+type Message struct {
+	ID   string
+	Text string
 }
 
 func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
@@ -61,14 +66,14 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 		return nil, errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
 	}
 	for _, file := range files {
-		if err := addFileToBundle(dir, bundle, file); err != nil {
-			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to bundle")
+		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
+			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to Bundle")
 		}
 	}
 	return bundle, nil
 }
 
-func addFileToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo) error {
+func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo) error {
 	f, err := dir.Open("/i18n/" + file.Name())
 	if err != nil {
 		return err
@@ -80,6 +85,20 @@ func addFileToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo)
 	}
 	bundle.MustParseMessageFileBytes(content, file.Name())
 	return nil
+}
+
+func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
+	if len(messages) == 0 {
+		return nil
+	}
+	i18nMessages := make([]*i18n.Message, len(messages))
+	for i, message := range messages {
+		i18nMessages[i] = &i18n.Message{
+			ID:    message.ID,
+			Other: message.Text,
+		}
+	}
+	return t.bundle.AddMessages(tag, i18nMessages...)
 }
 
 func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[string]interface{}) string {

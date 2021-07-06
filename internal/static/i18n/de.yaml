@@ -355,6 +355,9 @@ Errors:
     AlreadyExists: Kundenspezifischer Text existiert bereits
     Invalid: Kundenspezifischer Text ist ungültig
     NotFound: Kundenspezifischer Text nicht gefunden
+  TranslationFile:
+    ReadError: Übersetzungsfile konnte nicht gelesen werden
+    MergeError: Übersetzungsfile konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
 EventTypes:
   user:
     added: Benutzer hinzugefügt

@@ -1,6 +1,8 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "UsernameChangeDone.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
     <p>{{t "UsernameChangeDone.Description"}}</p>
@@ -15,7 +17,7 @@
 
     <div class="lgn-actions">
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" type="submit">{{t "Actions.Next"}}</button>
+        <button class="lgn-raised-button lgn-primary" type="submit">{{t "UsernameChangeDone.NextButtonText"}}</button>
     </div>
 </form>
 

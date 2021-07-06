@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -30,6 +31,8 @@ type IAMRepository interface {
 
 	GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
 	GetDefaultMessageText(ctx context.Context, textType string, language string) (*iam_model.MessageTextView, error)
+	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
+	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 
 	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 

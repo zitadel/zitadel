@@ -16,6 +16,8 @@ title: zitadel/auth.proto
 
 
 
+    GET: /healthz
+
 
 ### GetMyUser
 
@@ -25,6 +27,8 @@ title: zitadel/auth.proto
 Returns my full blown user
 
 
+
+    GET: /users/me
 
 
 ### ListMyUserChanges
@@ -36,6 +40,8 @@ Returns the history of the authorized user (each event)
 
 
 
+    POST: /users/me/changes/_search
+
 
 ### ListMyUserSessions
 
@@ -45,6 +51,8 @@ Returns the history of the authorized user (each event)
 Returns the user sessions of the authorized user of the current useragent
 
 
+
+    POST: /users/me/sessions/_search
 
 
 ### ListMyRefreshTokens
@@ -56,6 +64,8 @@ Returns the refresh tokens of the authorized user
 
 
 
+    POST: /users/me/tokens/refresh/_search
+
 
 ### RevokeMyRefreshToken
 
@@ -65,6 +75,8 @@ Returns the refresh tokens of the authorized user
 Revokes a single refresh token of the authorized user by its (token) id
 
 
+
+    DELETE: /users/me/tokens/refresh/{id}
 
 
 ### RevokeAllMyRefreshTokens
@@ -76,6 +88,8 @@ Revokes all refresh tokens of the authorized user
 
 
 
+    POST: /users/me/tokens/refresh/_revoke_all
+
 
 ### UpdateMyUserName
 
@@ -85,6 +99,8 @@ Revokes all refresh tokens of the authorized user
 Change the user name of the authorize user
 
 
+
+    PUT: /users/me/username
 
 
 ### GetMyPasswordComplexityPolicy
@@ -97,6 +113,8 @@ This policy defines how the password should look
 
 
 
+    GET: /policies/passwords/complexity
+
 
 ### UpdateMyPassword
 
@@ -106,6 +124,8 @@ This policy defines how the password should look
 Change the password of the authorized user
 
 
+
+    PUT: /users/me/password
 
 
 ### GetMyProfile
@@ -117,6 +137,8 @@ Returns the profile information of the authorized user
 
 
 
+    GET: /users/me/profile
+
 
 ### UpdateMyProfile
 
@@ -127,6 +149,8 @@ Changes the profile information of the authorized user
 
 
 
+    PUT: /users/me/profile
+
 
 ### GetMyEmail
 
@@ -136,6 +160,8 @@ Changes the profile information of the authorized user
 Returns the email address of the authorized user
 
 
+
+    GET: /users/me/email
 
 
 ### SetMyEmail
@@ -148,6 +174,8 @@ An email is sent to the given address, to verify it
 
 
 
+    PUT: /users/me/email
+
 
 ### VerifyMyEmail
 
@@ -157,6 +185,8 @@ An email is sent to the given address, to verify it
 Sets the email address to verified
 
 
+
+    POST: /users/me/email/_verify
 
 
 ### ResendMyEmailVerification
@@ -168,6 +198,8 @@ Sends a new email to the last given address to verify it
 
 
 
+    POST: /users/me/email/_resend_verification
+
 
 ### GetMyPhone
 
@@ -177,6 +209,8 @@ Sends a new email to the last given address to verify it
 Returns the phone number of the authorized user
 
 
+
+    GET: /users/me/phone
 
 
 ### SetMyPhone
@@ -189,6 +223,8 @@ An sms is sent to the number with a verification code
 
 
 
+    PUT: /users/me/phone
+
 
 ### VerifyMyPhone
 
@@ -198,6 +234,8 @@ An sms is sent to the number with a verification code
 Sets the phone number to verified
 
 
+
+    POST: /users/me/phone/_verify
 
 
 ### ResendMyPhoneVerification
@@ -209,6 +247,8 @@ Resends a sms to the last given phone number, to verify it
 
 
 
+    POST: /users/me/phone/_resend_verification
+
 
 ### RemoveMyPhone
 
@@ -218,6 +258,8 @@ Resends a sms to the last given phone number, to verify it
 Removed the phone number of the authorized user
 
 
+
+    DELETE: /users/me/phone
 
 
 ### RemoveMyAvatar
@@ -229,6 +271,8 @@ Remove my avatar
 
 
 
+    DELETE: /users/me/avatar
+
 
 ### ListMyLinkedIDPs
 
@@ -238,6 +282,8 @@ Remove my avatar
 Returns a list of all linked identity providers (social logins, eg. Google, Microsoft, AD, etc.)
 
 
+
+    POST: /users/me/idps/_search
 
 
 ### RemoveMyLinkedIDP
@@ -249,6 +295,8 @@ Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, et
 
 
 
+    DELETE: /users/me/idps/{idp_id}/{linked_user_id}
+
 
 ### ListMyAuthFactors
 
@@ -258,6 +306,8 @@ Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, et
 Returns all configured authentication factors (second and multi)
 
 
+
+    POST: /users/me/auth_factors/_search
 
 
 ### AddMyAuthFactorOTP
@@ -270,6 +320,8 @@ Only one OTP can be configured per user
 
 
 
+    POST: /users/me/auth_factors/otp
+
 
 ### VerifyMyAuthFactorOTP
 
@@ -280,6 +332,8 @@ Verify the last added OTP (One Time Password)
 
 
 
+    POST: /users/me/auth_factors/otp/_verify
+
 
 ### RemoveMyAuthFactorOTP
 
@@ -289,6 +343,8 @@ Verify the last added OTP (One Time Password)
 Removed the configured OTP (One Time Password) Factor
 
 
+
+    DELETE: /users/me/auth_factors/otp
 
 
 ### AddMyAuthFactorU2F
@@ -301,6 +357,8 @@ Multiple U2Fs can be configured
 
 
 
+    POST: /users/me/auth_factors/u2f
+
 
 ### VerifyMyAuthFactorU2F
 
@@ -310,6 +368,8 @@ Multiple U2Fs can be configured
 Verifies the last added U2F (Universal Second Factor) of the authorized user
 
 
+
+    POST: /users/me/auth_factors/u2f/_verify
 
 
 ### RemoveMyAuthFactorU2F
@@ -321,6 +381,8 @@ Removes the U2F Authentication from the authorized user
 
 
 
+    DELETE: /users/me/auth_factors/u2f/{token_id}
+
 
 ### ListMyPasswordless
 
@@ -330,6 +392,8 @@ Removes the U2F Authentication from the authorized user
 Returns all configured passwordless authentications of the authorized user
 
 
+
+    POST: /users/me/passwordless/_search
 
 
 ### AddMyPasswordless
@@ -342,6 +406,8 @@ Multiple passwordless authentications can be configured
 
 
 
+    POST: /users/me/passwordless
+
 
 ### VerifyMyPasswordless
 
@@ -351,6 +417,8 @@ Multiple passwordless authentications can be configured
 Verifies the last added passwordless configuration
 
 
+
+    POST: /users/me/passwordless/_verify
 
 
 ### RemoveMyPasswordless
@@ -362,6 +430,8 @@ Removes the passwordless configuration from the authorized user
 
 
 
+    DELETE: /users/me/passwordless/{token_id}
+
 
 ### ListMyUserGrants
 
@@ -371,6 +441,8 @@ Removes the passwordless configuration from the authorized user
 Returns all user grants (authorizations) of the authorized user
 
 
+
+    POST: /usergrants/me/_search
 
 
 ### ListMyProjectOrgs
@@ -382,6 +454,8 @@ Returns a list of organisations where the authorized user has a user grant (auth
 
 
 
+    POST: /global/projectorgs/_search
+
 
 ### ListMyZitadelFeatures
 
@@ -391,6 +465,8 @@ Returns a list of organisations where the authorized user has a user grant (auth
 Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
 
 
+
+    POST: /features/zitadel/me/_search
 
 
 ### ListMyZitadelPermissions
@@ -402,6 +478,8 @@ Returns the permissions the authorized user has in ZITADEL based on his manager 
 
 
 
+    POST: /permissions/zitadel/me/_search
+
 
 ### ListMyProjectPermissions
 
@@ -411,6 +489,8 @@ Returns the permissions the authorized user has in ZITADEL based on his manager 
 Returns a list of roles for the authorized user and project
 
 
+
+    POST: /permissions/me/_search
 
 
 
