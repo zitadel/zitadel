@@ -42,13 +42,15 @@ func readModelToIDPConfigDomain(rm *IAMIDPConfigReadModel) domain.IDPConfig {
 	}
 	if rm.OIDCConfig != nil {
 		return &domain.OIDCIDPConfig{
-			CommonIDPConfig:       config,
-			ClientID:              rm.OIDCConfig.ClientID,
-			ClientSecret:          rm.OIDCConfig.ClientSecret,
-			IDPDisplayNameMapping: rm.OIDCConfig.IDPDisplayNameMapping,
-			Issuer:                rm.OIDCConfig.Issuer,
-			Scopes:                rm.OIDCConfig.Scopes,
-			UsernameMapping:       rm.OIDCConfig.UserNameMapping,
+			CommonIDPConfig:       		config,
+			ClientID:              		rm.OIDCConfig.ClientID,
+			ClientSecret:          		rm.OIDCConfig.ClientSecret,
+			IDPDisplayNameMapping: 		rm.OIDCConfig.IDPDisplayNameMapping,
+			Issuer:                		rm.OIDCConfig.Issuer,
+			Scopes:                		rm.OIDCConfig.Scopes,
+			UsernameMapping:       		rm.OIDCConfig.UserNameMapping,
+			OAuthAuthorizationEndpoint: rm.OIDCConfig.AuthorizationEndpoint,
+			OAuthTokenEndpoint: 		rm.OIDCConfig.TokenEndpoint,
 		}
 	}
 	return &domain.AuthConnectorIDPConfig{

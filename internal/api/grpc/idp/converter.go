@@ -148,11 +148,13 @@ func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
 	if config.IDPConfigOIDCView != nil {
 		return &idp_pb.IDP_OidcConfig{
 			OidcConfig: &idp_pb.OIDCConfig{
-				ClientId:           config.OIDCClientID,
-				Issuer:             config.OIDCIssuer,
-				Scopes:             config.OIDCScopes,
-				DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-				UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+				ClientId:              config.OIDCClientID,
+				Issuer:                config.OIDCIssuer,
+				Scopes:                config.OIDCScopes,
+				DisplayNameMapping:    ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+				UsernameMapping:       ModelMappingFieldToPb(config.OIDCUsernameMapping),
+				AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
+				TokenEndpoint:         config.OAuthTokenEndpoint,
 			},
 		}
 	}
@@ -174,11 +176,13 @@ func IDPConfigToConfigPb(config domain.IDPConfig) idp_pb.IDPConfig {
 	case *domain.OIDCIDPConfig:
 		return &idp_pb.IDP_OidcConfig{
 			OidcConfig: &idp_pb.OIDCConfig{
-				ClientId:           c.ClientID,
-				Issuer:             c.Issuer,
-				Scopes:             c.Scopes,
-				DisplayNameMapping: MappingFieldToPb(c.IDPDisplayNameMapping),
-				UsernameMapping:    MappingFieldToPb(c.UsernameMapping),
+				ClientId:              c.ClientID,
+				Issuer:                c.Issuer,
+				AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
+				TokenEndpoint:         config.OAuthTokenEndpoint,
+				Scopes:                c.Scopes,
+				DisplayNameMapping:    MappingFieldToPb(c.IDPDisplayNameMapping),
+				UsernameMapping:       MappingFieldToPb(c.UsernameMapping),
 			},
 		}
 	case *domain.AuthConnectorIDPConfig:
@@ -192,18 +196,6 @@ func IDPConfigToConfigPb(config domain.IDPConfig) idp_pb.IDPConfig {
 		}
 	}
 	return nil
-}
-
-func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.ClientID,
-			Issuer:             config.Issuer,
-			Scopes:             config.Scopes,
-			DisplayNameMapping: MappingFieldToPb(config.IDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.UsernameMapping),
-		},
-	}
 }
 
 func FieldNameToModel(fieldName idp_pb.IDPFieldName) iam_model.IDPConfigSearchKey {

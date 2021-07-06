@@ -105,6 +105,8 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 									"clientid1",
 									"config1",
 									"issuer",
+									"authorization-endpoint",
+									"token-endpoint",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
@@ -133,6 +135,8 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 					},
 					ClientID:              "clientid1",
 					Issuer:                "issuer",
+					AuthorizationEndpoint: "authorization-endpoint",
+					TokenEndpoint:         "token-endpoint",
 					ClientSecretString:    "secret",
 					Scopes:                []string{"scope"},
 					IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
@@ -260,6 +264,8 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 								"clientid1",
 								"config1",
 								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",

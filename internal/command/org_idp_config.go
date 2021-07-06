@@ -73,6 +73,8 @@ func (c *Commands) addOIDCIDPConfig(config *domain.OIDCIDPConfig) configEventCre
 			config.ClientID,
 			idpConfigID,
 			config.Issuer,
+			config.AuthorizationEndpoint,
+			config.TokenEndpoint,
 			clientSecret,
 			config.IDPDisplayNameMapping,
 			config.UsernameMapping,

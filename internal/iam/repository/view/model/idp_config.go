@@ -4,19 +4,17 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
-	org_repo "github.com/caos/zitadel/internal/repository/org"
-
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
+	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	org_repo "github.com/caos/zitadel/internal/repository/org"
 )
 
 const (
@@ -42,12 +40,14 @@ type IDPConfigView struct {
 }
 
 type IDPConfigOIDCView struct {
-	OIDCClientID              string              `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCClientSecret          *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
-	OIDCIssuer                string              `json:"issuer" gorm:"column:oidc_issuer"`
-	OIDCScopes                pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
-	OIDCIDPDisplayNameMapping int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
-	OIDCUsernameMapping       int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
+	OIDCClientID               string              `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCClientSecret           *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
+	OIDCIssuer                 string              `json:"issuer" gorm:"column:oidc_issuer"`
+	OIDCScopes                 pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
+	OIDCIDPDisplayNameMapping  int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
+	OIDCUsernameMapping        int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
+	OAuthAuthorizationEndpoint string              `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
+	OAuthTokenEndpoint         string              `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
 }
 
 func (v *IDPConfigOIDCView) IsZero() bool {
@@ -79,12 +79,14 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	}
 	if !idp.IDPConfigOIDCView.IsZero() {
 		idpView.IDPConfigOIDCView = &model.IDPConfigOIDCView{
-			OIDCClientID:              idp.OIDCClientID,
-			OIDCClientSecret:          idp.OIDCClientSecret,
-			OIDCIssuer:                idp.OIDCIssuer,
-			OIDCScopes:                idp.OIDCScopes,
-			OIDCIDPDisplayNameMapping: model.OIDCMappingField(idp.OIDCIDPDisplayNameMapping),
-			OIDCUsernameMapping:       model.OIDCMappingField(idp.OIDCUsernameMapping),
+			OIDCClientID:               idp.OIDCClientID,
+			OIDCClientSecret:           idp.OIDCClientSecret,
+			OIDCIssuer:                 idp.OIDCIssuer,
+			OIDCScopes:                 idp.OIDCScopes,
+			OIDCIDPDisplayNameMapping:  model.OIDCMappingField(idp.OIDCIDPDisplayNameMapping),
+			OIDCUsernameMapping:        model.OIDCMappingField(idp.OIDCUsernameMapping),
+			OAuthAuthorizationEndpoint: idp.OAuthAuthorizationEndpoint,
+			OAuthTokenEndpoint:         idp.OAuthTokenEndpoint,
 		}
 	}
 	if !idp.IDPConfigAuthConnectorView.IsZero() {

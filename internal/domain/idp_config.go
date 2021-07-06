@@ -63,13 +63,15 @@ type IDPConfigView struct {
 	Sequence        uint64
 	IDPProviderType IdentityProviderType
 
-	IsOIDC                    bool
-	OIDCClientID              string
-	OIDCClientSecret          *crypto.CryptoValue
-	OIDCIssuer                string
-	OIDCScopes                []string
-	OIDCIDPDisplayNameMapping OIDCMappingField
-	OIDCUsernameMapping       OIDCMappingField
+	IsOIDC                     bool
+	OIDCClientID               string
+	OIDCClientSecret           *crypto.CryptoValue
+	OIDCIssuer                 string
+	OIDCScopes                 []string
+	OIDCIDPDisplayNameMapping  OIDCMappingField
+	OIDCUsernameMapping        OIDCMappingField
+	OAuthAuthorizationEndpoint string
+	OAuthTokenEndpoint         string
 }
 
 type OIDCIDPConfig struct {
@@ -80,6 +82,8 @@ type OIDCIDPConfig struct {
 	ClientSecret          *crypto.CryptoValue
 	ClientSecretString    string
 	Issuer                string
+	AuthorizationEndpoint string
+	TokenEndpoint         string
 	Scopes                []string
 	IDPDisplayNameMapping OIDCMappingField
 	UsernameMapping       OIDCMappingField

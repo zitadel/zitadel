@@ -155,6 +155,22 @@ message OIDCConfig {
             description: "definition which field is mapped to the email of the user";
         }
     ];
+    string authorization_endpoint = 6 [
+        (validate.rules).string = {max_len: 500},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
+            description: "the oauth2 authorization endpoint of the identity provider";
+            max_length: 500;
+        }
+    ];
+    string token_endpoint = 7 [
+        (validate.rules).string = {max_len: 500},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://oauth2.googleapis.com/token\"";
+            description: "the oauth2 token endpoint of the identity provider";
+            max_length: 500;
+        }
+    ];
 }
 
 enum OIDCMappingField {

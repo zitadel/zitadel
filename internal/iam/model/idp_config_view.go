@@ -24,12 +24,14 @@ type IDPConfigView struct {
 }
 
 type IDPConfigOIDCView struct {
-	OIDCClientID              string
-	OIDCClientSecret          *crypto.CryptoValue
-	OIDCIssuer                string
-	OIDCScopes                []string
-	OIDCIDPDisplayNameMapping OIDCMappingField
-	OIDCUsernameMapping       OIDCMappingField
+	OIDCClientID               string
+	OIDCClientSecret           *crypto.CryptoValue
+	OIDCIssuer                 string
+	OIDCScopes                 []string
+	OIDCIDPDisplayNameMapping  OIDCMappingField
+	OIDCUsernameMapping        OIDCMappingField
+	OAuthAuthorizationEndpoint string
+	OAuthTokenEndpoint         string
 }
 
 type IDPConfigAuthConnectorView struct {

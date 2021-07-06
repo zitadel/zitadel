@@ -2363,12 +2363,13 @@ message AddOIDCIDPRequest {
             max_length: 200;
         }
     ];
+    // Fill the issuer if the identity provider is oidc discovery compliant
+    // If the identity provider is only oauth2 compliant or does not serve a openid configuration, fill the authorization and token endpoint instead
     string issuer = 5 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the oidc issuer of the identity provider";
-            min_length: 1;
             max_length: 200;
         }
     ];
@@ -2388,6 +2389,24 @@ message AddOIDCIDPRequest {
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "definition which field is mapped to the email of the user";
+        }
+    ];
+    // If the identity provider does not serve an openid configuration, fill the authorization and token endpoint instead of the issuer
+    string authorization_endpoint = 9 [
+        (validate.rules).string = {max_len: 500},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
+            description: "the oauth2 authorization endpoint of the identity provider";
+            max_length: 500;
+        }
+    ];
+    // If the identity provider does not serve an openid configuration, fill the authorization and token endpoint instead of the issuer
+    string token_endpoint = 10 [
+        (validate.rules).string = {max_len: 500},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://oauth2.googleapis.com/token\"";
+            description: "the oauth2 token  endpoint of the identity provider";
+            max_length: 500;
         }
     ];
 }
@@ -2546,6 +2565,8 @@ message UpdateIDPOIDCConfigRequest {
             max_length: 200;
         }
     ];
+    // Fill the issuer if the identity provider is oidc discovery compliant
+    // If the identity provider is only oauth2 compliant or does not serve a openid configuration, fill the authorization and token endpoint instead
     string issuer = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2586,6 +2607,24 @@ message UpdateIDPOIDCConfigRequest {
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "definition which field is mapped to the email of the user";
+        }
+    ];
+    // If the identity provider does not serve an openid configuration, fill the authorization and token endpoint instead of the issuer
+    string authorization_endpoint = 8 [
+        (validate.rules).string = {max_len: 500},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
+            description: "the oauth2 authorization endpoint of the identity provider";
+            max_length: 500;
+        }
+    ];
+    // If the identity provider does not serve an openid configuration, fill the authorization and token endpoint instead of the issuer
+    string token_endpoint = 9 [
+        (validate.rules).string = {max_len: 500},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://oauth2.googleapis.com/token\"";
+            description: "the oauth2 token endpoint of the identity provider";
+            max_length: 500;
         }
     ];
 }

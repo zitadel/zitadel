@@ -71,6 +71,8 @@ func (c *Commands) addDefaultOIDCIDPConfig(config *domain.OIDCIDPConfig) configE
 			config.ClientID,
 			idpConfigID,
 			config.Issuer,
+			config.AuthorizationEndpoint,
+			config.TokenEndpoint,
 			clientSecret,
 			config.IDPDisplayNameMapping,
 			config.UsernameMapping,
