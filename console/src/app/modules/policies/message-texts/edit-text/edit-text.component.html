@@ -1,11 +1,13 @@
-<div class="flex">
-  <cnsl-form-field class="formfield">
-    <cnsl-label>{{ label | translate }}</cnsl-label>
-    <textarea cnslInput [name]="label" [(ngModel)]="value"></textarea>
-  </cnsl-form-field>
-  <div class="actions">
-    <button mat-icon-button><i class="las la-history"></i></button>
-    <button mat-icon-button><i class="las la-undo"></i></button>
-    <button mat-icon-button><i class="las la-check"></i></button>
+<div>
+  <div *ngFor="let key of (currentMap | keyvalue)" class="flex">
+    <cnsl-form-field class="formfield">
+      <cnsl-label>{{key.key}}</cnsl-label>
+      <textarea class="text" cnslInput [name]="label" [(ngModel)]="currentMap[key.key]"></textarea>
+    </cnsl-form-field>
+    <div class="actions" *ngIf="(default$ | async) as defaultmap">
+      <button mat-icon-button [disabled]="defaultmap[key.key] == currentMap[key.key]"><i class="las la-history"></i></button>
+      <button mat-icon-button  [disabled]="key.value == currentMap[key.key]"><i class="las la-undo"></i></button>
+      <button mat-icon-button><i class="las la-check"></i></button>
+    </div>
   </div>
 </div>

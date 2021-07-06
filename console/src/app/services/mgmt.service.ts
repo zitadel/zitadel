@@ -355,7 +355,9 @@ export class ManagementService {
   constructor(private readonly grpcService: GrpcService) { }
 
   public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
-    return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => {
+      return resp.toObject();
+    });
   }
 
   public getCustomInitMessageText(req: GetCustomInitMessageTextRequest): Promise<GetCustomInitMessageTextResponse.AsObject> {

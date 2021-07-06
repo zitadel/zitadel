@@ -1,3 +1,4 @@
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -38,6 +39,7 @@ import { MessageTextsComponent } from './message-texts.component';
     DetailLayoutModule,
     MatProgressSpinnerModule,
     LinksModule,
+    TextFieldModule
   ],
 })
 export class MessageTextsPolicyModule { }

@@ -3,8 +3,7 @@
     [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
     <div class="content" >
-      <cnsl-edit-text label="one" [current$]=""></cnsl-edit-text>
-      <cnsl-edit-text label="one"></cnsl-edit-text>
+      <cnsl-edit-text *ngIf="getCustomInitMessageTextMap$ && getDefaultInitMessageTextMap$" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$"></cnsl-edit-text>
     </div>
 
     <div class="divider"></div>

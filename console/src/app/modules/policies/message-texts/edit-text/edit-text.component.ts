@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -9,21 +9,18 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = 'hello';
-  @Input() current$: Observable<string> = of('');
-  @Input() default$: Observable<string> = of('');
+  @Input() current$!: Observable<{ [key: string]: string; }>;
+  @Input() default$!: Observable<{ [key: string]: string; }>;
 
-  public value: string = '';
-  public default: string = '';
+  public currentMap: { [key: string]: string; } = {};
   private destroy$: Subject<void> = new Subject();
 
   constructor() { }
 
   public ngOnInit(): void {
     this.current$.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      this.value = value;
-    });
-    this.default$.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      this.default = value;
+      console.log('current', value);
+      this.currentMap = value;
     });
   }
 

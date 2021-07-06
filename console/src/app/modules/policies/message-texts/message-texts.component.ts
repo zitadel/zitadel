@@ -1,9 +1,10 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, of, Subscription } from 'rxjs';
+import { from, Observable, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GetDefaultInitMessageTextRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { GetCustomInitMessageTextRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -51,17 +52,14 @@ export class MessageTextsComponent implements OnDestroy {
             ORG_PRIVATELABEL_LINK,
           ];
 
-          const req = new GetDefaultInitMessageTextRequest().setLanguage(this.translate.currentLang);
-          // Object.keys((new GetDefaultInitMessageTextResponse()).toObject().customText).keys(key => {})
-          this.getDefaultInitMessageTextMap$ = of(
-            this.service.getDefaultInitMessageText(req).then(res => {
-              if (res.customText) {
-                delete res.customText.details;
-                return Object.assign({}, res.customText as unknown as { [key: string]: string; });
-              } else {
-                return {};
-              }
-            })
+          const reqDefaultInit = new GetDefaultInitMessageTextRequest().setLanguage(this.translate.currentLang);
+          this.getDefaultInitMessageTextMap$ = from(
+            this.stripDetails(this.service.getDefaultInitMessageText(reqDefaultInit))
+          );
+
+          const reqCustomInit = new GetCustomInitMessageTextRequest().setLanguage(this.translate.currentLang);
+          this.getCustomInitMessageTextMap$ = from(
+            this.stripDetails(this.service.getCustomInitMessageText(reqCustomInit))
           );
           // this.defaultInitMsg = of(req);
           break;
@@ -81,6 +79,17 @@ export class MessageTextsComponent implements OnDestroy {
     });
   }
 
+  private stripDetails(prom: Promise<any>): Promise<any> {
+    return prom.then(res => {
+      if (res.customText) {
+        delete res.customText.details;
+        console.log(res.customText);
+        return Object.assign({}, res.customText as unknown as { [key: string]: string; });
+      } else {
+        return {};
+      }
+    });
+  }
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
   }

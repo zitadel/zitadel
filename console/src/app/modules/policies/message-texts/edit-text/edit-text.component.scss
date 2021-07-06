@@ -1,0 +1,17 @@
+.flex {
+  display: flex;
+
+  .formfield {
+    flex: 1;
+
+    .text {
+      min-height: 80px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    align-self: flex-end;
+    margin-bottom: 16px;
+  }
+}
