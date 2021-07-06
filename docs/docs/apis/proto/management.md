@@ -3007,10 +3007,12 @@ This is an empty request
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | Fill the issuer if you the provider is oidc compliant If the identity provider is only oauth compliant fill the authorization and token endpoint instead | string.max_len: 200<br />  |
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| authorization_endpoint |  string | If the identity provider only provides oauth configuration fill the authorize and token endpoint istead of the issuer | string.max_len: 500<br />  |
+| token_endpoint |  string | If the identity provider only provides oauth configuration fill the authorize and token endpoint istead of the issuer | string.max_len: 500<br />  |
 
 
 
@@ -6901,10 +6903,12 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_secret |  string | - | string.max_len: 200<br />  |
-| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | Fill the issuer if you the provider is oidc compliant If the identity provider is only oauth compliant fill the authorization and token endpoint instead | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| authorization_endpoint |  string | If the identity provider only provides oauth configuration fill the authorize and token endpoint istead of the issuer | string.max_len: 500<br />  |
+| token_endpoint |  string | If the identity provider only provides oauth configuration fill the authorize and token endpoint istead of the issuer | string.max_len: 500<br />  |
 
 
 

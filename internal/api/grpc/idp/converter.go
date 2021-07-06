@@ -133,11 +133,13 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+			ClientId:              config.OIDCClientID,
+			Issuer:                config.OIDCIssuer,
+			Scopes:                config.OIDCScopes,
+			DisplayNameMapping:    ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+			UsernameMapping:       ModelMappingFieldToPb(config.OIDCUsernameMapping),
+			AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
+			TokenEndpoint:         config.OAuthTokenEndpoint,
 		},
 	}
 }
@@ -145,23 +147,13 @@ func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcCon
 func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
-		},
-	}
-}
-
-func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.ClientID,
-			Issuer:             config.Issuer,
-			Scopes:             config.Scopes,
-			DisplayNameMapping: MappingFieldToPb(config.IDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.UsernameMapping),
+			ClientId:              config.OIDCClientID,
+			Issuer:                config.OIDCIssuer,
+			AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
+			TokenEndpoint:         config.OAuthTokenEndpoint,
+			Scopes:                config.OIDCScopes,
+			DisplayNameMapping:    MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+			UsernameMapping:       MappingFieldToPb(config.OIDCUsernameMapping),
 		},
 	}
 }

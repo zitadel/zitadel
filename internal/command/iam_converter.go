@@ -145,6 +145,8 @@ func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *domain.OIDCIDPConfig {
 		IDPConfigID:           wm.IDPConfigID,
 		IDPDisplayNameMapping: wm.IDPDisplayNameMapping,
 		Issuer:                wm.Issuer,
+		AuthorizationEndpoint: wm.AuthorizationEndpoint,
+		TokenEndpoint:         wm.TokenEndpoint,
 		Scopes:                wm.Scopes,
 		UsernameMapping:       wm.UserNameMapping,
 	}
