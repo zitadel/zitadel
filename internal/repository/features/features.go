@@ -36,6 +36,7 @@ type FeaturesSetEvent struct {
 	LabelPolicyWatermark     *bool                 `json:"labelPolicyWatermark,omitempty"`
 	CustomDomain             *bool                 `json:"customDomain,omitempty"`
 	CustomText               *bool                 `json:"customText,omitempty"`
+	PrivacyPolicy            *bool                 `json:"privacyPolicy,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -159,6 +160,13 @@ func ChangeCustomText(customText bool) func(event *FeaturesSetEvent) {
 		e.CustomText = &customText
 	}
 }
+
+func ChangePrivacyPolicy(privacyPolicy bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.PrivacyPolicy = &privacyPolicy
+	}
+}
+
 func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

@@ -115,3 +115,11 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*i
 	}
 	return iam_view_model.LabelPolicyViewToModel(orgPolicy), nil
 }
+
+func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.PrivacyViewToModel(policy), nil
+}

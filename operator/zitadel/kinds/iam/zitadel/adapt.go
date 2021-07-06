@@ -35,6 +35,7 @@ func AdaptFunc(
 	action string,
 	version *string,
 	features []string,
+	customImageRegistry string,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -113,6 +114,7 @@ func AdaptFunc(
 			certPath,
 			secretName,
 			secretPath,
+			version,
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
@@ -141,6 +143,7 @@ func AdaptFunc(
 			usersWithoutPWs,
 			nodeselector,
 			tolerations,
+			customImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -162,6 +165,7 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
+			customImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -189,6 +193,7 @@ func AdaptFunc(
 			migration.GetDoneFunc(monitor, namespace, action),
 			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			setup.GetDoneFunc(monitor, namespace, action),
+			customImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err

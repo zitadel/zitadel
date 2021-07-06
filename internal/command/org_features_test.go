@@ -239,6 +239,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -267,6 +277,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					CustomText:               false,
+					PrivacyPolicy:            false,
 				},
 			},
 			res: res{
@@ -396,6 +407,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								domain.MessageSubject,
 								"text",
 								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
 							),
 						),
 					),
@@ -569,6 +590,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								domain.MessageSubject,
 								"text",
 								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
 							),
 						),
 					),
@@ -752,6 +783,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								domain.MessageSubject,
 								"text",
 								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
 							),
 						),
 					),
@@ -993,6 +1034,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1015,6 +1066,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.InitCodeMessageType, language.English),
+							),
+							eventFromEventPusher(
+								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -1218,6 +1272,16 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								domain.MessageSubject,
 								"text",
 								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
 							),
 						),
 					),

@@ -2,9 +2,15 @@
   <span class="label">{{label}}</span>
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}" [style.background]="theme == Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper" [style.color]="theme == Theme.DARK ? policy.fontColorDark : policy.fontColor">
-      <img *ngIf="images['previewLogo'] && theme == Theme.LIGHT" [src]="images['previewLogo']" alt="logo-mock" />
+      <ng-container *ngIf="preview === Preview.PREVIEW; else currentimgs">
+        <img *ngIf="images['previewLogo'] && theme == Theme.LIGHT" [src]="images['previewLogo']" alt="logo-mock" />
+        <img *ngIf="images['previewDarkLogo'] && theme == Theme.DARK"  [src]="images['previewDarkLogo']" alt="logo-mock" />
+      </ng-container>
 
-      <img *ngIf="images['previewDarkLogo'] && theme == Theme.DARK"  [src]="images['previewDarkLogo']" alt="logo-mock" />
+      <ng-template #currentimgs>
+        <img *ngIf="images['logo'] && theme == Theme.LIGHT" [src]="images['logo']" alt="logo-mock" />
+        <img *ngIf="images['darkLogo'] && theme == Theme.DARK"  [src]="images['darkLogo']" alt="logo-mock" />
+      </ng-template>
 
       <h1 [style.color]="theme == Theme.DARK ? policy.fontColorDark : policy.fontColor">{{'POLICY.PRIVATELABELING.PREVIEW.TITLE' | translate}}</h1>
       <p [style.color]="theme == Theme.DARK ? policy.fontColorDark : policy.fontColor" class="desc-text">{{'POLICY.PRIVATELABELING.PREVIEW.SECOND' | translate}}</p>

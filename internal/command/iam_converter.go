@@ -120,6 +120,14 @@ func writeModelToPasswordLockoutPolicy(wm *PasswordLockoutPolicyWriteModel) *dom
 	}
 }
 
+func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		TOSLink:     wm.TOSLink,
+		PrivacyLink: wm.PrivacyLink,
+	}
+}
+
 func writeModelToIDPConfig(wm *IDPConfigWriteModel) domain.IDPConfig {
 	return &domain.CommonIDPConfig{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),

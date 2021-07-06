@@ -18,7 +18,7 @@ const (
 	MessageGreeting          = "Greeting"
 	MessageText              = "Text"
 	MessageButtonText        = "ButtonText"
-	MessageFooterText        = "FooterText"
+	MessageFooterText        = "Footer"
 )
 
 type CustomMessageText struct {

@@ -72,7 +72,8 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	labelPolicyPrivateLabel,
 	labelPolicyWatermark,
 	customDomain,
-	customText bool,
+	customText,
+	privacyPolicy bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -80,7 +81,7 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if tierName != "" && wm.TierName != tierName {
 		changes = append(changes, features.ChangeTierName(tierName))
 	}
-	if tierDescription != "" && wm.TierDescription != tierDescription {
+	if wm.TierDescription != tierDescription {
 		changes = append(changes, features.ChangeTierDescription(tierDescription))
 	}
 	if wm.State != state {
@@ -124,6 +125,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.CustomText != customText {
 		changes = append(changes, features.ChangeCustomText(customText))
+	}
+	if wm.PrivacyPolicy != privacyPolicy {
+		changes = append(changes, features.ChangePrivacyPolicy(privacyPolicy))
 	}
 
 	if len(changes) == 0 {

@@ -355,6 +355,9 @@ Errors:
     AlreadyExists: Custom text already exists
     Invalid: Custom text invalid
     NotFound: Custom text not found
+  TranslationFile:
+    ReadError: Error in reading translation file
+    MergeError: Translation file could not be merged with custom translations
 EventTypes:
   user:
     added: User added

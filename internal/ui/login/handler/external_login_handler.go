@@ -223,7 +223,8 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	data := externalNotFoundOptionData{
 		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errID, errMessage),
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
 }
 
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {

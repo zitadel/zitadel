@@ -35,7 +35,7 @@
         <p class="error" *ngIf="(stripeCustomer || stripeCustomer == null) && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
         <div class="current-tier">
-            <a [disabled]="!org.id || !customerValid" mat-raised-button [href]="stripeURL" target="_blank"
+            <a [disabled]="!org.id || !customerValid || !stripeURL" mat-raised-button [href]="stripeURL" target="_blank"
                 alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</a>
         </div>
     </ng-container>
@@ -152,8 +152,8 @@
         </div>
     </div>
 
-    <div class="btn-container">
-        <button (click)="savePolicy()" [disabled]="(['iam.features.write'] | hasRole | async) == false" color="primary"
+    <div class="btn-container" *ngIf="(['iam.features.write'] | hasRole | async) == true">
+        <button (click)="savePolicy()" color="primary"
             type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
             }}</button>
     </div>

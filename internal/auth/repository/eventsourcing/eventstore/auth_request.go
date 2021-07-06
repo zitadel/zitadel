@@ -157,7 +157,7 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string)
 	if err != nil {
 		return nil, err
 	}
-	err = repo.fillLoginPolicy(ctx, request)
+	err = repo.fillPolicies(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +399,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	if request.AgentID != userAgentID {
 		return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
 	}
-	err = repo.fillLoginPolicy(ctx, request)
+	err = repo.fillPolicies(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -423,7 +423,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	return policy.ToLoginPolicyDomain(), providers, nil
 }
 
-func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *domain.AuthRequest) error {
+func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
 	orgID := request.RequestedOrgID
 	if orgID == "" {
 		orgID = request.UserOrgID
@@ -440,11 +440,26 @@ func (repo *AuthRequestRepo) fillLoginPolicy(ctx context.Context, request *domai
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
+	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.PrivacyPolicy = privacyPolicy
 	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
 	if err != nil {
 		return err
 	}
 	request.LabelPolicy = labelPolicy
+	defaultLoginTranslations, err := repo.getLoginTexts(ctx, domain.IAMID)
+	if err != nil {
+		return err
+	}
+	request.DefaultTranslations = defaultLoginTranslations
+	orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.OrgTranslations = orgLoginTranslations
 	return nil
 }
 
@@ -719,6 +734,21 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	return iam_es_model.LoginPolicyViewToModel(policy), err
 }
 
+func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
+	policy, err := repo.View.PrivacyPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.PrivacyPolicyByAggregateID(repo.IAMID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return policy.ToDomain(), err
+}
+
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
 	policy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
@@ -732,6 +762,14 @@ func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (
 		return nil, err
 	}
 	return policy.ToDomain(), err
+}
+
+func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
+	loginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(aggregateID, domain.LoginCustomText)
+	if err != nil {
+		return nil, err
+	}
+	return iam_view_model.CustomTextViewsToDomain(loginTexts), err
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {

@@ -666,6 +666,8 @@
       "ADVANCEDBEHAVIOR":"Erweitertes Verhalten",
       "DROP":"Bild hier ablegen",
       "RELEASE":"Jetzt loslassen",
+      "DROPFONT":"Fontdatei hier ablegen",
+      "RELEASEFONT":"Jetzt loslassen",
       "PREVIEW": {
         "TITLE":"Anmeldung",
         "SECOND":"mit ZITADEL-Konto anmelden.",
