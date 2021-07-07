@@ -108,6 +108,8 @@
   "ACTIONS": {
     "SET":"Übernehmen",
     "RESETDEFAULT":"Auf Standard zurücksetzen",
+    "RESETTO":"Zurücksetzen auf: ",
+    "RESETCURRENT":"Auf aktuellen Wert zurücksetzen",
     "SHOW":"Aufklappen",
     "HIDE":"Zuklappen",
     "SAVE": "Speichern",

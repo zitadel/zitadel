@@ -108,6 +108,8 @@
   "ACTIONS": {
     "SET":"Set",
     "RESETDEFAULT":"Reset to Default",
+    "RESETTO":"Reset to: ",
+    "RESETCURRENT":"Reset to current",
     "SHOW":"Show",
     "HIDE":"Hide",
     "SAVE": "Save",

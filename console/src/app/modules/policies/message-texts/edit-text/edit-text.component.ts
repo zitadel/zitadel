@@ -16,6 +16,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
   public currentMap: { [key: string]: string; } = {};
   private destroy$: Subject<void> = new Subject();
   public form!: FormGroup;
+  public warnText: { [key: string]: string | undefined; } = {};
   constructor() { }
 
   public ngOnInit(): void {
@@ -36,5 +37,9 @@ export class EditTextComponent implements OnInit, OnDestroy {
     console.log('destroy');
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public setWarnText(key: string, text: string | undefined): void {
+    this.warnText[key] = text;
   }
 }
