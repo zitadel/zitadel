@@ -73,7 +73,7 @@ func (p *Project) appendChangeAPIConfigEvent(event *es_models.Event) error {
 	}
 
 	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
-		if p.Applications[i].OIDCConfig == nil {
+		if p.Applications[i].APIConfig == nil {
 			return errors.ThrowInvalidArgument(nil, "MODEL-ADbsd", "api config is nil")
 		}
 		return p.Applications[i].APIConfig.setData(event)
