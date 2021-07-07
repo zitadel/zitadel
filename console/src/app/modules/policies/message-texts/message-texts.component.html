@@ -3,7 +3,7 @@
     [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
     <div class="message-type">
-      <button (click)="setCurrentType(type.key)" [ngClass]="{'active': currentType == type.key}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
+      <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType == type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
     </div>
     <div class="content" >
       <cnsl-edit-text label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(

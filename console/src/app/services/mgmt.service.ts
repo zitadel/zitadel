@@ -281,6 +281,14 @@ import {
   ResetPasswordLockoutPolicyToDefaultRequest,
   ResetPasswordLockoutPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
+  SetCustomInitMessageTextRequest,
+  SetCustomInitMessageTextResponse,
+  SetCustomPasswordResetMessageTextRequest,
+  SetCustomPasswordResetMessageTextResponse,
+  SetCustomVerifyEmailMessageTextRequest,
+  SetCustomVerifyEmailMessageTextResponse,
+  SetCustomVerifyPhoneMessageTextRequest,
+  SetCustomVerifyPhoneMessageTextResponse,
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
@@ -355,15 +363,17 @@ export class ManagementService {
   constructor(private readonly grpcService: GrpcService) { }
 
   public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
-    return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => {
-      console.log(resp.toObject());
-      return resp.toObject();
-    });
+    return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
   }
 
   public getCustomInitMessageText(req: GetCustomInitMessageTextRequest): Promise<GetCustomInitMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomInitMessageText(req, null).then(resp => resp.toObject());
   }
+
+  public setCustomInitMessageText(req: SetCustomInitMessageTextRequest): Promise<SetCustomInitMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
 
   public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest): Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
@@ -373,6 +383,11 @@ export class ManagementService {
     return this.grpcService.mgmt.getCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
   }
 
+  public setCustomVerifyEmailMessageText(req: SetCustomVerifyEmailMessageTextRequest): Promise<SetCustomVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
   public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest): Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
@@ -381,12 +396,21 @@ export class ManagementService {
     return this.grpcService.mgmt.getCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
+  public setCustomVerifyPhoneMessageText(req: SetCustomVerifyPhoneMessageTextRequest): Promise<SetCustomVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
   public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
   public getCustomPasswordResetMessageText(req: GetCustomPasswordResetMessageTextRequest): Promise<GetCustomPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomPasswordResetMessageText(req: SetCustomPasswordResetMessageTextRequest): Promise<SetCustomPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
   public listOrgIDPs(

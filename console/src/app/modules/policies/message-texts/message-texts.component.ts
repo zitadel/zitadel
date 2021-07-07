@@ -12,7 +12,6 @@ import {
   SetDefaultVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetCustomInitMessageTextRequest,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyPhoneMessageTextRequest,
   GetDefaultInitMessageTextRequest,
@@ -48,7 +47,7 @@ const REQUESTMAP = {
     [MESSAGETYPES.INIT]: {
       get: new GetDefaultInitMessageTextRequest(),
       set: new SetCustomInitMessageTextRequest(),
-      getDefault: new GetCustomInitMessageTextRequest(),
+      getDefault: new GetDefaultInitMessageTextRequest(),
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomInitMessageTextRequest => {
         const req = new SetCustomInitMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
@@ -185,15 +184,7 @@ export class MessageTextsComponent implements OnDestroy {
             ORG_PRIVATELABEL_LINK,
           ];
 
-          const reqDefaultInit = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].getDefault.setLanguage(this.translate.currentLang);
-          this.getDefaultInitMessageTextMap$ = from(
-            this.stripDetails(this.service.getDefaultInitMessageText(reqDefaultInit))
-          );
-
-          const reqCustomInit = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].get.setLanguage(this.translate.currentLang);
-          this.getCustomInitMessageTextMap$ = from(
-            this.stripDetails(this.service.getCustomInitMessageText(reqCustomInit))
-          );
+          this.loadData(this.currentType);
 
           // this.defaultInitMsg = of(req);
           break;
@@ -213,6 +204,46 @@ export class MessageTextsComponent implements OnDestroy {
     });
   }
 
+  public getDefaultValues(type: MESSAGETYPES, req: any): Promise<any> {
+    switch (type) {
+      case MESSAGETYPES.INIT:
+        return this.stripDetails((this.service).getDefaultInitMessageText(req));
+      case MESSAGETYPES.VERIFYPHONE:
+        return this.stripDetails((this.service).getDefaultVerifyPhoneMessageText(req));
+      case MESSAGETYPES.VERIFYEMAIL:
+        return this.stripDetails((this.service).getDefaultVerifyEmailMessageText(req));
+    }
+  }
+
+  public getCurrentValues(type: MESSAGETYPES, req: any): Promise<any> {
+    switch (type) {
+      case MESSAGETYPES.INIT:
+        return this.stripDetails((this.service as ManagementService).getCustomInitMessageText(req));
+      case MESSAGETYPES.VERIFYPHONE:
+        return this.stripDetails((this.service as ManagementService).getCustomVerifyPhoneMessageText(req));
+      case MESSAGETYPES.VERIFYEMAIL:
+        return this.stripDetails((this.service as ManagementService).getCustomVerifyEmailMessageText(req));
+    }
+  }
+
+  public loadData(type: MESSAGETYPES) {
+
+    console.log(this.serviceType, type);
+    if (this.serviceType == PolicyComponentServiceType.MGMT) {
+      const reqDefaultInit = REQUESTMAP[this.serviceType][type].getDefault;
+
+      reqDefaultInit.setLanguage(this.translate.currentLang);
+      this.getDefaultInitMessageTextMap$ = from(
+        this.getDefaultValues(type, reqDefaultInit)
+      );
+    }
+
+    const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.translate.currentLang);
+    this.getCustomInitMessageTextMap$ = from(
+      this.getCurrentValues(type, reqCustomInit)
+    );
+  }
+
   public updateCurrentValues(values: { [key: string]: string; }): void {
     const req = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].setFcn;
     const mappedValues = req(values);
@@ -228,7 +259,6 @@ export class MessageTextsComponent implements OnDestroy {
     return prom.then(res => {
       if (res.customText) {
         delete res.customText.details;
-        console.log(res.customText);
         return Object.assign({}, res.customText as unknown as { [key: string]: string; });
       } else {
         return {};
@@ -240,7 +270,7 @@ export class MessageTextsComponent implements OnDestroy {
   }
 
   public setCurrentType(key: MESSAGETYPES): void {
-    console.log(key);
     this.currentType = key;
+    this.loadData(this.currentType);
   }
 }

@@ -23,6 +23,14 @@ import {
   GetCustomOrgIAMPolicyResponse,
   GetDefaultFeaturesRequest,
   GetDefaultFeaturesResponse,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultInitMessageTextResponse,
+  GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultPasswordResetMessageTextResponse,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextResponse,
+  GetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextResponse,
   GetIDPByIDRequest,
   GetIDPByIDResponse,
   GetLabelPolicyRequest,
@@ -88,6 +96,14 @@ import {
   ResetOrgFeaturesResponse,
   SetDefaultFeaturesRequest,
   SetDefaultFeaturesResponse,
+  SetDefaultInitMessageTextRequest,
+  SetDefaultInitMessageTextResponse,
+  SetDefaultPasswordResetMessageTextRequest,
+  SetDefaultPasswordResetMessageTextResponse,
+  SetDefaultVerifyEmailMessageTextRequest,
+  SetDefaultVerifyEmailMessageTextResponse,
+  SetDefaultVerifyPhoneMessageTextRequest,
+  SetDefaultVerifyPhoneMessageTextResponse,
   SetOrgFeaturesRequest,
   SetOrgFeaturesResponse,
   SetUpOrgRequest,
@@ -122,6 +138,41 @@ import { GrpcService } from './grpc.service';
 })
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) { }
+
+  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultInitMessageText(req: SetDefaultInitMessageTextRequest): Promise<SetDefaultInitMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest): Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultVerifyEmailMessageText(req: SetDefaultVerifyEmailMessageTextRequest): Promise<SetDefaultVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest): Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultVerifyPhoneMessageText(req: SetDefaultVerifyPhoneMessageTextRequest): Promise<SetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultPasswordResetMessageText(req: SetDefaultPasswordResetMessageTextRequest): Promise<SetDefaultPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
 
   public SetUpOrg(
     org: SetUpOrgRequest.Org,
