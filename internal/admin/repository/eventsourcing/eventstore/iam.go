@@ -29,10 +29,6 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
-const (
-	defaultLang = "en"
-)
-
 type IAMRepository struct {
 	Eventstore              v1.Eventstore
 	SearchLimit             uint64
@@ -420,7 +416,7 @@ func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	if !ok {
 		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
 		if os.IsNotExist(err) {
-			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", defaultLang))
+			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
 			return nil, err
