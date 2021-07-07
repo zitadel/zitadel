@@ -2,8 +2,10 @@ package handler
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -37,6 +39,15 @@ func NewCol(name string, value interface{}) Column {
 		Name:  name,
 		Value: value,
 	}
+}
+
+func NewJSONCol(name string, value interface{}) Column {
+	marshalled, err := json.Marshal(value)
+	if err != nil {
+		logging.LogWithFields("HANDL-oFvsl", "column", name).WithError(err).Panic("unable to marshal column")
+	}
+
+	return NewCol(name, marshalled)
 }
 
 type Column struct {

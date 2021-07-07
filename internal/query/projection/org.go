@@ -27,7 +27,7 @@ func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 func (p *OrgProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: "org",
+			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.OrgAddedEventType,

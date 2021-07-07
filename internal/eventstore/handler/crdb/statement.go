@@ -149,6 +149,14 @@ func NewNoOpStatement(aggregateType eventstore.AggregateType, sequence, previous
 	}
 }
 
+func NoOpStatementFromEvent(event eventstore.EventReader) handler.Statement {
+	return handler.Statement{
+		AggregateType:    event.Aggregate().Typ,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+	}
+}
+
 func columnsToQuery(cols []handler.Column) (names []string, parameters []string, values []interface{}) {
 	names = make([]string, len(cols))
 	values = make([]interface{}, len(cols))
