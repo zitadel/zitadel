@@ -658,7 +658,19 @@ it impacts all organisations without a customised policy
 > **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
 [GetDefaultInitMessageTextResponse](#getdefaultinitmessagetextresponse)
 
-Returns the custom text for initial message
+Returns the default text for initial message (translation file)
+
+
+
+    GET: /text/default/message/init/{language}
+
+
+### GetCustomInitMessageText
+
+> **rpc** GetCustomInitMessageText([GetCustomInitMessageTextRequest](#getcustominitmessagetextrequest))
+[GetCustomInitMessageTextResponse](#getcustominitmessagetextresponse)
+
+Returns the custom text for initial message (overwritten in eventstore)
 
 
 
@@ -685,7 +697,19 @@ The Following Variables can be used:
 > **rpc** GetDefaultPasswordResetMessageText([GetDefaultPasswordResetMessageTextRequest](#getdefaultpasswordresetmessagetextrequest))
 [GetDefaultPasswordResetMessageTextResponse](#getdefaultpasswordresetmessagetextresponse)
 
-Returns the custom text for password reset message
+Returns the default text for password reset message (translation file)
+
+
+
+    GET: /text/deafult/message/passwordreset/{language}
+
+
+### GetCustomPasswordResetMessageText
+
+> **rpc** GetCustomPasswordResetMessageText([GetCustomPasswordResetMessageTextRequest](#getcustompasswordresetmessagetextrequest))
+[GetCustomPasswordResetMessageTextResponse](#getcustompasswordresetmessagetextresponse)
+
+Returns the custom text for password reset message (overwritten in eventstore)
 
 
 
@@ -712,7 +736,19 @@ The Following Variables can be used:
 > **rpc** GetDefaultVerifyEmailMessageText([GetDefaultVerifyEmailMessageTextRequest](#getdefaultverifyemailmessagetextrequest))
 [GetDefaultVerifyEmailMessageTextResponse](#getdefaultverifyemailmessagetextresponse)
 
-Returns the custom text for verify email message
+Returns the deafult text for verify email message (translation files)
+
+
+
+    GET: /text/default/message/verifyemail/{language}
+
+
+### GetCustomVerifyEmailMessageText
+
+> **rpc** GetCustomVerifyEmailMessageText([GetCustomVerifyEmailMessageTextRequest](#getcustomverifyemailmessagetextrequest))
+[GetCustomVerifyEmailMessageTextResponse](#getcustomverifyemailmessagetextresponse)
+
+Returns the custom text for verify email message (overwritten in eventstore)
 
 
 
@@ -738,6 +774,18 @@ The Following Variables can be used:
 
 > **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
 [GetDefaultVerifyPhoneMessageTextResponse](#getdefaultverifyphonemessagetextresponse)
+
+Returns the custom text for verify phone message (translation file)
+
+
+
+    GET: /text/default/message/verifyphone/{language}
+
+
+### GetCustomVerifyPhoneMessageText
+
+> **rpc** GetCustomVerifyPhoneMessageText([GetCustomVerifyPhoneMessageTextRequest](#getcustomverifyphonemessagetextrequest))
+[GetCustomVerifyPhoneMessageTextResponse](#getcustomverifyphonemessagetextresponse)
 
 Returns the custom text for verify phone message
 
@@ -766,7 +814,19 @@ The Following Variables can be used:
 > **rpc** GetDefaultDomainClaimedMessageText([GetDefaultDomainClaimedMessageTextRequest](#getdefaultdomainclaimedmessagetextrequest))
 [GetDefaultDomainClaimedMessageTextResponse](#getdefaultdomainclaimedmessagetextresponse)
 
-Returns the custom text for domain claimed message
+Returns the default text for domain claimed message (translation file)
+
+
+
+    GET: /text/default/message/domainclaimed/{language}
+
+
+### GetCustomDomainClaimedMessageText
+
+> **rpc** GetCustomDomainClaimedMessageText([GetCustomDomainClaimedMessageTextRequest](#getcustomdomainclaimedmessagetextrequest))
+[GetCustomDomainClaimedMessageTextResponse](#getcustomdomainclaimedmessagetextresponse)
+
+Returns the custom text for domain claimed message (overwritten in eventstore)
 
 
 
@@ -1171,6 +1231,50 @@ This is an empty response
 
 
 
+### GetCustomDomainClaimedMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomDomainClaimedMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetCustomInitMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomInitMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomLoginTextsRequest
 
 
@@ -1212,6 +1316,72 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
 | is_default |  bool | - |  |
+
+
+
+
+### GetCustomPasswordResetMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetCustomVerifyEmailMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomVerifyEmailMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetCustomVerifyPhoneMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomVerifyPhoneMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
