@@ -2,24 +2,24 @@ package handler
 
 import (
 	"context"
+
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/org/repository/view"
-
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
 const (
@@ -115,7 +115,9 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		if event.AggregateID != i.systemDefaults.IamID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
-		esConfig.AppendEvent(providerType, event)
+		if err = esConfig.AppendEvent(providerType, event); err != nil {
+			return err
+		}
 		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID)
 		if err != nil {
 			return err
@@ -131,6 +133,24 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		}
 		for _, provider := range providers {
 			i.fillConfigData(provider, config)
+		}
+		return i.view.PutIDPProviders(event, providers...)
+	case model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated,
+		model.IDPConfigReactivated, org_es_model.IDPConfigReactivated:
+		esConfig := new(iam_view_model.IDPConfigView)
+		providerType := iam_model.IDPProviderTypeSystem
+		if event.AggregateID != i.systemDefaults.IamID {
+			providerType = iam_model.IDPProviderTypeOrg
+		}
+		if err := esConfig.AppendEvent(providerType, event); err != nil {
+			return err
+		}
+		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID)
+		if err != nil {
+			return err
+		}
+		for _, provider := range providers {
+			provider.IDPState = esConfig.IDPState
 		}
 		return i.view.PutIDPProviders(event, providers...)
 	case org_es_model.LoginPolicyRemoved:

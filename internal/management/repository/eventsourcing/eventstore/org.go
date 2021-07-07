@@ -293,7 +293,7 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 }
 
 func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
-	idpProviders, err := repo.View.IDPProvidersByIdpConfigID(aggregateID, idpConfigID)
+	idpProviders, err := repo.View.IDPProvidersByIDPConfigID(aggregateID, idpConfigID)
 	if err != nil {
 		return nil, err
 	}

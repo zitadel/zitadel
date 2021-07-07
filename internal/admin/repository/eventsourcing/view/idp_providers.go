@@ -17,7 +17,7 @@ func (v *View) IDPProviderByAggregateAndIdpConfigID(aggregateID, idpConfigID str
 	return view.GetIDPProviderByAggregateIDAndConfigID(v.Db, idpProviderTable, aggregateID, idpConfigID)
 }
 
-func (v *View) IDPProvidersByIdpConfigID(idpConfigID string) ([]*model.IDPProviderView, error) {
+func (v *View) IDPProvidersByIDPConfigID(idpConfigID string) ([]*model.IDPProviderView, error) {
 	return view.IDPProvidersByIdpConfigID(v.Db, idpProviderTable, idpConfigID)
 }
 

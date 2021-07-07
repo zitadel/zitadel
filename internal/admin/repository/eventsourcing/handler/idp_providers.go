@@ -114,8 +114,10 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		if event.AggregateID != i.systemDefaults.IamID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
-		esConfig.AppendEvent(providerType, event)
-		providers, err := i.view.IDPProvidersByIdpConfigID(esConfig.IDPConfigID)
+		if err = esConfig.AppendEvent(providerType, event); err != nil {
+			return err
+		}
+		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
@@ -125,6 +127,24 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		}
 		for _, provider := range providers {
 			i.fillConfigData(provider, config)
+		}
+		return i.view.PutIDPProviders(event, providers...)
+	case model.IDPConfigDeactivated,
+		model.IDPConfigReactivated:
+		esConfig := new(iam_view_model.IDPConfigView)
+		providerType := iam_model.IDPProviderTypeSystem
+		if event.AggregateID != i.systemDefaults.IamID {
+			providerType = iam_model.IDPProviderTypeOrg
+		}
+		if err := esConfig.AppendEvent(providerType, event); err != nil {
+			return err
+		}
+		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID)
+		if err != nil {
+			return err
+		}
+		for _, provider := range providers {
+			provider.IDPState = esConfig.IDPState
 		}
 		return i.view.PutIDPProviders(event, providers...)
 	default:

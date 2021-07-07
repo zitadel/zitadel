@@ -83,7 +83,7 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 }
 
 func (repo *IAMRepository) IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
-	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
+	providers, err := repo.View.IDPProvidersByIDPConfigID(idpConfigID)
 	if err != nil {
 		return nil, err
 	}

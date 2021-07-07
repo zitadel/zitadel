@@ -113,8 +113,10 @@ func (m *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		if event.AggregateID != m.systemDefaults.IamID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
-		esConfig.AppendEvent(providerType, event)
-		providers, err := m.view.IDPProvidersByIdpConfigID(event.AggregateID, esConfig.IDPConfigID)
+		if err = esConfig.AppendEvent(providerType, event); err != nil {
+			return err
+		}
+		providers, err := m.view.IDPProvidersByIDPConfigID(event.AggregateID, esConfig.IDPConfigID)
 		if err != nil {
 			return err
 		}
@@ -129,6 +131,24 @@ func (m *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		}
 		for _, provider := range providers {
 			m.fillConfigData(provider, config)
+		}
+		return m.view.PutIDPProviders(event, providers...)
+	case model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated,
+		model.IDPConfigReactivated, org_es_model.IDPConfigReactivated:
+		esConfig := new(iam_view_model.IDPConfigView)
+		providerType := iam_model.IDPProviderTypeSystem
+		if event.AggregateID != m.systemDefaults.IamID {
+			providerType = iam_model.IDPProviderTypeOrg
+		}
+		if err := esConfig.AppendEvent(providerType, event); err != nil {
+			return err
+		}
+		providers, err := m.view.IDPProvidersByIDPConfigID(event.AggregateID, esConfig.IDPConfigID)
+		if err != nil {
+			return err
+		}
+		for _, provider := range providers {
+			provider.IDPState = esConfig.IDPState
 		}
 		return m.view.PutIDPProviders(event, providers...)
 	case org_es_model.LoginPolicyRemoved:

@@ -127,8 +127,10 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 		err = i.SetData(event)
 	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
 		i.IDPState = int32(model.IDPConfigStateInactive)
+		err = i.SetData(event)
 	case es_model.IDPConfigReactivated, org_es_model.IDPConfigReactivated:
 		i.IDPState = int32(model.IDPConfigStateActive)
+		err = i.SetData(event)
 	}
 	return err
 }
