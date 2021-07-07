@@ -107,6 +107,7 @@
   },
   "ACTIONS": {
     "SET":"Set",
+    "RESETDEFAULT":"Reset to Default",
     "SHOW":"Show",
     "HIDE":"Hide",
     "SAVE": "Save",

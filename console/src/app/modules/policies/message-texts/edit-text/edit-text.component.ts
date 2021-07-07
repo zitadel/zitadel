@@ -9,7 +9,7 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./edit-text.component.scss']
 })
 export class EditTextComponent implements OnInit, OnDestroy {
-  @Input() label: string = 'hello';
+  @Input() label: string = '';
   @Input() current$!: Observable<{ [key: string]: string; }>;
   @Input() default$!: Observable<{ [key: string]: string; }>;
   @Output() changedValues: EventEmitter<{ [key: string]: string; }> = new EventEmitter();

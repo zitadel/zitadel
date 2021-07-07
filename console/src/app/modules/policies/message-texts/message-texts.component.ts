@@ -1,7 +1,7 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { from, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
   GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
@@ -154,7 +154,7 @@ const REQUESTMAP = {
 })
 export class MessageTextsComponent implements OnDestroy {
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
-  public getCustomInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
+  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string; }> = new BehaviorSubject({});
 
   public currentType: MESSAGETYPES = MESSAGETYPES.INIT;
 
@@ -172,7 +172,6 @@ export class MessageTextsComponent implements OnDestroy {
     private injector: Injector,
     private translate: TranslateService,
   ) {
-    console.log(this.MESSAGETYPES);
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
       switch (this.serviceType) {
@@ -226,7 +225,7 @@ export class MessageTextsComponent implements OnDestroy {
     }
   }
 
-  public loadData(type: MESSAGETYPES) {
+  public async loadData(type: MESSAGETYPES) {
 
     console.log(this.serviceType, type);
     if (this.serviceType == PolicyComponentServiceType.MGMT) {
@@ -239,8 +238,8 @@ export class MessageTextsComponent implements OnDestroy {
     }
 
     const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.translate.currentLang);
-    this.getCustomInitMessageTextMap$ = from(
-      this.getCurrentValues(type, reqCustomInit)
+    this.getCustomInitMessageTextMap$.next(
+      await this.getCurrentValues(type, reqCustomInit)
     );
   }
 

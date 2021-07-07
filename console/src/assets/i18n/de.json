@@ -107,6 +107,7 @@
   },
   "ACTIONS": {
     "SET":"Übernehmen",
+    "RESETDEFAULT":"Auf Standard zurücksetzen",
     "SHOW":"Aufklappen",
     "HIDE":"Zuklappen",
     "SAVE": "Speichern",

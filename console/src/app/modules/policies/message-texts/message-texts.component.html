@@ -11,6 +11,8 @@
     </div>
 
     <div class="actions">
+      <button class="reset-button" (click)="saveCurrentMessage()" color="warn" type="submit"
+      mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
       <button class="save-button" (click)="saveCurrentMessage()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>

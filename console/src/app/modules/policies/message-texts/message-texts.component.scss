@@ -20,8 +20,22 @@
   margin: 1rem 0;
 }
 
-.save-button {
-  margin-bottom: 3rem;
-  float: right;
-  display: block;
+.actions {
+  display: flex;
+  justify-content: flex-end;
+
+  .save-button,
+  .reset-button {
+    display: block;
+    margin: 0 .25rem 3rem .25rem;
+  }
+
+  .reset-button {
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-bottom: 3px;
+    }
+  }
 }
