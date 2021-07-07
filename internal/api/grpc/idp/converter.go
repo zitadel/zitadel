@@ -178,8 +178,8 @@ func IDPConfigToConfigPb(config domain.IDPConfig) idp_pb.IDPConfig {
 			OidcConfig: &idp_pb.OIDCConfig{
 				ClientId:              c.ClientID,
 				Issuer:                c.Issuer,
-				AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
-				TokenEndpoint:         config.OAuthTokenEndpoint,
+				AuthorizationEndpoint: c.AuthorizationEndpoint,
+				TokenEndpoint:         c.TokenEndpoint,
 				Scopes:                c.Scopes,
 				DisplayNameMapping:    MappingFieldToPb(c.IDPDisplayNameMapping),
 				UsernameMapping:       MappingFieldToPb(c.UsernameMapping),
