@@ -16,7 +16,7 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.15.3
+	github.com/caos/oidc v0.15.5
 	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
@@ -87,5 +87,3 @@ require (
 	k8s.io/client-go v0.19.2
 	sigs.k8s.io/controller-runtime v0.7.0
 )
-
-replace github.com/caos/oidc => /Users/livio/workspaces/go/src/github.com/caos/oidc
