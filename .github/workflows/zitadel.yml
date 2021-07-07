@@ -343,4 +343,4 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:	
-          SENTRY_RELEASE: ${{ steps.semantic.outputs.new_release_version }}
+          version: ${{ steps.semantic.outputs.new_release_version }}
