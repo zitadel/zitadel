@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 
@@ -26,6 +27,10 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+)
+
+const (
+	defaultLang = "en"
 )
 
 type IAMRepository struct {
@@ -414,6 +419,9 @@ func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	contents, ok := repo.TranslationFileContents[lang]
 	if !ok {
 		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if os.IsNotExist(err) {
+			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", defaultLang))
+		}
 		if err != nil {
 			return nil, err
 		}
