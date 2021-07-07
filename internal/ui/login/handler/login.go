@@ -114,9 +114,6 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 	login.renderer = CreateRenderer(prefix, statikFS, staticStorage, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	check := func(request *oidc.JWTTokenRequest) error {
-		//sub, err := authRepo.UserViewProvider.UserByID(request.Subject)
-		//issuer, err := authRepo.UserViewProvider.UserByID(request.Issuer)
-		//if sub.ResourceOwner != issuer.ResourceOwner
 		return nil
 	}
 	login.authConnectorVerifier = op.NewJWTProfileVerifier(&jwtProfileStorage{authRepo}, config.Issuer, 300*time.Second, time.Second, op.SubjectCheck(check))

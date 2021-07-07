@@ -35,10 +35,9 @@ func readModelToIDPConfigDomain(rm *IAMIDPConfigReadModel) domain.IDPConfig {
 		},
 		IDPConfigID:     rm.ConfigID,
 		IDPProviderType: rm.ProviderType,
-		//IsOIDC:          rm.OIDCConfig != nil,
-		Name:        rm.Name,
-		State:       rm.State,
-		StylingType: rm.StylingType,
+		Name:            rm.Name,
+		State:           rm.State,
+		StylingType:     rm.StylingType,
 	}
 	if rm.OIDCConfig != nil {
 		return &domain.OIDCIDPConfig{

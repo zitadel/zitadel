@@ -56,17 +56,12 @@ func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader
 				continue
 			}
 			wm.OIDCConfigWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
-		default:
-			wm.OIDCConfigWriteModel.AppendEvents(e)
 		}
 	}
 }
 
 func (wm *IDPOIDCConfigWriteModel) Reduce() error {
-	if err := wm.OIDCConfigWriteModel.Reduce(); err != nil {
-		return err
-	}
-	return wm.WriteModel.Reduce()
+	return wm.OIDCConfigWriteModel.Reduce()
 }
 
 func (wm *IDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {

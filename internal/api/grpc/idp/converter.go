@@ -70,8 +70,10 @@ func IDPConfigTypeModelToPb(configType iam_model.IdpConfigType) idp_pb.IDPType {
 	switch configType {
 	case iam_model.IDPConfigTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	default: //TODO: fix
+	case iam_model.IDPConfigTypeAuthConnector:
 		return idp_pb.IDPType_IPD_TYPE_AUTH_CONNECTOR
+	default:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
 	}
 }
 

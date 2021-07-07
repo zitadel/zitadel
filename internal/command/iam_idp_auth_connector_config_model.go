@@ -53,8 +53,6 @@ func (wm *IAMIDPAuthConnectorConfigWriteModel) AppendEvents(events ...eventstore
 				continue
 			}
 			wm.AuthConnectorConfigWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
-		default:
-			wm.AuthConnectorConfigWriteModel.AppendEvents(e)
 		}
 	}
 }

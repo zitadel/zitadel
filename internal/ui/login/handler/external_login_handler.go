@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strings"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -133,60 +135,64 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 }
 
 func (l *Login) handleExternalLoginCallbackAuthConnector(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *externalIDPCallbackData, idpConfig *iam_model.IDPConfigView) {
-	ctx := r.Context()
-	profile, err := op.VerifyJWTAssertion(ctx, data.Assertion, l.authConnectorVerifier)
+	profile, user, err := l.verifyAuthConnectorCallback(r.Context(), authReq, data, idpConfig)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
-		return
 	}
-	if authReq.ID != profile.GetCustomClaim("jti") {
-		l.renderLogin(w, r, authReq, caos_errors.ThrowInvalidArgument(nil, "LOGIN-dg4gh", "Errors.User.ExternalIDP.DataInvalid"))
-		return
-	}
-	if profile.Issuer != idpConfig.AuthConnectorMachineID {
-		l.renderLogin(w, r, authReq, caos_errors.ThrowInvalidArgument(nil, "LOGIN-Gdg2d", "Errors.User.ExternalIDP.DataInvalid"))
-		return
-	}
-	user, err := l.authRepo.UserByID(ctx, profile.Subject)
-	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
-	}
-	ctx = setContext(ctx, user.ResourceOwner)
-	if idpConfig.AggregateID != domain.IAMID && user.ResourceOwner != idpConfig.AggregateID {
-		l.renderLogin(w, r, authReq, caos_errors.ThrowInvalidArgument(nil, "LOGIN-Vbb25", "Errors.User.ExternalIDP.NotAllowed"))
-		return
-	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(ctx)
+
 	externalUser := &domain.ExternalUser{
 		IDPConfigID:    idpConfig.IDPConfigID,
 		ExternalUserID: profile.Subject,
 	}
 
-	if len(authReq.LinkingUsers) > 0 {
-		err = l.authRepo.ResetLinkingUsers(ctx, authReq.ID, userAgentID)
-		if err != nil {
-			l.renderLogin(w, r, authReq, err)
-		}
-	}
-	err = l.authRepo.CheckExternalUserLogin(ctx, authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			l.renderLogin(w, r, authReq, err)
-			return
-		}
-		err = l.authRepo.SelectUser(ctx, authReq.ID, user.ID, userAgentID)
-		if err != nil {
-			l.renderLogin(w, r, authReq, err)
-			return
-		}
-		err = l.authRepo.LinkExternalUsers(ctx, authReq.ID, userAgentID, domain.BrowserInfoFromRequest(r))
-		if err != nil {
-			l.renderLogin(w, r, authReq, err)
-			return
-		}
+	if err = l.linkAuthConnectorUser(r, authReq, user, externalUser); err != nil {
+		l.renderLogin(w, r, authReq, err)
 	}
 	l.renderNextStep(w, r, authReq)
+}
+
+func (l *Login) verifyAuthConnectorCallback(ctx context.Context, authReq *domain.AuthRequest, data *externalIDPCallbackData, idpConfig *iam_model.IDPConfigView) (*oidc.JWTTokenRequest, *model.UserView, error) {
+	profile, err := op.VerifyJWTAssertion(ctx, data.Assertion, l.authConnectorVerifier)
+	if err != nil {
+		return nil, nil, err
+	}
+	if authReq.ID != profile.GetCustomClaim("jti") {
+		return nil, nil, caos_errors.ThrowInvalidArgument(nil, "LOGIN-dg4gh", "Errors.User.ExternalIDP.DataInvalid")
+	}
+	if profile.Issuer != idpConfig.AuthConnectorMachineID {
+		return nil, nil, caos_errors.ThrowInvalidArgument(nil, "LOGIN-Gdg2d", "Errors.User.ExternalIDP.DataInvalid")
+	}
+	user, err := l.authRepo.UserByID(ctx, profile.Subject)
+	if err != nil {
+		return nil, nil, err
+	}
+	if idpConfig.AggregateID != domain.IAMID && user.ResourceOwner != idpConfig.AggregateID {
+		return nil, nil, caos_errors.ThrowInvalidArgument(nil, "LOGIN-Vbb25", "Errors.User.ExternalIDP.NotAllowed")
+	}
+	return profile, user, err
+}
+
+func (l *Login) linkAuthConnectorUser(r *http.Request, authReq *domain.AuthRequest, user *model.UserView, externalUser *domain.ExternalUser) error {
+	ctx := setContext(r.Context(), user.ResourceOwner)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(ctx)
+	if len(authReq.LinkingUsers) > 0 {
+		err := l.authRepo.ResetLinkingUsers(ctx, authReq.ID, userAgentID)
+		if err != nil {
+			return err
+		}
+	}
+	err := l.authRepo.CheckExternalUserLogin(ctx, authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	if err == nil {
+		return nil
+	}
+	if !errors.IsNotFound(err) {
+		return err
+	}
+	err = l.authRepo.SelectUser(ctx, authReq.ID, user.ID, userAgentID)
+	if err != nil {
+		return err
+	}
+	return l.authRepo.LinkExternalUsers(ctx, authReq.ID, userAgentID, domain.BrowserInfoFromRequest(r))
 }
 
 func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelyingParty {

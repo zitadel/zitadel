@@ -14,7 +14,6 @@ type IDPConfig interface {
 	IDPConfigName() string
 	IDPConfigStylingType() IDPConfigStylingType
 	IDPConfigState() IDPConfigState
-	//Details() *ObjectDetails
 }
 
 type CommonIDPConfig struct {
@@ -25,7 +24,6 @@ type CommonIDPConfig struct {
 	StylingType     IDPConfigStylingType
 	State           IDPConfigState
 	IDPProviderType IdentityProviderType
-	//OIDCConfig  *OIDCIDPConfig
 }
 
 func (c *CommonIDPConfig) ObjectDetails() es_models.ObjectRoot {

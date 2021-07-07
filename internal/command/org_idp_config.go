@@ -42,7 +42,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config domain.IDPConfig, re
 	case *domain.AuthConnectorIDPConfig:
 		configEventCreator = c.addAuthConnectorIDPConfig(conf)
 	default:
-		return "", nil, errors.ThrowInvalidArgument(nil, "\"Org-eUpQU", "Errors.idp.config.notset")
+		return "", nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
 	configEvent, err := configEventCreator(ctx, orgAgg, idpConfigID)
 	if err != nil {

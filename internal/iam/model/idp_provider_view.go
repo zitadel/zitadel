@@ -1,10 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errors "github.com/caos/zitadel/internal/errors"
-
-	"time"
 )
 
 type IDPProviderView struct {
@@ -100,6 +100,8 @@ func idpConfigTypeToDomain(idpType IdpConfigType) domain.IDPConfigType {
 		return domain.IDPConfigTypeOIDC
 	case IDPConfigTypeSAML:
 		return domain.IDPConfigTypeSAML
+	case IDPConfigTypeAuthConnector:
+		return domain.IDPConfigTypeAuthConnector
 	default:
 		return domain.IDPConfigTypeOIDC
 	}

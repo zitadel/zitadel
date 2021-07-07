@@ -44,7 +44,6 @@ func (s *Server) AddAuthConnectorIDP(ctx context.Context, req *admin_pb.AddAuthC
 		return nil, err
 	}
 	return &admin_pb.AddAuthConnectorIDPResponse{
-		//IdpId: config.ID(),
 		IdpId:   id,
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil

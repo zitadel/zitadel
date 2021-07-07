@@ -52,17 +52,12 @@ func (wm *OrgIDPAuthConnectorConfigWriteModel) AppendEvents(events ...eventstore
 				continue
 			}
 			wm.AuthConnectorConfigWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
-		default:
-			wm.AuthConnectorConfigWriteModel.AppendEvents(e)
 		}
 	}
 }
 
 func (wm *OrgIDPAuthConnectorConfigWriteModel) Reduce() error {
-	if err := wm.AuthConnectorConfigWriteModel.Reduce(); err != nil {
-		return err
-	}
-	return wm.WriteModel.Reduce()
+	return wm.AuthConnectorConfigWriteModel.Reduce()
 }
 
 func (wm *OrgIDPAuthConnectorConfigWriteModel) Query() *eventstore.SearchQueryBuilder {

@@ -32,6 +32,7 @@ type IdpConfigType int32
 const (
 	IDPConfigTypeOIDC IdpConfigType = iota
 	IDPConfigTypeSAML
+	IDPConfigTypeAuthConnector
 )
 
 type IDPConfigState int32
