@@ -144,6 +144,7 @@ module.exports = {
     'concepts/introduction',
     'concepts/architecture',
     'concepts/principles',
+    'concepts/eventstore',
   ],
   legal: [
     'legal/introduction',
