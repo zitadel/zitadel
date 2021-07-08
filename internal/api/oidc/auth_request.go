@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 	"gopkg.in/square/go-jose.v2"
@@ -145,13 +146,17 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
+		logging.Log("OIDC-aGh4q").Error("no user agent id")
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
 	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
 	if err != nil {
+		logging.Log("OIDC-Ghgr3").WithError(err).Error("error retrieving user sessions")
 		return err
 	}
-	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
+	return err
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
