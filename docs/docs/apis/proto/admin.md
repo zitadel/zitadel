@@ -853,7 +853,7 @@ The Following Variables can be used:
 > **rpc** GetDefaultLoginTexts([GetDefaultLoginTextsRequest](#getdefaultlogintextsrequest))
 [GetDefaultLoginTextsResponse](#getdefaultlogintextsresponse)
 
-Returns the default custom texts for login ui
+Returns the default custom texts for login ui (translation file)
 
 
 
