@@ -343,7 +343,6 @@ func (l *Login) getTranslator(authReq *domain.AuthRequest) *i18n.Translator {
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)
-		translator.SetPreferredLanguages(authReq.UiLocales...)
 	}
 	return translator
 }
