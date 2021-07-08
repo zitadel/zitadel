@@ -24,9 +24,10 @@ const (
 )
 
 type Translator struct {
-	bundle        *i18n.Bundle
-	cookieName    string
-	cookieHandler *http_util.CookieHandler
+	bundle             *i18n.Bundle
+	cookieName         string
+	cookieHandler      *http_util.CookieHandler
+	preferredLanguages []string
 }
 
 type TranslatorConfig struct {
@@ -136,7 +137,7 @@ func (t *Translator) localizer(langs ...string) *i18n.Localizer {
 }
 
 func (t *Translator) langsFromRequest(r *http.Request) []string {
-	langs := make([]string, 0)
+	langs := t.preferredLanguages
 	if r != nil {
 		lang, err := t.cookieHandler.GetCookieValue(r, t.cookieName)
 		if err == nil {
@@ -148,7 +149,7 @@ func (t *Translator) langsFromRequest(r *http.Request) []string {
 }
 
 func (t *Translator) langsFromCtx(ctx context.Context) []string {
-	langs := make([]string, 0)
+	langs := t.preferredLanguages
 	if ctx != nil {
 		ctxData := authz.GetCtxData(ctx)
 		if ctxData.PreferredLanguage != "" {
@@ -157,6 +158,10 @@ func (t *Translator) langsFromCtx(ctx context.Context) []string {
 		langs = append(langs, getAcceptLanguageHeader(ctx))
 	}
 	return langs
+}
+
+func (t *Translator) SetPreferredLanguages(langs ...string) {
+	t.preferredLanguages = langs
 }
 
 func getAcceptLanguageHeader(ctx context.Context) string {

@@ -2,10 +2,13 @@ package oidc
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -13,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
@@ -74,6 +78,9 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
 	config.OPConfig.CodeMethodS256 = true
 	config.OPConfig.GrantTypeRefreshToken = true
+	supportedLanguages, err := getSupportedLanguages()
+	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
+	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	provider, err := op.NewOpenIDProvider(
 		ctx,
@@ -113,4 +120,28 @@ func newStorage(config StorageConfig, command *command.Commands, query *query.Qu
 
 func (o *OPStorage) Health(ctx context.Context) error {
 	return o.repo.Health(ctx)
+}
+
+func getSupportedLanguages() ([]language.Tag, error) {
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	if err != nil {
+		return nil, err
+	}
+	i18nDir, err := statikLoginFS.Open("/i18n")
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "OIDC-Dbt42", "cannot open dir")
+	}
+	defer i18nDir.Close()
+	files, err := i18nDir.Readdir(0)
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "OIDC-Gh4zk", "cannot read dir")
+	}
+	languages := make([]language.Tag, 0, len(files))
+	for _, file := range files {
+		lang := language.Make(strings.TrimSuffix(file.Name(), ".yaml"))
+		if lang != language.Und {
+			languages = append(languages, lang)
+		}
+	}
+	return languages, nil
 }
