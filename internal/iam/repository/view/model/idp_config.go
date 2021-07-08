@@ -129,7 +129,6 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 	case models.EventType(iam_repo.IDPAuthConnectorMachineUserRemovedEventType),
 		models.EventType(org_repo.IDPAuthConnectorMachineUserRemovedEventType):
 		i.AuthConnectorMachineID = ""
-		i.AuthConnectorMachineName = ""
 	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
 		i.IDPState = int32(model.IDPConfigStateInactive)
 		err = i.SetData(event)

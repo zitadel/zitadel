@@ -175,11 +175,6 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	authConnectors, err := s.org.SearchIDPConfigs(ctx, &iam_model.IDPConfigSearchRequest{
 		Queries: []*iam_model.IDPConfigSearchQuery{
 			{
-				Key:    iam_model.IDPConfigSearchKeyIdpProviderType,
-				Method: domain.SearchMethodEquals,
-				Value:  iam_model.IDPConfigTypeAuthConnector,
-			},
-			{
 				Key:    iam_model.IDPConfigSearchKeyAuthConnectorMachineID,
 				Method: domain.SearchMethodEquals,
 				Value:  req.Id,

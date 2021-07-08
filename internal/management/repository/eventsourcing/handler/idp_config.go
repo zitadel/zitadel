@@ -1,10 +1,16 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	org_repo "github.com/caos/zitadel/internal/repository/org"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -83,7 +89,7 @@ func (m *IDPConfig) Reduce(event *es_models.Event) (err error) {
 	return err
 }
 
-func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *es_models.Event) (err error) {
+func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *es_models.Event) (err error) {
 	idp := new(iam_view_model.IDPConfigView)
 	switch event.Type {
 	case model.IDPConfigAdded,
@@ -102,18 +108,22 @@ func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		idp, err = m.view.IDPConfigByID(idp.IDPConfigID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID)
 		if err != nil {
 			return err
 		}
 		err = idp.AppendEvent(providerType, event)
+		if err != nil {
+			return err
+		}
+		err = i.fillData(idp)
 	case model.IDPConfigDeactivated, iam_es_model.IDPConfigDeactivated,
 		model.IDPConfigReactivated, iam_es_model.IDPConfigReactivated:
 		err = idp.SetData(event)
 		if err != nil {
 			return err
 		}
-		idp, err = m.view.IDPConfigByID(idp.IDPConfigID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID)
 		if err != nil {
 			return err
 		}
@@ -123,14 +133,14 @@ func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteIDPConfig(idp.IDPConfigID, event)
+		return i.view.DeleteIDPConfig(idp.IDPConfigID, event)
 	default:
-		return m.view.ProcessedIDPConfigSequence(event)
+		return i.view.ProcessedIDPConfigSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutIDPConfig(idp, event)
+	return i.view.PutIDPConfig(idp, event)
 }
 
 func (i *IDPConfig) OnError(event *es_models.Event, err error) error {
@@ -140,4 +150,53 @@ func (i *IDPConfig) OnError(event *es_models.Event, err error) error {
 
 func (i *IDPConfig) OnSuccess() error {
 	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
+}
+
+func (i *IDPConfig) fillData(idp *iam_view_model.IDPConfigView) error {
+	if idp.AuthConnectorMachineID == "" {
+		idp.AuthConnectorMachineName = ""
+		return nil
+	}
+
+	user, err := i.getUserByID(idp.AuthConnectorMachineID)
+	if err != nil {
+		return err
+	}
+	if user.MachineView != nil {
+		idp.AuthConnectorMachineName = user.MachineView.Name
+	}
+	return nil
+}
+
+func (i *IDPConfig) getUserByID(userID string) (*usr_view_model.UserView, error) {
+	user, usrErr := i.view.UserByID(userID)
+	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+		return nil, usrErr
+	}
+	if user == nil {
+		user = &usr_view_model.UserView{}
+	}
+	events, err := i.getUserEvents(userID, user.Sequence)
+	if err != nil {
+		return user, usrErr
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return user, nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) {
+		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-GAdg2", "Errors.User.NotFound")
+	}
+	return &userCopy, nil
+}
+
+func (i *IDPConfig) getUserEvents(userID string, sequence uint64) ([]*es_models.Event, error) {
+	query, err := view.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return i.es.FilterEvents(context.Background(), query)
 }
