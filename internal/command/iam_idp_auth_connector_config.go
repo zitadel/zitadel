@@ -5,6 +5,8 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/iam"
 )
 
 func (c *Commands) ChangeDefaultIDPAuthConnectorConfig(ctx context.Context, config *domain.AuthConnectorIDPConfig) (*domain.ObjectDetails, error) {
@@ -25,7 +27,7 @@ func (c *Commands) ChangeDefaultIDPAuthConnectorConfig(ctx context.Context, conf
 		return nil, err
 	}
 	if !isUserStateExists(machine.UserState) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-BGf31", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-BGf31", "Errors.User.NotFound")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)
@@ -53,4 +55,29 @@ func (c *Commands) ChangeDefaultIDPAuthConnectorConfig(ctx context.Context, conf
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingConfig.AuthConnectorConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) removeMachineUserFromDefaultAuthConnector(ctx context.Context, idpConfigID string) ([]eventstore.EventPusher, error) {
+	if idpConfigID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Dfgfq", "Errors.IDMissing")
+	}
+
+	existingConfig := NewIAMIDPAuthConnectorConfigWriteModel(idpConfigID)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-ADghn", "Errors.Org.IDPConfig.NotFound")
+	}
+
+	iamAgg := IAMAggregateFromWriteModel(&existingConfig.WriteModel)
+	events := []eventstore.EventPusher{
+		iam.NewIDPAuthConnectorMachineUserRemovedEvent(ctx, iamAgg, existingConfig.IDPConfigID),
+	}
+	if existingConfig.State == domain.IDPConfigStateActive {
+		events = append(events, iam.NewIDPConfigDeactivatedEvent(ctx, iamAgg, existingConfig.IDPConfigID))
+	}
+	return events, nil
 }

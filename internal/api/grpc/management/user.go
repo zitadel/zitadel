@@ -11,6 +11,8 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -170,7 +172,24 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants)...)
+	authConnectors, err := s.org.SearchIDPConfigs(ctx, &iam_model.IDPConfigSearchRequest{
+		Queries: []*iam_model.IDPConfigSearchQuery{
+			{
+				Key:    iam_model.IDPConfigSearchKeyIdpProviderType,
+				Method: domain.SearchMethodEquals,
+				Value:  iam_model.IDPConfigTypeAuthConnector,
+			},
+			{
+				Key:    iam_model.IDPConfigSearchKeyAuthConnectorMachineID,
+				Method: domain.SearchMethodEquals,
+				Value:  req.Id,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants), authConnectors.Result...)
 	if err != nil {
 		return nil, err
 	}

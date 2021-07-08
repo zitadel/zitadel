@@ -18,10 +18,11 @@ import (
 )
 
 const (
-	IDPConfigKeyIdpConfigID  = "idp_config_id"
-	IDPConfigKeyAggregateID  = "aggregate_id"
-	IDPConfigKeyName         = "name"
-	IDPConfigKeyProviderType = "idp_provider_type"
+	IDPConfigKeyIdpConfigID            = "idp_config_id"
+	IDPConfigKeyAggregateID            = "aggregate_id"
+	IDPConfigKeyName                   = "name"
+	IDPConfigKeyProviderType           = "idp_provider_type"
+	IDPConfigKeyAuthConnectorMachineID = "auth_connector_machine_id"
 )
 
 type IDPConfigView struct {
@@ -125,6 +126,10 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 		models.EventType(iam_repo.IDPAuthConnectorConfigChangedEventType),
 		models.EventType(org_repo.IDPAuthConnectorConfigChangedEventType):
 		err = i.SetData(event)
+	case models.EventType(iam_repo.IDPAuthConnectorMachineUserRemovedEventType),
+		models.EventType(org_repo.IDPAuthConnectorMachineUserRemovedEventType):
+		i.AuthConnectorMachineID = ""
+		i.AuthConnectorMachineName = ""
 	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
 		i.IDPState = int32(model.IDPConfigStateInactive)
 		err = i.SetData(event)

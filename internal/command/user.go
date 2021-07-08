@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
-
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -169,7 +168,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*domain.UserMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*domain.UserMembership, cascadingGrantIDs []string, authConnectorIDs ...*iam_model.IDPConfigView) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -197,6 +196,19 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 			continue
 		}
 		events = append(events, removeEvent)
+	}
+	for _, connector := range authConnectorIDs {
+		var removeEvents []eventstore.EventPusher
+		if connector.IDPProviderType == iam_model.IDPProviderTypeOrg {
+			removeEvents, err = c.removeMachineUserFromAuthConnector(ctx, connector.IDPConfigID, resourceOwner)
+		} else {
+			removeEvents, err = c.removeMachineUserFromDefaultAuthConnector(ctx, connector.IDPConfigID)
+		}
+		if err != nil {
+			logging.LogWithFields("COMMAND-Ghrrf", "idpConfigID", connector.IDPConfigID).WithError(err).Warn("could not cascade remove machine on auth connector")
+			continue
+		}
+		events = append(events, removeEvents...)
 	}
 
 	if len(cascadingUserMemberships) > 0 {

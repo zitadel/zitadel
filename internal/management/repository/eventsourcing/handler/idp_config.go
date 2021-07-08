@@ -95,7 +95,9 @@ func (m *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		es_models.EventType(iam_repo.IDPAuthConnectorConfigAddedEventType),
 		es_models.EventType(org_repo.IDPAuthConnectorConfigAddedEventType),
 		es_models.EventType(iam_repo.IDPAuthConnectorConfigChangedEventType),
-		es_models.EventType(org_repo.IDPAuthConnectorConfigChangedEventType):
+		es_models.EventType(org_repo.IDPAuthConnectorConfigChangedEventType),
+		es_models.EventType(iam_repo.IDPAuthConnectorMachineUserRemovedEventType),
+		es_models.EventType(org_repo.IDPAuthConnectorMachineUserRemovedEventType):
 		err = idp.SetData(event)
 		if err != nil {
 			return err

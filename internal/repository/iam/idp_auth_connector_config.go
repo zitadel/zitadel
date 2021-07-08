@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	IDPAuthConnectorConfigAddedEventType   eventstore.EventType = "iam.idp." + idpconfig.AuthConnectorConfigAddedEventType
-	IDPAuthConnectorConfigChangedEventType eventstore.EventType = "iam.idp." + idpconfig.AuthConnectorConfigChangedEventType
+	IDPAuthConnectorConfigAddedEventType        eventstore.EventType = "iam.idp." + idpconfig.AuthConnectorConfigAddedEventType
+	IDPAuthConnectorConfigChangedEventType      eventstore.EventType = "iam.idp." + idpconfig.AuthConnectorConfigChangedEventType
+	IDPAuthConnectorMachineUserRemovedEventType eventstore.EventType = "iam.idp." + idpconfig.AuthConnectorMachineUserRemovedEventType
 )
 
 type IDPAuthConnectorConfigAddedEvent struct {
@@ -82,4 +83,35 @@ func IDPAuthConnectorConfigChangedEventMapper(event *repository.Event) (eventsto
 	}
 
 	return &IDPAuthConnectorConfigChangedEvent{AuthConnectorConfigChangedEvent: *e.(*idpconfig.AuthConnectorConfigChangedEvent)}, nil
+}
+
+type IDPAuthConnectorMachineUserRemovedEvent struct {
+	idpconfig.AuthConnectorMachineUserRemovedEvent
+}
+
+func NewIDPAuthConnectorMachineUserRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID string,
+) *IDPAuthConnectorMachineUserRemovedEvent {
+
+	return &IDPAuthConnectorMachineUserRemovedEvent{
+		AuthConnectorMachineUserRemovedEvent: *idpconfig.NewAuthConnectorMachineUserRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				IDPAuthConnectorMachineUserRemovedEventType,
+			),
+			idpConfigID,
+		),
+	}
+}
+
+func IDPAuthConnectorMachineUserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := idpconfig.AuthConnectorMachineUserRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPAuthConnectorMachineUserRemovedEvent{AuthConnectorMachineUserRemovedEvent: *e.(*idpconfig.AuthConnectorMachineUserRemovedEvent)}, nil
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -94,7 +95,9 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		es_models.EventType(iam_repo.IDPAuthConnectorConfigAddedEventType),
 		es_models.EventType(org_repo.IDPAuthConnectorConfigAddedEventType),
 		es_models.EventType(iam_repo.IDPAuthConnectorConfigChangedEventType),
-		es_models.EventType(org_repo.IDPAuthConnectorConfigChangedEventType):
+		es_models.EventType(org_repo.IDPAuthConnectorConfigChangedEventType),
+		es_models.EventType(iam_repo.IDPAuthConnectorMachineUserRemovedEventType),
+		es_models.EventType(org_repo.IDPAuthConnectorMachineUserRemovedEventType):
 		err = idp.SetData(event)
 		if err != nil {
 			return err

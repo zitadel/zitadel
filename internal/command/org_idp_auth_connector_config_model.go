@@ -27,6 +27,11 @@ func NewOrgIDPAuthConnectorConfigWriteModel(idpConfigID, orgID string) *OrgIDPAu
 func (wm *OrgIDPAuthConnectorConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
+		case *org.IDPConfigAddedEvent:
+			if wm.IDPConfigID != e.ConfigID {
+				continue
+			}
+			wm.AuthConnectorConfigWriteModel.AppendEvents(e)
 		case *org.IDPAuthConnectorConfigAddedEvent:
 			if wm.IDPConfigID != e.IDPConfigID {
 				continue
@@ -69,6 +74,7 @@ func (wm *OrgIDPAuthConnectorConfigWriteModel) Query() *eventstore.SearchQueryBu
 		EventTypes(
 			org.IDPAuthConnectorConfigAddedEventType,
 			org.IDPAuthConnectorConfigChangedEventType,
+			org.IDPAuthConnectorMachineUserRemovedEventType,
 			org.IDPConfigReactivatedEventType,
 			org.IDPConfigDeactivatedEventType,
 			org.IDPConfigRemovedEventType).

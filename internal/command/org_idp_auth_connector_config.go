@@ -5,6 +5,8 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 func (c *Commands) ChangeIDPAuthConnectorConfig(ctx context.Context, config *domain.AuthConnectorIDPConfig, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -14,6 +16,7 @@ func (c *Commands) ChangeIDPAuthConnectorConfig(ctx context.Context, config *dom
 	if config.IDPConfigID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-GVbhg", "Errors.IDMissing")
 	}
+
 	existingConfig := NewOrgIDPAuthConnectorConfigWriteModel(config.IDPConfigID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
@@ -57,4 +60,32 @@ func (c *Commands) ChangeIDPAuthConnectorConfig(ctx context.Context, config *dom
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingConfig.AuthConnectorConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) removeMachineUserFromAuthConnector(ctx context.Context, idpConfigID string, resourceOwner string) ([]eventstore.EventPusher, error) {
+	if resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-GBj52", "Errors.ResourceOwnerMissing")
+	}
+	if idpConfigID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Grgh3", "Errors.IDMissing")
+	}
+
+	existingConfig := NewOrgIDPAuthConnectorConfigWriteModel(idpConfigID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-ADghn", "Errors.Org.IDPConfig.NotFound")
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
+	events := []eventstore.EventPusher{
+		org.NewIDPAuthConnectorMachineUserRemovedEvent(ctx, orgAgg, existingConfig.IDPConfigID),
+	}
+	if existingConfig.State == domain.IDPConfigStateActive {
+		events = append(events, org.NewIDPConfigDeactivatedEvent(ctx, orgAgg, existingConfig.IDPConfigID))
+	}
+	return events, nil
 }

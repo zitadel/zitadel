@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	AuthConnectorConfigAddedEventType   eventstore.EventType = "auth_connector.config.added"
-	AuthConnectorConfigChangedEventType eventstore.EventType = "auth_connector.config.changed"
+	AuthConnectorConfigAddedEventType        eventstore.EventType = "auth_connector.config.added"
+	AuthConnectorConfigChangedEventType      eventstore.EventType = "auth_connector.config.changed"
+	AuthConnectorMachineUserRemovedEventType eventstore.EventType = "auth_connector.machine.removed"
 )
 
 type AuthConnectorConfigAddedEvent struct {
@@ -125,6 +126,43 @@ func AuthConnectorConfigChangedEventMapper(event *repository.Event) (eventstore.
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDPCONF-GHn2s", "unable to unmarshal event")
+	}
+
+	return e, nil
+}
+
+type AuthConnectorMachineUserRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	IDPConfigID string `json:"idpConfigId"`
+}
+
+func (e *AuthConnectorMachineUserRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *AuthConnectorMachineUserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewAuthConnectorMachineUserRemovedEvent(
+	base *eventstore.BaseEvent,
+	idpConfigID string,
+) *AuthConnectorMachineUserRemovedEvent {
+	return &AuthConnectorMachineUserRemovedEvent{
+		BaseEvent:   *base,
+		IDPConfigID: idpConfigID,
+	}
+}
+
+func AuthConnectorMachineUserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &AuthConnectorMachineUserRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDPCONF-FDsgd", "unable to unmarshal event")
 	}
 
 	return e, nil

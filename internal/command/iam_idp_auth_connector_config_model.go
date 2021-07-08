@@ -58,10 +58,7 @@ func (wm *IAMIDPAuthConnectorConfigWriteModel) AppendEvents(events ...eventstore
 }
 
 func (wm *IAMIDPAuthConnectorConfigWriteModel) Reduce() error {
-	if err := wm.AuthConnectorConfigWriteModel.Reduce(); err != nil {
-		return err
-	}
-	return wm.WriteModel.Reduce()
+	return wm.AuthConnectorConfigWriteModel.Reduce()
 }
 
 func (wm *IAMIDPAuthConnectorConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -73,6 +70,7 @@ func (wm *IAMIDPAuthConnectorConfigWriteModel) Query() *eventstore.SearchQueryBu
 		EventTypes(
 			iam.IDPAuthConnectorConfigAddedEventType,
 			iam.IDPAuthConnectorConfigChangedEventType,
+			iam.IDPAuthConnectorMachineUserRemovedEventType,
 			iam.IDPConfigReactivatedEventType,
 			iam.IDPConfigDeactivatedEventType,
 			iam.IDPConfigRemovedEventType).

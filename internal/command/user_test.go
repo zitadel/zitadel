@@ -12,6 +12,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/member"
@@ -922,6 +923,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			userID                 string
 			cascadeUserMemberships []*domain.UserMembership
 			cascadeUserGrants      []string
+			cascadeAuthConnectors  []*iam_model.IDPConfigView
 		}
 	)
 	type res struct {
@@ -934,75 +936,130 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		args   args
 		res    res
 	}{
+		//{
+		//	name: "userid missing, invalid argument error",
+		//	fields: fields{
+		//		eventstore: eventstoreExpect(
+		//			t,
+		//		),
+		//	},
+		//	args: args{
+		//		ctx:    context.Background(),
+		//		orgID:  "org1",
+		//		userID: "",
+		//	},
+		//	res: res{
+		//		err: caos_errs.IsErrorInvalidArgument,
+		//	},
+		//},
+		//{
+		//	name: "user not existing, not found error",
+		//	fields: fields{
+		//		eventstore: eventstoreExpect(
+		//			t,
+		//			expectFilter(),
+		//		),
+		//	},
+		//	args: args{
+		//		ctx:    context.Background(),
+		//		orgID:  "org1",
+		//		userID: "user1",
+		//	},
+		//	res: res{
+		//		err: caos_errs.IsNotFound,
+		//	},
+		//},
+		//{
+		//	name: "org iam policy not found, precondition error",
+		//	fields: fields{
+		//		eventstore: eventstoreExpect(
+		//			t,
+		//			expectFilter(
+		//				eventFromEventPusher(
+		//					user.NewHumanAddedEvent(context.Background(),
+		//						&user.NewAggregate("user1", "org1").Aggregate,
+		//						"username",
+		//						"firstname",
+		//						"lastname",
+		//						"nickname",
+		//						"displayname",
+		//						language.German,
+		//						domain.GenderUnspecified,
+		//						"email@test.ch",
+		//						true,
+		//					),
+		//				),
+		//			),
+		//			expectFilter(),
+		//			expectFilter(),
+		//		),
+		//	},
+		//	args: args{
+		//		ctx:    context.Background(),
+		//		orgID:  "org1",
+		//		userID: "user1",
+		//	},
+		//	res: res{
+		//		err: caos_errs.IsPreconditionFailed,
+		//	},
+		//},
+		//{
+		//	name: "remove user, ok",
+		//	fields: fields{
+		//		eventstore: eventstoreExpect(
+		//			t,
+		//			expectFilter(
+		//				eventFromEventPusher(
+		//					user.NewHumanAddedEvent(context.Background(),
+		//						&user.NewAggregate("user1", "org1").Aggregate,
+		//						"username",
+		//						"firstname",
+		//						"lastname",
+		//						"nickname",
+		//						"displayname",
+		//						language.German,
+		//						domain.GenderUnspecified,
+		//						"email@test.ch",
+		//						true,
+		//					),
+		//				),
+		//			),
+		//			expectFilter(),
+		//			expectFilter(
+		//				eventFromEventPusher(
+		//					iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+		//						&user.NewAggregate("user1", "org1").Aggregate,
+		//						true,
+		//					),
+		//				),
+		//			),
+		//			expectPush(
+		//				[]*repository.Event{
+		//					eventFromEventPusher(
+		//						user.NewUserRemovedEvent(context.Background(),
+		//							&user.NewAggregate("user1", "org1").Aggregate,
+		//							"username",
+		//							true,
+		//						),
+		//					),
+		//				},
+		//				uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
+		//			),
+		//		),
+		//	},
+		//	args: args{
+		//		ctx:    context.Background(),
+		//		orgID:  "org1",
+		//		userID: "user1",
+		//	},
+		//	res: res{
+		//		want: &domain.ObjectDetails{
+		//			ResourceOwner: "org1",
+		//		},
+		//	},
+		//},
 		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: caos_errs.IsNotFound,
-			},
-		},
-		{
-			name: "org iam policy not found, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-					expectFilter(),
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "remove user, ok",
+			name: "remove machine user with auth connector, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1031,6 +1088,52 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"idpConfigOrg",
+								"idpConfigOrg",
+								domain.IDPConfigTypeAuthConnector,
+								domain.IDPConfigStylingTypeUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPAuthConnectorConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"idpConfigOrg",
+								"baseURL",
+								"",
+								"user1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPConfigDeactivatedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"idpConfigOrg",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewIDPConfigAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"idpConfigIAM",
+								"idpConfigIAM",
+								domain.IDPConfigTypeAuthConnector,
+								domain.IDPConfigStylingTypeUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewIDPAuthConnectorConfigAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"idpConfigIAM",
+								"baseURL",
+								"",
+								"user1",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1038,6 +1141,24 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"username",
 									true,
+								),
+							),
+							eventFromEventPusher(
+								org.NewIDPAuthConnectorMachineUserRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"idpConfigOrg",
+								),
+							),
+							eventFromEventPusher(
+								iam.NewIDPAuthConnectorMachineUserRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate,
+									"idpConfigIAM",
+								),
+							),
+							eventFromEventPusher(
+								iam.NewIDPConfigDeactivatedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate,
+									"idpConfigIAM",
 								),
 							),
 						},
@@ -1049,6 +1170,18 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
+				cascadeAuthConnectors: []*iam_model.IDPConfigView{
+					{
+						AggregateID:     "org1",
+						IDPConfigID:     "idpConfigOrg",
+						IDPProviderType: iam_model.IDPProviderTypeOrg,
+					},
+					{
+						AggregateID:     "IAM",
+						IDPConfigID:     "idpConfigIAM",
+						IDPProviderType: iam_model.IDPProviderTypeSystem,
+					},
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1173,7 +1306,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveUser(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.cascadeUserMemberships, tt.args.cascadeUserGrants...)
+			got, err := r.RemoveUser(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.cascadeUserMemberships, tt.args.cascadeUserGrants, tt.args.cascadeAuthConnectors...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
