@@ -64,7 +64,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID: "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 				},
 			},
 			res: res{
@@ -118,7 +120,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID: "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 				},
 			},
 			res: res{
@@ -166,7 +170,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID:           "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 					ClientID:              "clientid1",
 					Issuer:                "issuer",
 					AuthorizationEndpoint: "authorization-endpoint",
@@ -243,7 +249,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID:           "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 					ClientID:              "clientid-changed",
 					Issuer:                "issuer-changed",
 					AuthorizationEndpoint: "authorization-endpoint-changed",
@@ -260,7 +268,10 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 						AggregateID:   "IAM",
 						ResourceOwner: "IAM",
 					},
-					IDPConfigID:           "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+						State:       domain.IDPConfigStateActive,
+					},
 					ClientID:              "clientid-changed",
 					Issuer:                "issuer-changed",
 					AuthorizationEndpoint: "authorization-endpoint-changed",

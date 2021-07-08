@@ -49,7 +49,9 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID: "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 				},
 			},
 			res: res{
@@ -83,7 +85,9 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID: "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 				},
 				resourceOwner: "org1",
 			},
@@ -138,7 +142,9 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID: "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 				},
 				resourceOwner: "org1",
 			},
@@ -187,7 +193,9 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID:           "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 					ClientID:              "clientid1",
 					Issuer:                "issuer",
 					AuthorizationEndpoint: "authorization-endpoint",
@@ -266,7 +274,9 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.OIDCIDPConfig{
-					IDPConfigID:           "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+					},
 					ClientID:              "clientid-changed",
 					Issuer:                "issuer-changed",
 					AuthorizationEndpoint: "authorization-endpoint-changed",
@@ -284,7 +294,10 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					IDPConfigID:           "config1",
+					CommonIDPConfig: domain.CommonIDPConfig{
+						IDPConfigID: "config1",
+						State:       domain.IDPConfigStateActive,
+					},
 					ClientID:              "clientid-changed",
 					Issuer:                "issuer-changed",
 					AuthorizationEndpoint: "authorization-endpoint-changed",
