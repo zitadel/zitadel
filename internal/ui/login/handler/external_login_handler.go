@@ -138,6 +138,7 @@ func (l *Login) handleExternalLoginCallbackAuthConnector(w http.ResponseWriter, 
 	profile, user, err := l.verifyAuthConnectorCallback(r.Context(), authReq, data, idpConfig)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
+		return
 	}
 
 	externalUser := &domain.ExternalUser{
@@ -147,6 +148,7 @@ func (l *Login) handleExternalLoginCallbackAuthConnector(w http.ResponseWriter, 
 
 	if err = l.linkAuthConnectorUser(r, authReq, user, externalUser); err != nil {
 		l.renderLogin(w, r, authReq, err)
+		return
 	}
 	l.renderNextStep(w, r, authReq)
 }
