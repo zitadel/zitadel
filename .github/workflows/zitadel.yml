@@ -342,5 +342,5 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-        with:	
-          SENTRY_RELEASE: ${{ steps.semantic.outputs.new_release_version }}
+        with:
+          version: ${{ steps.semantic.outputs.new_release_version }}
