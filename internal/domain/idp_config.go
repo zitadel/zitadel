@@ -75,7 +75,6 @@ type IDPConfigView struct {
 type OIDCIDPConfig struct {
 	es_models.ObjectRoot
 	CommonIDPConfig
-	IDPConfigID           string
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	ClientSecretString    string

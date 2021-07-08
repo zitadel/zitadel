@@ -51,7 +51,9 @@ func updateIDPToDomain(req *mgmt_pb.UpdateOrgIDPRequest) *domain.CommonIDPConfig
 
 func updateOIDCConfigToDomain(req *mgmt_pb.UpdateOrgIDPOIDCConfigRequest) *domain.OIDCIDPConfig {
 	return &domain.OIDCIDPConfig{
-		IDPConfigID:           req.IdpId,
+		CommonIDPConfig: domain.CommonIDPConfig{
+			IDPConfigID: req.IdpId,
+		},
 		ClientID:              req.ClientId,
 		ClientSecretString:    req.ClientSecret,
 		Issuer:                req.Issuer,

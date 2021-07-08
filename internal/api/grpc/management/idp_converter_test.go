@@ -39,12 +39,17 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 			got := addOIDCIDPRequestToDomain(tt.args.req)
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
-				"OIDCConfig.ClientSecret",
-				"OIDCConfig.ObjectRoot",
-				"OIDCConfig.IDPConfigID",
-				"IDPConfigID",
-				"State",
-				"Type", //TODO: default (0) is oidc
+				"ClientSecret",
+				"CommonIDPConfig.IDPConfigID",
+				"CommonIDPConfig.IDPProviderType",
+				"CommonIDPConfig.ObjectRoot",
+				"CommonIDPConfig.ObjectRoot.AggregateID",
+				"CommonIDPConfig.ObjectRoot.ChangeDate",
+				"CommonIDPConfig.ObjectRoot.CreationDate",
+				"CommonIDPConfig.ObjectRoot.ResourceOwner",
+				"CommonIDPConfig.ObjectRoot.Sequence",
+				"CommonIDPConfig.State",
+				"CommonIDPConfig.Type",
 			)
 		})
 	}
@@ -74,9 +79,9 @@ func Test_updateIDPToDomain(t *testing.T) {
 			got := updateIDPToDomain(tt.args.req)
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
-				"OIDCConfig",
 				"State",
 				"Type", //TODO: type should not be changeable
+				"IDPProviderType",
 			)
 		})
 	}
@@ -113,6 +118,17 @@ func Test_updateOIDCConfigToDomain(t *testing.T) {
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
 				"ClientSecret",
+				"CommonIDPConfig.IDPProviderType",
+				"CommonIDPConfig.Name",
+				"CommonIDPConfig.ObjectRoot",
+				"CommonIDPConfig.ObjectRoot.AggregateID",
+				"CommonIDPConfig.ObjectRoot.ChangeDate",
+				"CommonIDPConfig.ObjectRoot.CreationDate",
+				"CommonIDPConfig.ObjectRoot.ResourceOwner",
+				"CommonIDPConfig.ObjectRoot.Sequence",
+				"CommonIDPConfig.State",
+				"CommonIDPConfig.StylingType",
+				"CommonIDPConfig.Type",
 			)
 		})
 	}
