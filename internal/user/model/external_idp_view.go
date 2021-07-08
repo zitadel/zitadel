@@ -17,6 +17,7 @@ type ExternalIDPView struct {
 	ChangeDate      time.Time
 	ResourceOwner   string
 	Sequence        uint64
+	IDPConfigType   domain.IDPConfigType
 }
 
 type ExternalIDPSearchRequest struct {

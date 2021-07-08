@@ -2,12 +2,15 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 )
 
 const (
@@ -27,20 +30,7 @@ type ExternalIDPView struct {
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner   string    `json:"-" gorm:"column:resource_owner"`
 	Sequence        uint64    `json:"-" gorm:"column:sequence"`
-}
-
-func ExternalIDPViewFromModel(externalIDP *model.ExternalIDPView) *ExternalIDPView {
-	return &ExternalIDPView{
-		UserID:          externalIDP.UserID,
-		IDPConfigID:     externalIDP.IDPConfigID,
-		ExternalUserID:  externalIDP.ExternalUserID,
-		IDPName:         externalIDP.IDPName,
-		UserDisplayName: externalIDP.UserDisplayName,
-		Sequence:        externalIDP.Sequence,
-		CreationDate:    externalIDP.CreationDate,
-		ChangeDate:      externalIDP.ChangeDate,
-		ResourceOwner:   externalIDP.ResourceOwner,
-	}
+	IDPConfigType   int32     `json:"-" gorm:"column:idp_config_type"`
 }
 
 func ExternalIDPViewToModel(externalIDP *ExternalIDPView) *model.ExternalIDPView {
@@ -54,6 +44,7 @@ func ExternalIDPViewToModel(externalIDP *ExternalIDPView) *model.ExternalIDPView
 		CreationDate:    externalIDP.CreationDate,
 		ChangeDate:      externalIDP.ChangeDate,
 		ResourceOwner:   externalIDP.ResourceOwner,
+		IDPConfigType:   domain.IDPConfigType(externalIDP.IDPConfigType),
 	}
 }
 

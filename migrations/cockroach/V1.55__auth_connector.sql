@@ -13,3 +13,7 @@ ALTER TABLE management.idp_configs ADD COLUMN auth_connector_provider_id TEXT;
 ALTER TABLE management.idp_configs ADD COLUMN auth_connector_machine_id TEXT;
 ALTER TABLE management.idp_configs ADD COLUMN auth_connector_machine_name TEXT;
 ALTER TABLE management.idp_configs ADD COLUMN resource_owner TEXT;
+
+ALTER TABLE adminapi.user_external_idps ADD COLUMN idp_config_type SMALLINT;
+ALTER TABLE auth.user_external_idps ADD COLUMN idp_config_type SMALLINT;
+ALTER TABLE management.user_external_idps ADD COLUMN idp_config_type SMALLINT;

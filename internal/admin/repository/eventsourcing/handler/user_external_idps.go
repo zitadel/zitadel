@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -166,6 +168,7 @@ func (i *ExternalIDP) fillData(externalIDP *usr_view_model.ExternalIDPView) erro
 
 func (i *ExternalIDP) fillConfigData(externalIDP *usr_view_model.ExternalIDPView, config *iam_model.IDPConfig) {
 	externalIDP.IDPName = config.Name
+	externalIDP.IDPConfigType = int32(config.Type)
 }
 
 func (i *ExternalIDP) OnError(event *es_models.Event, err error) error {

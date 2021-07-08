@@ -77,6 +77,17 @@ func IDPConfigTypeModelToPb(configType iam_model.IdpConfigType) idp_pb.IDPType {
 	}
 }
 
+func IDPConfigTypeToPb(configType domain.IDPConfigType) idp_pb.IDPType {
+	switch configType {
+	case domain.IDPConfigTypeOIDC:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
+	case domain.IDPConfigTypeAuthConnector:
+		return idp_pb.IDPType_IPD_TYPE_AUTH_CONNECTOR
+	default:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
+	}
+}
+
 func IDPsToUserLinkPb(res []*user_model.ExternalIDPView) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
@@ -92,8 +103,7 @@ func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUs
 		IdpName:          link.IDPName,
 		ProvidedUserId:   link.ExternalUserID,
 		ProvidedUserName: link.UserDisplayName,
-		//TODO: as soon as saml is implemented we need to switch here
-		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+		IdpType:          IDPConfigTypeToPb(link.IDPConfigType),
 	}
 }
 
