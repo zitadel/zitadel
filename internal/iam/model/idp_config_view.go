@@ -17,6 +17,7 @@ type IDPConfigView struct {
 	CreationDate    time.Time
 	ChangeDate      time.Time
 	Sequence        uint64
+	ResourceOwner   string
 	IDPProviderType IDPProviderType
 
 	*IDPConfigOIDCView

@@ -35,6 +35,7 @@ type IDPConfigView struct {
 	IDPState        int32     `json:"-" gorm:"column:idp_state"`
 	IDPProviderType int32     `json:"-" gorm:"column:idp_provider_type"`
 	Sequence        uint64    `json:"-" gorm:"column:sequence"`
+	ResourceOwner   string    `json:"-" gorm:"column:resource_owner"`
 
 	*IDPConfigOIDCView
 	*IDPConfigAuthConnectorView
@@ -74,6 +75,7 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 		Name:            idp.Name,
 		StylingType:     model.IDPStylingType(idp.StylingType),
 		Sequence:        idp.Sequence,
+		ResourceOwner:   idp.ResourceOwner,
 		CreationDate:    idp.CreationDate,
 		ChangeDate:      idp.ChangeDate,
 		IDPProviderType: model.IDPProviderType(idp.IDPProviderType),
@@ -141,6 +143,7 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 
 func (r *IDPConfigView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
+	r.ResourceOwner = event.ResourceOwner
 }
 
 func (r *IDPConfigView) SetData(event *models.Event) error {
