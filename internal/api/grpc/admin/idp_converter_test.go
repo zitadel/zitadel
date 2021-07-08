@@ -50,42 +50,6 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 	}
 }
 
-func Test_addOIDCIDPRequestToDomainOIDCIDPConfig(t *testing.T) {
-	type args struct {
-		req *admin_pb.AddOIDCIDPRequest
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "all fields filled",
-			args: args{
-				req: &admin_pb.AddOIDCIDPRequest{
-					ClientId:              "test1234",
-					ClientSecret:          "test4321",
-					Issuer:                "zitadel.ch",
-					AuthorizationEndpoint: "https://accounts.zitadel.ch/oauth/v2/authorize",
-					TokenEndpoint:         "https://api.zitadel.ch/oauth/v2/token",
-					Scopes:                []string{"email", "profile"},
-					DisplayNameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:       idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := addOIDCIDPRequestToDomainOIDCIDPConfig(tt.args.req)
-			test.AssertFieldsMapped(t, got,
-				"ObjectRoot",
-				"ClientSecret", //TODO: is client secret string enough for backend?
-				"IDPConfigID",
-			)
-		})
-	}
-}
-
 func Test_updateIDPToDomain(t *testing.T) {
 	type args struct {
 		req *admin_pb.UpdateIDPRequest
