@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -629,6 +630,9 @@ func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	contents, ok := repo.TranslationFileContents[lang]
 	if !ok {
 		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if os.IsNotExist(err) {
+			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
 		if err != nil {
 			return nil, err
 		}

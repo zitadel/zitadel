@@ -1641,7 +1641,7 @@ service AdminService {
         };
     }
 
-    //Returns the default custom texts for login ui
+    //Returns the default custom texts for login ui (translation file)
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/default/login/{language}";
