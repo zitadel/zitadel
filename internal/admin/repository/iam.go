@@ -29,8 +29,8 @@ type IAMRepository interface {
 
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 
-	GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error)
-	GetDefaultMessageText(ctx context.Context, textType string, language string) (*iam_model.MessageTextView, error)
+	GetDefaultMessageText(ctx context.Context, textType, language string) (*domain.CustomMessageText, error)
+	GetCustomMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 

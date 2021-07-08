@@ -5,6 +5,7 @@ import (
 	"html"
 	"strings"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
@@ -16,10 +17,6 @@ const (
 	defaultFontColor       = "#22292f"
 	defaultBackgroundColor = "#fafafa"
 	defaultPrimaryColor    = "#5282C1"
-	//defaultOrgName         = "CAOS AG"
-	//defaultOrgURL          = "http://www.caos.ch"
-	//defaultFooter1         = "Teufener Strasse 19"
-	//defaultFooter2         = "CH-9000 St. Gallen"
 )
 
 type TemplateData struct {
@@ -41,28 +38,19 @@ type TemplateData struct {
 	FooterText    string
 }
 
-func (data *TemplateData) Translate(i18n *i18n.Translator, args map[string]interface{}, langs ...string) {
-	data.Title = i18n.Localize(data.Title, nil, langs...)
-	data.PreHeader = i18n.Localize(data.PreHeader, nil, langs...)
-	data.Subject = i18n.Localize(data.Subject, nil, langs...)
-	data.Greeting = i18n.Localize(data.Greeting, args, langs...)
-	data.Text = html.UnescapeString(i18n.Localize(data.Text, args, langs...))
-	if data.Href != "" {
-		data.Href = i18n.Localize(data.Href, nil, langs...)
-	}
-	data.ButtonText = i18n.Localize(data.ButtonText, nil, langs...)
+func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]interface{}, langs ...string) {
+	data.Title = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageTitle), nil, langs...)
+	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), nil, langs...)
+	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), nil, langs...)
+	data.Greeting = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageGreeting), args, langs...)
+	data.Text = html.UnescapeString(translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...))
+	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), nil, langs...)
+	data.FooterText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText), nil, langs...)
 }
 
-func GetTemplateData(apiDomain, href string, text *iam_model.MessageTextView, policy *iam_model.LabelPolicyView) TemplateData {
+func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, apiDomain, href, msgType, lang string, policy *iam_model.LabelPolicyView) TemplateData {
 	templateData := TemplateData{
-		Title:           text.Title,
-		PreHeader:       text.PreHeader,
-		Subject:         text.Subject,
-		Greeting:        text.Greeting,
-		Text:            html.UnescapeString(text.Text),
 		Href:            href,
-		ButtonText:      text.ButtonText,
-		FooterText:      text.FooterText,
 		PrimaryColor:    defaultPrimaryColor,
 		BackgroundColor: defaultBackgroundColor,
 		FontColor:       defaultFontColor,
@@ -71,6 +59,7 @@ func GetTemplateData(apiDomain, href string, text *iam_model.MessageTextView, po
 		FontFamily:      defaultFontFamily,
 		IncludeFooter:   false,
 	}
+	templateData.Translate(translator, msgType, translateArgs, lang)
 	if policy.PrimaryColor != "" {
 		templateData.PrimaryColor = policy.PrimaryColor
 	}
