@@ -50,13 +50,13 @@ service AuthService {
     }
 
     // Returns the default languages
-    rpc GetMyLanguages(GetMyLanguagesRequest) returns (GetMyLanguagesResponse) {
+    rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
         option (google.api.http) = {
-            get: "/users/me/languages";
+            get: "/languages";
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.read";
+            permission: "authenticated";
         };
     }
 
@@ -516,10 +516,10 @@ message HealthzRequest {}
 message HealthzResponse {}
 
 //This is an empty request
-message GetMyLanguagesRequest {}
+message GetSupportedLanguagesRequest {}
 
 //This is an empty response
-message GetMyLanguagesResponse {
+message GetSupportedLanguagesResponse {
     repeated string languages = 1;
 }
 

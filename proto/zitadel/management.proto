@@ -85,13 +85,13 @@ service ManagementService {
     }
 
     // Returns the default languages
-    rpc GetLanguages(GetLanguagesRequest) returns (GetLanguagesResponse) {
+    rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
         option (google.api.http) = {
             get: "/languages";
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.read";
+            permission: "authenticated";
         };
     }
 
@@ -2580,9 +2580,9 @@ message GetIAMResponse {
 }
 
 //This is an empty request
-message GetLanguagesRequest {}
+message GetSupportedLanguagesRequest {}
 
-message GetLanguagesResponse {
+message GetSupportedLanguagesResponse {
     repeated string languages = 1;
 }
 

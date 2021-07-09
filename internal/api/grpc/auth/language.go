@@ -7,10 +7,10 @@ import (
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func (s *Server) GetMyLanguages(ctx context.Context, req *auth_pb.GetMyLanguagesRequest) (*auth_pb.GetMyLanguagesResponse, error) {
+func (s *Server) GetSupportedLanguages(ctx context.Context, req *auth_pb.GetSupportedLanguagesRequest) (*auth_pb.GetSupportedLanguagesResponse, error) {
 	langs, err := s.repo.Languages(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyLanguagesResponse{Languages: text.LanguageTagsToStrings(langs)}, nil
+	return &auth_pb.GetSupportedLanguagesResponse{Languages: text.LanguageTagsToStrings(langs)}, nil
 }

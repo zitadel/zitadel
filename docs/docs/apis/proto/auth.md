@@ -19,16 +19,16 @@ title: zitadel/auth.proto
     GET: /healthz
 
 
-### GetMyLanguages
+### GetSupportedLanguages
 
-> **rpc** GetMyLanguages([GetMyLanguagesRequest](#getmylanguagesrequest))
-[GetMyLanguagesResponse](#getmylanguagesresponse)
+> **rpc** GetSupportedLanguages([GetSupportedLanguagesRequest](#getsupportedlanguagesrequest))
+[GetSupportedLanguagesResponse](#getsupportedlanguagesresponse)
 
 Returns the default languages
 
 
 
-    GET: /users/me/languages
+    GET: /languages
 
 
 ### GetMyUser
@@ -586,23 +586,6 @@ This is an empty request
 
 
 
-### GetMyLanguagesRequest
-This is an empty request
-
-
-
-
-### GetMyLanguagesResponse
-This is an empty response
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| languages | repeated string | - |  |
-
-
-
-
 ### GetMyPasswordComplexityPolicyRequest
 This is an empty request
 
@@ -671,6 +654,23 @@ the request parameters are read from the token-header
 | ----- | ---- | ----------- | ----------- |
 | user |  zitadel.user.v1.User | - |  |
 | last_login |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### GetSupportedLanguagesRequest
+This is an empty request
+
+
+
+
+### GetSupportedLanguagesResponse
+This is an empty response
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| languages | repeated string | - |  |
 
 
 

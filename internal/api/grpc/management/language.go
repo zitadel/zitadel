@@ -7,10 +7,10 @@ import (
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetLanguages(ctx context.Context, req *mgmt_pb.GetLanguagesRequest) (*mgmt_pb.GetLanguagesResponse, error) {
+func (s *Server) GetSupportedLanguages(ctx context.Context, req *mgmt_pb.GetSupportedLanguagesRequest) (*mgmt_pb.GetSupportedLanguagesResponse, error) {
 	langs, err := s.org.Languages(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLanguagesResponse{Languages: text.LanguageTagsToStrings(langs)}, nil
+	return &mgmt_pb.GetSupportedLanguagesResponse{Languages: text.LanguageTagsToStrings(langs)}, nil
 }
