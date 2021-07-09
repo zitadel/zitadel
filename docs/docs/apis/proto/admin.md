@@ -748,7 +748,7 @@ The Following Variables can be used:
 > **rpc** GetDefaultVerifyEmailMessageText([GetDefaultVerifyEmailMessageTextRequest](#getdefaultverifyemailmessagetextrequest))
 [GetDefaultVerifyEmailMessageTextResponse](#getdefaultverifyemailmessagetextresponse)
 
-Returns the deafult text for verify email message (translation files)
+Returns the default text for verify email message (translation files)
 
 
 
@@ -787,7 +787,7 @@ The Following Variables can be used:
 > **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
 [GetDefaultVerifyPhoneMessageTextResponse](#getdefaultverifyphonemessagetextresponse)
 
-Returns the custom text for verify phone message (translation file)
+Returns the default text for verify phone message (translation file)
 
 
 
