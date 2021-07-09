@@ -1595,7 +1595,7 @@ service AdminService {
 
     }
 
-    //Returns the deafult text for verify email message (translation files)
+    //Returns the default text for verify email message (translation files)
     rpc GetDefaultVerifyEmailMessageText(GetDefaultVerifyEmailMessageTextRequest) returns (GetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/verifyemail/{language}";
@@ -1632,7 +1632,7 @@ service AdminService {
         };
     }
 
-    //Returns the custom text for verify phone message (translation file)
+    //Returns the default text for verify phone message (translation file)
     rpc GetDefaultVerifyPhoneMessageText(GetDefaultVerifyPhoneMessageTextRequest) returns (GetDefaultVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/verifyphone/{language}";

@@ -56,7 +56,10 @@ type OrgRepository struct {
 func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error) {
 	if len(repo.supportedLangs) == 0 {
 		langs, err := i18n.SupportedLanguages(repo.LoginDir)
-		logging.Log("ADMIN-tiMWs").OnError(err).Debug("unable to parse language")
+		if err != nil {
+			logging.Log("ADMIN-tiMWs").WithError(err).Debug("unable to parse language")
+			return nil, err
+		}
 		repo.supportedLangs = langs
 	}
 	return repo.supportedLangs, nil

@@ -50,19 +50,16 @@ func (m *CustomMessageText) IsValid() bool {
 }
 
 func (m *MessageTexts) GetMessageTextByType(msgType string) *CustomMessageText {
-	if msgType == InitCodeMessageType {
+	switch msgType {
+	case InitCodeMessageType:
 		return &m.InitCode
-	}
-	if msgType == PasswordResetMessageType {
+	case PasswordResetMessageType:
 		return &m.PasswordReset
-	}
-	if msgType == VerifyEmailMessageType {
+	case VerifyEmailMessageType:
 		return &m.VerifyEmail
-	}
-	if msgType == VerifyPhoneMessageType {
+	case VerifyPhoneMessageType:
 		return &m.VerifyPhone
-	}
-	if msgType == DomainClaimedMessageType {
+	case DomainClaimedMessageType:
 		return &m.DomainClaimed
 	}
 	return nil

@@ -39,13 +39,13 @@ type TemplateData struct {
 }
 
 func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]interface{}, langs ...string) {
-	data.Title = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageTitle), nil, langs...)
-	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), nil, langs...)
-	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), nil, langs...)
+	data.Title = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageTitle), args, langs...)
+	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), args, langs...)
+	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), args, langs...)
 	data.Greeting = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageGreeting), args, langs...)
 	data.Text = html.UnescapeString(translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...))
-	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), nil, langs...)
-	data.FooterText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText), nil, langs...)
+	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), args, langs...)
+	data.FooterText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText), args, langs...)
 }
 
 func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, apiDomain, href, msgType, lang string, policy *iam_model.LabelPolicyView) TemplateData {
