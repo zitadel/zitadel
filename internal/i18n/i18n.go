@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/caos/logging"
@@ -86,6 +87,30 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	}
 	bundle.MustParseMessageFileBytes(content, file.Name())
 	return nil
+}
+
+func SupportedLanguages(dir http.FileSystem) ([]language.Tag, error) {
+	i18nDir, err := dir.Open("/i18n")
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "I18N-Dbt42", "cannot open dir")
+	}
+	defer i18nDir.Close()
+	files, err := i18nDir.Readdir(0)
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "I18N-Gh4zk", "cannot read dir")
+	}
+	languages := make([]language.Tag, 0, len(files))
+	for _, file := range files {
+		lang := language.Make(strings.TrimSuffix(file.Name(), ".yaml"))
+		if lang != language.Und {
+			languages = append(languages, lang)
+		}
+	}
+	return languages, nil
+}
+
+func (t *Translator) SupportedLanguages() []language.Tag {
+	return t.bundle.LanguageTags()
 }
 
 func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {

@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/caos/logging"
@@ -16,7 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
@@ -127,21 +126,5 @@ func getSupportedLanguages() ([]language.Tag, error) {
 	if err != nil {
 		return nil, err
 	}
-	i18nDir, err := statikLoginFS.Open("/i18n")
-	if err != nil {
-		return nil, errors.ThrowNotFound(err, "OIDC-Dbt42", "cannot open dir")
-	}
-	defer i18nDir.Close()
-	files, err := i18nDir.Readdir(0)
-	if err != nil {
-		return nil, errors.ThrowNotFound(err, "OIDC-Gh4zk", "cannot read dir")
-	}
-	languages := make([]language.Tag, 0, len(files))
-	for _, file := range files {
-		lang := language.Make(strings.TrimSuffix(file.Name(), ".yaml"))
-		if lang != language.Und {
-			languages = append(languages, lang)
-		}
-	}
-	return languages, nil
+	return i18n.SupportedLanguages(statikLoginFS)
 }
