@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/caos/logging"
@@ -24,9 +25,10 @@ const (
 )
 
 type Translator struct {
-	bundle        *i18n.Bundle
-	cookieName    string
-	cookieHandler *http_util.CookieHandler
+	bundle             *i18n.Bundle
+	cookieName         string
+	cookieHandler      *http_util.CookieHandler
+	preferredLanguages []string
 }
 
 type TranslatorConfig struct {
@@ -87,6 +89,30 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	return nil
 }
 
+func SupportedLanguages(dir http.FileSystem) ([]language.Tag, error) {
+	i18nDir, err := dir.Open("/i18n")
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "I18N-Dbt42", "cannot open dir")
+	}
+	defer i18nDir.Close()
+	files, err := i18nDir.Readdir(0)
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "I18N-Gh4zk", "cannot read dir")
+	}
+	languages := make([]language.Tag, 0, len(files))
+	for _, file := range files {
+		lang := language.Make(strings.TrimSuffix(file.Name(), ".yaml"))
+		if lang != language.Und {
+			languages = append(languages, lang)
+		}
+	}
+	return languages, nil
+}
+
+func (t *Translator) SupportedLanguages() []language.Tag {
+	return t.bundle.LanguageTags()
+}
+
 func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
 	if len(messages) == 0 {
 		return nil
@@ -136,7 +162,7 @@ func (t *Translator) localizer(langs ...string) *i18n.Localizer {
 }
 
 func (t *Translator) langsFromRequest(r *http.Request) []string {
-	langs := make([]string, 0)
+	langs := t.preferredLanguages
 	if r != nil {
 		lang, err := t.cookieHandler.GetCookieValue(r, t.cookieName)
 		if err == nil {
@@ -148,7 +174,7 @@ func (t *Translator) langsFromRequest(r *http.Request) []string {
 }
 
 func (t *Translator) langsFromCtx(ctx context.Context) []string {
-	langs := make([]string, 0)
+	langs := t.preferredLanguages
 	if ctx != nil {
 		ctxData := authz.GetCtxData(ctx)
 		if ctxData.PreferredLanguage != "" {
@@ -157,6 +183,10 @@ func (t *Translator) langsFromCtx(ctx context.Context) []string {
 		langs = append(langs, getAcceptLanguageHeader(ctx))
 	}
 	return langs
+}
+
+func (t *Translator) SetPreferredLanguages(langs ...string) {
+	t.preferredLanguages = langs
 }
 
 func getAcceptLanguageHeader(ctx context.Context) string {
