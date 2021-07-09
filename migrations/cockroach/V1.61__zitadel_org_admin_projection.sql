@@ -11,5 +11,5 @@ CREATE TABLE projections.org_owners (
 	owner_last_name TEXT,
     owner_gender INT2,
 
-    PRIMARY KEY (org_id)
+    PRIMARY KEY (org_id, owner_id)
 );
