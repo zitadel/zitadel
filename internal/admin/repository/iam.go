@@ -2,6 +2,9 @@ package repository
 
 import (
 	"context"
+
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 
@@ -9,6 +12,8 @@ import (
 )
 
 type IAMRepository interface {
+	Languages(ctx context.Context) ([]language.Tag, error)
+
 	SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error)
 
 	GetIAMMemberRoles() []string

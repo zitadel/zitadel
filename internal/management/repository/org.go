@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
@@ -11,7 +13,7 @@ import (
 )
 
 type OrgRepository interface {
-	Languages(ctx context.Context, orgID string) ([]string, error)
+	Languages(ctx context.Context) ([]language.Tag, error)
 	OrgByID(ctx context.Context, id string) (*org_model.OrgView, error)
 	OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error)
 	OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error)

@@ -10,10 +10,12 @@ import (
 	"sync"
 
 	"github.com/ghodss/yaml"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 
@@ -41,6 +43,16 @@ type IAMRepository struct {
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
 	mutex                               sync.Mutex
+	supportedLangs                      []language.Tag
+}
+
+func (repo *IAMRepository) Languages(ctx context.Context) ([]language.Tag, error) {
+	if len(repo.supportedLangs) == 0 {
+		langs, err := i18n.SupportedLanguages(repo.LoginDir)
+		logging.Log("ADMIN-tiMWs").OnError(err).Debug("unable to parse language")
+		repo.supportedLangs = langs
+	}
+	return repo.supportedLangs, nil
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {

@@ -3,6 +3,9 @@ package eventsourcing
 import (
 	"context"
 
+	"github.com/caos/logging"
+	"github.com/rakyll/statik/fs"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
@@ -75,6 +78,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	if err != nil {
 		return nil, err
 	}
+
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
 
 	keyChan := make(chan *key_model.KeyView)
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
@@ -153,6 +159,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
+			LoginDir:       statikLoginFS,
 			IAMV2QuerySide: queries,
 		},
 		eventstore.FeaturesRepo{

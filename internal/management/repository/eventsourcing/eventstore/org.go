@@ -14,6 +14,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/ptypes"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -21,6 +22,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -48,11 +50,16 @@ type OrgRepository struct {
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
 	mutex                               sync.Mutex
+	supportedLangs                      []language.Tag
 }
 
-func (repo *OrgRepository) Languages(ctx context.Context, orgID string) ([]string, error) {
-
-	return []string{}, nil
+func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error) {
+	if len(repo.supportedLangs) == 0 {
+		langs, err := i18n.SupportedLanguages(repo.LoginDir)
+		logging.Log("ADMIN-tiMWs").OnError(err).Debug("unable to parse language")
+		repo.supportedLangs = langs
+	}
+	return repo.supportedLangs, nil
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
