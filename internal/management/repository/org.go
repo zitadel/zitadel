@@ -11,6 +11,7 @@ import (
 )
 
 type OrgRepository interface {
+	Languages(ctx context.Context, orgID string) ([]string, error)
 	OrgByID(ctx context.Context, id string) (*org_model.OrgView, error)
 	OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error)
 	OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error)

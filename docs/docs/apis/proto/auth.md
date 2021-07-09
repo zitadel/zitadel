@@ -19,6 +19,18 @@ title: zitadel/auth.proto
     GET: /healthz
 
 
+### GetMyLanguages
+
+> **rpc** GetMyLanguages([GetMyLanguagesRequest](#getmylanguagesrequest))
+[GetMyLanguagesResponse](#getmylanguagesresponse)
+
+Returns the default languages
+
+
+
+    GET: /users/me/languages
+
+
 ### GetMyUser
 
 > **rpc** GetMyUser([GetMyUserRequest](#getmyuserrequest))
@@ -570,6 +582,23 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | email |  zitadel.user.v1.Email | - |  |
+
+
+
+
+### GetMyLanguagesRequest
+This is an empty request
+
+
+
+
+### GetMyLanguagesResponse
+This is an empty response
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| languages | repeated string | - |  |
 
 
 

@@ -20,6 +20,18 @@ It respondes as soon as ZITADEL started
     GET: /healthz
 
 
+### GetLanguages
+
+> **rpc** GetLanguages([GetLanguagesRequest](#getlanguagesrequest))
+[GetLanguagesResponse](#getlanguagesresponse)
+
+Returns the default languages
+
+
+
+    GET: /languages
+
+
 ### IsOrgUnique
 
 > **rpc** IsOrgUnique([IsOrgUniqueRequest](#isorguniquerequest))
@@ -1570,6 +1582,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
+### GetLanguagesRequest
+This is an empty request
+
+
+
+
+### GetLanguagesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| languages | repeated string | - |  |
 
 
 

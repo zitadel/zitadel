@@ -141,7 +141,18 @@ service AdminService {
             }
         };
     }
-    
+
+    // Returns the default languages
+    rpc GetLanguages(GetLanguagesRequest) returns (GetLanguagesResponse) {
+        option (google.api.http) = {
+            get: "/languages";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
     //Checks whether an organisation exists by the given parameters 
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
@@ -2033,6 +2044,13 @@ message HealthzRequest {}
 
 //This is an empty response
 message HealthzResponse {}
+
+//This is an empty request
+message GetLanguagesRequest {}
+
+message GetLanguagesResponse {
+    repeated string languages = 1;
+}
 
 // if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {

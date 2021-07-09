@@ -50,6 +50,11 @@ type OrgRepository struct {
 	mutex                               sync.Mutex
 }
 
+func (repo *OrgRepository) Languages(ctx context.Context, orgID string) ([]string, error) {
+
+	return []string{}, nil
+}
+
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
 	org, err := repo.View.OrgByID(id)
 	if err != nil {
