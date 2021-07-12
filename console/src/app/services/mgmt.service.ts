@@ -80,6 +80,8 @@ import {
   GetAppByIDResponse,
   GetCustomInitMessageTextRequest,
   GetCustomInitMessageTextResponse,
+  GetCustomLoginTextsRequest,
+  GetCustomLoginTextsResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
@@ -90,6 +92,8 @@ import {
   GetDefaultInitMessageTextResponse,
   GetDefaultLabelPolicyRequest,
   GetDefaultLabelPolicyResponse,
+  GetDefaultLoginTextsRequest,
+  GetDefaultLoginTextsResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
   GetDefaultPasswordResetMessageTextRequest,
@@ -283,6 +287,8 @@ import {
   SendHumanResetPasswordNotificationRequest,
   SetCustomInitMessageTextRequest,
   SetCustomInitMessageTextResponse,
+  SetCustomLoginTextsRequest,
+  SetCustomLoginTextsResponse,
   SetCustomPasswordResetMessageTextRequest,
   SetCustomPasswordResetMessageTextResponse,
   SetCustomVerifyEmailMessageTextRequest,
@@ -361,6 +367,20 @@ export class ManagementService {
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) { }
+
+  public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultLoginTexts(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomLoginTexts(req: GetCustomLoginTextsRequest): Promise<GetCustomLoginTextsResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomLoginTexts(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomLoginText(req: SetCustomLoginTextsRequest): Promise<SetCustomLoginTextsResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomLoginText(req, null).then(resp => resp.toObject());
+  }
+
+  // message texts
 
   public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => resp.toObject());

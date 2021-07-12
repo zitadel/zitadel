@@ -124,6 +124,14 @@ const routes: Routes = [
         loadChildren: () => import('src/app/modules/policies/message-texts/message-texts.module')
           .then(m => m.MessageTextsPolicyModule),
       },
+      {
+        path: PolicyComponentType.LOGINTEXTS,
+        data: {
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+        loadChildren: () => import('src/app/modules/policies/login-texts/login-texts.module')
+          .then(m => m.LoginTextsPolicyModule),
+      },
     ],
   },
 ];

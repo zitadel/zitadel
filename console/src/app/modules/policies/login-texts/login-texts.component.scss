@@ -1,0 +1,41 @@
+.spinner-wr {
+  margin: .5rem 0;
+}
+
+.message-type {
+  .active {
+    background: #cbf4c9;
+    color: #0e6245;
+  }
+}
+
+.content {
+  padding-top: 1rem;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(var(--grey), .5);
+  margin: 1rem 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+
+  .save-button,
+  .reset-button {
+    display: block;
+    margin: 0 .25rem 3rem .25rem;
+  }
+
+  .reset-button {
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-bottom: 3px;
+    }
+  }
+}

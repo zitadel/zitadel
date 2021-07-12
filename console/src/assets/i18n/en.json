@@ -704,6 +704,10 @@
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
       "SAVED": "Saved successfully!"
     },
+    "LOGIN_TEXTS": {
+      "TITLE":"Login Interface Texts",
+      "DESCRIPTION": "Define your texts for the login interfaces"
+    },
     "MESSAGE_TEXTS": {
       "TITLE":"Message Texts",
       "DESCRIPTION": "Define your texts for your notication mails.",

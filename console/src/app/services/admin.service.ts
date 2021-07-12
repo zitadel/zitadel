@@ -19,12 +19,16 @@ import {
   ClearViewResponse,
   DeactivateIDPRequest,
   DeactivateIDPResponse,
+  GetCustomLoginTextsRequest,
+  GetCustomLoginTextsResponse,
   GetCustomOrgIAMPolicyRequest,
   GetCustomOrgIAMPolicyResponse,
   GetDefaultFeaturesRequest,
   GetDefaultFeaturesResponse,
   GetDefaultInitMessageTextRequest,
   GetDefaultInitMessageTextResponse,
+  GetDefaultLoginTextsRequest,
+  GetDefaultLoginTextsResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -94,6 +98,8 @@ import {
   ResetCustomOrgIAMPolicyToDefaultResponse,
   ResetOrgFeaturesRequest,
   ResetOrgFeaturesResponse,
+  SetCustomLoginTextsRequest,
+  SetCustomLoginTextsResponse,
   SetDefaultFeaturesRequest,
   SetDefaultFeaturesResponse,
   SetDefaultInitMessageTextRequest,
@@ -138,6 +144,20 @@ import { GrpcService } from './grpc.service';
 })
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) { }
+
+  public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
+    return this.grpcService.admin.getDefaultLoginTexts(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomLoginTexts(req: GetCustomLoginTextsRequest): Promise<GetCustomLoginTextsResponse.AsObject> {
+    return this.grpcService.admin.getCustomLoginTexts(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomLoginText(req: SetCustomLoginTextsRequest): Promise<SetCustomLoginTextsResponse.AsObject> {
+    return this.grpcService.admin.setCustomLoginText(req, null).then(resp => resp.toObject());
+  }
+
+  // message texts
 
   public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
     return this.grpcService.admin.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
