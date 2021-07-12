@@ -197,7 +197,7 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="!disabled && (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async))"
+        <div *ngIf="!disabled && ((serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async)) || serviceType == PolicyComponentServiceType.ADMIN)"
             class="new-idp" (click)="openDialog()" matRipple>
             <mat-icon>add</mat-icon>
         </div>
