@@ -141,8 +141,10 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 			case map[string]interface{}:
 				var err error
 				value, err = json.Marshal(value)
-				logging.Log("SQL-BSsNy").OnError(err).Warn("unable to marshal search value")
-				continue
+				if err != nil {
+					logging.Log("SQL-BSsNy").WithError(err).Warn("unable to marshal search value")
+					continue
+				}
 			}
 
 			subClauses = append(subClauses, getCondition(criteria, f))
