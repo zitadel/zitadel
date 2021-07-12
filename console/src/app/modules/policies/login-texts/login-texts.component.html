@@ -3,10 +3,10 @@
     [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
 
     <cnsl-form-field class="full-width" appearance="outline">
-      <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
       <mat-select [(ngModel)]="currentSubMap" (selectionChange)="setCurrentType($event.value)">
           <mat-option *ngFor="let key of KeyNamesArray" [value]="key">
-              {{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate}}
+              {{key }}
           </mat-option>
       </mat-select>
   </cnsl-form-field>

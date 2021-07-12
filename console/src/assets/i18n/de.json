@@ -704,7 +704,8 @@
     },
     "LOGIN_TEXTS": {
       "TITLE":"Login Interface Texte",
-      "DESCRIPTION": "Definiere die Texte für den Login"
+      "DESCRIPTION": "Definiere die Texte für den Login",
+      "KEYNAME":"Login Screen / Interface"
     },
     "MESSAGE_TEXTS": {
       "TITLE":"Email Texte",

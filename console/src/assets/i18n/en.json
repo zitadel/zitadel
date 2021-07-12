@@ -706,7 +706,8 @@
     },
     "LOGIN_TEXTS": {
       "TITLE":"Login Interface Texts",
-      "DESCRIPTION": "Define your texts for the login interfaces"
+      "DESCRIPTION": "Define your texts for the login interfaces",
+      "KEYNAME":"Login Screen / Interface"
     },
     "MESSAGE_TEXTS": {
       "TITLE":"Message Texts",
