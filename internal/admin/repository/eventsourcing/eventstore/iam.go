@@ -413,9 +413,10 @@ func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
 	contents, ok := repo.TranslationFileContents[lang]
+	var err error
 	if !ok {
-		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
-		if os.IsNotExist(err) {
+		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if caos_errs.IsNotFound(err) {
 			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
@@ -448,6 +449,9 @@ func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 
 func (repo *IAMRepository) readTranslationFile(filename string) ([]byte, error) {
 	r, err := repo.LoginDir.Open(filename)
+	if os.IsNotExist(err) {
+		return nil, caos_errs.ThrowNotFound(err, "TEXT-3n9fs", "Errors.TranslationFile.NotFound")
+	}
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
 	}

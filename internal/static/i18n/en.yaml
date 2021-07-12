@@ -358,6 +358,7 @@ Errors:
   TranslationFile:
     ReadError: Error in reading translation file
     MergeError: Translation file could not be merged with custom translations
+    NotFound: Translation file doesn't exist
 EventTypes:
   user:
     added: User added
