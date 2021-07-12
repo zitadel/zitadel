@@ -600,7 +600,7 @@ func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, 
 	contents, ok := repo.NotificationTranslationFileContents[lang]
 	if !ok {
 		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if os.IsNotExist(err) {
+		if errors.IsNotFound(err) {
 			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
@@ -651,10 +651,11 @@ func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
 	contents, ok := repo.LoginTranslationFileContents[lang]
+	var err error
 	if !ok {
-		contents, err := repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if os.IsNotExist(err) {
-			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if errors.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
 			return nil, err
@@ -794,6 +795,9 @@ func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 
 func (repo *OrgRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
 	r, err := dir.Open(filename)
+	if os.IsNotExist(err) {
+		return nil, errors.ThrowNotFound(err, "TEXT-93nfl", "Errors.TranslationFile.NotFound")
+	}
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
 	}

@@ -389,7 +389,7 @@ func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, 
 	contents, ok := repo.NotificationTranslationFileContents[lang]
 	if !ok {
 		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if os.IsNotExist(err) {
+		if caos_errs.IsNotFound(err) {
 			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
@@ -445,10 +445,11 @@ func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
 	contents, ok := repo.LoginTranslationFileContents[lang]
+	var err error
 	if !ok {
-		contents, err := repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if os.IsNotExist(err) {
-			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		if caos_errs.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
 			return nil, err
@@ -480,6 +481,9 @@ func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 
 func (repo *IAMRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
 	r, err := dir.Open(filename)
+	if os.IsNotExist(err) {
+		return nil, caos_errs.ThrowNotFound(err, "TEXT-3n9fs", "Errors.TranslationFile.NotFound")
+	}
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
 	}
