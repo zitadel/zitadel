@@ -653,9 +653,9 @@ func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string
 	contents, ok := repo.LoginTranslationFileContents[lang]
 	var err error
 	if !ok {
-		contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
 		if errors.IsNotFound(err) {
-			contents, err = repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
 		}
 		if err != nil {
 			return nil, err
