@@ -6,8 +6,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-
-	"github.com/caos/zitadel/internal/api/grpc/errors"
+	"google.golang.org/grpc/status"
 )
 
 func SentryHandler() grpc.UnaryServerInterceptor {
@@ -18,8 +17,17 @@ func SentryHandler() grpc.UnaryServerInterceptor {
 
 func sendErrToSentry(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (interface{}, error) {
 	resp, err := handler(ctx, req)
-	code, _, _, _ := errors.ExtractCaosError(err)
-	if code == codes.Unknown || code == codes.Internal {
+	code := status.Code(err)
+	switch code {
+	case codes.Canceled,
+		codes.Unknown,
+		codes.DeadlineExceeded,
+		codes.ResourceExhausted,
+		codes.Aborted,
+		codes.Unimplemented,
+		codes.Internal,
+		codes.Unavailable,
+		codes.DataLoss:
 		sentry.CaptureException(err)
 	}
 	return resp, err
