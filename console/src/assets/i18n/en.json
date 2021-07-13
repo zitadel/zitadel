@@ -139,7 +139,8 @@
     "PIN": "Pin / Unpin",
     "CONFIGURE": "Configure",
     "SEND": "Send",
-    "NEWVALUE": "New Value"
+    "NEWVALUE": "New Value",
+    "RESTORE":"Restore"
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
@@ -706,8 +707,10 @@
     },
     "LOGIN_TEXTS": {
       "TITLE":"Login Interface Texts",
-      "DESCRIPTION": "Define your texts for the login interfaces",
-      "KEYNAME":"Login Screen / Interface"
+      "DESCRIPTION": "Define your texts for the login interfaces. If texts are empty, the default Value shown as the placeholder will be used.",
+      "KEYNAME":"Login Screen / Interface",
+      "RESET_TITLE":"Restore Default Values",
+      "RESET_DESCRIPTION":"You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?"
     },
     "MESSAGE_TEXTS": {
       "TITLE":"Message Texts",

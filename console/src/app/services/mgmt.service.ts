@@ -274,6 +274,8 @@ import {
   ResendHumanInitializationRequest,
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequest,
+  ResetCustomLoginTextsToDefaultRequest,
+  ResetCustomLoginTextsToDefaultResponse,
   ResetLabelPolicyToDefaultRequest,
   ResetLabelPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
@@ -378,6 +380,10 @@ export class ManagementService {
 
   public setCustomLoginText(req: SetCustomLoginTextsRequest): Promise<SetCustomLoginTextsResponse.AsObject> {
     return this.grpcService.mgmt.setCustomLoginText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomLoginTextToDefault(req: ResetCustomLoginTextsToDefaultRequest): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
+    return this.grpcService.mgmt.resetCustomLoginTextToDefault(req, null).then(resp => resp.toObject());
   }
 
   // message texts

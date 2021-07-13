@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,6 +19,7 @@ import { EditTextModule } from '../../edit-text/edit-text.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { LinksModule } from '../../links/links.module';
+import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { LoginTextsRoutingModule } from './login-texts-routing.module';
 import { LoginTextsComponent } from './login-texts.component';
 
@@ -44,7 +46,9 @@ import { LoginTextsComponent } from './login-texts.component';
     DetailLayoutModule,
     MatProgressSpinnerModule,
     LinksModule,
-    TextFieldModule
+    TextFieldModule,
+    MatDialogModule,
+    WarnDialogModule,
   ],
 })
 export class LoginTextsPolicyModule { }

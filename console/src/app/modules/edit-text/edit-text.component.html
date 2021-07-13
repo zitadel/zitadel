@@ -11,7 +11,7 @@
           <button matTooltip="{{'ACTIONS.RESETCURRENT'| translate }}" mat-icon-button [disabled]="form.get(key.key)?.value == currentMap[key.key]" (click)="form.get(key.key)?.setValue(currentMap[key.key])" (mouseenter) = "form.get(key.key)?.value != currentMap[key.key] && setWarnText(key.key, currentMap[key.key])"  (mouseleave) ="setWarnText(key.key, undefined)"><i class="las la-undo"></i></button>
         </div>
       </div>
-      <cnsl-info-section *ngIf="warnText[key.key] !== undefined" class="info" type="WARN">{{'ACTIONS.RESETTO'| translate }} <cite>{{warnText[key.key]}}</cite></cnsl-info-section>
+      <cnsl-info-section @info *ngIf="warnText[key.key] !== undefined" class="info" type="WARN">{{'ACTIONS.RESETTO'| translate }} <cite>{{warnText[key.key]}}</cite></cnsl-info-section>
     </ng-container>
   </form>
 </div>

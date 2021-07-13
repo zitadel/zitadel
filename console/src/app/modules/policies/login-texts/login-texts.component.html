@@ -10,6 +10,9 @@
           </mat-option>
       </mat-select>
   </cnsl-form-field>
+
+  <div class="divider"></div>
+
     <!-- <div class="message-type">
       <button *ngFor="let key of KeyNamesArray" (click)="setCurrentType(key)" [ngClass]="{'active': currentSubMap == key}" mat-button>{{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate}}</button>
     </div> -->
@@ -19,13 +22,11 @@
     </div>
 
     <div class="actions">
-      <button class="reset-button" (click)="saveCurrentMessage()" color="warn" type="submit"
+      <button class="reset-button" (click)="resetDefault()" color="warn" type="submit"
       mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
       <button class="save-button" (click)="saveCurrentMessage()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
-
-    <div class="divider"></div>
 
     <ng-container
         *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false">

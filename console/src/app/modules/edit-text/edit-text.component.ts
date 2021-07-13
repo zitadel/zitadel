@@ -2,11 +2,15 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { infoAnimation } from 'src/app/animations';
 
 @Component({
   selector: 'cnsl-edit-text',
   templateUrl: './edit-text.component.html',
-  styleUrls: ['./edit-text.component.scss']
+  styleUrls: ['./edit-text.component.scss'],
+  animations: [
+    infoAnimation,
+  ]
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = '';
