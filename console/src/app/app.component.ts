@@ -19,7 +19,6 @@ import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
-import { UpdateService } from './services/update.service';
 
 @Component({
     selector: 'app-root',
@@ -72,7 +71,6 @@ export class AppComponent implements OnDestroy {
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private router: Router,
-        update: UpdateService,
         @Inject(DOCUMENT) private document: Document,
     ) {
         console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px');

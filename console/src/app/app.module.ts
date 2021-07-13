@@ -18,7 +18,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
@@ -128,7 +127,6 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     RegExpPipeModule,
     OnboardingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [
     ThemeService,
