@@ -1,10 +1,10 @@
 package types
 
 import (
-	"html"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -22,7 +22,7 @@ type UrlData struct {
 	PasswordSet bool
 }
 
-func SendUserInitCode(mailhtml string, text *iam_model.MessageTextView, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView, apiDomain string) error {
+func SendUserInitCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView, apiDomain string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -34,17 +34,13 @@ func SendUserInitCode(mailhtml string, text *iam_model.MessageTextView, user *vi
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString
 
-	text.Greeting, err = templates.ParseTemplateText(text.Greeting, args)
-	text.Text, err = templates.ParseTemplateText(text.Text, args)
-	text.Text = html.UnescapeString(text.Text)
-
-	emailCodeData := &InitCodeEmailData{
-		TemplateData: templates.GetTemplateData(apiDomain, url, text, colors),
+	initCodeData := &InitCodeEmailData{
+		TemplateData: templates.GetTemplateData(translator, args, apiDomain, url, domain.InitCodeMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
-	template, err := templates.GetParsedTemplate(mailhtml, emailCodeData)
+	template, err := templates.GetParsedTemplate(mailhtml, initCodeData)
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, text.Subject, template, systemDefaults.Notifications, true)
+	return generateEmail(user, initCodeData.Subject, template, systemDefaults.Notifications, true)
 }
