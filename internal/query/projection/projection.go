@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/caos/zitadel/internal/query/projection/org/owner"
 )
 
 const (
@@ -36,7 +37,7 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 		BulkLimit:         config.BulkLimit,
 	}
 
-	NewOrgProjection(ctx, projectionConfig)
-	NewOrgOwnerProjection(ctx, projectionConfig)
+	// NewOrgProjection(ctx, projectionConfig)
+	owner.NewOrgOwnerProjection(ctx, projectionConfig)
 	return nil
 }

@@ -34,20 +34,26 @@ EventstoreBase:
   SSL:
     Mode: $CR_SSL_MODE
     RootCert: $CR_ROOT_CERT
+    Cert: $CR_EVENTSTORE_CERT
+    Key: $CR_EVENTSTORE_KEY
 
 Commands:
   Eventstore:
-    User: 'eventstore'
+    User: 'root'
     Password: $CR_EVENTSTORE_PASSWORD
     SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
       Cert: $CR_EVENTSTORE_CERT
       Key: $CR_EVENTSTORE_KEY
 
 Queries:
   Eventstore:
-    User: 'eventstore'
-    Password: $CR_EVENTSTORE_PASSWORD
+    User: 'root'
+    Password: $CR_QUERIES_PASSWORD
     SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
       Cert: $CR_EVENTSTORE_CERT
       Key: $CR_EVENTSTORE_KEY
 
@@ -55,20 +61,19 @@ Projections:
   RequeueEvery: 10s
   RetryFailedAfter: 1s
   MaxFailureCount: 5
-  BulkLimit: 20
+  BulkLimit: 200
   CRDB:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'queries'
+    User: 'root'
     Database: 'zitadel'
     Schema: 'projections'
     Password: $CR_QUERIES_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_AUTHZ_CERT
-      Key: $CR_AUTHZ_KEY
-  
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
 
 AuthZ:
   Repository:
@@ -78,14 +83,14 @@ AuthZ:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'authz'
+          User: 'root'
           Database: 'eventstore'
           Password: $CR_AUTHZ_PASSWORD
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_AUTHZ_CERT
-            Key: $CR_AUTHZ_KEY
+            Cert: $CR_EVENTSTORE_CERT
+            Key: $CR_EVENTSTORE_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -93,14 +98,14 @@ AuthZ:
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'authz'
+      User: 'root'
       Database: 'authz'
       Password: $CR_AUTHZ_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_AUTHZ_CERT
-        Key: $CR_AUTHZ_KEY
+        Cert: $CR_EVENTSTORE_CERT
+        Key: $CR_EVENTSTORE_KEY
     Spooler:
       ConcurrentWorkers: 1
       BulkLimit: 10000
@@ -116,14 +121,14 @@ Auth:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'auth'
+        User: 'root'
         Database: 'eventstore'
         Password: $CR_AUTH_PASSWORD
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_AUTH_CERT
-          Key: $CR_AUTH_KEY
+          Cert: $CR_EVENTSTORE_CERT
+          Key: $CR_EVENTSTORE_KEY
     Cache:
       Type: 'fastcache'
       Config:
@@ -132,25 +137,25 @@ Auth:
     Connection:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'auth'
+      User: 'root'
       Database: 'auth'
       Password: $CR_AUTH_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_AUTH_CERT
-        Key: $CR_AUTH_KEY
+        Cert: $CR_EVENTSTORE_CERT
+        Key: $CR_EVENTSTORE_KEY
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'auth'
+    User: 'root'
     Database: 'auth'
     Password: $CR_AUTH_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_AUTH_CERT
-      Key: $CR_AUTH_KEY
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -166,14 +171,14 @@ Admin:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'adminapi'
+        User: 'root'
         Database: 'eventstore'
         Password: $CR_ADMINAPI_PASSWORD
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_ADMINAPI_CERT
-          Key: $CR_ADMINAPI_KEY
+          Cert: $CR_EVENTSTORE_CERT
+          Key: $CR_EVENTSTORE_KEY
     Cache:
       Type: 'fastcache'
       Config:
@@ -181,14 +186,14 @@ Admin:
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'adminapi'
+    User: 'root'
     Database: 'adminapi'
     Password: $CR_ADMINAPI_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_ADMINAPI_CERT
-      Key: $CR_ADMINAPI_KEY
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -204,14 +209,14 @@ Mgmt:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'management'
+        User: 'root'
         Database: 'eventstore'
         Password: $CR_MANAGEMENT_PASSWORD
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_MANAGEMENT_CERT
-          Key: $CR_MANAGEMENT_KEY
+          Cert: $CR_EVENTSTORE_CERT
+          Key: $CR_EVENTSTORE_KEY
     Cache:
       Type: 'fastcache'
       Config:
@@ -219,14 +224,14 @@ Mgmt:
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'management'
+    User: 'root'
     Database: 'management'
     Password: $CR_MANAGEMENT_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_MANAGEMENT_CERT
-      Key: $CR_MANAGEMENT_KEY
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -328,14 +333,14 @@ Notification:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'notification'
+          User: 'root'
           Database: 'eventstore'
           Password: $CR_NOTIFICATION_PASSWORD
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_NOTIFICATION_CERT
-            Key: $CR_NOTIFICATION_KEY
+            Cert: $CR_EVENTSTORE_CERT
+            Key: $CR_EVENTSTORE_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -343,14 +348,14 @@ Notification:
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'notification'
+      User: 'root'
       Database: 'notification'
       Password: $CR_NOTIFICATION_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_NOTIFICATION_CERT
-        Key: $CR_NOTIFICATION_KEY
+        Cert: $CR_EVENTSTORE_CERT
+        Key: $CR_EVENTSTORE_KEY
     Spooler:
       ConcurrentWorkers: 1
       BulkLimit: 10000
