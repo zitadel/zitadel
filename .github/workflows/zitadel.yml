@@ -344,3 +344,4 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           version: ${{ steps.semantic.outputs.new_release_version }}
+          projects: "console database-operator zitadel zitadel-operator zitadelctl"
