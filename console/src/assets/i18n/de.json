@@ -709,6 +709,13 @@
       "KEYNAME":"Login Screen / Interface",
       "RESET_TITLE":"Standardwerte wiederherstellen",
       "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "LOCALE":"Sprachcode",
+      "LOCALES": {
+        "de":"German",
+        "en":"English",
+        "it":"Italian",
+        "fr":"French"
+      },
       "KEYS": {
         "emailVerificationDoneText":"Email Verification erfolgreich",
         "emailVerificationText":"Email Verification",

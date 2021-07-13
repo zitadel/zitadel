@@ -711,6 +711,13 @@
       "KEYNAME":"Login Screen / Interface",
       "RESET_TITLE":"Restore Default Values",
       "RESET_DESCRIPTION":"You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
+      "LOCALE":"Locale Code",
+      "LOCALES": {
+        "de":"German",
+        "en":"English",
+        "it":"Italian",
+        "fr":"French"
+      },
       "KEYS": {
         "emailVerificationDoneText":"Email verification done",
         "emailVerificationText":"Email verification",

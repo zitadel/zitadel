@@ -1,5 +1,6 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
@@ -106,7 +107,11 @@ export class LoginTextsComponent implements OnDestroy {
   public currentSubMap: string = 'emailVerificationDoneText';
 
   public KeyNamesArray: string[] = KeyNamesArray;
+  public locale: string = 'en';
+  public LOCALES: string[] = ['en', 'de', 'fr', 'it'];
+
   private sub: Subscription = new Subscription();
+
 
   constructor(
     private route: ActivatedRoute,
@@ -151,6 +156,10 @@ export class LoginTextsComponent implements OnDestroy {
 
   public getCurrentValues(req: any): Promise<any> {
     return this.stripDetails((this.service as ManagementService).getCustomLoginTexts(req));
+  }
+
+  public changeLocale(selection: MatSelectChange): void {
+    this.locale = selection.value;
   }
 
   public async loadData() {

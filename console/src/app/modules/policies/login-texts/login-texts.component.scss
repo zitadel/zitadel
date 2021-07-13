@@ -2,10 +2,42 @@
   margin: .5rem 0;
 }
 
-.message-type {
-  .active {
-    background: #cbf4c9;
-    color: #0e6245;
+.top-actions {
+  display: flex;
+  margin: 0 -.5rem;
+  flex-wrap: wrap;
+
+  .keys {
+    flex: 1;
+    margin: 0 .5rem;
+    min-width: 150px;
+  }
+
+  .language {
+    flex: 1;
+    margin: 0 .5rem;
+    min-width: 150px;
+
+    .lighter {
+      font-size: 12px;
+      color: var(--grey);
+      padding: 0 .5rem;
+    }
+  }
+}
+
+.centerline {
+  display: flex;
+  align-items: center;
+
+  .img-wrapper {
+    width: 50px;
+    display: flex;
+
+    img {
+      height: 15px;
+      width: auto;
+    }
   }
 }
 
