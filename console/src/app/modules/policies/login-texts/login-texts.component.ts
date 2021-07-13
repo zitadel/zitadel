@@ -15,6 +15,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
 import {
@@ -34,7 +35,6 @@ const KeyNamesArray = [
   'emailVerificationText',
   'externalUserNotFoundText',
   'footerText',
-  'initMfaDoneText',
   'initMfaDoneText',
   'initMfaOtpText',
   'initMfaPromptText',
@@ -107,11 +107,13 @@ export class LoginTextsComponent implements OnDestroy {
 
   public KeyNamesArray: string[] = KeyNamesArray;
   private sub: Subscription = new Subscription();
+
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
     private translate: TranslateService,
     private dialog: MatDialog,
+    private toast: ToastService,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
@@ -195,7 +197,15 @@ export class LoginTextsComponent implements OnDestroy {
 
     dialogRef.afterClosed().subscribe(resp => {
       if (resp) {
-
+        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+          (this.service as ManagementService).resetCustomLoginTextToDefault().then(() => {
+            setTimeout(() => {
+              this.loadData();
+            }, 1000);
+          }).catch(error => {
+            this.toast.showError(error);
+          });
+        }
       }
     });
   }

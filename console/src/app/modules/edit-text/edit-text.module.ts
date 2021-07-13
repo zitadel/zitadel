@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
 import { FormFieldModule } from '../form-field/form-field.module';
@@ -28,7 +29,8 @@ import { EditTextComponent } from './edit-text.component';
     MatTooltipModule,
     TranslateModule,
     MatTooltipModule,
-    TextFieldModule
+    TextFieldModule,
+    CopyToClipboardModule,
   ],
   exports: [
     EditTextComponent,

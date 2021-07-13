@@ -25,6 +25,12 @@ import {
   RegistrationOptionScreenText,
   RegistrationOrgScreenText,
   RegistrationUserScreenText,
+  SelectAccountScreenText,
+  SuccessLoginScreenText,
+  UsernameChangeDoneScreenText,
+  UsernameChangeScreenText,
+  VerifyMFAOTPScreenText,
+  VerifyMFAU2FScreenText,
 } from 'src/app/proto/generated/zitadel/text_pb';
 
 type Req = AdminSetCustomLoginTextsRequest | SetCustomLoginTextsRequest;
@@ -347,12 +353,74 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     req.setRegistrationUserText(r);
   })() : null;
 
-  // req.setSelectAccountText(map.selectAccountText ?? '');
-  // req.setSuccessLoginText(map.successLoginText ?? '');
-  // req.setUsernameChangeDoneText(map.usernameChangeDoneText ?? '');
-  // req.setUsernameChangeText(map.usernameChangeText ?? '');
-  // req.setVerifyMfaOtpText(map.verifyMfaOtpText ?? '');
-  // req.setVerifyMfaU2fText(map.verifyMfaU2fText ?? '');
+  map.selectAccountText ? (() => {
+    const r = new SelectAccountScreenText();
+    r.setDescription(map.selectAccountText?.description ?? '');
+    r.setDescriptionLinkingProcess(map.selectAccountText?.descriptionLinkingProcess ?? '');
+    r.setOtherUser(map.selectAccountText?.otherUser ?? '');
+    r.setSessionStateActive(map.selectAccountText?.sessionStateActive ?? '');
+    r.setSessionStateInactive(map.selectAccountText?.sessionStateInactive ?? '');
+    r.setTitle(map.selectAccountText?.title ?? '');
+    r.setTitleLinkingProcess(map.selectAccountText?.titleLinkingProcess ?? '');
+    r.setUserMustBeMemberOfOrg(map.selectAccountText?.userMustBeMemberOfOrg ?? '');
+
+    req.setSelectAccountText(r);
+  })() : null;
+
+
+  map.successLoginText ? (() => {
+    const r = new SuccessLoginScreenText();
+    r.setAutoRedirectDescription(map.successLoginText?.autoRedirectDescription ?? '');
+    r.setNextButtonText(map.successLoginText?.nextButtonText ?? '');
+    r.setRedirectedDescription(map.successLoginText?.redirectedDescription ?? '');
+    r.setTitle(map.successLoginText?.title ?? '');
+
+    req.setSuccessLoginText(r);
+  })() : null;
+
+
+  map.usernameChangeDoneText ? (() => {
+    const r = new UsernameChangeDoneScreenText();
+    r.setDescription(map.usernameChangeDoneText?.description ?? '');
+    r.setNextButtonText(map.usernameChangeDoneText?.nextButtonText ?? '');
+    r.setTitle(map.usernameChangeDoneText?.title ?? '');
+
+    req.setUsernameChangeDoneText(r);
+  })() : null;
+
+
+  map.usernameChangeText ? (() => {
+    const r = new UsernameChangeScreenText();
+    r.setCancelButtonText(map.usernameChangeText?.cancelButtonText ?? '');
+    r.setDescription(map.usernameChangeText?.description ?? '');
+    r.setNextButtonText(map.usernameChangeText?.nextButtonText ?? '');
+    r.setTitle(map.usernameChangeText?.title ?? '');
+    r.setUsernameLabel(map.usernameChangeText?.usernameLabel ?? '');
+
+    req.setUsernameChangeText(r);
+  })() : null;
+
+  map.verifyMfaOtpText ? (() => {
+    const r = new VerifyMFAOTPScreenText();
+    r.setCodeLabel(map.verifyMfaOtpText?.codeLabel ?? '');
+    r.setDescription(map.verifyMfaOtpText?.description ?? '');
+    r.setNextButtonText(map.verifyMfaOtpText?.nextButtonText ?? '');
+    r.setTitle(map.verifyMfaOtpText?.title ?? '');
+
+    req.setVerifyMfaOtpText(r);
+  })() : null;
+
+
+  map.verifyMfaU2fText ? (() => {
+    const r = new VerifyMFAU2FScreenText();
+    r.setDescription(map.verifyMfaU2fText?.description ?? '');
+    r.setErrorRetry(map.verifyMfaU2fText?.errorRetry ?? '');
+    r.setNotSupported(map.verifyMfaU2fText?.notSupported ?? '');
+    r.setTitle(map.verifyMfaU2fText?.title ?? '');
+    r.setValidateTokenText(map.verifyMfaU2fText?.validateTokenText ?? '');
+
+    req.setVerifyMfaU2fText(r);
+  })() : null;
 
   return req;
 }

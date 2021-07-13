@@ -13,6 +13,24 @@
   padding-top: 1rem;
 }
 
+.chips {
+  display: flex;
+  margin: 0 -.25rem;
+
+  .chip {
+    border-radius: 50vw;
+    padding: 2px .5rem;
+    font-size: 12px;
+    background: #cbf4c9;
+    color: #0e6245;
+    margin: .25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+}
+
 .divider {
   width: 100%;
   height: 1px;

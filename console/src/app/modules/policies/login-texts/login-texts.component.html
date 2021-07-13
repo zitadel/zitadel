@@ -2,29 +2,37 @@
     [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate"
     [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
 
-    <cnsl-form-field class="full-width" appearance="outline">
+    <cnsl-form-field class="full-width" appearance="outline" >
       <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
       <mat-select [(ngModel)]="currentSubMap" (selectionChange)="setCurrentType($event.value)">
           <mat-option *ngFor="let key of KeyNamesArray" [value]="key">
-              {{key }}
+              {{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate }}
           </mat-option>
       </mat-select>
   </cnsl-form-field>
+
+  <cnsl-info-section class="warn"
+  *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false"
+  type="WARN">
+  {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+  'custom_text'})}}
+</cnsl-info-section>
 
   <div class="divider"></div>
 
     <!-- <div class="message-type">
       <button *ngFor="let key of KeyNamesArray" (click)="setCurrentType(key)" [ngClass]="{'active': currentSubMap == key}" mat-button>{{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate}}</button>
     </div> -->
+
     <div class="content" >
-      <cnsl-edit-text label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+      <cnsl-edit-text label="one" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
         $event)"></cnsl-edit-text>
     </div>
 
     <div class="actions">
-      <button class="reset-button" (click)="resetDefault()" color="warn" type="submit"
+      <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="resetDefault()" color="warn" type="submit"
       mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
-      <button class="save-button" (click)="saveCurrentMessage()" color="primary" type="submit"
+      <button class="save-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
 

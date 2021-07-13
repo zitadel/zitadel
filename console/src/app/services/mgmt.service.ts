@@ -382,7 +382,8 @@ export class ManagementService {
     return this.grpcService.mgmt.setCustomLoginText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomLoginTextToDefault(req: ResetCustomLoginTextsToDefaultRequest): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
+  public resetCustomLoginTextToDefault(): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
+    const req = new ResetCustomLoginTextsToDefaultRequest();
     return this.grpcService.mgmt.resetCustomLoginTextToDefault(req, null).then(resp => resp.toObject());
   }
 

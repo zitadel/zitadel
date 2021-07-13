@@ -24,6 +24,7 @@ import {
 import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
 import {
@@ -165,10 +166,20 @@ export class MessageTextsComponent implements OnDestroy {
   public nextLinks: CnslLinks[] = [];
   public MESSAGETYPES: any = MESSAGETYPES;
 
+  private updateRequest!: SetCustomInitMessageTextRequest | SetDefaultInitMessageTextRequest;
+
+  public chips: any[] = [
+    { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+    { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+    { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
+    { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+  ];
+
   private sub: Subscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
+    private toast: ToastService,
     private injector: Injector,
     private translate: TranslateService,
   ) {
@@ -246,12 +257,21 @@ export class MessageTextsComponent implements OnDestroy {
   public updateCurrentValues(values: { [key: string]: string; }): void {
     const req = REQUESTMAP[this.serviceType][MESSAGETYPES.INIT].setFcn;
     const mappedValues = req(values);
-
+    this.updateRequest = mappedValues;
+    this.updateRequest.setLanguage(this.translate.currentLang);
     console.log(mappedValues.toObject());
   }
 
   public saveCurrentMessage(): void {
-    console.log('save');
+    if (this.serviceType == PolicyComponentServiceType.MGMT) {
+      (this.service as ManagementService).setCustomInitMessageText(this.updateRequest).then(() => {
+        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+      }).catch(error => this.toast.showError(error));
+    } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
+      (this.service as AdminService).setDefaultInitMessageText(this.updateRequest).then(() => {
+        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+      }).catch(error => this.toast.showError(error));
+    }
   }
 
   private stripDetails(prom: Promise<any>): Promise<any> {

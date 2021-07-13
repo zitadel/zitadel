@@ -10,35 +10,6 @@ import {
   trigger,
 } from '@angular/animations';
 
-export const infoAnimation: AnimationTriggerMetadata =
-  trigger('info', [
-    transition(':enter', [
-      style({
-        transform: 'translateY(-80%)',
-        opacity: 0,
-      }),
-      animate(
-        '.15s ease',
-        style({
-          transform: 'translateY(0%)',
-          opacity: 1,
-        }),
-      ),
-    ]),
-    transition(':leave', [
-      style({
-        transform: 'translateY(0%)',
-        opacity: 1,
-      }),
-      animate(
-        '.15s ease',
-        style({
-          transform: 'translateY(-80%)',
-          opacity: 0,
-        }),
-      ),
-    ]),
-  ]);
 
 export const toolbarAnimation: AnimationTriggerMetadata =
   trigger('toolbar', [

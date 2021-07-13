@@ -708,7 +708,39 @@
       "DESCRIPTION": "Definiere die Texte für den Login. Wenn Texte leer sind, wird der als Platzhalter angezeigte Standardwert verwendet.",
       "KEYNAME":"Login Screen / Interface",
       "RESET_TITLE":"Standardwerte wiederherstellen",
-      "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?"
+      "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "KEYS": {
+        "emailVerificationDoneText":"Email Verification erfolgreich",
+        "emailVerificationText":"Email Verification",
+        "externalUserNotFoundText":"Externer Benutzer nicht gefunden",
+        "footerText":"Fusszeile",
+        "initMfaDoneText":"MFA Initialisierung erfolgreich",
+        "initMfaOtpText":"MFA Initialisierung",
+        "initMfaPromptText":"MFA Einrichtungsaufforderung",
+        "initMfaU2fText":"Universeller Zweitfaktor Initialisierung",
+        "initPasswordDoneText":"Passwort Initialisierung erfolgreich",
+        "initPasswordText":"Password Initialisierung",
+        "initializeDoneText":"Benutzereinrichtung erfolgreich",
+        "initializeUserText":"Benutzereinrichtung",
+        "linkingUserDoneText":"Benutzerverlinkung erfolgreich",
+        "loginText":"Anmelden",
+        "logoutText":"Abmelden",
+        "mfaProvidersText":"MFA Provider",
+        "passwordChangeDoneText":"Passwortwechsel erfolgreich",
+        "passwordChangeText":"Passwortwechsel",
+        "passwordResetDoneText":"Passwort zurücksetzen erfolgreich",
+        "passwordText":"Passwort",
+        "passwordlessText":"Passwortlose Authentifizierung",
+        "registrationOptionText":"Registrierungsoptionen",
+        "registrationOrgText":"Organisation registrieren",
+        "registrationUserText":"Benutzer registrieren",
+        "selectAccountText":"Account wählen",
+        "successLoginText":"Erfolgreiche Anmeldung",
+        "usernameChangeDoneText":"Benutzernamenwechsel erfolgreich",
+        "usernameChangeText":"Benutzernamenwechsel",
+        "verifyMfaOtpText":"OTP Verifikation",
+        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation"
+      }
     },
     "MESSAGE_TEXTS": {
       "TITLE":"Email Texte",
@@ -717,6 +749,15 @@
         "INIT":"Initialisierung",
         "VE":"Emailverifikation",
         "VP":"Telefonnummerverifikation"
+      },
+      "CHIPS": {
+        "firstname":"Vorname",
+        "lastname":"Nachname",
+        "code":"Code",
+        "preferredLoginName":"Bevorzugter Anmeldename"
+      },
+      "TOAST": {
+        "UPDATED":"Benutzerdefinierte Texte gespeichert."
       }
     },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",

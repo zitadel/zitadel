@@ -52,21 +52,26 @@
     <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
     <div class="content" *ngIf="features">
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
-            <span class="fill-space"></span>
-            <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONDAYS' |
-                translate}}</span>
+          <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>
+          <span class="fill-space"></span>
+          <span>{{features.auditLogRetention | timestampToRetention }} {{'FEATURES.RETENTIONDAYS' |
+              translate}}</span>
         </div>
+
+        <br/>
+
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="features.loginPolicyUsernameLogin"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
+          <i class="icon las la-sign-in-alt"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYUSERNAMELOGIN' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+              [(ngModel)]="features.loginPolicyUsernameLogin"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
         <div class="row">
+          <i class="icon las la-sign-in-alt"></i>
           <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYPASSWORDRESET' | translate}}</span>
           <span class="fill-space"></span>
           <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
@@ -76,66 +81,81 @@
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYREGISTRATION' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="features.loginPolicyRegistration"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
+          <i class="icon las la-sign-in-alt"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYREGISTRATION' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+              [(ngModel)]="features.loginPolicyRegistration"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYIDP' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.loginPolicyIdp"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
+          <i class="icon las la-sign-in-alt"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYIDP' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.loginPolicyIdp"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYFACTORS' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="features.loginPolicyFactors"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
+          <i class="icon las la-sign-in-alt"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYFACTORS' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+              [(ngModel)]="features.loginPolicyFactors"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYPASSWORDLESS' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="features.loginPolicyPasswordless"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
+          <i class="icon las la-sign-in-alt"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYPASSWORDLESS' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+              [(ngModel)]="features.loginPolicyPasswordless"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+        </div>
+
+        <br/>
+
+        <div class="row">
+          <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
+
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYCOMPLEXITYPOLICY' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+              [(ngModel)]="features.passwordComplexityPolicy"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+        </div>
+
+        <br/>
+
+        <div class="row">
+          <i class="icon las la-swatchbook"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYPRIVATELABEL' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyPrivateLabel"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYCOMPLEXITYPOLICY' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="features.passwordComplexityPolicy"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
+          <i class="icon las la-swatchbook"></i>
+          <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYWATERMARK' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyWatermark"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
-        <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYPRIVATELABEL' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyPrivateLabel"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
-        </div>
+        <br/>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYWATERMARK' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyWatermark"
-                [disabled]="(['iam.features.write'] | hasRole | async) == false">
-            </mat-slide-toggle>
-        </div>
-
-        <div class="row">
+          <i class="icon las la-gem"></i>
           <span class="left-desc">{{'FEATURES.DATA.CUSTOMDOMAIN' | translate}}</span>
           <span class="fill-space"></span>
           <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.customDomain"
@@ -144,6 +164,7 @@
         </div>
 
         <div class="row">
+          <i class="icon las la-paragraph"></i>
           <span class="left-desc">{{'FEATURES.DATA.CUSTOMTEXT' | translate}}</span>
           <span class="fill-space"></span>
           <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.customText"

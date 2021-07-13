@@ -2,25 +2,27 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { infoAnimation } from 'src/app/animations';
 
 @Component({
   selector: 'cnsl-edit-text',
   templateUrl: './edit-text.component.html',
   styleUrls: ['./edit-text.component.scss'],
-  animations: [
-    infoAnimation,
-  ]
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = '';
   @Input() current$!: Observable<{ [key: string]: any | string; }>;
   @Input() default$!: Observable<{ [key: string]: any | string; }>;
+  @Input() currentlyDragged: string = '';
   @Output() changedValues: EventEmitter<{ [key: string]: string; }> = new EventEmitter();
   public currentMap: { [key: string]: string; } = {};
   private destroy$: Subject<void> = new Subject();
   public form!: FormGroup;
   public warnText: { [key: string]: string | undefined; } = {};
+
+  @Input() public chips: any[] = [];
+  @Input() public disabled: boolean = true;
+
+  public copied: string = '';
   constructor() { }
 
   public ngOnInit(): void {
@@ -29,21 +31,29 @@ export class EditTextComponent implements OnInit, OnDestroy {
       this.currentMap = value;
       this.form = new FormGroup({});
       Object.keys(value).map(key => {
-        const control = new FormControl(value[key]);
+        const control = new FormControl({ value: value[key], disabled: this.disabled });
         this.form.addControl(key, control);
       });
 
       this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(values => this.changedValues.emit(values));
     });
+
+    // this.disabled ? this.form.disable() : this.form.enable();
   }
 
   public ngOnDestroy(): void {
-    console.log('destroy');
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   public setWarnText(key: string, text: string | undefined): void {
+    // setTimeout(() => {
     this.warnText[key] = text;
+    // }, text == undefined ? 1000 : 0);
+  }
+
+  public addChip(key: string, value: string): void {
+    const c = this.form.get(key)?.value;
+    this.form.get(key)?.setValue(`${c} ${value}`);
   }
 }

@@ -5,15 +5,23 @@
     <div class="message-type">
       <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType == type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
     </div>
+
+    <cnsl-info-section class="warn"
+    *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false"
+    type="WARN">
+    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+    'custom_text'})}}
+</cnsl-info-section>
+
     <div class="content" >
-      <cnsl-edit-text label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+      <cnsl-edit-text [chips]="chips" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
         $event)"></cnsl-edit-text>
     </div>
 
     <div class="actions">
-      <button class="reset-button" (click)="saveCurrentMessage()" color="warn" type="submit"
+      <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="warn" type="submit"
       mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
-      <button class="save-button" (click)="saveCurrentMessage()" color="primary" type="submit"
+      <button class="save-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
 
