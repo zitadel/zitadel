@@ -25,6 +25,7 @@ func SendPhoneVerificationCode(translator *i18n.Translator, user *view_model.Not
 	args["Code"] = codeString
 
 	text := translator.Localize(fmt.Sprintf("%s.%s", domain.VerifyPhoneMessageType, domain.MessageTitle), args, user.PreferredLanguage)
+	text = text + ", " + translator.Localize(fmt.Sprintf("%s.%s", domain.VerifyPhoneMessageType, domain.MessageText), args, user.PreferredLanguage)
 
 	codeData := &PhoneVerificationCodeData{UserID: user.ID}
 	template, err := templates.ParseTemplateText(text, codeData)
