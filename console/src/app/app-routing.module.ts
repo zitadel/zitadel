@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { NoPreloading, PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { QuicklinkStrategy } from 'ngx-quicklink';
 
 import { AuthGuard } from './guards/auth.guard';
@@ -139,7 +139,7 @@ const routes: Routes = [
         RouterModule.forRoot(
             routes,
             {
-                preloadingStrategy: QuicklinkStrategy,
+                preloadingStrategy: NoPreloading,
                 relativeLinkResolution: 'legacy',
             },
         ),
