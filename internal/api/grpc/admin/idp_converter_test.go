@@ -20,16 +20,14 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &admin_pb.AddOIDCIDPRequest{
-					Name:                  "ZITADEL",
-					StylingType:           idp.IDPStylingType_STYLING_TYPE_GOOGLE,
-					ClientId:              "test1234",
-					ClientSecret:          "test4321",
-					Issuer:                "zitadel.ch",
-					AuthorizationEndpoint: "https://accounts.zitadel.ch/oauth/v2/authorize",
-					TokenEndpoint:         "https://api.zitadel.ch/oauth/v2/token",
-					Scopes:                []string{"email", "profile"},
-					DisplayNameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:       idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					Name:               "ZITADEL",
+					StylingType:        idp.IDPStylingType_STYLING_TYPE_GOOGLE,
+					ClientId:           "test1234",
+					ClientSecret:       "test4321",
+					Issuer:             "zitadel.ch",
+					Scopes:             []string{"email", "profile"},
+					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 				},
 			},
 		},
@@ -44,6 +42,8 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 				"OIDCConfig.IDPConfigID",
 				"IDPConfigID",
 				"State",
+				"OIDCConfig.AuthorizationEndpoint",
+				"OIDCConfig.TokenEndpoint",
 				"Type", //TODO: default (0) is oidc
 			)
 		})
@@ -62,14 +62,12 @@ func Test_addOIDCIDPRequestToDomainOIDCIDPConfig(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &admin_pb.AddOIDCIDPRequest{
-					ClientId:              "test1234",
-					ClientSecret:          "test4321",
-					Issuer:                "zitadel.ch",
-					AuthorizationEndpoint: "https://accounts.zitadel.ch/oauth/v2/authorize",
-					TokenEndpoint:         "https://api.zitadel.ch/oauth/v2/token",
-					Scopes:                []string{"email", "profile"},
-					DisplayNameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:       idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					ClientId:           "test1234",
+					ClientSecret:       "test4321",
+					Issuer:             "zitadel.ch",
+					Scopes:             []string{"email", "profile"},
+					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 				},
 			},
 		},
@@ -81,6 +79,8 @@ func Test_addOIDCIDPRequestToDomainOIDCIDPConfig(t *testing.T) {
 				"ObjectRoot",
 				"ClientSecret", //TODO: is client secret string enough for backend?
 				"IDPConfigID",
+				"AuthorizationEndpoint",
+				"TokenEndpoint",
 			)
 		})
 	}
@@ -130,15 +130,13 @@ func Test_updateOIDCConfigToDomain(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &admin_pb.UpdateIDPOIDCConfigRequest{
-					IdpId:                 "4208",
-					Issuer:                "zitadel.ch",
-					AuthorizationEndpoint: "https://accounts.zitadel.ch/oauth/v2/authorize",
-					TokenEndpoint:         "https://api.zitadel.ch/oauth/v2/token",
-					ClientId:              "ZITEADEL",
-					ClientSecret:          "i'm so secret",
-					Scopes:                []string{"profile"},
-					DisplayNameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:       idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					IdpId:              "4208",
+					Issuer:             "zitadel.ch",
+					ClientId:           "ZITEADEL",
+					ClientSecret:       "i'm so secret",
+					Scopes:             []string{"profile"},
+					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 				},
 			},
 		},
@@ -149,6 +147,8 @@ func Test_updateOIDCConfigToDomain(t *testing.T) {
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
 				"ClientSecret",
+				"AuthorizationEndpoint",
+				"TokenEndpoint",
 			)
 		})
 	}
