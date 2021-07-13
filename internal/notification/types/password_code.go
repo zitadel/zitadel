@@ -40,5 +40,9 @@ func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_m
 	if err != nil {
 		return err
 	}
+	if code.NotificationType == int32(domain.NotificationTypeSms) {
+		return generateSms(user, passwordResetData.Text, systemDefaults.Notifications, false)
+	}
 	return generateEmail(user, passwordResetData.Subject, template, systemDefaults.Notifications, true)
+
 }
