@@ -28,7 +28,6 @@ import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
 import { AssetService } from 'src/app/services/asset.service';
 import { SubscriptionService } from 'src/app/services/subscription.service';
 
-import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
@@ -128,7 +127,7 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     RegExpPipeModule,
     OnboardingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
     ThemeService,
