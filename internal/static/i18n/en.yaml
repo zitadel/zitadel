@@ -359,6 +359,10 @@ Errors:
     ReadError: Error in reading translation file
     MergeError: Translation file could not be merged with custom translations
     NotFound: Translation file doesn't exist
+  MetaData:
+    NotFound: Metadata not found
+    NoData: Metadata list is empty
+    Invalid: Metadata is invalid
 EventTypes:
   user:
     added: User added

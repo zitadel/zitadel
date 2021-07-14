@@ -359,6 +359,10 @@ Errors:
     ReadError: Übersetzungsdatei konnte nicht gelesen werden
     MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
     NotFound: Übersetzungsdatei existiert nicht
+  MetaData:
+    NotFound: Meta Daten konnten nicht gefunden werden
+    NoData: Meta Daten Liste ist leer
+    Invalid: Meta Daten sind ungültig
 EventTypes:
   user:
     added: Benutzer hinzugefügt
