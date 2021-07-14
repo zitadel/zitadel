@@ -85,5 +85,5 @@ RUN npm run prodbuild
 #######################
 ## Only Copy Assets
 #######################
-FROM alpine:3 as prod-angular-export
+FROM scratch as prod-angular-export
 COPY --from=prod-angular-build /console/dist/console .
