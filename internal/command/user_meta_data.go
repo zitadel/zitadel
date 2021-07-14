@@ -42,7 +42,6 @@ func (c *Commands) BulkSetUserMetaData(ctx context.Context, userID, resourceOwne
 	}
 
 	events := make([]eventstore.EventPusher, len(metaDatas))
-
 	setMetaData := NewUserMetaDataListWriteModel(userID, resourceOwner)
 	userAgg := UserAggregateFromWriteModel(&setMetaData.WriteModel)
 	for i, data := range metaDatas {
