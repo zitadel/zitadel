@@ -133,13 +133,11 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:              config.OIDCClientID,
-			Issuer:                config.OIDCIssuer,
-			Scopes:                config.OIDCScopes,
-			DisplayNameMapping:    ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:       ModelMappingFieldToPb(config.OIDCUsernameMapping),
-			AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
-			TokenEndpoint:         config.OAuthTokenEndpoint,
+			ClientId:           config.OIDCClientID,
+			Issuer:             config.OIDCIssuer,
+			Scopes:             config.OIDCScopes,
+			DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+			UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
 		},
 	}
 }
@@ -147,13 +145,11 @@ func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcCon
 func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
 	return &idp_pb.IDP_OidcConfig{
 		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:              config.OIDCClientID,
-			Issuer:                config.OIDCIssuer,
-			AuthorizationEndpoint: config.OAuthAuthorizationEndpoint,
-			TokenEndpoint:         config.OAuthTokenEndpoint,
-			Scopes:                config.OIDCScopes,
-			DisplayNameMapping:    MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:       MappingFieldToPb(config.OIDCUsernameMapping),
+			ClientId:           config.OIDCClientID,
+			Issuer:             config.OIDCIssuer,
+			Scopes:             config.OIDCScopes,
+			DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+			UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
 		},
 	}
 }

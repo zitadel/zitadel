@@ -100,8 +100,6 @@ title: zitadel/idp.proto
 | scopes | repeated string | - |  |
 | display_name_mapping |  OIDCMappingField | - |  |
 | username_mapping |  OIDCMappingField | - |  |
-| authorization_endpoint |  string | - | string.max_len: 500<br />  |
-| token_endpoint |  string | - | string.max_len: 500<br />  |
 
 
 
