@@ -122,20 +122,13 @@ jobs:
           version: "https://github.com/docker/buildx.git#67bd6f4dc82a9cd96f34133dab3f6f7af803bb14"
           driver-opts: image=moby/buildkit:master
           buildkitd-flags: --debug
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ${{ env.REGISTRY }}
-      - run: ls -la
       - uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./build/dockerfile
+          file: ./build/Console/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
-          push: true
+          push: false
           cache-from: type=gha
           cache-to: type=gha
 
