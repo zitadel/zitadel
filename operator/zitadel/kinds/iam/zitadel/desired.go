@@ -42,9 +42,5 @@ func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
 		Spec:   &Spec{},
 	}
 
-	if err := desiredTree.Original.Decode(desiredKind); err != nil {
-		return nil, errors.Wrap(err, "parsing desired state failed")
-	}
-
-	return desiredKind, nil
+	return desiredKind, errors.Wrap(desiredTree.Original.Decode(desiredKind), "parsing desired state failed")
 }

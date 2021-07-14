@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/caos/orbos/pkg/helper"
 
@@ -54,6 +55,15 @@ func AdaptFunc(
 		internalMonitor := monitor.WithField("kind", "iam")
 
 		desiredKind, err := parseDesiredV0(desired)
+
+		if desiredKind != nil &&
+			desiredKind.Spec != nil &&
+			desiredKind.Spec.Configuration != nil &&
+			desiredKind.Spec.Configuration.DNS != nil &&
+			desiredKind.Spec.Configuration.DNS.Domain != "" {
+			mntr.SwitchEnvironment(strings.ToLower(strings.ReplaceAll(desiredKind.Spec.Configuration.DNS.Domain, ".", "-")))
+		}
+
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
 		}
