@@ -1,7 +1,7 @@
 #######################
 ## Final Production Image
 #######################
-FROM alpine:latest as artifact
+FROM alpine:3 as artifact
 ARG BUILDARCH
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/

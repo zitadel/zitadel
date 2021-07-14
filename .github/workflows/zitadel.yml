@@ -127,11 +127,11 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha
-          outputs: type=local,dest=tmp/zitadel-console
+          outputs: type=local,dest=/tmp/zitadel-console
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel-console
-          path: tmp/zitadel-console
+          path: /tmp/zitadel-console/
 
   # zitadel-image:
   #   name: Build ZITADEL

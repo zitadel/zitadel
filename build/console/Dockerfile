@@ -1,12 +1,12 @@
-ARG NODE_VERSION=14.17.0
+ARG NODE_VERSION=14
 
 #######################
 ## These steps set platform / arch type specific variables
 #######################
-FROM alpine AS arm64-base
+FROM alpine:3 AS arm64-base
 ENV PROTOC_ARCH aarch_64
 
-FROM alpine AS amd64-base
+FROM alpine:3 AS amd64-base
 ENV PROTOC_ARCH x86_64
 
 #######################
@@ -85,5 +85,5 @@ RUN npm run prodbuild
 #######################
 ## Only Copy Assets
 #######################
-FROM alpine:latest as prod-angular-export
+FROM alpine:3 as prod-angular-export
 COPY --from=prod-angular-build /console/dist/console .
