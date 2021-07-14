@@ -23,6 +23,8 @@ import {
   GetCustomLoginTextsResponse,
   GetCustomOrgIAMPolicyRequest,
   GetCustomOrgIAMPolicyResponse,
+  GetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultDomainClaimedMessageTextResponse,
   GetDefaultFeaturesRequest,
   GetDefaultFeaturesResponse,
   GetDefaultInitMessageTextRequest,
@@ -100,6 +102,8 @@ import {
   ResetOrgFeaturesResponse,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
+  SetDefaultDomainClaimedMessageTextRequest,
+  SetDefaultDomainClaimedMessageTextResponse,
   SetDefaultFeaturesRequest,
   SetDefaultFeaturesResponse,
   SetDefaultInitMessageTextRequest,
@@ -193,6 +197,18 @@ export class AdminService {
   public setDefaultPasswordResetMessageText(req: SetDefaultPasswordResetMessageTextRequest): Promise<SetDefaultPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
+
+
+  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest): Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultDomainClaimedMessageText(req: SetDefaultDomainClaimedMessageTextRequest): Promise<SetDefaultDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
+
 
   public SetUpOrg(
     org: SetUpOrgRequest.Org,

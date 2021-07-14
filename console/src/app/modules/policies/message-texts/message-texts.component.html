@@ -19,9 +19,9 @@
     </div>
 
     <div class="actions">
-      <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="warn" type="submit"
+      <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="resetDefault()" color="warn" type="submit"
       mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
-      <button class="save-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
+      <button class="save-button" [disabled]="!updateRequest || serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
 

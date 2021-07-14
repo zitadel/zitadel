@@ -3,6 +3,7 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
+import { GetDefaultDomainClaimedMessageTextRequest } from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -78,6 +79,8 @@ import {
   GenerateOrgDomainValidationResponse,
   GetAppByIDRequest,
   GetAppByIDResponse,
+  GetCustomDomainClaimedMessageTextRequest,
+  GetCustomDomainClaimedMessageTextResponse,
   GetCustomInitMessageTextRequest,
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
@@ -88,6 +91,7 @@ import {
   GetCustomVerifyEmailMessageTextResponse,
   GetCustomVerifyPhoneMessageTextRequest,
   GetCustomVerifyPhoneMessageTextResponse,
+  GetDefaultDomainClaimedMessageTextResponse,
   GetDefaultInitMessageTextRequest,
   GetDefaultInitMessageTextResponse,
   GetDefaultLabelPolicyRequest,
@@ -274,8 +278,18 @@ import {
   ResendHumanInitializationRequest,
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequest,
+  ResetCustomDomainClaimedMessageTextToDefaultRequest,
+  ResetCustomDomainClaimedMessageTextToDefaultResponse,
+  ResetCustomInitMessageTextToDefaultRequest,
+  ResetCustomInitMessageTextToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  ResetCustomPasswordResetMessageTextToDefaultRequest,
+  ResetCustomPasswordResetMessageTextToDefaultResponse,
+  ResetCustomVerifyEmailMessageTextToDefaultRequest,
+  ResetCustomVerifyEmailMessageTextToDefaultResponse,
+  ResetCustomVerifyPhoneMessageTextToDefaultRequest,
+  ResetCustomVerifyPhoneMessageTextToDefaultResponse,
   ResetLabelPolicyToDefaultRequest,
   ResetLabelPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
@@ -287,6 +301,8 @@ import {
   ResetPasswordLockoutPolicyToDefaultRequest,
   ResetPasswordLockoutPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
+  SetCustomDomainClaimedMessageTextRequest,
+  SetCustomDomainClaimedMessageTextResponse,
   SetCustomInitMessageTextRequest,
   SetCustomInitMessageTextResponse,
   SetCustomLoginTextsRequest,
@@ -382,8 +398,9 @@ export class ManagementService {
     return this.grpcService.mgmt.setCustomLoginText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomLoginTextToDefault(): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
+  public resetCustomLoginTextToDefault(lang: string): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
     const req = new ResetCustomLoginTextsToDefaultRequest();
+    req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomLoginTextToDefault(req, null).then(resp => resp.toObject());
   }
 
@@ -401,6 +418,13 @@ export class ManagementService {
     return this.grpcService.mgmt.setCustomInitMessageText(req, null).then(resp => resp.toObject());
   }
 
+  public resetCustomInitMessageTextToDefault(lang: string): Promise<ResetCustomInitMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomInitMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomInitMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
 
   public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest): Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
@@ -412,6 +436,12 @@ export class ManagementService {
 
   public setCustomVerifyEmailMessageText(req: SetCustomVerifyEmailMessageTextRequest): Promise<SetCustomVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomVerifyEmailMessageTextToDefault(lang: string): Promise<ResetCustomVerifyEmailMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyEmailMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomVerifyEmailMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
 
@@ -427,6 +457,12 @@ export class ManagementService {
     return this.grpcService.mgmt.setCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
+  public resetCustomVerifyPhoneMessageTextToDefault(lang: string): Promise<ResetCustomVerifyPhoneMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyPhoneMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomVerifyPhoneMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
 
   public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
@@ -438,6 +474,31 @@ export class ManagementService {
 
   public setCustomPasswordResetMessageText(req: SetCustomPasswordResetMessageTextRequest): Promise<SetCustomPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomPasswordResetMessageTextToDefault(lang: string): Promise<ResetCustomPasswordResetMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordResetMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomPasswordResetMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest): Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomDomainClaimedMessageText(req: GetCustomDomainClaimedMessageTextRequest): Promise<GetCustomDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomDomainClaimedMessageCustomText(req: SetCustomDomainClaimedMessageTextRequest): Promise<SetCustomDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomDomainClaimedMessageCustomText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomDomainClaimedMessageTextToDefault(lang: string): Promise<ResetCustomDomainClaimedMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomDomainClaimedMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomDomainClaimedMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
   public listOrgIDPs(

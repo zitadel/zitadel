@@ -32,7 +32,6 @@
           align-items: center;
           justify-content: center;
           z-index: 10;
-          cursor: copy;
 
           * {
             transition: all .2s ease;
@@ -70,8 +69,8 @@
 
       &.cnsl-focused {
         .chips {
-          // visibility: visible;
           opacity: 1;
+          cursor: copy;
         }
       }
 

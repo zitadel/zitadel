@@ -755,7 +755,9 @@
       "TYPES": {
         "INIT":"Initialisierung",
         "VE":"Emailverifikation",
-        "VP":"Telefonnummerverifikation"
+        "VP":"Telefonnummerverifikation",
+        "PR":"Password Wiederherstellung",
+        "DC":"Domainbeanspruchung"
       },
       "CHIPS": {
         "firstname":"Vorname",

@@ -757,7 +757,9 @@
       "TYPES": {
         "INIT":"Initialization",
         "VE":"Verify Email",
-        "VP":"Verify Phone"
+        "VP":"Verify Phone",
+        "PR":"Password Reset",
+        "DC":"Domain Claim"
       },
       "CHIPS": {
         "firstname":"Firstname",

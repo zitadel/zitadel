@@ -207,7 +207,7 @@ export class LoginTextsComponent implements OnDestroy {
     dialogRef.afterClosed().subscribe(resp => {
       if (resp) {
         if (this.serviceType == PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).resetCustomLoginTextToDefault().then(() => {
+          (this.service as ManagementService).resetCustomLoginTextToDefault(this.translate.currentLang ?? 'en').then(() => {
             setTimeout(() => {
               this.loadData();
             }, 1000);
