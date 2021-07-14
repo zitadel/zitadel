@@ -79,13 +79,14 @@ RUN npm install -g @angular/cli
 ## angular lint workspace and prod build
 #######################
 FROM npm-base as prod-angular-build
-RUN npm run lint
-RUN npm run prodbuild
-RUN ls -la dist
+#RUN npm run lint
+#RUN npm run prodbuild
+#RUN ls -la dist
+RUN touch dist/console/hodor.txt
 
 #######################
 ## Only Copy Assets
 #######################
 FROM scratch as prod-angular-export
-COPY --from=prod-angular-build dist/console .
+COPY --from=prod-angular-build dist/console console
 RUN ls -la
