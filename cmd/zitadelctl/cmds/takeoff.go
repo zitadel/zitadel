@@ -24,7 +24,7 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 	)
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv("takeoff", "", nil)
+		rv, err := getRv("takeoff", nil, "")
 		if err != nil {
 			return err
 		}

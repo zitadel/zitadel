@@ -21,7 +21,7 @@ type RootValues struct {
 	ErrFunc    errFunc
 }
 
-type GetRootValues func(command, component string, tags map[string]interface{}) (*RootValues, error)
+type GetRootValues func(command string, tags map[string]interface{}, component string, moreComponents ...string) (*RootValues, error)
 
 type errFunc func(err error) error
 
@@ -73,7 +73,7 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
 	flags.BoolVar(&disableIngestion, "disable-ingestion", false, "Don't help CAOS AG to improve ZITADEL by sending them errors and usage data")
 
-	return cmd, func(command, component string, tags map[string]interface{}) (*RootValues, error) {
+	return cmd, func(command string, tags map[string]interface{}, component string, moreComponents ...string) (*RootValues, error) {
 
 		if verbose {
 			monitor = monitor.Verbose()
@@ -103,7 +103,9 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 		}
 
 		if !disableIngestion {
-			mntr.Ingest(rv.Monitor, "zitadel", version, env, component, "zitadel")
+			if err := mntr.Ingest(rv.Monitor, "zitadel", version, env, component, moreComponents...); err != nil {
+				panic(err)
+			}
 		}
 
 		rv.Monitor.WithFields(map[string]interface{}{"command": command, "gitops": rv.Gitops}).WithFields(tags).CaptureMessage("zitadelctl invoked")

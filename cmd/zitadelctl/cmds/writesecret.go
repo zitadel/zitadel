@@ -42,7 +42,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			path = args[0]
 		}
 
-		rv, err := getRv("writesecret", "", map[string]interface{}{"path": path, "value": value != "", "file": file, "stdin": stdin})
+		rv, err := getRv("writesecret", map[string]interface{}{"path": path, "value": value != "", "file": file, "stdin": stdin}, "")
 		if err != nil {
 			return err
 		}

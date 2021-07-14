@@ -35,7 +35,7 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 
-		rv, _ := getRv("configure", "", map[string]interface{}{"masterkey": newMasterKey != "", "newRepoURL": newRepoURL})
+		rv, _ := getRv("configure", map[string]interface{}{"masterkey": newMasterKey != "", "newRepoURL": newRepoURL}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()

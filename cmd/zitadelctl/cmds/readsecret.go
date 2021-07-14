@@ -25,7 +25,7 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 				path = args[0]
 			}
 
-			rv, err := getRv("readsecret", "", map[string]interface{}{"path": path})
+			rv, err := getRv("readsecret", map[string]interface{}{"path": path}, "")
 			if err != nil {
 				return err
 			}
