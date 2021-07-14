@@ -131,6 +131,12 @@ jobs:
           push: false
           cache-from: type=gha
           cache-to: type=gha
+          target: prod-angular-build
+          outputs: type=local,dest=/tmp/zitadel-console
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadel-console
+          path: /tmp/zitadel-console
 
   # zitadel-image:
   #   name: Build ZITADEL
