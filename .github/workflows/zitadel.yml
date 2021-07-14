@@ -2,7 +2,7 @@ name: ZITADEL Release
 on:
   push:
     branches:
-      - 'main'
+      - '**'
     tags-ignore:
       - '**'
   workflow_dispatch:
