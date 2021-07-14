@@ -9,8 +9,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  NODE_VERSION: '12'
-  GO_VERSION: '1.15'
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
   CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts'
@@ -127,8 +125,6 @@ jobs:
           context: .
           file: ./build/console/Dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
-          push: false
           cache-from: type=gha
           cache-to: type=gha
           target: prod-angular-build
