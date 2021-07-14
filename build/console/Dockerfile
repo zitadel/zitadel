@@ -81,10 +81,11 @@ RUN npm install -g @angular/cli
 FROM npm-base as prod-angular-build
 RUN npm run lint
 RUN npm run prodbuild
-RUN ls -la
+RUN ls -la dist
 
 #######################
 ## Only Copy Assets
 #######################
 FROM scratch as prod-angular-export
-COPY --from=prod-angular-build dist/console ./zitadel/console
+COPY --from=prod-angular-build dist/console dist/console
+RUN ls -la 
