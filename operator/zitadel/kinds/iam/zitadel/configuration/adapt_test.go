@@ -34,7 +34,7 @@ func SetConfigMap(
 			Name:      cmName,
 			Labels:    labels,
 		},
-		Data: literalsConfigMap(desired, users, certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath, version, queried),
+		Data: literalsConfigMap(desired, users, certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath, queried),
 	})
 }
 
