@@ -125,7 +125,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./build/Console/Dockerfile
+          file: ./build/console/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: false
