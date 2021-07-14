@@ -87,5 +87,5 @@ RUN ls -la dist
 ## Only Copy Assets
 #######################
 FROM scratch as prod-angular-export
-COPY --from=prod-angular-build dist/console dist/console
-RUN ls -la 
+COPY --from=prod-angular-build dist/console .
+RUN ls -la
