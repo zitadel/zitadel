@@ -363,6 +363,7 @@ Errors:
     NotFound: Meta Daten konnten nicht gefunden werden
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig
+    KeyNotExisting: Ein oder mehrere Keys existiert nicht
 EventTypes:
   user:
     added: Benutzer hinzugefügt

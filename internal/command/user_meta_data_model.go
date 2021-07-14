@@ -49,16 +49,17 @@ func (wm *UserMetaDataWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 type UserMetaDataListWriteModel struct {
-	MetaDataWriteModel
+	MetaDataListWriteModel
 }
 
 func NewUserMetaDataListWriteModel(userID, resourceOwner string) *UserMetaDataListWriteModel {
 	return &UserMetaDataListWriteModel{
-		MetaDataWriteModel{
+		MetaDataListWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   userID,
 				ResourceOwner: resourceOwner,
 			},
+			metaDataList: make(map[string]string),
 		},
 	}
 }
@@ -67,22 +68,22 @@ func (wm *UserMetaDataListWriteModel) AppendEvents(events ...eventstore.EventRea
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MetaDataSetEvent:
-			wm.MetaDataWriteModel.AppendEvents(&e.SetEvent)
+			wm.MetaDataListWriteModel.AppendEvents(&e.SetEvent)
 		case *user.MetaDataRemovedEvent:
-			wm.MetaDataWriteModel.AppendEvents(&e.RemovedEvent)
+			wm.MetaDataListWriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
 }
 
 func (wm *UserMetaDataListWriteModel) Reduce() error {
-	return wm.MetaDataWriteModel.Reduce()
+	return wm.MetaDataListWriteModel.Reduce()
 }
 
 func (wm *UserMetaDataListWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateIDs(wm.MetaDataWriteModel.AggregateID).
+		AggregateIDs(wm.MetaDataListWriteModel.AggregateID).
 		AggregateTypes(user.AggregateType).
 		EventTypes(
 			user.MetaDataSetType,
