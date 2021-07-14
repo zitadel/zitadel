@@ -19,7 +19,7 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 	)
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv()
+		rv, err := getRv("backuplist", "", nil)
 		if err != nil {
 			return err
 		}

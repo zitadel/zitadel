@@ -19,7 +19,13 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Example: `zitadelctl readsecret database.bucket.serviceaccountjson.encrypted > ~/googlecloudstoragesa.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			rv, err := getRv()
+
+			path := ""
+			if len(args) > 0 {
+				path = args[0]
+			}
+
+			rv, err := getRv("readsecret", "", map[string]interface{}{"path": path})
 			if err != nil {
 				return err
 			}
@@ -30,11 +36,6 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 			monitor := rv.Monitor
 			orbConfig := rv.OrbConfig
 			gitClient := rv.GitClient
-
-			path := ""
-			if len(args) > 0 {
-				path = args[0]
-			}
 
 			k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
 			if err != nil && !rv.Gitops {

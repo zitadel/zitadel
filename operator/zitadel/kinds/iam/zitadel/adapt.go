@@ -114,7 +114,6 @@ func AdaptFunc(
 			certPath,
 			secretName,
 			secretPath,
-			version,
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,

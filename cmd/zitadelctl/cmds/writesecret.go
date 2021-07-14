@@ -36,7 +36,13 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 	flags.BoolVar(&stdin, "stdin", false, "Value to encrypt is read from standard input")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv()
+
+		path := ""
+		if len(args) > 0 {
+			path = args[0]
+		}
+
+		rv, err := getRv("writesecret", "", map[string]interface{}{"path": path, "value": value != "", "file": file, "stdin": stdin})
 		if err != nil {
 			return err
 		}
@@ -52,11 +58,6 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 		if err != nil {
 			monitor.Error(err)
 			return nil
-		}
-
-		path := ""
-		if len(args) > 0 {
-			path = args[0]
 		}
 
 		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)

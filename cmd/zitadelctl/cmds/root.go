@@ -21,20 +21,15 @@ type RootValues struct {
 	ErrFunc    errFunc
 }
 
-type GetRootValues func() (*RootValues, error)
+type GetRootValues func(command, component string, tags map[string]interface{}) (*RootValues, error)
 
 type errFunc func(err error) error
 
-func RootCommand(version string) (*cobra.Command, GetRootValues) {
+func RootCommand(version string, monitor mntr.Monitor) (*cobra.Command, GetRootValues) {
 
 	var (
-		ctx     = context.Background()
-		monitor = mntr.Monitor{
-			OnInfo:   mntr.LogMessage,
-			OnChange: mntr.LogMessage,
-			OnError:  mntr.LogError,
-		}
-		rv = &RootValues{
+		ctx = context.Background()
+		rv  = &RootValues{
 			Ctx:     ctx,
 			Version: version,
 			ErrFunc: func(err error) error {
@@ -44,8 +39,9 @@ func RootCommand(version string) (*cobra.Command, GetRootValues) {
 				return nil
 			},
 		}
-		orbConfigPath string
-		verbose       bool
+		orbConfigPath    string
+		verbose          bool
+		disableIngestion bool
 	)
 	cmd := &cobra.Command{
 		Use:   "zitadelctl [flags]",
@@ -75,8 +71,9 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 	flags.StringVarP(&orbConfigPath, "orbconfig", "f", "~/.orb/config", "Path to the file containing the orbs git repo URL, deploy key and the master key for encrypting and decrypting secrets")
 	flags.StringVarP(&rv.Kubeconfig, "kubeconfig", "k", "~/.kube/config", "Path to the kubeconfig file to the cluster zitadelctl should target")
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
+	flags.BoolVar(&disableIngestion, "disable-ingestion", false, "Don't help CAOS AG to improve ZITADEL by sending them errors and usage data")
 
-	return cmd, func() (*RootValues, error) {
+	return cmd, func(command, component string, tags map[string]interface{}) (*RootValues, error) {
 
 		if verbose {
 			monitor = monitor.Verbose()
@@ -94,6 +91,22 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 				rv.OrbConfig = &orb.Orb{Path: prunedPath}
 			}
 		}
+
+		env := "unknown"
+		if orbID, err := rv.OrbConfig.ID(); err == nil {
+			env = orbID
+		}
+		err = nil
+
+		if component == "" {
+			component = "zitadelctl"
+		}
+
+		if !disableIngestion {
+			mntr.Ingest(rv.Monitor, "zitadel", version, env, component, "zitadel")
+		}
+
+		rv.Monitor.WithFields(map[string]interface{}{"command": command, "gitops": rv.Gitops}).WithFields(tags).CaptureMessage("zitadelctl invoked")
 
 		return rv, err
 	}

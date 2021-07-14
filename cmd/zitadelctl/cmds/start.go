@@ -20,7 +20,7 @@ func StartOperator(getRv GetRootValues) *cobra.Command {
 	flags.StringVar(&metricsAddr, "metrics-addr", "", "The address the metric endpoint binds to.")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv()
+		rv, err := getRv("operator", "zitadel-operator", nil)
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func StartDatabase(getRv GetRootValues) *cobra.Command {
 	flags.StringVar(&metricsAddr, "metrics-addr", "", "The address the metric endpoint binds to.")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
-		rv, err := getRv()
+		rv, err := getRv("database", "database-operator", nil)
 		if err != nil {
 			return err
 		}

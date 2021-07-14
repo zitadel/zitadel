@@ -1,6 +1,7 @@
 ARG GO_VERSION=1.15.8
 ARG NODE_VERSION=14.17.0
 ARG ENV=prod
+ARG VERSION=dev
 
 #######################
 ## These steps set platform / arch type specific variables
@@ -201,7 +202,7 @@ ARG BUILDARCH
 COPY --from=prod-angular-build console/dist/console console/dist/console/
 RUN go generate internal/ui/console/statik/generate.go
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION} -extldflags \"-static\"" -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
 
 #######################
