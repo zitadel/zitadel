@@ -11,13 +11,25 @@ h2 {
 }
 
 .row-lyt {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -.5rem;
+  // display: flex;
+  // flex-wrap: wrap;
+  margin: 0;
+  display: grid;
+  row-gap: 1rem;
+  column-gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  @media only screen and (max-width: 1300px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media only screen and (max-width: 450px) {
+    grid-template-columns: 1fr;
+  }
 
   .p-item {
-    flex-basis: 290px;
-    margin: .5rem;
+    // flex-basis: 290px;
+    // margin: .5rem;
     display: flex;
     flex-direction: column;
     min-height: 250px;
@@ -33,11 +45,31 @@ h2 {
       height: 60px;
       width: 60px;
       border-radius: 50%;
-      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: .5rem;
+      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
+
+      &.purple {
+        background: linear-gradient(40deg, #7c3aed 30%, #6d28d9);
+      }
+
+      &.red {
+        background: linear-gradient(40deg, #dc2626 30%, #db2777);
+      }
+
+      &.green {
+        background: linear-gradient(40deg, #059669 30%, #047857);
+      }
+
+      &.blue {
+        background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+      }
+
+      &.yellow {
+        background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+      }
 
       .icon,
       i {

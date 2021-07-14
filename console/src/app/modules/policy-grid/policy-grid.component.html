@@ -6,7 +6,7 @@
     <ng-template appHasRole
         [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
-            <div class="avatar">
+            <div class="avatar yellow">
                 <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
             </div>
             <div class="title">
@@ -44,7 +44,7 @@
 
     <ng-template appHasRole [appHasRole]="['iam.policy.read']">
         <div class="p-item card">
-            <div class="avatar">
+            <div class="avatar purple">
                 <i class="icon las la-gem"></i>
             </div>
             <div class="title">
@@ -70,7 +70,7 @@
 
     <ng-template appHasRole [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
       <div class="p-item card">
-          <div class="avatar">
+          <div class="avatar blue">
               <i class="icon las la-swatchbook"></i>
           </div>
           <div class="title">
@@ -103,7 +103,7 @@
     <ng-template appHasRole
         [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
-            <div class="avatar">
+            <div class="avatar green">
                 <i class="icon las la-sign-in-alt"></i>
             </div>
             <div class="title">
@@ -130,7 +130,7 @@
     <ng-template appHasRole
         [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
-            <div class="avatar">
+            <div class="avatar red">
               <i class="icon las la-paragraph"></i>
             </div>
             <div class="title">
@@ -157,7 +157,7 @@
     <ng-template appHasRole
         [appHasRole]="type == PolicyGridType.IAM ? ['iam.policy.read'] : type == PolicyGridType.ORG ?  ['policy.read'] : []">
         <div class="p-item card">
-            <div class="avatar">
+            <div class="avatar red">
               <i class="icon las la-paragraph"></i>
             </div>
             <div class="title">
