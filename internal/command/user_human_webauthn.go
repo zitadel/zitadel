@@ -128,7 +128,7 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 }
 
 func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner string, isLoginUI bool, tokens []*domain.WebAuthNToken) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
-	if userID == "" || resourceowner == "" {
+	if userID == "" {
 		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
 	user, err := c.getHuman(ctx, userID, resourceowner)
@@ -233,7 +233,7 @@ func (c *Commands) HumanHumanPasswordlessSetup(ctx context.Context, userID, reso
 }
 
 func (c *Commands) verifyHumanWebAuthN(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte, tokens []*domain.WebAuthNToken) (*eventstore.Aggregate, *domain.WebAuthNToken, *HumanWebAuthNWriteModel, error) {
-	if userID == "" || resourceowner == "" {
+	if userID == "" {
 		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
 	user, err := c.getHuman(ctx, userID, resourceowner)

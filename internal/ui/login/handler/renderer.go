@@ -42,6 +42,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplUserSelection:            "select_user.html",
 		tmplPassword:                 "password.html",
 		tmplPasswordlessVerification: "passwordless.html",
+		tmplPasswordlessRegistration: "passwordless_registration.html",
 		tmplMFAVerify:                "mfa_verify_otp.html",
 		tmplMFAPrompt:                "mfa_prompt.html",
 		tmplMFAInitVerify:            "mfa_init_otp.html",
@@ -126,6 +127,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		},
 		"passwordLessVerificationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointPasswordlessLogin)
+		},
+		"passwordLessRegistrationUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointPasswordlessRegistration)
 		},
 		"passwordResetUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
