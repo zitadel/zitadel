@@ -5,7 +5,8 @@ FROM alpine:3 as artifact
 ARG BUILDARCH
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-${BUILDARCH} /app/zitadel
+COPY /tmp/zitadel/zitadel-linux-${BUILDARCH} /app/zitadel
+COPY /tmp/zitadel-consoole/ /app/zitadel/console
 RUN chmod a+x /app/zitadel
 RUN ls -la /
 
