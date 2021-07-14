@@ -126,7 +126,7 @@ jobs:
           file: ./build/console/Dockerfile
           platforms: linux/amd64
           cache-from: type=gha
-          cache-to: type=gha
+          cache-to: type=gha,mode=max
           outputs: type=local,dest=/tmp/zitadel-console
       - uses: actions/upload-artifact@v2
         with:
