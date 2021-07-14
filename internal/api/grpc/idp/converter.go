@@ -154,18 +154,6 @@ func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
 	}
 }
 
-func OIDCConfigToPb(config *domain.OIDCIDPConfig) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.ClientID,
-			Issuer:             config.Issuer,
-			Scopes:             config.Scopes,
-			DisplayNameMapping: MappingFieldToPb(config.IDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.UsernameMapping),
-		},
-	}
-}
-
 func FieldNameToModel(fieldName idp_pb.IDPFieldName) iam_model.IDPConfigSearchKey {
 	switch fieldName {
 	// case admin.IdpSearchKey_IDPSEARCHKEY_IDP_CONFIG_ID: //TODO: not implemented in proto

@@ -1,9 +1,10 @@
 package eventstore
 
 import (
+	"sync"
+
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"sync"
 )
 
 var (
@@ -68,7 +69,10 @@ func (s *Subscription) Unsubscribe() {
 			}
 		}
 	}
-	close(s.Events)
+	_, ok := <-s.Events
+	if ok {
+		close(s.Events)
+	}
 }
 
 func MapEventsToV1Events(events []EventReader) []*models.Event {

@@ -43,6 +43,18 @@ Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project
     GET: /iam
 
 
+### GetSupportedLanguages
+
+> **rpc** GetSupportedLanguages([GetSupportedLanguagesRequest](#getsupportedlanguagesrequest))
+[GetSupportedLanguagesResponse](#getsupportedlanguagesresponse)
+
+Returns the default languages
+
+
+
+    GET: /languages
+
+
 ### GetUserByID
 
 > **rpc** GetUserByID([GetUserByIDRequest](#getuserbyidrequest))
@@ -4276,6 +4288,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | project_grant |  zitadel.project.v1.GrantedProject | - |  |
+
+
+
+
+### GetSupportedLanguagesRequest
+This is an empty request
+
+
+
+
+### GetSupportedLanguagesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| languages | repeated string | - |  |
 
 
 

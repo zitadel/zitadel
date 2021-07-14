@@ -59,12 +59,6 @@ func MessageTextViewFromModel(template *model.MessageTextView) *MessageTextView 
 	}
 }
 
-func MessageTextsViewToModel(textsIn []*MessageTextView, defaultIn bool) *model.MessageTextsView {
-	return &model.MessageTextsView{
-		Texts: messageTextsViewToModelArr(textsIn, defaultIn),
-	}
-}
-
 func messageTextsViewToModelArr(texts []*MessageTextView, defaultIn bool) []*model.MessageTextView {
 	result := make([]*model.MessageTextView, len(texts))
 	for i, r := range texts {

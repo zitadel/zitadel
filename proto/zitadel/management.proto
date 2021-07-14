@@ -84,6 +84,17 @@ service ManagementService {
         };
     }
 
+    // Returns the default languages
+    rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
+        option (google.api.http) = {
+            get: "/languages";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
+    }
+
     // Returns the requested full blown user (human or machine)
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
@@ -2566,6 +2577,13 @@ message GetIAMRequest {}
 message GetIAMResponse {
     string global_org_id = 1;
     string iam_project_id = 2;
+}
+
+//This is an empty request
+message GetSupportedLanguagesRequest {}
+
+message GetSupportedLanguagesResponse {
+    repeated string languages = 1;
 }
 
 message GetUserByIDRequest {

@@ -14,6 +14,8 @@ type OIDCConfigReadModel struct {
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
+	AuthorizationEndpoint string
+	TokenEndpoint         string
 	Scopes                []string
 	IDPDisplayNameMapping domain.OIDCMappingField
 	UserNameMapping       domain.OIDCMappingField
@@ -37,6 +39,8 @@ func (rm *OIDCConfigReadModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAdd
 	rm.ClientID = e.ClientID
 	rm.ClientSecret = e.ClientSecret
 	rm.Issuer = e.Issuer
+	rm.AuthorizationEndpoint = e.AuthorizationEndpoint
+	rm.TokenEndpoint = e.TokenEndpoint
 	rm.Scopes = e.Scopes
 	rm.IDPDisplayNameMapping = e.IDPDisplayNameMapping
 	rm.UserNameMapping = e.UserNameMapping
@@ -48,6 +52,12 @@ func (rm *OIDCConfigReadModel) reduceConfigChangedEvent(e *idpconfig.OIDCConfigC
 	}
 	if e.Issuer != nil {
 		rm.Issuer = *e.Issuer
+	}
+	if e.AuthorizationEndpoint != nil {
+		rm.AuthorizationEndpoint = *e.AuthorizationEndpoint
+	}
+	if e.TokenEndpoint != nil {
+		rm.TokenEndpoint = *e.TokenEndpoint
 	}
 	if len(e.Scopes) > 0 {
 		rm.Scopes = e.Scopes

@@ -3,11 +3,10 @@ package text
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/iam/model"
 	text_pb "github.com/caos/zitadel/pkg/grpc/text"
 )
 
-func ModelCustomMsgTextToPb(msg *model.MessageTextView) *text_pb.MessageCustomText {
+func DomainCustomMsgTextToPb(msg *domain.CustomMessageText) *text_pb.MessageCustomText {
 	return &text_pb.MessageCustomText{
 		Title:      msg.Title,
 		PreHeader:  msg.PreHeader,

@@ -63,6 +63,10 @@ func (m *Styling) ViewModel() string {
 	return stylingTable
 }
 
+func (m *Styling) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *Styling) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

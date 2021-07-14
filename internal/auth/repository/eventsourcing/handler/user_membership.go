@@ -57,6 +57,10 @@ func (m *UserMembership) ViewModel() string {
 	return userMembershipTable
 }
 
+func (m *UserMembership) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
 }

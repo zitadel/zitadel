@@ -47,11 +47,14 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 }
 
 func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanExternalIDPAddedType,
 			user.HumanExternalIDPRemovedType,
 			user.HumanExternalIDPCascadeRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		Builder()
 }

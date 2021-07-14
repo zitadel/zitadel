@@ -208,7 +208,7 @@ func prepareTestScan(err error, res []interface{}) scan {
 
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
-		filters []*repository.Filter
+		filters [][]*repository.Filter
 	}
 	type res struct {
 		clause string
@@ -232,7 +232,7 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "empty filters",
 			args: args{
-				filters: []*repository.Filter{},
+				filters: [][]*repository.Filter{},
 			},
 			res: res{
 				clause: "",
@@ -242,8 +242,10 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "invalid condition",
 			args: args{
-				filters: []*repository.Filter{
-					repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
+				filters: [][]*repository.Filter{
+					{
+						repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
+					},
 				},
 			},
 			res: res{
@@ -254,26 +256,30 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "array as condition value",
 			args: args{
-				filters: []*repository.Filter{
-					repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+				filters: [][]*repository.Filter{
+					{
+						repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+					},
 				},
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?)",
+				clause: " WHERE ( aggregate_type = ANY(?) )",
 				values: []interface{}{pq.Array([]repository.AggregateType{"user", "org"})},
 			},
 		},
 		{
 			name: "multiple filters",
 			args: args{
-				filters: []*repository.Filter{
-					repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
-					repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
-					repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "org.created"}, repository.OperationIn),
+				filters: [][]*repository.Filter{
+					{
+						repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+						repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
+						repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "org.created"}, repository.OperationIn),
+					},
 				},
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?)",
+				clause: " WHERE ( aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) )",
 				values: []interface{}{pq.Array([]repository.AggregateType{"user", "org"}), "1234", pq.Array([]repository.EventType{"user.created", "org.created"})},
 			},
 		},
@@ -304,7 +310,6 @@ func Test_query_events_with_crdb(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []*repository.Event
-		existingAssets []*repository.Asset
 		client         *sql.DB
 	}
 	type res struct {
@@ -322,8 +327,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -345,8 +352,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -369,9 +378,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
-						repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+							repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -395,8 +406,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldResourceOwner, "caos", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldResourceOwner, "caos", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -420,9 +433,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldEditorService, "MANAGEMENT-API", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEditorService, "ADMIN-API", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldEditorService, "MANAGEMENT-API", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEditorService, "ADMIN-API", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -446,10 +461,12 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldEditorUser, "adlerhurst", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEditorUser, "nobody", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEditorUser, "", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldEditorUser, "adlerhurst", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEditorUser, "nobody", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEditorUser, "", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -475,9 +492,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldEventType, repository.EventType("user.created"), repository.OperationEquals),
-						repository.NewFilter(repository.FieldEventType, repository.EventType("user.updated"), repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldEventType, repository.EventType("user.created"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldEventType, repository.EventType("user.updated"), repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -559,18 +578,20 @@ func Test_query_events_mocked(t *testing.T) {
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC`,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 				),
 			},
@@ -586,18 +607,20 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    false,
 					Limit:   5,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence LIMIT \$2`,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY event_sequence LIMIT \$2`,
 					[]driver.Value{repository.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -613,18 +636,20 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   5,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC LIMIT \$2`,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY event_sequence DESC LIMIT \$2`,
 					[]driver.Value{repository.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -640,18 +665,20 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   0,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQueryErr(t,
-					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC`,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 					sql.ErrConnDone),
 			},
@@ -667,18 +694,20 @@ func Test_query_events_mocked(t *testing.T) {
 					Columns: repository.ColumnsEvent,
 					Desc:    true,
 					Limit:   0,
-					Filters: []*repository.Filter{
+					Filters: [][]*repository.Filter{
 						{
-							Field:     repository.FieldAggregateType,
-							Value:     repository.AggregateType("user"),
-							Operation: repository.OperationEquals,
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
 						},
 					},
 				},
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC`,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 					&repository.Event{Sequence: 100}),
 			},
@@ -702,13 +731,56 @@ func Test_query_events_mocked(t *testing.T) {
 			args: args{
 				query: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						{},
+					Filters: [][]*repository.Filter{
+						{
+							{},
+						},
 					},
 				},
 			},
 			res: res{
 				wantErr: true,
+			},
+		},
+		{
+			name: "with subqueries",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    true,
+					Limit:   5,
+					Filters: [][]*repository.Filter{
+						{
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
+						},
+						{
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("org"),
+								Operation: repository.OperationEquals,
+							},
+							{
+								Field:     repository.FieldAggregateID,
+								Value:     "asdf42",
+								Operation: repository.OperationEquals,
+							},
+						},
+					},
+				},
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) OR \( aggregate_type = \$2 AND aggregate_id = \$3 \) ORDER BY event_sequence DESC LIMIT \$4`,
+					[]driver.Value{repository.AggregateType("user"), repository.AggregateType("org"), "asdf42", uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
 			},
 		},
 	}

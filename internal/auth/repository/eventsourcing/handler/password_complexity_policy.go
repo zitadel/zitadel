@@ -44,6 +44,10 @@ func (p *PasswordComplexityPolicy) ViewModel() string {
 	return passwordComplexityPolicyTable
 }
 
+func (p *PasswordComplexityPolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *PasswordComplexityPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{org_es_model.OrgAggregate, iam_es_model.IAMAggregate}
 }

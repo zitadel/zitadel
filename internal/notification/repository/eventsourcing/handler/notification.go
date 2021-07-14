@@ -29,19 +29,14 @@ import (
 )
 
 const (
-	notificationTable            = "notification.notifications"
-	NotifyUserID                 = "NOTIFICATION"
-	labelPolicyTableOrg          = "management.label_policies"
-	labelPolicyTableDef          = "adminapi.label_policies"
-	mailTemplateTableOrg         = "management.mail_templates"
-	mailTemplateTableDef         = "adminapi.mail_templates"
-	messageTextTableOrg          = "management.message_texts"
-	messageTextTableDef          = "adminapi.message_texts"
-	messageTextTypeDomainClaimed = "DomainClaimed"
-	messageTextTypeInitCode      = "InitCode"
-	messageTextTypePasswordReset = "PasswordReset"
-	messageTextTypeVerifyEmail   = "VerifyEmail"
-	messageTextTypeVerifyPhone   = "VerifyPhone"
+	notificationTable    = "notification.notifications"
+	NotifyUserID         = "NOTIFICATION"
+	labelPolicyTableOrg  = "management.label_policies"
+	labelPolicyTableDef  = "adminapi.label_policies"
+	mailTemplateTableOrg = "management.mail_templates"
+	mailTemplateTableDef = "adminapi.mail_templates"
+	messageTextTableOrg  = "management.message_texts"
+	messageTextTableDef  = "adminapi.message_texts"
 )
 
 type Notification struct {
@@ -49,7 +44,6 @@ type Notification struct {
 	command        *command.Commands
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
-	i18n           *i18n.Translator
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
 	apiDomain      string
@@ -60,7 +54,6 @@ func newNotification(
 	command *command.Commands,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
-	translator *i18n.Translator,
 	statikDir http.FileSystem,
 	apiDomain string,
 ) *Notification {
@@ -68,7 +61,6 @@ func newNotification(
 		handler:        handler,
 		command:        command,
 		systemDefaults: defaults,
-		i18n:           translator,
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
 		apiDomain:      apiDomain,
@@ -90,6 +82,10 @@ func (k *Notification) subscribe() {
 
 func (n *Notification) ViewModel() string {
 	return notificationTable
+}
+
+func (n *Notification) Subscription() *v1.Subscription {
+	return n.subscription
 }
 
 func (_ *Notification) AggregateTypes() []models.AggregateType {
@@ -162,12 +158,12 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(user, messageTextTypeInitCode, user.PreferredLanguage)
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.InitCodeMessageType)
 	if err != nil {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), text, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendUserInitCode(string(template.Template), translator, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -201,11 +197,11 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(user, messageTextTypePasswordReset, user.PreferredLanguage)
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.PasswordResetMessageType)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), text, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendPasswordCode(string(template.Template), translator, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -239,12 +235,12 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	text, err := n.getMessageText(user, messageTextTypeVerifyEmail, user.PreferredLanguage)
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.VerifyEmailMessageType)
 	if err != nil {
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), text, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendEmailVerificationCode(string(template.Template), translator, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -266,11 +262,11 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	text, err := n.getMessageText(user, messageTextTypeVerifyPhone, user.PreferredLanguage)
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.VerifyPhoneMessageType)
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(text, user, phoneCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendPhoneVerificationCode(translator, user, phoneCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -305,11 +301,11 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	text, err := n.getMessageText(user, messageTextTypeDomainClaimed, user.PreferredLanguage)
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.DomainClaimedMessageType)
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), text, user, data["userName"], n.systemDefaults, colors, n.apiDomain)
+	err = types.SendDomainClaimed(string(template.Template), translator, user, data["userName"], n.systemDefaults, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -394,6 +390,31 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemp
 		return nil, err
 	}
 	return iam_es_model.MailTemplateViewToModel(template), err
+}
+
+func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
+	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.systemDefaults.DefaultLanguage})
+	if err != nil {
+		return nil, err
+	}
+	allCustomTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(domain.IAMID, textType)
+	if err == nil {
+		return translator, nil
+	}
+	customTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(orgID, textType)
+	if err == nil {
+		return translator, nil
+	}
+	allCustomTexts = append(allCustomTexts, customTexts...)
+
+	for _, text := range allCustomTexts {
+		msg := i18n.Message{
+			ID:   text.Key,
+			Text: text.Text,
+		}
+		translator.AddMessages(language.Make(text.Language), msg)
+	}
+	return translator, nil
 }
 
 // Read organization specific texts

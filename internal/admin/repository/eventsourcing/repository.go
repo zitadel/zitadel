@@ -54,6 +54,9 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
 
+	statikNotificationFS, err := fs.NewWithNamespace("notification")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
+
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
@@ -63,14 +66,16 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 			SystemDefaults: systemDefaults,
 		},
 		IAMRepository: eventstore.IAMRepository{
-			Eventstore:              es,
-			View:                    view,
-			SystemDefaults:          systemDefaults,
-			SearchLimit:             conf.SearchLimit,
-			Roles:                   roles,
-			PrefixAvatarURL:         assetsAPI,
-			LoginDir:                statikLoginFS,
-			TranslationFileContents: make(map[string][]byte),
+			Eventstore:                          es,
+			View:                                view,
+			SystemDefaults:                      systemDefaults,
+			SearchLimit:                         conf.SearchLimit,
+			Roles:                               roles,
+			PrefixAvatarURL:                     assetsAPI,
+			LoginDir:                            statikLoginFS,
+			NotificationDir:                     statikNotificationFS,
+			LoginTranslationFileContents:        make(map[string][]byte),
+			NotificationTranslationFileContents: make(map[string][]byte),
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,
