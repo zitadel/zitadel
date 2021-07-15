@@ -3,7 +3,7 @@
 .github
 .gitignore
 .dockerignore
-Dockerfile
+**/Dockerfile
 k8s
 docs
 console/node_modules

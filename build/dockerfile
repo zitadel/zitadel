@@ -6,9 +6,8 @@ ARG BUILDARCH
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/
 COPY /tmp/zitadel/zitadel-linux-${BUILDARCH} /app/zitadel
-COPY /tmp/zitadel-console /app/zitadel/console
+COPY /tmp/zitadel/console /app/zitadel/console
 RUN chmod a+x /app/zitadel
-RUN ls -la /
 
 #######################
 ## Scratch Image
