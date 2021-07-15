@@ -193,8 +193,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: false
-          cache-from: type=gha,scope=zitadel-operator
-          cache-to: type=gha,mode=max,scope=zitadel-operator
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
@@ -219,7 +219,7 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           #push: true //TODO reenable
           push: false
-          cache-from: type=gha,scope=zitadel-operator
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
@@ -231,7 +231,7 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
           push: false
-          cache-from: type=gha,scope=zitadel-operator
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           target: go-codecov
           outputs: type=local,dest=/tmp/operator
       - uses: codecov/codecov-action@v1
