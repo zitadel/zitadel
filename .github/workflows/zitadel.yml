@@ -273,113 +273,114 @@ jobs:
           cache-from: type=gha,scope=zitadel-cockroachdb
           cache-to: type=gha,mode=max,scope=zitadel-cockroachdb
 
-  # release:
-  #   name: Semantic Release Images and Artifacts
-  #   runs-on: ubuntu-18.04
-  #   needs: [ refs, zitadel-image, operator-image, crdb-image ]
-  #   env:
-  #     DOCKER_USERNAME: ${{ github.repository_owner }}
-  #     DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-  #   steps:
-  #     - name: Source checkout
-  #       uses: actions/checkout@v2
-  #     - name: Login to DockerHub
-  #       uses: docker/login-action@v1
-  #       with:
-  #         username: ${{ github.repository_owner }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #         registry: ${{ env.REGISTRY }}
-  #     - name: Docker Pull ZITADEL Image
-  #       run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
-  #     - name: Docker Pull ZITADEL Operator Image
-  #       run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-  #     - name: Docker Pull CockroachDB Image
-  #       run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-  #     - name: Download zitadelctl Artifacts
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         path: ${{ env.ARTIFACTS_FOLDER }}/
-  #     - name: Workaround for exe
-  #       run: |
-  #         mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
-  #         find ${ARTIFACTS_FOLDER}
+  release:
+    name: Semantic Release Images and Artifacts
+    runs-on: ubuntu-18.04
+    needs: [ refs, zitadel-image, operator-image, crdb-image ]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    env:
+      DOCKER_USERNAME: ${{ github.repository_owner }}
+      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+      - name: Docker Pull ZITADEL Image
+        run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
+      - name: Docker Pull ZITADEL Operator Image
+        run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
+      - name: Docker Pull CockroachDB Image
+        run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
+      - name: Download zitadelctl Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: ${{ env.ARTIFACTS_FOLDER }}/
+      - name: Workaround for exe
+        run: |
+          mv ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64 ${ARTIFACTS_FOLDER}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe
+          find ${ARTIFACTS_FOLDER}
 
-  #     - name: Run Semantic Release
-  #       id: semantic
-  #       uses: cycjimmy/semantic-release-action@v2
-  #       with:
-  #         dry_run: false
-  #         semantic_version: 17.0.4
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     - name: Echo Semantic Release Versions
-  #       if: steps.semantic.outputs.new_release_published == 'true'
-  #       run: |
-  #         echo ${{ steps.semantic.outputs.new_release_version }}
-  #         echo ${{ steps.semantic.outputs.new_release_major_version }}
-  #         echo ${{ steps.semantic.outputs.new_release_minor_version }}
-  #         echo ${{ steps.semantic.outputs.new_release_patch_version }}
-  #     - name: Docker Tag Version
-  #       run: |
-  #         docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-  #         docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-  #         docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-  #       if: steps.semantic.outputs.new_release_published == 'true'
-  #     - name: Docker Tag Latest
-  #       run: |
-  #         docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-  #         docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-  #         docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
-  #       if: steps.semantic.outputs.new_release_published == 'true'
-  #     - name: Docker Push Version
-  #       run: |
-  #         docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-  #         docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-  #         docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-  #       if: steps.semantic.outputs.new_release_published == 'true'
-  #     - name: Docker Push Latest
-  #       run: |
-  #         docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-  #         docker push $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-  #         docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
-  #       if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Run Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: false
+          semantic_version: 17.0.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Echo Semantic Release Versions
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name: Docker Tag Version
+        run: |
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Tag Latest
+        run: |
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Push Version
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
+        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Docker Push Latest
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:latest
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:latest
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
+        if: steps.semantic.outputs.new_release_published == 'true'
 
-  #     - name: Docker Tag Version
-  #       run: |
-  #         docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
-  #         docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-  #         docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-  #       if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
-  #     - name: Docker Push Version
-  #       run: |
-  #         docker push $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
-  #         docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-  #         docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-  #       if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
-  #     - name: Development Release
-  #       id: create_release
-  #       uses: ncipollo/release-action@v1.8.4
-  #       if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
-  #       with:
-  #         artifacts: "${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe"
-  #         body: |
-  #           This is a release from a development branch.
-  #           Do not use these artifacts in production.
-  #         tag: ${{ needs.refs.outputs.short_ref }}-dev
-  #         commit: ${{ needs.refs.outputs.short_ref }}
-  #         name: Branch ${{ needs.refs.outputs.short_ref }}
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         replacesArtifacts: true
-  #         prerelease: true
-  #         draft: false
-  #         allowUpdates: true
-  #     - uses: actions/checkout@v2
-  #     - name: Create Sentry release
-  #       uses: getsentry/action-release@v1
-  #       env:
-  #         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-  #         SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-  #         SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-  #       with:
-  #         version: ${{ steps.semantic.outputs.new_release_version }}
+      - name: Docker Tag Version
+        run: |
+          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
+          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
+      - name: Docker Push Version
+        run: |
+          docker push $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
+          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
+      - name: Development Release
+        id: create_release
+        uses: ncipollo/release-action@v1.8.4
+        if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
+        with:
+          artifacts: "${{ env.ARTIFACTS_FOLDER }}/zitadelctl-darwin-amd64/zitadelctl-darwin-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-linux-amd64/zitadelctl-linux-amd64,${{ env.ARTIFACTS_FOLDER }}/zitadelctl-windows-amd64/zitadelctl-windows-amd64.exe"
+          body: |
+            This is a release from a development branch.
+            Do not use these artifacts in production.
+          tag: ${{ needs.refs.outputs.short_ref }}-dev
+          commit: ${{ needs.refs.outputs.short_ref }}
+          name: Branch ${{ needs.refs.outputs.short_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          replacesArtifacts: true
+          prerelease: true
+          draft: false
+          allowUpdates: true
+      - uses: actions/checkout@v2
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          version: ${{ steps.semantic.outputs.new_release_version }}
 
