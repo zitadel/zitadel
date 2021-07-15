@@ -44,6 +44,10 @@ func (p *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
+func (p *LabelPolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (p *LabelPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.IAMAggregate}
 }

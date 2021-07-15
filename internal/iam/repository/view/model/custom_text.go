@@ -110,6 +110,46 @@ func (r *CustomTextView) IsMessageTemplate() bool {
 		r.Template == domain.DomainClaimedMessageType
 }
 
+func CustomTextViewsToMessageDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomMessageText {
+	langTag := language.Make(lang)
+	result := &domain.CustomMessageText{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: aggregateID,
+		},
+		Language: langTag,
+	}
+	for _, text := range texts {
+		if text.CreationDate.Before(result.CreationDate) {
+			result.CreationDate = text.CreationDate
+		}
+		if text.ChangeDate.After(result.ChangeDate) {
+			result.ChangeDate = text.ChangeDate
+		}
+		if text.Key == domain.MessageTitle {
+			result.Title = text.Text
+		}
+		if text.Key == domain.MessagePreHeader {
+			result.PreHeader = text.Text
+		}
+		if text.Key == domain.MessageSubject {
+			result.Subject = text.Text
+		}
+		if text.Key == domain.MessageGreeting {
+			result.Greeting = text.Text
+		}
+		if text.Key == domain.MessageText {
+			result.Text = text.Text
+		}
+		if text.Key == domain.MessageButtonText {
+			result.ButtonText = text.Text
+		}
+		if text.Key == domain.MessageFooterText {
+			result.FooterText = text.Text
+		}
+	}
+	return result
+}
+
 func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomLoginText {
 	langTag := language.Make(lang)
 	result := &domain.CustomLoginText{

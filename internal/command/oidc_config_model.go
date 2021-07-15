@@ -10,11 +10,13 @@ import (
 type OIDCConfigWriteModel struct {
 	eventstore.WriteModel
 
-	IDPConfigID  string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Issuer       string
-	Scopes       []string
+	IDPConfigID           string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	Issuer                string
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	Scopes                []string
 
 	IDPDisplayNameMapping domain.OIDCMappingField
 	UserNameMapping       domain.OIDCMappingField
@@ -45,6 +47,8 @@ func (wm *OIDCConfigWriteModel) reduceConfigAddedEvent(e *idpconfig.OIDCConfigAd
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.Issuer = e.Issuer
+	wm.AuthorizationEndpoint = e.AuthorizationEndpoint
+	wm.TokenEndpoint = e.TokenEndpoint
 	wm.Scopes = e.Scopes
 	wm.IDPDisplayNameMapping = e.IDPDisplayNameMapping
 	wm.UserNameMapping = e.UserNameMapping
@@ -57,6 +61,12 @@ func (wm *OIDCConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.OIDCConfig
 	}
 	if e.Issuer != nil {
 		wm.Issuer = *e.Issuer
+	}
+	if e.AuthorizationEndpoint != nil {
+		wm.AuthorizationEndpoint = *e.AuthorizationEndpoint
+	}
+	if e.TokenEndpoint != nil {
+		wm.TokenEndpoint = *e.TokenEndpoint
 	}
 	if len(e.Scopes) > 0 {
 		wm.Scopes = e.Scopes

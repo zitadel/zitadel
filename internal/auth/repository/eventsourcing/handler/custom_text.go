@@ -44,6 +44,10 @@ func (m *CustomText) ViewModel() string {
 	return customTextTable
 }
 
+func (m *CustomText) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *CustomText) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

@@ -1,9 +1,10 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"time"
 )
 
 type IDPConfig struct {
@@ -27,13 +28,15 @@ type IDPConfigView struct {
 	Sequence        uint64
 	IDPProviderType IdentityProviderType
 
-	IsOIDC                    bool
-	OIDCClientID              string
-	OIDCClientSecret          *crypto.CryptoValue
-	OIDCIssuer                string
-	OIDCScopes                []string
-	OIDCIDPDisplayNameMapping OIDCMappingField
-	OIDCUsernameMapping       OIDCMappingField
+	IsOIDC                     bool
+	OIDCClientID               string
+	OIDCClientSecret           *crypto.CryptoValue
+	OIDCIssuer                 string
+	OIDCScopes                 []string
+	OIDCIDPDisplayNameMapping  OIDCMappingField
+	OIDCUsernameMapping        OIDCMappingField
+	OAuthAuthorizationEndpoint string
+	OAuthTokenEndpoint         string
 }
 
 type OIDCIDPConfig struct {
@@ -43,6 +46,8 @@ type OIDCIDPConfig struct {
 	ClientSecret          *crypto.CryptoValue
 	ClientSecretString    string
 	Issuer                string
+	AuthorizationEndpoint string
+	TokenEndpoint         string
 	Scopes                []string
 	IDPDisplayNameMapping OIDCMappingField
 	UsernameMapping       OIDCMappingField

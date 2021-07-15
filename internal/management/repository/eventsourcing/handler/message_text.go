@@ -44,6 +44,10 @@ func (m *MessageText) ViewModel() string {
 	return messageTextTable
 }
 
+func (m *MessageText) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *MessageText) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

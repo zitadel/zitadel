@@ -2,17 +2,19 @@ package model
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/crypto"
 	"time"
+
+	"github.com/caos/zitadel/internal/crypto"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
-	"github.com/lib/pq"
 )
 
 const (
@@ -32,56 +34,39 @@ type IDPConfigView struct {
 	IDPState        int32     `json:"-" gorm:"column:idp_state"`
 	IDPProviderType int32     `json:"-" gorm:"column:idp_provider_type"`
 
-	IsOIDC                    bool                `json:"-" gorm:"column:is_oidc"`
-	OIDCClientID              string              `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCClientSecret          *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
-	OIDCIssuer                string              `json:"issuer" gorm:"column:oidc_issuer"`
-	OIDCScopes                pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
-	OIDCIDPDisplayNameMapping int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
-	OIDCUsernameMapping       int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
+	IsOIDC                     bool                `json:"-" gorm:"column:is_oidc"`
+	OIDCClientID               string              `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCClientSecret           *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
+	OIDCIssuer                 string              `json:"issuer" gorm:"column:oidc_issuer"`
+	OIDCScopes                 pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
+	OIDCIDPDisplayNameMapping  int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
+	OIDCUsernameMapping        int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
+	OAuthAuthorizationEndpoint string              `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
+	OAuthTokenEndpoint         string              `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func IDPConfigViewFromModel(idp *model.IDPConfigView) *IDPConfigView {
-	return &IDPConfigView{
-		IDPConfigID:               idp.IDPConfigID,
-		AggregateID:               idp.AggregateID,
-		IDPState:                  int32(idp.State),
-		Name:                      idp.Name,
-		StylingType:               int32(idp.StylingType),
-		Sequence:                  idp.Sequence,
-		CreationDate:              idp.CreationDate,
-		ChangeDate:                idp.ChangeDate,
-		IDPProviderType:           int32(idp.IDPProviderType),
-		IsOIDC:                    idp.IsOIDC,
-		OIDCClientID:              idp.OIDCClientID,
-		OIDCClientSecret:          idp.OIDCClientSecret,
-		OIDCIssuer:                idp.OIDCIssuer,
-		OIDCScopes:                idp.OIDCScopes,
-		OIDCIDPDisplayNameMapping: int32(idp.OIDCIDPDisplayNameMapping),
-		OIDCUsernameMapping:       int32(idp.OIDCUsernameMapping),
-	}
-}
-
 func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return &model.IDPConfigView{
-		IDPConfigID:               idp.IDPConfigID,
-		AggregateID:               idp.AggregateID,
-		State:                     model.IDPConfigState(idp.IDPState),
-		Name:                      idp.Name,
-		StylingType:               model.IDPStylingType(idp.StylingType),
-		Sequence:                  idp.Sequence,
-		CreationDate:              idp.CreationDate,
-		ChangeDate:                idp.ChangeDate,
-		IDPProviderType:           model.IDPProviderType(idp.IDPProviderType),
-		IsOIDC:                    idp.IsOIDC,
-		OIDCClientID:              idp.OIDCClientID,
-		OIDCClientSecret:          idp.OIDCClientSecret,
-		OIDCIssuer:                idp.OIDCIssuer,
-		OIDCScopes:                idp.OIDCScopes,
-		OIDCIDPDisplayNameMapping: model.OIDCMappingField(idp.OIDCIDPDisplayNameMapping),
-		OIDCUsernameMapping:       model.OIDCMappingField(idp.OIDCUsernameMapping),
+		IDPConfigID:                idp.IDPConfigID,
+		AggregateID:                idp.AggregateID,
+		State:                      model.IDPConfigState(idp.IDPState),
+		Name:                       idp.Name,
+		StylingType:                model.IDPStylingType(idp.StylingType),
+		Sequence:                   idp.Sequence,
+		CreationDate:               idp.CreationDate,
+		ChangeDate:                 idp.ChangeDate,
+		IDPProviderType:            model.IDPProviderType(idp.IDPProviderType),
+		IsOIDC:                     idp.IsOIDC,
+		OIDCClientID:               idp.OIDCClientID,
+		OIDCClientSecret:           idp.OIDCClientSecret,
+		OIDCIssuer:                 idp.OIDCIssuer,
+		OIDCScopes:                 idp.OIDCScopes,
+		OIDCIDPDisplayNameMapping:  model.OIDCMappingField(idp.OIDCIDPDisplayNameMapping),
+		OIDCUsernameMapping:        model.OIDCMappingField(idp.OIDCUsernameMapping),
+		OAuthAuthorizationEndpoint: idp.OAuthAuthorizationEndpoint,
+		OAuthTokenEndpoint:         idp.OAuthTokenEndpoint,
 	}
 }
 

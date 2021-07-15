@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -41,6 +42,10 @@ func (p *OrgIAMPolicy) subscribe() {
 
 func (p *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable
+}
+
+func (p *OrgIAMPolicy) Subscription() *v1.Subscription {
+	return p.subscription
 }
 
 func (p *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {

@@ -3,6 +3,8 @@ package handler
 import (
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
+	"golang.org/x/oauth2"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -119,7 +121,29 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *dom
 		l.renderError(w, r, authReq, err)
 		return nil
 	}
-	provider, err := rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
+	if idpConfig.OIDCIssuer != "" {
+		provider, err := rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return nil
+		}
+		return provider
+	}
+	if idpConfig.OAuthAuthorizationEndpoint == "" || idpConfig.OAuthTokenEndpoint == "" {
+		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig"))
+		return nil
+	}
+	oauth2Config := &oauth2.Config{
+		ClientID:     idpConfig.OIDCClientID,
+		ClientSecret: oidcClientSecret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  idpConfig.OAuthAuthorizationEndpoint,
+			TokenURL: idpConfig.OAuthTokenEndpoint,
+		},
+		RedirectURL: l.baseURL + callbackEndpoint,
+		Scopes:      idpConfig.OIDCScopes,
+	}
+	provider, err := rp.NewRelyingPartyOAuth(oauth2Config, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return nil

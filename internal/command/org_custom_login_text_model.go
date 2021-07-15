@@ -44,8 +44,8 @@ func (wm *OrgCustomLoginTextReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.CustomLoginTextReadModel.AggregateID).
+		AggregateTypes(org.AggregateType).
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,

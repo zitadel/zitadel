@@ -44,6 +44,10 @@ func (p *PrivacyPolicy) ViewModel() string {
 	return privacyPolicyTable
 }
 
+func (p *PrivacyPolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (p *PrivacyPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

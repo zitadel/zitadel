@@ -47,6 +47,10 @@ func (u *UserSession) ViewModel() string {
 	return userSessionTable
 }
 
+func (u *UserSession) Subscription() *v1.Subscription {
+	return u.subscription
+}
+
 func (_ *UserSession) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate}
 }

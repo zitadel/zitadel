@@ -42,8 +42,8 @@ func (wm *IAMCustomTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.CustomTextWriteModel.AggregateID).
+		AggregateTypes(iam.AggregateType).
 		EventTypes(
 			iam.CustomTextSetEventType).
 		Builder()
