@@ -236,28 +236,16 @@ Changes the username
     GET: /users/{user_id}/username
 
 
-### GetUserMetaData
+### SetUserMetaData
 
-> **rpc** GetUserMetaData([GetUserMetaDataRequest](#getusermetadatarequest))
-[GetUserMetaDataResponse](#getusermetadataresponse)
+> **rpc** SetUserMetaData([SetUserMetaDataRequest](#setusermetadatarequest))
+[SetUserMetaDataResponse](#setusermetadataresponse)
 
-Returns the user meta data by key
-
-
-
-    GET: /users/{id}/metadata/{key}
-
-
-### ListUserMetaData
-
-> **rpc** ListUserMetaData([ListUserMetaDataRequest](#listusermetadatarequest))
-[ListUserMetaDataResponse](#listusermetadataresponse)
-
-Returns the user meta data
+Sets a user meta data by key
 
 
 
-    POST: /users/{id}/metadata/_search
+    POST: /users/{id}/metadata/{key}
 
 
 ### BulkSetUserMetaData
@@ -272,16 +260,28 @@ Set a list of user meta data
     POST: /users/{id}/metadata/_bulk
 
 
-### SetUserMetaData
+### ListUserMetaData
 
-> **rpc** SetUserMetaData([SetUserMetaDataRequest](#setusermetadatarequest))
-[SetUserMetaDataResponse](#setusermetadataresponse)
+> **rpc** ListUserMetaData([ListUserMetaDataRequest](#listusermetadatarequest))
+[ListUserMetaDataResponse](#listusermetadataresponse)
 
-Sets a user meta data by key
+Returns the user meta data
 
 
 
-    POST: /users/{id}/metadata/{key}
+    POST: /users/{id}/metadata/_search
+
+
+### GetUserMetaData
+
+> **rpc** GetUserMetaData([GetUserMetaDataRequest](#getusermetadatarequest))
+[GetUserMetaDataResponse](#getusermetadataresponse)
+
+Returns the user meta data by key
+
+
+
+    GET: /users/{id}/metadata/{key}
 
 
 ### RemoveUserMetaData

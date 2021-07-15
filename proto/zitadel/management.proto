@@ -286,26 +286,15 @@ service ManagementService {
         };
     }
 
-    // Returns the user meta data by key
-    rpc GetUserMetaData(GetUserMetaDataRequest) returns (GetUserMetaDataResponse) {
+    // Sets a user meta data by key
+    rpc SetUserMetaData(SetUserMetaDataRequest) returns (SetUserMetaDataResponse) {
         option (google.api.http) = {
-            get: "/users/{id}/metadata/{key}"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    // Returns the user meta data
-    rpc ListUserMetaData(ListUserMetaDataRequest) returns (ListUserMetaDataResponse) {
-        option (google.api.http) = {
-            post: "/users/{id}/metadata/_search"
+            post: "/users/{id}/metadata/{key}"
             body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "user.read"
+            permission: "user.write"
         };
     }
 
@@ -321,15 +310,26 @@ service ManagementService {
         };
     }
 
-    // Sets a user meta data by key
-    rpc SetUserMetaData(SetUserMetaDataRequest) returns (SetUserMetaDataResponse) {
+    // Returns the user meta data
+    rpc ListUserMetaData(ListUserMetaDataRequest) returns (ListUserMetaDataResponse) {
         option (google.api.http) = {
-            post: "/users/{id}/metadata/{key}"
+            post: "/users/{id}/metadata/_search"
             body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "user.write"
+            permission: "user.read"
+        };
+    }
+
+    // Returns the user meta data by key
+    rpc GetUserMetaData(GetUserMetaDataRequest) returns (GetUserMetaDataResponse) {
+        option (google.api.http) = {
+            get: "/users/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
         };
     }
 
