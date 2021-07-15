@@ -37,7 +37,8 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 		BulkLimit:         config.BulkLimit,
 	}
 
-	// NewOrgProjection(ctx, projectionConfig)
+	NewOrgProjection(ctx, projectionConfig)
+	NewProjectProjection(ctx, projectionConfig)
 	owner.NewOrgOwnerProjection(ctx, projectionConfig)
 	return nil
 }
