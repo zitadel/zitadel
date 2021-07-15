@@ -57,6 +57,7 @@ const (
 	projectIDCol           = "id"
 	projectNameCol         = "name"
 	projectCreationDateCol = "creation_date"
+	projectChangeDateCol   = "change_date"
 	projectOwnerCol        = "owner_id"
 	projectCreatorCol      = "creator_id"
 	projectStateCol        = "state"
@@ -77,6 +78,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) ([]
 				handler.NewCol(projectIDCol, e.Aggregate().ID),
 				handler.NewCol(projectNameCol, e.Name),
 				handler.NewCol(projectCreationDateCol, e.CreationDate()),
+				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 				handler.NewCol(projectOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCol(projectCreatorCol, e.EditorUser()),
 				handler.NewCol(projectStateCol, projectActive),
@@ -88,6 +90,10 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) ([]
 func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) ([]handler.Statement, error) {
 	e := event.(*project.ProjectChangeEvent)
 
+	if e.Name == nil {
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+	}
+
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
 			e.Aggregate().Typ,
@@ -95,6 +101,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
 				handler.NewCol(projectNameCol, e.Name),
+				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			},
 			[]handler.Column{
 				handler.NewCol(projectIDCol, e.Aggregate().ID),
@@ -113,6 +120,7 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReade
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
 				handler.NewCol(projectStateCol, projectInactive),
+				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			},
 			[]handler.Column{
 				handler.NewCol(projectIDCol, e.Aggregate().ID),
@@ -131,6 +139,7 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReade
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
 				handler.NewCol(projectStateCol, projectActive),
+				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			},
 			[]handler.Column{
 				handler.NewCol(projectIDCol, e.Aggregate().ID),

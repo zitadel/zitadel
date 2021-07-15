@@ -12,8 +12,8 @@ type Config struct {
 }
 
 type CustomConfig struct {
-	RequeueEvery     types.Duration
-	RetryFailedAfter types.Duration
-	MaxFailureCount  uint
-	BulkLimit        uint64
+	RequeueEvery     *types.Duration
+	RetryFailedAfter *types.Duration
+	MaxFailureCount  *uint
+	BulkLimit        *uint64
 }

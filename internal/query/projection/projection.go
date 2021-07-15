@@ -37,8 +37,25 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 		BulkLimit:         config.BulkLimit,
 	}
 
-	NewOrgProjection(ctx, projectionConfig)
-	NewProjectProjection(ctx, projectionConfig)
-	owner.NewOrgOwnerProjection(ctx, projectionConfig)
+	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
+	NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
+	owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
 	return nil
+}
+
+func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {
+	if customConfig.BulkLimit != nil {
+		config.BulkLimit = *customConfig.BulkLimit
+	}
+	if customConfig.MaxFailureCount != nil {
+		config.MaxFailureCount = *customConfig.MaxFailureCount
+	}
+	if customConfig.RequeueEvery != nil {
+		config.RequeueEvery = customConfig.RequeueEvery.Duration
+	}
+	if customConfig.RetryFailedAfter != nil {
+		config.RetryFailedAfter = customConfig.RetryFailedAfter.Duration
+	}
+
+	return config
 }
