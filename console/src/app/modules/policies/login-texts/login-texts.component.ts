@@ -31,6 +31,7 @@ import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
 
+// tslint:disable
 const KeyNamesArray = [
   'emailVerificationDoneText',
   'emailVerificationText',
@@ -61,32 +62,31 @@ const KeyNamesArray = [
   'usernameChangeDoneText',
   'usernameChangeText',
   'verifyMfaOtpText',
-  'verifyMfaU2fText'
+  'verifyMfaU2fText',
 ];
-// type KeyName = keyof typeof KeyNamesArray;
+// tslint:enable
 
 const REQUESTMAP = {
   [PolicyComponentServiceType.MGMT]: {
     get: new GetCustomLoginTextsRequest(),
     set: new SetCustomLoginTextsRequest(),
     getDefault: new GetDefaultLoginTextsRequest(),
-    setFcn: (map: Partial<SetCustomLoginTextsRequest.AsObject>): SetCustomLoginTextsRequest => {
-      console.log(map);
+    setFcn: (mgmtmap: Partial<SetCustomLoginTextsRequest.AsObject>): SetCustomLoginTextsRequest => {
       let req = new SetCustomLoginTextsRequest();
-      req.setLanguage(map.language ?? '');
-      req = mapRequestValues(map, req);
+      req.setLanguage(mgmtmap.language ?? '');
+      req = mapRequestValues(mgmtmap, req);
       return req;
-    }
+    },
   },
   [PolicyComponentServiceType.ADMIN]: {
     get: new AdminGetDefaultLoginTextsRequest(),
     set: new AdminSetCustomLoginTextsRequest(),
-    setFcn: (map: Partial<AdminSetCustomLoginTextsRequest.AsObject>): AdminSetCustomLoginTextsRequest => {
+    setFcn: (adminmap: Partial<AdminSetCustomLoginTextsRequest.AsObject>): AdminSetCustomLoginTextsRequest => {
       let req = new AdminSetCustomLoginTextsRequest();
-      req.setLanguage(map.language ?? '');
-      req = mapRequestValues(map, req);
+      req.setLanguage(adminmap.language ?? '');
+      req = mapRequestValues(adminmap, req);
       return req;
-    }
+    },
   },
 };
 @Component({
@@ -112,7 +112,7 @@ export class LoginTextsComponent implements OnDestroy {
 
   private sub: Subscription = new Subscription();
 
-
+  public updateRequest: any;
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
@@ -162,21 +162,20 @@ export class LoginTextsComponent implements OnDestroy {
     this.locale = selection.value;
   }
 
-  public async loadData() {
-    const lang = this.translate.currentLang ?? 'en';
-    if (this.serviceType == PolicyComponentServiceType.MGMT) {
+  public async loadData(): Promise<any> {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
 
 
-      reqDefaultInit.setLanguage(lang);
+      reqDefaultInit.setLanguage(this.locale);
       this.getDefaultInitMessageTextMap$ = from(
-        this.getDefaultValues(reqDefaultInit)
+        this.getDefaultValues(reqDefaultInit),
       ).pipe(map(m => m[this.currentSubMap]));
     }
 
-    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(lang);
+    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
     this.getCustomInitMessageTextMap$.next(
-      (await this.getCurrentValues(reqCustomInit))[this.currentSubMap]
+      (await this.getCurrentValues(reqCustomInit))[this.currentSubMap],
     );
   }
 
@@ -184,12 +183,20 @@ export class LoginTextsComponent implements OnDestroy {
     console.log(values);
     const req = REQUESTMAP[this.serviceType].setFcn;
     const mappedValues = req({ [this.currentSubMap]: values });
-
-    console.log(mappedValues.toObject());
+    this.updateRequest = mappedValues;
+    this.updateRequest.setLanguage(this.translate.currentLang);
   }
 
   public saveCurrentMessage(): void {
-    console.log('save');
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      (this.service as ManagementService).setCustomLoginText(this.updateRequest).then(() => {
+        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+      }).catch(error => this.toast.showError(error));
+    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+      (this.service as AdminService).setCustomLoginText(this.updateRequest).then(() => {
+        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+      }).catch(error => this.toast.showError(error));
+    }
   }
 
   public resetDefault(): void {
@@ -206,8 +213,8 @@ export class LoginTextsComponent implements OnDestroy {
 
     dialogRef.afterClosed().subscribe(resp => {
       if (resp) {
-        if (this.serviceType == PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).resetCustomLoginTextToDefault(this.translate.currentLang ?? 'en').then(() => {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+          (this.service as ManagementService).resetCustomLoginTextToDefault(this.locale).then(() => {
             setTimeout(() => {
               this.loadData();
             }, 1000);

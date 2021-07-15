@@ -406,19 +406,23 @@ export class ManagementService {
 
   // message texts
 
-  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
+  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest):
+    Promise<GetDefaultInitMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public getCustomInitMessageText(req: GetCustomInitMessageTextRequest): Promise<GetCustomInitMessageTextResponse.AsObject> {
+  public getCustomInitMessageText(req: GetCustomInitMessageTextRequest):
+    Promise<GetCustomInitMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomInitMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setCustomInitMessageText(req: SetCustomInitMessageTextRequest): Promise<SetCustomInitMessageTextResponse.AsObject> {
+  public setCustomInitMessageText(req: SetCustomInitMessageTextRequest):
+    Promise<SetCustomInitMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomInitMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomInitMessageTextToDefault(lang: string): Promise<ResetCustomInitMessageTextToDefaultResponse.AsObject> {
+  public resetCustomInitMessageTextToDefault(lang: string):
+    Promise<ResetCustomInitMessageTextToDefaultResponse.AsObject> {
     const req = new ResetCustomInitMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomInitMessageTextToDefault(req, null).then(resp => resp.toObject());
@@ -426,76 +430,92 @@ export class ManagementService {
 
 
 
-  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest): Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
+  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest):
+    Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public getCustomVerifyEmailMessageText(req: GetCustomVerifyEmailMessageTextRequest): Promise<GetCustomVerifyEmailMessageTextResponse.AsObject> {
+  public getCustomVerifyEmailMessageText(req: GetCustomVerifyEmailMessageTextRequest):
+    Promise<GetCustomVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setCustomVerifyEmailMessageText(req: SetCustomVerifyEmailMessageTextRequest): Promise<SetCustomVerifyEmailMessageTextResponse.AsObject> {
+  public setCustomVerifyEmailMessageText(req: SetCustomVerifyEmailMessageTextRequest):
+    Promise<SetCustomVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomVerifyEmailMessageTextToDefault(lang: string): Promise<ResetCustomVerifyEmailMessageTextToDefaultResponse.AsObject> {
+  public resetCustomVerifyEmailMessageTextToDefault(lang: string):
+    Promise<ResetCustomVerifyEmailMessageTextToDefaultResponse.AsObject> {
     const req = new ResetCustomVerifyEmailMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomVerifyEmailMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest): Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest):
+    Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public getCustomVerifyPhoneMessageText(req: GetCustomVerifyPhoneMessageTextRequest): Promise<GetCustomVerifyPhoneMessageTextResponse.AsObject> {
+  public getCustomVerifyPhoneMessageText(req: GetCustomVerifyPhoneMessageTextRequest):
+    Promise<GetCustomVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setCustomVerifyPhoneMessageText(req: SetCustomVerifyPhoneMessageTextRequest): Promise<SetCustomVerifyPhoneMessageTextResponse.AsObject> {
+  public setCustomVerifyPhoneMessageText(req: SetCustomVerifyPhoneMessageTextRequest):
+    Promise<SetCustomVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomVerifyPhoneMessageTextToDefault(lang: string): Promise<ResetCustomVerifyPhoneMessageTextToDefaultResponse.AsObject> {
+  public resetCustomVerifyPhoneMessageTextToDefault(lang: string):
+    Promise<ResetCustomVerifyPhoneMessageTextToDefaultResponse.AsObject> {
     const req = new ResetCustomVerifyPhoneMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomVerifyPhoneMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
+  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest):
+    Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public getCustomPasswordResetMessageText(req: GetCustomPasswordResetMessageTextRequest): Promise<GetCustomPasswordResetMessageTextResponse.AsObject> {
+  public getCustomPasswordResetMessageText(req: GetCustomPasswordResetMessageTextRequest):
+    Promise<GetCustomPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setCustomPasswordResetMessageText(req: SetCustomPasswordResetMessageTextRequest): Promise<SetCustomPasswordResetMessageTextResponse.AsObject> {
+  public setCustomPasswordResetMessageText(req: SetCustomPasswordResetMessageTextRequest):
+    Promise<SetCustomPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomPasswordResetMessageTextToDefault(lang: string): Promise<ResetCustomPasswordResetMessageTextToDefaultResponse.AsObject> {
+  public resetCustomPasswordResetMessageTextToDefault(lang: string):
+    Promise<ResetCustomPasswordResetMessageTextToDefaultResponse.AsObject> {
     const req = new ResetCustomPasswordResetMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomPasswordResetMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest): Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
+  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest):
+    Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public getCustomDomainClaimedMessageText(req: GetCustomDomainClaimedMessageTextRequest): Promise<GetCustomDomainClaimedMessageTextResponse.AsObject> {
+  public getCustomDomainClaimedMessageText(req: GetCustomDomainClaimedMessageTextRequest):
+    Promise<GetCustomDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomDomainClaimedMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setCustomDomainClaimedMessageCustomText(req: SetCustomDomainClaimedMessageTextRequest): Promise<SetCustomDomainClaimedMessageTextResponse.AsObject> {
+  public setCustomDomainClaimedMessageCustomText(req: SetCustomDomainClaimedMessageTextRequest):
+    Promise<SetCustomDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomDomainClaimedMessageCustomText(req, null).then(resp => resp.toObject());
   }
 
-  public resetCustomDomainClaimedMessageTextToDefault(lang: string): Promise<ResetCustomDomainClaimedMessageTextToDefaultResponse.AsObject> {
+  public resetCustomDomainClaimedMessageTextToDefault(lang: string):
+    Promise<ResetCustomDomainClaimedMessageTextToDefaultResponse.AsObject> {
     const req = new ResetCustomDomainClaimedMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomDomainClaimedMessageTextToDefault(req, null).then(resp => resp.toObject());

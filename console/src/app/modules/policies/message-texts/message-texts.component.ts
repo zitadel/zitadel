@@ -53,8 +53,8 @@ enum MESSAGETYPES {
   VERIFYPHONE = 'VP',
   VERIFYEMAIL = 'VE',
   PASSWORDRESET = 'PR',
-  DOMAINCLAIMED = 'DC'
-};
+  DOMAINCLAIMED = 'DC',
+}
 
 const REQUESTMAP = {
   [PolicyComponentServiceType.MGMT]: {
@@ -73,7 +73,7 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.VERIFYEMAIL]: {
       get: new GetCustomVerifyEmailMessageTextRequest(),
@@ -90,7 +90,7 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.VERIFYPHONE]: {
       get: new GetCustomVerifyPhoneMessageTextRequest(),
@@ -107,13 +107,14 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.PASSWORDRESET]: {
       get: new GetCustomPasswordResetMessageTextRequest(),
       set: new SetCustomPasswordResetMessageTextRequest(),
       getDefault: new GetDefaultPasswordResetMessageTextRequest(),
-      setFcn: (map: Partial<SetCustomPasswordResetMessageTextRequest.AsObject>): SetCustomPasswordResetMessageTextRequest => {
+      setFcn: (map: Partial<SetCustomPasswordResetMessageTextRequest.AsObject>):
+        SetCustomPasswordResetMessageTextRequest => {
         const req = new SetCustomPasswordResetMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -124,13 +125,14 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.DOMAINCLAIMED]: {
       get: new GetCustomDomainClaimedMessageTextRequest(),
       set: new SetCustomDomainClaimedMessageTextRequest(),
       getDefault: new GetDefaultDomainClaimedMessageTextRequest(),
-      setFcn: (map: Partial<SetCustomDomainClaimedMessageTextRequest.AsObject>): SetCustomDomainClaimedMessageTextRequest => {
+      setFcn: (map: Partial<SetCustomDomainClaimedMessageTextRequest.AsObject>):
+        SetCustomDomainClaimedMessageTextRequest => {
         const req = new SetCustomDomainClaimedMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -141,14 +143,15 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
   },
   [PolicyComponentServiceType.ADMIN]: {
     [MESSAGETYPES.INIT]: {
       get: new AdminGetDefaultInitMessageTextRequest(),
       set: new SetDefaultInitMessageTextRequest(),
-      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultInitMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>):
+        SetDefaultInitMessageTextRequest => {
         const req = new SetDefaultInitMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -159,12 +162,13 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.VERIFYEMAIL]: {
       get: new AdminGetDefaultVerifyEmailMessageTextRequest(),
       set: new SetDefaultVerifyEmailMessageTextRequest(),
-      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyEmailMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>):
+        SetDefaultVerifyEmailMessageTextRequest => {
         const req = new SetDefaultVerifyEmailMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -175,12 +179,13 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.VERIFYPHONE]: {
       get: new AdminGetDefaultVerifyPhoneMessageTextRequest(),
       set: new SetDefaultVerifyPhoneMessageTextRequest(),
-      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyPhoneMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>):
+        SetDefaultVerifyPhoneMessageTextRequest => {
         const req = new SetDefaultVerifyPhoneMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -196,7 +201,8 @@ const REQUESTMAP = {
     [MESSAGETYPES.PASSWORDRESET]: {
       get: new AdminGetCustomPasswordResetMessageTextRequest(),
       set: new SetDefaultPasswordResetMessageTextRequest(),
-      setFcn: (map: Partial<SetDefaultPasswordResetMessageTextRequest.AsObject>): SetDefaultPasswordResetMessageTextRequest => {
+      setFcn: (map: Partial<SetDefaultPasswordResetMessageTextRequest.AsObject>):
+        SetDefaultPasswordResetMessageTextRequest => {
         const req = new SetDefaultPasswordResetMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -207,12 +213,13 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
     [MESSAGETYPES.DOMAINCLAIMED]: {
       get: new GetDefaultDomainClaimedMessageTextRequest(),
       set: new SetDefaultDomainClaimedMessageTextRequest(),
-      setFcn: (map: Partial<SetDefaultDomainClaimedMessageTextRequest.AsObject>): SetDefaultDomainClaimedMessageTextRequest => {
+      setFcn: (map: Partial<SetDefaultDomainClaimedMessageTextRequest.AsObject>):
+        SetDefaultDomainClaimedMessageTextRequest => {
         const req = new SetDefaultDomainClaimedMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -223,7 +230,7 @@ const REQUESTMAP = {
         req.setTitle(map.title ?? '');
 
         return req;
-      }
+      },
     },
   },
 };
@@ -324,21 +331,19 @@ export class MessageTextsComponent implements OnDestroy {
     }
   }
 
-  public async loadData(type: MESSAGETYPES) {
-
-    console.log(this.serviceType, type);
-    if (this.serviceType == PolicyComponentServiceType.MGMT) {
+  public async loadData(type: MESSAGETYPES): Promise<any> {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const reqDefaultInit = REQUESTMAP[this.serviceType][type].getDefault;
 
       reqDefaultInit.setLanguage(this.translate.currentLang);
       this.getDefaultInitMessageTextMap$ = from(
-        this.getDefaultValues(type, reqDefaultInit)
+        this.getDefaultValues(type, reqDefaultInit),
       );
     }
 
     const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.translate.currentLang);
     this.getCustomInitMessageTextMap$.next(
-      await this.getCurrentValues(type, reqCustomInit)
+      await this.getCurrentValues(type, reqCustomInit),
     );
   }
 
@@ -347,18 +352,40 @@ export class MessageTextsComponent implements OnDestroy {
     const mappedValues = req(values);
     this.updateRequest = mappedValues;
     this.updateRequest.setLanguage(this.translate.currentLang);
-    console.log(mappedValues.toObject());
   }
 
-  public saveCurrentMessage(): void {
-    if (this.serviceType == PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).setCustomInitMessageText(this.updateRequest).then(() => {
+  public saveCurrentMessage(): any {
+    const handler = (prom: Promise<any>): Promise<any> => {
+      return prom.then(() => {
         this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
       }).catch(error => this.toast.showError(error));
-    } else if (this.serviceType == PolicyComponentServiceType.ADMIN) {
-      (this.service as AdminService).setDefaultInitMessageText(this.updateRequest).then(() => {
-        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
-      }).catch(error => this.toast.showError(error));
+    };
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      switch (this.currentType) {
+        case MESSAGETYPES.INIT:
+          return handler((this.service as ManagementService).setCustomInitMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYPHONE:
+          return handler((this.service as ManagementService).setCustomVerifyPhoneMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYEMAIL:
+          return handler((this.service as ManagementService).setCustomVerifyEmailMessageText(this.updateRequest));
+        case MESSAGETYPES.PASSWORDRESET:
+          return handler((this.service as ManagementService).setCustomPasswordResetMessageText(this.updateRequest));
+        case MESSAGETYPES.DOMAINCLAIMED:
+          return handler((this.service as ManagementService).setCustomDomainClaimedMessageCustomText(this.updateRequest));
+      }
+    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+      switch (this.currentType) {
+        case MESSAGETYPES.INIT:
+          return handler((this.service as AdminService).setDefaultInitMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYPHONE:
+          return handler((this.service as AdminService).setDefaultVerifyPhoneMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYEMAIL:
+          return handler((this.service as AdminService).setDefaultVerifyEmailMessageText(this.updateRequest));
+        case MESSAGETYPES.PASSWORDRESET:
+          return handler((this.service as AdminService).setDefaultPasswordResetMessageText(this.updateRequest));
+        case MESSAGETYPES.DOMAINCLAIMED:
+          return handler((this.service as AdminService).setDefaultDomainClaimedMessageText(this.updateRequest));
+      }
     }
   }
 
@@ -376,7 +403,7 @@ export class MessageTextsComponent implements OnDestroy {
 
     dialogRef.afterClosed().subscribe(resp => {
       if (resp) {
-        if (this.serviceType == PolicyComponentServiceType.MGMT) {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
           const handler = (prom: Promise<any>): Promise<any> => {
             return prom.then(() => {
               setTimeout(() => {

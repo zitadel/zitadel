@@ -34,6 +34,6 @@ import { EditTextComponent } from './edit-text.component';
   ],
   exports: [
     EditTextComponent,
-  ]
+  ],
 })
 export class EditTextModule { }

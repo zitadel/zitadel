@@ -8,9 +8,9 @@ describe('EditTextComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditTextComponent ]
+      declarations: [EditTextComponent],
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

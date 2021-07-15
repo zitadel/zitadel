@@ -37,9 +37,7 @@ type Req = AdminSetCustomLoginTextsRequest | SetCustomLoginTextsRequest;
 type Map = AdminSetCustomLoginTextsRequest.AsObject | SetCustomLoginTextsRequest.AsObject;
 
 export function mapRequestValues(map: Partial<Map>, req: Req): Req {
-  console.log(!!map.emailVerificationDoneText);
-
-  const emailFunc = () => {
+  if (!!map.emailVerificationDoneText) {
     const r = new EmailVerificationDoneScreenText();
     r.setCancelButtonText(map.emailVerificationDoneText?.cancelButtonText ?? '');
     r.setDescription(map.emailVerificationDoneText?.description ?? '');
@@ -48,10 +46,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.emailVerificationDoneText?.title ?? '');
 
     req.setEmailVerificationDoneText(r);
-  };
-  !!map.emailVerificationDoneText ? emailFunc() : null;
+  }
 
-  const emailVerificationFunc = () => {
+
+  if (!!map.emailVerificationText) {
     const r = new EmailVerificationScreenText();
     r.setCodeLabel(map.emailVerificationText?.codeLabel ?? '');
     r.setDescription(map.emailVerificationText?.description ?? '');
@@ -60,10 +58,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.emailVerificationText?.title ?? '');
 
     req.setEmailVerificationText(r);
-  };
-  !!map.emailVerificationText ? emailVerificationFunc() : null;
+  }
 
-  const externalUserFunc = () => {
+
+  if (!!map.externalUserNotFoundText) {
     const r = new ExternalUserNotFoundScreenText();
     r.setAutoRegisterButtonText(map.externalUserNotFoundText?.autoRegisterButtonText ?? '');
     r.setDescription(map.externalUserNotFoundText?.description ?? '');
@@ -71,10 +69,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.externalUserNotFoundText?.title ?? '');
 
     req.setExternalUserNotFoundText(r);
-  };
-  !!map.externalUserNotFoundText ? externalUserFunc() : null;
+  }
 
-  const footerTextFunc = () => {
+  if (!!map.footerText) {
     const r = new FooterText();
     r.setHelp(map.footerText?.help ?? '');
     r.setHelpLink(map.footerText?.helpLink ?? '');
@@ -84,10 +81,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTosLink(map.footerText?.tosLink ?? '');
 
     req.setFooterText(r);
-  };
-  map.footerText ? footerTextFunc() : null;
+  }
 
-  const initMfaDoneTextFunc = () => {
+  if (!!map.initMfaDoneText) {
     const r = new InitMFADoneScreenText();
     r.setCancelButtonText(map.initMfaDoneText?.cancelButtonText ?? '');
     r.setDescription(map.initMfaDoneText?.description ?? '');
@@ -95,10 +91,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.initMfaDoneText?.title ?? '');
 
     req.setInitMfaDoneText(r);
-  };
-  map.initMfaDoneText ? initMfaDoneTextFunc() : null;
+  }
 
-  const initMfaOtpTextFunc = () => {
+  if (!!map.initMfaOtpText) {
     const r = new InitMFAOTPScreenText();
     r.setCancelButtonText(map.initMfaOtpText?.cancelButtonText ?? '');
     r.setCodeLabel(map.initMfaOtpText?.codeLabel ?? '');
@@ -109,10 +104,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.initMfaOtpText?.title ?? '');
 
     req.setInitMfaOtpText(r);
-  };
-  map.initMfaOtpText ? initMfaOtpTextFunc() : null;
+  }
 
-  const initMfaPromptTextFunc = () => {
+  if (!!map.initMfaPromptText) {
     const r = new InitMFAPromptScreenText();
     r.setDescription(map.initMfaPromptText?.description ?? '');
     r.setNextButtonText(map.initMfaPromptText?.nextButtonText ?? '');
@@ -122,10 +116,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setU2fOption(map.initMfaPromptText?.otpOption ?? '');
 
     req.setInitMfaPromptText(r);
-  };
-  map.initMfaPromptText ? initMfaPromptTextFunc() : null;
+  }
 
-  const initMfaU2fTextFunc = () => {
+
+  if (!!map.initMfaU2fText) {
     const r = new InitMFAU2FScreenText();
     r.setDescription(map.initMfaU2fText?.description ?? '');
     r.setErrorRetry(map.initMfaU2fText?.errorRetry ?? '');
@@ -135,10 +129,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTokenNameLabel(map.initMfaU2fText?.tokenNameLabel ?? '');
 
     req.setInitMfaU2fText(r);
-  };
-  map.initMfaU2fText ? initMfaU2fTextFunc() : null;
+  }
 
-  const initPasswordDoneTextFunc = () => {
+  if (!!map.initPasswordDoneText) {
     const r = new InitPasswordDoneScreenText();
     r.setCancelButtonText(map.initPasswordDoneText?.cancelButtonText ?? '');
     r.setDescription(map.initPasswordDoneText?.description ?? '');
@@ -146,10 +139,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.initPasswordDoneText?.title ?? '');
 
     req.setInitPasswordDoneText(r);
-  };
-  map.initPasswordDoneText ? initPasswordDoneTextFunc() : null;
+  }
 
-  const initPasswordTextFunc = () => {
+  if (!!map.initPasswordText) {
     const r = new InitPasswordScreenText();
     r.setCodeLabel(map.initPasswordText?.description ?? '');
     r.setDescription(map.initPasswordText?.description ?? '');
@@ -160,10 +152,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.initPasswordText?.title ?? '');
 
     req.setInitPasswordText(r);
-  };
-  map.initPasswordText ? initPasswordTextFunc : null;
+  }
 
-  const initializeDoneTextFunc = () => {
+
+  if (!!map.initializeDoneText) {
     const r = new InitializeUserDoneScreenText();
     r.setCancelButtonText(map.initializeDoneText?.cancelButtonText ?? '');
     r.setDescription(map.initializeDoneText?.description ?? '');
@@ -171,10 +163,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.initializeDoneText?.title ?? '');
 
     req.setInitializeDoneText(r);
-  };
-  map.initializeDoneText ? initializeDoneTextFunc() : null;
+  }
 
-  const initializeUserTextFunc = () => {
+  if (!!map.initializeUserText) {
     const initializeUserTextRequest = new InitializeUserScreenText();
     initializeUserTextRequest.setCodeLabel(map.initializeUserText?.codeLabel ?? '');
     initializeUserTextRequest.setDescription(map.initializeUserText?.description ?? '');
@@ -185,10 +176,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     initializeUserTextRequest.setTitle(map.initializeUserText?.title ?? '');
 
     req.setInitializeUserText(initializeUserTextRequest);
-  };
-  map.initializeUserText ? initializeUserTextFunc() : null;
+  }
 
-  const linkingUserDoneTextFunc = (() => {
+  if (!!map.linkingUserDoneText) {
     const r = new LinkingUserDoneScreenText();
     r.setCancelButtonText(map.linkingUserDoneText?.cancelButtonText ?? '');
     r.setDescription(map.linkingUserDoneText?.description ?? '');
@@ -196,10 +186,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.linkingUserDoneText?.title ?? '');
 
     req.setLinkingUserDoneText(r);
-  })();
-  map.linkingUserDoneText ? linkingUserDoneTextFunc : null;
+  }
 
-  const loginTextFunc = (() => {
+  if (!!map.loginText) {
     const r = new LoginScreenText();
     r.setDescription(map.loginText?.description ?? '');
     r.setDescriptionLinkingProcess(map.loginText?.descriptionLinkingProcess ?? '');
@@ -214,55 +203,54 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setUserNamePlaceholder(map.loginText?.userNamePlaceholder ?? '');
 
     req.setLoginText(r);
-  })();
-  map.loginText ? loginTextFunc : null;
+  }
 
-  map.logoutText ? (() => {
+  if (!!map.logoutText) {
     const r = new LogoutDoneScreenText();
     r.setDescription(map.logoutText?.description ?? '');
     r.setLoginButtonText(map.logoutText?.loginButtonText ?? '');
     r.setTitle(map.logoutText?.title ?? '');
 
     req.setLogoutText(r);
-  })() : null;
+  }
 
-  map.mfaProvidersText ? (() => {
+  if (!!map.mfaProvidersText) {
     const r = new MFAProvidersText();
     r.setChooseOther(map.mfaProvidersText?.chooseOther ?? '');
     r.setOtp(map.mfaProvidersText?.otp ?? '');
     r.setU2f(map.mfaProvidersText?.u2f ?? '');
 
     req.setMfaProvidersText(r);
-  })() : null;
+  }
 
-  map.passwordChangeDoneText ? (() => {
+  if (!!map.passwordChangeDoneText) {
     const r = new PasswordChangeDoneScreenText();
     r.setDescription(map.passwordChangeDoneText?.description ?? '');
     r.setNextButtonText(map.passwordChangeDoneText?.nextButtonText ?? '');
     r.setTitle(map.passwordChangeDoneText?.title ?? '');
 
     req.setPasswordChangeDoneText(r);
-  })() : null;
+  }
 
-  map.passwordChangeText ? (() => {
+  if (!!map.passwordChangeText) {
     const r = new PasswordChangeScreenText();
     r.setDescription(map.passwordChangeText?.description ?? '');
     r.setNextButtonText(map.passwordChangeText?.nextButtonText ?? '');
     r.setTitle(map.passwordChangeText?.title ?? '');
 
     req.setPasswordChangeText(r);
-  })() : null;
+  }
 
-  map.passwordResetDoneText ? (() => {
+  if (!!map.passwordResetDoneText) {
     const r = new PasswordResetDoneScreenText();
     r.setDescription(map.passwordResetDoneText?.description ?? '');
     r.setNextButtonText(map.passwordResetDoneText?.nextButtonText ?? '');
     r.setTitle(map.passwordResetDoneText?.title ?? '');
 
     req.setPasswordResetDoneText(r);
-  })() : null;
+  }
 
-  map.passwordText ? (() => {
+  if (!!map.passwordText) {
     const r = new PasswordScreenText();
     r.setBackButtonText(map.passwordText?.backButtonText ?? '');
     r.setConfirmation(map.passwordText?.confirmation ?? '');
@@ -278,9 +266,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.passwordText?.title ?? '');
 
     req.setPasswordText(r);
-  })() : null;
+  }
 
-  map.passwordlessText ? (() => {
+  if (!!map.passwordlessText) {
     const r = new PasswordlessScreenText();
     r.setDescription(map.passwordlessText?.description ?? '');
     r.setErrorRetry(map.passwordlessText?.errorRetry ?? '');
@@ -290,9 +278,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setValidateTokenButtonText(map.passwordlessText?.validateTokenButtonText ?? '');
 
     req.setPasswordlessText(r);
-  })() : null;
+  }
 
-  map.registrationOptionText ? (() => {
+  if (!!map.registrationOptionText) {
     const r = new RegistrationOptionScreenText();
     r.setDescription(map.registrationOptionText?.description ?? '');
     r.setExternalLoginDescription(map.registrationOptionText?.externalLoginDescription ?? '');
@@ -300,9 +288,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setUserNameButtonText(map.registrationOptionText?.userNameButtonText ?? '');
 
     req.setRegistrationOptionText(r);
-  })() : null;
+  }
 
-  map.registrationOrgText ? (() => {
+  if (!!map.registrationOrgText) {
     const r = new RegistrationOrgScreenText();
     r.setDescription(map.registrationOrgText?.description ?? '');
     r.setEmailLabel(map.registrationOrgText?.emailLabel ?? '');
@@ -324,9 +312,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setUsernameLabel(map.registrationOrgText?.usernameLabel ?? '');
 
     req.setRegistrationOrgText(r);
-  })() : null;
+  }
 
-  map.registrationUserText ? (() => {
+  if (!!map.registrationUserText) {
     const r = new RegistrationUserScreenText();
     r.setBackButtonText(map.registrationUserText?.backButtonText ?? '');
     r.setDescription(map.registrationUserText?.description ?? '');
@@ -351,9 +339,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setUsernameLabel(map.registrationUserText?.usernameLabel ?? '');
 
     req.setRegistrationUserText(r);
-  })() : null;
+  }
 
-  map.selectAccountText ? (() => {
+  if (!!map.selectAccountText) {
     const r = new SelectAccountScreenText();
     r.setDescription(map.selectAccountText?.description ?? '');
     r.setDescriptionLinkingProcess(map.selectAccountText?.descriptionLinkingProcess ?? '');
@@ -365,10 +353,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setUserMustBeMemberOfOrg(map.selectAccountText?.userMustBeMemberOfOrg ?? '');
 
     req.setSelectAccountText(r);
-  })() : null;
+  }
 
 
-  map.successLoginText ? (() => {
+  if (!!map.successLoginText) {
     const r = new SuccessLoginScreenText();
     r.setAutoRedirectDescription(map.successLoginText?.autoRedirectDescription ?? '');
     r.setNextButtonText(map.successLoginText?.nextButtonText ?? '');
@@ -376,20 +364,20 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.successLoginText?.title ?? '');
 
     req.setSuccessLoginText(r);
-  })() : null;
+  }
 
 
-  map.usernameChangeDoneText ? (() => {
+  if (!!map.usernameChangeDoneText) {
     const r = new UsernameChangeDoneScreenText();
     r.setDescription(map.usernameChangeDoneText?.description ?? '');
     r.setNextButtonText(map.usernameChangeDoneText?.nextButtonText ?? '');
     r.setTitle(map.usernameChangeDoneText?.title ?? '');
 
     req.setUsernameChangeDoneText(r);
-  })() : null;
+  }
 
 
-  map.usernameChangeText ? (() => {
+  if (!!map.usernameChangeText) {
     const r = new UsernameChangeScreenText();
     r.setCancelButtonText(map.usernameChangeText?.cancelButtonText ?? '');
     r.setDescription(map.usernameChangeText?.description ?? '');
@@ -398,9 +386,9 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setUsernameLabel(map.usernameChangeText?.usernameLabel ?? '');
 
     req.setUsernameChangeText(r);
-  })() : null;
+  }
 
-  map.verifyMfaOtpText ? (() => {
+  if (!!map.verifyMfaOtpText) {
     const r = new VerifyMFAOTPScreenText();
     r.setCodeLabel(map.verifyMfaOtpText?.codeLabel ?? '');
     r.setDescription(map.verifyMfaOtpText?.description ?? '');
@@ -408,10 +396,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setTitle(map.verifyMfaOtpText?.title ?? '');
 
     req.setVerifyMfaOtpText(r);
-  })() : null;
+  }
 
 
-  map.verifyMfaU2fText ? (() => {
+  if (!!map.verifyMfaU2fText) {
     const r = new VerifyMFAU2FScreenText();
     r.setDescription(map.verifyMfaU2fText?.description ?? '');
     r.setErrorRetry(map.verifyMfaU2fText?.errorRetry ?? '');
@@ -420,7 +408,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
     r.setValidateTokenText(map.verifyMfaU2fText?.validateTokenText ?? '');
 
     req.setVerifyMfaU2fText(r);
-  })() : null;
+  }
 
   return req;
 }

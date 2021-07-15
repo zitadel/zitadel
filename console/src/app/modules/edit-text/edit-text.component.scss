@@ -17,6 +17,7 @@
 
       .chips {
         display: flex;
+        flex-wrap: wrap;
         opacity: 0;
         margin: 0 -.25rem;
         transition: all .2s ease;

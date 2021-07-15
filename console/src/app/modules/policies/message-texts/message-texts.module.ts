@@ -42,7 +42,7 @@ import { MessageTextsComponent } from './message-texts.component';
     DetailLayoutModule,
     MatProgressSpinnerModule,
     LinksModule,
-    TextFieldModule
+    TextFieldModule,
   ],
 })
 export class MessageTextsPolicyModule { }

@@ -149,66 +149,76 @@ import { GrpcService } from './grpc.service';
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) { }
 
-  public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
+  public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest):
+    Promise<GetDefaultLoginTextsResponse.AsObject> {
     return this.grpcService.admin.getDefaultLoginTexts(req, null).then(resp => resp.toObject());
   }
 
-  public getCustomLoginTexts(req: GetCustomLoginTextsRequest): Promise<GetCustomLoginTextsResponse.AsObject> {
+  public getCustomLoginTexts(req: GetCustomLoginTextsRequest):
+    Promise<GetCustomLoginTextsResponse.AsObject> {
     return this.grpcService.admin.getCustomLoginTexts(req, null).then(resp => resp.toObject());
   }
 
-  public setCustomLoginText(req: SetCustomLoginTextsRequest): Promise<SetCustomLoginTextsResponse.AsObject> {
+  public setCustomLoginText(req: SetCustomLoginTextsRequest):
+    Promise<SetCustomLoginTextsResponse.AsObject> {
     return this.grpcService.admin.setCustomLoginText(req, null).then(resp => resp.toObject());
   }
 
   // message texts
 
-  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest): Promise<GetDefaultInitMessageTextResponse.AsObject> {
+  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest):
+    Promise<GetDefaultInitMessageTextResponse.AsObject> {
     return this.grpcService.admin.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setDefaultInitMessageText(req: SetDefaultInitMessageTextRequest): Promise<SetDefaultInitMessageTextResponse.AsObject> {
+  public setDefaultInitMessageText(req: SetDefaultInitMessageTextRequest):
+    Promise<SetDefaultInitMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultInitMessageText(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest): Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
+  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest):
+    Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.admin.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setDefaultVerifyEmailMessageText(req: SetDefaultVerifyEmailMessageTextRequest): Promise<SetDefaultVerifyEmailMessageTextResponse.AsObject> {
+  public setDefaultVerifyEmailMessageText(req: SetDefaultVerifyEmailMessageTextRequest):
+    Promise<SetDefaultVerifyEmailMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest): Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest):
+    Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.admin.getDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setDefaultVerifyPhoneMessageText(req: SetDefaultVerifyPhoneMessageTextRequest): Promise<SetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+  public setDefaultVerifyPhoneMessageText(req: SetDefaultVerifyPhoneMessageTextRequest):
+    Promise<SetDefaultVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
+  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest):
+    Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.admin.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setDefaultPasswordResetMessageText(req: SetDefaultPasswordResetMessageTextRequest): Promise<SetDefaultPasswordResetMessageTextResponse.AsObject> {
+  public setDefaultPasswordResetMessageText(req: SetDefaultPasswordResetMessageTextRequest):
+    Promise<SetDefaultPasswordResetMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
   }
 
 
-  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest): Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
+  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest):
+    Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.admin.getDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
   }
 
-  public setDefaultDomainClaimedMessageText(req: SetDefaultDomainClaimedMessageTextRequest): Promise<SetDefaultDomainClaimedMessageTextResponse.AsObject> {
+  public setDefaultDomainClaimedMessageText(req: SetDefaultDomainClaimedMessageTextRequest):
+    Promise<SetDefaultDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
   }
-
-
-
 
   public SetUpOrg(
     org: SetUpOrgRequest.Org,
