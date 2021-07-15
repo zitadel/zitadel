@@ -38,6 +38,17 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 	}
 }
 
+func BulkSetMetaDataToDomain(req *mgmt_pb.BulkSetUserMetaDataRequest) []*domain.MetaData {
+	metaData := make([]*domain.MetaData, len(req.MetaData))
+	for i, data := range req.MetaData {
+		metaData[i] = &domain.MetaData{
+			Key:   data.Key,
+			Value: data.Value,
+		}
+	}
+	return metaData
+}
+
 func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {
 	h := &domain.Human{
 		Username: req.UserName,

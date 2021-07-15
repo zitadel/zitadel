@@ -7,8 +7,10 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/change"
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
@@ -46,19 +48,51 @@ func (s *Server) GetMyMetaData(ctx context.Context, req *auth_pb.GetMyMetaDataRe
 }
 
 func (s *Server) SetMyMetaData(ctx context.Context, req *auth_pb.SetMyMetaDataRequest) (*auth_pb.SetMyMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.SetUserMetaData(ctx, &domain.MetaData{Key: req.Key, Value: req.Value}, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.SetMyMetaDataResponse{
+		Details: obj_grpc.AddToDetailsPb(
+			result.Sequence,
+			result.ChangeDate,
+			result.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) BulkSetMyMetaData(ctx context.Context, req *auth_pb.BulkSetMyMetaDataRequest) (*auth_pb.BulkSetMyMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkSetUserMetaData(ctx, ctxData.UserID, ctxData.ResourceOwner, BulkSetMetaDataToDomain(req)...)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.BulkSetMyMetaDataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }
 
 func (s *Server) RemoveMyMetaData(ctx context.Context, req *auth_pb.RemoveMyMetaDataRequest) (*auth_pb.RemoveMyMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.RemoveUserMetaData(ctx, req.Key, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.RemoveMyMetaDataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }
 
 func (s *Server) BulkRemoveMyMetaData(ctx context.Context, req *auth_pb.BulkRemoveMyMetaDataRequest) (*auth_pb.BulkRemoveMyMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkRemoveUserMetaData(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.BulkRemoveMyMetaDataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }
 
 func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUserSessionsRequest) (*auth_pb.ListMyUserSessionsResponse, error) {

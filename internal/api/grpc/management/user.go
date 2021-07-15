@@ -11,6 +11,7 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -85,19 +86,51 @@ func (s *Server) GetUserMetaData(ctx context.Context, req *mgmt_pb.GetUserMetaDa
 }
 
 func (s *Server) SetUserMetaData(ctx context.Context, req *mgmt_pb.SetUserMetaDataRequest) (*mgmt_pb.SetUserMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.SetUserMetaData(ctx, &domain.MetaData{Key: req.Key, Value: req.Value}, req.Id, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetUserMetaDataResponse{
+		Details: obj_grpc.AddToDetailsPb(
+			result.Sequence,
+			result.ChangeDate,
+			result.ResourceOwner,
+		),
+	}, nil
 }
 
 func (s *Server) BulkSetUserMetaData(ctx context.Context, req *mgmt_pb.BulkSetUserMetaDataRequest) (*mgmt_pb.BulkSetUserMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkSetUserMetaData(ctx, req.Id, ctxData.ResourceOwner, BulkSetMetaDataToDomain(req)...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkSetUserMetaDataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }
 
 func (s *Server) RemoveUserMetaData(ctx context.Context, req *mgmt_pb.RemoveUserMetaDataRequest) (*mgmt_pb.RemoveUserMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.RemoveUserMetaData(ctx, req.Key, req.Id, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveUserMetaDataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }
 
 func (s *Server) BulkRemoveUserMetaData(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetaDataRequest) (*mgmt_pb.BulkRemoveUserMetaDataResponse, error) {
-	return nil, nil
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkRemoveUserMetaData(ctx, req.Id, ctxData.ResourceOwner, req.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkRemoveUserMetaDataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
