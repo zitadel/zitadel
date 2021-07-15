@@ -73,10 +73,9 @@ jobs:
           context: .
           file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=zitadel
+          cache-to: type=gha,mode=max,scope=zitadel
           outputs: type=local,dest=/tmp/zitadel
-          scope: zitadel
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel
@@ -112,10 +111,9 @@ jobs:
           context: .
           file: ./build/console/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=zitadel-console
+          cache-to: type=gha,mode=max,scope=zitadel-console
           outputs: type=local,dest=/tmp/zitadel-console
-          scope: zitadel-console
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel-console
@@ -158,9 +156,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          scope: zitadel-image
+          cache-from: type=gha,scope=zitadel-image
+          cache-to: type=gha,mode=max,scope=zitadel-image
 
   # operator-image:
   #   needs: refs
