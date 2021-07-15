@@ -83,7 +83,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./build/Dockerfile
+          file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
           target: go-codecov
           outputs: type=local,dest=/tmp/zitadel
