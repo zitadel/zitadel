@@ -37,6 +37,30 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 	}, nil
 }
 
+func (s *Server) ListMyMetaData(ctx context.Context, req *auth_pb.ListMyMetaDataRequest) (*auth_pb.ListMyMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetMyMetaData(ctx context.Context, req *auth_pb.GetMyMetaDataRequest) (*auth_pb.GetMyMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) SetMyMetaData(ctx context.Context, req *auth_pb.SetMyMetaDataRequest) (*auth_pb.SetMyMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) BulkSetMyMetaData(ctx context.Context, req *auth_pb.BulkSetMyMetaDataRequest) (*auth_pb.BulkSetMyMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveMyMetaData(ctx context.Context, req *auth_pb.RemoveMyMetaDataRequest) (*auth_pb.RemoveMyMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) BulkRemoveMyMetaData(ctx context.Context, req *auth_pb.BulkRemoveMyMetaDataRequest) (*auth_pb.BulkRemoveMyMetaDataResponse, error) {
+	return nil, nil
+}
+
 func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUserSessionsRequest) (*auth_pb.ListMyUserSessionsResponse, error) {
 	userSessions, err := s.repo.GetMyUserSessions(ctx)
 	if err != nil {

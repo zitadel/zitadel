@@ -14,6 +14,7 @@ import "zitadel/message.proto";
 import "zitadel/change.proto";
 import "zitadel/auth_n_key.proto";
 import "zitadel/features.proto";
+import "zitadel/metadata.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -278,6 +279,76 @@ service ManagementService {
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/username"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Returns the user meta data
+    rpc ListUserMetaData(ListUserMetaDataRequest) returns (ListUserMetaDataResponse) {
+        option (google.api.http) = {
+            post: "/users/{id}/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Returns the user meta data by key
+    rpc GetUserMetaData(GetUserMetaDataRequest) returns (GetUserMetaDataResponse) {
+        option (google.api.http) = {
+            get: "/users/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Sets a user meta data by key
+    rpc SetUserMetaData(SetUserMetaDataRequest) returns (SetUserMetaDataResponse) {
+        option (google.api.http) = {
+            post: "/users/{id}/metadata/{key}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Set a list of user meta data
+    rpc BulkSetUserMetaData(BulkSetUserMetaDataRequest) returns (BulkSetUserMetaDataResponse) {
+        option (google.api.http) = {
+            post: "/users/{id}/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removes a user meta data by key
+    rpc RemoveUserMetaData(RemoveUserMetaDataRequest) returns (RemoveUserMetaDataResponse) {
+        option (google.api.http) = {
+            delete: "/users/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Set a list of user meta data
+    rpc BulkRemoveUserMetaData(BulkRemoveUserMetaDataRequest) returns (BulkRemoveUserMetaDataResponse) {
+        option (google.api.http) = {
+            delete: "/users/{id}/metadata/_bulk"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2760,6 +2831,68 @@ message UpdateUserNameRequest {
 }
 
 message UpdateUserNameResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListUserMetaDataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.v1.ListQuery query = 2;
+    repeated zitadel.metadata.v1.MetaDataQuery queries = 3;
+}
+
+message ListUserMetaDataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.MetaData result = 2;
+}
+
+message GetUserMetaDataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetUserMetaDataResponse {
+    repeated zitadel.metadata.v1.MetaData meta_data = 1;
+}
+
+message SetUserMetaDataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string value = 3 [(validate.rules).string = {min_len: 1}];
+}
+
+message SetUserMetaDataResponse {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message BulkSetUserMetaDataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    message MetaData {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string value = 2 [(validate.rules).string = {min_len: 1}];
+    }
+    repeated MetaData meta_data = 2;
+}
+
+message BulkSetUserMetaDataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveUserMetaDataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveUserMetaDataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveUserMetaDataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string keys = 2;
+}
+
+message BulkRemoveUserMetaDataResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

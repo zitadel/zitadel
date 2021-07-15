@@ -7,6 +7,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/policy.proto";
 import "zitadel/idp.proto";
+import "zitadel/metadata.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -75,6 +76,7 @@ service AuthService {
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/me/changes/_search"
+            body: "*"
         };
     
         option (zitadel.v1.auth_option) = {
@@ -86,6 +88,78 @@ service AuthService {
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
             post: "/users/me/sessions/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user meta data of the authorized user
+    rpc ListMyMetaData(ListMyMetaDataRequest) returns (ListMyMetaDataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user meta data by key of the authorized user
+    rpc GetMyMetaData(GetMyMetaDataRequest) returns (GetMyMetaDataResponse) {
+        option (google.api.http) = {
+            get: "/users/me/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Sets a user meta data by key to the authorized user
+    rpc SetMyMetaData(SetMyMetaDataRequest) returns (SetMyMetaDataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/{key}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Set a list of user meta data to the authorized user
+    rpc BulkSetMyMetaData(BulkSetMyMetaDataRequest) returns (BulkSetMyMetaDataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+
+    // Removes a user meta data by key to the authorized user
+    rpc RemoveMyMetaData(RemoveMyMetaDataRequest) returns (RemoveMyMetaDataResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Set a list of user meta data to the authorized user
+    rpc BulkRemoveMyMetaData(BulkRemoveMyMetaDataRequest) returns (BulkRemoveMyMetaDataResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/metadata/_bulk"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -97,6 +171,7 @@ service AuthService {
     rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -119,6 +194,7 @@ service AuthService {
     rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_revoke_all"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -550,6 +626,61 @@ message ListMyUserSessionsRequest {}
 
 message ListMyUserSessionsResponse {
     repeated zitadel.user.v1.Session result = 1;
+}
+
+message ListMyMetaDataRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.metadata.v1.MetaDataQuery queries = 2;
+}
+
+message ListMyMetaDataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.MetaData result = 2;
+}
+
+message GetMyMetaDataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1}];
+}
+
+message GetMyMetaDataResponse {
+    repeated zitadel.metadata.v1.MetaData meta_data = 1;
+}
+
+message SetMyMetaDataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string value = 2 [(validate.rules).string = {min_len: 1}];
+}
+
+message SetMyMetaDataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkSetMyMetaDataRequest {
+    message MetaData {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string value = 2 [(validate.rules).string = {min_len: 1}];
+    }
+    repeated MetaData meta_data = 1;
+}
+
+message BulkSetMyMetaDataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyMetaDataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMyMetaDataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveMyMetaDataRequest {
+    repeated string keys = 1;
+}
+
+message BulkRemoveMyMetaDataResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request

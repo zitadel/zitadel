@@ -67,8 +67,10 @@ protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
   --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
+  --openapiv2_opt allow_delete_body=true \
   --authoption_out=${GRPC_PATH}/auth \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto

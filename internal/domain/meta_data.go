@@ -1,6 +1,10 @@
 package domain
 
-import es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+import (
+	"time"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+)
 
 type MetaData struct {
 	es_models.ObjectRoot
@@ -24,4 +28,36 @@ func (u *MetaData) IsValid() bool {
 
 func (s MetaDataState) Exists() bool {
 	return s != MetaDataStateUnspecified && s != MetaDataStateRemoved
+}
+
+type MetaDataSearchRequest struct {
+	Offset        uint64
+	Limit         uint64
+	SortingColumn MetaDataSearchKey
+	Asc           bool
+	Queries       []*MetaDataSearchQuery
+}
+
+type MetaDataSearchKey int32
+
+const (
+	MetaDataSearchKeyUnspecified MetaDataSearchKey = iota
+	MetaDataSearchKeyAggregateID
+	MetaDataSearchKeyResourceOwner
+	MetaDataSearchKeyKey
+)
+
+type MetaDataSearchQuery struct {
+	Key    MetaDataSearchKey
+	Method SearchMethod
+	Value  interface{}
+}
+
+type MetaDataSearchResponse struct {
+	Offset      uint64
+	Limit       uint64
+	TotalResult uint64
+	Result      []*MetaData
+	Sequence    uint64
+	Timestamp   time.Time
 }

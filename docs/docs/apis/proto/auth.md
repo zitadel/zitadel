@@ -67,6 +67,78 @@ Returns the user sessions of the authorized user of the current useragent
     POST: /users/me/sessions/_search
 
 
+### ListMyMetaData
+
+> **rpc** ListMyMetaData([ListMyMetaDataRequest](#listmymetadatarequest))
+[ListMyMetaDataResponse](#listmymetadataresponse)
+
+Returns the user meta data of the authorized user
+
+
+
+    POST: /users/me/metadata/_search
+
+
+### GetMyMetaData
+
+> **rpc** GetMyMetaData([GetMyMetaDataRequest](#getmymetadatarequest))
+[GetMyMetaDataResponse](#getmymetadataresponse)
+
+Returns the user meta data by key of the authorized user
+
+
+
+    GET: /users/me/metadata/{key}
+
+
+### SetMyMetaData
+
+> **rpc** SetMyMetaData([SetMyMetaDataRequest](#setmymetadatarequest))
+[SetMyMetaDataResponse](#setmymetadataresponse)
+
+Sets a user meta data by key to the authorized user
+
+
+
+    POST: /users/me/metadata/{key}
+
+
+### BulkSetMyMetaData
+
+> **rpc** BulkSetMyMetaData([BulkSetMyMetaDataRequest](#bulksetmymetadatarequest))
+[BulkSetMyMetaDataResponse](#bulksetmymetadataresponse)
+
+Set a list of user meta data to the authorized user
+
+
+
+    POST: /users/me/metadata/_bulk
+
+
+### RemoveMyMetaData
+
+> **rpc** RemoveMyMetaData([RemoveMyMetaDataRequest](#removemymetadatarequest))
+[RemoveMyMetaDataResponse](#removemymetadataresponse)
+
+Removes a user meta data by key to the authorized user
+
+
+
+    DELETE: /users/me/metadata/{key}
+
+
+### BulkRemoveMyMetaData
+
+> **rpc** BulkRemoveMyMetaData([BulkRemoveMyMetaDataRequest](#bulkremovemymetadatarequest))
+[BulkRemoveMyMetaDataResponse](#bulkremovemymetadataresponse)
+
+Set a list of user meta data to the authorized user
+
+
+
+    DELETE: /users/me/metadata/_bulk
+
+
 ### ListMyRefreshTokens
 
 > **rpc** ListMyRefreshTokens([ListMyRefreshTokensRequest](#listmyrefreshtokensrequest))
@@ -568,6 +640,62 @@ This is an empty request
 
 
 
+### BulkRemoveMyMetaDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| keys | repeated string | - |  |
+
+
+
+
+### BulkRemoveMyMetaDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetMyMetaDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| meta_data | repeated BulkSetMyMetaDataRequest.MetaData | - |  |
+
+
+
+
+### BulkSetMyMetaDataRequest.MetaData
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### BulkSetMyMetaDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### GetMyEmailRequest
 This is an empty request
 
@@ -582,6 +710,28 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | email |  zitadel.user.v1.Email | - |  |
+
+
+
+
+### GetMyMetaDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### GetMyMetaDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| meta_data | repeated zitadel.metadata.v1.MetaData | - |  |
 
 
 
@@ -723,6 +873,30 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.idp.v1.IDPUserLink | - |  |
+
+
+
+
+### ListMyMetaDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetaDataQuery | - |  |
+
+
+
+
+### ListMyMetaDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.MetaData | - |  |
 
 
 
@@ -979,6 +1153,28 @@ This is an empty request
 
 
 
+### RemoveMyMetaDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMyMetaDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveMyPasswordlessRequest
 
 
@@ -1098,6 +1294,29 @@ This is an empty response
 
 
 ### SetMyEmailResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetMyMetaDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### SetMyMetaDataResponse
 
 
 

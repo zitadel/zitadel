@@ -76,6 +76,30 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 	}, nil
 }
 
+func (s *Server) ListUserMetaData(ctx context.Context, req *mgmt_pb.ListUserMetaDataRequest) (*mgmt_pb.ListUserMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetUserMetaData(ctx context.Context, req *mgmt_pb.GetUserMetaDataRequest) (*mgmt_pb.GetUserMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) SetUserMetaData(ctx context.Context, req *mgmt_pb.SetUserMetaDataRequest) (*mgmt_pb.SetUserMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) BulkSetUserMetaData(ctx context.Context, req *mgmt_pb.BulkSetUserMetaDataRequest) (*mgmt_pb.BulkSetUserMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) RemoveUserMetaData(ctx context.Context, req *mgmt_pb.RemoveUserMetaDataRequest) (*mgmt_pb.RemoveUserMetaDataResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) BulkRemoveUserMetaData(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetaDataRequest) (*mgmt_pb.BulkRemoveUserMetaDataResponse, error) {
+	return nil, nil
+}
+
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
 	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req))
 	if err != nil {

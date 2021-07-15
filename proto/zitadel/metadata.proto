@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+package zitadel.metadata.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/text";
+
+message MetaData {
+    zitadel.v1.ObjectDetails details = 1;
+    string key = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "meta data key"
+        }
+    ];
+    string value = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "meta data value"
+        }
+    ];
+}
+
+message MetaDataQuery {
+    oneof query {
+        option (validate.required) = true;
+        MetaDataKeyQuery key_query = 1;
+        MetaDataValueQuery value_query = 2;
+    }
+}
+
+message MetaDataKeyQuery {
+    string key = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"key\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message MetaDataValueQuery {
+    string value = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"value\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
