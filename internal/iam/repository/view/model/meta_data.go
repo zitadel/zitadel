@@ -26,21 +26,10 @@ type MetaDataView struct {
 	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
 
-	Key   string `json:"Key" gorm:"column:key;primary_key"`
-	Value string `json:"Value" gorm:"column:value"`
+	Key   string `json:"key" gorm:"column:key;primary_key"`
+	Value string `json:"value" gorm:"column:value"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
-}
-
-func MetaDataViewFromModel(data *domain.MetaData) *MetaDataView {
-	return &MetaDataView{
-		AggregateID:  data.AggregateID,
-		Sequence:     data.Sequence,
-		CreationDate: data.CreationDate,
-		ChangeDate:   data.ChangeDate,
-		Key:          data.Key,
-		Value:        data.Value,
-	}
 }
 
 func MetaDataViewsToDomain(texts []*MetaDataView) []*domain.MetaData {

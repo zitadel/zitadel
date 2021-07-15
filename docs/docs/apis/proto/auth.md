@@ -67,30 +67,6 @@ Returns the user sessions of the authorized user of the current useragent
     POST: /users/me/sessions/_search
 
 
-### ListMyMetaData
-
-> **rpc** ListMyMetaData([ListMyMetaDataRequest](#listmymetadatarequest))
-[ListMyMetaDataResponse](#listmymetadataresponse)
-
-Returns the user meta data of the authorized user
-
-
-
-    POST: /users/me/metadata/_search
-
-
-### GetMyMetaData
-
-> **rpc** GetMyMetaData([GetMyMetaDataRequest](#getmymetadatarequest))
-[GetMyMetaDataResponse](#getmymetadataresponse)
-
-Returns the user meta data by key of the authorized user
-
-
-
-    GET: /users/me/metadata/{key}
-
-
 ### SetMyMetaData
 
 > **rpc** SetMyMetaData([SetMyMetaDataRequest](#setmymetadatarequest))
@@ -113,6 +89,30 @@ Set a list of user meta data to the authorized user
 
 
     POST: /users/me/metadata/_bulk
+
+
+### ListMyMetaData
+
+> **rpc** ListMyMetaData([ListMyMetaDataRequest](#listmymetadatarequest))
+[ListMyMetaDataResponse](#listmymetadataresponse)
+
+Returns the user meta data of the authorized user
+
+
+
+    POST: /users/me/metadata/_search
+
+
+### GetMyMetaData
+
+> **rpc** GetMyMetaData([GetMyMetaDataRequest](#getmymetadatarequest))
+[GetMyMetaDataResponse](#getmymetadataresponse)
+
+Returns the user meta data by key of the authorized user
+
+
+
+    GET: /users/me/metadata/{key}
 
 
 ### RemoveMyMetaData

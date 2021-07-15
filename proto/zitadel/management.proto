@@ -286,6 +286,17 @@ service ManagementService {
         };
     }
 
+    // Returns the user meta data by key
+    rpc GetUserMetaData(GetUserMetaDataRequest) returns (GetUserMetaDataResponse) {
+        option (google.api.http) = {
+            get: "/users/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
     // Returns the user meta data
     rpc ListUserMetaData(ListUserMetaDataRequest) returns (ListUserMetaDataResponse) {
         option (google.api.http) = {
@@ -298,21 +309,10 @@ service ManagementService {
         };
     }
 
-    // Returns the user meta data by key
-    rpc GetUserMetaData(GetUserMetaDataRequest) returns (GetUserMetaDataResponse) {
+    // Set a list of user meta data
+    rpc BulkSetUserMetaData(BulkSetUserMetaDataRequest) returns (BulkSetUserMetaDataResponse) {
         option (google.api.http) = {
-            get: "/users/{id}/metadata/{key}"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "user.read"
-        };
-    }
-
-    // Sets a user meta data by key
-    rpc SetUserMetaData(SetUserMetaDataRequest) returns (SetUserMetaDataResponse) {
-        option (google.api.http) = {
-            post: "/users/{id}/metadata/{key}"
+            post: "/users/{id}/metadata/_bulk"
             body: "*"
         };
 
@@ -321,10 +321,10 @@ service ManagementService {
         };
     }
 
-    // Set a list of user meta data
-    rpc BulkSetUserMetaData(BulkSetUserMetaDataRequest) returns (BulkSetUserMetaDataResponse) {
+    // Sets a user meta data by key
+    rpc SetUserMetaData(SetUserMetaDataRequest) returns (SetUserMetaDataResponse) {
         option (google.api.http) = {
-            post: "/users/{id}/metadata/_bulk"
+            post: "/users/{id}/metadata/{key}"
             body: "*"
         };
 
