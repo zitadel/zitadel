@@ -309,6 +309,19 @@ func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID
 	return err
 }
 
+func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string) (login *domain.WebAuthNToken, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode)
+}
+
+func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode, credentialData)
+	return err
+}
+
 func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -621,9 +634,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return steps, nil
 	}
 
+	step = repo.checkPasswordlessRegistration(user)
+	if step != nil {
+		return append(steps, step), nil
+	}
+
 	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
 		return append(steps, &domain.LinkUsersStep{}), nil
-
 	}
 	//PLANNED: consent step
 
@@ -737,6 +754,13 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 		return true
 	}
 	return checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime)
+}
+
+func (repo *AuthRequestRepo) checkPasswordlessRegistration(user *user_model.UserView) domain.NextStep {
+	if user.MFAMaxSetUp > model.MFALevelMultiFactor || checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime) { //TODO: PasswordlessInitSkipped
+		return nil
+	}
+	return &domain.PasswordlessRegistrationPromptStep{}
 }
 
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {

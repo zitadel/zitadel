@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
@@ -35,6 +37,34 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 			token.ChangeDate,
 			token.ResourceOwner,
 		),
+	}, nil
+}
+
+func (s *Server) AddMyPasswordlessLink(ctx context.Context, req *auth_pb.AddMyPasswordlessLinkRequest) (*auth_pb.AddMyPasswordlessLinkResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Send)
+	if err != nil {
+		return nil, err
+	}
+	var linkAdded auth_pb.LinkAdded
+	if initCode.Active {
+		linkAdded = &auth_pb.AddMyPasswordlessLinkResponse_Added{
+			Added: &auth_pb.AddMyPasswordlessLinkResponse_Link{
+				CodeId:     initCode.CodeID,
+				Code:       initCode.Code,
+				Link:       initCode.Code,
+				Expiration: durationpb.New(initCode.Expiration),
+			},
+		}
+	} else {
+		linkAdded = &auth_pb.AddMyPasswordlessLinkResponse_Send{
+			Send: true,
+		}
+	}
+
+	return &auth_pb.AddMyPasswordlessLinkResponse{
+		Details:   object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		LinkAdded: linkAdded,
 	}, nil
 }
 

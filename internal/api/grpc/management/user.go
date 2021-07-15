@@ -408,6 +408,34 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
+func (s *Server) AddPasswordlessLink(ctx context.Context, req *mgmt_pb.AddPasswordlessLinkRequest) (*mgmt_pb.AddPasswordlessLinkResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, false)
+	if err != nil {
+		return nil, err
+	}
+	var linkAdded mgmt_pb.LinkAdded
+	//if initCode.Active {
+	//	linkAdded = &auth_pb.AddMyPasswordlessLinkResponse_Added{
+	//		Added: &auth_pb.AddMyPasswordlessLinkResponse_Link{
+	//			CodeId:     initCode.CodeID,
+	//			Code:       initCode.Code,
+	//			Link:       initCode.Code,
+	//			Expiration: durationpb.New(initCode.Expiration),
+	//		},
+	//	}
+	//} else {
+	linkAdded = &mgmt_pb.AddPasswordlessLinkResponse_Send{
+		Send: true,
+	}
+	//}
+
+	return &mgmt_pb.AddPasswordlessLinkResponse{
+		Details:   object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		LinkAdded: linkAdded,
+	}, nil
+}
+
 func (s *Server) RemoveHumanPasswordless(ctx context.Context, req *mgmt_pb.RemoveHumanPasswordlessRequest) (*mgmt_pb.RemoveHumanPasswordlessResponse, error) {
 	objectDetails, err := s.command.HumanRemovePasswordless(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {

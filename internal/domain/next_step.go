@@ -24,6 +24,7 @@ const (
 	NextStepExternalLogin
 	NextStepGrantRequired
 	NextStepPasswordless
+	NextStepPasswordlessRegistrationPrompt
 	NextStepRegistration
 )
 
@@ -97,6 +98,12 @@ type PasswordlessStep struct{}
 
 func (s *PasswordlessStep) Type() NextStepType {
 	return NextStepPasswordless
+}
+
+type PasswordlessRegistrationPromptStep struct{}
+
+func (s *PasswordlessRegistrationPromptStep) Type() NextStepType {
+	return NextStepPasswordlessRegistrationPrompt
 }
 
 type ChangePasswordStep struct{}

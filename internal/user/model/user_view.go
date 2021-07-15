@@ -169,6 +169,18 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 			}
 		}
 		//PLANNED: add sms
+		fallthrough
+	case domain.MFALevelMultiFactor:
+		if policy.HasMultiFactors() {
+			for _, factor := range policy.MultiFactors {
+				switch factor {
+				case domain.MultiFactorTypeU2FWithPIN:
+					if u.IsPasswordlessReady() {
+						types = append(types, domain.MFATypeU2F)
+					}
+				}
+			}
+		}
 	}
 	return types
 }

@@ -450,11 +450,25 @@ The u2f (universial second factor) will be removed from the user
 > **rpc** ListHumanPasswordless([ListHumanPasswordlessRequest](#listhumanpasswordlessrequest))
 [ListHumanPasswordlessResponse](#listhumanpasswordlessresponse)
 
-Returns all configured passwordless authentications
+Returns all configured passwordless authenticators
 
 
 
     POST: /users/{user_id}/passwordless/_search
+
+
+### AddPasswordlessLink
+
+> **rpc** AddPasswordlessLink([AddPasswordlessLinkRequest](#addpasswordlesslinkrequest))
+[AddPasswordlessLinkResponse](#addpasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the user
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/{user_id}/passwordless/_link
 
 
 ### RemoveHumanPasswordless
@@ -462,7 +476,7 @@ Returns all configured passwordless authentications
 > **rpc** RemoveHumanPasswordless([RemoveHumanPasswordlessRequest](#removehumanpasswordlessrequest))
 [RemoveHumanPasswordlessResponse](#removehumanpasswordlessresponse)
 
-Removed a configured passwordless authentication
+Removed a configured passwordless authenticator
 
 
 
@@ -3058,6 +3072,44 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddPasswordlessLinkRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.added |  AddPasswordlessLinkResponse.Link | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.send |  bool | - |  |
+
+
+
+
+### AddPasswordlessLinkResponse.Link
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| code_id |  string | - |  |
+| code |  string | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 

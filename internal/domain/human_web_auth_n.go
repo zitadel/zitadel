@@ -2,6 +2,8 @@ package domain
 
 import (
 	"bytes"
+	"time"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -65,3 +67,31 @@ func GetTokenByKeyID(tokens []*WebAuthNToken, keyID []byte) (int, *WebAuthNToken
 	}
 	return -1, nil
 }
+
+type PasswordlessInitCodeState int32
+
+const (
+	PasswordlessInitCodeStateUnspecified PasswordlessInitCodeState = iota
+	PasswordlessInitCodeStateActive
+	PasswordlessInitCodeStateRemoved
+)
+
+type PasswordlessInitCode struct {
+	es_models.ObjectRoot
+
+	CodeID     string
+	Code       string
+	Expiration time.Duration
+	Active     bool
+}
+
+//func NewPasswordlessInitCode(generator crypto.Generator) (*PasswordlessInitCode, string, error) {
+//	initCodeCrypto, code, err := crypto.NewCode(generator)
+//	if err != nil {
+//		return nil, "", err
+//	}
+//	return &PasswordlessInitCode{
+//		Code:   initCodeCrypto,
+//		Expiry: generator.Expiry(),
+//	}, code, nil
+//}

@@ -401,7 +401,7 @@ Removes the U2F Authentication from the authorized user
 > **rpc** ListMyPasswordless([ListMyPasswordlessRequest](#listmypasswordlessrequest))
 [ListMyPasswordlessResponse](#listmypasswordlessresponse)
 
-Returns all configured passwordless authentications of the authorized user
+Returns all configured passwordless authenticators of the authorized user
 
 
 
@@ -413,12 +413,26 @@ Returns all configured passwordless authentications of the authorized user
 > **rpc** AddMyPasswordless([AddMyPasswordlessRequest](#addmypasswordlessrequest))
 [AddMyPasswordlessResponse](#addmypasswordlessresponse)
 
-Adds a new passwordless authentications to the authorized user
+Adds a new passwordless authenticator to the authorized user
 Multiple passwordless authentications can be configured
 
 
 
     POST: /users/me/passwordless
+
+
+### AddMyPasswordlessLink
+
+> **rpc** AddMyPasswordlessLink([AddMyPasswordlessLinkRequest](#addmypasswordlesslinkrequest))
+[AddMyPasswordlessLinkResponse](#addmypasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the authorized user
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/me/passwordless/_link
 
 
 ### VerifyMyPasswordless
@@ -546,6 +560,44 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | key |  zitadel.user.v1.WebAuthNKey | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddMyPasswordlessLinkRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| send |  bool | - |  |
+
+
+
+
+### AddMyPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.added |  AddMyPasswordlessLinkResponse.Link | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.send |  bool | - |  |
+
+
+
+
+### AddMyPasswordlessLinkResponse.Link
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| code_id |  string | - |  |
+| code |  string | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 

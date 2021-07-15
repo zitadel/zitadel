@@ -485,7 +485,7 @@ service ManagementService {
         };
     }
 
-    // Returns all configured passwordless authentications
+    // Returns all configured passwordless authenticators
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -496,7 +496,20 @@ service ManagementService {
         };
     }
 
-    // Removed a configured passwordless authentication
+    // Adds a new passwordless authenticator link to the user
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc AddPasswordlessLink(AddPasswordlessLinkRequest) returns (AddPasswordlessLinkResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/passwordless/_link"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Removed a configured passwordless authenticator
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -2932,6 +2945,24 @@ message ListHumanPasswordlessRequest {
 
 message ListHumanPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1;
+}
+
+message AddPasswordlessLinkRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddPasswordlessLinkResponse {
+    message Link {
+        string code_id = 1;
+        string code = 2;
+        string link = 3;
+        google.protobuf.Duration expiration = 4;
+    }
+    zitadel.v1.ObjectDetails details = 1;
+    oneof linkAdded {
+        Link added = 2;
+        bool send = 3;
+    }
 }
 
 message RemoveHumanPasswordlessRequest {

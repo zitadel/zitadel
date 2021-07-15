@@ -39,6 +39,7 @@ type Commands struct {
 	emailVerificationCode       crypto.Generator
 	phoneVerificationCode       crypto.Generator
 	passwordVerificationCode    crypto.Generator
+	passwordlessInitCode        crypto.Generator
 	machineKeyAlg               crypto.EncryptionAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
@@ -90,6 +91,7 @@ func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults
 	repo.emailVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.EmailVerificationCode, userEncryptionAlgorithm)
 	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PhoneVerificationCode, userEncryptionAlgorithm)
 	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordVerificationCode, userEncryptionAlgorithm)
+	repo.passwordlessInitCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordlessInitCode, userEncryptionAlgorithm)
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)

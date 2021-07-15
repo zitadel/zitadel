@@ -1,6 +1,9 @@
 package command
 
 import (
+	"time"
+
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
@@ -429,4 +432,95 @@ func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilde
 			user.UserRemovedType).
 		Builder()
 
+}
+
+type HumanPasswordlessInitCodeWriteModel struct {
+	eventstore.WriteModel
+
+	CodeID     string
+	Attempts   uint8
+	CryptoCode *crypto.CryptoValue
+	Expiration time.Duration
+	Active     bool
+	State      domain.PasswordlessInitCodeState
+}
+
+func NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner string) *HumanPasswordlessInitCodeWriteModel {
+	return &HumanPasswordlessInitCodeWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		CodeID: codeID,
+	}
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessInitCodeAddedEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeSentEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeCheckFailedEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessInitCodeAddedEvent:
+			wm.appendAddedEvent(e)
+		case *user.HumanPasswordlessInitCodeSentEvent:
+			wm.Active = true
+		case *user.HumanPasswordlessInitCodeCheckFailedEvent:
+			wm.appendCheckFailedEvent(e)
+		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
+			wm.Active = false
+		case *user.UserRemovedEvent:
+			wm.Active = false
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) appendAddedEvent(e *user.HumanPasswordlessInitCodeAddedEvent) {
+	wm.CryptoCode = e.Code
+	wm.Expiration = e.Expiry
+	wm.Active = !e.Send
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) appendCheckFailedEvent(e *user.HumanPasswordlessInitCodeCheckFailedEvent) {
+	wm.Attempts++
+	if wm.Attempts == 3 { //TODO: config?
+		wm.Active = false
+	}
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanPasswordlessInitCodeAddedType,
+			user.HumanPasswordlessInitCodeSentType,
+			user.HumanPasswordlessInitCodeCheckFailedType,
+			user.HumanPasswordlessInitCodeCheckSucceededType,
+			user.UserRemovedType).
+		Builder()
 }

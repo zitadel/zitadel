@@ -44,6 +44,13 @@ SystemDefaults:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
+    PasswordlessInitCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
     MachineKeySize: 2048
     ApplicationKeySize: 2048
   Multifactors:
