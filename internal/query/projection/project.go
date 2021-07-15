@@ -15,7 +15,7 @@ type ProjectProjection struct {
 
 func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
 	p := &ProjectProjection{}
-	config.ProjectionName = "projections.orgs"
+	config.ProjectionName = "projections.projects"
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -78,7 +78,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) ([]
 				handler.NewCol(projectNameCol, e.Name),
 				handler.NewCol(projectCreationDateCol, e.CreationDate()),
 				handler.NewCol(projectOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(projectOwnerCol, e.EditorUser()),
+				handler.NewCol(projectCreatorCol, e.EditorUser()),
 				handler.NewCol(projectStateCol, projectActive),
 			},
 		),

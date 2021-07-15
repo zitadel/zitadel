@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -27,22 +28,23 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartQueries(ctx context.Context, eventstore *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
 	repo = &Queries{
 		iamID:       defaults.IamID,
-		eventstore:  eventstore,
+		eventstore:  es,
 		idGenerator: id.SonyFlakeGenerator,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
+	project.RegisterEventMappers(repo.eventstore)
 
 	repo.secretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
 	}
 
-	err = projection.Start(ctx, eventstore, projections)
+	err = projection.Start(ctx, es, projections)
 	if err != nil {
 		return nil, err
 	}
