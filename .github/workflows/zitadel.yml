@@ -162,10 +162,9 @@ jobs:
           cache-to: type=gha,mode=max,scope=zitadel-image
 
   operator-image:
-    name: Build ZITADEL Operator Image
+    name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
     needs: refs
     runs-on: ubuntu-18.04
-    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
