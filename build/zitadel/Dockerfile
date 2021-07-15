@@ -149,3 +149,9 @@ FROM go-test as prod-go-build
 ARG BUILDARCH
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
+
+#######################
+## Only Copy Assets
+#######################
+FROM scratch as prod-go-export
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-${BUILDARCH} .
