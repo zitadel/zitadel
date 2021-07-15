@@ -129,13 +129,13 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: zitadel
-          path: /tmp/zitadel
+          path: /zitadel
       - uses: actions/download-artifact@v2
         with:
           name: zitadel-console
-          path: /tmp/zitadel/console
-      - run: ls -la /tmp/zitadel
-      - run: ls -la /tmp/zitadel/console
+          path: /zitadel/console
+      - run: ls -la /zitadel
+      - run: ls -la /zitadel/console
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
