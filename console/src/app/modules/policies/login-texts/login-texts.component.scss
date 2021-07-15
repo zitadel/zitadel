@@ -14,7 +14,7 @@
   }
 
   .language {
-    flex: 1;
+    min-width: 150px;
     margin: 0 .5rem;
     min-width: 150px;
 
@@ -29,16 +29,6 @@
 .centerline {
   display: flex;
   align-items: center;
-
-  .img-wrapper {
-    width: 50px;
-    display: flex;
-
-    img {
-      height: 15px;
-      width: auto;
-    }
-  }
 }
 
 .content {

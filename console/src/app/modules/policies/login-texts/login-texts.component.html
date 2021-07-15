@@ -17,11 +17,11 @@
       <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
           <mat-option *ngFor="let loc of LOCALES" [value]="loc">
               <div class="centerline">
-                  <div class="img-wrapper">
+                  <!-- <div class="img-wrapper">
                       <img height="20px" width="30px"
                           style="margin-right: 1rem; border-radius: 2px; vertical-align: middle;"
                           src="../../../../assets/flags/{{loc.toLowerCase()}}.png" />
-                  </div>
+                  </div> -->
                   <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
               </div>
           </mat-option>

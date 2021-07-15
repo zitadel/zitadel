@@ -23,11 +23,9 @@ export class EditTextComponent implements OnInit, OnDestroy {
   @Input() public disabled: boolean = true;
 
   public copied: string = '';
-  constructor() { }
 
   public ngOnInit(): void {
     this.current$.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      console.log('current', value);
       this.currentMap = value;
       this.form = new FormGroup({});
       Object.keys(value).map(key => {
@@ -38,7 +36,6 @@ export class EditTextComponent implements OnInit, OnDestroy {
       this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(values => this.changedValues.emit(values));
     });
 
-    // this.disabled ? this.form.disable() : this.form.enable();
   }
 
   public ngOnDestroy(): void {
@@ -47,9 +44,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
   }
 
   public setWarnText(key: string, text: string | undefined): void {
-    // setTimeout(() => {
     this.warnText[key] = text;
-    // }, text == undefined ? 1000 : 0);
   }
 
   public addChip(key: string, value: string): void {

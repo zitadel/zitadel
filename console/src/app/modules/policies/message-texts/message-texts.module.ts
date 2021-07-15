@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
@@ -39,6 +40,7 @@ import { MessageTextsComponent } from './message-texts.component';
     MatTooltipModule,
     TranslateModule,
     MatTooltipModule,
+    MatSelectModule,
     DetailLayoutModule,
     MatProgressSpinnerModule,
     LinksModule,

@@ -2,10 +2,10 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
+  GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
   GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
   SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -79,8 +79,9 @@ const REQUESTMAP = {
     },
   },
   [PolicyComponentServiceType.ADMIN]: {
-    get: new AdminGetDefaultLoginTextsRequest(),
+    get: new AdminGetCustomLoginTextsRequest(),
     set: new AdminSetCustomLoginTextsRequest(),
+    getDefault: new AdminGetDefaultLoginTextsRequest(),
     setFcn: (adminmap: Partial<AdminSetCustomLoginTextsRequest.AsObject>): AdminSetCustomLoginTextsRequest => {
       let req = new AdminSetCustomLoginTextsRequest();
       req.setLanguage(adminmap.language ?? '');
@@ -108,7 +109,7 @@ export class LoginTextsComponent implements OnDestroy {
 
   public KeyNamesArray: string[] = KeyNamesArray;
   public locale: string = 'en';
-  public LOCALES: string[] = ['en', 'de', 'fr', 'it'];
+  public LOCALES: string[] = ['en'];
 
   private sub: Subscription = new Subscription();
 
@@ -116,7 +117,6 @@ export class LoginTextsComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
-    private translate: TranslateService,
     private dialog: MatDialog,
     private toast: ToastService,
   ) {
@@ -131,7 +131,10 @@ export class LoginTextsComponent implements OnDestroy {
             ORG_PRIVATELABEL_LINK,
           ];
 
-          // this.setCurrentType('emailVerificationDoneText');
+          this.service.getSupportedLanguages().then(lang => {
+            this.LOCALES = lang.languagesList;
+          });
+
           this.loadData();
           break;
         case PolicyComponentServiceType.ADMIN:
@@ -141,6 +144,12 @@ export class LoginTextsComponent implements OnDestroy {
             IAM_POLICY_LINK,
             IAM_PRIVATELABEL_LINK,
           ];
+
+          this.service.getSupportedLanguages().then(lang => {
+            this.LOCALES = lang.languagesList;
+          });
+
+          this.loadData();
           break;
       }
 
@@ -160,18 +169,15 @@ export class LoginTextsComponent implements OnDestroy {
 
   public changeLocale(selection: MatSelectChange): void {
     this.locale = selection.value;
+    this.loadData();
   }
 
   public async loadData(): Promise<any> {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
-
-
-      reqDefaultInit.setLanguage(this.locale);
-      this.getDefaultInitMessageTextMap$ = from(
-        this.getDefaultValues(reqDefaultInit),
-      ).pipe(map(m => m[this.currentSubMap]));
-    }
+    const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
+    reqDefaultInit.setLanguage(this.locale);
+    this.getDefaultInitMessageTextMap$ = from(
+      this.getDefaultValues(reqDefaultInit),
+    ).pipe(map(m => m[this.currentSubMap]));
 
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
     this.getCustomInitMessageTextMap$.next(
@@ -180,11 +186,10 @@ export class LoginTextsComponent implements OnDestroy {
   }
 
   public updateCurrentValues(values: { [key: string]: string; }): void {
-    console.log(values);
     const req = REQUESTMAP[this.serviceType].setFcn;
     const mappedValues = req({ [this.currentSubMap]: values });
     this.updateRequest = mappedValues;
-    this.updateRequest.setLanguage(this.translate.currentLang);
+    this.updateRequest.setLanguage(this.locale);
   }
 
   public saveCurrentMessage(): void {
@@ -230,7 +235,6 @@ export class LoginTextsComponent implements OnDestroy {
     return prom.then(res => {
       if (res.customText) {
         delete res.customText.details;
-        console.log(Object.assign({}, res.customText));
         return Object.assign({}, res.customText);
       } else {
         return {};

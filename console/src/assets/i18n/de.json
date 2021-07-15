@@ -705,7 +705,8 @@
     },
     "LOGIN_TEXTS": {
       "TITLE":"Login Interface Texte",
-      "DESCRIPTION": "Definiere die Texte für den Login. Wenn Texte leer sind, wird der als Platzhalter angezeigte Standardwert verwendet.",
+      "DESCRIPTION": "Definiere die Texte für das Logininterface. Wenn Texte leer sind, wird der als Platzhalter angezeigte Standardwert verwendet.",
+      "DESCRIPTION_SHORT":"Definiere die Texte für das Logininterface.",
       "KEYNAME":"Login Screen / Interface",
       "RESET_TITLE":"Standardwerte wiederherstellen",
       "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",

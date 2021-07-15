@@ -2,10 +2,33 @@
   margin: .5rem 0;
 }
 
-.message-type {
-  .active {
-    background: #cbf4c9;
-    color: #0e6245;
+.top-actions {
+  display: flex;
+  margin: 0 -.5rem;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .message-type {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 11px;
+
+    .active {
+      background: #cbf4c9;
+      color: #0e6245;
+    }
+  }
+
+  .language {
+    display: block;
+    margin: 0 .5rem;
+    min-width: 150px;
+
+    .lighter {
+      font-size: 12px;
+      color: var(--grey);
+      padding: 0 .5rem;
+    }
   }
 }
 

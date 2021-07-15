@@ -1,7 +1,7 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
@@ -261,13 +261,14 @@ export class MessageTextsComponent implements OnDestroy {
     { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
   ];
 
+  public locale: string = 'en';
+  public LOCALES: string[] = ['en'];
   private sub: Subscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
-    private translate: TranslateService,
     private dialog: MatDialog,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
@@ -281,9 +282,12 @@ export class MessageTextsComponent implements OnDestroy {
             ORG_PRIVATELABEL_LINK,
           ];
 
+          this.service.getSupportedLanguages().then(lang => {
+            this.LOCALES = lang.languagesList;
+          });
+
           this.loadData(this.currentType);
 
-          // this.defaultInitMsg = of(req);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -292,6 +296,13 @@ export class MessageTextsComponent implements OnDestroy {
             IAM_POLICY_LINK,
             IAM_PRIVATELABEL_LINK,
           ];
+
+          this.service.getSupportedLanguages().then(lang => {
+            this.LOCALES = lang.languagesList;
+          });
+
+          this.loadData(this.currentType);
+
           break;
       }
 
@@ -316,32 +327,53 @@ export class MessageTextsComponent implements OnDestroy {
     }
   }
 
-  public getCurrentValues(type: MESSAGETYPES, req: any): Promise<any> {
-    switch (type) {
-      case MESSAGETYPES.INIT:
-        return this.stripDetails((this.service as ManagementService).getCustomInitMessageText(req));
-      case MESSAGETYPES.VERIFYPHONE:
-        return this.stripDetails((this.service as ManagementService).getCustomVerifyPhoneMessageText(req));
-      case MESSAGETYPES.VERIFYEMAIL:
-        return this.stripDetails((this.service as ManagementService).getCustomVerifyEmailMessageText(req));
-      case MESSAGETYPES.PASSWORDRESET:
-        return this.stripDetails((this.service as ManagementService).getCustomPasswordResetMessageText(req));
-      case MESSAGETYPES.DOMAINCLAIMED:
-        return this.stripDetails((this.service as ManagementService).getCustomDomainClaimedMessageText(req));
+  public getCurrentValues(type: MESSAGETYPES, req: any): Promise<any> | undefined {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      switch (type) {
+        case MESSAGETYPES.INIT:
+          return this.stripDetails((this.service as ManagementService).getCustomInitMessageText(req));
+        case MESSAGETYPES.VERIFYPHONE:
+          return this.stripDetails((this.service as ManagementService).getCustomVerifyPhoneMessageText(req));
+        case MESSAGETYPES.VERIFYEMAIL:
+          return this.stripDetails((this.service as ManagementService).getCustomVerifyEmailMessageText(req));
+        case MESSAGETYPES.PASSWORDRESET:
+          return this.stripDetails((this.service as ManagementService).getCustomPasswordResetMessageText(req));
+        case MESSAGETYPES.DOMAINCLAIMED:
+          return this.stripDetails((this.service as ManagementService).getCustomDomainClaimedMessageText(req));
+      }
+    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+      switch (type) {
+        case MESSAGETYPES.INIT:
+          return this.stripDetails((this.service as AdminService).getCustomInitMessageText(req));
+        case MESSAGETYPES.VERIFYPHONE:
+          return this.stripDetails((this.service as AdminService).getCustomVerifyPhoneMessageText(req));
+        case MESSAGETYPES.VERIFYEMAIL:
+          return this.stripDetails((this.service as AdminService).getCustomVerifyEmailMessageText(req));
+        case MESSAGETYPES.PASSWORDRESET:
+          return this.stripDetails((this.service as AdminService).getCustomPasswordResetMessageText(req));
+        case MESSAGETYPES.DOMAINCLAIMED:
+          return this.stripDetails((this.service as AdminService).getCustomDomainClaimedMessageText(req));
+      }
     }
+  }
+
+  public changeLocale(selection: MatSelectChange): void {
+    this.locale = selection.value;
+    this.loadData(this.currentType);
   }
 
   public async loadData(type: MESSAGETYPES): Promise<any> {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const reqDefaultInit = REQUESTMAP[this.serviceType][type].getDefault;
 
-      reqDefaultInit.setLanguage(this.translate.currentLang);
+      reqDefaultInit.setLanguage(this.locale);
+      console.log(this.locale);
       this.getDefaultInitMessageTextMap$ = from(
         this.getDefaultValues(type, reqDefaultInit),
       );
     }
 
-    const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.translate.currentLang);
+    const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.locale);
     this.getCustomInitMessageTextMap$.next(
       await this.getCurrentValues(type, reqCustomInit),
     );
@@ -351,7 +383,7 @@ export class MessageTextsComponent implements OnDestroy {
     const req = REQUESTMAP[this.serviceType][this.currentType].setFcn;
     const mappedValues = req(values);
     this.updateRequest = mappedValues;
-    this.updateRequest.setLanguage(this.translate.currentLang);
+    this.updateRequest.setLanguage(this.locale);
   }
 
   public saveCurrentMessage(): any {
@@ -414,19 +446,17 @@ export class MessageTextsComponent implements OnDestroy {
             });
           };
 
-          const lang = this.translate.currentLang ?? 'en';
-
           switch (this.currentType) {
             case MESSAGETYPES.INIT:
-              return handler((this.service as ManagementService).resetCustomInitMessageTextToDefault(lang));
+              return handler((this.service as ManagementService).resetCustomInitMessageTextToDefault(this.locale));
             case MESSAGETYPES.VERIFYPHONE:
-              return handler((this.service as ManagementService).resetCustomVerifyPhoneMessageTextToDefault(lang));
+              return handler((this.service as ManagementService).resetCustomVerifyPhoneMessageTextToDefault(this.locale));
             case MESSAGETYPES.VERIFYEMAIL:
-              return handler((this.service as ManagementService).resetCustomVerifyEmailMessageTextToDefault(lang));
+              return handler((this.service as ManagementService).resetCustomVerifyEmailMessageTextToDefault(this.locale));
             case MESSAGETYPES.PASSWORDRESET:
-              return handler((this.service as ManagementService).resetCustomPasswordResetMessageTextToDefault(lang));
+              return handler((this.service as ManagementService).resetCustomPasswordResetMessageTextToDefault(this.locale));
             case MESSAGETYPES.DOMAINCLAIMED:
-              return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(lang));
+              return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(this.locale));
           }
 
         }

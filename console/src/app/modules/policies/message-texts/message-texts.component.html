@@ -2,8 +2,21 @@
     [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
     [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
-    <div class="message-type">
-      <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType == type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
+    <div class="top-actions">
+      <div class="message-type">
+        <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType == type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
+      </div>
+
+      <cnsl-form-field class="language">
+        <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
+        <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
+            <mat-option *ngFor="let loc of LOCALES" [value]="loc">
+                <div class="centerline">
+                    <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
+                </div>
+            </mat-option>
+        </mat-select>
+    </cnsl-form-field>
     </div>
 
     <cnsl-info-section class="warn"
