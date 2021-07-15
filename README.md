@@ -112,6 +112,10 @@ See the policy [here](./SECURITY.md)
 * [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect SDK (client and server) for Go
 * [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
+## Usage Data
+
+ZITADEL components send errors and usage data to CAOS AG, so that we are able to identify code improvement potential. If you'd rather be anonymous or don't have an internet connection, pass the global flag `--disable-ingestion` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-ingestion` flag.
+
 ## License
 
 See the exact licensing terms [here](./LICENSE)
