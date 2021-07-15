@@ -121,7 +121,7 @@ jobs:
 
   zitadel-image:
     name: Build ZITADEL Image
-    needs: [zitadel, zitadel-console]
+    needs: [refs, zitadel, zitadel-console]
     runs-on: ubuntu-18.04
     steps:
       - name: Source checkout
