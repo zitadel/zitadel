@@ -86,6 +86,7 @@ jobs:
           file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
           target: go-codecov
+          cache-from: type=gha,scope=zitadel
           outputs: type=local,dest=/tmp/zitadel
       - uses: codecov/codecov-action@v1
         with:
