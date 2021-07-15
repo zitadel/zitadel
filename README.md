@@ -97,7 +97,6 @@ Delegate the right to assign roles to another organization
 Customize login and console with your design  
 ![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
-
 ## How To Contribute
 
 Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
@@ -117,5 +116,3 @@ See the policy [here](./SECURITY.md)
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-Test CI
