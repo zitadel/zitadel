@@ -124,6 +124,7 @@ jobs:
     name: Build ZITADEL Image
     needs: [refs, zitadel, zitadel-console]
     runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -154,8 +155,7 @@ jobs:
           file: ./build/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
-          #push: true //TODO reenable
-          push: false
+          push: true
           cache-from: type=gha,scope=zitadel-image
           cache-to: type=gha,mode=max,scope=zitadel-image
 
@@ -163,6 +163,7 @@ jobs:
     name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
     needs: refs
     runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
@@ -217,8 +218,7 @@ jobs:
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          #push: true //TODO reenable
-          push: false
+          push: true
           cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           build-args: |
             OS=${{ matrix.goos }}
@@ -243,6 +243,7 @@ jobs:
     name: Build ZITADEL CockroachDB Image
     needs: refs
     runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -268,8 +269,7 @@ jobs:
           file: ./build/cr-backup/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          #push: true //TODO reenable
-          push: false
+          push: true
           cache-from: type=gha,scope=zitadel-cockroachdb
           cache-to: type=gha,mode=max,scope=zitadel-cockroachdb
 
