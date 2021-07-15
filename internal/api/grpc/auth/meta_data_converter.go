@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"github.com/caos/zitadel/internal/api/grpc/metadata"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
@@ -14,4 +16,14 @@ func BulkSetMetaDataToDomain(req *auth.BulkSetMyMetaDataRequest) []*domain.MetaD
 		}
 	}
 	return metaData
+}
+
+func ListUserMetaDataToDomain(req *auth.ListMyMetaDataRequest) *domain.MetaDataSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	return &domain.MetaDataSearchRequest{
+		Offset:  offset,
+		Limit:   limit,
+		Asc:     asc,
+		Queries: metadata.MetaDataQueriesToModel(req.Queries),
+	}
 }

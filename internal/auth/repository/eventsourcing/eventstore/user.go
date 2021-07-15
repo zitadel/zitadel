@@ -10,9 +10,11 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -242,26 +244,6 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearch
 	return result, nil
 }
 
-//func (repo *UserRepo) GetUserMetaData(ctx context.Context, userID string) (*domain.MetaDataSearchResponse, error) {
-//	sequence, sequenceErr := repo.View.GetLatestUserSequence()
-//	logging.Log("EVENT-Gdgsw").OnError(sequenceErr).Warn("could not read latest user sequence")
-//	users, count, err := repo.View.SearchUsers(request)
-//	if err != nil {
-//		return nil, err
-//	}
-//	result := &domain.MetaDataSearchResponse{
-//		Offset:      request.Offset,
-//		Limit:       request.Limit,
-//		TotalResult: count,
-//		Result:      usr_view_model.UsersToModel(users, repo.PrefixAvatarURL),
-//	}
-//	if sequenceErr == nil {
-//		result.Sequence = sequence.CurrentSequence
-//		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-//	}
-//	return result, nil
-//}
-
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
 	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending, retention)
 
@@ -312,4 +294,40 @@ func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence ui
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *UserRepo) GetMyMetaDataByKey(ctx context.Context, key string) (*domain.MetaData, error) {
+	ctxData := authz.GetCtxData(ctx)
+	data, err := repo.View.MetaDataByKeyAndResourceOwner(ctxData.UserID, ctxData.ResourceOwner, key)
+	if err != nil {
+		return nil, err
+	}
+	return iam_model.MetaDataViewToDomain(data), nil
+}
+
+func (repo *UserRepo) SearchMyMetaData(ctx context.Context, req *domain.MetaDataSearchRequest) (*domain.MetaDataSearchResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	err := req.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-N9fsd").OnError(sequenceErr).Warn("could not read latest user sequence")
+	req.AppendAggregateIDQuery(ctxData.UserID)
+	req.AppendResourceOwnerQuery(ctxData.ResourceOwner)
+	metaData, count, err := repo.View.SearchMetaData(req)
+	if err != nil {
+		return nil, err
+	}
+	result := &domain.MetaDataSearchResponse{
+		Offset:      req.Offset,
+		Limit:       req.Limit,
+		TotalResult: count,
+		Result:      iam_model.MetaDataViewsToDomain(metaData),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
 }

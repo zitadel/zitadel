@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/repository/view"
@@ -18,6 +19,14 @@ func (v *View) MetaDataByKey(aggregateID, key string) (*model.MetaDataView, erro
 
 func (v *View) MetaDataListByAggregateID(aggregateID string) ([]*model.MetaDataView, error) {
 	return view.GetMetaDataList(v.Db, metaDataTable, aggregateID)
+}
+
+func (v *View) MetaDataByKeyAndResourceOwner(aggregateID, resourceOwner, key string) (*model.MetaDataView, error) {
+	return view.MetaDataByKeyAndResourceOwner(v.Db, metaDataTable, aggregateID, resourceOwner, key)
+}
+
+func (v *View) SearchMetaData(request *domain.MetaDataSearchRequest) ([]*model.MetaDataView, uint64, error) {
+	return view.SearchMetaData(v.Db, metaDataTable, request)
 }
 
 func (v *View) PutMetaData(template *model.MetaDataView, event *models.Event) error {

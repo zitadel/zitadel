@@ -38,6 +38,29 @@ func MetaDataByKey(db *gorm.DB, table, aggregateID, key string) (*model.MetaData
 	return customText, err
 }
 
+func MetaDataByKeyAndResourceOwner(db *gorm.DB, table, aggregateID, resourceOwner, key string) (*model.MetaDataView, error) {
+	customText := new(model.MetaDataView)
+	aggregateIDQuery := &model.MetaDataSearchQuery{Key: domain.MetaDataSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
+	resourceOwnerQuery := &model.MetaDataSearchQuery{Key: domain.MetaDataSearchKeyResourceOwner, Value: resourceOwner, Method: domain.SearchMethodEquals}
+	keyQuery := &model.MetaDataSearchQuery{Key: domain.MetaDataSearchKeyKey, Value: key, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggregateIDQuery, resourceOwnerQuery, keyQuery)
+	err := query(db, customText)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-29kkd", "Errors.MetaData.NotExisting")
+	}
+	return customText, err
+}
+
+func SearchMetaData(db *gorm.DB, table string, req *domain.MetaDataSearchRequest) ([]*model.MetaDataView, uint64, error) {
+	metaData := make([]*model.MetaDataView, 0)
+	query := repository.PrepareSearchQuery(table, model.MetaDataSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+	count, err := query(db, &metaData)
+	if err != nil {
+		return nil, 0, err
+	}
+	return metaData, count, nil
+}
+
 func PutMetaData(db *gorm.DB, table string, customText *model.MetaDataView) error {
 	save := repository.PrepareSave(table)
 	return save(db, customText)

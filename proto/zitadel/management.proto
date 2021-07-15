@@ -2851,7 +2851,7 @@ message GetUserMetaDataRequest {
 }
 
 message GetUserMetaDataResponse {
-    repeated zitadel.metadata.v1.MetaData meta_data = 1;
+    zitadel.metadata.v1.MetaData meta_data = 1;
 }
 
 message SetUserMetaDataRequest {

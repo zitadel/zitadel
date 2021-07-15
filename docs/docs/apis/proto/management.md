@@ -4524,7 +4524,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| meta_data | repeated zitadel.metadata.v1.MetaData | - |  |
+| meta_data |  zitadel.metadata.v1.MetaData | - |  |
 
 
 

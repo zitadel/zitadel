@@ -6,7 +6,7 @@ import "validate/validate.proto";
 
 package zitadel.metadata.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/text";
+option go_package ="github.com/caos/zitadel/pkg/grpc/metadata";
 
 message MetaData {
     zitadel.v1.ObjectDetails details = 1;

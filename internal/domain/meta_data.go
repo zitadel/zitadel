@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -45,6 +46,7 @@ const (
 	MetaDataSearchKeyAggregateID
 	MetaDataSearchKeyResourceOwner
 	MetaDataSearchKeyKey
+	MetaDataSearchKeyValue
 )
 
 type MetaDataSearchQuery struct {
@@ -60,4 +62,22 @@ type MetaDataSearchResponse struct {
 	Result      []*MetaData
 	Sequence    uint64
 	Timestamp   time.Time
+}
+
+func (r *MetaDataSearchRequest) EnsureLimit(limit uint64) error {
+	if r.Limit > limit {
+		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-0ds32", "Errors.Limit.ExceedsDefault")
+	}
+	if r.Limit == 0 {
+		r.Limit = limit
+	}
+	return nil
+}
+
+func (r *MetaDataSearchRequest) AppendAggregateIDQuery(aggregateID string) {
+	r.Queries = append(r.Queries, &MetaDataSearchQuery{Key: MetaDataSearchKeyAggregateID, Method: SearchMethodEquals, Value: aggregateID})
+}
+
+func (r *MetaDataSearchRequest) AppendResourceOwnerQuery(resourceOwner string) {
+	r.Queries = append(r.Queries, &MetaDataSearchQuery{Key: MetaDataSearchKeyResourceOwner, Method: SearchMethodEquals, Value: resourceOwner})
 }

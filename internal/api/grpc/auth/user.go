@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/change"
+	"github.com/caos/zitadel/internal/api/grpc/metadata"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/org"
@@ -40,11 +41,28 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 }
 
 func (s *Server) ListMyMetaData(ctx context.Context, req *auth_pb.ListMyMetaDataRequest) (*auth_pb.ListMyMetaDataResponse, error) {
-	return nil, nil
+	res, err := s.repo.SearchMyMetaData(ctx, ListUserMetaDataToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.ListMyMetaDataResponse{
+		Result: metadata.MetaDataListToPb(res.Result),
+		Details: obj_grpc.ToListDetails(
+			res.TotalResult,
+			res.Sequence,
+			res.Timestamp,
+		),
+	}, nil
 }
 
 func (s *Server) GetMyMetaData(ctx context.Context, req *auth_pb.GetMyMetaDataRequest) (*auth_pb.GetMyMetaDataResponse, error) {
-	return nil, nil
+	data, err := s.repo.GetMyMetaDataByKey(ctx, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.GetMyMetaDataResponse{
+		MetaData: metadata.DomainMetaDataToPb(data),
+	}, nil
 }
 
 func (s *Server) SetMyMetaData(ctx context.Context, req *auth_pb.SetMyMetaDataRequest) (*auth_pb.SetMyMetaDataResponse, error) {

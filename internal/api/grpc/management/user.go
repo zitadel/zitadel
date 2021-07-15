@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/authn"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
+	"github.com/caos/zitadel/internal/api/grpc/metadata"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
@@ -78,11 +79,28 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 }
 
 func (s *Server) ListUserMetaData(ctx context.Context, req *mgmt_pb.ListUserMetaDataRequest) (*mgmt_pb.ListUserMetaDataResponse, error) {
-	return nil, nil
+	res, err := s.user.SearchMetaData(ctx, req.Id, authz.GetCtxData(ctx).OrgID, ListUserMetaDataToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListUserMetaDataResponse{
+		Result: metadata.MetaDataListToPb(res.Result),
+		Details: obj_grpc.ToListDetails(
+			res.TotalResult,
+			res.Sequence,
+			res.Timestamp,
+		),
+	}, nil
 }
 
 func (s *Server) GetUserMetaData(ctx context.Context, req *mgmt_pb.GetUserMetaDataRequest) (*mgmt_pb.GetUserMetaDataResponse, error) {
-	return nil, nil
+	data, err := s.user.GetMetaDataByKey(ctx, req.Id, authz.GetCtxData(ctx).OrgID, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetUserMetaDataResponse{
+		MetaData: metadata.DomainMetaDataToPb(data),
+	}, nil
 }
 
 func (s *Server) SetUserMetaData(ctx context.Context, req *mgmt_pb.SetUserMetaDataRequest) (*mgmt_pb.SetUserMetaDataResponse, error) {

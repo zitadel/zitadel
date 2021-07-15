@@ -17,6 +17,7 @@ const (
 	MetaDataKeyAggregateID   = "aggregate_id"
 	MetaDataKeyResourceOwner = "resource_owner"
 	MetaDataKeyKey           = "key"
+	MetaDataKeyValue         = "value"
 )
 
 type MetaDataView struct {

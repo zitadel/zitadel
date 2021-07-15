@@ -56,6 +56,8 @@ func (key MetaDataSearchKey) ToColumnName() string {
 		return MetaDataKeyResourceOwner
 	case domain.MetaDataSearchKeyKey:
 		return MetaDataKeyKey
+	case domain.MetaDataSearchKeyValue:
+		return MetaDataKeyValue
 	default:
 		return ""
 	}
