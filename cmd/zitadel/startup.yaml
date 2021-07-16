@@ -39,7 +39,7 @@ EventstoreBase:
 
 Commands:
   Eventstore:
-    User: 'root'
+    User: 'eventstore'
     Password: $CR_EVENTSTORE_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
@@ -49,7 +49,7 @@ Commands:
 
 Queries:
   Eventstore:
-    User: 'root'
+    User: 'queries'
     Password: $CR_QUERIES_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
@@ -65,7 +65,7 @@ Projections:
   CRDB:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'root'
+    User: 'queries'
     Database: 'zitadel'
     Schema: 'projections'
     Password: $CR_QUERIES_PASSWORD
@@ -87,7 +87,7 @@ AuthZ:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'root'
+          User: 'authz'
           Database: 'eventstore'
           Password: $CR_AUTHZ_PASSWORD
           SSL:
@@ -102,7 +102,7 @@ AuthZ:
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'root'
+      User: 'authz'
       Database: 'authz'
       Password: $CR_AUTHZ_PASSWORD
       SSL:
@@ -125,7 +125,7 @@ Auth:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'root'
+        User: 'auth'
         Database: 'eventstore'
         Password: $CR_AUTH_PASSWORD
         SSL:
@@ -141,7 +141,7 @@ Auth:
     Connection:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'root'
+      User: 'auth'
       Database: 'auth'
       Password: $CR_AUTH_PASSWORD
       SSL:
@@ -152,7 +152,7 @@ Auth:
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'root'
+    User: 'auth'
     Database: 'auth'
     Password: $CR_AUTH_PASSWORD
     SSL:
@@ -175,7 +175,7 @@ Admin:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'root'
+        User: 'adminapi'
         Database: 'eventstore'
         Password: $CR_ADMINAPI_PASSWORD
         SSL:
@@ -190,7 +190,7 @@ Admin:
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'root'
+    User: 'adminapi'
     Database: 'adminapi'
     Password: $CR_ADMINAPI_PASSWORD
     SSL:
@@ -213,7 +213,7 @@ Mgmt:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'root'
+        User: 'management'
         Database: 'eventstore'
         Password: $CR_MANAGEMENT_PASSWORD
         SSL:
@@ -228,7 +228,7 @@ Mgmt:
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'root'
+    User: 'management'
     Database: 'management'
     Password: $CR_MANAGEMENT_PASSWORD
     SSL:
@@ -337,7 +337,7 @@ Notification:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'root'
+          User: 'notification'
           Database: 'eventstore'
           Password: $CR_NOTIFICATION_PASSWORD
           SSL:
@@ -352,7 +352,7 @@ Notification:
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'root'
+      User: 'notification'
       Database: 'notification'
       Password: $CR_NOTIFICATION_PASSWORD
       SSL:
