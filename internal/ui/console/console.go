@@ -7,18 +7,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rakyll/statik/fs"
-
 	"github.com/caos/zitadel/internal/api/http/middleware"
-	_ "github.com/caos/zitadel/internal/ui/console/statik"
 )
 
 type Config struct {
-	Port            string
-	EnvOverwriteDir string
-	ShortCache      middleware.CacheConfig
-	LongCache       middleware.CacheConfig
-	CSPDomain       string
+	Port                string
+	ConsoleOverwriteDir string
+	ShortCache          middleware.CacheConfig
+	LongCache           middleware.CacheConfig
+	CSPDomain           string
 }
 
 type spaHandler struct {
@@ -26,9 +23,9 @@ type spaHandler struct {
 }
 
 const (
-	envRequestPath = "/assets/environment.json"
-	envDefaultDir  = "/console/"
-	handlerPrefix  = "/console"
+	envRequestPath    = "/assets/environment.json"
+	consoleDefaultDir = "/console/"
+	handlerPrefix     = "/console"
 )
 
 var (
@@ -53,14 +50,11 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 }
 
 func Start(config Config) (http.Handler, string, error) {
-	statikFS, err := fs.NewWithNamespace("console")
-	if err != nil {
-		return nil, "", err
+	consoleDir := consoleDefaultDir
+	if config.ConsoleOverwriteDir != "" {
+		consoleDir = config.ConsoleOverwriteDir
 	}
-	envDir := envDefaultDir
-	if config.EnvOverwriteDir != "" {
-		envDir = config.EnvOverwriteDir
-	}
+	consoleHTTPDir := http.FS(os.DirFS(consoleDir))
 	cache := AssetsCacheInterceptorIgnoreManifest(
 		config.ShortCache.MaxAge.Duration,
 		config.ShortCache.SharedMaxAge.Duration,
@@ -69,8 +63,8 @@ func Start(config Config) (http.Handler, string, error) {
 	)
 	security := middleware.SecurityHeaders(csp(config.CSPDomain), nil)
 	handler := &http.ServeMux{}
-	handler.Handle("/", cache(security(http.FileServer(&spaHandler{statikFS}))))
-	handler.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))))
+	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
+	handler.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(consoleHTTPDir)))))
 	return handler, handlerPrefix, nil
 }
 
