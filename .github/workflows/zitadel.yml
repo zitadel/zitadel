@@ -228,7 +228,7 @@ jobs:
           name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
           path: /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
 
- zitadel-operator-codecov:
+  zitadel-operator-codecov:
     name: Upload ZITADEL Operator Codecov ${{ matrix.goos }}-${{ matrix.goarch }}
     needs: [refs, zitadel-operator]
     runs-on: ubuntu-18.04
