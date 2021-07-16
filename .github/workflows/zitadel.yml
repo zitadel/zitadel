@@ -93,6 +93,33 @@ jobs:
           name: zitadel-codecov
           files: /tmp/zitadel/profile.cov
 
+  zitadel-codecov:
+    name: Upload ZITADEL Codecov
+    needs: [refs, zitadel]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/zitadel/Dockerfile
+          platforms: linux/amd64
+          target: go-codecov
+          cache-from: type=gha,scope=zitadel
+          outputs: type=local,dest=/tmp/zitadel
+      - uses: codecov/codecov-action@v1
+        with:
+          name: zitadel-codecov
+          files: /tmp/zitadel/profile.cov
+
   zitadel-console:
     name: Build ZITADEL Console
     needs: refs
@@ -155,13 +182,88 @@ jobs:
           file: ./build/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
-          push: true
+          push: false #TODO Testing
           cache-from: type=gha,scope=zitadel-image
           cache-to: type=gha,mode=max,scope=zitadel-image
 
-  operator-image:
-    name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
+  zitadel-operator:
+    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
     needs: refs
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        goos: [ 'linux', 'darwin', 'windows' ]
+        goarch: [ 'amd64' ]
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/operator/Dockerfile
+          platforms: linux/amd64
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          outputs: type=local,dest=/tmp/operator
+          build-args: |
+            OS=${{ matrix.goos }}
+            ARCH=${{ matrix.goarch }}
+            VERSION=${{ needs.refs.outputs.version }}
+            GITHUBOAUTHCLIENTID=${{ secrets.GITHUBOAUTHCLIENTID }}
+            GITHUBOAUTHCLIENTSECRET=${{ secrets.GITHUBOAUTHCLIENTSECRET }}
+      - shell: bash
+        run: |
+          mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+
+ zitadel-operator-codecov:
+    name: Upload ZITADEL Operator Codecov ${{ matrix.goos }}-${{ matrix.goarch }}
+    needs: [refs, zitadel-operator]
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        goos: [ 'linux' ]
+        goarch: [ 'amd64' ]
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/operator/Dockerfile
+          platforms: linux/amd64
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          target: go-codecov
+          outputs: type=local,dest=/tmp/operator
+      - uses: codecov/codecov-action@v1
+        with:
+          files: /tmp/operator/profile.cov
+          name: codecov-go
+
+  zitadel-operator-image:
+    name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
+    needs: [refs, zitadel-operator]
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     strategy:
@@ -187,57 +289,18 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
-        name: onlybuild
-        with:
-          context: .
-          file: ./build/operator/Dockerfile
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: false
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          outputs: type=local,dest=/tmp/operator
-          build-args: |
-            OS=${{ matrix.goos }}
-            ARCH=${{ matrix.goarch }}
-            VERSION=${{ needs.refs.outputs.version }}
-            GITHUBOAUTHCLIENTID=${{ secrets.GITHUBOAUTHCLIENTID }}
-            GITHUBOAUTHCLIENTSECRET=${{ secrets.GITHUBOAUTHCLIENTSECRET }}
-      - shell: bash
-        run: |
-          mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-      - uses: docker/build-push-action@v2
         if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
-        name: buildandpush
         with:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: true
+          push: false #TODO Testing
           cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
             VERSION=${{ needs.refs.outputs.version }}
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/operator/Dockerfile
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
-          push: false
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          target: go-codecov
-          outputs: type=local,dest=/tmp/operator
-      - uses: codecov/codecov-action@v1
-        with:
-          files: /tmp/operator/profile.cov
-          name: codecov-go
 
   crdb-image:
     name: Build ZITADEL CockroachDB Image
@@ -269,14 +332,14 @@ jobs:
           file: ./build/cr-backup/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: true
+          push: false #TODO Testing
           cache-from: type=gha,scope=zitadel-cockroachdb
           cache-to: type=gha,mode=max,scope=zitadel-cockroachdb
 
   release:
     name: Semantic Release Images and Artifacts
     runs-on: ubuntu-18.04
-    needs: [ refs, zitadel-image, operator-image, crdb-image ]
+    needs: [ refs, zitadel-image, zitadel-operator-image, crdb-image ]
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     env:
       DOCKER_USERNAME: ${{ github.repository_owner }}
@@ -383,4 +446,3 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           version: ${{ steps.semantic.outputs.new_release_version }}
-
