@@ -23,6 +23,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -124,6 +125,8 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 		err = n.handlePasswordCode(event)
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
+	case models.EventType(user_repo.HumanPasswordlessInitCodeAddedType):
+		err = n.handlePasswordlessRegistrationLink(event)
 	}
 	if err != nil {
 		return err
@@ -310,6 +313,55 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 	return n.command.UserDomainClaimedSent(ctx, event.ResourceOwner, event.AggregateID)
+}
+
+func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (err error) {
+	addedEvent := new(user_repo.HumanPasswordlessInitCodeAddedEvent)
+	if err := json.Unmarshal(event.Data, addedEvent); err != nil {
+		return err
+	}
+	if !addedEvent.Send {
+		return nil
+	}
+	events, err := n.getUserEvents(event.AggregateID, event.Sequence)
+	if err != nil {
+		return err
+	}
+	for _, e := range events {
+		if e.Type == models.EventType(user_repo.HumanPasswordlessInitCodeSentType) {
+			sentEvent := new(user_repo.HumanPasswordlessInitCodeSentEvent)
+			if err := json.Unmarshal(e.Data, sentEvent); err != nil {
+				return err
+			}
+			if sentEvent.ID == addedEvent.ID {
+				return nil
+			}
+		}
+	}
+	user, err := n.getUserByID(event.AggregateID)
+	if err != nil {
+		return err
+	}
+	ctx := getSetNotifyContextData(event.ResourceOwner)
+	colors, err := n.getLabelPolicy(ctx)
+	if err != nil {
+		return err
+	}
+
+	template, err := n.getMailTemplate(ctx)
+	if err != nil {
+		return err
+	}
+
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.DomainClaimedMessageType)
+	if err != nil {
+		return err
+	}
+	err = types.SendPasswordlessRegistrationLink(string(template.Template), translator, user, addedEvent, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	if err != nil {
+		return err
+	}
+	return n.command.HumanPasswordlessInitCodeSent(ctx, event.AggregateID, event.ResourceOwner, addedEvent.ID)
 }
 
 func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {

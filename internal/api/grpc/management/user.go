@@ -410,7 +410,7 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 
 func (s *Server) AddPasswordlessLink(ctx context.Context, req *mgmt_pb.AddPasswordlessLinkRequest) (*mgmt_pb.AddPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, false)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, true)
 	if err != nil {
 		return nil, err
 	}

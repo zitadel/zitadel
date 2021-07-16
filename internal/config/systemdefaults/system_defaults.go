@@ -74,10 +74,11 @@ type Notifications struct {
 }
 
 type Endpoints struct {
-	InitCode      string
-	PasswordReset string
-	VerifyEmail   string
-	DomainClaimed string
+	InitCode                 string
+	PasswordReset            string
+	VerifyEmail              string
+	DomainClaimed            string
+	PasswordlessRegistration string
 }
 
 type Providers struct {

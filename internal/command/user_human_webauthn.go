@@ -519,6 +519,26 @@ func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, res
 	return writeModelToPasswordlessInitCode(initCode, code), nil
 }
 
+func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error {
+	if userID == "" || codeID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-ADggh", "Errors.IDMissing")
+	}
+	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, initCode)
+	if err != nil {
+		return err
+	}
+
+	//if !isUserStateExists(existingUser.UserState) {
+	//	return caos_errs.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
+	//}
+
+	_, err = c.eventstore.PushEvents(ctx,
+		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID),
+	)
+	return err
+}
+
 func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, resourceOwner, codeID, verificationCode string) error {
 	if userID == "" || codeID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
