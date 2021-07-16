@@ -71,6 +71,10 @@ h2 {
         background: linear-gradient(40deg, #f59e0b 30%, #b45309);
       }
 
+      &.black {
+        background: linear-gradient(40deg, #1f2937, #111827);
+      }
+
       .icon,
       i {
         font-size: 2.5rem;

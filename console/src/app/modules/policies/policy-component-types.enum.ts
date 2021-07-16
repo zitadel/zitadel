@@ -7,7 +7,9 @@ export enum PolicyComponentType {
   PRIVATELABEL = 'privatelabel',
   MESSAGETEXTS = 'messagetexts',
   LOGINTEXTS = 'logintexts',
+  PRIVACYPOLICY = 'privacypolicy',
 }
+
 export enum PolicyComponentServiceType {
   MGMT = 'mgmt',
   ADMIN = 'admin',

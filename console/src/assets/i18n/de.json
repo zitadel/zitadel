@@ -632,7 +632,8 @@
       "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
       "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
-      "CUSTOMTEXT": "Benutzerdefinierte Texte"
+      "CUSTOMTEXT": "Benutzerdefinierte Texte",
+      "PRIVACYPOLICY":"Datenschutzrichtlinie und AGB - benutzerdefiniert"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -702,6 +703,15 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "SAVED": "Erfolgreich gespeichert."
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Datenschutzbestimmungen und AGB",
+      "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
+      "TOSLINK":"Link zu den Allgemeinen Geschäftsbedingungen",
+      "POLICYLINK":"Link zur den Datenschutzrichtlinien",
+      "SAVED": "Saved successfully!",
+      "RESET_TITLE":"Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION":"Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
     },
     "LOGIN_TEXTS": {
       "TITLE":"Login Interface Texte",

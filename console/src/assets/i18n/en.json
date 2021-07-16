@@ -632,7 +632,8 @@
       "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
       "LABELPOLICYWATERMARK": "Label Policy - watermark",
       "CUSTOMDOMAIN": "Domain Verification - available",
-      "CUSTOMTEXT": "Custom texts"
+      "CUSTOMTEXT": "Custom texts",
+      "PRIVACYPOLICY":"Privacy Policy and TOS - custom"
     },
     "TIERSTATES": {
       "0": "Active",
@@ -704,6 +705,15 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
       "SAVED": "Saved successfully!"
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Privacy Policy and TOS",
+      "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",
+      "TOSLINK":"Link to Terms of Service",
+      "POLICYLINK":"Link to Privacy Policy",
+      "SAVED": "Saved successfully!",
+      "RESET_TITLE":"Restore Default Values",
+      "RESET_DESCRIPTION":"You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
     },
     "LOGIN_TEXTS": {
       "TITLE":"Login Interface Texts",

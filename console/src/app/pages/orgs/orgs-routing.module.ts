@@ -116,6 +116,14 @@ const routes: Routes = [
         loadChildren: () => import('src/app/modules/policies/login-texts/login-texts.module')
           .then(m => m.LoginTextsPolicyModule),
       },
+      {
+        path: PolicyComponentType.PRIVACYPOLICY,
+        data: {
+          serviceType: PolicyComponentServiceType.MGMT,
+        },
+        loadChildren: () => import('src/app/modules/policies/privacy-policy/privacy-policy.module')
+          .then(m => m.PrivacyPolicyModule),
+      },
     ],
   },
   {

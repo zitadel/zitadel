@@ -50,12 +50,5 @@
       mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
   </div>
 
-  <ng-container
-      *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false">
-      <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
-          'login_policy.idp'})}}
-      </cnsl-info-section>
-  </ng-container>
-
   <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
 </app-detail-layout>

@@ -37,14 +37,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_COMPLEXITY_LINK,
-  IAM_POLICY_LINK,
-  IAM_PRIVATELABEL_LINK,
-  ORG_COMPLEXITY_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_PRIVATELABEL_LINK,
-} from '../../policy-grid/policy-links';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -276,33 +268,17 @@ export class MessageTextsComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.nextLinks = [
-            ORG_COMPLEXITY_LINK,
-            ORG_IAM_POLICY_LINK,
-            ORG_PRIVATELABEL_LINK,
-          ];
-
           this.service.getSupportedLanguages().then(lang => {
             this.LOCALES = lang.languagesList;
           });
-
           this.loadData(this.currentType);
-
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.nextLinks = [
-            IAM_COMPLEXITY_LINK,
-            IAM_POLICY_LINK,
-            IAM_PRIVATELABEL_LINK,
-          ];
-
           this.service.getSupportedLanguages().then(lang => {
             this.LOCALES = lang.languagesList;
           });
-
           this.loadData(this.currentType);
-
           break;
       }
 
