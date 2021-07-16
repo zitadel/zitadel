@@ -1,0 +1,36 @@
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+  [title]="'POLICY.PRIVACY_POLICY.TITLE' | translate"
+  [description]="'POLICY.PRIVACY_POLICY.DESCRIPTION' | translate">
+
+  <cnsl-info-section class="warn"
+    *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) == false"
+    type="WARN">
+    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+    'privacy_policy'})}}
+  </cnsl-info-section>
+
+  <div class="divider"></div>
+
+  <div class="content" >
+    <form *ngIf="form" [formGroup]="form">
+      <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.TOSLINK' | translate }}</cnsl-label>
+          <input cnslInput name="tosLink" formControlName="tosLink" />
+      </cnsl-form-field>
+
+      <cnsl-form-field class="formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.POLICYLINK' | translate }}</cnsl-label>
+        <input cnslInput name="privacyLink" formControlName="privacyLink" />
+      </cnsl-form-field>
+    </form>
+  </div>
+
+  <div class="actions">
+    <button *ngIf="!privacyPolicy?.isDefault" class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) == false" (click)="resetDefault()" color="warn" type="submit"
+    mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
+    <button class="save-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
+      mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+  </div>
+
+  <!-- <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links> -->
+</app-detail-layout>

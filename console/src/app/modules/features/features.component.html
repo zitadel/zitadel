@@ -164,6 +164,15 @@
         </div>
 
         <div class="row">
+          <i class="icon las la-file-contract"></i>
+          <span class="left-desc">{{'FEATURES.DATA.PRIVACYPOLICY' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.privacyPolicy"
+                            [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+        </div>
+
+        <div class="row">
           <i class="icon las la-paragraph"></i>
           <span class="left-desc">{{'FEATURES.DATA.CUSTOMTEXT' | translate}}</span>
           <span class="fill-space"></span>

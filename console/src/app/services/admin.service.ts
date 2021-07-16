@@ -65,6 +65,8 @@ import {
   GetPasswordLockoutPolicyResponse,
   GetPreviewLabelPolicyRequest,
   GetPreviewLabelPolicyResponse,
+  GetPrivacyPolicyRequest,
+  GetPrivacyPolicyResponse,
   GetSupportedLanguagesRequest,
   GetSupportedLanguagesResponse,
   IDPQuery,
@@ -150,6 +152,8 @@ import {
   UpdatePasswordComplexityPolicyResponse,
   UpdatePasswordLockoutPolicyRequest,
   UpdatePasswordLockoutPolicyResponse,
+  UpdatePrivacyPolicyRequest,
+  UpdatePrivacyPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -333,6 +337,17 @@ export class AdminService {
     req.setViewName(viewname);
     req.setFailedSequence(sequence);
     return this.grpcService.admin.removeFailedEvent(req, null).then(resp => resp.toObject());
+  }
+
+  public getPrivacyPolicy():
+    Promise<GetPrivacyPolicyResponse.AsObject> {
+    const req = new GetPrivacyPolicyRequest();
+    return this.grpcService.admin.getPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public updatePrivacyPolicy(req: UpdatePrivacyPolicyRequest):
+    Promise<UpdatePrivacyPolicyResponse.AsObject> {
+    return this.grpcService.admin.updatePrivacyPolicy(req, null).then(resp => resp.toObject());
   }
 
   // Features

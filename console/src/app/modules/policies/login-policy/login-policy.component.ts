@@ -20,14 +20,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_COMPLEXITY_LINK,
-  IAM_POLICY_LINK,
-  IAM_PRIVATELABEL_LINK,
-  ORG_COMPLEXITY_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_PRIVATELABEL_LINK,
-} from '../../policy-grid/policy-links';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
 
@@ -67,22 +59,12 @@ export class LoginPolicyComponent implements OnDestroy {
             PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
             PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
           ];
-          this.nextLinks = [
-            ORG_COMPLEXITY_LINK,
-            ORG_IAM_POLICY_LINK,
-            ORG_PRIVATELABEL_LINK,
-          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
           this.passwordlessTypes = [
             PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
             PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-          ];
-          this.nextLinks = [
-            IAM_COMPLEXITY_LINK,
-            IAM_POLICY_LINK,
-            IAM_PRIVATELABEL_LINK,
           ];
           break;
       }

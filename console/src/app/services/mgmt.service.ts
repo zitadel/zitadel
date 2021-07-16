@@ -25,6 +25,8 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPasswordLockoutPolicyRequest,
   AddCustomPasswordLockoutPolicyResponse,
+  AddCustomPrivacyPolicyRequest,
+  AddCustomPrivacyPolicyResponse,
   AddHumanUserRequest,
   AddHumanUserResponse,
   AddIDPToLoginPolicyRequest,
@@ -140,6 +142,8 @@ import {
   GetPasswordLockoutPolicyResponse,
   GetPreviewLabelPolicyRequest,
   GetPreviewLabelPolicyResponse,
+  GetPrivacyPolicyRequest,
+  GetPrivacyPolicyResponse,
   GetProjectByIDRequest,
   GetProjectByIDResponse,
   GetProjectGrantByIDRequest,
@@ -302,6 +306,8 @@ import {
   ResetPasswordComplexityPolicyToDefaultResponse,
   ResetPasswordLockoutPolicyToDefaultRequest,
   ResetPasswordLockoutPolicyToDefaultResponse,
+  ResetPrivacyPolicyToDefaultRequest,
+  ResetPrivacyPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomDomainClaimedMessageTextResponse,
@@ -332,6 +338,8 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPasswordLockoutPolicyRequest,
   UpdateCustomPasswordLockoutPolicyResponse,
+  UpdateCustomPrivacyPolicyRequest,
+  UpdateCustomPrivacyPolicyResponse,
   UpdateHumanEmailRequest,
   UpdateHumanEmailResponse,
   UpdateHumanPhoneRequest,
@@ -546,6 +554,28 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.mgmt.listOrgIDPs(req, null).then(resp => resp.toObject());
+  }
+
+  public getPrivacyPolicy():
+    Promise<GetPrivacyPolicyResponse.AsObject> {
+    const req = new GetPrivacyPolicyRequest();
+    return this.grpcService.mgmt.getPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public addCustomPrivacyPolicy(req: AddCustomPrivacyPolicyRequest):
+    Promise<AddCustomPrivacyPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.addCustomPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public updateCustomPrivacyPolicy(req: UpdateCustomPrivacyPolicyRequest):
+    Promise<UpdateCustomPrivacyPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.updateCustomPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public resetPrivacyPolicyToDefault():
+    Promise<ResetPrivacyPolicyToDefaultResponse.AsObject> {
+    const req = new ResetPrivacyPolicyToDefaultRequest();
+    return this.grpcService.mgmt.resetPrivacyPolicyToDefault(req, null).then(resp => resp.toObject());
   }
 
   public listHumanPasswordless(userId: string): Promise<ListHumanPasswordlessResponse.AsObject> {
