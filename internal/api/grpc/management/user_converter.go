@@ -43,7 +43,7 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 		Username: req.UserName,
 	}
 	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
-	logging.Log("MANAG-3GUFJ").OnError(err).Debug("language malformed")
+	logging.Log("MANAG-M029f").OnError(err).Debug("language malformed")
 	h.Profile = &domain.Profile{
 		FirstName:         req.Profile.FirstName,
 		LastName:          req.Profile.LastName,

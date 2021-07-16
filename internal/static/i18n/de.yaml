@@ -356,8 +356,9 @@ Errors:
     Invalid: Kundenspezifischer Text ist ungültig
     NotFound: Kundenspezifischer Text nicht gefunden
   TranslationFile:
-    ReadError: Übersetzungsfile konnte nicht gelesen werden
-    MergeError: Übersetzungsfile konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
+    ReadError: Übersetzungsdatei konnte nicht gelesen werden
+    MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
+    NotFound: Übersetzungsdatei existiert nicht
 EventTypes:
   user:
     added: Benutzer hinzugefügt

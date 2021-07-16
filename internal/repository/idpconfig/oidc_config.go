@@ -18,11 +18,13 @@ const (
 type OIDCConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID  string              `json:"idpConfigId"`
-	ClientID     string              `json:"clientId,omitempty"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Issuer       string              `json:"issuer,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	IDPConfigID           string              `json:"idpConfigId"`
+	ClientID              string              `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Issuer                string              `json:"issuer,omitempty"`
+	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
 
 	IDPDisplayNameMapping domain.OIDCMappingField `json:"idpDisplayNameMapping,omitempty"`
 	UserNameMapping       domain.OIDCMappingField `json:"usernameMapping,omitempty"`
@@ -40,7 +42,9 @@ func NewOIDCConfigAddedEvent(
 	base *eventstore.BaseEvent,
 	clientID,
 	idpConfigID,
-	issuer string,
+	issuer,
+	authorizationEndpoint,
+	tokenEndpoint string,
 	clientSecret *crypto.CryptoValue,
 	idpDisplayNameMapping,
 	userNameMapping domain.OIDCMappingField,
@@ -53,6 +57,8 @@ func NewOIDCConfigAddedEvent(
 		ClientID:              clientID,
 		ClientSecret:          clientSecret,
 		Issuer:                issuer,
+		AuthorizationEndpoint: authorizationEndpoint,
+		TokenEndpoint:         tokenEndpoint,
 		Scopes:                scopes,
 		IDPDisplayNameMapping: idpDisplayNameMapping,
 		UserNameMapping:       userNameMapping,
@@ -77,10 +83,12 @@ type OIDCConfigChangedEvent struct {
 
 	IDPConfigID string `json:"idpConfigId"`
 
-	ClientID     *string             `json:"clientId,omitempty"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Issuer       *string             `json:"issuer,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	ClientID              *string             `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Issuer                *string             `json:"issuer,omitempty"`
+	AuthorizationEndpoint *string             `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         *string             `json:"tokenEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
 
 	IDPDisplayNameMapping *domain.OIDCMappingField `json:"idpDisplayNameMapping,omitempty"`
 	UserNameMapping       *domain.OIDCMappingField `json:"usernameMapping,omitempty"`
@@ -129,6 +137,18 @@ func ChangeClientSecret(secret *crypto.CryptoValue) func(*OIDCConfigChangedEvent
 func ChangeIssuer(issuer string) func(*OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.Issuer = &issuer
+	}
+}
+
+func ChangeAuthorizationEndpoint(authorizationEndpoint string) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AuthorizationEndpoint = &authorizationEndpoint
+	}
+}
+
+func ChangeTokenEndpoint(tokenEndpoint string) func(*OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.TokenEndpoint = &tokenEndpoint
 	}
 }
 

@@ -117,12 +117,16 @@ func (h *ProjectionHandler) Process(
 			h.shutdown()
 			return
 		case event := <-h.Handler.EventQueue:
+			start := time.Now()
 			if err := h.processEvent(ctx, event, reduce); err != nil {
 				continue
 			}
+			logging.LogWithFields("HANDL-Y8F06-1.1", "projection", h.ProjectionName, "seq", event.Sequence(), "since", time.Since(start)).Debug("event processed")
 			h.triggerShouldPush(0)
 		case <-h.shouldBulk.C:
+			start := time.Now()
 			h.bulk(ctx, lock, execBulk, unlock)
+			logging.LogWithFields("HANDL-Y8F06-1.2", "projection", h.ProjectionName, "since", time.Since(start)).Debug("bulk")
 			h.ResetShouldBulk()
 		default:
 			//lower prio select with push
@@ -134,15 +138,21 @@ func (h *ProjectionHandler) Process(
 				h.shutdown()
 				return
 			case event := <-h.Handler.EventQueue:
+				start := time.Now()
 				if err := h.processEvent(ctx, event, reduce); err != nil {
 					continue
 				}
+				logging.LogWithFields("HANDL-Y8F06-1.3", "projection", h.ProjectionName, "seq", event.Sequence(), "since", time.Since(start)).Debug("event processed")
 				h.triggerShouldPush(0)
 			case <-h.shouldBulk.C:
+				start := time.Now()
 				h.bulk(ctx, lock, execBulk, unlock)
+				logging.LogWithFields("HANDL-Y8F06-1.4", "projection", h.ProjectionName, "since", time.Since(start)).Debug("bulk")
 				h.ResetShouldBulk()
 			case <-h.shouldPush.C:
+				start := time.Now()
 				h.push(ctx, update, reduce)
+				logging.LogWithFields("HANDL-Y8F06-1.5", "projection", h.ProjectionName, "since", time.Since(start)).Debug("push")
 				h.ResetShouldBulk()
 			}
 		}
@@ -177,15 +187,21 @@ func (h *ProjectionHandler) bulk(
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	startLock := time.Now()
+
 	errs := lock(ctx, h.requeueAfter)
 	//wait until projection is locked
 	if err, ok := <-errs; err != nil || !ok {
+		logging.LogWithFields("HANDL-Y8F06-3.1", "projection", h.ProjectionName, "since", time.Since(startLock)).Debug("failed lock")
 		logging.LogWithFields("HANDL-XDJ4i", "projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
 		return err
 	}
+	logging.LogWithFields("HANDL-Y8F06-3.2", "projection", h.ProjectionName, "since", time.Since(startLock)).Debug("finish lock")
 	go h.cancelOnErr(ctx, errs, cancel)
 
+	startExec := time.Now()
 	execErr := executeBulk(ctx)
+	logging.LogWithFields("HANDL-Y8F06-3.3", "projection", h.ProjectionName, "sinceLock", time.Since(startLock), "sinceExec", time.Since(startExec)).Debug("finish execute bulk")
 	logging.LogWithFields("EVENT-gwiu4", "projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
 
 	unlockErr := unlock()
@@ -228,16 +244,20 @@ func (h *ProjectionHandler) prepareExecuteBulk(
 			case <-ctx.Done():
 				return nil
 			default:
+				start := time.Now()
 				hasLimitExeeded, err := h.fetchBulkStmts(ctx, query, reduce)
+				logging.LogWithFields("HANDL-Y8F06-4.1", "projection", h.ProjectionName, "since", time.Since(start)).Debug("bulk fetch stmts")
 				if err != nil || len(h.stmts) == 0 {
 					logging.LogWithFields("HANDL-CzQvn", "projection", h.ProjectionName).OnError(err).Warn("unable to fetch stmts")
 					return err
 				}
 
+				startPush := time.Now()
 				if err = h.push(ctx, update, reduce); err != nil {
-					logging.LogWithFields("EVENT-EFDwe", "projection", h.ProjectionName).WithError(err).Warn("unable to push")
+					logging.LogWithFields("EVENT-EFDwe", "projection", h.ProjectionName, "sincePush", time.Since(startPush)).WithError(err).Warn("unable to push")
 					return err
 				}
+				logging.LogWithFields("HANDL-Y8F06-4.3", "projection", h.ProjectionName, "limitExeeded", hasLimitExeeded, "since", time.Since(startPush)).Debug("finish bulk push stmts")
 
 				if !hasLimitExeeded {
 					return nil
@@ -260,9 +280,11 @@ func (h *ProjectionHandler) fetchBulkStmts(
 
 	events, err := h.Eventstore.FilterEvents(ctx, eventQuery)
 	if err != nil {
-		logging.LogWithFields("EVENT-ACMMS", "projection", h.ProjectionName).WithError(err).Info("Unable to bulk fetch events")
+		logging.LogWithFields("HANDL-X8vlo", "projection", h.ProjectionName).WithError(err).Info("Unable to bulk fetch events")
 		return false, err
 	}
+
+	startEvents := time.Now()
 
 	for _, event := range events {
 		if err = h.processEvent(ctx, event, reduce); err != nil {
@@ -270,6 +292,8 @@ func (h *ProjectionHandler) fetchBulkStmts(
 			return false, err
 		}
 	}
+
+	logging.LogWithFields("HANDL-Y8F06-5.3", "projection", h.ProjectionName, "sinceEvents", time.Since(startEvents)).Debug("finised process event")
 
 	return len(events) == int(eventsLimit), nil
 }
@@ -285,7 +309,9 @@ func (h *ProjectionHandler) push(
 	sort.Slice(h.stmts, func(i, j int) bool {
 		return h.stmts[i].Sequence < h.stmts[j].Sequence
 	})
+	start := time.Now()
 	h.stmts, err = update(ctx, h.stmts, reduce)
+	logging.LogWithFields("HANDL-Y8F06-6.1", "projection", h.ProjectionName, "since", time.Since(start)).Debug("finish update")
 
 	h.pushSet = len(h.stmts) > 0
 

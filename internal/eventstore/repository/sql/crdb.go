@@ -217,6 +217,7 @@ func (db *CRDB) eventQuery() string {
 		", aggregate_version" +
 		" FROM eventstore.events"
 }
+
 func (db *CRDB) maxSequenceQuery() string {
 	return "SELECT MAX(event_sequence) FROM eventstore.events"
 }

@@ -45,8 +45,8 @@ func (wm *OrgPrivacyPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.PrivacyPolicyWriteModel.AggregateID).
+		AggregateTypes(org.AggregateType).
 		EventTypes(org.PrivacyPolicyAddedEventType,
 			org.PrivacyPolicyChangedEventType,
 			org.PrivacyPolicyRemovedEventType).

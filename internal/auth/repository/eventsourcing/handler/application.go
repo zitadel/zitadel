@@ -49,6 +49,10 @@ func (a *Application) ViewModel() string {
 	return applicationTable
 }
 
+func (a *Application) Subscription() *v1.Subscription {
+	return a.subscription
+}
+
 func (_ *Application) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }

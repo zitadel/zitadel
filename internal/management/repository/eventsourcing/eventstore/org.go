@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/ptypes"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -20,6 +22,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -36,15 +39,30 @@ import (
 )
 
 type OrgRepository struct {
-	SearchLimit             uint64
-	Eventstore              v1.Eventstore
-	View                    *mgmt_view.View
-	Roles                   []string
-	SystemDefaults          systemdefaults.SystemDefaults
-	PrefixAvatarURL         string
-	LoginDir                http.FileSystem
-	TranslationFileContents map[string][]byte
-	mutex                   sync.Mutex
+	SearchLimit                         uint64
+	Eventstore                          v1.Eventstore
+	View                                *mgmt_view.View
+	Roles                               []string
+	SystemDefaults                      systemdefaults.SystemDefaults
+	PrefixAvatarURL                     string
+	LoginDir                            http.FileSystem
+	NotificationDir                     http.FileSystem
+	LoginTranslationFileContents        map[string][]byte
+	NotificationTranslationFileContents map[string][]byte
+	mutex                               sync.Mutex
+	supportedLangs                      []language.Tag
+}
+
+func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error) {
+	if len(repo.supportedLangs) == 0 {
+		langs, err := i18n.SupportedLanguages(repo.LoginDir)
+		if err != nil {
+			logging.Log("ADMIN-tiMWs").WithError(err).Debug("unable to parse language")
+			return nil, err
+		}
+		repo.supportedLangs = langs
+	}
+	return repo.supportedLangs, nil
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -575,64 +593,74 @@ func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.Mail
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *OrgRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
-	texts, err := repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.MessageTextsViewToModel(texts, true), err
-}
-
-func (repo *OrgRepository) GetMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
-	defaultIn := false
-	texts, err := repo.View.MessageTextsByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) || len(texts) == 0 {
-		texts, err = repo.View.MessageTextsByAggregateID(repo.SystemDefaults.IamID)
+func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	var err error
+	contents, ok := repo.NotificationTranslationFileContents[lang]
+	if !ok {
+		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if errors.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
 		if err != nil {
 			return nil, err
 		}
-		defaultIn = true
+		repo.NotificationTranslationFileContents[lang] = contents
 	}
+	notificationTextMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-093sd", "Errors.TranslationFile.ReadError")
+	}
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MessageTextsViewToModel(texts, defaultIn), err
-}
-
-func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
-	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
-	if err != nil {
-		return nil, err
-	}
-	text.Default = true
-	return iam_es_model.MessageTextViewToModel(text), err
-}
-
-func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, lang string) (*iam_model.MessageTextView, error) {
-	text, err := repo.View.MessageTextByIDs(orgID, textType, lang)
-	if errors.IsNotFound(err) {
-		result, err := repo.GetDefaultMessageText(ctx, textType, lang)
-		if err != nil {
-			return nil, err
+	for _, text := range texts {
+		messageTextMap, ok := notificationTextMap[textType].(map[string]interface{})
+		if !ok {
+			continue
 		}
-		return result, nil
+		messageTextMap[text.Key] = text.Text
 	}
+	jsonbody, err := json.Marshal(notificationTextMap)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-02m8f", "Errors.TranslationFile.MergeError")
+	}
+	notificationText := new(domain.MessageTexts)
+	if err := json.Unmarshal(jsonbody, &notificationText); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-20ops", "Errors.TranslationFile.MergeError")
+	}
+	result := notificationText.GetMessageTextByType(textType)
+	result.Default = true
+	return result, nil
+}
+
+func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, lang string) (*domain.CustomMessageText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MessageTextViewToModel(text), err
+	if len(texts) == 0 {
+		return repo.GetDefaultMessageText(ctx, textType, lang)
+	}
+	return iam_es_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
 func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
-	contents, ok := repo.TranslationFileContents[lang]
+	contents, ok := repo.LoginTranslationFileContents[lang]
+	var err error
 	if !ok {
-		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if errors.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
 		if err != nil {
 			return nil, err
 		}
-		repo.TranslationFileContents[lang] = contents
+		repo.LoginTranslationFileContents[lang] = contents
 	}
 	loginTextMap := make(map[string]interface{})
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
@@ -765,8 +793,11 @@ func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-func (repo *OrgRepository) readTranslationFile(filename string) ([]byte, error) {
-	r, err := repo.LoginDir.Open(filename)
+func (repo *OrgRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
+	r, err := dir.Open(filename)
+	if os.IsNotExist(err) {
+		return nil, errors.ThrowNotFound(err, "TEXT-93nfl", "Errors.TranslationFile.NotFound")
+	}
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
 	}

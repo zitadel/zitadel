@@ -44,6 +44,8 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.OIDCConfig.ClientID,
 			idpConfigID,
 			config.OIDCConfig.Issuer,
+			config.OIDCConfig.AuthorizationEndpoint,
+			config.OIDCConfig.TokenEndpoint,
 			clientSecret,
 			config.OIDCConfig.IDPDisplayNameMapping,
 			config.OIDCConfig.UsernameMapping,

@@ -21,7 +21,7 @@ const (
 	jobSuffix          = "-restore"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
-	timeout            = 15 * time.Minute
+	timeout            = 45 * time.Minute
 )
 
 func AdaptFunc(

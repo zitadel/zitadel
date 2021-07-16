@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 
 	"github.com/ghodss/yaml"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 
@@ -29,15 +32,30 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore              v1.Eventstore
-	SearchLimit             uint64
-	View                    *admin_view.View
-	SystemDefaults          systemdefaults.SystemDefaults
-	Roles                   []string
-	PrefixAvatarURL         string
-	LoginDir                http.FileSystem
-	TranslationFileContents map[string][]byte
-	mutex                   sync.Mutex
+	Eventstore                          v1.Eventstore
+	SearchLimit                         uint64
+	View                                *admin_view.View
+	SystemDefaults                      systemdefaults.SystemDefaults
+	Roles                               []string
+	PrefixAvatarURL                     string
+	LoginDir                            http.FileSystem
+	NotificationDir                     http.FileSystem
+	LoginTranslationFileContents        map[string][]byte
+	NotificationTranslationFileContents map[string][]byte
+	mutex                               sync.Mutex
+	supportedLangs                      []language.Tag
+}
+
+func (repo *IAMRepository) Languages(ctx context.Context) ([]language.Tag, error) {
+	if len(repo.supportedLangs) == 0 {
+		langs, err := i18n.SupportedLanguages(repo.LoginDir)
+		if err != nil {
+			logging.Log("ADMIN-tiMWs").WithError(err).Debug("unable to parse language")
+			return nil, err
+		}
+		repo.supportedLangs = langs
+	}
+	return repo.supportedLangs, nil
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -364,21 +382,36 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
-	text, err := repo.View.MessageTexts(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	var err error
+	contents, ok := repo.NotificationTranslationFileContents[lang]
+	if !ok {
+		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if caos_errs.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		repo.NotificationTranslationFileContents[lang] = contents
 	}
-	return iam_es_model.MessageTextsViewToModel(text, true), err
+	messageTexts := new(domain.MessageTexts)
+	if err := yaml.Unmarshal(contents, messageTexts); err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-3N9fs", "Errors.TranslationFile.ReadError")
+	}
+	return messageTexts.GetMessageTextByType(textType), nil
 }
 
-func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
-	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
+func (repo *IAMRepository) GetCustomMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
-	text.Default = true
-	return iam_es_model.MessageTextViewToModel(text), err
+	result := iam_es_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts)
+	result.Default = true
+	return result, err
 }
 
 func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
@@ -411,13 +444,17 @@ func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_mo
 func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
-	contents, ok := repo.TranslationFileContents[lang]
+	contents, ok := repo.LoginTranslationFileContents[lang]
+	var err error
 	if !ok {
-		contents, err := repo.readTranslationFile(fmt.Sprintf("/i18n/%s.yaml", lang))
+		contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if caos_errs.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
 		if err != nil {
 			return nil, err
 		}
-		repo.TranslationFileContents[lang] = contents
+		repo.LoginTranslationFileContents[lang] = contents
 	}
 	loginText := new(domain.CustomLoginText)
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
@@ -442,8 +479,11 @@ func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-func (repo *IAMRepository) readTranslationFile(filename string) ([]byte, error) {
-	r, err := repo.LoginDir.Open(filename)
+func (repo *IAMRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
+	r, err := dir.Open(filename)
+	if os.IsNotExist(err) {
+		return nil, caos_errs.ThrowNotFound(err, "TEXT-3n9fs", "Errors.TranslationFile.NotFound")
+	}
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
 	}

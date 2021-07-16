@@ -2,6 +2,9 @@ package spooler
 
 import (
 	"context"
+
+	"github.com/getsentry/sentry-go"
+
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"strconv"
 	"sync"
@@ -64,7 +67,14 @@ func requeueTask(task *spooledHandler, queue chan<- *spooledHandler) {
 
 func (s *spooledHandler) load(workerID string) {
 	errs := make(chan error)
-	defer close(errs)
+	defer func() {
+		close(errs)
+		err := recover()
+
+		if err != nil {
+			sentry.CurrentHub().Recover(err)
+		}
+	}()
 	ctx, cancel := context.WithCancel(context.Background())
 	go s.awaitError(cancel, errs, workerID)
 	hasLocked := s.lock(ctx, errs, workerID)

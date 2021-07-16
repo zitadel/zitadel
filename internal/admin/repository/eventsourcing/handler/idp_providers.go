@@ -54,6 +54,10 @@ func (i *IDPProvider) subscribe() {
 	}()
 }
 
+func (i *IDPProvider) Subscription() *v1.Subscription {
+	return i.subscription
+}
+
 func (i *IDPProvider) ViewModel() string {
 	return idpProviderTable
 }

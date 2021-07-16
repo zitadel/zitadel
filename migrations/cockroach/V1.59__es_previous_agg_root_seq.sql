@@ -1,14 +1,20 @@
 BEGIN;
 
+-- ALTER TABLE eventstore.events
+--     RENAME COLUMN previous_sequence TO previous_aggregate_sequence,
+--     ADD COLUMN previous_aggregate_type_sequence INT8, 
+--     ADD CONSTRAINT prev_agg_type_seq_unique UNIQUE(previous_aggregate_type_sequence);
+
 ALTER TABLE eventstore.events
-    RENAME COLUMN previous_sequence TO previous_aggregate_sequence,
+    ADD COLUMN previous_aggregate_sequence INT8 AS (previous_sequence) STORED,
     ADD COLUMN previous_aggregate_type_sequence INT8, 
     ADD CONSTRAINT prev_agg_type_seq_unique UNIQUE(previous_aggregate_type_sequence);
 
 COMMIT;
 
-BEGIN;
+SET CLUSTER SETTING kv.closed_timestamp.target_duration = '2m';
 
+BEGIN;
 WITH data AS (
     SELECT 
     event_sequence, 
@@ -24,8 +30,9 @@ WITH data AS (
     SET previous_aggregate_type_sequence = data.prev_seq
     FROM data 
     WHERE data.event_sequence = events.event_sequence;
-
 COMMIT;
+
+SET CLUSTER SETTING kv.closed_timestamp.target_duration TO DEFAULT;
 
 -- validation by hand:
 -- SELECT 

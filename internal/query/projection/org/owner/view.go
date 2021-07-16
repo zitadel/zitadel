@@ -1,4 +1,4 @@
-package projection
+package owner
 
 import (
 	"context"
@@ -31,6 +31,22 @@ type OrgOwnerProjection struct {
 	crdb.StatementHandler
 }
 
+const (
+	orgTableSuffix     = "orgs"
+	orgIDCol           = "id"
+	orgNameCol         = "name"
+	orgCreationDateCol = "creation_date"
+
+	userTableSuffix  = "users"
+	userOrgIDCol     = "org_id"
+	userIDCol        = "owner_id"
+	userLanguageCol  = "language"
+	userEmailCol     = "email"
+	userFirstNameCol = "first_name"
+	userLastNameCol  = "last_name"
+	userGenderCol    = "gender"
+)
+
 func NewOrgOwnerProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgOwnerProjection {
 	p := &OrgOwnerProjection{}
 	config.ProjectionName = "projections.org_owners"
@@ -45,6 +61,18 @@ func (p *OrgOwnerProjection) reducers() []handler.AggregateReducer {
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  org.OrgAddedEventType,
+					Reduce: p.reduceOrgAdded,
+				},
+				{
+					Event:  org.OrgChangedEventType,
+					Reduce: p.reduceOrgChanged,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
+				{
 					Event:  org.MemberAddedEventType,
 					Reduce: p.reduceMemberAdded,
 				},
@@ -55,14 +83,6 @@ func (p *OrgOwnerProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.MemberRemovedEventType,
 					Reduce: p.reduceMemberRemoved,
-				},
-				{
-					Event:  org.OrgChangedEventType,
-					Reduce: p.reduceOrgChanged,
-				},
-				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
 				},
 			},
 		},
@@ -89,18 +109,6 @@ func (p *OrgOwnerProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	orgOwnerOrgID           = "org_id"
-	orgOwnerOrgName         = "org_name"
-	orgOwnerOrgCreationDate = "org_creation_date"
-	orgOwnerOwnerID         = "owner_id"
-	orgOwnerLanguage        = "owner_language"
-	orgOwnerEmail           = "owner_email"
-	orgOwnerFirstName       = "owner_first_name"
-	orgOwnerLastName        = "owner_last_name"
-	orgOwnerGender          = "owner_gender"
-)
 
 func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) ([]handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
@@ -150,54 +158,6 @@ func (p *OrgOwnerProjection) reduceMemberRemoved(event eventstore.EventReader) (
 	return []handler.Statement{p.deleteOwner(e, e.Aggregate().ID, e.UserID)}, nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]handler.Statement, error) {
-	e, ok := event.(*org.OrgChangedEvent)
-	if !ok {
-		logging.LogWithFields("PROJE-piy2b", "seq", event.Sequence, "expected", org.OrgChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-MGbru", "reduce.wrong.event.type")
-	}
-
-	values := []handler.Column{}
-	if e.Name != "" {
-		values = append(values, handler.NewCol(orgOwnerOrgName, e.Name))
-	}
-
-	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
-	}
-
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e.Aggregate().Typ,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
-			values,
-			[]handler.Column{
-				handler.NewCol(orgOwnerOrgID, e.Aggregate().ResourceOwner),
-			},
-		),
-	}, nil
-}
-
-func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]handler.Statement, error) {
-	e, ok := event.(*org.OrgChangedEvent)
-	if !ok {
-		logging.LogWithFields("PROJE-F1mHQ", "seq", event.Sequence, "expected", org.OrgRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-9ZR2w", "reduce.wrong.event.type")
-	}
-
-	return []handler.Statement{
-		crdb.NewDeleteStatement(
-			e.Aggregate().Typ,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
-			[]handler.Column{
-				handler.NewCol(orgOwnerOrgID, e.Aggregate().ResourceOwner),
-			},
-		),
-	}, nil
-}
-
 func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReader) ([]handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailChangedEvent)
 	if !ok {
@@ -206,15 +166,16 @@ func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReade
 	}
 
 	return []handler.Statement{
-		crdb.NewUpdateStatement(
+		crdb.NewViewUpdateStatement(
+			userTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
-				handler.NewCol(orgOwnerEmail, e.EmailAddress),
+				handler.NewCol(userEmailCol, e.EmailAddress),
 			},
 			[]handler.Column{
-				handler.NewCol(orgOwnerOwnerID, e.Aggregate().ID),
+				handler.NewCol(userIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
@@ -229,16 +190,16 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 
 	values := []handler.Column{}
 	if e.FirstName != "" {
-		values = append(values, handler.NewCol(orgOwnerFirstName, e.FirstName))
+		values = append(values, handler.NewCol(userFirstNameCol, e.FirstName))
 	}
 	if e.LastName != "" {
-		values = append(values, handler.NewCol(orgOwnerLastName, e.LastName))
+		values = append(values, handler.NewCol(userLastNameCol, e.LastName))
 	}
 	if e.PreferredLanguage != nil {
-		values = append(values, handler.NewCol(orgOwnerLanguage, e.PreferredLanguage.String()))
+		values = append(values, handler.NewCol(userLanguageCol, e.PreferredLanguage.String()))
 	}
 	if e.Gender != nil {
-		values = append(values, handler.NewCol(orgOwnerGender, *e.Gender))
+		values = append(values, handler.NewCol(userGenderCol, *e.Gender))
 	}
 
 	if len(values) == 0 {
@@ -246,13 +207,96 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	}
 
 	return []handler.Statement{
-		crdb.NewUpdateStatement(
+		crdb.NewViewUpdateStatement(
+			userTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			values,
 			[]handler.Column{
-				handler.NewCol(orgOwnerOwnerID, e.Aggregate().ID),
+				handler.NewCol(userIDCol, e.Aggregate().ID),
+			},
+		),
+	}, nil
+}
+
+func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) ([]handler.Statement, error) {
+	e, ok := event.(*org.OrgAddedEvent)
+	if !ok {
+		logging.LogWithFields("PROJE-wbOrL", "seq", event.Sequence, "expected", org.OrgAddedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pk6TS", "reduce.wrong.event.type")
+	}
+	return []handler.Statement{
+		crdb.NewViewCreateStatement(
+			orgTableSuffix,
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousAggregateTypeSequence(),
+			[]handler.Column{
+				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
+				handler.NewCol(orgNameCol, e.Name),
+				handler.NewCol(orgCreationDateCol, e.CreationDate()),
+			},
+		),
+	}, nil
+}
+
+func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+	e, ok := event.(*org.OrgChangedEvent)
+	if !ok {
+		logging.LogWithFields("PROJE-piy2b", "seq", event.Sequence, "expected", org.OrgChangedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-MGbru", "reduce.wrong.event.type")
+	}
+
+	values := []handler.Column{}
+	if e.Name != "" {
+		values = append(values, handler.NewCol(orgNameCol, e.Name))
+	}
+
+	if len(values) == 0 {
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+	}
+
+	return []handler.Statement{
+		crdb.NewViewUpdateStatement(
+			orgTableSuffix,
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousAggregateTypeSequence(),
+			values,
+			[]handler.Column{
+				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
+			},
+		),
+	}, nil
+}
+
+func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]handler.Statement, error) {
+	e, ok := event.(*org.OrgChangedEvent)
+	if !ok {
+		logging.LogWithFields("PROJE-F1mHQ", "seq", event.Sequence, "expected", org.OrgRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-9ZR2w", "reduce.wrong.event.type")
+	}
+
+	return []handler.Statement{
+		//delete org in org table
+		crdb.NewViewDeleteStatement(
+			orgTableSuffix,
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousAggregateTypeSequence(),
+			[]handler.Column{
+				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
+			},
+		),
+		// delete users of the org
+		crdb.NewViewDeleteStatement(
+			userTableSuffix,
+			e.Aggregate().Typ,
+			e.Sequence(),
+			e.PreviousAggregateTypeSequence(),
+			[]handler.Column{
+				handler.NewCol(userOrgIDCol, e.Aggregate().ResourceOwner),
 			},
 		),
 	}, nil
@@ -268,13 +312,14 @@ func isOrgOwner(roles []string) bool {
 }
 
 func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) handler.Statement {
-	return crdb.NewDeleteStatement(
+	return crdb.NewViewDeleteStatement(
+		userTableSuffix,
 		event.Aggregate().Typ,
 		event.Sequence(),
 		event.PreviousAggregateTypeSequence(),
 		[]handler.Column{
-			handler.NewCol(orgOwnerOrgID, orgID),
-			handler.NewCol(orgOwnerOwnerID, ownerID),
+			handler.NewCol(userOrgIDCol, orgID),
+			handler.NewCol(userIDCol, ownerID),
 		})
 }
 
@@ -282,12 +327,6 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 	events, err := p.Eventstore.FilterEvents(context.Background(),
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			AddQuery().
-			AggregateTypes(org.AggregateType).
-			EventTypes(
-				org.OrgAddedEventType,
-				org.OrgChangedEventType).
-			AggregateIDs(orgID).
-			Or().
 			AggregateTypes(user.AggregateType).
 			EventTypes(
 				user.HumanAddedType,
@@ -297,7 +336,9 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 				user.HumanEmailChangedType,
 				user.UserV1EmailChangedType,
 				user.HumanProfileChangedType,
-				user.UserV1ProfileChangedType).
+				user.UserV1ProfileChangedType,
+				user.MachineAddedEventType,
+				user.MachineChangedEventType).
 			AggregateIDs(userID).
 			SequenceLess(event.Sequence()).
 			Builder())
@@ -306,7 +347,8 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 	}
 
 	if len(events) == 0 {
-		return handler.Statement{}, errors.ThrowInternal(nil, "PROJE-Qk7Tv", "unable to find org events")
+		logging.LogWithFields("mqd3w", "user", userID, "org", orgID, "seq", event.Sequence()).Warn("no events for user found")
+		return handler.Statement{}, errors.ThrowInternal(nil, "PROJE-Qk7Tv", "unable to find user events")
 	}
 
 	owner := &OrgOwner{
@@ -317,63 +359,63 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 	p.reduce(owner, events)
 
 	values := []handler.Column{
-		handler.NewCol(orgOwnerOrgID, owner.OrgID),
-		handler.NewCol(orgOwnerOrgName, owner.OrgName),
-		handler.NewCol(orgOwnerOrgCreationDate, owner.OrgCreationDate),
-		handler.NewCol(orgOwnerOwnerID, owner.OwnerID),
-		handler.NewCol(orgOwnerEmail, owner.OwnerEmailAddress),
-		handler.NewCol(orgOwnerFirstName, owner.OwnerFirstName),
-		handler.NewCol(orgOwnerLastName, owner.OwnerLastName),
-		handler.NewCol(orgOwnerGender, owner.OwnerGender),
+		handler.NewCol(userOrgIDCol, owner.OrgID),
+		handler.NewCol(userIDCol, owner.OwnerID),
+		handler.NewCol(userEmailCol, owner.OwnerEmailAddress),
+		handler.NewCol(userFirstNameCol, owner.OwnerFirstName),
+		handler.NewCol(userLastNameCol, owner.OwnerLastName),
+		handler.NewCol(userGenderCol, owner.OwnerGender),
 	}
 
 	if owner.OwnerLanguage != nil {
-		values = append(values, handler.NewCol(orgOwnerLanguage, owner.OwnerLanguage.String()))
+		values = append(values, handler.NewCol(userLanguageCol, owner.OwnerLanguage.String()))
 	}
 
-	return crdb.NewUpsertStatement(
+	return crdb.NewViewUpsertStatement(
+		userTableSuffix,
 		event.Aggregate().Typ,
 		event.Sequence(),
 		event.PreviousAggregateTypeSequence(),
 		values), nil
 }
 
-func (p *OrgOwnerProjection) reduce(admin *OrgOwner, events []eventstore.EventReader) {
+func (p *OrgOwnerProjection) reduce(owner *OrgOwner, events []eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			admin.OwnerLanguage = &e.PreferredLanguage
-			admin.OwnerEmailAddress = e.EmailAddress
-			admin.OwnerFirstName = e.FirstName
-			admin.OwnerLastName = e.LastName
-			admin.OwnerGender = e.Gender
+			owner.OwnerLanguage = &e.PreferredLanguage
+			owner.OwnerEmailAddress = e.EmailAddress
+			owner.OwnerFirstName = e.FirstName
+			owner.OwnerLastName = e.LastName
+			owner.OwnerGender = e.Gender
 		case *user.HumanRegisteredEvent:
-			admin.OwnerLanguage = &e.PreferredLanguage
-			admin.OwnerEmailAddress = e.EmailAddress
-			admin.OwnerFirstName = e.FirstName
-			admin.OwnerLastName = e.LastName
-			admin.OwnerGender = e.Gender
+			owner.OwnerLanguage = &e.PreferredLanguage
+			owner.OwnerEmailAddress = e.EmailAddress
+			owner.OwnerFirstName = e.FirstName
+			owner.OwnerLastName = e.LastName
+			owner.OwnerGender = e.Gender
 		case *user.HumanEmailChangedEvent:
-			admin.OwnerEmailAddress = e.EmailAddress
+			owner.OwnerEmailAddress = e.EmailAddress
 		case *user.HumanProfileChangedEvent:
 			if e.PreferredLanguage != nil {
-				admin.OwnerLanguage = e.PreferredLanguage
+				owner.OwnerLanguage = e.PreferredLanguage
 			}
 			if e.FirstName != "" {
-				admin.OwnerFirstName = e.FirstName
+				owner.OwnerFirstName = e.FirstName
 			}
 			if e.LastName != "" {
-				admin.OwnerLastName = e.LastName
+				owner.OwnerLastName = e.LastName
 			}
 			if e.Gender != nil {
-				admin.OwnerGender = *e.Gender
+				owner.OwnerGender = *e.Gender
 			}
-		case *org.OrgAddedEvent:
-			admin.OrgName = e.Name
-			admin.OrgCreationDate = e.CreationDate()
-		case *org.OrgChangedEvent:
-			if e.Name != "" {
-				admin.OrgName = e.Name
+		case *user.MachineAddedEvent:
+			owner.OwnerFirstName = "machine"
+			owner.OwnerLastName = e.Name
+			owner.OwnerEmailAddress = e.UserName
+		case *user.MachineChangedEvent:
+			if e.Name != nil {
+				owner.OwnerLastName = *e.Name
 			}
 		default:
 			// This happens only on implementation errors

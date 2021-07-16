@@ -44,6 +44,10 @@ func (p *PasswordLockoutPolicy) ViewModel() string {
 	return passwordLockoutPolicyTable
 }
 
+func (m *PasswordLockoutPolicy) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (p *PasswordLockoutPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

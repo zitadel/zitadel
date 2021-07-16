@@ -46,6 +46,10 @@ func (p *ProjectRole) ViewModel() string {
 	return projectRoleTable
 }
 
+func (p *ProjectRole) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *ProjectRole) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.ProjectAggregate}
 }

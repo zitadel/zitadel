@@ -67,5 +67,8 @@ func (s *Subscription) Unsubscribe() {
 			}
 		}
 	}
-	close(s.Events)
+	_, ok := <-s.Events
+	if ok {
+		close(s.Events)
+	}
 }

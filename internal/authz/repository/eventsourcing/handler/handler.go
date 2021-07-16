@@ -3,7 +3,7 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -32,17 +32,17 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
-		newUserGrant(
-			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},
-			systemDefaults.IamID),
-		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),
-		newApplication(
-			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
-		newOrg(
-			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
-		newFeatures(
-			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
+		// newUserGrant(
+		// 	handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},
+		// 	systemDefaults.IamID),
+		// newUserMembership(
+		// 	handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),
+		// newApplication(
+		// 	handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
+		// newOrg(
+		// 	handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
+		// newFeatures(
+		// 	handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}
 }
 
