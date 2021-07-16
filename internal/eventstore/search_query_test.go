@@ -454,36 +454,6 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
 							repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
 						},
-					},
-				},
-			},
-		},
-		{
-			name: "filter multiple aggregate type and aggregate id",
-			args: args{
-				columns: ColumnsEvent,
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testAddQuery(
-						testSetAggregateTypes("user"),
-						testSetAggregateIDs("1234"),
-						testOr(
-							testSetAggregateTypes("org"),
-							testSetAggregateIDs("izu"),
-						),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Desc:    false,
-					Limit:   0,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
-						},
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("org"), repository.OperationEquals),
 							repository.NewFilter(repository.FieldAggregateID, "izu", repository.OperationEquals),
