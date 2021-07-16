@@ -18,7 +18,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
+import { GridPolicy, LOGIN_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
@@ -95,8 +95,6 @@ export class LoginTextsComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-  public nextLinks: CnslLinks[] = [];
-
   public currentSubMap: string = 'emailVerificationDoneText';
 
   public KeyNamesArray: string[] = KeyNamesArray;
@@ -106,6 +104,8 @@ export class LoginTextsComponent implements OnDestroy {
   private sub: Subscription = new Subscription();
 
   public updateRequest: any;
+  public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
+
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,

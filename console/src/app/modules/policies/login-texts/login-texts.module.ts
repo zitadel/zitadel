@@ -18,7 +18,7 @@ import { HasRolePipeModule } from '../../../pipes/has-role-pipe/has-role-pipe.mo
 import { EditTextModule } from '../../edit-text/edit-text.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { LinksModule } from '../../links/links.module';
+import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { LoginTextsRoutingModule } from './login-texts-routing.module';
 import { LoginTextsComponent } from './login-texts.component';
@@ -45,10 +45,10 @@ import { LoginTextsComponent } from './login-texts.component';
     MatTooltipModule,
     DetailLayoutModule,
     MatProgressSpinnerModule,
-    LinksModule,
     TextFieldModule,
     MatDialogModule,
     WarnDialogModule,
+    PolicyGridModule,
   ],
 })
 export class LoginTextsPolicyModule { }

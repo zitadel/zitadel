@@ -10,9 +10,26 @@ h2 {
   font-size: 14px;
 }
 
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 -.5rem 1rem -.5rem;
+
+  .tag {
+    display: flex;
+    align-items: center;
+    margin: 0 .5rem;
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      color: var(--color-main);
+    }
+  }
+}
+
 .row-lyt {
-  // display: flex;
-  // flex-wrap: wrap;
   margin: 0;
   display: grid;
   row-gap: 1rem;
@@ -28,8 +45,6 @@ h2 {
   }
 
   .p-item {
-    // flex-basis: 290px;
-    // margin: .5rem;
     display: flex;
     flex-direction: column;
     min-height: 250px;
@@ -117,6 +132,17 @@ h2 {
 
     .fill-space {
       flex: 1;
+    }
+
+    .tags {
+      .tag {
+        color: var(--grey);
+        font-size: 12px;
+
+        i {
+          font-size: 18px;
+        }
+      }
     }
 
     .btn-wrapper {

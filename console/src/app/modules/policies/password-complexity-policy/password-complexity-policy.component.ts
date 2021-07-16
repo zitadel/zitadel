@@ -13,6 +13,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { COMPLEXITY_POLICY, GridPolicy } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -30,6 +31,8 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
+  public currentPolicy: GridPolicy = COMPLEXITY_POLICY;
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,

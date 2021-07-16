@@ -17,7 +17,7 @@ import { HasFeaturePipeModule } from '../../../pipes/has-feature-pipe/has-featur
 import { HasRolePipeModule } from '../../../pipes/has-role-pipe/has-role-pipe.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { LinksModule } from '../../links/links.module';
+import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { PrivacyPolicyRoutingModule } from './privacy-policy-routing.module';
 import { PrivacyPolicyComponent } from './privacy-policy.component';
@@ -43,10 +43,10 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     MatTooltipModule,
     DetailLayoutModule,
     MatProgressSpinnerModule,
-    LinksModule,
     TextFieldModule,
     MatDialogModule,
     WarnDialogModule,
+    PolicyGridModule,
   ],
 })
 export class PrivacyPolicyModule { }

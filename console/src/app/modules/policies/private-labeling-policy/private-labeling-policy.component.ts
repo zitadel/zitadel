@@ -24,6 +24,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -85,7 +86,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
   private org!: Org.AsObject;
-
+  public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,

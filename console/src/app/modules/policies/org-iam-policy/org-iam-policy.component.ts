@@ -11,7 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
+import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -29,7 +29,8 @@ export class OrgIamPolicyComponent implements OnDestroy {
   private org!: Org.AsObject;
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public nextLinks: Array<CnslLinks> = [];
+  public currentPolicy: GridPolicy = IAM_POLICY;
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,

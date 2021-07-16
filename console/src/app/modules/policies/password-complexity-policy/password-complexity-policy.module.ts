@@ -10,27 +10,27 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { LinksModule } from '../../links/links.module';
 
+import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { PasswordComplexityPolicyRoutingModule } from './password-complexity-policy-routing.module';
 import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
 
 @NgModule({
-    declarations: [PasswordComplexityPolicyComponent],
-    imports: [
-        PasswordComplexityPolicyRoutingModule,
-        CommonModule,
-        FormsModule,
-        InputModule,
-        MatButtonModule,
-        MatSlideToggleModule,
-        MatIconModule,
-        HasRoleModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-        MatProgressSpinnerModule,
-        LinksModule,
-    ],
+  declarations: [PasswordComplexityPolicyComponent],
+  imports: [
+    PasswordComplexityPolicyRoutingModule,
+    CommonModule,
+    FormsModule,
+    InputModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    MatIconModule,
+    HasRoleModule,
+    MatTooltipModule,
+    TranslateModule,
+    DetailLayoutModule,
+    MatProgressSpinnerModule,
+    PolicyGridModule,
+  ],
 })
 export class PasswordComplexityPolicyModule { }

@@ -20,7 +20,7 @@ export const COMPLEXITY_POLICY: GridPolicy = {
   orgRouterLink: ['/org', 'policy', PolicyComponentType.COMPLEXITY],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['loginbehaviour', 'security'],
+  tags: ['login', 'security'],
   svgIcon: 'mdi_textbox_password',
   color: 'yellow',
 };
@@ -32,7 +32,7 @@ export const IAM_POLICY = {
   orgRouterLink: ['/org', 'policy', PolicyComponentType.IAM],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['iam.policy.read'],
-  tags: ['loginbehaviour', 'security'],
+  tags: ['login'],
   icon: 'las la-gem',
   color: 'purple',
 };
@@ -44,7 +44,7 @@ export const LOGIN_POLICY = {
   orgRouterLink: ['/org', 'policy', PolicyComponentType.LOGIN],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['loginbehaviour', 'security'],
+  tags: ['login', 'security'],
   icon: 'las la-sign-in-alt',
   color: 'green',
 };
@@ -56,7 +56,7 @@ export const PRIVATELABEL_POLICY = {
   orgRouterLink: ['/org', 'policy', PolicyComponentType.PRIVATELABEL],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['loginbehaviour', 'security'],
+  tags: ['login', 'appearance'],
   icon: 'las la-sign-in-alt',
   color: 'blue',
 };

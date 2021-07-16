@@ -47,6 +47,5 @@
         </cnsl-info-section>
     </ng-container>
 
-    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
-
+    <app-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></app-policy-grid>
 </app-detail-layout>

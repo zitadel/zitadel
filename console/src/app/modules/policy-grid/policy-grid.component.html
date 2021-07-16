@@ -2,9 +2,12 @@
 
 <p class="top-desc">{{'POLICY.DESCRIPTION' | translate}}</p>
 
-<div class="row-lyt">
+<div class="tags" *ngIf="tags">
+  <span class="tag" [ngClass]="{'active': tag === tagForFilter}" (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''" *ngFor="let tag of tags"><i class="las la-hashtag"></i>{{tag}}</span>
+</div>
 
-  <ng-container *ngFor="let policy of POLICIES">
+<div class="row-lyt">
+  <ng-container *ngFor="let policy of filteredPolicies">
     <ng-template appHasRole
         [appHasRole]="type == PolicyComponentServiceType.ADMIN ? policy.iamWithRole : type == PolicyComponentServiceType.MGMT ? policy.orgWithRole : []">
         <div class="p-item card">
@@ -20,6 +23,9 @@
                 {{policy.i18nDesc | translate}}</p>
 
             <span class="fill-space"></span>
+            <div class="tags" *ngIf="policy.tags">
+              <span class="tag" *ngFor="let tag of policy.tags" (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''"><i class="las la-hashtag"></i>{{tag}}</span>
+            </div>
             <div class="btn-wrapper">
                 <button
                     [routerLink]="type == PolicyComponentServiceType.ADMIN ? policy.iamRouterLink : type == PolicyComponentServiceType.MGMT ? policy.orgRouterLink : null"

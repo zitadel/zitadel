@@ -14,4 +14,16 @@ export class PolicyGridComponent {
   public PolicyComponentType: any = PolicyComponentType;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public POLICIES: GridPolicy[] = POLICIES;
+  public tags: Set<string> = new Set(POLICIES.map(p => p.tags).flat());
+
+  @Input() public tagForFilter: string = '';
+  @Input() public currentPolicy!: GridPolicy;
+
+  public get filteredPolicies(): GridPolicy[] {
+    if (this.tagForFilter) {
+      return POLICIES.filter(p => p !== this.currentPolicy && p.tags.includes(this.tagForFilter));
+    } else {
+      return POLICIES.filter(p => p !== this.currentPolicy);
+    }
+  }
 }

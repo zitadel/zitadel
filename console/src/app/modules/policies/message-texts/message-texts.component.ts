@@ -36,7 +36,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
+import { GridPolicy, MESSAGE_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -241,7 +241,6 @@ export class MessageTextsComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-  public nextLinks: CnslLinks[] = [];
   public MESSAGETYPES: any = MESSAGETYPES;
 
   public updateRequest!: SetCustomInitMessageTextRequest | SetDefaultInitMessageTextRequest;
@@ -256,6 +255,7 @@ export class MessageTextsComponent implements OnDestroy {
   public locale: string = 'en';
   public LOCALES: string[] = ['en'];
   private sub: Subscription = new Subscription();
+  public currentPolicy: GridPolicy = MESSAGE_TEXTS_POLICY;
 
   constructor(
     private route: ActivatedRoute,

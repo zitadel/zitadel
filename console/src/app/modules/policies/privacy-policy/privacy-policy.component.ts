@@ -19,6 +19,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CnslLinks } from '../../links/links.component';
+import { GridPolicy, PRIVACY_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -37,6 +38,8 @@ export class PrivacyPolicyComponent implements OnDestroy {
 
   public privacyPolicy!: PrivacyPolicy.AsObject;
   public form!: FormGroup;
+  public currentPolicy: GridPolicy = PRIVACY_POLICY;
+
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
