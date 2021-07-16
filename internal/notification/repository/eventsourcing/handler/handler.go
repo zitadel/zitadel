@@ -44,6 +44,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			systemDefaults.IamID,
 		),
+
 		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomText"), errorCount, es}),
 		newNotification(
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
