@@ -268,7 +268,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
-        goos: [ 'linux', 'darwin', 'windows' ]
+        goos: [ 'linux' ]
         goarch: [ 'amd64' ]
     steps:
       - name: Source checkout
@@ -289,7 +289,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
       - uses: docker/build-push-action@v2
-        if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
         with:
           context: .
           file: ./build/operator/Dockerfile
