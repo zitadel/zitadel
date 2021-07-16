@@ -80,18 +80,6 @@ jobs:
         with:
           name: zitadel
           path: /tmp/zitadel/
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/zitadel/Dockerfile
-          platforms: linux/amd64
-          target: go-codecov
-          cache-from: type=gha,scope=zitadel
-          outputs: type=local,dest=/tmp/zitadel
-      - uses: codecov/codecov-action@v1
-        with:
-          name: zitadel-codecov
-          files: /tmp/zitadel/profile.cov
 
   zitadel-codecov:
     name: Upload ZITADEL Codecov
@@ -148,7 +136,7 @@ jobs:
           path: /tmp/zitadel-console/
 
   zitadel-image:
-    name: Build ZITADEL Image
+    name: Package ZITADEL Image
     needs: [refs, zitadel, zitadel-console]
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
@@ -262,7 +250,7 @@ jobs:
           name: codecov-go
 
   zitadel-operator-image:
-    name: Build ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
+    name: Package ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
     needs: [refs, zitadel-operator]
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
@@ -302,7 +290,7 @@ jobs:
             VERSION=${{ needs.refs.outputs.version }}
 
   crdb-image:
-    name: Build ZITADEL CockroachDB Image
+    name: Package ZITADEL CockroachDB Image
     needs: refs
     runs-on: ubuntu-18.04
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
