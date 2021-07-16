@@ -13,12 +13,12 @@ var (
 )
 
 type Subscription struct {
-	Events chan<- EventReader
+	Events chan EventReader
 	types  map[AggregateType][]EventType
 }
 
 //SubscribeAggregates subscribes for all events on the given aggregates
-func SubscribeAggregates(eventQueue chan<- EventReader, aggregates ...AggregateType) *Subscription {
+func SubscribeAggregates(eventQueue chan EventReader, aggregates ...AggregateType) *Subscription {
 	types := make(map[AggregateType][]EventType, len(aggregates))
 	for _, aggregate := range aggregates {
 		types[aggregate] = nil
@@ -40,7 +40,7 @@ func SubscribeAggregates(eventQueue chan<- EventReader, aggregates ...AggregateT
 
 //SubscribeEventTypes subscribes for the given event types
 // if no event types are provided the subscription is for all events of the aggregate
-func SubscribeEventTypes(eventQueue chan<- EventReader, types map[AggregateType][]EventType) *Subscription {
+func SubscribeEventTypes(eventQueue chan EventReader, types map[AggregateType][]EventType) *Subscription {
 	aggregates := make([]AggregateType, len(types))
 	sub := &Subscription{
 		Events: eventQueue,
