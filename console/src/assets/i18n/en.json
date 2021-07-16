@@ -60,7 +60,7 @@
     "IAM": "Identity and Access Management",
     "IAM_DESC": "Manage your organisations and administrators.",
     "IAM_BUTTON": "Manage ZITADEL",
-    "WELCOME": "Welcome",
+    "WELCOME": "Get started with ZITADEL",
     "WELCOMESENTENCE": "Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
     "DISCLAIMER": "You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
     "DISCLAIMERLINK": "Further information",

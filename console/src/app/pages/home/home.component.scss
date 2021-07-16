@@ -5,23 +5,16 @@
   .header {
     display: flex;
     flex-direction: column;
-    margin-bottom: 4rem;
-    align-items: center;
+    margin-bottom: 2rem;
 
-    h3 {
+    .title {
       font-size: 24px;
       margin-bottom: 1rem;
-      text-align: center;
     }
 
     .wlc_stnce {
       color: var(--grey);
       font-size: 16px;
-    }
-
-    .avatar {
-      outline: none;
-      cursor: pointer;
     }
   }
 
