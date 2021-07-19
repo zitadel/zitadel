@@ -154,6 +154,9 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 		logging.Log("OIDC-Ghgr3").WithError(err).Error("error retrieving user sessions")
 		return err
 	}
+	if len(userIDs) == 0 {
+		return nil
+	}
 	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
 	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
 	return err
