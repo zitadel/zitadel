@@ -171,6 +171,7 @@ export class LoginTextsComponent implements OnDestroy {
     const req = REQUESTMAP[this.serviceType].setFcn;
     const mappedValues = req({ [this.currentSubMap]: values });
     this.updateRequest = mappedValues;
+    console.log(mappedValues.toObject());
     this.updateRequest.setLanguage(this.locale);
   }
 
