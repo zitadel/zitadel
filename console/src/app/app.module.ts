@@ -2,7 +2,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,8 +18,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import * as Sentry from '@sentry/angular';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
@@ -40,6 +42,7 @@ import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { AuthenticationService } from './services/authentication.service';
+import { EnvService } from './services/env.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -61,15 +64,42 @@ export class WebpackTranslateLoader implements TranslateLoader {
   }
 }
 
-const appInitializerFn = (grpcServ: GrpcService) => {
+const appInitializerFn = (envService: EnvService, grpcService: GrpcService) => {
   return () => {
-    return grpcServ.loadAppEnvironment();
+    return envService.loadEnvironment().then(data => {
+      return grpcService.initializeGrpc(data);
+    });
   };
 };
 
 const stateHandlerFn = (stateHandler: StatehandlerService) => {
   return () => {
     return stateHandler.initStateHandler();
+  };
+};
+
+const sentryInitializerFn = (envServ: EnvService) => {
+  return async () => {
+    const env = await envServ.loadEnvironment();
+    console.log(env);
+    // Sentry.init({
+    //   dsn: "https://4680958f1ca34bd0bdc84f37d35bc315@o882723.ingest.sentry.io/5836616",
+    //   integrations: [
+    //     // Registers and configures the Tracing integration,
+    //     // which automatically instruments your application to monitor its
+    //     // performance, including custom Angular routing instrumentation
+    //     new Integrations.BrowserTracing({
+    //       tracingOrigins: ["localhost", "https://yourserver.io/api"],
+    //       routingInstrumentation: Sentry.routingInstrumentation,
+    //     }),
+    //   ],
+
+    //   // Set tracesSampleRate to 1.0 to capture 100%
+    //   // of transactions for performance monitoring.
+    //   // We recommend adjusting this value in production
+    //   tracesSampleRate: 1.0,
+    // });
+    return env;
   };
 };
 
@@ -133,9 +163,15 @@ const authConfig: AuthConfig = {
     ThemeService,
     {
       provide: APP_INITIALIZER,
+      useFactory: sentryInitializerFn,
+      deps: [EnvService, Sentry.TraceService],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
       multi: true,
-      deps: [GrpcService],
+      deps: [EnvService, GrpcService],
     },
     {
       provide: APP_INITIALIZER,
@@ -182,6 +218,16 @@ const authConfig: AuthConfig = {
     SubscriptionService,
     AssetService,
     { provide: 'windowObject', useValue: window },
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler({
+        showDialog: true,
+      }),
+    },
+    {
+      provide: Sentry.TraceService,
+      deps: [Router],
+    },
   ],
   bootstrap: [AppComponent],
 })
