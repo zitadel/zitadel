@@ -23,126 +23,79 @@
 }
 
 $caos-dark-brand: (
-  50: #fff,
-  100: #dde6f3,
-  200: #b4c9e4,
-  300: #7fa3d1,
-  400: #6992c9,
-  500: #5282c1,
-  600: #4072b4,
-  700: #38649d,
-  800: #305687,
-  900: #284770,
-  A100: #fff,
-  A200: #dde6f3,
-  A300: #6992c9,
-  A400: #38649d,
-  A500: #666,
-  A600: #fff,
-  A700: #8795a1,
-  A800: #2d2e30,
-  A900: #212224,
+  50 : var(--theme-dark-50),
+  100 : var(--theme-dark-100),
+  200 : var(--theme-dark-200),
+  300 : var(--theme-dark-300),
+  400 : var(--theme-dark-400),
+  500 : var(--theme-dark-500),
+  600 : var(--theme-dark-600),
+  700 : var(--theme-dark-700),
+  800 : var(--theme-dark-800),
+  900 : var(--theme-dark-900),
+  A100 : var(--theme-dark-A100),
+  A200 : var(--theme-dark-A200),
+  A400 : var(--theme-dark-A400),
+  A700 : var(--theme-dark-A700),
   contrast:
-  (
-    50: rgba(black, .87),
-    100: rgba(black, .87),
-    200: rgba(black, .87),
-    300: rgba(black, .87),
-    400: rgba(black, .87),
-    500: white,
-    600: white,
-    700: white,
-    800: white,
-    900: white,
-    A100: rgba(black, .87),
-    A200: rgba(black, .87),
-    A400: rgba(black, .87),
-    A700: white
-  )
+    (
+      50: var(--theme-dark-contrast-50),
+      100: var(--theme-dark-contrast-100),
+      200: var(--theme-dark-contrast-200),
+      300: var(--theme-dark-contrast-300),
+      400: var(--theme-dark-contrast-400),
+      500: var(--theme-dark-contrast-500),
+      600: var(--theme-dark-contrast-600),
+      700: var(--theme-dark-contrast-700),
+      800: var(--theme-dark-contrast-800),
+      900: var(--theme-dark-contrast-900),
+      A100: var(--theme-dark-contrast-A100),
+      A200: var(--theme-dark-contrast-A200),
+      A400: var(--theme-dark-contrast-A400),
+      A700: var(--theme-dark-contrast-A700)
+    )
 );
 
 $caos-light-brand: (
-  50: #eaedfa,
-  100: #ccd2f2,
-  200: #aab4ea,
-  300: #8796e1,
-  400: #6e80da,
-  500: #5469d4,
-  600: #4d61cf,
-  700: #4356c9,
-  800: #3a4cc3,
-  900: #293bb9,
-  A100: #f9faff,
-  A200: #c6ccff,
-  A300: #939fff,
-  A400: #7a88ff,
-  A500:#333,
-  A600: #000,
-  A700: #8795a1,
-  A800: white,
-  A900: #fafafa,
+  50 : var(--theme-light-50),
+  100 : var(--theme-light-100),
+  200 : var(--theme-light-200),
+  300 : var(--theme-light-300),
+  400 : var(--theme-light-400),
+  500 : var(--theme-light-500),
+  600 : var(--theme-light-600),
+  700 : var(--theme-light-700),
+  800 : var(--theme-light-800),
+  900 : var(--theme-light-900),
+  A100 : var(--theme-light-A100),
+  A200 : var(--theme-light-A200),
+  A400 : var(--theme-light-A400),
+  A700 : var(--theme-light-A700),
   contrast:
-  (
-    50: #3d4852,
-    100: #3d4852,
-    200: #3d4852,
-    300: #3d4852,
-    400: #3d4852,
-    500: white,
-    600: white,
-    700: white,
-    800: white,
-    900: white,
-    A100: #3d4852,
-    A200: #3d4852,
-    A400: #3d4852,
-    A700: white
-  )
+    (
+      50: var(--theme-light-contrast-50),
+      100: var(--theme-light-contrast-100),
+      200: var(--theme-light-contrast-200),
+      300: var(--theme-light-contrast-300),
+      400: var(--theme-light-contrast-400),
+      500: var(--theme-light-contrast-500),
+      600: var(--theme-light-contrast-600),
+      700: var(--theme-light-contrast-700),
+      800: var(--theme-light-contrast-800),
+      900: var(--theme-light-contrast-900),
+      A100: var(--theme-light-contrast-A100),
+      A200: var(--theme-light-contrast-A200),
+      A400: var(--theme-light-contrast-A400),
+      A700: var(--theme-light-contrast-A700)
+    )
 );
-
-$caos-accent-color: (
-  50: #ebf4f2,
-  100: #cce3de,
-  200: #abd1c9,
-  300: #89bfb3,
-  400: #6fb1a2,
-  500: #56a392,
-  600: #4f9b8a,
-  700: #45917f,
-  800: #3c8875,
-  900: #2b7763,
-  A100: #beffed,
-  A200: #8bffde,
-  A400: #58ffd0,
-  A700: #3effc9,
-  contrast:
-  (
-    50: rgba(black, .87),
-    100: rgba(black, .87),
-    200: rgba(black, .87),
-    300: rgba(black, .87),
-    400: rgba(black, .87),
-    500: white,
-    600: white,
-    700: white,
-    800: white,
-    900: white,
-    A100: rgba(black, .87),
-    A200: rgba(black, .87),
-    A400: rgba(black, .87),
-    A700: white
-  )
-);
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
 
 $light-primary: mat.define-palette($caos-light-brand);
-$light-accent: mat.define-palette($caos-accent-color);
+$light-accent: mat.define-palette($caos-light-brand);
 $light-warn: mat.define-palette(mat.$red-palette);
 
 $dark-primary: mat.define-palette($caos-dark-brand);
-$dark-accent: mat.define-palette(mat.$pink-palette);
+$dark-accent: mat.define-palette($caos-dark-brand);
 $dark-warn: mat.define-palette(mat.$red-palette);
 
 $light-theme: mat.define-light-theme($light-primary, $light-accent, $light-warn);
@@ -250,19 +203,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Roboto",
-    "Oxygen",
-    "Ubuntu",
-    "Cantarell",
-    "Fira Sans",
-    "Droid Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 h1 {
