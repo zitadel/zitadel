@@ -22,7 +22,7 @@
     "@angular/router": "~12.0.5",
     "@angular/platform-browser-dynamic": "~12.0.5",
     "@angular/service-worker": "~12.0.5",
-    "@grpc/grpc-js": "^1.3.2",
+    "@grpc/grpc-js": "^1.3.5",
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^6.0.0",
     "@types/file-saver": "^2.0.2",
