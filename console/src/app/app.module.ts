@@ -66,23 +66,7 @@ export class WebpackTranslateLoader implements TranslateLoader {
 
 const appInitializerFn = (envService: EnvService, grpcService: GrpcService) => {
   return () => envService.loadEnvironment().toPromise().then(async data => {
-    console.log(data);
-    return await grpcService.initializeGrpc(data);
-  });
-};
-
-const stateHandlerFn = (stateHandler: StatehandlerService) => {
-  return () => {
-    return stateHandler.initStateHandler();
-  };
-};
-
-const sentryInitializerFn = (envServ: EnvService) => {
-  return () => {
-    return envServ.loadEnvironment().subscribe(env => {
-      console.log('sentry', env);
-      return env;
-    });
+    console.log('sentry', data);
     // Sentry.init({
     //   dsn: "https://4680958f1ca34bd0bdc84f37d35bc315@o882723.ingest.sentry.io/5836616",
     //   integrations: [
@@ -100,6 +84,14 @@ const sentryInitializerFn = (envServ: EnvService) => {
     //   // We recommend adjusting this value in production
     //   tracesSampleRate: 1.0,
     // });
+
+    return await grpcService.initializeGrpc(data);
+  });
+};
+
+const stateHandlerFn = (stateHandler: StatehandlerService) => {
+  return () => {
+    return stateHandler.initStateHandler();
   };
 };
 
@@ -161,12 +153,6 @@ const authConfig: AuthConfig = {
   ],
   providers: [
     ThemeService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: sentryInitializerFn,
-      deps: [EnvService, Sentry.TraceService],
-      multi: true,
-    },
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
