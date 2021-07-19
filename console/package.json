@@ -27,7 +27,7 @@
     "@ngx-translate/http-loader": "^6.0.0",
     "@sentry/angular": "^6.9.0",
     "@sentry/tracing": "^6.9.0",
-    "@types/file-saver": "^2.0.2",
+    "@types/file-saver": "^2.0.3",
     "@types/google-protobuf": "^3.7.4",
     "@types/uuid": "^8.3.0",
     "angular-oauth2-oidc": "^10.0.3",
