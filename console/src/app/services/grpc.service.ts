@@ -27,47 +27,53 @@ export class GrpcService {
     private dialog: MatDialog,
   ) { }
 
-  public initializeGrpc(data: any): void {
-    if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
-      const interceptors = {
-        unaryInterceptors: [
-          new OrgInterceptor(this.storageService),
-          new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
-          new I18nInterceptor(),
-        ],
-      };
+  public initializeGrpc(data: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
+        const interceptors = {
+          unaryInterceptors: [
+            new OrgInterceptor(this.storageService),
+            new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
+            new I18nInterceptor(),
+          ],
+        };
 
-      this.auth = new AuthServiceClient(
-        data.authServiceUrl,
-        null,
-        // @ts-ignore
-        interceptors,
-      );
-      this.mgmt = new ManagementServiceClient(
-        data.mgmtServiceUrl,
-        null,
-        // @ts-ignore
-        interceptors,
-      );
-      this.admin = new AdminServiceClient(
-        // TODO: replace with service url
-        data.mgmtServiceUrl,
-        null,
-        // @ts-ignore
-        interceptors,
-      );
+        this.auth = new AuthServiceClient(
+          data.authServiceUrl,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
+        this.mgmt = new ManagementServiceClient(
+          data.mgmtServiceUrl,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
+        this.admin = new AdminServiceClient(
+          // TODO: replace with service url
+          data.mgmtServiceUrl,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
 
-      const authConfig: AuthConfig = {
-        scope: 'openid profile email',
-        responseType: 'code',
-        oidc: true,
-        clientId: data.clientid,
-        issuer: data.issuer,
-        redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
-        postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
-      };
+        const authConfig: AuthConfig = {
+          scope: 'openid profile email',
+          responseType: 'code',
+          oidc: true,
+          clientId: data.clientid,
+          issuer: data.issuer,
+          redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
+          postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+        };
 
-      this.authenticationService.initConfig(authConfig);
-    }
+        this.authenticationService.initConfig(authConfig);
+
+        return resolve();
+      } else {
+        return reject();
+      }
+    });
   }
 }

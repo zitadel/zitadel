@@ -65,11 +65,10 @@ export class WebpackTranslateLoader implements TranslateLoader {
 }
 
 const appInitializerFn = (envService: EnvService, grpcService: GrpcService) => {
-  return () => {
-    return envService.loadEnvironment().then(data => {
-      return grpcService.initializeGrpc(data);
-    });
-  };
+  return () => envService.loadEnvironment().toPromise().then(async data => {
+    console.log(data);
+    return await grpcService.initializeGrpc(data);
+  });
 };
 
 const stateHandlerFn = (stateHandler: StatehandlerService) => {
@@ -79,9 +78,11 @@ const stateHandlerFn = (stateHandler: StatehandlerService) => {
 };
 
 const sentryInitializerFn = (envServ: EnvService) => {
-  return async () => {
-    const env = await envServ.loadEnvironment();
-    console.log(env);
+  return () => {
+    return envServ.loadEnvironment().subscribe(env => {
+      console.log('sentry', env);
+      return env;
+    });
     // Sentry.init({
     //   dsn: "https://4680958f1ca34bd0bdc84f37d35bc315@o882723.ingest.sentry.io/5836616",
     //   integrations: [
@@ -99,7 +100,6 @@ const sentryInitializerFn = (envServ: EnvService) => {
     //   // We recommend adjusting this value in production
     //   tracesSampleRate: 1.0,
     // });
-    return env;
   };
 };
 

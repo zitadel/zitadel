@@ -1,25 +1,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnvService {
   env: any;
-  constructor(private http: HttpClient) {
-    this.loadEnvironment();
-  }
+  constructor(private http: HttpClient) { }
 
-  public loadEnvironment(): Promise<any> {
+  public loadEnvironment(): Observable<any> {
     if (this.env) {
       console.log('loaded env from cache');
-      return Promise.resolve(this.env);
+      return of(this.env);
     } else {
-      return this.http.get('./assets/environment.json')
-        .toPromise().then((data: any) => {
-          this.env = data;
-          return this.env;
-        });
+      return this.http.get('./assets/environment.json');
     }
   }
 }
