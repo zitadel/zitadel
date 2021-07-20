@@ -404,7 +404,7 @@ service ManagementService {
         };
     }
     // Removes the avatar number of the human
-    rpc RemoveMyAvatar(RemoveHumanAvatarRequest) returns (RemoveHumanAvatarResponse) {
+    rpc RemoveHumanAvatar(RemoveHumanAvatarRequest) returns (RemoveHumanAvatarResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/avatar"
         };
