@@ -457,18 +457,18 @@ Returns all configured passwordless authenticators
     POST: /users/{user_id}/passwordless/_search
 
 
-### AddPasswordlessLink
+### SendPasswordlessLink
 
-> **rpc** AddPasswordlessLink([AddPasswordlessLinkRequest](#addpasswordlesslinkrequest))
-[AddPasswordlessLinkResponse](#addpasswordlesslinkresponse)
+> **rpc** SendPasswordlessLink([SendPasswordlessLinkRequest](#sendpasswordlesslinkrequest))
+[SendPasswordlessLinkResponse](#sendpasswordlesslinkresponse)
 
-Adds a new passwordless authenticator link to the user
+Adds a new passwordless authenticator link to the user and sends it to the registered email address
 This link enables the user to register a new device if current passwordless devices are all platform authenticators
 e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
 
 
 
-    POST: /users/{user_id}/passwordless/_link
+    POST: /users/{user_id}/passwordless/_send_link
 
 
 ### RemoveHumanPasswordless
@@ -3072,44 +3072,6 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### AddPasswordlessLinkRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### AddPasswordlessLinkResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.added |  AddPasswordlessLinkResponse.Link | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.send |  bool | - |  |
-
-
-
-
-### AddPasswordlessLinkResponse.Link
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| code_id |  string | - |  |
-| code |  string | - |  |
-| link |  string | - |  |
-| expiration |  google.protobuf.Duration | - |  |
 
 
 
@@ -6344,6 +6306,30 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SendPasswordlessLinkRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SendPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 

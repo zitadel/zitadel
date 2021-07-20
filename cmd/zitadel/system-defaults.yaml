@@ -81,7 +81,7 @@ SystemDefaults:
       PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
       VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
       DomainClaimed: '$ZITADEL_ACCOUNTS/login'
-      PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init?userID={{.UserID}}&codeID={{.CodeID}}&code={{.Code}}'
+      PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
     Providers:
       Chat:
         Url: $CHAT_URL

@@ -482,7 +482,15 @@ func (c *Commands) HumanRemovePasswordless(ctx context.Context, userID, webAuthN
 	return c.removeHumanWebAuthN(ctx, userID, webAuthNID, resourceOwner, event)
 }
 
-func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, send bool) (*domain.PasswordlessInitCode, error) {
+func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
+	return c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, false)
+}
+
+func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
+	return c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
+}
+
+func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, send bool) (*domain.PasswordlessInitCode, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}

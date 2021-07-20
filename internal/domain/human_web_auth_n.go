@@ -2,6 +2,7 @@ package domain
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -83,6 +84,10 @@ type PasswordlessInitCode struct {
 	Code       string
 	Expiration time.Duration
 	Active     bool
+}
+
+func (p *PasswordlessInitCode) Link(baseURL string) string {
+	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, p.AggregateID, p.ResourceOwner, p.CodeID, p.Code)
 }
 
 //func NewPasswordlessInitCode(generator crypto.Generator) (*PasswordlessInitCode, string, error) {

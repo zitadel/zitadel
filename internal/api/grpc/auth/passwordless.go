@@ -40,31 +40,27 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 	}, nil
 }
 
-func (s *Server) AddMyPasswordlessLink(ctx context.Context, req *auth_pb.AddMyPasswordlessLinkRequest) (*auth_pb.AddMyPasswordlessLinkResponse, error) {
+func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPasswordlessLinkRequest) (*auth_pb.AddMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Send)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	var linkAdded auth_pb.LinkAdded
-	if initCode.Active {
-		linkAdded = &auth_pb.AddMyPasswordlessLinkResponse_Added{
-			Added: &auth_pb.AddMyPasswordlessLinkResponse_Link{
-				CodeId:     initCode.CodeID,
-				Code:       initCode.Code,
-				Link:       initCode.Code,
-				Expiration: durationpb.New(initCode.Expiration),
-			},
-		}
-	} else {
-		linkAdded = &auth_pb.AddMyPasswordlessLinkResponse_Send{
-			Send: true,
-		}
-	}
-
 	return &auth_pb.AddMyPasswordlessLinkResponse{
-		Details:   object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		LinkAdded: linkAdded,
+		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Link:       initCode.Link(s.defaults.Notifications.Endpoints.PasswordlessRegistration),
+		Expiration: durationpb.New(initCode.Expiration),
+	}, nil
+}
+
+func (s *Server) SendMyPasswordlessLink(ctx context.Context, _ *auth_pb.SendMyPasswordlessLinkRequest) (*auth_pb.SendMyPasswordlessLinkResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.SendMyPasswordlessLinkResponse{
+		Details: object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 

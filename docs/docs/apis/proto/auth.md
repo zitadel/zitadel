@@ -426,13 +426,27 @@ Multiple passwordless authentications can be configured
 > **rpc** AddMyPasswordlessLink([AddMyPasswordlessLinkRequest](#addmypasswordlesslinkrequest))
 [AddMyPasswordlessLinkResponse](#addmypasswordlesslinkresponse)
 
-Adds a new passwordless authenticator link to the authorized user
+Adds a new passwordless authenticator link to the authorized user and returns it directly
 This link enables the user to register a new device if current passwordless devices are all platform authenticators
 e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
 
 
 
     POST: /users/me/passwordless/_link
+
+
+### SendMyPasswordlessLink
+
+> **rpc** SendMyPasswordlessLink([SendMyPasswordlessLinkRequest](#sendmypasswordlesslinkrequest))
+[SendMyPasswordlessLinkResponse](#sendmypasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the authorized user and sends it to the registered email address
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/me/passwordless/_send_link
 
 
 ### VerifyMyPasswordless
@@ -565,12 +579,7 @@ This is an empty request
 
 
 ### AddMyPasswordlessLinkRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| send |  bool | - |  |
+This is an empty request
 
 
 
@@ -582,20 +591,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.added |  AddMyPasswordlessLinkResponse.Link | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) linkAdded.send |  bool | - |  |
-
-
-
-
-### AddMyPasswordlessLinkResponse.Link
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| code_id |  string | - |  |
-| code |  string | - |  |
 | link |  string | - |  |
 | expiration |  google.protobuf.Duration | - |  |
 
@@ -1128,6 +1123,23 @@ This is an empty response
 
 
 ### RevokeMyRefreshTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SendMyPasswordlessLinkRequest
+This is an empty request
+
+
+
+
+### SendMyPasswordlessLinkResponse
 
 
 

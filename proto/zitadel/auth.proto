@@ -430,12 +430,25 @@ service AuthService {
         };
     }
 
-    // Adds a new passwordless authenticator link to the authorized user
+    // Adds a new passwordless authenticator link to the authorized user and returns it directly
     // This link enables the user to register a new device if current passwordless devices are all platform authenticators
     // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
     rpc AddMyPasswordlessLink(AddMyPasswordlessLinkRequest) returns (AddMyPasswordlessLinkResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless/_link"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Adds a new passwordless authenticator link to the authorized user and sends it to the registered email address
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc SendMyPasswordlessLink(SendMyPasswordlessLinkRequest) returns (SendMyPasswordlessLinkResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_send_link"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -800,22 +813,20 @@ message AddMyPasswordlessResponse {
     zitadel.v1.ObjectDetails details = 2;
 }
 
-message AddMyPasswordlessLinkRequest {
-    bool send = 1;
-}
+//This is an empty request
+message AddMyPasswordlessLinkRequest {}
 
 message AddMyPasswordlessLinkResponse {
-    message Link {
-        string code_id = 1;
-        string code = 2;
-        string link = 3;
-        google.protobuf.Duration expiration = 4;
-    }
     zitadel.v1.ObjectDetails details = 1;
-    oneof linkAdded {
-        Link added = 2;
-        bool send = 3;
-    }
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
+}
+
+//This is an empty request
+message SendMyPasswordlessLinkRequest {}
+
+message SendMyPasswordlessLinkResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message VerifyMyPasswordlessRequest {

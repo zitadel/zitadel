@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
@@ -20,20 +21,22 @@ const (
 
 type Server struct {
 	auth.UnimplementedAuthServiceServer
-	command *command.Commands
-	query   *query.Queries
-	repo    repository.Repository
+	command  *command.Commands
+	query    *query.Queries
+	repo     repository.Repository
+	defaults systemdefaults.SystemDefaults
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository, defaults systemdefaults.SystemDefaults) *Server {
 	return &Server{
-		command: command,
-		query:   query,
-		repo:    authRepo,
+		command:  command,
+		query:    query,
+		repo:     authRepo,
+		defaults: defaults,
 	}
 }
 

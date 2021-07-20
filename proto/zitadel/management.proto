@@ -496,12 +496,12 @@ service ManagementService {
         };
     }
 
-    // Adds a new passwordless authenticator link to the user
+    // Adds a new passwordless authenticator link to the user and sends it to the registered email address
     // This link enables the user to register a new device if current passwordless devices are all platform authenticators
     // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
-    rpc AddPasswordlessLink(AddPasswordlessLinkRequest) returns (AddPasswordlessLinkResponse) {
+    rpc SendPasswordlessLink(SendPasswordlessLinkRequest) returns (SendPasswordlessLinkResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/passwordless/_link"
+            post: "/users/{user_id}/passwordless/_send_link"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -2947,22 +2947,14 @@ message ListHumanPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1;
 }
 
-message AddPasswordlessLinkRequest {
+message SendPasswordlessLinkRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message AddPasswordlessLinkResponse {
-    message Link {
-        string code_id = 1;
-        string code = 2;
-        string link = 3;
-        google.protobuf.Duration expiration = 4;
-    }
+message SendPasswordlessLinkResponse {
     zitadel.v1.ObjectDetails details = 1;
-    oneof linkAdded {
-        Link added = 2;
-        bool send = 3;
-    }
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
 }
 
 message RemoveHumanPasswordlessRequest {

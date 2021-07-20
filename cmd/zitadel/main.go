@@ -203,7 +203,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo))
+		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
 	}
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)

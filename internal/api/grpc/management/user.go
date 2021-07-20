@@ -3,6 +3,8 @@ package management
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
@@ -408,31 +410,16 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
-func (s *Server) AddPasswordlessLink(ctx context.Context, req *mgmt_pb.AddPasswordlessLinkRequest) (*mgmt_pb.AddPasswordlessLinkResponse, error) {
+func (s *Server) SendPasswordlessLink(ctx context.Context, req *mgmt_pb.SendPasswordlessLinkRequest) (*mgmt_pb.SendPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, true)
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	var linkAdded mgmt_pb.LinkAdded
-	//if initCode.Active {
-	//	linkAdded = &auth_pb.AddMyPasswordlessLinkResponse_Added{
-	//		Added: &auth_pb.AddMyPasswordlessLinkResponse_Link{
-	//			CodeId:     initCode.CodeID,
-	//			Code:       initCode.Code,
-	//			Link:       initCode.Code,
-	//			Expiration: durationpb.New(initCode.Expiration),
-	//		},
-	//	}
-	//} else {
-	linkAdded = &mgmt_pb.AddPasswordlessLinkResponse_Send{
-		Send: true,
-	}
-	//}
-
-	return &mgmt_pb.AddPasswordlessLinkResponse{
-		Details:   object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		LinkAdded: linkAdded,
+	return &mgmt_pb.SendPasswordlessLinkResponse{
+		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }
 
