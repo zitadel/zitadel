@@ -54,7 +54,7 @@ func Start(config Config) (http.Handler, string, error) {
 	if config.ConsoleOverwriteDir != "" {
 		consoleDir = config.ConsoleOverwriteDir
 	}
-	consoleHTTPDir := http.FS(os.DirFS(consoleDir))
+	consoleHTTPDir := http.Dir(consoleDir)
 	cache := AssetsCacheInterceptorIgnoreManifest(
 		config.ShortCache.MaxAge.Duration,
 		config.ShortCache.SharedMaxAge.Duration,
