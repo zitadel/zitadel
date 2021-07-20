@@ -10,6 +10,7 @@ type DesiredV0 struct {
 	Common *tree.Common `yaml:",inline"`
 	Spec   *Spec        `json:"spec" yaml:"spec"`
 	IAM    *tree.Tree   `json:"iam" yaml:"iam"`
+	Backup *tree.Tree   `json:"backup" yaml:"backup"`
 }
 
 // +kubebuilder:object:generate=true

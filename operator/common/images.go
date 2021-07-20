@@ -16,6 +16,7 @@ const (
 	ZITADELImage         zitadelImage   = "caos/zitadel"
 	BackupImage          zitadelImage   = "caos/zitadel-crbackup"
 	ZITADELOperatorImage zitadelImage   = "caos/zitadel-operator"
+	AssetBackupImage     dockerhubImage = "rclone/rclone:1.55.1"
 )
 
 func (z zitadelImage) Reference(customImageRegistry, version string) string {
