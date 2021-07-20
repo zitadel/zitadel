@@ -1,0 +1,61 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "InitMFAOTP.Title"}}</h1>
+
+    {{ template "user-profile" . }}
+
+    <p>{{t "InitMFAOTP.Description"}}</p>
+</div>
+
+<form action="{{ mfaInitVerifyUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="mfaType" value="{{ .MFAType }}" />
+    <input type="hidden" name="url" value="{{ .Url }}" />
+    <input type="hidden" name="secret" value="{{ .Secret }}" />
+
+    {{if (eq .MFAType 0) }}
+    <p>{{t "InitMFAOTP.OTPDescription"}}</p>
+    <div class="lgn-qrcode" id="qrcode">
+        {{.QrCode}}
+    </div>
+    <div class="fields">
+        <div class="field">
+            <span class="lgn-label" for="secret">{{t "InitMFAOTP.SecretLabel"}}</span>
+            <div class="lgn-row">
+                <span id="secret"> {{.Secret}} </span>
+                <span class="fill-space"></span>
+                <button id="copy" data-copy="{{ .Secret }}" class="lgn-icon-button">
+                    <i class="lgn-icon-clipboard"></i>
+                </button>
+            </div>
+        </div>
+        <div class="field">
+            <label class="lgn-label" for="code">{{t "InitMFAOTP.CodeLabel"}}</label>
+            <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+        </div>
+    </div>
+    {{end}}
+
+    <div class="lgn-actions">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
+        
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
+            {{t "InitMFAOTP.CancelButtonText"}}
+        </a>
+        <span class="fill-space"></span>
+        <button class="lgn-primary lgn-raised-button" id="submit-button" type="submit">{{t "InitMFAOTP.NextButtonText"}}</button>
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/copy_to_clipboard.js" }}"></script>
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+
+{{template "main-bottom" .}}

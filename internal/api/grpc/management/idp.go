@@ -32,7 +32,7 @@ func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRe
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgOIDCIDPResponse{
-		IdpId: config.AggregateID,
+		IdpId: config.IDPConfigID,
 		Details: object_pb.AddToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,

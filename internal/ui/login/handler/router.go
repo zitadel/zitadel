@@ -35,9 +35,11 @@ const (
 	EndpointExternalRegisterCallback = "/register/externalidp/callback"
 	EndpointRegisterOrg              = "/register/org"
 	EndpointLogoutDone               = "/logout/done"
+	EndpointLoginSuccess             = "/login/success"
 	EndpointExternalNotFoundOption   = "/externaluser/option"
 
-	EndpointResources = "/resources"
+	EndpointResources        = "/resources"
+	EndpointDynamicResources = "/resources/dynamic"
 )
 
 func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.MiddlewareFunc) *mux.Router {
@@ -77,8 +79,10 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointExternalRegister, login.handleExternalRegister).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalRegisterCallback, login.handleExternalRegisterCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
+	router.HandleFunc(EndpointDynamicResources, login.handleDynamicResources).Methods(http.MethodGet)
 	router.PathPrefix(EndpointResources).Handler(login.handleResources(staticDir)).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrgCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointLoginSuccess, login.handleLoginSuccess).Methods(http.MethodGet)
 	return router
 }

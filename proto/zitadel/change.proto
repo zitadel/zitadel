@@ -39,6 +39,18 @@ message Change {
             example: "\"69629023906488334\"";
         }
     ];
+    string editor_preferred_login_name = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the preferred login name of the editor";
+            example: "\"gigi@acme.zitadel.ch\"";
+        }
+    ];
+    string editor_avatar_url = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the editor";
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
 }
 
 message ChangeQuery {

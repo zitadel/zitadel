@@ -66,9 +66,9 @@
                 <ng-container matColumnDef="actions" stickyEnd>
                     <th mat-header-cell *matHeaderCellDef></th>
                     <td mat-cell *matCellDef="let project">
-                        <button class="dlt-button" *ngIf="project.projectId !== zitadelProjectId" color="warn"
+                        <button class="dlt-button" *ngIf="project.id !== zitadelProjectId" color="warn"
                             mat-icon-button matTooltip="{{'ACTIONS.DELETE' | translate}}"
-                            (click)="deleteProject(project.projectId)">
+                            (click)="deleteProject(project.id)">
                             <i class="las la-trash"></i>
                         </button>
                     </td>
@@ -76,7 +76,7 @@
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
-                    [routerLink]="['/projects', row.projectId]"></tr>
+                    [routerLink]="['/projects', row.id]"></tr>
 
             </table>
             <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">

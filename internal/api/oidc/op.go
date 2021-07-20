@@ -6,6 +6,8 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -13,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
@@ -28,10 +31,12 @@ type OPHandlerConfig struct {
 }
 
 type StorageConfig struct {
-	DefaultLoginURL            string
-	SigningKeyAlgorithm        string
-	DefaultAccessTokenLifetime types.Duration
-	DefaultIdTokenLifetime     types.Duration
+	DefaultLoginURL                   string
+	SigningKeyAlgorithm               string
+	DefaultAccessTokenLifetime        types.Duration
+	DefaultIdTokenLifetime            types.Duration
+	DefaultRefreshTokenIdleExpiration types.Duration
+	DefaultRefreshTokenExpiration     types.Duration
 }
 
 type EndpointConfig struct {
@@ -49,13 +54,15 @@ type Endpoint struct {
 }
 
 type OPStorage struct {
-	repo                       repository.Repository
-	command                    *command.Commands
-	query                      *query.Queries
-	defaultLoginURL            string
-	defaultAccessTokenLifetime time.Duration
-	defaultIdTokenLifetime     time.Duration
-	signingKeyAlgorithm        string
+	repo                              repository.Repository
+	command                           *command.Commands
+	query                             *query.Queries
+	defaultLoginURL                   string
+	defaultAccessTokenLifetime        time.Duration
+	defaultIdTokenLifetime            time.Duration
+	signingKeyAlgorithm               string
+	defaultRefreshTokenIdleExpiration time.Duration
+	defaultRefreshTokenExpiration     time.Duration
 }
 
 func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig *crypto.KeyConfig, localDevMode bool) op.OpenIDProvider {
@@ -69,6 +76,10 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	}
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
 	config.OPConfig.CodeMethodS256 = true
+	config.OPConfig.GrantTypeRefreshToken = true
+	supportedLanguages, err := getSupportedLanguages()
+	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
+	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	provider, err := op.NewOpenIDProvider(
 		ctx,
@@ -94,16 +105,26 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 
 func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository) *OPStorage {
 	return &OPStorage{
-		repo:                       repo,
-		command:                    command,
-		query:                      query,
-		defaultLoginURL:            config.DefaultLoginURL,
-		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
-		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime.Duration,
-		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime.Duration,
+		repo:                              repo,
+		command:                           command,
+		query:                             query,
+		defaultLoginURL:                   config.DefaultLoginURL,
+		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
+		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime.Duration,
+		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime.Duration,
+		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration.Duration,
+		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration.Duration,
 	}
 }
 
 func (o *OPStorage) Health(ctx context.Context) error {
 	return o.repo.Health(ctx)
+}
+
+func getSupportedLanguages() ([]language.Tag, error) {
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	if err != nil {
+		return nil, err
+	}
+	return i18n.SupportedLanguages(statikLoginFS)
 }

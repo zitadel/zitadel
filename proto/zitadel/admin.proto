@@ -6,6 +6,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
 
@@ -140,7 +141,18 @@ service AdminService {
             }
         };
     }
-    
+
+    // Returns the default languages
+    rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
+        option (google.api.http) = {
+            get: "/languages";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
     //Checks whether an organisation exists by the given parameters 
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
@@ -822,6 +834,28 @@ service AdminService {
         };
     }
 
+    //Returns the preview label policy defined by the administrators of ZITADEL
+    rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label/_preview";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "label policy";
+            tags: "policy";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default label policy";
+                };
+            };
+        };
+    }
+
     //Updates the default label policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
@@ -843,6 +877,73 @@ service AdminService {
                     description: "default label policy updated";
                 };
             };
+        };
+    }
+
+    // Activates all changes of the label policy
+    rpc ActivateLabelPolicy(ActivateLabelPolicyRequest) returns (ActivateLabelPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/label/_activate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo of the label policy
+    rpc RemoveLabelPolicyLogo(RemoveLabelPolicyLogoRequest) returns (RemoveLabelPolicyLogoResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveLabelPolicyLogoDark(RemoveLabelPolicyLogoDarkRequest) returns (RemoveLabelPolicyLogoDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/logo_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the icon of the label policy
+    rpc RemoveLabelPolicyIcon(RemoveLabelPolicyIconRequest) returns (RemoveLabelPolicyIconResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the logo dark of the label policy
+    rpc RemoveLabelPolicyIconDark(RemoveLabelPolicyIconDarkRequest) returns (RemoveLabelPolicyIconDarkResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/icon_dark"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the font of the label policy
+    rpc RemoveLabelPolicyFont(RemoveLabelPolicyFontRequest) returns (RemoveLabelPolicyFontResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/font"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
         };
     }
 
@@ -1358,15 +1459,51 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+    }
+
+    //Returns the privacy policy defined by the administrators of ZITADEL
+    rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/privacy";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "policy";
-            tags: "password policy";
-            tags: "password lockout policy";
+            tags: "privacy policy";
+            tags: "privacy";
             responses: {
                 key: "200";
                 value: {
-                    description: "default password lockout policy updated";
+                    description: "default privacy policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default privacy policy of ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/privacy";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "privacy policy";
+            tags: "privacy";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default privacy policy updated";
                 };
             };
             responses: {
@@ -1380,6 +1517,227 @@ service AdminService {
                     };
                 };
             };
+        };
+    }
+
+    //Returns the default text for initial message (translation file)
+    rpc GetDefaultInitMessageText(GetDefaultInitMessageTextRequest) returns (GetDefaultInitMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/init/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for initial message (overwritten in eventstore)
+    rpc GetCustomInitMessageText(GetCustomInitMessageTextRequest) returns (GetCustomInitMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/init/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for initial message
+    // it impacts all organisations without customized initial message text
+    // The Following Variables can be used:
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultInitMessageText(SetDefaultInitMessageTextRequest) returns (SetDefaultInitMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/init/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default text for password reset message (translation file)
+    rpc GetDefaultPasswordResetMessageText(GetDefaultPasswordResetMessageTextRequest) returns (GetDefaultPasswordResetMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/deafult/message/passwordreset/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for password reset message (overwritten in eventstore)
+    rpc GetCustomPasswordResetMessageText(GetCustomPasswordResetMessageTextRequest) returns (GetCustomPasswordResetMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/passwordreset/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for password reset message
+    // it impacts all organisations without customized password reset message text
+    // The Following Variables can be used:
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultPasswordResetMessageText(SetDefaultPasswordResetMessageTextRequest) returns (SetDefaultPasswordResetMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/passwordreset/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+    }
+
+    //Returns the default text for verify email message (translation files)
+    rpc GetDefaultVerifyEmailMessageText(GetDefaultVerifyEmailMessageTextRequest) returns (GetDefaultVerifyEmailMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/verifyemail/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for verify email message (overwritten in eventstore)
+    rpc GetCustomVerifyEmailMessageText(GetCustomVerifyEmailMessageTextRequest) returns (GetCustomVerifyEmailMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifyemail/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for verify email message
+    // it impacts all organisations without customized verify email message text
+    // The Following Variables can be used:
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultVerifyEmailMessageText(SetDefaultVerifyEmailMessageTextRequest) returns (SetDefaultVerifyEmailMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyemail/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default text for verify phone message (translation file)
+    rpc GetDefaultVerifyPhoneMessageText(GetDefaultVerifyPhoneMessageTextRequest) returns (GetDefaultVerifyPhoneMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/verifyphone/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for verify phone message
+    rpc GetCustomVerifyPhoneMessageText(GetCustomVerifyPhoneMessageTextRequest) returns (GetCustomVerifyPhoneMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifyphone/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for verify phone message
+    // it impacts all organisations without customized verify phone message text
+    // The Following Variables can be used:
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultVerifyPhoneMessageText(SetDefaultVerifyPhoneMessageTextRequest) returns (SetDefaultVerifyPhoneMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyphone/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default text for domain claimed message (translation file)
+    rpc GetDefaultDomainClaimedMessageText(GetDefaultDomainClaimedMessageTextRequest) returns (GetDefaultDomainClaimedMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/domainclaimed/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for domain claimed message (overwritten in eventstore)
+    rpc GetCustomDomainClaimedMessageText(GetCustomDomainClaimedMessageTextRequest) returns (GetCustomDomainClaimedMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/domainclaimed/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for domain claimed phone message
+    // it impacts all organisations without customized verify phone message text
+    // The Following Variables can be used:
+    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyphone/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default custom texts for login ui (translation file)
+    rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
+        option (google.api.http) = {
+            get: "/text/default/login/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom texts for login ui
+    rpc GetCustomLoginTexts(GetCustomLoginTextsRequest) returns (GetCustomLoginTextsResponse) {
+        option (google.api.http) = {
+            get: "/text/login/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the custom text for login ui
+    //it impacts all organisations without customized login ui texts
+    rpc SetCustomLoginText(SetCustomLoginTextsRequest) returns (SetCustomLoginTextsResponse) {
+        option (google.api.http) = {
+            put: "/text/login/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
         };
     }
 
@@ -1687,6 +2045,13 @@ message HealthzRequest {}
 //This is an empty response
 message HealthzResponse {}
 
+//This is an empty request
+message GetSupportedLanguagesRequest {}
+
+message GetSupportedLanguagesResponse {
+    repeated string languages = 1;
+}
+
 // if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -1993,7 +2358,6 @@ message AddOIDCIDPRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the oidc issuer of the identity provider";
-            min_length: 1;
             max_length: 200;
         }
     ];
@@ -2194,6 +2558,11 @@ message SetDefaultFeaturesRequest {
     bool password_complexity_policy = 11;
     bool label_policy = 12;
     bool custom_domain = 13;
+    bool login_policy_password_reset = 14;
+    bool label_policy_private_label = 15;
+    bool label_policy_watermark = 16;
+    bool custom_text = 17;
+    bool privacy_policy = 18;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2224,6 +2593,11 @@ message SetOrgFeaturesRequest {
     bool password_complexity_policy = 12;
     bool label_policy = 13;
     bool custom_domain = 14;
+    bool login_policy_password_reset = 15;
+    bool label_policy_private_label = 16;
+    bool label_policy_watermark = 17;
+    bool custom_text = 18;
+    bool privacy_policy = 19;
 }
 
 message SetOrgFeaturesResponse {
@@ -2352,28 +2726,19 @@ message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
 }
 
+//This is an empty request
+message GetPreviewLabelPolicyRequest {}
+
+message GetPreviewLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
 message UpdateLabelPolicyRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["primary_color", "secondary_color"]
-		};
-	};
-    
     string primary_color = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 50},
+        (validate.rules).string = {max_len: 50},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "respresents a color scheme"
             example: "\"#353535\"";
-            min_length: 1;
-            max_length: 50;
-        }
-    ];
-    string secondary_color = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 50},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "respresents a color scheme";
-            example: "\"#707070\"";
-            min_length: 1;
             max_length: 50;
         }
     ];
@@ -2382,9 +2747,59 @@ message UpdateLabelPolicyRequest {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
+    string warn_color = 4 [(validate.rules).string = {max_len: 50}];
+    string background_color = 5 [(validate.rules).string = {max_len: 50}];
+    string font_color = 6 [(validate.rules).string = {max_len: 50}];
+    string primary_color_dark = 7 [(validate.rules).string = {max_len: 50}];
+    string background_color_dark = 8 [(validate.rules).string = { max_len: 50}];
+    string warn_color_dark = 9 [(validate.rules).string = { max_len: 50}];
+    string font_color_dark = 10 [(validate.rules).string = { max_len: 50}];
+    bool disable_watermark = 11;
 }
 
 message UpdateLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ActivateLabelPolicyRequest {}
+
+message ActivateLabelPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLogoRequest {}
+
+message RemoveLabelPolicyLogoResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLogoDarkRequest {}
+
+message RemoveLabelPolicyLogoDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyIconRequest {}
+
+message RemoveLabelPolicyIconResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyIconDarkRequest {}
+
+message RemoveLabelPolicyIconDarkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyFontRequest {}
+
+message RemoveLabelPolicyFontResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -2421,6 +2836,11 @@ message UpdateLoginPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if passwordless is allowed for users"
         }];
+    bool hide_password_reset = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if password reset link should be shown in the login screen"
+        }
+    ];
 }
 
 message UpdateLoginPolicyResponse {
@@ -2635,6 +3055,261 @@ message UpdatePasswordLockoutPolicyRequest {
 }
 
 message UpdatePasswordLockoutPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetPrivacyPolicyRequest {}
+
+message GetPrivacyPolicyResponse {
+    zitadel.policy.v1.PrivacyPolicy policy = 1;
+}
+
+message UpdatePrivacyPolicyRequest {
+    string tos_link = 1;
+    string privacy_link = 2;
+}
+
+message UpdatePrivacyPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDefaultInitMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultInitMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomInitMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomInitMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultInitMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 1000}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultInitMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDefaultPasswordResetMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultPasswordResetMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomPasswordResetMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomPasswordResetMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultPasswordResetMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultPasswordResetMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDefaultVerifyEmailMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultVerifyEmailMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomVerifyEmailMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomVerifyEmailMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultVerifyEmailMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultVerifyEmailMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDefaultVerifyPhoneMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultVerifyPhoneMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomVerifyPhoneMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomVerifyPhoneMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultVerifyPhoneMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultVerifyPhoneMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDefaultDomainClaimedMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultDomainClaimedMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomDomainClaimedMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomDomainClaimedMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultDomainClaimedMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultDomainClaimedMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDefaultLoginTextsRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultLoginTextsResponse {
+    zitadel.text.v1.LoginCustomText custom_text = 1;
+}
+
+message GetCustomLoginTextsRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomLoginTextsResponse {
+    zitadel.text.v1.LoginCustomText custom_text = 1;
+}
+
+message SetCustomLoginTextsRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    zitadel.text.v1.SelectAccountScreenText select_account_text = 2;
+    zitadel.text.v1.LoginScreenText login_text = 3;
+    zitadel.text.v1.PasswordScreenText password_text = 4;
+    zitadel.text.v1.UsernameChangeScreenText username_change_text = 5;
+    zitadel.text.v1.UsernameChangeDoneScreenText username_change_done_text = 6;
+    zitadel.text.v1.InitPasswordScreenText init_password_text = 7;
+    zitadel.text.v1.InitPasswordDoneScreenText init_password_done_text = 8;
+    zitadel.text.v1.EmailVerificationScreenText email_verification_text = 9;
+    zitadel.text.v1.EmailVerificationDoneScreenText email_verification_done_text = 10;
+    zitadel.text.v1.InitializeUserScreenText initialize_user_text = 11;
+    zitadel.text.v1.InitializeUserDoneScreenText initialize_done_text = 12;
+    zitadel.text.v1.InitMFAPromptScreenText init_mfa_prompt_text = 13;
+    zitadel.text.v1.InitMFAOTPScreenText init_mfa_otp_text = 14;
+    zitadel.text.v1.InitMFAU2FScreenText init_mfa_u2f_text = 15;
+    zitadel.text.v1.InitMFADoneScreenText init_mfa_done_text = 16;
+    zitadel.text.v1.MFAProvidersText mfa_providers_text = 17;
+    zitadel.text.v1.VerifyMFAOTPScreenText verify_mfa_otp_text = 18;
+    zitadel.text.v1.VerifyMFAU2FScreenText verify_mfa_u2f_text = 19;
+    zitadel.text.v1.PasswordlessScreenText passwordless_text = 20;
+    zitadel.text.v1.PasswordChangeScreenText password_change_text = 21;
+    zitadel.text.v1.PasswordChangeDoneScreenText password_change_done_text = 22;
+    zitadel.text.v1.PasswordResetDoneScreenText password_reset_done_text = 23;
+    zitadel.text.v1.RegistrationOptionScreenText registration_option_text = 24;
+    zitadel.text.v1.RegistrationUserScreenText registration_user_text = 25;
+    zitadel.text.v1.RegistrationOrgScreenText registration_org_text = 26;
+    zitadel.text.v1.LinkingUserDoneScreenText linking_user_done_text = 27;
+    zitadel.text.v1.ExternalUserNotFoundScreenText external_user_not_found_text = 28;
+    zitadel.text.v1.SuccessLoginScreenText success_login_text = 29;
+    zitadel.text.v1.LogoutDoneScreenText logout_text = 30;
+    zitadel.text.v1.FooterText footer_text = 31;
+}
+
+message SetCustomLoginTextsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

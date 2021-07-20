@@ -7,7 +7,12 @@
 
     <div class="detail">
         <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
-        <p>{{features?.tier?.name}}</p>
+        <p class="center">{{features?.tier?.name}}
+          <a class="ext" href="https://zitadel.ch/pricing"
+          target="_blank">
+            <i class="las la-external-link-alt"></i>
+          </a>
+        </p>
     </div>
 
     <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
@@ -30,7 +35,7 @@
         <p class="error" *ngIf="(stripeCustomer || stripeCustomer == null) && !customerValid">{{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
         <div class="current-tier">
-            <a [disabled]="!org.id || !customerValid" mat-raised-button [href]="stripeURL" target="_blank"
+            <a [disabled]="!org.id || !customerValid || !stripeURL" mat-raised-button [href]="stripeURL" target="_blank"
                 alt="change tier">{{'FEATURES.TIER.BTN' | translate}}</a>
         </div>
     </ng-container>
@@ -59,6 +64,15 @@
                 [(ngModel)]="features.loginPolicyUsernameLogin"
                 [disabled]="(['iam.features.write'] | hasRole | async) == false">
             </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+          <span class="left-desc">{{'FEATURES.DATA.LOGINPOLICYPASSWORDRESET' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+                            [(ngModel)]="features.loginPolicyPasswordReset"
+                            [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
         </div>
 
         <div class="row">
@@ -106,9 +120,17 @@
         </div>
 
         <div class="row">
-            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICY' | translate}}</span>
+            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYPRIVATELABEL' | translate}}</span>
             <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicy"
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyPrivateLabel"
+                [disabled]="(['iam.features.write'] | hasRole | async) == false">
+            </mat-slide-toggle>
+        </div>
+
+        <div class="row">
+            <span class="left-desc">{{'FEATURES.DATA.LABELPOLICYWATERMARK' | translate}}</span>
+            <span class="fill-space"></span>
+            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.labelPolicyWatermark"
                 [disabled]="(['iam.features.write'] | hasRole | async) == false">
             </mat-slide-toggle>
         </div>
@@ -119,11 +141,19 @@
           <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.customDomain"
               [disabled]="(['iam.features.write'] | hasRole | async) == false">
           </mat-slide-toggle>
-      </div>
+        </div>
+
+        <div class="row">
+          <span class="left-desc">{{'FEATURES.DATA.CUSTOMTEXT' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.customText"
+                            [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+        </div>
     </div>
 
-    <div class="btn-container">
-        <button (click)="savePolicy()" [disabled]="(['iam.features.write'] | hasRole | async) == false" color="primary"
+    <div class="btn-container" *ngIf="(['iam.features.write'] | hasRole | async) == true">
+        <button (click)="savePolicy()" color="primary"
             type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
             }}</button>
     </div>

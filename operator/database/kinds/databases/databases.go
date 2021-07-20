@@ -32,6 +32,7 @@ func Adapt(
 	tolerations []core.Toleration,
 	version string,
 	features []string,
+	customImageRegistry string,
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
@@ -46,7 +47,16 @@ func Adapt(
 
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
-		return managed.Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features)(internalMonitor, desiredTree, currentTree)
+		return managed.Adapter(
+			componentLabels,
+			namespace,
+			timestamp,
+			nodeselector,
+			tolerations,
+			version,
+			features,
+			customImageRegistry,
+		)(internalMonitor, desiredTree, currentTree)
 	case "databases.caos.ch/ProvidedDatabase":
 		return provided.Adapter()(internalMonitor, desiredTree, currentTree)
 	default:

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "zitadel/object.proto";
 import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -110,6 +111,12 @@ message Profile {
     Gender gender = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the gender of the human";
+        }
+    ];
+    string avatar_url = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
 }
@@ -508,12 +515,60 @@ message Session {
         }
     ];
     zitadel.v1.ObjectDetails details = 9;
+    string avatar_url = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
 }
 
 enum SessionState {
     SESSION_STATE_UNSPECIFIED = 0;
     SESSION_STATE_ACTIVE = 1;
     SESSION_STATE_TERMINATED = 2;
+}
+
+message RefreshToken {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906489455\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    string client_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334@ZITADEL\"";
+            description: "oauth2/oidc client_id of the authorized application";
+        }
+    ];
+    google.protobuf.Timestamp auth_time = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "\"time when the user authenticated, does not have to be the same time the token was created\""
+        }
+    ];
+    google.protobuf.Timestamp idle_expiration = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "\"time the refresh token will expire if not used, the user will have to reauthenticate\""
+        }
+    ];
+    google.protobuf.Timestamp expiration = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "\"time the refresh token will expire, the user will have to reauthenticate\""
+        }
+    ];
+    repeated string scopes = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\",\"email\",\"profile\",\"offline_access\"]";
+            description: "scopes of the initial auth request, access tokens created by this refresh token can have a subset of these scopes";
+        }
+    ];
+    repeated string audience = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"69629023906488334@ZITADEL\", \"69629023906481256\"]"
+            description: "audience of the initial auth request and of all access tokens created by this refresh token";
+        }
+    ];
 }
 
 message UserGrant {
@@ -596,6 +651,12 @@ message UserGrant {
     string project_grant_id = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
+        }
+    ];
+    string avatar_url = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar url of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
 }

@@ -56,6 +56,10 @@ func (m *UserMembership) ViewModel() string {
 	return userMembershipTable
 }
 
+func (m *UserMembership) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
 }
@@ -107,7 +111,8 @@ func (m *UserMembership) processIAM(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case iam_es_model.IAMMemberRemoved:
+	case iam_es_model.IAMMemberRemoved,
+		iam_es_model.IAMMemberCascadeRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam, event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event)
@@ -137,7 +142,7 @@ func (m *UserMembership) processOrg(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case org_es_model.OrgMemberRemoved:
+	case org_es_model.OrgMemberRemoved, org_es_model.OrgMemberCascadeRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event)
 	case org_es_model.OrgChanged:
 		return m.updateOrgDisplayName(event)
@@ -190,7 +195,7 @@ func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectMemberRemoved:
+	case proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject, event)
 	case proj_es_model.ProjectGrantMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant)
@@ -198,7 +203,8 @@ func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectGrantMemberRemoved:
+	case proj_es_model.ProjectGrantMemberRemoved,
+		proj_es_model.ProjectGrantMemberCascadeRemoved:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event)
 	case proj_es_model.ProjectChanged:
 		return m.updateProjectDisplayName(event)

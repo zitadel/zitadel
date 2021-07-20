@@ -13,6 +13,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MemberAddedType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedType, MemberRemovedEventMapper).
+		RegisterFilterEventMapper(MemberCascadeRemovedType, MemberCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(RoleAddedType, RoleAddedEventMapper).
 		RegisterFilterEventMapper(RoleChangedType, RoleChangedEventMapper).
 		RegisterFilterEventMapper(RoleRemovedType, RoleRemovedEventMapper).
@@ -25,6 +26,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(GrantMemberAddedType, GrantMemberAddedEventMapper).
 		RegisterFilterEventMapper(GrantMemberChangedType, GrantMemberChangedEventMapper).
 		RegisterFilterEventMapper(GrantMemberRemovedType, GrantMemberRemovedEventMapper).
+		RegisterFilterEventMapper(GrantMemberCascadeRemovedType, GrantMemberCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(ApplicationAddedType, ApplicationAddedEventMapper).
 		RegisterFilterEventMapper(ApplicationChangedType, ApplicationChangedEventMapper).
 		RegisterFilterEventMapper(ApplicationRemovedType, ApplicationRemovedEventMapper).

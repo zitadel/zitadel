@@ -57,6 +57,10 @@ func (u *User) ViewModel() string {
 	return userTable
 }
 
+func (u *User) Subscription() *v1.Subscription {
+	return u.subscription
+}
+
 func (_ *User) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
 }
@@ -120,6 +124,8 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		es_model.HumanProfileChanged,
 		es_model.HumanEmailChanged,
 		es_model.HumanEmailVerified,
+		es_model.HumanAvatarAdded,
+		es_model.HumanAvatarRemoved,
 		es_model.HumanPhoneChanged,
 		es_model.HumanPhoneVerified,
 		es_model.HumanPhoneRemoved,

@@ -3,20 +3,19 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/domain"
 	"testing"
 	"time"
-
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -36,6 +35,10 @@ func (m *mockViewNoUserSession) UserSessionsByAgentID(string) ([]*user_view_mode
 	return nil, nil
 }
 
+func (m *mockViewNoUserSession) PrefixAvatarURL() string {
+	return ""
+}
+
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
@@ -44,6 +47,10 @@ func (m *mockViewErrUserSession) UserSessionByIDs(string, string) (*user_view_mo
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockViewErrUserSession) PrefixAvatarURL() string {
+	return ""
 }
 
 type mockViewUserSession struct {
@@ -83,10 +90,18 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*user_view_model.
 	return sessions, nil
 }
 
+func (m *mockViewUserSession) PrefixAvatarURL() string {
+	return "prefix/"
+}
+
 type mockViewNoUser struct{}
 
 func (m *mockViewNoUser) UserByID(string) (*user_view_model.UserView, error) {
 	return nil, errors.ThrowNotFound(nil, "id", "user not found")
+}
+
+func (m *mockViewNoUser) PrefixAvatarURL() string {
+	return ""
 }
 
 type mockEventUser struct {
@@ -150,6 +165,10 @@ func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 			PasswordlessTokens:     m.PasswordlessTokens,
 		},
 	}, nil
+}
+
+func (m *mockViewUser) PrefixAvatarURL() string {
+	return ""
 }
 
 type mockViewOrg struct {
@@ -232,7 +251,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		{
 			"prompt none and checkLoggedIn false, callback step",
 			fields{},
-			args{&domain.AuthRequest{Prompt: domain.PromptNone}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptNone}}, false},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -259,7 +278,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewErrUserSession{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -282,7 +301,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
 				&domain.LoginStep{},
 				&domain.SelectUserStep{
@@ -291,11 +310,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 							UserID:            "id1",
 							LoginName:         "loginname1",
 							SelectionPossible: true,
+							ResourceOwner:     "orgID1",
 						},
 						{
 							UserID:            "id2",
 							LoginName:         "loginname2",
 							SelectionPossible: true,
+							ResourceOwner:     "orgID2",
 						},
 					},
 				}},
@@ -320,7 +341,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount, RequestedOrgID: "orgID1"}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}, RequestedOrgID: "orgID1"}, false},
 			[]domain.NextStep{
 				&domain.LoginStep{},
 				&domain.SelectUserStep{
@@ -329,11 +350,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 							UserID:            "id1",
 							LoginName:         "loginname1",
 							SelectionPossible: true,
+							ResourceOwner:     "orgID1",
 						},
 						{
 							UserID:            "id2",
 							LoginName:         "loginname2",
 							SelectionPossible: false,
+							ResourceOwner:     "orgID2",
 						},
 					},
 				}},
@@ -347,7 +370,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&domain.AuthRequest{Prompt: domain.PromptSelectAccount}, false},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
 				&domain.LoginStep{},
 				&domain.SelectUserStep{
@@ -825,7 +848,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  domain.PromptNone,
+				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
@@ -857,7 +880,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  domain.PromptNone,
+				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
@@ -889,7 +912,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
-				Prompt:  domain.PromptNone,
+				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},

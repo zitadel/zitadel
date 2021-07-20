@@ -77,13 +77,22 @@ func RemoteIPStringFromRequest(r *http.Request) string {
 	if ok {
 		return ip
 	}
-	return r.RemoteAddr
+	host, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return host
+}
+
+func GetAuthorization(r *http.Request) string {
+	return r.Header.Get(Authorization)
+}
+
+func GetOrgID(r *http.Request) string {
+	return r.Header.Get(ZitadelOrgID)
 }
 
 func GetForwardedFor(headers http.Header) (string, bool) {
 	forwarded, ok := headers[ForwardedFor]
 	if ok {
-		ip := strings.Split(forwarded[0], ", ")[0]
+		ip := strings.TrimSpace(strings.Split(forwarded[0], ",")[0])
 		if ip != "" {
 			return ip, true
 		}

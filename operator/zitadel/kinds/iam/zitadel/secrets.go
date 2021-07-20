@@ -101,5 +101,43 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	mailKey := "emailappkey"
 	secrets[mailKey] = conf.Notifications.Email.AppKey
 	existing[mailKey] = conf.Notifications.Email.ExistingAppKey
+
+	if conf.AssetStorage == nil {
+		conf.AssetStorage = &configuration.AssetStorage{}
+	}
+	if conf.AssetStorage.AccessKeyID == nil {
+		conf.AssetStorage.AccessKeyID = &secret.Secret{}
+	}
+	if conf.AssetStorage.ExistingAccessKeyID == nil {
+		conf.AssetStorage.ExistingAccessKeyID = &secret.Existing{}
+	}
+	if conf.AssetStorage.SecretAccessKey == nil {
+		conf.AssetStorage.SecretAccessKey = &secret.Secret{}
+	}
+	if conf.AssetStorage.ExistingSecretAccessKey == nil {
+		conf.AssetStorage.ExistingSecretAccessKey = &secret.Existing{}
+	}
+	accessKey := "accesskeyid"
+	secrets[accessKey] = conf.AssetStorage.AccessKeyID
+	existing[accessKey] = conf.AssetStorage.ExistingAccessKeyID
+
+	secretKey := "secretaccesskey"
+	secrets[secretKey] = conf.AssetStorage.SecretAccessKey
+	existing[secretKey] = conf.AssetStorage.ExistingSecretAccessKey
+
+	if conf.Sentry == nil {
+		conf.Sentry = &configuration.Sentry{}
+	}
+	if conf.Sentry.SentryDSN == nil {
+		conf.Sentry.SentryDSN = &secret.Secret{}
+	}
+	if conf.Sentry.ExistingSentryDSN == nil {
+		conf.Sentry.ExistingSentryDSN = &secret.Existing{}
+	}
+
+	SentryDSN := "sentrydsn"
+	secrets[SentryDSN] = conf.Sentry.SentryDSN
+	existing[SentryDSN] = conf.Sentry.ExistingSentryDSN
+
 	return secrets, existing
 }

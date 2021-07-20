@@ -49,4 +49,14 @@ This API is intended to configure and manage the IAM itself.
 | REST    | [https://api.zitadel.ch/admin/v1/](https://api.zitadel.ch/admin/v1/)                                                            |
 | GRPC    | [https://api.zitadel.ch/caos.zitadel.admin.api.v1.AdminService/](https://api.zitadel.ch/caos.zitadel.admin.api.v1.AdminService) |
 
-[Latest
+[Latest API Version](https://github.com/caos/zitadel/blob/main/proto/zitadel/admin.proto)
+
+## Assets API
+
+
+The Assets API allows you to up- and download all kinds of assets. This can be files such as logos, fonts or user avatar.
+
+
+| Service | URI                                                                                                                             |
+|:--------|:--------------------------------------------------------------------------------------------------------------------------------|
+| REST    | [https://api.zitadel.ch/assets/v1/](https://api.zitadel.ch/assets/v1/)                                                            |

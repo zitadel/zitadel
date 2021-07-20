@@ -115,7 +115,6 @@ export class FeaturesComponent implements OnDestroy {
       this.subService.getLink(this.org.id, window.location.href)
         .then(payload => {
           this.stripeLoading = false;
-          console.log(payload);
           this.stripeURL = payload.redirect_url;
         })
         .catch(error => {
@@ -152,13 +151,16 @@ export class FeaturesComponent implements OnDestroy {
         req.setOrgId(this.org.id);
 
         req.setLoginPolicyUsernameLogin(this.features.loginPolicyUsernameLogin);
+        req.setLoginPolicyPasswordReset(this.features.loginPolicyPasswordReset);
         req.setLoginPolicyRegistration(this.features.loginPolicyRegistration);
         req.setLoginPolicyIdp(this.features.loginPolicyIdp);
         req.setLoginPolicyFactors(this.features.loginPolicyFactors);
         req.setLoginPolicyPasswordless(this.features.loginPolicyPasswordless);
         req.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
-        req.setLabelPolicy(this.features.labelPolicy);
+        req.setLabelPolicyPrivateLabel(this.features.labelPolicyPrivateLabel);
+        req.setLabelPolicyWatermark(this.features.labelPolicyWatermark);
         req.setCustomDomain(this.features.customDomain);
+        req.setCustomText(this.features.customText);
 
         this.adminService.setOrgFeatures(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -170,13 +172,16 @@ export class FeaturesComponent implements OnDestroy {
         // update Default org iam policy?
         const dreq = new SetDefaultFeaturesRequest();
         dreq.setLoginPolicyUsernameLogin(this.features.loginPolicyUsernameLogin);
+        dreq.setLoginPolicyPasswordReset(this.features.loginPolicyPasswordReset);
         dreq.setLoginPolicyRegistration(this.features.loginPolicyRegistration);
         dreq.setLoginPolicyIdp(this.features.loginPolicyIdp);
         dreq.setLoginPolicyFactors(this.features.loginPolicyFactors);
         dreq.setLoginPolicyPasswordless(this.features.loginPolicyPasswordless);
         dreq.setPasswordComplexityPolicy(this.features.passwordComplexityPolicy);
-        dreq.setLabelPolicy(this.features.labelPolicy);
+        dreq.setLabelPolicyPrivateLabel(this.features.labelPolicyPrivateLabel);
+        dreq.setLabelPolicyWatermark(this.features.labelPolicyWatermark);
         dreq.setCustomDomain(this.features.customDomain);
+        dreq.setCustomText(this.features.customText);
 
         this.adminService.setDefaultFeatures(dreq).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);

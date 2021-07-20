@@ -18,7 +18,7 @@ export class TimestampToRetentionPipe implements PipeTransform {
     if (date?.seconds !== undefined && date?.nanos !== undefined) {
       const ms = (date.seconds * 1000 + date.nanos / 1000 / 1000);
       const mins = ms / 1000 / 60;
-      return mins / 60 / 24;
+      return +(mins / 60 / 24).toFixed(2);
     }
   }
 }

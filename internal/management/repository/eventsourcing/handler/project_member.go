@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -60,6 +61,10 @@ func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable
 }
 
+func (p *ProjectMember) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *ProjectMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
 }
@@ -111,7 +116,7 @@ func (p *ProjectMember) processProjectMember(event *es_models.Event) (err error)
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectMemberRemoved:
+	case proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		err = member.SetData(event)
 		if err != nil {
 			return err
@@ -134,7 +139,9 @@ func (p *ProjectMember) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		members, err := p.view.ProjectMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -150,6 +157,8 @@ func (p *ProjectMember) processUser(event *es_models.Event) (err error) {
 			p.fillUserData(member, user)
 		}
 		return p.view.PutProjectMembers(members, event)
+	case usr_es_model.UserRemoved:
+		p.view.DeleteProjectMembersByUserID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event)
 	}
@@ -166,6 +175,9 @@ func (p *ProjectMember) fillData(member *view_model.ProjectMemberView) (err erro
 
 func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user *usr_view_model.UserView) error {
 	org, err := p.getOrgByID(context.Background(), user.ResourceOwner)
+	if err != nil {
+		return err
+	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
 		policy, err = p.getDefaultOrgIAMPolicy(context.TODO())
@@ -175,11 +187,13 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 	}
 	member.UserName = user.UserName
 	member.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	member.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.Email = user.Email
 		member.DisplayName = user.DisplayName
+		member.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name

@@ -69,7 +69,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		userOrg = authReq.UserOrgID
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.command.SetPassword(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
+	err = l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
@@ -96,21 +96,20 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
-
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, "Init Password", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Init Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
+	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, authReq, userID)
 	if policy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
@@ -127,10 +126,11 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 			data.HasNumber = NumberRegex
 		}
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPassword], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
 func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	data := l.getUserData(r, authReq, "Password Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPasswordDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }

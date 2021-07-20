@@ -166,7 +166,11 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
+	membersShips, err := s.user.UserMembershipsByUserID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -323,12 +327,33 @@ func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.
 	}, nil
 }
 
+func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHumanAvatarRequest) (*mgmt_pb.RemoveHumanAvatarResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	objectDetails, err := s.command.RemoveHumanAvatar(ctx, ctxData.OrgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveHumanAvatarResponse{
+		Details: object.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
-	objectDetails, err := s.command.SetOneTimePassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.SetHumanInitialPasswordResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPasswordRequest) (*mgmt_pb.SetHumanPasswordResponse, error) {
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetHumanPasswordResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

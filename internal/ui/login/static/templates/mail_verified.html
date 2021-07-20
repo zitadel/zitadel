@@ -1,6 +1,7 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "EmailVerificationDone.Title"}}</h1>
     {{ template "user-profile" . }}
 
     <p>{{t "EmailVerificationDone.Description"}}</p>
@@ -14,11 +15,16 @@
 
     <div class="lgn-actions">
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">
-            {{t "Actions.Cancel"}}
+            {{t "EmailVerificationDone.CancelButtonText"}}
         </a>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary"
-            type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
+        <button class="lgn-raised-button lgn-primary" type="submit">
+            {{if .AuthReqID }}
+                {{t "EmailVerificationDone.NextButtonText"}}
+            {{else}}
+                {{t "EmailVerificationDone.LoginButtonText"}}
+            {{end}}
+        </button>
     </div>
 </form>
 

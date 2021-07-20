@@ -5,7 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -14,12 +16,15 @@ import (
 	"github.com/caos/zitadel/internal/repository/features"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/static"
+	"github.com/caos/zitadel/internal/static/mock"
 )
 
 func TestCommandSide_SetOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 		iamDomain  string
+		static     static.Storage
 	}
 	type args struct {
 		ctx           context.Context
@@ -54,8 +59,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyPasswordless:  false,
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -87,8 +94,41 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyPasswordless:  false,
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
+					CustomDomain:             false,
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "org does not exist, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				features: &domain.Features{
+					TierName:                 "Test",
+					State:                    domain.FeaturesStateActive,
+					AuditLogRetention:        time.Hour,
+					LoginPolicyFactors:       false,
+					LoginPolicyIDP:           false,
+					LoginPolicyPasswordless:  false,
+					LoginPolicyRegistration:  false,
+					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
+					PasswordComplexityPolicy: false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -101,12 +141,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -135,6 +185,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -169,6 +227,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -191,9 +271,13 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyPasswordless:  false,
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
+					CustomText:               false,
+					PrivacyPolicy:            false,
 				},
 			},
 			res: res{
@@ -207,12 +291,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -241,6 +335,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -296,6 +398,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -325,8 +449,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyPasswordless:  false,
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -341,12 +467,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -375,6 +511,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -437,6 +581,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -469,8 +635,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyPasswordless:  false,
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -485,12 +653,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -519,6 +697,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -588,6 +774,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -623,8 +831,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyPasswordless:  false,
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
+					LoginPolicyPasswordReset: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 				},
 			},
@@ -639,6 +849,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					//checkOrgExists
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"org1",
+							),
+						),
+					),
 					//NewOrgFeaturesWriteModel
 					expectFilter(),
 					//begin ensureOrgSettingsToFeatures
@@ -649,6 +869,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -664,6 +885,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 							),
 						),
@@ -674,6 +896,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -727,6 +950,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					//begin setDefaultAuthFactorsInCustomLoginPolicy
 					//orgLabelPolicyWriteModelByID
 					expectFilter(
 						eventFromEventPusher(
@@ -735,6 +959,14 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -744,10 +976,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"custom",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
 					),
+					//removeLabelPolicy
+					expectFilter(),
+					//end setDefaultAuthFactorsInCustomLoginPolicy
+					//removeCustomDomains
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
@@ -778,6 +1022,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -790,7 +1056,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.MultiFactorTypeU2FWithPIN),
 							),
 							eventFromEventPusher(
-								newLoginPolicyChangedEvent(context.Background(), "org1", true, true, true, true, domain.PasswordlessTypeAllowed),
+								newLoginPolicyChangedEvent(context.Background(), "org1", true, true, true, true, true, domain.PasswordlessTypeAllowed),
 							),
 							eventFromEventPusher(
 								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
@@ -799,12 +1065,19 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								org.NewLabelPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
 							),
 							eventFromEventPusher(
+								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.InitCodeMessageType, language.English),
+							),
+							eventFromEventPusher(
+								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
 							),
 						},
 					),
 				),
 				iamDomain: "iam-domain",
+				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -819,7 +1092,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LoginPolicyRegistration:  false,
 					LoginPolicyUsernameLogin: false,
 					PasswordComplexityPolicy: false,
-					LabelPolicy:              false,
+					LabelPolicyPrivateLabel:  false,
+					LabelPolicyWatermark:     false,
+					CustomDomain:             false,
 				},
 			},
 			res: res{
@@ -834,6 +1109,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 				iamDomain:  tt.fields.iamDomain,
+				static:     tt.fields.static,
 			}
 			got, err := r.SetOrgFeatures(tt.args.ctx, tt.args.resourceOwner, tt.args.features)
 			if tt.res.err == nil {
@@ -920,6 +1196,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -944,6 +1221,14 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"primary",
 								"secondary",
+								"warn",
+								"font",
+								"primary-dark",
+								"secondary-dark",
+								"warn-dark",
+								"font-dark",
+								false,
+								false,
 								false,
 							),
 						),
@@ -975,6 +1260,28 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"org1.iam-domain",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.InitCodeMessageType,
+								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewPrivacyPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"toslink",
+								"privacylink",
 							),
 						),
 					),

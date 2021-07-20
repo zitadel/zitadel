@@ -27,11 +27,6 @@ func Reconcile(
 				return err
 			}
 
-			imageRegistry := spec.CustomImageRegistry
-			if imageRegistry == "" {
-				imageRegistry = "ghcr.io"
-			}
-
 			if spec.SelfReconciling {
 				desiredTree := &tree.Tree{
 					Common: &tree.Common{
@@ -40,7 +35,7 @@ func Reconcile(
 					},
 				}
 
-				if err := zitadelKubernetes.EnsureDatabaseArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustDatabaseOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, gitops); err != nil {
+				if err := zitadelKubernetes.EnsureDatabaseArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustDatabaseOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, spec.CustomImageRegistry, gitops); err != nil {
 					recMonitor.Error(errors.Wrap(err, "Failed to deploy database-operator into k8s-cluster"))
 					return err
 				}

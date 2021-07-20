@@ -23,26 +23,72 @@ message OrgIAMPolicy {
 
 message LabelPolicy {
     zitadel.v1.ObjectDetails details = 1;
+    // hex value for primary color
     string primary_color = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for primary color"
         }
     ];
-    string secondary_color = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for secondary color"
-        }
-    ];
+    // defines if the organisation's admin changed the policy
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
         }
     ];
+    // hex value for secondary color
+    string warn_color = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warn color"
+        }
+     ];
+    // hex value for background color
+    string background_color = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color"
+        }
+    ];
+    // hex value for font color
+    string font_color = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color"
+        }
+    ];
+    // hex value for primary color dark theme
+    string primary_color_dark = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for primary color dark theme"
+        }
+    ];
+    // hex value for background color dark theme
+    string background_color_dark = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color dark theme"
+        }
+    ];
+    // hex value for warn color dark theme
+    string warn_color_dark = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warn color dark theme"
+        }
+    ];
+    // hex value for font color dark theme
+    string font_color_dark = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme"
+        }
+    ];
+    bool disable_watermark = 13;
+    string logo_url = 14;
+    string icon_url = 15;
+    string logo_url_dark = 16;
+    string icon_url_dark = 17;
+    string font_url = 18;
 }
 
 message LoginPolicy {
@@ -75,6 +121,11 @@ message LoginPolicy {
     bool is_default = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the organisation's admin changed the policy"
+        }
+    ];
+    bool hide_password_reset = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if password reset link should be shown in the login screen"
         }
     ];
 }
@@ -169,4 +220,11 @@ message PasswordLockoutPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
+}
+
+message PrivacyPolicy {
+    zitadel.v1.ObjectDetails details = 1;
+    string tos_link = 2;
+    string privacy_link = 3;
+    bool is_default = 4;
 }

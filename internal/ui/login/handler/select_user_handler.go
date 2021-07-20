@@ -21,7 +21,8 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 		Users:    selectionData.Users,
 		Linking:  len(authReq.LinkingUsers) > 0,
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplUserSelection], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplUserSelection], data, nil)
 }
 
 func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {

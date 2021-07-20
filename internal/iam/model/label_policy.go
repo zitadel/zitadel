@@ -10,7 +10,13 @@ type LabelPolicy struct {
 	State               PolicyState
 	Default             bool
 	PrimaryColor        string
-	SecondaryColor      string
+	BackgroundColor     string
+	FontColor           string
+	WarnColor           string
+	PrimaryColorDark    string
+	BackgroundColorDark string
+	FontColorDark       string
+	WarnColorDark       string
 	HideLoginNameSuffix bool
 }
 

@@ -92,6 +92,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								"clientid1",
 								"config1",
 								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -144,6 +146,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								"clientid1",
 								"config1",
 								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -165,6 +169,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					IDPConfigID:           "config1",
 					ClientID:              "clientid1",
 					Issuer:                "issuer",
+					AuthorizationEndpoint: "authorization-endpoint",
+					TokenEndpoint:         "token-endpoint",
 					Scopes:                []string{"scope"},
 					IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
 					UsernameMapping:       domain.OIDCMappingFieldEmail,
@@ -195,6 +201,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								"clientid1",
 								"config1",
 								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -214,6 +222,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 									"config1",
 									"clientid-changed",
 									"issuer-changed",
+									"authorization-endpoint-changed",
+									"token-endpoint-changed",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
@@ -236,6 +246,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",
 					Issuer:                "issuer-changed",
+					AuthorizationEndpoint: "authorization-endpoint-changed",
+					TokenEndpoint:         "token-endpoint-changed",
 					ClientSecretString:    "secret-changed",
 					Scopes:                []string{"scope", "scope2"},
 					IDPDisplayNameMapping: domain.OIDCMappingFieldPreferredLoginName,
@@ -251,6 +263,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",
 					Issuer:                "issuer-changed",
+					AuthorizationEndpoint: "authorization-endpoint-changed",
+					TokenEndpoint:         "token-endpoint-changed",
 					Scopes:                []string{"scope", "scope2"},
 					IDPDisplayNameMapping: domain.OIDCMappingFieldPreferredLoginName,
 					UsernameMapping:       domain.OIDCMappingFieldPreferredLoginName,
@@ -278,13 +292,15 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 	}
 }
 
-func newDefaultIDPOIDCConfigChangedEvent(ctx context.Context, configID, clientID, issuer string, secret *crypto.CryptoValue, displayMapping, usernameMapping domain.OIDCMappingField, scopes []string) *iam.IDPOIDCConfigChangedEvent {
+func newDefaultIDPOIDCConfigChangedEvent(ctx context.Context, configID, clientID, issuer, authorizationEndpoint, tokenEndpoint string, secret *crypto.CryptoValue, displayMapping, usernameMapping domain.OIDCMappingField, scopes []string) *iam.IDPOIDCConfigChangedEvent {
 	event, _ := iam.NewIDPOIDCConfigChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		configID,
 		[]idpconfig.OIDCConfigChanges{
 			idpconfig.ChangeClientID(clientID),
 			idpconfig.ChangeIssuer(issuer),
+			idpconfig.ChangeAuthorizationEndpoint(authorizationEndpoint),
+			idpconfig.ChangeTokenEndpoint(tokenEndpoint),
 			idpconfig.ChangeClientSecret(secret),
 			idpconfig.ChangeIDPDisplayNameMapping(displayMapping),
 			idpconfig.ChangeUserNameMapping(usernameMapping),

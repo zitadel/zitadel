@@ -1,20 +1,12 @@
 @import './account_selection.scss';
 
-@mixin lgn-account-selection-theme($theme-or-color-config) {
-    $theme: lgn-private-legacy-get-theme($theme-or-color-config);
-    $color: lgn-get-color-config($theme);
+@mixin lgn-account-selection-theme() {
 
-    @if $color != null {
-        @include lgn-account-selection-color($color);
-    }
+    @include lgn-account-selection-color();
+
 }
 
-@mixin lgn-account-selection-color($config-or-theme) {
-    $config: lgn-get-color-config($config-or-theme);
-    $warn: map-get($config, warn);
-    $primary: map-get($config, primary);
-    $foreground: map-get($config, foreground);
-    $background: map-get($config, background);
+@mixin lgn-account-selection-color() {
 
     .lgn-account-selection{
         display: flex;
@@ -24,36 +16,34 @@
         .lgn-account {
             color: inherit;
             background: transparent;
-            box-shadow: inset 0 -1px lgn-color($foreground, footer-line);
+            box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
 
             &:hover {
-                $primary: map-get($config, primary);
-                background-color: lgn-color($background, account-selector-hover);
+                background-color: var(--zitadel-color-account-selector-hover);
             }
 
             &:focus {
-                background-color: lgn-color($background, account-selector-active);
+                background-color: var(--zitadel-color-account-selector-active);
             }
 
             &:active {
-                background-color: lgn-color($background, account-selector-active);
+                background-color: var(--zitadel-color-account-selector-active);
             }
 
             .lgn-loginname{
                 font-size: 14px;
-                color: lgn-color($foreground, label);
+                color: var(--zitadel-color-label);
             }
 
             .lgn-session-state {
-                color: lgn-color($foreground, label);
+                color: var(--zitadel-color-label);
 
                 &.i0 {
                     color: #85d996;
                 }
 
                 &.i1 {
-                    $warn: map-get($config, warn);
-                    color: lgn-color($warn, default);
+                    color: var(--zitadel-color-warn);
                 }
             }
         }

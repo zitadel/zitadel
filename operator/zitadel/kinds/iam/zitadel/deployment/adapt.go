@@ -21,8 +21,7 @@ const (
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
-	zitadelImage = "ghcr.io/caos/zitadel"
-	timeout      = 60 * time.Second
+	timeout = 60 * time.Second
 )
 
 func AdaptFunc(
@@ -47,6 +46,7 @@ func AdaptFunc(
 	migrationDone operator.EnsureFunc,
 	configurationDone operator.EnsureFunc,
 	setupDone operator.EnsureFunc,
+	customImageRegistry string,
 ) (
 	func(
 		necessaryUsers map[string]string,
@@ -93,6 +93,7 @@ func AdaptFunc(
 					consoleCMName,
 					secretVarsName,
 					secretPasswordsName,
+					customImageRegistry,
 				)
 
 				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
@@ -126,7 +127,26 @@ func AdaptFunc(
 
 }
 
-func deploymentDef(nameLabels *labels.Name, namespace string, replicaCount int, podSelector *labels.Selector, nodeSelector map[string]string, tolerations []corev1.Toleration, affinity *k8s.Affinity, users []string, version *string, resources *k8s.Resources, cmName string, certPath string, secretName string, secretPath string, consoleCMName string, secretVarsName string, secretPasswordsName string) *appsv1.Deployment {
+func deploymentDef(
+	nameLabels *labels.Name,
+	namespace string,
+	replicaCount int,
+	podSelector *labels.Selector,
+	nodeSelector map[string]string,
+	tolerations []corev1.Toleration,
+	affinity *k8s.Affinity,
+	users []string,
+	version *string,
+	resources *k8s.Resources,
+	cmName string,
+	certPath string,
+	secretName string,
+	secretPath string,
+	consoleCMName string,
+	secretVarsName string,
+	secretPasswordsName string,
+	customImageRegistry string,
+) *appsv1.Deployment {
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        nameLabels.Name(),
@@ -161,6 +181,7 @@ func deploymentDef(nameLabels *labels.Name, namespace string, replicaCount int, 
 							dbSecrets,
 							users,
 							RunAsUser,
+							customImageRegistry,
 						),
 					},
 					Containers: []corev1.Container{
@@ -180,6 +201,7 @@ func deploymentDef(nameLabels *labels.Name, namespace string, replicaCount int, 
 							users,
 							dbSecrets,
 							"start",
+							customImageRegistry,
 						),
 					},
 					Volumes: GetVolumes(

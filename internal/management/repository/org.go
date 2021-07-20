@@ -4,12 +4,16 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
 type OrgRepository interface {
+	Languages(ctx context.Context) ([]language.Tag, error)
 	OrgByID(ctx context.Context, id string) (*org_model.OrgView, error)
 	OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error)
 	OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error)
@@ -41,12 +45,20 @@ type OrgRepository interface {
 	GetPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
 	GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
 
+	GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
+	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
+
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 
-	GetDefaultMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
-	GetMailTexts(ctx context.Context) (*iam_model.MailTextsView, error)
+	GetDefaultMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
+	GetMessageText(ctx context.Context, orgID, textType, lang string) (*domain.CustomMessageText, error)
+
+	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
+	GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error)
 
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
+	GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 }

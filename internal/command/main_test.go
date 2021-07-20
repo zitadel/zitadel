@@ -81,9 +81,11 @@ func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.Search
 	events := make([]*repository.Event, 0, len(repo.events))
 	for _, event := range repo.events {
 		for _, filter := range searchQuery.Filters {
-			if filter.Field == repository.FieldAggregateType {
-				if event.AggregateType != filter.Value {
-					continue
+			for _, f := range filter {
+				if f.Field == repository.FieldAggregateType {
+					if event.AggregateType != f.Value {
+						continue
+					}
 				}
 			}
 		}

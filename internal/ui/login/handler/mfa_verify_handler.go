@@ -53,11 +53,11 @@ func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq 
 }
 
 func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, verificationStep *domain.MFAVerificationStep, selectedProvider domain.MFAType, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "MFA Verify", errType, errMessage)
+	data := l.getUserData(r, authReq, "MFA Verify", errID, errMessage)
 	if verificationStep == nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -73,7 +73,7 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAVerify], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplMFAVerify], data, nil)
 }
 
 func removeSelectedProviderFromList(providers []domain.MFAType, selected domain.MFAType) []domain.MFAType {

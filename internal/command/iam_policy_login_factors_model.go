@@ -42,12 +42,15 @@ func (wm *IAMSecondFactorWriteModel) Reduce() error {
 }
 
 func (wm *IAMSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
 		EventTypes(
 			iam.LoginPolicySecondFactorAddedEventType,
-			iam.LoginPolicySecondFactorRemovedEventType)
+			iam.LoginPolicySecondFactorRemovedEventType).
+		Builder()
 }
 
 type IAMMultiFactorWriteModel struct {
@@ -86,10 +89,13 @@ func (wm *IAMMultiFactorWriteModel) Reduce() error {
 }
 
 func (wm *IAMMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
 		EventTypes(
 			iam.LoginPolicyMultiFactorAddedEventType,
-			iam.LoginPolicyMultiFactorRemovedEventType)
+			iam.LoginPolicyMultiFactorRemovedEventType).
+		Builder()
 }

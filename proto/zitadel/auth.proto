@@ -49,6 +49,17 @@ service AuthService {
         };
     }
 
+    // Returns the default languages
+    rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
+        option (google.api.http) = {
+            get: "/languages";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
+    }
+
     // Returns my full blown user
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
@@ -75,6 +86,39 @@ service AuthService {
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
             post: "/users/me/sessions/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the refresh tokens of the authorized user
+    rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/me/tokens/refresh/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Revokes a single refresh token of the authorized user by its (token) id
+    rpc RevokeMyRefreshToken(RevokeMyRefreshTokenRequest) returns (RevokeMyRefreshTokenResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/tokens/refresh/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Revokes all refresh tokens of the authorized user
+    rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/me/tokens/refresh/_revoke_all"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -241,6 +285,17 @@ service AuthService {
     rpc RemoveMyPhone(RemoveMyPhoneRequest) returns (RemoveMyPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/me/phone"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Remove my avatar
+    rpc RemoveMyAvatar(RemoveMyAvatarRequest) returns (RemoveMyAvatarResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/avatar"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -461,6 +516,14 @@ message HealthzRequest {}
 message HealthzResponse {}
 
 //This is an empty request
+message GetSupportedLanguagesRequest {}
+
+//This is an empty response
+message GetSupportedLanguagesResponse {
+    repeated string languages = 1;
+}
+
+//This is an empty request
 // the request parameters are read from the token-header
 message GetMyUserRequest {}
 
@@ -488,6 +551,28 @@ message ListMyUserSessionsRequest {}
 message ListMyUserSessionsResponse {
     repeated zitadel.user.v1.Session result = 1;
 }
+
+//This is an empty request
+message ListMyRefreshTokensRequest {}
+
+message ListMyRefreshTokensResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.RefreshToken result = 2;
+}
+
+message RevokeMyRefreshTokenRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RevokeMyRefreshTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RevokeAllMyRefreshTokensRequest {}
+
+//This is an empty response
+message RevokeAllMyRefreshTokensResponse {}
 
 message UpdateMyUserNameRequest {
     string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -600,6 +685,13 @@ message ResendMyPhoneVerificationResponse {
 message RemoveMyPhoneRequest {}
 
 message RemoveMyPhoneResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveMyAvatarRequest {}
+
+message RemoveMyAvatarResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

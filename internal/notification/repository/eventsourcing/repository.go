@@ -1,17 +1,18 @@
 package eventsourcing
 
 import (
+	"net/http"
+
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
-	"net/http"
+
+	"golang.org/x/text/language"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/spooler"
 	noti_view "github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
-	"golang.org/x/text/language"
 )
 
 type Config struct {
@@ -26,7 +27,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 }
 
-func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands) (*EsRepository, error) {
+func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands, apiDomain string) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -41,11 +42,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 		return nil, err
 	}
 
-	translator, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: conf.DefaultLanguage})
-	if err != nil {
-		return nil, err
-	}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, systemDefaults, translator, dir)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, systemDefaults, dir, apiDomain)
 
 	return &EsRepository{
 		spool,

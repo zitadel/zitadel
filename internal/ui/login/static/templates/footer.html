@@ -1,8 +1,18 @@
 {{define "footer"}}
 <footer>
+    {{ if hasWatermark .LabelPolicy }}
+    <span class="watermark" >
+        <span class="powered">{{t "Footer.PoweredBy"}}</span>
+        <span class="lgn-logo-watermark" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo"></span>
+    </span>
+    {{end}}
     <span class="fill-space"></span>
-    <a href="{{t "Footer.TosLink"}}" rel="noopener noreferrer" target="_blank" alt="TOS">{{t "Footer.Tos"}}</a>
-    <a href="{{t "Footer.PrivacyLink"}}" rel="noopener noreferrer" target="_blank" alt="Privacy Policy">{{t "Footer.Privacy"}}</a>
-    <a href="https://docs.zitadel.ch/use" target="_black" alt="Help">{{t "Footer.Help"}}</a>
+    {{ if .TOSLink }}
+        <a href="{{.TOSLink}}" rel="noopener noreferrer" target="_blank" alt="TOS">{{t "Footer.Tos"}}</a>
+    {{ end }}
+    {{ if .PrivacyLink }}
+        <a href="{{.PrivacyLink}}" rel="noopener noreferrer" target="_blank" alt="Privacy Policy">{{t "Footer.Privacy"}}</a>
+    {{end}}
+    <a href="{{t "Footer.HelpLink"}}" target="_black" alt="Help">{{t "Footer.Help"}}</a>
 </footer>
 {{end}}

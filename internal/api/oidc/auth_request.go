@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 	"gopkg.in/square/go-jose.v2"
@@ -80,7 +81,7 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
-func (o *OPStorage) CreateToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
+func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	var userAgentID, applicationID, userOrgID string
@@ -107,18 +108,58 @@ func grantsToScopes(grants []*grant_model.UserGrantView) []string {
 	return scopes
 }
 
+func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
+	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
+		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
+		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
+	if err != nil {
+		return "", "", time.Time{}, err
+	}
+	return resp.TokenID, token, resp.Expiration, nil
+}
+
+func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time, []string) {
+	authReq, ok := req.(*AuthRequest)
+	if ok {
+		return authReq.AgentID, authReq.ApplicationID, authReq.UserOrgID, authReq.AuthTime, authReq.GetAMR()
+	}
+	refreshReq, ok := req.(*RefreshTokenRequest)
+	if ok {
+		return refreshReq.UserAgentID, refreshReq.ClientID, "", refreshReq.AuthTime, refreshReq.AuthMethodsReferences
+	}
+	return "", "", "", time.Time{}, nil
+}
+
+func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
+	tokenView, err := o.repo.RefreshTokenByID(ctx, refreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return RefreshTokenRequestFromBusiness(tokenView), nil
+}
+
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
+		logging.Log("OIDC-aGh4q").Error("no user agent id")
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
 	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
 	if err != nil {
+		logging.Log("OIDC-Ghgr3").WithError(err).Error("error retrieving user sessions")
 		return err
 	}
-	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	if len(userIDs) == 0 {
+		return nil
+	}
+	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
+	return err
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {

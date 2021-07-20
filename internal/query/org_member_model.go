@@ -18,6 +18,8 @@ func (rm *OrgMembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.MembersReadModel.AppendEvents(&e.MemberChangedEvent)
 		case *org.MemberRemovedEvent:
 			rm.MembersReadModel.AppendEvents(&e.MemberRemovedEvent)
+		case *org.MemberCascadeRemovedEvent:
+			rm.MembersReadModel.AppendEvents(&e.MemberCascadeRemovedEvent)
 		}
 	}
 }

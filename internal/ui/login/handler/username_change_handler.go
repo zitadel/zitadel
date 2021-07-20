@@ -15,12 +15,12 @@ type changeUsernameData struct {
 }
 
 func (l *Login) renderChangeUsername(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "Change Username", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangeUsername], data, nil)
+	data := l.getUserData(r, authReq, "Change Username", errID, errMessage)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplChangeUsername], data, nil)
 }
 
 func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
@@ -41,5 +41,5 @@ func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderChangeUsernameDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
 	data := l.getUserData(r, authReq, "Username Change Done", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangeUsernameDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplChangeUsernameDone], data, nil)
 }

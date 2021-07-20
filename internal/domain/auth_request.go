@@ -18,11 +18,11 @@ type AuthRequest struct {
 	ApplicationID string
 	CallbackURI   string
 	TransferState string
-	Prompt        Prompt
+	Prompt        []Prompt
 	PossibleLOAs  []LevelOfAssurance
 	UiLocales     []string
 	LoginHint     string
-	MaxAuthAge    uint32
+	MaxAuthAge    *time.Duration
 	Request       Request
 
 	levelOfAssurance       LevelOfAssurance
@@ -30,6 +30,8 @@ type AuthRequest struct {
 	UserName               string
 	LoginName              string
 	DisplayName            string
+	AvatarKey              string
+	PresignedAvatar        string
 	UserOrgID              string
 	RequestedOrgID         string
 	RequestedOrgName       string
@@ -45,6 +47,9 @@ type AuthRequest struct {
 	LoginPolicy            *LoginPolicy
 	AllowedExternalIDPs    []*IDPProvider
 	LabelPolicy            *LabelPolicy
+	PrivacyPolicy          *PrivacyPolicy
+	DefaultTranslations    []*CustomText
+	OrgTranslations        []*CustomText
 }
 
 type ExternalUser struct {
@@ -70,7 +75,17 @@ const (
 	PromptLogin
 	PromptConsent
 	PromptSelectAccount
+	PromptCreate
 )
+
+func IsPrompt(prompt []Prompt, requestedPrompt Prompt) bool {
+	for _, p := range prompt {
+		if p == requestedPrompt {
+			return true
+		}
+	}
+	return false
+}
 
 type LevelOfAssurance int
 
@@ -96,11 +111,11 @@ const (
 )
 
 func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
-	request, ok := authRequestTypeMapping[requestType]
-	if !ok {
-		return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
+	switch requestType {
+	case AuthRequestTypeOIDC:
+		return &AuthRequest{Request: &AuthRequestOIDC{}}, nil
 	}
-	return &AuthRequest{Request: request}, nil
+	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
 
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
@@ -108,11 +123,12 @@ func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
 	return a
 }
 
-func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, userOrgID string) {
+func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, avatar, userOrgID string) {
 	a.UserID = userID
 	a.UserName = userName
 	a.LoginName = loginName
 	a.DisplayName = displayName
+	a.AvatarKey = avatar
 	a.UserOrgID = userOrgID
 }
 

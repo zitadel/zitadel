@@ -71,6 +71,7 @@ func TestBucket_Secrets(t *testing.T) {
 		tolerations,
 		version,
 		features,
+		"",
 	)(
 		monitor,
 		desired,
@@ -143,6 +144,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 		tolerations,
 		version,
 		features,
+		"",
 	)(
 		monitor,
 		desired,
@@ -217,6 +219,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 		tolerations,
 		version,
 		features,
+		"",
 	)(
 		monitor,
 		desired,
@@ -292,6 +295,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 		tolerations,
 		version,
 		features,
+		"",
 	)(
 		monitor,
 		desired,
@@ -367,6 +371,7 @@ func TestBucket_AdaptClean(t *testing.T) {
 		tolerations,
 		version,
 		features,
+		"",
 	)(
 		monitor,
 		desired,

@@ -44,6 +44,10 @@ func (a *Application) ViewModel() string {
 	return applicationTable
 }
 
+func (p *Application) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (a *Application) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }
@@ -72,6 +76,8 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 	case es_model.ApplicationChanged,
 		es_model.OIDCConfigAdded,
 		es_model.OIDCConfigChanged,
+		es_model.APIConfigAdded,
+		es_model.APIConfigChanged,
 		es_model.ApplicationDeactivated,
 		es_model.ApplicationReactivated:
 		err := app.SetData(event)

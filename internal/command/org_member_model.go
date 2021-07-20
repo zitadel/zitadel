@@ -39,6 +39,11 @@ func (wm *OrgMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
 				continue
 			}
 			wm.MemberWriteModel.AppendEvents(&e.MemberRemovedEvent)
+		case *org.MemberCascadeRemovedEvent:
+			if e.UserID != wm.MemberWriteModel.UserID {
+				continue
+			}
+			wm.MemberWriteModel.AppendEvents(&e.MemberCascadeRemovedEvent)
 		}
 	}
 }
@@ -48,11 +53,15 @@ func (wm *OrgMemberWriteModel) Reduce() error {
 }
 
 func (wm *OrgMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.MemberWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.MemberWriteModel.AggregateID).
 		EventTypes(
 			org.MemberAddedEventType,
 			org.MemberChangedEventType,
-			org.MemberRemovedEventType)
+			org.MemberRemovedEventType,
+			org.MemberCascadeRemovedEventType).
+		Builder()
 }

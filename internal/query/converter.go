@@ -45,6 +45,8 @@ func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *domain.IDPConfigView {
 		converted.OIDCIssuer = rm.OIDCConfig.Issuer
 		converted.OIDCScopes = rm.OIDCConfig.Scopes
 		converted.OIDCUsernameMapping = rm.OIDCConfig.UserNameMapping
+		converted.OAuthAuthorizationEndpoint = rm.OIDCConfig.AuthorizationEndpoint
+		converted.OAuthTokenEndpoint = rm.OIDCConfig.TokenEndpoint
 	}
 	return converted
 }
@@ -73,10 +75,16 @@ func readModelToMembers(readModel *IAMMembersReadModel) []*model.IAMMember {
 
 func readModelToLabelPolicy(readModel *IAMLabelPolicyReadModel) *model.LabelPolicy {
 	return &model.LabelPolicy{
-		ObjectRoot:     readModelToObjectRoot(readModel.LabelPolicyReadModel.ReadModel),
-		PrimaryColor:   readModel.PrimaryColor,
-		SecondaryColor: readModel.SecondaryColor,
-		Default:        true,
+		ObjectRoot:          readModelToObjectRoot(readModel.LabelPolicyReadModel.ReadModel),
+		PrimaryColor:        readModel.PrimaryColor,
+		BackgroundColor:     readModel.BackgroundColor,
+		WarnColor:           readModel.WarnColor,
+		FontColor:           readModel.FontColor,
+		PrimaryColorDark:    readModel.PrimaryColorDark,
+		BackgroundColorDark: readModel.BackgroundColorDark,
+		WarnColorDark:       readModel.WarnColorDark,
+		FontColorDark:       readModel.FontColorDark,
+		Default:             true,
 	}
 }
 

@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/domain"
-
 	"golang.org/x/text/language"
 
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -36,6 +36,7 @@ type registerData struct {
 	HasNumber                 string
 	HasSymbol                 string
 	ShowUsername              bool
+	OrgRegister               bool
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -82,23 +83,29 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
 		return
 	}
-	authRequest.LoginName = user.PreferredLoginName
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
 	l.renderNextStep(w, r, authRequest)
 }
 
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {
-	var errType, errMessage string
+	var errID, errMessage string
 	if err != nil {
-		errMessage = l.getErrorMessage(r, err)
+		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	translator := l.getTranslator(authRequest)
 	if formData == nil {
 		formData = new(registerFormData)
 	}
 	if formData.Language == "" {
-		formData.Language = l.renderer.Lang(r).String()
+		formData.Language = l.renderer.ReqLang(translator, r).String()
 	}
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerFormData: *formData,
 	}
 
@@ -113,7 +120,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		resourceOwner = iam.GlobalOrgID
 	}
 
-	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, resourceOwner)
+	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, resourceOwner)
 	if pwPolicy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = pwPolicy.MinLength
@@ -137,6 +144,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		return
 	}
 	data.ShowUsername = orgIAMPolicy.UserLoginMustBeDomain
+	data.OrgRegister = orgIAMPolicy.UserLoginMustBeDomain
 
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {
@@ -152,7 +160,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			return formData.Gender == g
 		},
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
 func (d registerFormData) toHumanDomain() *domain.Human {

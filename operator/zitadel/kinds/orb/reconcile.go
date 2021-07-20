@@ -1,6 +1,7 @@
 package orb
 
 import (
+	"fmt"
 	"github.com/caos/orbos/mntr"
 	kubernetes2 "github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
@@ -23,12 +24,9 @@ func Reconcile(
 			recMonitor := monitor.WithField("version", spec.Version)
 
 			if spec.Version == "" {
-				return errors.New("no version provided for self-reconciling")
-			}
-
-			imageRegistry := spec.CustomImageRegistry
-			if imageRegistry == "" {
-				imageRegistry = "ghcr.io"
+				err := errors.New("No version provided for self-reconciling")
+				recMonitor.Error(err)
+				return err
 			}
 
 			if spec.SelfReconciling {
@@ -39,7 +37,7 @@ func Reconcile(
 					},
 				}
 
-				if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, imageRegistry, gitops); err != nil {
+				if err := kubernetes.EnsureZitadelOperatorArtifacts(monitor, treelabels.MustForAPI(desiredTree, mustZITADELOperator(&spec.Version)), k8sClient, spec.Version, spec.NodeSelector, spec.Tolerations, spec.CustomImageRegistry, gitops); err != nil {
 					return fmt.Errorf("failed to deploy zitadel-operator into k8s-cluster: %w", err)
 				}
 				recMonitor.Info("Applied zitadel-operator")

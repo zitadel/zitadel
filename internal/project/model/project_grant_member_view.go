@@ -17,6 +17,8 @@ type ProjectGrantMemberView struct {
 	LastName           string
 	DisplayName        string
 	PreferredLoginName string
+	AvatarURL          string
+	UserResourceOwner  string
 	Roles              []string
 	CreationDate       time.Time
 	ChangeDate         time.Time

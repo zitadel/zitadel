@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -44,12 +45,15 @@ func (wm *IAMLoginPolicyWriteModel) Reduce() error {
 }
 
 func (wm *IAMLoginPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.LoginPolicyWriteModel.AggregateID).
 		EventTypes(
 			iam.LoginPolicyAddedEventType,
-			iam.LoginPolicyChangedEventType)
+			iam.LoginPolicyChangedEventType).
+		Builder()
 }
 
 func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
@@ -58,7 +62,8 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	allowUsernamePassword,
 	allowRegister,
 	allowExternalIDP,
-	forceMFA bool,
+	forceMFA,
+	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
 ) (*iam.LoginPolicyChangedEvent, bool) {
 
@@ -77,6 +82,9 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))
+	}
+	if wm.HidePasswordReset != hidePasswordReset {
+		changes = append(changes, policy.ChangeHidePasswordReset(hidePasswordReset))
 	}
 	if len(changes) == 0 {
 		return nil, false

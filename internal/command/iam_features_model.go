@@ -43,10 +43,12 @@ func (wm *IAMFeaturesWriteModel) Reduce() error {
 }
 
 func (wm *IAMFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.FeaturesWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		EventTypes(iam.FeaturesSetEventType)
+		AddQuery().
+		EventTypes(iam.FeaturesSetEventType).
+		AggregateTypes(iam.AggregateType).
+		Builder()
 }
 
 func (wm *IAMFeaturesWriteModel) NewSetEvent(
@@ -62,8 +64,11 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
 	passwordComplexityPolicy,
-	labelPolicy,
-	customDomain bool,
+	labelPolicyPrivateLabel,
+	labelPolicyWatermark,
+	customDomain,
+	customText,
+	privacyPolicy bool,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -71,13 +76,13 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if tierName != "" && wm.TierName != tierName {
 		changes = append(changes, features.ChangeTierName(tierName))
 	}
-	if tierDescription != "" && wm.TierDescription != tierDescription {
+	if wm.TierDescription != tierDescription {
 		changes = append(changes, features.ChangeTierDescription(tierDescription))
 	}
 	if wm.State != state {
 		changes = append(changes, features.ChangeState(state))
 	}
-	if stateDescription != "" && wm.StateDescription != stateDescription {
+	if wm.StateDescription != stateDescription {
 		changes = append(changes, features.ChangeStateDescription(stateDescription))
 	}
 	if auditLogRetention != 0 && wm.AuditLogRetention != auditLogRetention {
@@ -101,13 +106,21 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
 		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))
 	}
-	if wm.LabelPolicy != labelPolicy {
-		changes = append(changes, features.ChangeLabelPolicy(labelPolicy))
+	if wm.LabelPolicyPrivateLabel != labelPolicyPrivateLabel {
+		changes = append(changes, features.ChangeLabelPolicyPrivateLabel(labelPolicyPrivateLabel))
+	}
+	if wm.LabelPolicyWatermark != labelPolicyWatermark {
+		changes = append(changes, features.ChangeLabelPolicyWatermark(labelPolicyWatermark))
 	}
 	if wm.CustomDomain != customDomain {
 		changes = append(changes, features.ChangeCustomDomain(customDomain))
 	}
-
+	if wm.CustomText != customText {
+		changes = append(changes, features.ChangeCustomText(customText))
+	}
+	if wm.PrivacyPolicy != privacyPolicy {
+		changes = append(changes, features.ChangePrivacyPolicy(privacyPolicy))
+	}
 	if len(changes) == 0 {
 		return nil, false
 	}

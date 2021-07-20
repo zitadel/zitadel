@@ -21,9 +21,13 @@ type FeaturesWriteModel struct {
 	LoginPolicyPasswordless  bool
 	LoginPolicyRegistration  bool
 	LoginPolicyUsernameLogin bool
+	LoginPolicyPasswordReset bool
 	PasswordComplexityPolicy bool
-	LabelPolicy              bool
+	LabelPolicyPrivateLabel  bool
+	LabelPolicyWatermark     bool
 	CustomDomain             bool
+	CustomText               bool
+	PrivacyPolicy            bool
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {
@@ -61,14 +65,26 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			if e.LoginPolicyUsernameLogin != nil {
 				wm.LoginPolicyUsernameLogin = *e.LoginPolicyUsernameLogin
 			}
+			if e.LoginPolicyPasswordReset != nil {
+				wm.LoginPolicyPasswordReset = *e.LoginPolicyPasswordReset
+			}
 			if e.PasswordComplexityPolicy != nil {
 				wm.PasswordComplexityPolicy = *e.PasswordComplexityPolicy
 			}
 			if e.LabelPolicy != nil {
-				wm.LabelPolicy = *e.LabelPolicy
+				wm.LabelPolicyPrivateLabel = *e.LabelPolicy
+			}
+			if e.LabelPolicyPrivateLabel != nil {
+				wm.LabelPolicyPrivateLabel = *e.LabelPolicyPrivateLabel
+			}
+			if e.LabelPolicyWatermark != nil {
+				wm.LabelPolicyWatermark = *e.LabelPolicyWatermark
 			}
 			if e.CustomDomain != nil {
 				wm.CustomDomain = *e.CustomDomain
+			}
+			if e.CustomText != nil {
+				wm.CustomText = *e.CustomText
 			}
 		case *features.FeaturesRemovedEvent:
 			wm.State = domain.FeaturesStateRemoved

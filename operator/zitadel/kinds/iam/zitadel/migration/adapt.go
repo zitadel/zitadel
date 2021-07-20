@@ -4,12 +4,13 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/pkg/errors"
-	"github.com/rakyll/statik/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
+
+	"github.com/pkg/errors"
+	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -49,6 +50,7 @@ func AdaptFunc(
 	users []string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
+	customImageRegistry string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -103,9 +105,9 @@ func AdaptFunc(
 						Spec: corev1.PodSpec{
 							NodeSelector:   nodeselector,
 							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName),
+							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry),
 							Containers: []corev1.Container{
-								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users),
+								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",

@@ -46,8 +46,11 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
 		features.PasswordComplexityPolicy,
-		features.LabelPolicy,
+		features.LabelPolicyPrivateLabel,
+		features.LabelPolicyWatermark,
 		features.CustomDomain,
+		features.CustomText,
+		features.PrivacyPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -61,5 +64,7 @@ func (c *Commands) getDefaultFeatures(ctx context.Context) (*domain.Features, er
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
+	features := writeModelToFeatures(&existingFeatures.FeaturesWriteModel)
+	features.IsDefault = true
+	return features, nil
 }

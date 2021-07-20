@@ -118,7 +118,6 @@ export class AuthenticationService {
     public async authenticate(
         setState: boolean = true,
     ): Promise<boolean> {
-        console.log('auth');
         this.oauthService.configure(this.authConfig);
 
         this.oauthService.strictDiscoveryDocumentValidation = false;

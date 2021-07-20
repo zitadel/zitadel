@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -60,6 +61,10 @@ func (p *ProjectGrantMember) ViewModel() string {
 	return projectGrantMemberTable
 }
 
+func (p *ProjectGrantMember) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *ProjectGrantMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{proj_es_model.ProjectAggregate, usr_es_model.UserAggregate}
 }
@@ -111,7 +116,8 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *es_models.Event) (
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectGrantMemberRemoved:
+	case proj_es_model.ProjectGrantMemberRemoved,
+		proj_es_model.ProjectGrantMemberCascadeRemoved:
 		err = member.SetData(event)
 		if err != nil {
 			return err
@@ -138,7 +144,9 @@ func (p *ProjectGrantMember) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		members, err := p.view.ProjectGrantMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -154,9 +162,12 @@ func (p *ProjectGrantMember) processUser(event *es_models.Event) (err error) {
 			p.fillUserData(member, user)
 		}
 		return p.view.PutProjectGrantMembers(members, event)
+	case usr_es_model.UserRemoved:
+		p.view.DeleteProjectGrantMembersByUserID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectGrantMemberSequence(event)
 	}
+	return nil
 }
 
 func (p *ProjectGrantMember) fillData(member *view_model.ProjectGrantMemberView) (err error) {
@@ -179,11 +190,13 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 	}
 	member.UserName = user.UserName
 	member.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	member.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.DisplayName = user.DisplayName
 		member.Email = user.Email
+		member.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name

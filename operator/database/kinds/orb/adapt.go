@@ -85,6 +85,7 @@ func AdaptFunc(
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Version,
 			features,
+			desiredKind.Spec.CustomImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, migrate, err

@@ -45,10 +45,12 @@
     "ORG_POLICY_COMPLEXITY": "Password Complexity Settings",
     "ORG_POLICY_IAM": "Organisation Access Properties",
     "ORG_POLICY_LOGIN": "Login Policy",
+    "ORG_POLICY_LABEL": "Private Label Policy",
     "IAM_CREATE_ORG": "Create organisation",
     "IAM_POLICY_COMPLEXITY": "System Password Complexity Settings",
     "IAM_POLICY_IAM": "System Access Properties",
     "IAM_POLICY_LOGIN": "System Login Policy",
+    "IAM_POLICY_LABEL": "System Private Label Policy",
     "USERS": "Create and Manage Your Users",
     "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
     "USERS_HUMANS": "Show human users",
@@ -104,6 +106,9 @@
     }
   },
   "ACTIONS": {
+    "SET":"Set",
+    "SHOW":"Show",
+    "HIDE":"Hide",
     "SAVE": "Save",
     "SAVENOW": "Save now",
     "NEW": "New",
@@ -303,7 +308,16 @@
       "DISPLAYNAME": "Display Name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
-      "PASSWORD": "Password"
+      "PASSWORD": "Password",
+      "AVATAR": {
+        "UPLOADTITLE":"Upload your Profile Picture",
+        "UPLOADBTN":"Choose file",
+        "UPLOAD":"Upload",
+        "CURRENT":"Current Picture",
+        "PREVIEW":"Preview",
+        "DELETESUCCESS":"Deleted successfully!",
+        "CROPPERERROR":"An error while uploading your file failed. Try a different format and size if necessary."
+      }
     },
     "MACHINE": {
       "TITLE": "Service User Details",
@@ -605,13 +619,16 @@
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
       "LOGINPOLICYUSERNAMELOGIN": "Login Policy: Allow login with Username - custom",
+      "LOGINPOLICYPASSWORDRESET": "Login Policy: Hide reset password link - custom",
       "LOGINPOLICYREGISTRATION": "Login Policy: Allow self registration - custom",
       "LOGINPOLICYIDP": "Login Policy: Identity Provider - custom",
       "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
       "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICY": "Labeling Policy - custom",
-      "CUSTOMDOMAIN": "Domain Verification - available"
+      "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
+      "LABELPOLICYWATERMARK": "Label Policy - watermark",
+      "CUSTOMDOMAIN": "Domain Verification - available",
+      "CUSTOMTEXT": "Custom texts"
     },
     "TIERSTATES": {
       "0": "Active",
@@ -633,6 +650,32 @@
       "NUMBERERROR": "The password must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
+    "PRIVATELABELING": {
+      "TITLE":"Private Labeling",
+      "DESCRIPTION":"Give the login your personalized style and modify its behavior.",
+      "PREVIEW_DESCRIPTION":"Changes of the policy will automatically deployed to preview environment.",
+      "BTN":"Select File",
+      "ACTIVATEPREVIEW":"Apply configuration",
+      "DARK":"Dark Mode",
+      "LIGHT":"Lighg Mode",
+      "CHANGEVIEW":"Change View",
+      "ACTIVATED":"Policy changes are now LIVE",
+      "THEME":"Theme",
+      "COLORS":"Colors",
+      "FONT":"Font",
+      "ADVANCEDBEHAVIOR":"Advanced Behavior",
+      "DROP":"Drop image here",
+      "RELEASE":"Release",
+      "DROPFONT":"Drop fontfile here",
+      "RELEASEFONT":"Release",
+      "PREVIEW": {
+        "TITLE":"Login",
+        "SECOND":"login with your ZITADEL-Account.",
+        "ERROR":"User could not be found!",
+        "PRIMARYBUTTON":"next",
+        "SECONDARYBUTTON":"register"
+      }
+    },
     "PWD_AGE": {
       "TITLE": "Password Aging",
       "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
@@ -645,19 +688,18 @@
       "TITLE": "IAM Access Preferences",
       "DESCRIPTION": "Define access properties of your users."
     },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Private Labeling",
+      "BTN":"Select File",
+      "DESCRIPTION": "Customize the appearance of the Login",
+      "ACTIVATEPREVIEW":"Activate Configuration"
+    },
     "LOGIN_POLICY": {
       "TITLE": "Login Policy",
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
       "SAVED": "Saved successfully!"
-    },
-    "LABEL": {
-      "TITLE": "Email Labelling Settings",
-      "DESCRIPTION": "Change the look of your emails.",
-      "PRIMARYCOLOR": "Background color",
-      "SECONDARYCOLOR": "Font color",
-      "SAVED": "Saved successfully"
     },
     "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
     "BTN_INSTALL": "Setup",
@@ -681,13 +723,21 @@
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
-      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login."
+      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
+      "HIDEPASSWORDRESET": "Hide Password reset",
+      "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
+      "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
+      "ERRORMSGPOPUP":"Show Error in Dialog",
+      "DISABLEWATERMARK":"Disable Watermark"
     },
     "RESET": "Reset Policy",
     "CREATECUSTOM": "Create Custom Policy",
     "TOAST": {
       "SET": "Policy set successfully!",
-      "RESETSUCCESS": "Policy reset successfully!"
+      "RESETSUCCESS": "Policy reset successfully!",
+      "UPLOADSUCCESS": "Uploaded successfully!",
+      "DELETESUCCESS": "Deleted successfully!",
+      "UPLOADFAILED":"Upload failed!"
     }
   },
   "ORG_DETAIL": {
@@ -858,8 +908,8 @@
       "CREATIONDATE": "Created",
       "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
       "OPTIONS": "Options",
-      "ASSERTION": "Assert Roles on Authentication.",
-      "ASSERTION_DESCRIPTION": "Roleinformation is sent as Token, Userinfo endpoint or other type, depending on your application settings.",
+      "ASSERTION": "Assert Roles on Authentication",
+      "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
       "CHECK": "Check roles on Authentication",
       "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
@@ -1057,6 +1107,10 @@
     "AUTHMETHOD": "Authentication Method",
     "AUTHMETHODSECTION": "Authentication Method",
     "GRANT": "Grant Types",
+    "ADDITIONALORIGINS":"Additional Origins",
+    "ADDITIONALORIGINSDESC":"If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
+    "ORIGINS":"Origins",
+    "NOTANORIGIN":"The entered value is not an origin",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1101,6 +1155,7 @@
         "1": "ID Token",
         "2": "Token-ID Token"
       },
+      "REFRESHTOKEN":"Refresh Token",
       "GRANTTYPE": "Grant Types",
       "GRANT": {
         "0": "Authorization Code",
@@ -1120,9 +1175,9 @@
       "OVERVIEWSECTION": "Overview",
       "OVERVIEWTITLE": "You are now done. Review your configuration.",
       "ACCESSTOKENROLEASSERTION": "Add user roles to the access token",
-      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the roles of the authenticated user are added to the access token.",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
       "IDTOKENROLEASSERTION": "User roles inside ID Token",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "If selected, the roles of the authenticated user are added to the ID token.",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the ID token.",
       "IDTOKENUSERINFOASSERTION": "User Info inside ID Token",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
       "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
@@ -1146,6 +1201,9 @@
       }
     },
     "API": {
+      "INFO": {
+        "CLIENTID": "Client Id"
+      },
       "REGENERATESECRET": "Regenerate Client Secret",
       "SELECTION": {
         "TITLE": "API",
@@ -1175,7 +1233,7 @@
       },
       "BASIC": {
         "TITLE": "Basic",
-        "DESCRIPTION": "Authentication with Username and Passwort"
+        "DESCRIPTION": "Authentication with Username and Password"
       },
       "IMPLICIT": {
         "TITLE": "Implicit",
@@ -1190,6 +1248,7 @@
       "REACTIVATED": "Application reactivated.",
       "DEACTIVATED": "Application deactivated.",
       "OIDCUPDATED": "OIDC configuration updated.",
+      "APIUPDATED":"API configuration updated",
       "UPDATED": "App updated.",
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",

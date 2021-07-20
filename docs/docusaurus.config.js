@@ -21,31 +21,37 @@ module.exports = {
           type: 'doc',
           docId: 'manuals/introduction',
           label: 'Manuals',
-          position: 'left'
+          position: 'left',
         },
         {
           type: 'doc',
           label: 'Quickstarts',
           docId: 'quickstarts/introduction',
-          position: 'left'
+          position: 'left',
         },
         {
           type: 'doc',
           label: 'Guides',
           docId: 'guides/introduction',
-          position: 'left'
+          position: 'left',
         },
         {
           type: 'doc',
           label: 'APIs',
           docId: 'apis/introduction',
-          position: 'left'
+          position: 'left',
         },
         {
           type: 'doc',
           docId: 'concepts/introduction',
           label: 'Concepts',
-          position: 'left'
+          position: 'left',
+        },
+        {
+          type: 'doc',
+          docId: 'legal/introduction',
+          label: 'Legal',
+          position: 'left',
         },
         {
           href: 'https://github.com/caos/zitadel',
@@ -99,11 +105,11 @@ module.exports = {
             },
             {
               label: 'Terms and Conditions',
-              href: 'https://zitadel.ch/pdf/tos.pdf',
+              href: 'https://docs.zitadel.ch/docs/legal/terms-of-service',
             },
             {
               label: 'Privacy Policy',
-              href: 'https://zitadel.ch/pdf/privacy.pdf',
+              href: 'https://docs.zitadel.ch/docs/legal/privacy-policy',
             },
           ],
         },
@@ -112,10 +118,10 @@ module.exports = {
     },
     algolia: {
       apiKey: 'bff480bce03126c2d348345647854e91',
-      indexName: 'zitadel'
+      indexName: 'zitadel',
     },
     prism: {
-      additionalLanguages: ['csharp'],
+      additionalLanguages: ['csharp', 'dart', 'groovy'],
     },
   },
   presets: [
@@ -124,8 +130,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl:
-            'https://github.com/caos/zitadel/edit/main/docs/',
+          editUrl: 'https://github.com/caos/zitadel/edit/main/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -139,6 +144,6 @@ module.exports = {
       {
         domain: 'docs.zitadel.ch',
       },
-    ]
+    ],
   ],
 };

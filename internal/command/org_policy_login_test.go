@@ -70,6 +70,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -102,6 +103,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								false,
+								true,
 								true,
 								true,
 								true,
@@ -141,6 +143,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -150,6 +153,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 							eventFromEventPusher(
 								org.NewLoginPolicyAddedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate,
+									true,
 									true,
 									true,
 									true,
@@ -170,6 +174,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: true,
 					AllowExternalIDP:      true,
 					ForceMFA:              true,
+					HidePasswordReset:     true,
 					PasswordlessType:      domain.PasswordlessTypeAllowed,
 				},
 			},
@@ -183,6 +188,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: true,
 					AllowExternalIDP:      true,
 					ForceMFA:              true,
+					HidePasswordReset:     true,
 					PasswordlessType:      domain.PasswordlessTypeAllowed,
 				},
 			},
@@ -285,6 +291,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -294,6 +301,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								false,
+								true,
 								true,
 								true,
 								true,
@@ -332,6 +340,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -341,6 +350,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								false,
+								true,
 								true,
 								true,
 								true,
@@ -359,6 +369,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: true,
 					AllowExternalIDP:      true,
 					ForceMFA:              true,
+					HidePasswordReset:     true,
 					PasswordlessType:      domain.PasswordlessTypeAllowed,
 				},
 			},
@@ -379,6 +390,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -391,6 +403,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 							),
 						),
@@ -398,7 +411,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newLoginPolicyChangedEvent(context.Background(), "org1", false, false, false, false, domain.PasswordlessTypeNotAllowed),
+								newLoginPolicyChangedEvent(context.Background(), "org1", false, false, false, false, false, domain.PasswordlessTypeNotAllowed),
 							),
 						},
 					),
@@ -426,6 +439,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					AllowUsernamePassword: false,
 					AllowExternalIDP:      false,
 					ForceMFA:              false,
+					HidePasswordReset:     false,
 					PasswordlessType:      domain.PasswordlessTypeNotAllowed,
 				},
 			},
@@ -508,6 +522,7 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -651,6 +666,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -839,6 +855,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -878,6 +895,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -928,6 +946,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -986,6 +1005,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -1600,7 +1620,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 	}
 }
 
-func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassword, register, externalIDP, mfa bool, passwordlessType domain.PasswordlessType) *org.LoginPolicyChangedEvent {
+func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassword, register, externalIDP, mfa, passwordReset bool, passwordlessType domain.PasswordlessType) *org.LoginPolicyChangedEvent {
 	event, _ := org.NewLoginPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		[]policy.LoginPolicyChanges{
@@ -1608,6 +1628,7 @@ func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassw
 			policy.ChangeAllowRegister(register),
 			policy.ChangeAllowExternalIDP(externalIDP),
 			policy.ChangeForceMFA(mfa),
+			policy.ChangeHidePasswordReset(passwordReset),
 			policy.ChangePasswordlessType(passwordlessType),
 		},
 	)

@@ -27,16 +27,19 @@ func (rm *IAMMemberReadModel) AppendEvents(events ...eventstore.EventReader) {
 			rm.MemberReadModel.AppendEvents(&e.MemberAddedEvent)
 		case *iam.MemberChangedEvent:
 			rm.MemberReadModel.AppendEvents(&e.MemberChangedEvent)
-		case *member.MemberAddedEvent, *member.MemberChangedEvent, *iam.MemberRemovedEvent:
+		case *member.MemberAddedEvent, *member.MemberChangedEvent,
+			*iam.MemberRemovedEvent, *iam.MemberCascadeRemovedEvent:
 			rm.MemberReadModel.AppendEvents(e)
 		}
 	}
 }
 
 func (rm *IAMMemberReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
 		AggregateIDs(rm.iamID).
 		EventData(map[string]interface{}{
 			"userId": rm.userID,
-		})
+		}).Builder()
 }

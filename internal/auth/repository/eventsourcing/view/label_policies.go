@@ -12,8 +12,8 @@ const (
 	labelPolicyTable = "auth.label_policies"
 )
 
-func (v *View) LabelPolicyByAggregateID(aggregateID string) (*model.LabelPolicyView, error) {
-	return view.GetLabelPolicyByAggregateID(v.Db, labelPolicyTable, aggregateID)
+func (v *View) LabelPolicyByAggregateIDAndState(aggregateID string, state int32) (*model.LabelPolicyView, error) {
+	return view.GetLabelPolicyByAggregateIDAndState(v.Db, labelPolicyTable, aggregateID, state)
 }
 
 func (v *View) PutLabelPolicy(policy *model.LabelPolicyView, event *models.Event) error {

@@ -44,6 +44,11 @@ func (wm *ProjectGrantMemberWriteModel) AppendEvents(events ...eventstore.EventR
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *project.GrantMemberCascadeRemovedEvent:
+			if e.UserID != wm.UserID || e.GrantID != wm.GrantID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
 		case *project.GrantRemovedEvent:
 			if e.GrantID != wm.GrantID {
 				continue
@@ -65,6 +70,8 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 			wm.Roles = e.Roles
 		case *project.GrantMemberRemovedEvent:
 			wm.State = domain.MemberStateRemoved
+		case *project.GrantMemberCascadeRemovedEvent:
+			wm.State = domain.MemberStateRemoved
 		case *project.GrantRemovedEvent, *project.ProjectRemovedEvent:
 			wm.State = domain.MemberStateRemoved
 		}
@@ -73,12 +80,16 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 }
 
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.GrantMemberAddedType,
 			project.GrantMemberChangedType,
 			project.GrantMemberRemovedType,
+			project.GrantMemberCascadeRemovedType,
 			project.GrantRemovedType,
-			project.ProjectRemovedType)
+			project.ProjectRemovedType).
+		Builder()
 }

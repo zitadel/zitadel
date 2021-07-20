@@ -24,7 +24,7 @@
 
     <div class="content" *ngIf="loginData">
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) == false" ngDefaultControl
                 [(ngModel)]="loginData.allowUsernamePassword">
                 {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
@@ -62,7 +62,7 @@
             </ng-template>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false" ngDefaultControl
                 [(ngModel)]="loginData.allowExternalIdp">
                 {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
@@ -79,7 +79,7 @@
             </ng-template>
         </div>
         <div class="row">
-            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled" ngDefaultControl
+            <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false" ngDefaultControl
                 [(ngModel)]="loginData.forceMfa">
                 {{'POLICY.DATA.FORCEMFA' | translate}}
             </mat-slide-toggle>
@@ -95,6 +95,26 @@
                 </cnsl-info-section>
             </ng-template>
         </div>
+      <div class="row">
+        <mat-slide-toggle class="toggle" color="primary" [disabled]="disabled || serviceType == PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) == false" ngDefaultControl
+                          [(ngModel)]="loginData.hidePasswordReset">
+          {{'POLICY.DATA.HIDEPASSWORDRESET' | translate}}
+        </mat-slide-toggle>
+
+        <ng-container
+          *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) == false; else passwordResetInfo">
+          <cnsl-info-section type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
+            'login_policy.hide_password_reset'})}}
+          </cnsl-info-section>
+        </ng-container>
+
+        <ng-template #passwordResetInfo>
+          <cnsl-info-section class="info">
+            {{'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate}}
+          </cnsl-info-section>
+        </ng-template>
+      </div>
+
         <div class="row">
 
             <cnsl-form-field class="form-field" label="Access Code" required="true">
@@ -130,7 +150,7 @@
         </ng-container>
         <app-mfa-table [service]="service" [serviceType]="serviceType"
             [componentType]="LoginMethodComponentType.MultiFactor"
-            [disabled]="(([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false) || ((['login_policy.factors'] | hasFeature | async) == false)">
+            [disabled]="(([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false) || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false)">
         </app-mfa-table>
 
         <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
@@ -142,7 +162,7 @@
         </ng-container>
         <app-mfa-table [service]="service" [serviceType]="serviceType"
             [componentType]="LoginMethodComponentType.SecondFactor"
-            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false || (['login_policy.factors'] | hasFeature | async) == false">
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false)">
         </app-mfa-table>
     </ng-container>
 
@@ -177,7 +197,7 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="!disabled && (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async))"
+        <div *ngIf="!disabled && ((serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async)) || serviceType == PolicyComponentServiceType.ADMIN)"
             class="new-idp" (click)="openDialog()" matRipple>
             <mat-icon>add</mat-icon>
         </div>
@@ -194,7 +214,7 @@
                 <i class="lab la-gitlab"></i>
             </div>
             <app-idp-table [service]="service" [serviceType]="serviceType"
-                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false || (['login_policy.idp'] | hasFeature | async) == false">
+                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false || ((serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false))">
             </app-idp-table>
         </app-card>
     </ng-template>

@@ -95,18 +95,6 @@ func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (unique
 	return uniqueConstraints
 }
 
-func assetsToRepository(assets []*Asset) (result []*repository.Asset) {
-	result = make([]*repository.Asset, len(assets))
-	for i, asset := range assets {
-		result[i] = &repository.Asset{
-			ID:     asset.ID,
-			Asset:  asset.Asset,
-			Action: assetActionToRepository(asset.Action),
-		}
-	}
-	return result
-}
-
 //FilterEvents filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryBuilder) ([]EventReader, error) {
@@ -239,16 +227,5 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 		return repository.UniqueConstraintRemoved
 	default:
 		return repository.UniqueConstraintAdd
-	}
-}
-
-func assetActionToRepository(action AssetAction) repository.AssetAction {
-	switch action {
-	case AssetAdd:
-		return repository.AssetAdded
-	case AssetRemove:
-		return repository.AssetRemoved
-	default:
-		return repository.AssetAdded
 	}
 }

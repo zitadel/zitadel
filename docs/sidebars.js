@@ -10,7 +10,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Administrator',
-      items: ['manuals/admin-managers'],
+      items: ['manuals/admin-managers', 'manuals/admin-policies'],
       collapsed: false,
     },
   ],
@@ -26,6 +26,12 @@ module.exports = {
       type: 'category',
       label: 'Backends',
       items: ['quickstarts/go', 'quickstarts/dot-net'],
+      collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Frameworks',
+      items: ['quickstarts/flutter'],
       collapsed: false,
     },
     {
@@ -81,11 +87,21 @@ module.exports = {
   apis: [
     'apis/introduction',
     'apis/domains',
+    {
+      type: 'category',
+      label: 'Rate Limits',
+      collapsed: true,
+      items: [
+        'legal/rate-limit-policy',
+        'apis/ratelimits/accounts',
+        'apis/ratelimits/api',
+      ],
+    },
     'apis/apis',
     {
       type: 'category',
       label: 'Proto API Definition',
-      collapsed: false,
+      collapsed: true,
       items: [
         'apis/proto/auth',
         'apis/proto/management',
@@ -105,8 +121,16 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'OpenID Connect & OAuth',
+      label: 'Assets API Definition',
       collapsed: false,
+      items: [
+        'apis/assets/assets',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'OpenID Connect & OAuth',
+      collapsed: true,
       items: [
           'apis/openidoauth/endpoints',
           'apis/openidoauth/scopes',
@@ -120,5 +144,30 @@ module.exports = {
     'concepts/introduction',
     'concepts/architecture',
     'concepts/principles',
-  ]
+    'concepts/eventstore',
+  ],
+  legal: [
+    'legal/introduction',
+    'legal/terms-of-service',
+    'legal/data-processing-agreement',
+    {
+      type: 'category',
+      label: 'Service Descriptions',
+      collapsed: false,
+      items: [
+        'legal/service-level-description',
+        'legal/support-services',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Policies',
+      collapsed: false,
+      items: [
+        'legal/privacy-policy',
+        'legal/acceptable-use-policy', 
+        'legal/rate-limit-policy'
+      ],
+    }
+  ],
 };

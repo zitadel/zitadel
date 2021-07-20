@@ -25,9 +25,10 @@ const (
 	OrgDomainReserved models.EventType = "org.domain.reserved"
 	OrgDomainReleased models.EventType = "org.domain.released"
 
-	OrgMemberAdded   models.EventType = "org.member.added"
-	OrgMemberChanged models.EventType = "org.member.changed"
-	OrgMemberRemoved models.EventType = "org.member.removed"
+	OrgMemberAdded          models.EventType = "org.member.added"
+	OrgMemberChanged        models.EventType = "org.member.changed"
+	OrgMemberRemoved        models.EventType = "org.member.removed"
+	OrgMemberCascadeRemoved models.EventType = "org.member.cascade.removed"
 
 	OrgIAMPolicyAdded   models.EventType = "org.iam.policy.added"
 	OrgIAMPolicyChanged models.EventType = "org.iam.policy.changed"
@@ -56,16 +57,29 @@ const (
 	LoginPolicyMultiFactorAdded          models.EventType = "org.policy.login.multifactor.added"
 	LoginPolicyMultiFactorRemoved        models.EventType = "org.policy.login.multifactor.removed"
 
-	LabelPolicyAdded   models.EventType = "org.policy.label.added"
-	LabelPolicyChanged models.EventType = "org.policy.label.changed"
-	LabelPolicyRemoved models.EventType = "org.policy.label.removed"
+	LabelPolicyAdded           models.EventType = "org.policy.label.added"
+	LabelPolicyChanged         models.EventType = "org.policy.label.changed"
+	LabelPolicyActivated       models.EventType = "org.policy.label.activated"
+	LabelPolicyRemoved         models.EventType = "org.policy.label.removed"
+	LabelPolicyLogoAdded       models.EventType = "org.policy.label.logo.added"
+	LabelPolicyLogoRemoved     models.EventType = "org.policy.label.logo.removed"
+	LabelPolicyIconAdded       models.EventType = "org.policy.label.icon.added"
+	LabelPolicyIconRemoved     models.EventType = "org.policy.label.icon.removed"
+	LabelPolicyLogoDarkAdded   models.EventType = "org.policy.label.logo.dark.added"
+	LabelPolicyLogoDarkRemoved models.EventType = "org.policy.label.logo.dark.removed"
+	LabelPolicyIconDarkAdded   models.EventType = "org.policy.label.icon.dark.added"
+	LabelPolicyIconDarkRemoved models.EventType = "org.policy.label.icon.dark.removed"
+	LabelPolicyFontAdded       models.EventType = "org.policy.label.font.added"
+	LabelPolicyFontRemoved     models.EventType = "org.policy.label.font.removed"
+	LabelPolicyAssetsRemoved   models.EventType = "org.policy.label.assets.removed"
 
 	MailTemplateAdded   models.EventType = "org.mail.template.added"
 	MailTemplateChanged models.EventType = "org.mail.template.changed"
 	MailTemplateRemoved models.EventType = "org.mail.template.removed"
-	MailTextAdded       models.EventType = "org.mail.text.added"
-	MailTextChanged     models.EventType = "org.mail.text.changed"
-	MailTextRemoved     models.EventType = "org.mail.text.removed"
+
+	CustomTextSet            models.EventType = "org.customtext.set"
+	CustomTextRemoved        models.EventType = "org.customtext.removed"
+	CustomTextMessageRemoved models.EventType = "org.customtext.template.removed"
 
 	PasswordComplexityPolicyAdded   models.EventType = "org.policy.password.complexity.added"
 	PasswordComplexityPolicyChanged models.EventType = "org.policy.password.complexity.changed"
@@ -78,4 +92,8 @@ const (
 	PasswordLockoutPolicyAdded   models.EventType = "org.policy.password.lockout.added"
 	PasswordLockoutPolicyChanged models.EventType = "org.policy.password.lockout.changed"
 	PasswordLockoutPolicyRemoved models.EventType = "org.policy.password.lockout.removed"
+
+	PrivacyPolicyAdded   models.EventType = "org.policy.privacy.added"
+	PrivacyPolicyChanged models.EventType = "org.policy.privacy.changed"
+	PrivacyPolicyRemoved models.EventType = "org.policy.privacy.removed"
 )

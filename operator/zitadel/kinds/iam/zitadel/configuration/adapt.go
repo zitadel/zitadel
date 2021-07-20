@@ -1,23 +1,26 @@
 package configuration
 
 import (
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/orbos/pkg/labels"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration/users"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
-	"time"
 )
 
 type ConsoleEnv struct {
-	AuthServiceURL string `json:"authServiceUrl"`
-	MgmtServiceURL string `json:"mgmtServiceUrl"`
-	Issuer         string `json:"issuer"`
-	ClientID       string `json:"clientid"`
-	SubServiceURL  string `json:"subscriptionServiceUrl"`
+	AuthServiceURL  string `json:"authServiceUrl"`
+	MgmtServiceURL  string `json:"mgmtServiceUrl"`
+	Issuer          string `json:"issuer"`
+	ClientID        string `json:"clientid"`
+	SubServiceURL   string `json:"subscriptionServiceUrl"`
+	AssetServiceURL string `json:"assetServiceUrl"`
 }
 
 const (
@@ -35,6 +38,7 @@ func AdaptFunc(
 	certPath string,
 	secretName string,
 	secretPath string,
+	version *string,
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordName string,
@@ -145,6 +149,7 @@ func AdaptFunc(
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
+						version,
 						queried,
 					),
 				)
@@ -191,6 +196,7 @@ func AdaptFunc(
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
+						version,
 						queried,
 					),
 				),

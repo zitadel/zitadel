@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/operator/common"
+
 	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/pkg/labels"
@@ -44,6 +46,7 @@ func Adapter(
 	tolerations []corev1.Toleration,
 	version string,
 	features []string,
+	customImageRegistry string,
 ) operator.AdaptFunc {
 
 	return func(
@@ -114,7 +117,7 @@ func Adapter(
 			cockroachSelector,
 			desiredKind.Spec.Force,
 			namespace,
-			image,
+			common.CockroachImage.Reference(customImageRegistry),
 			serviceAccountName,
 			desiredKind.Spec.ReplicaCount,
 			desiredKind.Spec.StorageCapacity,
@@ -207,6 +210,7 @@ func Adapter(
 						tolerations,
 						version,
 						features,
+						customImageRegistry,
 					)
 					if err != nil {
 						return nil, nil, nil, nil, nil, false, err

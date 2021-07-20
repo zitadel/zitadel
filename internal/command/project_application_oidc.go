@@ -81,7 +81,8 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 		oidcApp.AccessTokenRoleAssertion,
 		oidcApp.IDTokenRoleAssertion,
 		oidcApp.IDTokenUserinfoAssertion,
-		oidcApp.ClockSkew))
+		oidcApp.ClockSkew,
+		oidcApp.AdditionalOrigins))
 
 	return events, stringPw, nil
 }
@@ -97,6 +98,9 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	}
 	if existingOIDC.State == domain.AppStateUnspecified || existingOIDC.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
+	}
+	if !existingOIDC.IsOIDC() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GBr34", "Errors.Project.App.IsNotOIDC")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
 	changedEvent, hasChanged, err := existingOIDC.NewChangedEvent(
@@ -115,7 +119,8 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.AccessTokenRoleAssertion,
 		oidc.IDTokenRoleAssertion,
 		oidc.IDTokenUserinfoAssertion,
-		oidc.ClockSkew)
+		oidc.ClockSkew,
+		oidc.AdditionalOrigins)
 	if err != nil {
 		return nil, err
 	}
@@ -149,6 +154,9 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if existingOIDC.State == domain.AppStateUnspecified || existingOIDC.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2g66f", "Errors.Project.App.NotExisting")
 	}
+	if !existingOIDC.IsOIDC() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
+	}
 	cryptoSecret, stringPW, err := domain.NewClientSecret(c.applicationSecretGenerator)
 	if err != nil {
 		return nil, err
@@ -180,6 +188,9 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 	}
 	if !app.State.Exists() {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.NoExisting")
+	}
+	if !app.IsOIDC() {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
 	}
 	if app.ClientSecret == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid")

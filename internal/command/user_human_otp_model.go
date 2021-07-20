@@ -41,7 +41,9 @@ func (wm *HumanOTPWriteModel) Reduce() error {
 }
 
 func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanMFAOTPAddedType,
 			user.HumanMFAOTPVerifiedType,
@@ -49,7 +51,9 @@ func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserRemovedType,
 			user.UserV1MFAOTPAddedType,
 			user.UserV1MFAOTPVerifiedType,
-			user.UserV1MFAOTPRemovedType)
+			user.UserV1MFAOTPRemovedType).
+		Builder()
+
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}

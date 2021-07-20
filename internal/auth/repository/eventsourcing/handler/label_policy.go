@@ -2,6 +2,8 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -44,6 +46,10 @@ func (m *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
+func (p *LabelPolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *LabelPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
@@ -79,12 +85,25 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 	switch event.Type {
 	case iam_es_model.LabelPolicyAdded, model.LabelPolicyAdded:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LabelPolicyChanged, model.LabelPolicyChanged:
-		policy, err = m.view.LabelPolicyByAggregateID(event.AggregateID)
+	case iam_es_model.LabelPolicyChanged, model.LabelPolicyChanged,
+		iam_es_model.LabelPolicyActivated, model.LabelPolicyActivated,
+		iam_es_model.LabelPolicyLogoAdded, model.LabelPolicyLogoAdded,
+		iam_es_model.LabelPolicyLogoRemoved, model.LabelPolicyLogoRemoved,
+		iam_es_model.LabelPolicyIconAdded, model.LabelPolicyIconAdded,
+		iam_es_model.LabelPolicyIconRemoved, model.LabelPolicyIconRemoved,
+		iam_es_model.LabelPolicyLogoDarkAdded, model.LabelPolicyLogoDarkAdded,
+		iam_es_model.LabelPolicyLogoDarkRemoved, model.LabelPolicyLogoDarkRemoved,
+		iam_es_model.LabelPolicyIconDarkAdded, model.LabelPolicyIconDarkAdded,
+		iam_es_model.LabelPolicyIconDarkRemoved, model.LabelPolicyIconDarkRemoved,
+		iam_es_model.LabelPolicyFontAdded, model.LabelPolicyFontAdded,
+		iam_es_model.LabelPolicyFontRemoved, model.LabelPolicyFontRemoved:
+		policy, err = m.view.LabelPolicyByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
+	case model.LabelPolicyRemoved:
+		return m.view.DeleteLabelPolicy(event.AggregateID, event)
 	default:
 		return m.view.ProcessedLabelPolicySequence(event)
 	}
@@ -95,7 +114,7 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 }
 
 func (m *LabelPolicy) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
+	logging.LogWithFields("SPOOL-2ff7s", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
 }
 

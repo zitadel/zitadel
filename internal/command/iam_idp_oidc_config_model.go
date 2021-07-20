@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -69,15 +70,18 @@ func (wm *IAMIDPOIDCConfigWriteModel) Reduce() error {
 }
 
 func (wm *IAMIDPOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			iam.IDPOIDCConfigAddedEventType,
 			iam.IDPOIDCConfigChangedEventType,
 			iam.IDPConfigReactivatedEventType,
 			iam.IDPConfigDeactivatedEventType,
-			iam.IDPConfigRemovedEventType)
+			iam.IDPConfigRemovedEventType).
+		Builder()
 }
 
 func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(
@@ -86,6 +90,8 @@ func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(
 	idpConfigID,
 	clientID,
 	issuer,
+	authorizationEndpoint,
+	tokenEndpoint,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
 	idpDisplayNameMapping,
@@ -108,6 +114,12 @@ func (wm *IAMIDPOIDCConfigWriteModel) NewChangedEvent(
 	}
 	if wm.Issuer != issuer {
 		changes = append(changes, idpconfig.ChangeIssuer(issuer))
+	}
+	if wm.AuthorizationEndpoint != authorizationEndpoint {
+		changes = append(changes, idpconfig.ChangeAuthorizationEndpoint(authorizationEndpoint))
+	}
+	if wm.TokenEndpoint != tokenEndpoint {
+		changes = append(changes, idpconfig.ChangeTokenEndpoint(tokenEndpoint))
 	}
 	if idpDisplayNameMapping.Valid() && wm.IDPDisplayNameMapping != idpDisplayNameMapping {
 		changes = append(changes, idpconfig.ChangeIDPDisplayNameMapping(idpDisplayNameMapping))

@@ -3,13 +3,15 @@ Login:
   Description: Enter your logindata.
   TitleLinking: Login for userlinking
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
-  Loginname: Loginname
+  LoginNameLabel: Loginname
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
-  ExternalLogin: Login with an external user.
+  ExternalUserDescription: Login with an external user.
   MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organisation.
+  RegisterButtonText: register
+  NextButtonText: next
 
-UserSelection:
+SelectAccount:
   Title: Select account
   Description: Use your ZITADEL-Account
   TitleLinking: Select account for userlinking
@@ -22,209 +24,227 @@ UserSelection:
 Password:
   Title: Password
   Description: Enter your logindata.
-  Password: Password
+  PasswordLabel: Password
   MinLength: Minimumlength
   HasUppercase: Uppercase letter
   HasLowercase: Lowercase letter
   HasNumber: Number
   HasSymbol: Symbol
+  Confirmation: Confirmation match
+  ResetLinkText: reset password
+  BackButtonText: back
+  NextButtonText: next
 
 UsernameChange:
   Title: Change Username
   Description: Set your new username
-  Username: Username
+  UsernameLabel: Username
+  CancelButtonText: cancel
+  NextButtonText: next
 
 UsernameChangeDone:
   Title: Username changed
   Description: Your username was changed successfully.
-
-MFAVerify:
-  Title: Verify Multificator
-  Description: Verify your multifactor
-  OTP: OTP (One Time Password)
-  Code: Code
+  NextButtonText: next
 
 InitPassword: 
   Title: Set Password
   Description: You have received a code, which you have to enter in the form below, to set your new password.
-  Code: Code
-  NewPassword: New Password
-  NewPasswordConfirm: Confirm Password
+  CodeLabel: Code
+  NewPasswordLabel: New Password
+  NewPasswordConfirmLabel: Confirm Password
+  ResendButtonText: resend
+  NextButtonText: next
 
 InitPasswordDone:
-  Title: Passwortd set
+  Title: Password set
   Description: Password successfully set
+  NextButtonText: next
+  CancelButtonText: cancel
 
 InitUser:
   Title: Activate User
   Description: You have received a code, which you have to enter in the form below, to verify your email and set your new password.
-  Code: Code
-  NewPassword: New Password
-  NewPasswordConfirm: Confirm Password
+  CodeLabel: Code
+  NewPasswordLabel: New Password
+  NewPasswordConfirmLabel: Confirm Password
+  NextButtonText: next
+  ResendButtonText: resend
 
 InitUserDone:
   Title: User activated
   Description: Email verified and Password successfully set
+  NextButtonText: next
+  CancelButtonText: cancel
 
-MFA:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
-  ChooseOther: or choose an other option
-
-MFAPrompt:
+InitMFAPrompt:
   Title: Multifactor Setup
   Description: Would you like to setup multifactor authentication?
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
+  NextButtonText: weiter
+  SkipButtonText: überspringen
 
-MFAInitVerify:
+InitMFAOTP:
   Title: Multifactor Verification
   Description: Verify your multifactor.
   OTPDescription: Scan the code with your authenticator app (e.g Google Authenticator) or copy the secret and insert the generated code below.
-  Secret: Secret
-  Code: Code
+  SecretLabel: Secret
+  CodeLabel: Code
+  NextButtonText: next
+  CancelButtonText: cancel
 
-MFAInitDone:
-  Title: Multifcator Verification done
-  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
-
-MFAInitU2F:
+InitMFAU2F:
   Title: Multifactor Setup U2F / WebAuthN
   Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
+  TokenNameLabel: Name of the tokens / machine
+  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Register Token
+  ErrorRetry: Retry, create a new challenge or choose a different method.
 
-MFAVerifyU2F:
+InitMFADone:
+  Title: Multifcator Verification done
+  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
+  NextButtonText: next
+  CancelButtonText: cancel
+
+MFAProvider:
+  Provider0: OTP (One Time Password)
+  Provider1: U2F (Universal 2nd Factor)
+  ChooseOther: or choose an other option
+
+VerifyMFAOTP:
+  Title: Verify Multificator
+  Description: Verify your multifactor
+  CodeLabel: Code
+  NextButtonText: next
+
+VerifyMFAU2F:
   Title: Multifactor Verification
   Description: Verify your multifactor U2F / WebAuthN token
-
-WebAuthN:
-  Name: Name of the tokens / machine
-  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  Error:
-    Retry: Retry, create a new challenge or choose a different method.
+  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ValidateTokenButtonText: Validate Token
 
 Passwordless:
-  Title: Login passwordles
+  Title: Login passwordless
   Description: Verify your token
+  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
+  ErrorRetry: Retry, create a new challenge or choose a different method.
+  LoginWithPwButtonText: Login with password
+  ValidateTokenButtonText: Token validieren
 
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
-  OldPassword: Old Password
-  NewPassword: New Password
-  NewPasswordConfirmation: Passwort confirmation
+  OldPasswordLabel: Old Password
+  NewPasswordLabel: New Password
+  NewPasswordConfirmationLabel: Password confirmation
+  CancelButtonText: cancel
+  NextButtonText: next
 
 PasswordChangeDone:
   Title: Change Password
   Description: Your password was changed successfully.
+  NextButtonText: next
 
 PasswordResetDone:
   Title: Reset link set
   Description: Check your email to to reset your password.
-
-PasswordSetDone:
-  Title: Password set
-  Description: Your password was set successfully.
+  NextButtonText: next
 
 EmailVerification:
   Title: E-Mail Verification
   Description: We have sent you an email to verify your address. Please enter the code in the form below.
-  Code: Code
+  CodeLabel: Code
+  NextButtonText: next
+  ResendButtonText: resend
 
 EmailVerificationDone:
   Title: E-Mail Verification
   Description: Your email address has been successfully verified.
+  NextButtonText: next
+  CancelButtonText: cancel
+  LoginButtonText: login
 
 RegisterOption:
   Title: Registration Options
   Description: Choose how you'd like to register
-  RegisterUsernamePassword: With username password
+  RegisterUsernamePasswordButtonText: With username password
+  ExternalLoginDescription: or register with an external user
 
-Registration:
+RegistrationUser:
   Title: Registration
   Description: Enter your Userdata. Your email address will be used as loginname.
-  Email: E-Mail
-  Username: Username
-  Firstname: Firstname
-  Lastname: Lastname
-  Language: Language
+  DescriptionOrgRegister: Enter your Userdata.
+  EmailLabel: E-Mail
+  UsernameLabel: Username
+  FirstnameLabel: Firstname
+  LastnameLabel: Lastname
+  LanguageLabel: Language
   German: Deutsch
   English: English
-  Gender: Gender
+  GenderLabel: Gender
   Female: Female
   Male: Male
   Diverse: diverse / X
-  Password: Password
-  Password2: Password confirmation
-  TosAndPrivacy: Terms and conditions
+  PasswordLabel: Password
+  PasswordConfirmLabel: Password confirmation
+  TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
-  TosLink: https://zitadel.ch/pdf/tos.pdf
   PrivacyLinkText: privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   ExternalLogin: or register with an external user
+  BackButtonText: back
+  NextButtonText: next
 
 RegistrationOrg:
   Title: Organisation Registration
   Description: Enter your organisationname and userdata.
-  OrgName: Organisationname
-  OrgDomain: Domäne
-  Email: E-Mail
-  Username: Username
-  Firstname: Firstname
-  Lastname: Lastname
-  Language: Language
-  German: Deutsch
-  English: English
-  Gender: Gender
-  Female: Female
-  Male: Male
-  Diverse: diverse / X
-  Password: Password
-  Password2: Password confirmation
-  TosAndPrivacy: Terms and conditions
+  OrgNameLabel: Organisationname
+  EmailLabel: E-Mail
+  UsernameLabel: Username
+  FirstnameLabel: Firstname
+  LastnameLabel: Lastname
+  PasswordLabel: Password
+  PasswordConfirmLabel: Password confirmation
+  TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
-  TosLink: https://zitadel.ch/pdf/tos.pdf
   PrivacyLinkText: privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
+  SaveButtonText: save
+
+LoginSuccess:
+  Title: Login successful
+  AutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
+  RedirectedDescription: You can now close this window.
+  NextButtonText: next
 
 LogoutDone:
   Title: Logged out
   Description: You have logged out successfully.
+  LoginButtonText: login
 
 LinkingUsersDone:
   Title: Userlinking
   Description: Userlinking done.
+  CancelButtonText: cancel
+  NextButtonText: next
 
 ExternalNotFoundOption:
   Title: External User
   Description: External user not found. Do you want to link your user or auto register a new one.
-  Link: Link
-  AutoRegister: Auto register
-
-Actions:
-  Login: login
-  Next: next
-  Back: back
-  Resend: resend
-  Skip: skip
-  Register: register
-  ForgotPassword: reset password
-  Cancel: cancel
-  Save: save
-  RegisterToken: Register Token
-  ValidateToken: Validate Token
-  Recreate: recreate
-  PasswordLogin: Login with password
+  LinkButtonText: Link
+  AutoRegisterButtonText: Auto register
 
 Footer:
+  PoweredBy: Powered By
   Tos: TOS
-  TosLink: https://zitadel.ch/pdf/agb.pdf
   Privacy: Privacy policy
-  PrivacyLink: https://zitadel.ch/pdf/privacy.pdf
   Help: Help
+  HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
 Errors:
   Internal: An internal error occured
@@ -234,6 +254,7 @@ Errors:
     RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
+    Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     NotMatchingUserID: User and user in authrequest don't match
@@ -244,7 +265,7 @@ Errors:
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
-      Invalid: Passwort is invalid
+      Invalid: Password is invalid
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short
@@ -274,6 +295,7 @@ Errors:
       IDPTypeNotImplemented: IDP Type is not implemented
       NotAllowed: External Login Provider not allowed
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
-
+  IdentityProvider:
+    InvalidConfig: Identity Provider configuration is invalid
 
 optional: (optional)

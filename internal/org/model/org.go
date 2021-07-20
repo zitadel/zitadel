@@ -3,9 +3,10 @@ package model
 import (
 	"strings"
 
+	"github.com/golang/protobuf/ptypes/timestamp"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type Org struct {
@@ -33,12 +34,14 @@ type OrgChanges struct {
 }
 
 type OrgChange struct {
-	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
-	EventType    string               `json:"eventType,omitempty"`
-	Sequence     uint64               `json:"sequence,omitempty"`
-	ModifierId   string               `json:"modifierUser,omitempty"`
-	ModifierName string               `json:"-"`
-	Data         interface{}          `json:"data,omitempty"`
+	ChangeDate        *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType         string               `json:"eventType,omitempty"`
+	Sequence          uint64               `json:"sequence,omitempty"`
+	ModifierId        string               `json:"modifierUser,omitempty"`
+	ModifierName      string               `json:"-"`
+	ModifierLoginName string               `json:"-"`
+	ModifierAvatarURL string               `json:"-"`
+	Data              interface{}          `json:"data,omitempty"`
 }
 
 type OrgState int32

@@ -13,8 +13,12 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
+	err := c.checkOrgExists(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	existingFeatures := NewOrgFeaturesWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	err = c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
 		return nil, err
 	}
@@ -31,9 +35,13 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LoginPolicyPasswordless,
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
+		features.LoginPolicyPasswordReset,
 		features.PasswordComplexityPolicy,
-		features.LabelPolicy,
+		features.LabelPolicyPrivateLabel,
+		features.LabelPolicyWatermark,
 		features.CustomDomain,
+		features.CustomText,
+		features.PrivacyPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -105,15 +113,12 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removePasswordComplexityEvent)
 		}
 	}
-	if !features.LabelPolicy {
-		removeLabelPolicyEvent, err := c.removeLabelPolicyIfExists(ctx, orgID)
-		if err != nil {
-			return nil, err
-		}
-		if removeLabelPolicyEvent != nil {
-			events = append(events, removeLabelPolicyEvent)
-		}
+	labelPolicyEvents, err := c.setAllowedLabelPolicy(ctx, orgID, features)
+	if err != nil {
+		return nil, err
 	}
+	events = append(events, labelPolicyEvents...)
+
 	if !features.CustomDomain {
 		removeCustomDomainsEvents, err := c.removeCustomDomains(ctx, orgID)
 		if err != nil {
@@ -121,6 +126,24 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 		}
 		if removeCustomDomainsEvents != nil {
 			events = append(events, removeCustomDomainsEvents...)
+		}
+	}
+	if !features.CustomText {
+		removeCustomTextEvents, err := c.removeOrgMessageTextsIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removeCustomTextEvents != nil {
+			events = append(events, removeCustomTextEvents...)
+		}
+	}
+	if !features.PrivacyPolicy {
+		removePrivacyPolicyEvent, err := c.removePrivacyPolicyIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removePrivacyPolicyEvent != nil {
+			events = append(events, removePrivacyPolicyEvent)
 		}
 	}
 	return events, nil
@@ -165,7 +188,10 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	if !features.LoginPolicyUsernameLogin && defaultPolicy.AllowUsernamePassword != existingPolicy.AllowUserNamePassword {
 		policy.AllowUserNamePassword = defaultPolicy.AllowUsernamePassword
 	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel), policy.AllowUserNamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.PasswordlessType)
+	if !features.LoginPolicyPasswordReset && defaultPolicy.HidePasswordReset != existingPolicy.HidePasswordReset {
+		policy.HidePasswordReset = defaultPolicy.HidePasswordReset
+	}
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel), policy.AllowUserNamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.HidePasswordReset, policy.PasswordlessType)
 	if hasChanged {
 		events = append(events, changedEvent)
 	}
@@ -226,6 +252,62 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 		if event != nil {
 			events = append(events, event)
 		}
+	}
+	return events, nil
+}
+
+func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
+	events := make([]eventstore.EventPusher, 0)
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, nil
+	}
+	if !features.LabelPolicyPrivateLabel && !features.LabelPolicyWatermark {
+		removeEvent, err := c.removeLabelPolicy(ctx, existingPolicy)
+		if err != nil {
+			return nil, err
+		}
+		return append(events, removeEvent), nil
+	}
+	defaultPolicy, err := c.getDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	policy := *existingPolicy
+	if !features.LabelPolicyWatermark && defaultPolicy.DisableWatermark != existingPolicy.DisableWatermark {
+		policy.DisableWatermark = defaultPolicy.DisableWatermark
+	}
+	if !features.LabelPolicyPrivateLabel {
+		if defaultPolicy.HideLoginNameSuffix != existingPolicy.HideLoginNameSuffix {
+			policy.HideLoginNameSuffix = defaultPolicy.HideLoginNameSuffix
+		}
+		policy.PrimaryColor = ""
+		policy.BackgroundColor = ""
+		policy.WarnColor = ""
+		policy.FontColor = ""
+		policy.PrimaryColorDark = ""
+		policy.BackgroundColorDark = ""
+		policy.WarnColorDark = ""
+		policy.FontColorDark = ""
+
+		assetsEvent, err := c.removeLabelPolicyAssets(ctx, existingPolicy)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, assetsEvent)
+	}
+	changedEvent, hasChangedEvent := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel),
+		policy.PrimaryColor, policy.BackgroundColor, policy.WarnColor, policy.FontColor,
+		policy.PrimaryColorDark, policy.BackgroundColorDark, policy.WarnColorDark, policy.FontColorDark,
+		policy.HideLoginNameSuffix, policy.ErrorMsgPopup, policy.HideLoginNameSuffix)
+	if hasChangedEvent {
+		events = append(events, changedEvent)
+	}
+	if len(events) > 0 {
+		events = append(events, org.NewLabelPolicyActivatedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel)))
 	}
 	return events, nil
 }

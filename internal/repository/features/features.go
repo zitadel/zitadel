@@ -29,9 +29,14 @@ type FeaturesSetEvent struct {
 	LoginPolicyPasswordless  *bool                 `json:"loginPolicyPasswordless,omitempty"`
 	LoginPolicyRegistration  *bool                 `json:"loginPolicyRegistration,omitempty"`
 	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsernameLogin,omitempty"`
+	LoginPolicyPasswordReset *bool                 `json:"loginPolicyPasswordReset,omitempty"`
 	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
 	LabelPolicy              *bool                 `json:"labelPolicy,omitempty"`
+	LabelPolicyPrivateLabel  *bool                 `json:"labelPolicyPrivateLabel,omitempty"`
+	LabelPolicyWatermark     *bool                 `json:"labelPolicyWatermark,omitempty"`
 	CustomDomain             *bool                 `json:"customDomain,omitempty"`
+	CustomText               *bool                 `json:"customText,omitempty"`
+	PrivacyPolicy            *bool                 `json:"privacyPolicy,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -120,21 +125,45 @@ func ChangeLoginPolicyUsernameLogin(loginPolicyUsernameLogin bool) func(event *F
 	}
 }
 
+func ChangeLoginPolicyPasswordReset(loginPolicyPasswordReset bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.LoginPolicyPasswordReset = &loginPolicyPasswordReset
+	}
+}
+
 func ChangePasswordComplexityPolicy(passwordComplexityPolicy bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.PasswordComplexityPolicy = &passwordComplexityPolicy
 	}
 }
 
-func ChangeLabelPolicy(labelPolicy bool) func(event *FeaturesSetEvent) {
+func ChangeLabelPolicyPrivateLabel(labelPolicyPrivateLabel bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.LabelPolicy = &labelPolicy
+		e.LabelPolicyPrivateLabel = &labelPolicyPrivateLabel
+	}
+}
+
+func ChangeLabelPolicyWatermark(labelPolicyWatermark bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.LabelPolicyWatermark = &labelPolicyWatermark
 	}
 }
 
 func ChangeCustomDomain(customDomain bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.CustomDomain = &customDomain
+	}
+}
+
+func ChangeCustomText(customText bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.CustomText = &customText
+	}
+}
+
+func ChangePrivacyPolicy(privacyPolicy bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.PrivacyPolicy = &privacyPolicy
 	}
 }
 

@@ -1,16 +1,22 @@
 $lgn-header-padding: 0;
-$lgn-header-margin: 1rem auto .5rem auto;
+$lgn-header-margin: auto;
 
 .lgn-header {
-    display: block;
-    position: relative;
-    margin: $lgn-header-margin;
-    padding: $lgn-header-padding;
-    width: 100%;
+  display: flex;
+  position: relative;
+  margin: $lgn-header-margin;
+  padding: $lgn-header-padding;
+  max-width: 250px;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
 
-    .lgn-logo {
-        height: 43px;
-        width: 160px;
-        margin: 0 auto;
-    }
+  .lgn-logo {
+    display: block;
+    height: 100%;
+    margin: 0 auto;
+    max-width: 250px;
+    max-height: 150px;
+    object-fit: contain;
+  }
 }

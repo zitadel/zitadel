@@ -43,12 +43,15 @@ func (wm *OrgSecondFactorWriteModel) Reduce() error {
 }
 
 func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
 		EventTypes(
 			org.LoginPolicySecondFactorAddedEventType,
-			org.LoginPolicySecondFactorRemovedEventType)
+			org.LoginPolicySecondFactorRemovedEventType).
+		Builder()
 }
 
 type OrgMultiFactorWriteModel struct {
@@ -87,12 +90,15 @@ func (wm *OrgMultiFactorWriteModel) Reduce() error {
 }
 
 func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.WriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
 		EventTypes(
 			org.LoginPolicyMultiFactorAddedEventType,
-			org.LoginPolicyMultiFactorRemovedEventType)
+			org.LoginPolicyMultiFactorRemovedEventType).
+		Builder()
 }
 
 func NewOrgAuthFactorsAllowedWriteModel(orgID string) *OrgAuthFactorsAllowedWriteModel {
@@ -164,17 +170,26 @@ func (wm *OrgAuthFactorsAllowedWriteModel) ensureMultiFactor(multiFactor domain.
 }
 
 func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType, org.AggregateType).
-		AggregateIDs(domain.IAMID, wm.WriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(domain.IAMID).
 		EventTypes(
 			iam.LoginPolicySecondFactorAddedEventType,
 			iam.LoginPolicySecondFactorRemovedEventType,
 			iam.LoginPolicyMultiFactorAddedEventType,
 			iam.LoginPolicyMultiFactorRemovedEventType,
+		).
+		Or().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.WriteModel.AggregateID).
+		EventTypes(
 			org.LoginPolicySecondFactorAddedEventType,
 			org.LoginPolicySecondFactorRemovedEventType,
 			org.LoginPolicyMultiFactorAddedEventType,
-			org.LoginPolicyMultiFactorRemovedEventType)
+			org.LoginPolicyMultiFactorRemovedEventType,
+		).
+		Builder()
 }
 
 func (wm *OrgAuthFactorsAllowedWriteModel) ToSecondFactorWriteModel(factor domain.SecondFactorType) *OrgSecondFactorWriteModel {

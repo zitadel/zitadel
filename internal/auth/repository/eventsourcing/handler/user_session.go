@@ -47,6 +47,10 @@ func (u *UserSession) ViewModel() string {
 	return userSessionTable
 }
 
+func (u *UserSession) Subscription() *v1.Subscription {
+	return u.subscription
+}
+
 func (_ *UserSession) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.UserAggregate}
 }
@@ -111,6 +115,8 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		es_model.HumanPasswordChanged,
 		es_model.HumanMFAOTPRemoved,
 		es_model.HumanProfileChanged,
+		es_model.HumanAvatarAdded,
+		es_model.HumanAvatarRemoved,
 		es_model.DomainClaimed,
 		es_model.UserUserNameChanged,
 		es_model.HumanExternalIDPRemoved,
@@ -167,5 +173,6 @@ func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id strin
 	session.UserName = user.UserName
 	session.LoginName = user.PreferredLoginName
 	session.DisplayName = user.DisplayName
+	session.AvatarKey = user.AvatarKey
 	return nil
 }

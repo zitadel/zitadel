@@ -1,7 +1,7 @@
 package kubernetes
 
 import (
-	"fmt"
+	"github.com/caos/zitadel/operator/common"
 
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -31,7 +31,7 @@ func EnsureZitadelOperatorArtifacts(
 	version string,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	imageRegistry string,
+	customImageRegistry string,
 	gitops bool,
 ) error {
 
@@ -276,7 +276,7 @@ status:
 					Containers: []core.Container{{
 						Name:            "zitadel",
 						ImagePullPolicy: core.PullIfNotPresent,
-						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
+						Image:           common.ZITADELOperatorImage.Reference(customImageRegistry, version),
 						Command:         cmd,
 						Args:            []string{},
 						Ports: []core.ContainerPort{{
@@ -384,7 +384,7 @@ func EnsureDatabaseArtifacts(
 	version string,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	imageRegistry string,
+	customImageRegistry string,
 	gitops bool) error {
 
 	monitor.WithFields(map[string]interface{}{
@@ -621,7 +621,7 @@ status:
 					Containers: []core.Container{{
 						Name:            "database",
 						ImagePullPolicy: core.PullIfNotPresent,
-						Image:           fmt.Sprintf("%s/caos/zitadel-operator:%s", imageRegistry, version),
+						Image:           common.ZITADELOperatorImage.Reference(customImageRegistry, version),
 						Command:         cmd,
 						Args:            []string{},
 						Ports: []core.ContainerPort{{

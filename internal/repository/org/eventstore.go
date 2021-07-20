@@ -18,9 +18,22 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).
+		RegisterFilterEventMapper(MemberCascadeRemovedEventType, MemberCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyActivatedEventType, LabelPolicyActivatedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyRemovedEventType, LabelPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyLogoAddedEventType, LabelPolicyLogoAddedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyLogoRemovedEventType, LabelPolicyLogoRemovedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyIconAddedEventType, LabelPolicyIconAddedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyIconRemovedEventType, LabelPolicyIconRemovedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyLogoDarkAddedEventType, LabelPolicyLogoDarkAddedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyLogoDarkRemovedEventType, LabelPolicyLogoDarkRemovedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyIconDarkAddedEventType, LabelPolicyIconDarkAddedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyIconDarkRemovedEventType, LabelPolicyIconDarkRemovedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyFontAddedEventType, LabelPolicyFontAddedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyFontRemovedEventType, LabelPolicyFontRemovedEventMapper).
+		RegisterFilterEventMapper(LabelPolicyAssetsRemovedEventType, LabelPolicyAssetsRemovedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyAddedEventType, LoginPolicyAddedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyChangedEventType, LoginPolicyChangedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyRemovedEventType, LoginPolicyRemovedEventMapper).
@@ -43,12 +56,18 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(PasswordLockoutPolicyAddedEventType, PasswordLockoutPolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordLockoutPolicyChangedEventType, PasswordLockoutPolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordLockoutPolicyRemovedEventType, PasswordLockoutPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(PrivacyPolicyAddedEventType, PrivacyPolicyAddedEventMapper).
+		RegisterFilterEventMapper(PrivacyPolicyChangedEventType, PrivacyPolicyChangedEventMapper).
+		RegisterFilterEventMapper(PrivacyPolicyRemovedEventType, PrivacyPolicyRemovedEventMapper).
 		RegisterFilterEventMapper(MailTemplateAddedEventType, MailTemplateAddedEventMapper).
 		RegisterFilterEventMapper(MailTemplateChangedEventType, MailTemplateChangedEventMapper).
 		RegisterFilterEventMapper(MailTemplateRemovedEventType, MailTemplateRemovedEventMapper).
 		RegisterFilterEventMapper(MailTextAddedEventType, MailTextAddedEventMapper).
 		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper).
 		RegisterFilterEventMapper(MailTextRemovedEventType, MailTextRemovedEventMapper).
+		RegisterFilterEventMapper(CustomTextSetEventType, CustomTextSetEventMapper).
+		RegisterFilterEventMapper(CustomTextRemovedEventType, CustomTextRemovedEventMapper).
+		RegisterFilterEventMapper(CustomTextTemplateRemovedEventType, CustomTextTemplateRemovedEventMapper).
 		RegisterFilterEventMapper(IDPConfigAddedEventType, IDPConfigAddedEventMapper).
 		RegisterFilterEventMapper(IDPConfigChangedEventType, IDPConfigChangedEventMapper).
 		RegisterFilterEventMapper(IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).

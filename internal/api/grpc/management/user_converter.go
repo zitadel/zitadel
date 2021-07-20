@@ -43,7 +43,7 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 		Username: req.UserName,
 	}
 	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
-	logging.Log("MANAG-3GUFJ").OnError(err).Debug("language malformed")
+	logging.Log("MANAG-M029f").OnError(err).Debug("language malformed")
 	h.Profile = &domain.Profile{
 		FirstName:         req.Profile.FirstName,
 		LastName:          req.Profile.LastName,
@@ -240,4 +240,39 @@ func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) 
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
+}
+
+func UserMembershipViewsToDomain(memberships []*user_model.UserMembershipView) []*domain.UserMembership {
+	result := make([]*domain.UserMembership, len(memberships))
+	for i, membership := range memberships {
+		result[i] = &domain.UserMembership{
+			UserID:            membership.UserID,
+			MemberType:        MemberTypeToDomain(membership.MemberType),
+			AggregateID:       membership.AggregateID,
+			ObjectID:          membership.ObjectID,
+			Roles:             membership.Roles,
+			DisplayName:       membership.DisplayName,
+			CreationDate:      membership.CreationDate,
+			ChangeDate:        membership.ChangeDate,
+			ResourceOwner:     membership.ResourceOwner,
+			ResourceOwnerName: membership.ResourceOwnerName,
+			Sequence:          membership.Sequence,
+		}
+	}
+	return result
+}
+
+func MemberTypeToDomain(mType user_model.MemberType) domain.MemberType {
+	switch mType {
+	case user_model.MemberTypeIam:
+		return domain.MemberTypeIam
+	case user_model.MemberTypeOrganisation:
+		return domain.MemberTypeOrganisation
+	case user_model.MemberTypeProject:
+		return domain.MemberTypeProject
+	case user_model.MemberTypeProjectGrant:
+		return domain.MemberTypeProjectGrant
+	default:
+		return domain.MemberTypeUnspecified
+	}
 }

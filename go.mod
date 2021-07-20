@@ -16,22 +16,22 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.14.7
+	github.com/caos/oidc v0.15.6
 	github.com/caos/orbos v1.5.14-0.20210428081839-983ffc569980
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
-	github.com/envoyproxy/protoc-gen-validate v0.5.1
+	github.com/envoyproxy/protoc-gen-validate v0.6.1
+	github.com/getsentry/sentry-go v0.11.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/golang/mock v1.5.0
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/securecookie v1.1.1
-	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -43,11 +43,13 @@ require (
 	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect
 	github.com/kevinburke/twilio-go v0.0.0-20200810163702-320748330fac
 	github.com/lib/pq v1.9.0
+	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/minio/minio-go/v7 v7.0.10
 	github.com/mitchellh/copystructure v1.1.2 // indirect
-	github.com/nicksnyder/go-i18n/v2 v2.1.1
+	github.com/muesli/gamut v0.2.0
+	github.com/nicksnyder/go-i18n/v2 v2.1.2
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.2.0
 	github.com/prometheus/client_golang v1.8.0 // indirect
@@ -67,14 +69,16 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.13.0
 	go.opentelemetry.io/otel/sdk v0.13.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.6
-	golang.org/x/tools v0.1.0
+	golang.org/x/tools v0.1.1
 	google.golang.org/api v0.34.0
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46
 	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
-	gopkg.in/square/go-jose.v2 v2.5.1
+	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.19.2

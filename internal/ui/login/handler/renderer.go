@@ -3,10 +3,10 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 	"html/template"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
@@ -14,9 +14,11 @@ import (
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
+	"github.com/caos/zitadel/internal/static"
 )
 
 const (
@@ -25,12 +27,14 @@ const (
 
 type Renderer struct {
 	*renderer.Renderer
-	pathPrefix string
+	pathPrefix    string
+	staticStorage static.Storage
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
+func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string, defaultLanguage language.Tag) *Renderer {
 	r := &Renderer{
-		pathPrefix: pathPrefix,
+		pathPrefix:    pathPrefix,
+		staticStorage: staticStorage,
 	}
 	tmplMapping := map[string]string{
 		tmplError:                    "error.html",
@@ -38,9 +42,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplUserSelection:            "select_user.html",
 		tmplPassword:                 "password.html",
 		tmplPasswordlessVerification: "passwordless.html",
-		tmplMFAVerify:                "mfa_verify.html",
+		tmplMFAVerify:                "mfa_verify_otp.html",
 		tmplMFAPrompt:                "mfa_prompt.html",
-		tmplMFAInitVerify:            "mfa_init_verify.html",
+		tmplMFAInitVerify:            "mfa_init_otp.html",
 		tmplMFAU2FInit:               "mfa_init_u2f.html",
 		tmplU2FVerification:          "mfa_verification_u2f.html",
 		tmplMFAInitDone:              "mfa_init_done.html",
@@ -61,6 +65,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		tmplChangeUsernameDone:       "change_username_done.html",
 		tmplLinkUsersDone:            "link_users_done.html",
 		tmplExternalNotFoundOption:   "external_not_found_option.html",
+		tmplLoginSuccess:             "login_success.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -68,6 +73,35 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		},
 		"resourceThemeUrl": func(file, theme string) string {
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
+		},
+		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
+			if policy != nil {
+				return true
+			}
+			return false
+		},
+		"hasWatermark": func(policy *domain.LabelPolicy) bool {
+			if policy != nil && policy.DisableWatermark {
+				return false
+			}
+			return true
+		},
+		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
+		},
+		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.LogoURL
+			if darkMode && policy.LogoDarkURL != "" {
+				fileName = policy.LogoDarkURL
+			}
+			if fileName == "" {
+				return ""
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
+		},
+		"avatarResource": func(orgID, avatar string) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", false, "filename", avatar))
 		},
 		"loginUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLogin)
@@ -153,6 +187,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"hasUsernamePasswordLogin": func() bool {
 			return false
 		},
+		"showPasswordReset": func() bool {
+			return true
+		},
 		"hasExternalLogin": func() bool {
 			return false
 		},
@@ -200,6 +237,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			return
 		}
 		l.renderLogin(w, r, authReq, err)
+	case *domain.RegistrationStep:
+		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
 	case *domain.InitPasswordStep:
@@ -215,7 +254,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.redirectToCallback(w, r, authReq)
+		l.redirectToLoginSuccess(w, r, authReq.ID)
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
 	case *domain.VerifyEMailStep:
@@ -245,7 +284,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		msg = err.Error()
 	}
 	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
@@ -262,13 +301,14 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
 	baseData := baseData{
 		errorData: errorData{
-			ErrType:    errType,
+			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.Lang(r).String(),
+		Lang:                   l.renderer.ReqLang(l.getTranslator(authReq), r).String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
+		DarkMode:               l.isDarkMode(r),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -279,33 +319,59 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
+		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
+		if authReq.PrivacyPolicy != nil {
+			baseData.TOSLink = authReq.PrivacyPolicy.TOSLink
+			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
+		}
+	} else {
+		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
+		if err != nil {
+			return baseData
+		}
+		if privacyPolicy != nil {
+			baseData.TOSLink = privacyPolicy.TOSLink
+			baseData.PrivacyLink = privacyPolicy.PrivacyLink
+		}
 	}
 	return baseData
 }
 
+func (l *Login) getTranslator(authReq *domain.AuthRequest) *i18n.Translator {
+	translator, _ := l.renderer.NewTranslator()
+	if authReq != nil {
+		l.addLoginTranslations(translator, authReq.DefaultTranslations)
+		l.addLoginTranslations(translator, authReq.OrgTranslations)
+		translator.SetPreferredLanguages(authReq.UiLocales...)
+	}
+	return translator
+}
+
 func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
-	var userName, loginName, displayName string
+	var userName, loginName, displayName, avatar string
 	if authReq != nil {
 		userName = authReq.UserName
 		loginName = authReq.LoginName
 		displayName = authReq.DisplayName
+		avatar = authReq.AvatarKey
 	}
 	return profileData{
 		UserName:    userName,
 		LoginName:   loginName,
 		DisplayName: displayName,
+		AvatarKey:   avatar,
 	}
 }
 
-func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
+func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
-		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
-		return localized + " (" + caosErr.ID + ")"
+		localized := l.renderer.LocalizeFromRequest(l.getTranslator(nil), r, caosErr.Message, nil)
+		return caosErr.ID, localized
 
 	}
-	return err.Error()
+	return "", err.Error()
 }
 
 func (l *Login) getTheme(r *http.Request) string {
@@ -313,7 +379,18 @@ func (l *Login) getTheme(r *http.Request) string {
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
-	return "lgn-dark-theme" //TODO: impl
+	if l.isDarkMode(r) {
+		return "lgn-dark-theme"
+	}
+	return "lgn-light-theme"
+}
+
+func (l *Login) isDarkMode(r *http.Request) bool {
+	cookie, err := r.Cookie("mode")
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(cookie.Value, "dark")
 }
 
 func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
@@ -350,6 +427,17 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
 
+func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []*domain.CustomText) {
+	for _, text := range customTexts {
+		msg := i18n.Message{
+			ID:   text.Key,
+			Text: text.Text,
+		}
+		err := l.renderer.AddMessages(translator, text.Language, msg)
+		logging.Log("HANDLE-GD3g2").OnError(err).Warn("could no add message to translator")
+	}
+}
+
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
@@ -376,19 +464,24 @@ type baseData struct {
 	Title                  string
 	Theme                  string
 	ThemeMode              string
+	DarkMode               bool
 	OrgID                  string
 	OrgName                string
 	PrimaryDomain          string
 	DisplayLoginNameSuffix bool
+	TOSLink                string
+	PrivacyLink            string
 	AuthReqID              string
 	CSRF                   template.HTML
 	Nonce                  string
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
+	LabelPolicy            *domain.LabelPolicy
+	LoginTexts             []*domain.CustomLoginText
 }
 
 type errorData struct {
-	ErrType    string
+	ErrID      string
 	ErrMessage string
 }
 
@@ -405,6 +498,7 @@ type profileData struct {
 	LoginName   string
 	UserName    string
 	DisplayName string
+	AvatarKey   string
 }
 
 type passwordData struct {

@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
 	view_model "github.com/caos/zitadel/internal/view/model"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
 
@@ -78,7 +79,8 @@ func (a *API) RegisterServer(ctx context.Context, server server.Server) {
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
-	a.gatewayHandler.RegisterHandler(prefix, handler)
+	sentryHandler := sentryhttp.New(sentryhttp.Options{})
+	a.gatewayHandler.RegisterHandler(prefix, sentryHandler.Handle(handler))
 }
 
 func (a *API) Start(ctx context.Context) {

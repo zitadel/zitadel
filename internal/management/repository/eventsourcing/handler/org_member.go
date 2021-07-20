@@ -58,6 +58,10 @@ func (m *OrgMember) ViewModel() string {
 	return orgMemberTable
 }
 
+func (m *OrgMember) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, usr_es_model.UserAggregate}
 }
@@ -109,7 +113,8 @@ func (m *OrgMember) processOrgMember(event *es_models.Event) (err error) {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case model.OrgMemberRemoved:
+	case model.OrgMemberRemoved,
+		model.OrgMemberCascadeRemoved:
 		err = member.SetData(event)
 		if err != nil {
 			return err
@@ -130,7 +135,9 @@ func (m *OrgMember) processUser(event *es_models.Event) (err error) {
 		usr_es_model.UserEmailChanged,
 		usr_es_model.HumanProfileChanged,
 		usr_es_model.HumanEmailChanged,
-		usr_es_model.MachineChanged:
+		usr_es_model.MachineChanged,
+		usr_es_model.HumanAvatarAdded,
+		usr_es_model.HumanAvatarRemoved:
 		members, err := m.view.OrgMembersByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -163,6 +170,9 @@ func (m *OrgMember) fillData(member *org_view_model.OrgMemberView) (err error) {
 
 func (m *OrgMember) fillUserData(member *org_view_model.OrgMemberView, user *usr_view_model.UserView) error {
 	org, err := m.getOrgByID(context.Background(), user.ResourceOwner)
+	if err != nil {
+		return err
+	}
 	policy := org.OrgIamPolicy
 	if policy == nil {
 		policy, err = m.getDefaultOrgIAMPolicy(context.TODO())
@@ -172,11 +182,13 @@ func (m *OrgMember) fillUserData(member *org_view_model.OrgMemberView, user *usr
 	}
 	member.UserName = user.UserName
 	member.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	member.UserResourceOwner = user.ResourceOwner
 	if user.HumanView != nil {
 		member.FirstName = user.FirstName
 		member.LastName = user.LastName
 		member.DisplayName = user.DisplayName
 		member.Email = user.Email
+		member.AvatarKey = user.AvatarKey
 	}
 	if user.MachineView != nil {
 		member.DisplayName = user.MachineView.Name
