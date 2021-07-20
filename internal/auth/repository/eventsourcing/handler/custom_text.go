@@ -105,7 +105,7 @@ func (m *CustomText) processCustomText(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteCustomText(event.AggregateID, text.Template, text.Language, event)
+		return m.view.DeleteCustomText(event.AggregateID, text.Template, text.Language, text.Key, event)
 	default:
 		return m.view.ProcessedCustomTextSequence(event)
 	}
