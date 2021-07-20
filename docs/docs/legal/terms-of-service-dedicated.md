@@ -26,11 +26,15 @@ Please refer to the [annex](dedicated-instance-deployment) with regards to limit
 
 You may not modify, maintain or attempt to modify the Dedicated Instance, except in with prior instructions by CAOS.
 
-### Management
-
 CAOS will use the same backup strategy as for ZITADEL Cloud (public cloud) services, except otherwise agreed between you and CAOS in writing.
 
-We will access, modify, and maintain the Dedicated Instance at times solely determined by CAOS. For
+### Maintenance and Updates
+
+We will access, modify, and maintain the Dedicated Instance at times solely determined by CAOS (**"Regular Maintenance"**).
+
+Under certain Subscription plans, the Customer may agree a custom frequency and times for modifications and updates. CAOS will coordinate the cadence and the modifications with the Customer. To guarantee the quality of service, maintenance will occur on regular basis, typically monthly or sooner for security or performance related patches (**"Emergency Maintenance"**), but no longer than on quarterly basis.
+
+If you fail to permit CAOS to conduct Regular Maintenance for 3 consecutive months or Emergency Maintenance within 5 days of notification, then CAOS will raise this issue with the Customer via Escalation Process. In case the issue is not resolved 5 days after such an escalation, CAOS may terminate the subscription with 30 days prior written notice to Customer. CAOS is not obligated to provide the service according to the terms and SLA, nor is CAOS liable to any security breach or damages after failure to permit Regular Maintenance for 3 consecutive months, or Emergency Maintenance for 5 days after notification.
 
 ### Incidents
 
