@@ -32,6 +32,8 @@ Chat Support | n/a | no | yes | yes | yes | yes
 Phone Support | n/a | no | yes | yes | yes | yes
 Technical Account Manager | n/a | n/a | n/a | n/a | n/a | 2h / week
 
+CAOS and Customer may mutually agree on different support hours in writing.
+
 ### SLO - Initial response time
 
 CAOS service level objective (SLO) for Support Services  is defined in terms of initial response time to a support request, as outlined in the table below per plan. CAOS will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
@@ -96,11 +98,11 @@ The customer may submit support requests (“ticket”) through any means of eli
 - Description of the issue and if possible a description of the observed and expected behavior,  steps to reproduce the issue, evidence that issue is not caused by connectivity / compute, relevant anonymized log-files etc.
 - All information requested by CAOS as we resolve the ticket (e.g. system logs)
 
-CAOS will review the case information and determine the severity level (see below), working with the customer to assess the urgency of the request and use reasonable efforts to respond to support requests within the initial response time 
+CAOS will review the case information and determine the severity level (see below), working with the customer to assess the urgency of the request and use reasonable efforts to respond to support requests within the initial response time.
 
 CAOS will use reasonable efforts to resolve support request as defined below, but does not guarantee a workaround, resolution or resolution time
 
-Severity Level | Description 
+Severity Level | Description
 --- | --- 
 **Severity 1**<br/> Critical / Service down| <p>Widespread failure or complete unavailability of CAOS Core Services. </p><p> CAOS will use continuous effort to provide a workaround or permanent solution. When Core Services are available, the severity will be lowered to the new appropriate level.</p>
 **Severity 2**<br/> Core functionality unavailable or severely degraded| <p>Core Services of CAOS software continue to operate in severely restricted fashion, yet long-term productivity may be impacted.</p><p> When Core Services are no longer severely degraded (eg, through a viable workaround or release), the severity level will be lowered to Severity 3.</p>
@@ -110,9 +112,11 @@ Severity Level | Description
 
 ### Escalation
 
-The customer may escalate support requests following the escalation process: 
+The customer may escalate support requests following the escalation process:
+
 1. For non-urgent needs, the client may request management escalation within the ticket. A manager will review the request and provide a response within one business day.
 2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@caos.ch
 
 ### Termination
+
 If the customer decides to terminate, or downgrade the subscription, the customer may continue to use the software products, but the support level will be adjusted according to the new ZITADEL Cloud Subscription Plan. CAOS does not provide support on per-issue-basis.
