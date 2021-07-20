@@ -1,5 +1,5 @@
 ---
-title: Additional terms for dedicated instance
+title: Dedicated Instance Terms
 custom_edit_url: null
 --- 
 ## General
@@ -8,7 +8,7 @@ Last revised: July 20, 2021
 
 ### Background
 
-Within the scope of the Framework Agreement, the Customer may choose to purchase a subscription that requires a dedicated instance of ZITADEL. These additional terms for dedicated instance ("**Dedicated Cloud Terms**") apply in addition to the Framework Agreement.
+Within the scope of the Framework Agreement, the Customer may choose to purchase a subscription that requires a dedicated instance of ZITADEL. These additional terms for dedicated instance ("**Dedicated Instance Terms**") apply in addition to the Framework Agreement.
 
 ### Service
 
@@ -22,7 +22,7 @@ CAOS will install and manage the Dedicated Cloud on virtual machines provided by
 
 You may choose to provide the required infrastructure yourself. You must comply with the [requirements and prerequisites](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance) as documented.
 
-Please refer to the [annex](dedicated-instance-deployment) with regards to limitations of the deployment options, especially when using an own infrastructure provider. Accepting these terms you also accept the terms in the annex.
+Please refer to the [annex](dedicated-instance-description) with regards to limitations of the deployment options, especially when using an own infrastructure provider. Accepting these terms you also accept the terms in the annex.
 
 You may not modify, maintain or attempt to modify the Dedicated Instance, except in with prior instructions by CAOS.
 
