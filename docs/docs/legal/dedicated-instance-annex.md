@@ -12,7 +12,7 @@ Last revised: July 20, 2021
 
 ### Service differences
 
-The following table compares the different services, based on the preferred provider (Google Cloud). If you choose a different provider than our preferred provider the [Gurantees](#Guarantees) stated in this document apply.
+The following table compares the different services, based on the preferred provider (Google Cloud). If you choose a different provider than our preferred provider the [Gurantees](#guarantees) stated in this document apply.
 
 Service Levels
 
