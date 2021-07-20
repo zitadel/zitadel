@@ -4,6 +4,8 @@
   /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
+  $background: map-get($theme, background);
+  $card-background-color: mat.get-color-from-palette($background, card);
   $is-dark-theme: map-get($theme, is-dark);
   $back: if($is-dark-theme, #2d2e30, #ffffff);
   $border-color: if($is-dark-theme, rgba(#8795a1, .2), rgba(#8795a1, .2));
@@ -11,7 +13,7 @@
   /* stylelint-enable */
 
   .card {
-    background-color: $back;
+    background-color: $card-background-color;
     transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
     border: 1px solid $border-color;
     box-sizing: border-box;

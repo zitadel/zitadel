@@ -4,6 +4,7 @@
 @use '~@angular/material' as mat;
 
 @import './component-themes';
+@import '~@angular/material/theming';
 
 // Plus imports for other components in your app.
 
@@ -22,92 +23,248 @@
   --table-row-back: #363738;
 }
 
-$caos-dark-brand: (
-  50 : var(--theme-dark-50),
-  100 : var(--theme-dark-100),
-  200 : var(--theme-dark-200),
-  300 : var(--theme-dark-300),
-  400 : var(--theme-dark-400),
-  500 : var(--theme-dark-500),
-  600 : var(--theme-dark-600),
-  700 : var(--theme-dark-700),
-  800 : var(--theme-dark-800),
-  900 : var(--theme-dark-900),
-  A100 : var(--theme-dark-A100),
-  A200 : var(--theme-dark-A200),
-  A400 : var(--theme-dark-A400),
-  A700 : var(--theme-dark-A700),
+$caos-dark-primary: (
+  50 : var(--theme-dark-primary-50),
+  100 : var(--theme-dark-primary-100),
+  200 : var(--theme-dark-primary-200),
+  300 : var(--theme-dark-primary-300),
+  400 : var(--theme-dark-primary-400),
+  500 : var(--theme-dark-primary-500),
+  600 : var(--theme-dark-primary-600),
+  700 : var(--theme-dark-primary-700),
+  800 : var(--theme-dark-primary-800),
+  900 : var(--theme-dark-primary-900),
+  A100 : var(--theme-dark-primary-A100),
+  A200 : var(--theme-dark-primary-A200),
+  A400 : var(--theme-dark-primary-A400),
+  A700 : var(--theme-dark-primary-A700),
   contrast:
     (
-      50: var(--theme-dark-contrast-50),
-      100: var(--theme-dark-contrast-100),
-      200: var(--theme-dark-contrast-200),
-      300: var(--theme-dark-contrast-300),
-      400: var(--theme-dark-contrast-400),
-      500: var(--theme-dark-contrast-500),
-      600: var(--theme-dark-contrast-600),
-      700: var(--theme-dark-contrast-700),
-      800: var(--theme-dark-contrast-800),
-      900: var(--theme-dark-contrast-900),
-      A100: var(--theme-dark-contrast-A100),
-      A200: var(--theme-dark-contrast-A200),
-      A400: var(--theme-dark-contrast-A400),
-      A700: var(--theme-dark-contrast-A700)
+      50: var(--theme-dark-primary-contrast-50),
+      100: var(--theme-dark-primary-contrast-100),
+      200: var(--theme-dark-primary-contrast-200),
+      300: var(--theme-dark-primary-contrast-300),
+      400: var(--theme-dark-primary-contrast-400),
+      500: var(--theme-dark-primary-contrast-500),
+      600: var(--theme-dark-primary-contrast-600),
+      700: var(--theme-dark-primary-contrast-700),
+      800: var(--theme-dark-primary-contrast-800),
+      900: var(--theme-dark-primary-contrast-900),
+      A100: var(--theme-dark-primary-contrast-A100),
+      A200: var(--theme-dark-primary-contrast-A200),
+      A400: var(--theme-dark-primary-contrast-A400),
+      A700: var(--theme-dark-primary-contrast-A700)
     )
 );
 
-$caos-light-brand: (
-  50 : var(--theme-light-50),
-  100 : var(--theme-light-100),
-  200 : var(--theme-light-200),
-  300 : var(--theme-light-300),
-  400 : var(--theme-light-400),
-  500 : var(--theme-light-500),
-  600 : var(--theme-light-600),
-  700 : var(--theme-light-700),
-  800 : var(--theme-light-800),
-  900 : var(--theme-light-900),
-  A100 : var(--theme-light-A100),
-  A200 : var(--theme-light-A200),
-  A400 : var(--theme-light-A400),
-  A700 : var(--theme-light-A700),
+$caos-light-primary: (
+  50 : var(--theme-light-primary-50),
+  100 : var(--theme-light-primary-100),
+  200 : var(--theme-light-primary-200),
+  300 : var(--theme-light-primary-300),
+  400 : var(--theme-light-primary-400),
+  500 : var(--theme-light-primary-500),
+  600 : var(--theme-light-primary-600),
+  700 : var(--theme-light-primary-700),
+  800 : var(--theme-light-primary-800),
+  900 : var(--theme-light-primary-900),
+  A100 : var(--theme-light-primary-A100),
+  A200 : var(--theme-light-primary-A200),
+  A400 : var(--theme-light-primary-A400),
+  A700 : var(--theme-light-primary-A700),
   contrast:
     (
-      50: var(--theme-light-contrast-50),
-      100: var(--theme-light-contrast-100),
-      200: var(--theme-light-contrast-200),
-      300: var(--theme-light-contrast-300),
-      400: var(--theme-light-contrast-400),
-      500: var(--theme-light-contrast-500),
-      600: var(--theme-light-contrast-600),
-      700: var(--theme-light-contrast-700),
-      800: var(--theme-light-contrast-800),
-      900: var(--theme-light-contrast-900),
-      A100: var(--theme-light-contrast-A100),
-      A200: var(--theme-light-contrast-A200),
-      A400: var(--theme-light-contrast-A400),
-      A700: var(--theme-light-contrast-A700)
+      50: var(--theme-light-primary-contrast-50),
+      100: var(--theme-light-primary-contrast-100),
+      200: var(--theme-light-primary-contrast-200),
+      300: var(--theme-light-primary-contrast-300),
+      400: var(--theme-light-primary-contrast-400),
+      500: var(--theme-light-primary-contrast-500),
+      600: var(--theme-light-primary-contrast-600),
+      700: var(--theme-light-primary-contrast-700),
+      800: var(--theme-light-primary-contrast-800),
+      900: var(--theme-light-primary-contrast-900),
+      A100: var(--theme-light-primary-contrast-A100),
+      A200: var(--theme-light-primary-contrast-A200),
+      A400: var(--theme-light-primary-contrast-A400),
+      A700: var(--theme-light-primary-contrast-A700)
     )
 );
 
-$light-primary: mat.define-palette($caos-light-brand);
-$light-accent: mat.define-palette($caos-light-brand);
-$light-warn: mat.define-palette(mat.$red-palette);
+$caos-dark-background: (
+  50 : var(--theme-dark-background-50),
+  100 : var(--theme-dark-background-100),
+  200 : var(--theme-dark-background-200),
+  300 : var(--theme-dark-background-300),
+  400 : var(--theme-dark-background-400),
+  500 : var(--theme-dark-background-500),
+  600 : var(--theme-dark-background-600),
+  700 : var(--theme-dark-background-700),
+  800 : var(--theme-dark-background-800),
+  900 : var(--theme-dark-background-900),
+  A100 : var(--theme-dark-background-A100),
+  A200 : var(--theme-dark-background-A200),
+  A400 : var(--theme-dark-background-A400),
+  A700 : var(--theme-dark-background-A700),
+  contrast:
+    (
+      50: var(--theme-dark-background-contrast-50),
+      100: var(--theme-dark-background-contrast-100),
+      200: var(--theme-dark-background-contrast-200),
+      300: var(--theme-dark-background-contrast-300),
+      400: var(--theme-dark-background-contrast-400),
+      500: var(--theme-dark-background-contrast-500),
+      600: var(--theme-dark-background-contrast-600),
+      700: var(--theme-dark-background-contrast-700),
+      800: var(--theme-dark-background-contrast-800),
+      900: var(--theme-dark-background-contrast-900),
+      A100: var(--theme-dark-background-contrast-A100),
+      A200: var(--theme-dark-background-contrast-A200),
+      A400: var(--theme-dark-background-contrast-A400),
+      A700: var(--theme-dark-background-contrast-A700)
+    )
+);
 
-$dark-primary: mat.define-palette($caos-dark-brand);
-$dark-accent: mat.define-palette($caos-dark-brand);
-$dark-warn: mat.define-palette(mat.$red-palette);
+$caos-light-background: (
+  50 : var(--theme-light-background-50),
+  100 : var(--theme-light-background-100),
+  200 : var(--theme-light-background-200),
+  300 : var(--theme-light-background-300),
+  400 : var(--theme-light-background-400),
+  500 : var(--theme-light-background-500),
+  600 : var(--theme-light-background-600),
+  700 : var(--theme-light-background-700),
+  800 : var(--theme-light-background-800),
+  900 : var(--theme-light-background-900),
+  A100 : var(--theme-light-background-A100),
+  A200 : var(--theme-light-background-A200),
+  A400 : var(--theme-light-background-A400),
+  A700 : var(--theme-light-background-A700),
+  contrast:
+    (
+      50: var(--theme-light-background-contrast-50),
+      100: var(--theme-light-background-contrast-100),
+      200: var(--theme-light-background-contrast-200),
+      300: var(--theme-light-background-contrast-300),
+      400: var(--theme-light-background-contrast-400),
+      500: var(--theme-light-background-contrast-500),
+      600: var(--theme-light-background-contrast-600),
+      700: var(--theme-light-background-contrast-700),
+      800: var(--theme-light-background-contrast-800),
+      900: var(--theme-light-background-contrast-900),
+      A100: var(--theme-light-background-contrast-A100),
+      A200: var(--theme-light-background-contrast-A200),
+      A400: var(--theme-light-background-contrast-A400),
+      A700: var(--theme-light-background-contrast-A700)
+    )
+);
 
-$light-theme: mat.define-light-theme($light-primary, $light-accent, $light-warn);
-$dark-theme: mat.define-dark-theme($dark-primary, $dark-accent, $dark-warn);
+$caos-dark-theme-background: (
+  status-bar: map_get($caos-dark-background, 300),
+  app-bar: map_get($caos-dark-background, 100),
+  background: map_get($caos-dark-background, 500),
+  hover: rgba(black, 0.04),
+  card: map_get($caos-dark-background, 400),
+  dialog: white,
+  disabled-button: rgba(black, 0.12),
+  raised-button: white,
+  focused-button: $dark-focused,
+  selected-button: map_get($caos-dark-background, 300),
+  selected-disabled-button: map_get($caos-dark-background, 400),
+  disabled-button-toggle: map_get($caos-dark-background, 200),
+  unselected-chip: map_get($caos-dark-background, 300),
+  disabled-list-option: map_get($caos-dark-background, 200)
+);
+
+$caos-light-theme-background: (
+  status-bar: map_get($caos-light-background, 300),
+  app-bar: map_get($caos-light-background, 100),
+  background: map_get($caos-light-background, 500),
+  hover: rgba(black, 0.04),
+  card: map_get($caos-light-background, 400),
+  dialog: white,
+  disabled-button: rgba(black, 0.12),
+  raised-button: white,
+  focused-button: $light-focused,
+  selected-button: map_get($caos-light-background, 300),
+  selected-disabled-button: map_get($caos-light-background, 400),
+  disabled-button-toggle: map_get($caos-light-background, 200),
+  unselected-chip: map_get($caos-light-background, 300),
+  disabled-list-option: map_get($caos-light-background, 200)
+);
+
+$caos-dark-theme-foreground: (
+  base: black,
+  divider: $dark-dividers,
+  dividers: $dark-dividers,
+  disabled: $dark-disabled-text,
+  disabled-button: rgba(black, 0.26),
+  disabled-text: $dark-disabled-text,
+  elevation: black,
+  hint-text: $dark-disabled-text,
+  secondary-text: $dark-secondary-text,
+  icon: rgba(black, 0.54),
+  icons: rgba(black, 0.54),
+  text: rgba(black, 0.87),
+  slider-min: rgba(black, 0.87),
+  slider-off: rgba(black, 0.26),
+  slider-off-active: rgba(black, 0.38)
+);
+
+$caos-light-theme-foreground: (
+  base: black,
+  divider: $dark-dividers,
+  dividers: $dark-dividers,
+  disabled: $dark-disabled-text,
+  disabled-button: rgba(black, 0.26),
+  disabled-text: $dark-disabled-text,
+  elevation: black,
+  hint-text: $dark-disabled-text,
+  secondary-text: $dark-secondary-text,
+  icon: rgba(black, 0.54),
+  icons: rgba(black, 0.54),
+  text: rgba(black, 0.87),
+  slider-min: rgba(black, 0.87),
+  slider-off: rgba(black, 0.26),
+  slider-off-active: rgba(black, 0.38)
+);
+
+$caos-dark-app-theme: (
+  primary: mat-palette($caos-dark-primary),
+  accent: mat-palette($caos-dark-primary),
+  warn: mat-palette($mat-red),
+  is-dark: false,
+  foreground: $caos-dark-theme-foreground,
+  background: $caos-dark-theme-background
+);
+
+$caos-light-app-theme: (
+  primary: mat-palette($caos-light-primary),
+  accent: mat-palette($caos-light-primary),
+  warn: mat-palette($mat-red),
+  is-dark: false,
+  foreground: $caos-light-theme-foreground,
+  background: $caos-light-theme-background
+);
+
+// $light-primary: mat.define-palette($caos-light-primary);
+// $light-accent: mat.define-palette($caos-light-primary);
+// $light-warn: mat.define-palette(mat.$red-palette);
+
+// $dark-primary: mat.define-palette($caos-dark-primary);
+// $dark-accent: mat.define-palette($caos-dark-primary);
+// $dark-warn: mat.define-palette(mat.$red-palette);
+
+// $caos-light-app-theme: mat.define-light-theme($light-primary, $light-accent, $light-warn);
+// $caos-dark-app-theme: mat.define-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 $custom-typography: mat.define-typography-config($font-family: 'Lato');
 
 @include mat.core($custom-typography);
 
 // default theme
-@include component-themes($dark-theme);
-@include mat.all-component-themes($dark-theme);
+@include component-themes($caos-dark-app-theme);
+@include mat.all-component-themes($caos-dark-app-theme);
 
 .mat-dialog-container,
 .mat-raised-button,
@@ -116,30 +273,31 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 }
 
 .light-theme {
-  @include component-themes($light-theme);
-  @include mat.all-component-themes($light-theme);
+  @include component-themes($caos-light-app-theme);
+  @include mat.all-component-themes($caos-light-app-theme);
 
   --grey: #697386;
   --color-main: #5469d4;
+  $background: map-get($caos-light-app-theme, background);
 
   .sidenav,
   .main-container,
   .mat-dialog-container {
-    background-color: #fafafa;
+    background-color: map-get($background, background);
     transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
-    background-color: #fafafa;
+    background-color: map-get($background, background);
     border-radius: 8px;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-    background-color: #fafafa;
+    background-color: map-get($background, background);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -154,15 +312,16 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 }
 
 .dark-theme {
-  @include component-themes($dark-theme);
-  @include mat.all-component-themes($dark-theme);
+  @include component-themes($caos-dark-app-theme);
+  @include mat.all-component-themes($caos-dark-app-theme);
 
   --color-main: #5282c1;
+  $background: map-get($caos-dark-app-theme, background);
 
   .sidenav,
   .main-container,
   .mat-dialog-container {
-    background-color: #212224;
+    background-color: map-get($background, background);
     transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
   }
 

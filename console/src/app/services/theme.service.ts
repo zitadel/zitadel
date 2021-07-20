@@ -14,32 +14,34 @@ export class ThemeService {
   private _darkTheme: Subject<boolean> = new Subject<boolean>();
   public isDarkTheme: Observable<boolean> = this._darkTheme.asObservable();
 
-  private primaryColor = '#bb0000';
-  // private accentColor = '#0000aa';
   private primaryColorPalette: Color[] = [];
-  // private accentColorPalette: Color[] = [];
+  private backgroundColorPalette: Color[] = [];
 
   setDarkTheme(isDarkTheme: boolean): void {
     this._darkTheme.next(isDarkTheme);
   }
 
-  public updateTheme(colors: Color[], theme: string) {
+  public updateTheme(colors: Color[], type: string, theme: string) {
     colors.forEach(color => {
       document.documentElement.style.setProperty(
-        `--theme-${theme}-${color.name}`,
+        `--theme-${theme}-${type}-${color.name}`,
         color.hex
       );
       document.documentElement.style.setProperty(
-        `--theme-${theme}-contrast-${color.name}`,
+        `--theme-${theme}-${type}-contrast-${color.name}`,
         color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff'
       );
     });
   }
 
   public savePrimaryColor(color: string, isDark: boolean) {
-    this.primaryColor = color;
     this.primaryColorPalette = this.computeColors(color);
-    this.updateTheme(this.primaryColorPalette, isDark ? 'dark' : 'light');
+    this.updateTheme(this.primaryColorPalette, 'primary', isDark ? 'dark' : 'light');
+  }
+
+  public saveBackgroundColor(color: string, isDark: boolean) {
+    this.backgroundColorPalette = this.computeColors(color);
+    this.updateTheme(this.backgroundColorPalette, 'background', isDark ? 'dark' : 'light');
   }
 
   private computeColors(hex: string): Color[] {

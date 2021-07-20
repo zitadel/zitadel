@@ -197,14 +197,7 @@ export class AppComponent implements OnDestroy {
     }
 
     this.isDarkTheme = this.themeService.isDarkTheme;
-    this.isDarkTheme.subscribe(dark => {
-      // if (this.labelpolicy) {
-      //   const primary = (this.isDarkTheme ? this.labelpolicy.primaryColorDark : this.labelpolicy.primaryColor) || '#5282c1';
-      //   this.themeService.savePrimaryColor(primary, dark);
-      // }
-
-      this.onSetTheme(dark ? 'dark-theme' : 'light-theme');
-    });
+    this.isDarkTheme.subscribe(dark => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
 
     this.translate.onLangChange.subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
@@ -240,8 +233,16 @@ export class AppComponent implements OnDestroy {
         const darkPrimary = this.labelpolicy.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy.primaryColor || '#5282c1';
 
+        const darkBackPrimary = this.labelpolicy.backgroundColorDark || '#212224';
+        const lightBackPrimary = this.labelpolicy.backgroundColor || '#fafafa';
+
         this.themeService.savePrimaryColor(darkPrimary, true);
         this.themeService.savePrimaryColor(lightPrimary, false);
+
+        this.themeService.saveBackgroundColor(darkBackPrimary, true);
+        this.themeService.saveBackgroundColor(lightBackPrimary, false);
+
+
       }
     });
   }
