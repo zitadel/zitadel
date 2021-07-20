@@ -77,10 +77,10 @@ DEDICATED ADVANCED | 99.90%
 
 Subscription plan | Quality of Service Level | Request Priority
 --- | --- | ---
-FREE | high | When ZITADEL Cloud receives concurrent requests, it will try to process these requests first, and with higher priority over other requests
-OUTPOST | medium | Give way to requests with  priority ‘high’
-STARBASE | low | Give way to requests with priority ‘high’ or ‘medium’
-FORTRESS | best effort | No priority for requests
+FORTRESS | high | When ZITADEL Cloud receives concurrent requests, it will try to process these requests first, and with higher priority over other requests
+STARBASE | medium | Give way to requests with  priority ‘high’
+OUTPOST | low | Give way to requests with priority ‘high’ or ‘medium’
+FREE | best effort | No priority for requests
 DEDICATED STANDARD | n/a | Dedicated instance, single tenancy
 DEDICATED ADVANCED | n/a | Dedicated instance, single tenancy
 
