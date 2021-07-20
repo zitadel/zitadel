@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -105,7 +106,7 @@ func (m *CustomText) processCustomText(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteCustomText(event.AggregateID, text.Template, text.Language, event)
+		return m.view.DeleteCustomText(event.AggregateID, text.Template, text.Language, text.Key, event)
 	default:
 		return m.view.ProcessedCustomTextSequence(event)
 	}
