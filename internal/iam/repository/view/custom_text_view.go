@@ -78,10 +78,11 @@ func PutCustomText(db *gorm.DB, table string, customText *model.CustomTextView) 
 	return save(db, customText)
 }
 
-func DeleteCustomText(db *gorm.DB, table, aggregateID, template, lang string) error {
+func DeleteCustomText(db *gorm.DB, table, aggregateID, template, lang, key string) error {
 	aggregateIDSearch := repository.Key{Key: model.CustomTextSearchKey(iam_model.CustomTextSearchKeyAggregateID), Value: aggregateID}
 	templateSearch := repository.Key{Key: model.CustomTextSearchKey(iam_model.CustomTextSearchKeyTemplate), Value: template}
 	languageSearch := repository.Key{Key: model.CustomTextSearchKey(iam_model.CustomTextSearchKeyLanguage), Value: lang}
-	delete := repository.PrepareDeleteByKeys(table, aggregateIDSearch, templateSearch, languageSearch)
+	keySearch := repository.Key{Key: model.CustomTextSearchKey(iam_model.CustomTextSearchKeyKey), Value: key}
+	delete := repository.PrepareDeleteByKeys(table, aggregateIDSearch, templateSearch, keySearch, languageSearch)
 	return delete(db)
 }

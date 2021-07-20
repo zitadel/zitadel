@@ -28,8 +28,8 @@ func (v *View) PutCustomText(template *model.CustomTextView, event *models.Event
 	return v.ProcessedCustomTextSequence(event)
 }
 
-func (v *View) DeleteCustomText(aggregateID, textType, lang string, event *models.Event) error {
-	err := view.DeleteCustomText(v.Db, customTextTable, aggregateID, textType, lang)
+func (v *View) DeleteCustomText(aggregateID, textType, lang, key string, event *models.Event) error {
+	err := view.DeleteCustomText(v.Db, customTextTable, aggregateID, textType, lang, key)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
