@@ -12,7 +12,7 @@ Within the scope of the Framework Agreement, the Customer may choose to purchase
 
 ### Service
 
-CAOS operates and manages a **Dedicated Instance** of ZITADEL in a private infrastructure environment dedicated for Customer's use and provides support services for the customer according the Booking, these terms, agreed [**Service Level Description**](service-level-description), and [**Support Service Descriptions**](support-services).
+CAOS operates and manages a **Dedicated Instance** of ZITADEL in a private infrastructure environment dedicated for the Customer and provides support services for the Customer according the Purchase Order, these terms, agreed [**Service Level Description**](service-level-description), and [**Support Service Descriptions**](support-services).
 
 Each Dedicated Instance consists, except agreed otherwise in writing, of a multi-zonal high-availability configuration that guarantees loads up to the specified [rate limits](rate-limit-policy#what-rate-limits-do-apply).
 
@@ -38,4 +38,4 @@ If you fail to permit CAOS to conduct Regular Maintenance for 3 consecutive mont
 
 ### Incidents
 
-Incidents are handled as documented in the [**Support Service Descriptions**](support-services). If the Customer choose in Booking to provide the required infrastructure, then any incidents related to the infrastructure of the Dedicated Instance have to be resolved through the Customer directly.
+Incidents are handled as documented in the [**Support Service Descriptions**](support-services). If the Customer choose in Purchase Order to provide the required infrastructure, then any incidents related to the infrastructure of the Dedicated Instance have to be resolved through the Customer directly.
