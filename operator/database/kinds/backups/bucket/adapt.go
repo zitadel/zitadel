@@ -116,6 +116,7 @@ func AdaptFunc(
 			namespace,
 			componentLabels,
 			[]string{},
+			[]string{},
 			nodeselector,
 			tolerations,
 			checkDBReady,
@@ -160,6 +161,11 @@ func AdaptFunc(
 				databases, err := currentDB.GetListDatabasesFunc()(k8sClient)
 				if err != nil {
 					databases = []string{}
+				}
+
+				users, err := currentDB.GetListUsersFunc()(k8sClient)
+				if err != nil {
+					users = []string{}
 				}
 
 				value, err := read.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
@@ -218,6 +224,7 @@ func AdaptFunc(
 					namespace,
 					componentLabels,
 					databases,
+					users,
 					nodeselector,
 					tolerations,
 					checkDBReady,

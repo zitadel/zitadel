@@ -1,9 +1,10 @@
 package cmds
 
 import (
-	"errors"
 	"fmt"
 	"sort"
+
+	"github.com/caos/orbos/pkg/kubernetes/cli"
 
 	"github.com/caos/zitadel/pkg/databases"
 	"github.com/spf13/cobra"
@@ -31,24 +32,26 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
 
-		if !rv.Gitops {
-			return errors.New("backuplist command is only supported with the --gitops flag yet")
-		}
-
-		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			monitor.Error(err)
-			return nil
-		}
-
-		if err := gitClient.Clone(); err != nil {
-			monitor.Error(err)
-			return nil
-		}
-
-		backups, err := databases.ListBackups(monitor, gitClient)
+		backups := make([]string, 0)
+		k8sClient, err := cli.Client(monitor, orbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops, true)
 		if err != nil {
-			monitor.Error(err)
-			return nil
+			return err
+		}
+
+		if rv.Gitops {
+			backupsT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
+			if err != nil {
+				monitor.Error(err)
+				return nil
+			}
+			backups = backupsT
+		} else {
+			backupsT, err := databases.CrdListBackups(monitor, k8sClient)
+			if err != nil {
+				monitor.Error(err)
+				return nil
+			}
+			backups = backupsT
 		}
 
 		sort.Slice(backups, func(i, j int) bool {
