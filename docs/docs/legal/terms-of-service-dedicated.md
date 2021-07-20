@@ -12,7 +12,7 @@ Within the scope of the Framework Agreement, the Customer may choose to purchase
 
 ### Service
 
-CAOS operates and manages a **Dedicated Instance** of ZITADEL in a private infrastructure environment dedicated for Customer's use and provides support services for the customer according to the agreed terms and SLA.
+CAOS operates and manages a **Dedicated Instance** of ZITADEL in a private infrastructure environment dedicated for Customer's use and provides support services for the customer according the Booking, these terms, agreed [**Service Level Description**](service-level-description), and [**Support Service Descriptions**](support-services).
 
 Each Dedicated Instance consists, except agreed otherwise in writing, a multi-zonal high-availability configuration that guarantees loads up to the specified [rate limits](https://docs.zitadel.ch/docs/legal/rate-limit-policy#what-rate-limits-do-apply).
 
@@ -22,7 +22,7 @@ CAOS will install and manage the Dedicated Cloud on virtual machines provided by
 
 You may choose to provide the required infrastructure yourself. You must comply with the [requirements and prerequisites](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance) as documented.
 
-Please refer to the [annex](dedicated-instance-deployment) with regards to limitations of the deployment options, especially when using an own infrastructure provider.
+Please refer to the [annex](dedicated-instance-deployment) with regards to limitations of the deployment options, especially when using an own infrastructure provider. Accepting these terms you also accept the terms in the annex.
 
 You may not modify, maintain or attempt to modify the Dedicated Instance, except in with prior instructions by CAOS.
 
@@ -38,4 +38,4 @@ If you fail to permit CAOS to conduct Regular Maintenance for 3 consecutive mont
 
 ### Incidents
 
-Infra vs. Service
+Incidents are handled as documented in the [**Support Service Descriptions**](support-services). If the Customer choose in Booking to provide the required infrastructure, then any incidents related to the infrastructure of the Dedicated Instance have to be resolved through the Customer directly.
