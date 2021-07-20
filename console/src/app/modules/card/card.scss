@@ -1,18 +1,19 @@
 @use '~@angular/material' as mat;
 
 @mixin card-theme($theme) {
-/* stylelint-disable */
+  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
-  $primary-dark: mat.get-color-from-palette($primary, A800);
-  $border-color: mat.get-color-from-palette($primary, A700);
-  $border-selected-color: mat.get-color-from-palette($primary, A600);
-/* stylelint-enable */
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: if($is-dark-theme, #2d2e30, #ffffff);
+  $border-color: if($is-dark-theme, rgba(#8795a1, .2), rgba(#8795a1, .2));
+  $border-selected-color: if($is-dark-theme, #ffffff, #000000);
+  /* stylelint-enable */
 
   .card {
-    background-color: $primary-dark;
+    background-color: $back;
     transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
-    border: 1px solid rgba($border-color, .2);
+    border: 1px solid $border-color;
     box-sizing: border-box;
     border-radius: .5rem;
     outline: none;

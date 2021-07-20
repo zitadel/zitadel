@@ -57,7 +57,7 @@ export class AppComponent implements OnDestroy {
   public filterControl: FormControl = new FormControl('');
   private authSub: Subscription = new Subscription();
   private orgSub: Subscription = new Subscription();
-  private labelpolicy!: LabelPolicy.AsObject;
+  public labelpolicy!: LabelPolicy.AsObject;
 
   public hideAdminWarn: boolean = true;
   public language: string = 'en';
@@ -173,19 +173,7 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'),
     );
 
-    this.mgmtService.getLabelPolicy().then(labelpolicy => {
-      console.log(labelpolicy.policy);
-
-      if (labelpolicy.policy) {
-        this.labelpolicy = labelpolicy.policy;
-
-        const darkPrimary = this.labelpolicy.primaryColorDark || '#5282c1';
-        const lightPrimary = this.labelpolicy.primaryColorDark || '#5282c1';
-
-        this.themeService.savePrimaryColor(darkPrimary, true);
-        this.themeService.savePrimaryColor(lightPrimary, false);
-      }
-    });
+    this.loadPrivateLabelling();
 
     this.getProjectCount();
 
@@ -240,6 +228,22 @@ export class AppComponent implements OnDestroy {
   public toggleAdminHide(): void {
     this.hideAdminWarn = !this.hideAdminWarn;
     localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
+  }
+
+  public loadPrivateLabelling(): void {
+    this.mgmtService.getLabelPolicy().then(labelpolicy => {
+      console.log(labelpolicy.policy);
+
+      if (labelpolicy.policy) {
+        this.labelpolicy = labelpolicy.policy;
+
+        const darkPrimary = this.labelpolicy.primaryColorDark || '#5282c1';
+        const lightPrimary = this.labelpolicy.primaryColor || '#5282c1';
+
+        this.themeService.savePrimaryColor(darkPrimary, true);
+        this.themeService.savePrimaryColor(lightPrimary, false);
+      }
+    });
   }
 
   public loadOrgs(filter?: string): void {
@@ -305,6 +309,7 @@ export class AppComponent implements OnDestroy {
   public setActiveOrg(org: Org.AsObject): void {
     this.org = org;
     this.authService.setActiveOrg(org);
+    this.loadPrivateLabelling();
     this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
       this.router.navigate(['/']);
     });

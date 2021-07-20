@@ -3,15 +3,15 @@
 @mixin input-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
-  $secondary-dark: mat.get-color-from-palette($primary, A800);
-  $inv-color: mat.get-color-from-palette($primary, A600);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $primary-light-color: mat.get-color-from-palette($primary, 200);
   $warn: map-get($theme, warn);
   $warn-color: mat.get-color-from-palette($warn, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+  $primary-dark: if($is-dark-theme, #212224, #fafafa);
+  $secondary-dark: if($is-dark-theme, #2d2e30, #ffffff);
+  $inv-color: if($is-dark-theme, #ffffff, #000000);
 
   [cnslInput],
   .mat-select {
@@ -28,7 +28,7 @@
     font-size: 1rem;
     border: none;
     border: 1px solid if($is-dark-theme, #403e3e, #00000040);
-    background-color:if($is-dark-theme, #00000020, #fafafa50);
+    background-color: if($is-dark-theme, #00000020, #fafafa50);
     border-radius: 4px;
     height: 40px;
     padding: 10px;
@@ -38,27 +38,27 @@
     margin-bottom: 2px;
 
     &:hover {
-        border-color: if($is-dark-theme,#aeafb1, #1a1b1b);
+      border-color: if($is-dark-theme, #aeafb1, #1a1b1b);
     }
 
     &:active,
     &:focus {
-        border-color: $primary-color;
+      border-color: $primary-color;
     }
 
     &.ng-touched {
-        &.ng-invalid {
-            border-color: $warn-color;
-        }
+      &.ng-invalid {
+        border-color: $warn-color;
+      }
     }
 
     &[disabled] {
-        border-color: if($is-dark-theme,#36373850,#cccdce50);
-        color: if($is-dark-theme, #ffffff80 ,#00000061);
+      border-color: if($is-dark-theme, #36373850, #cccdce50);
+      color: if($is-dark-theme, #ffffff80, #00000061);
 
-        &::placeholder {
-            color: if($is-dark-theme, #ffffff80 ,#00000061);
-        }
+      &::placeholder {
+        color: if($is-dark-theme, #ffffff80, #00000061);
+      }
     }
   }
 
@@ -70,7 +70,7 @@
 
   .mat-paginator {
     .mat-select {
-        background-color: inherit;
+      background-color: inherit;
     }
   }
 }

@@ -5,18 +5,20 @@
                 (click)="drawer.toggle()">
                 <i class="icon las la-bars"></i>
             </button>
-            <a class="title" [routerLink]="['/']">
-                <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
-                    src="../assets/images/zitadel-logo-solo-light.svg" />
-                <ng-template #lighttheme>
-                    <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
-                </ng-template>
-            </a>
+            <ng-container *ngIf="labelpolicy && !labelpolicy?.disableWatermark">
+              <a  class="title" [routerLink]="['/']">
+                  <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+                      src="../assets/images/zitadel-logo-solo-light.svg" />
+                  <ng-template #lighttheme>
+                      <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
+                  </ng-template>
+              </a>
 
-            <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-                stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
-                <path d="M16.88 3.549L7.12 20.451"></path>
-            </svg>
+              <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+                  stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
+                  <path d="M16.88 3.549L7.12 20.451"></path>
+              </svg>
+            </ng-container>
 
             <button class="org-button" (click)="loadOrgs()" *ngIf="user && org" mat-button [matMenuTriggerFor]="menu"
                 (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
@@ -102,7 +104,7 @@
                             <ng-template appHasRole [appHasRole]="['org.read']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/org']">
-                                    <i class="icon las la-archway"></i>
+                                    <i class="icon las la-cog"></i>
                                     <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
                                 </a>
                             </ng-template>
@@ -165,13 +167,13 @@
                             </div>
                             <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMPOLICIES' | translate}}" class="nav-item"
                                 [routerLinkActive]="['active']" [routerLink]="[ '/iam','policies']">
-                                <i class="icon las la-gem"></i>
+                                <i class="icon las la-cog"></i>
                                 <span class="label">{{'MENU.IAMPOLICIES' | translate}}</span>
                             </a>
 
                             <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMEVENTSTORE' | translate}}" class="nav-item"
                                 [routerLinkActive]="['active']" [routerLink]="[ '/iam', 'eventstore']">
-                                <i class="icon las la-gem"></i>
+                                <i class="icon las la-database"></i>
                                 <span class="label">{{'MENU.IAMEVENTSTORE' | translate}}</span>
                             </a>
                         </ng-container>

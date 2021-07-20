@@ -4,7 +4,8 @@
   /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
-  $primary-dark: mat.get-color-from-palette($primary, A800);
+  $is-dark-theme: map-get($theme, is-dark);
+  $primary-dark: if($is-dark-theme, #2d2e30, #ffffff);
   /* stylelint-enable */
 
   $lighter-color: rgba(mat.get-color-from-palette($primary, 300), .5);

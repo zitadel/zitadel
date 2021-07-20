@@ -3,7 +3,8 @@
 @mixin theme-card($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
+  $is-dark-theme: map-get($theme, is-dark);
+  $primary-dark: if($is-dark-theme, #212224, #fafafa);
   /* stylelint-enable */
 
   .theme-conent,

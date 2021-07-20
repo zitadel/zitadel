@@ -6,11 +6,11 @@
   $warn: map-get($theme, warn);
   $warn-color: mat.get-color-from-palette($warn, 500);
   $primary-color: mat.get-color-from-palette($primary, 500);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
-  $secondary-dark: mat.get-color-from-palette($primary, A800);
-  $inv-color: mat.get-color-from-palette($primary, A600);
-  $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+  $primary-dark: if($is-dark-theme, #212224, #fafafa);
+  $inv-color: if($is-dark-theme, #ffffff, #000000);
+  $foreground: map-get($theme, foreground);
+  $secondary-dark: if($is-dark-theme, #2d2e30, #ffffff);
 
   .mat-table,
   .mat-paginator {
