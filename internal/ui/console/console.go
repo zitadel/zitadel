@@ -24,7 +24,7 @@ type spaHandler struct {
 
 const (
 	envRequestPath    = "/assets/environment.json"
-	consoleDefaultDir = "/console/"
+	consoleDefaultDir = "./console/"
 	handlerPrefix     = "/console"
 )
 
