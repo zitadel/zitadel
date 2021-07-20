@@ -2,8 +2,9 @@
 title: Annex to the Dedicated Instance Terms
 custom_edit_url: null
 --- 
+## Introduction
 
-## General
+This annex to the [Dedicated Instance Terms](terms-of-service-dedicated) describes the dedicated instance services and guarantees under different configurations.
 
 Last revised: July 20, 2021
 
