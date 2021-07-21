@@ -27,10 +27,9 @@ func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translat
 	}
 
 	var args = mapNotifyUserToArgs(user)
-	args["Code"] = codeString
 
 	emailCodeData := &PasswordlessRegistrationLinkData{
-		TemplateData: templates.GetTemplateData(translator, args, apiDomain, url, domain.VerifyEmailMessageType, user.PreferredLanguage, colors),
+		TemplateData: templates.GetTemplateData(translator, args, apiDomain, url, domain.PasswordlessRegistrationMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 

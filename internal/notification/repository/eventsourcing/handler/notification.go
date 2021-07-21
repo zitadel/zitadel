@@ -350,7 +350,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.DomainClaimedMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.PasswordlessRegistrationMessageType)
 	if err != nil {
 		return err
 	}

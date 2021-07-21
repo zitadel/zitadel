@@ -107,7 +107,8 @@ func (r *CustomTextView) IsMessageTemplate() bool {
 		r.Template == domain.PasswordResetMessageType ||
 		r.Template == domain.VerifyEmailMessageType ||
 		r.Template == domain.VerifyPhoneMessageType ||
-		r.Template == domain.DomainClaimedMessageType
+		r.Template == domain.DomainClaimedMessageType ||
+		r.Template == domain.PasswordlessRegistrationMessageType
 }
 
 func CustomTextViewsToMessageDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomMessageText {

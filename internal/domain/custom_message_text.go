@@ -7,18 +7,19 @@ import (
 )
 
 const (
-	InitCodeMessageType      = "InitCode"
-	PasswordResetMessageType = "PasswordReset"
-	VerifyEmailMessageType   = "VerifyEmail"
-	VerifyPhoneMessageType   = "VerifyPhone"
-	DomainClaimedMessageType = "DomainClaimed"
-	MessageTitle             = "Title"
-	MessagePreHeader         = "PreHeader"
-	MessageSubject           = "Subject"
-	MessageGreeting          = "Greeting"
-	MessageText              = "Text"
-	MessageButtonText        = "ButtonText"
-	MessageFooterText        = "Footer"
+	InitCodeMessageType                 = "InitCode"
+	PasswordResetMessageType            = "PasswordReset"
+	VerifyEmailMessageType              = "VerifyEmail"
+	VerifyPhoneMessageType              = "VerifyPhone"
+	DomainClaimedMessageType            = "DomainClaimed"
+	PasswordlessRegistrationMessageType = "PasswordlessRegistration"
+	MessageTitle                        = "Title"
+	MessagePreHeader                    = "PreHeader"
+	MessageSubject                      = "Subject"
+	MessageGreeting                     = "Greeting"
+	MessageText                         = "Text"
+	MessageButtonText                   = "ButtonText"
+	MessageFooterText                   = "Footer"
 )
 
 type MessageTexts struct {

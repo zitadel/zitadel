@@ -83,6 +83,21 @@ func SetDomainClaimedCustomTextToDomain(msg *admin_pb.SetDefaultDomainClaimedMes
 	}
 }
 
+func SetPasswordlessRegistrationCustomTextToDomain(msg *admin_pb.SetDefaultPasswordlessRegistrationMessageTextRequest) *domain.CustomMessageText {
+	langTag := language.Make(msg.Language)
+	return &domain.CustomMessageText{
+		MessageTextType: domain.PasswordlessRegistrationMessageType,
+		Language:        langTag,
+		Title:           msg.Title,
+		PreHeader:       msg.PreHeader,
+		Subject:         msg.Subject,
+		Greeting:        msg.Greeting,
+		Text:            msg.Text,
+		ButtonText:      msg.ButtonText,
+		FooterText:      msg.FooterText,
+	}
+}
+
 func SetLoginTextToDomain(req *admin_pb.SetCustomLoginTextsRequest) *domain.CustomLoginText {
 	langTag := language.Make(req.Language)
 	result := &domain.CustomLoginText{
