@@ -105,6 +105,8 @@ func AdaptFunc(
 		migrate = migrate || migrateIAM
 		secret.AppendSecrets("", allSecrets, zitadelSecrets, allExisting, zitadelExisting)
 
+		rec, _ := Reconcile(monitor, desiredKind.Spec, gitops)
+
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
@@ -118,7 +120,7 @@ func AdaptFunc(
 			case "operator":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
-					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+					operator.EnsureFuncToQueryFunc(rec),
 				)
 			}
 		}

@@ -38,6 +38,7 @@ func main() {
 		cmds.BackupCommand(rootValues),
 		cmds.StartDatabase(rootValues),
 		cmds.ConfigCommand(rootValues, githubClientID, githubClientSecret),
+		cmds.TeardownCommand(rootValues),
 	)
 
 	if err := rootCmd.Execute(); err != nil {

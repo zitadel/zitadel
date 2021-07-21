@@ -1,15 +1,9 @@
 package cmds
 
 import (
-	"errors"
-
-	"github.com/caos/orbos/mntr"
-
-	"github.com/caos/orbos/pkg/git"
-
 	"github.com/caos/orbos/pkg/kubernetes/cli"
+	"github.com/caos/zitadel/pkg/databases"
 
-	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/spf13/cobra"
 )
 
@@ -35,25 +29,27 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 		monitor := rv.Monitor
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
-		version := rv.Version
-
-		if !rv.Gitops {
-			return mntr.ToUserError(errors.New("backup command is only supported with the --gitops flag yet"))
-		}
 
 		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
 		if err != nil {
 			return err
 		}
 
-		if gitClient.Exists(git.DatabaseFile) {
-
-			if err := crtlgitops.Backup(
+		if rv.Gitops {
+			if err := databases.GitOpsInstantBackup(
 				monitor,
-				orbConfig.Path,
+				k8sClient,
+				gitClient,
+				backup,
+			); err != nil {
+				return err
+			}
+
+		} else {
+			if err := databases.CrdInstantBackup(
+				monitor,
 				k8sClient,
 				backup,
-				&version,
 			); err != nil {
 				return err
 			}

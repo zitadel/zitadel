@@ -224,7 +224,7 @@ func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *mg
 	}, nil
 }
 
-func (s *Server) SetCustomDomainClaimedMessageText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
+func (s *Server) SetCustomDomainClaimedMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err

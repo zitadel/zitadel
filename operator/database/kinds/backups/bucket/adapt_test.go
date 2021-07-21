@@ -147,7 +147,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	queried := SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(client, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
@@ -219,7 +219,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	queried := SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(client, queried)
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)
@@ -292,7 +292,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	queried := SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(client, queried)
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)
@@ -365,7 +365,8 @@ func TestBucket_AdaptClean(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	users := []string{"test1", "test2"}
+	queried := SetQueriedForDatabases(databases, users)
 	ensure, err := query(client, queried)
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)

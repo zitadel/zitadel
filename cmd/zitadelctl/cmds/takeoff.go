@@ -91,7 +91,8 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 			SelfReconciling: true,
 		}
 
-		return orbzit.Reconcile(monitor, spec, gitops)(k8sClient)
+		rec, _ := orbzit.Reconcile(monitor, spec, gitops)
+		return rec(k8sClient)
 	}
 
 	if !gitClient.Exists(git.ZitadelFile) {
@@ -111,7 +112,8 @@ func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 
 	// at takeoff the artifacts have to be applied
 	spec.SelfReconciling = true
-	return orbzit.Reconcile(monitor, spec, gitops)(k8sClient)
+	rec, _ := orbzit.Reconcile(monitor, spec, gitops)
+	return rec(k8sClient)
 }
 
 func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
@@ -123,13 +125,8 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 			SelfReconciling: true,
 		}
 
-		if err := orbdb.Reconcile(
-			monitor,
-			spec,
-			gitops,
-		)(k8sClient); err != nil {
-			return err
-		}
+		rec, _ := orbdb.Reconcile(monitor, spec, gitops)
+		return rec(k8sClient)
 	}
 
 	if !gitClient.Exists(git.DatabaseFile) {
@@ -148,9 +145,6 @@ func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kuber
 
 	// at takeoff the artifacts have to be applied
 	spec.SelfReconciling = true
-	return orbdb.Reconcile(
-		monitor,
-		spec,
-		gitops,
-	)(k8sClient)
+	rec, _ := orbdb.Reconcile(monitor, spec, gitops)
+	return rec(k8sClient)
 }
