@@ -73,6 +73,7 @@ type PasswordlessInitCodeState int32
 
 const (
 	PasswordlessInitCodeStateUnspecified PasswordlessInitCodeState = iota
+	PasswordlessInitCodeStateAdded
 	PasswordlessInitCodeStateActive
 	PasswordlessInitCodeStateRemoved
 )

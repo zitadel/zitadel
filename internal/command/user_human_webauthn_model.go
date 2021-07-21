@@ -462,6 +462,10 @@ func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore
 			if wm.CodeID == e.ID {
 				wm.WriteModel.AppendEvents(e)
 			}
+		case *user.HumanPasswordlessInitCodeRequestedEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
 		case *user.HumanPasswordlessInitCodeSentEvent:
 			if wm.CodeID == e.ID {
 				wm.WriteModel.AppendEvents(e)
@@ -485,6 +489,8 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanPasswordlessInitCodeAddedEvent:
 			wm.appendAddedEvent(e)
+		case *user.HumanPasswordlessInitCodeRequestedEvent:
+			wm.appendRequestedEvent(e)
 		case *user.HumanPasswordlessInitCodeSentEvent:
 			wm.Active = true
 		case *user.HumanPasswordlessInitCodeCheckFailedEvent:
@@ -501,7 +507,12 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 func (wm *HumanPasswordlessInitCodeWriteModel) appendAddedEvent(e *user.HumanPasswordlessInitCodeAddedEvent) {
 	wm.CryptoCode = e.Code
 	wm.Expiration = e.Expiry
-	wm.Active = !e.Send
+	wm.Active = true
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) appendRequestedEvent(e *user.HumanPasswordlessInitCodeRequestedEvent) {
+	wm.CryptoCode = e.Code
+	wm.Expiration = e.Expiry
 }
 
 func (wm *HumanPasswordlessInitCodeWriteModel) appendCheckFailedEvent(e *user.HumanPasswordlessInitCodeCheckFailedEvent) {
@@ -518,6 +529,7 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Query() *eventstore.SearchQueryBu
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanPasswordlessInitCodeAddedType,
+			user.HumanPasswordlessInitCodeRequestedType,
 			user.HumanPasswordlessInitCodeSentType,
 			user.HumanPasswordlessInitCodeCheckFailedType,
 			user.HumanPasswordlessInitCodeCheckSucceededType,

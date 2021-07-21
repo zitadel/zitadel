@@ -316,12 +316,9 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 }
 
 func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (err error) {
-	addedEvent := new(user_repo.HumanPasswordlessInitCodeAddedEvent)
+	addedEvent := new(user_repo.HumanPasswordlessInitCodeRequestedEvent)
 	if err := json.Unmarshal(event.Data, addedEvent); err != nil {
 		return err
-	}
-	if !addedEvent.Send {
-		return nil
 	}
 	events, err := n.getUserEvents(event.AggregateID, event.Sequence)
 	if err != nil {

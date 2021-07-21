@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -490,7 +491,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	return c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
 }
 
-func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, send bool) (*domain.PasswordlessInitCode, error) {
+func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool) (*domain.PasswordlessInitCode, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
@@ -509,13 +510,15 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 	if err != nil {
 		return nil, err
 	}
-	codeEvent := usr_repo.NewHumanPasswordlessInitCodeAddedEvent(ctx,
-		UserAggregateFromWriteModel(&initCode.WriteModel),
-		codeID,
-		cryptoCode,
-		c.passwordlessInitCode.Expiry(),
-		send,
-	)
+	codeEventCreator := func(ctx context.Context, agg *eventstore.Aggregate, id string, code *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
+		return usr_repo.NewHumanPasswordlessInitCodeAddedEvent(ctx, agg, id, code, exp)
+	}
+	if !direct {
+		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, code *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
+			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, code, exp)
+		}
+	}
+	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, c.passwordlessInitCode.Expiry())
 	pushedEvents, err := c.eventstore.PushEvents(ctx, codeEvent)
 	if err != nil {
 		return nil, err
