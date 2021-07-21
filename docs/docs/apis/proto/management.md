@@ -6541,6 +6541,8 @@ This is an empty request
 | success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 | logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
 | footer_text |  zitadel.text.v1.FooterText | - |  |
+| passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
 
 
 

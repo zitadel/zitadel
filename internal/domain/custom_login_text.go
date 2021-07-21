@@ -266,36 +266,38 @@ type CustomLoginText struct {
 	Default  bool
 	Language language.Tag
 
-	SelectAccount          SelectAccountScreenText
-	Login                  LoginScreenText
-	Password               PasswordScreenText
-	UsernameChange         UsernameChangeScreenText
-	UsernameChangeDone     UsernameChangeDoneScreenText
-	InitPassword           InitPasswordScreenText
-	InitPasswordDone       InitPasswordDoneScreenText
-	EmailVerification      EmailVerificationScreenText
-	EmailVerificationDone  EmailVerificationDoneScreenText
-	InitUser               InitializeUserScreenText
-	InitUserDone           InitializeUserDoneScreenText
-	InitMFAPrompt          InitMFAPromptScreenText
-	InitMFAOTP             InitMFAOTPScreenText
-	InitMFAU2F             InitMFAU2FScreenText
-	InitMFADone            InitMFADoneScreenText
-	MFAProvider            MFAProvidersText
-	VerifyMFAOTP           VerifyMFAOTPScreenText
-	VerifyMFAU2F           VerifyMFAU2FScreenText
-	Passwordless           PasswordlessScreenText
-	PasswordChange         PasswordChangeScreenText
-	PasswordChangeDone     PasswordChangeDoneScreenText
-	PasswordResetDone      PasswordResetDoneScreenText
-	RegisterOption         RegistrationOptionScreenText
-	RegistrationUser       RegistrationUserScreenText
-	RegistrationOrg        RegistrationOrgScreenText
-	LinkingUsersDone       LinkingUserDoneScreenText
-	ExternalNotFoundOption ExternalUserNotFoundScreenText
-	LoginSuccess           SuccessLoginScreenText
-	LogoutDone             LogoutDoneScreenText
-	Footer                 FooterText
+	SelectAccount                SelectAccountScreenText
+	Login                        LoginScreenText
+	Password                     PasswordScreenText
+	UsernameChange               UsernameChangeScreenText
+	UsernameChangeDone           UsernameChangeDoneScreenText
+	InitPassword                 InitPasswordScreenText
+	InitPasswordDone             InitPasswordDoneScreenText
+	EmailVerification            EmailVerificationScreenText
+	EmailVerificationDone        EmailVerificationDoneScreenText
+	InitUser                     InitializeUserScreenText
+	InitUserDone                 InitializeUserDoneScreenText
+	InitMFAPrompt                InitMFAPromptScreenText
+	InitMFAOTP                   InitMFAOTPScreenText
+	InitMFAU2F                   InitMFAU2FScreenText
+	InitMFADone                  InitMFADoneScreenText
+	MFAProvider                  MFAProvidersText
+	VerifyMFAOTP                 VerifyMFAOTPScreenText
+	VerifyMFAU2F                 VerifyMFAU2FScreenText
+	Passwordless                 PasswordlessScreenText
+	PasswordlessRegistration     PasswordlessRegistrationScreenText
+	PasswordlessRegistrationDone PasswordlessRegistrationDoneScreenText
+	PasswordChange               PasswordChangeScreenText
+	PasswordChangeDone           PasswordChangeDoneScreenText
+	PasswordResetDone            PasswordResetDoneScreenText
+	RegisterOption               RegistrationOptionScreenText
+	RegistrationUser             RegistrationUserScreenText
+	RegistrationOrg              RegistrationOrgScreenText
+	LinkingUsersDone             LinkingUserDoneScreenText
+	ExternalNotFoundOption       ExternalUserNotFoundScreenText
+	LoginSuccess                 SuccessLoginScreenText
+	LogoutDone                   LogoutDoneScreenText
+	Footer                       FooterText
 }
 
 func (m *CustomLoginText) IsValid() bool {
@@ -579,4 +581,19 @@ type FooterText struct {
 	PrivacyPolicyLink string
 	Help              string
 	HelpLink          string
+}
+
+type PasswordlessRegistrationScreenText struct {
+	Title                   string
+	Description             string
+	RegisterTokenButtonText string
+	TokenNameLabel          string
+	NotSupported            string
+	ErrorRetry              string
+}
+
+type PasswordlessRegistrationDoneScreenText struct {
+	Title          string
+	Description    string
+	NextButtonText string
 }

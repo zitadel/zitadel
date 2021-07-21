@@ -410,13 +410,13 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
-func (s *Server) SendPasswordlessLink(ctx context.Context, req *mgmt_pb.SendPasswordlessLinkRequest) (*mgmt_pb.SendPasswordlessLinkResponse, error) {
+func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.SendPasswordlessLinkResponse{
+	return &mgmt_pb.SendPasswordlessRegistrationResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),

@@ -122,6 +122,8 @@ func SetLoginCustomTextToDomain(req *mgmt_pb.SetCustomLoginTextsRequest) *domain
 	result.VerifyMFAOTP = text.VerifyMFAOTPScreenTextPbToDomain(req.VerifyMfaOtpText)
 	result.VerifyMFAU2F = text.VerifyMFAU2FScreenTextPbToDomain(req.VerifyMfaU2FText)
 	result.Passwordless = text.PasswordlessScreenTextPbToDomain(req.PasswordlessText)
+	result.PasswordlessRegistration = text.PasswordlessRegistrationScreenTextPbToDomain(req.PasswordlessRegistrationText)
+	result.PasswordlessRegistrationDone = text.PasswordlessRegistrationDoneScreenTextPbToDomain(req.PasswordlessRegistrationDoneText)
 	result.PasswordChange = text.PasswordChangeScreenTextPbToDomain(req.PasswordChangeText)
 	result.PasswordChangeDone = text.PasswordChangeDoneScreenTextPbToDomain(req.PasswordChangeDoneText)
 	result.PasswordResetDone = text.PasswordResetDoneScreenTextPbToDomain(req.PasswordResetDoneText)

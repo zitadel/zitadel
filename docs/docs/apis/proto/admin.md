@@ -889,7 +889,7 @@ Returns the custom text for passwordless registration message (overwritten in ev
 > **rpc** SetDefaultPasswordlessRegistrationMessageText([SetDefaultPasswordlessRegistrationMessageTextRequest](#setdefaultpasswordlessregistrationmessagetextrequest))
 [SetDefaultPasswordlessRegistrationMessageTextResponse](#setdefaultpasswordlessregistrationmessagetextresponse)
 
-Sets the default custom text for passwordless registration phone message
+Sets the default custom text for passwordless registration message
 it impacts all organisations without customized passwordless registration message text
 The Following Variables can be used:
 {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
@@ -2398,6 +2398,8 @@ This is an empty request
 | success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 | logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
 | footer_text |  zitadel.text.v1.FooterText | - |  |
+| passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
 
 
 
