@@ -105,7 +105,7 @@ func getAllSecrets(
 	}
 
 	if len(allSecrets) == 0 && len(allExisting) == 0 {
-		return nil, nil, nil, errors.New("couldn't find any secrets")
+		return nil, nil, nil, mntr.ToUserError(errors.New("couldn't find any secrets"))
 	}
 
 	return allSecrets, allExisting, allTrees, nil
@@ -158,7 +158,7 @@ func push(
 
 	desired, found := trees[desiredFile.WOExtension()]
 	if !found {
-		return fmt.Errorf("desired state not found for %s", desiredFile.WOExtension())
+		return mntr.ToUserError(fmt.Errorf("desired state not found for %s", desiredFile.WOExtension()))
 	}
 
 	if gitops {

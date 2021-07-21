@@ -35,17 +35,14 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 	flags.StringVarP(&file, "file", "s", "", "File containing the value to encrypt")
 	flags.BoolVar(&stdin, "stdin", false, "Value to encrypt is read from standard input")
 
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 
 		path := ""
 		if len(args) > 0 {
 			path = args[0]
 		}
 
-		rv, err := getRv("writesecret", map[string]interface{}{"path": path, "value": value != "", "file": file, "stdin": stdin}, "")
-		if err != nil {
-			return err
-		}
+		rv := getRv("writesecret", map[string]interface{}{"path": path, "value": value != "", "file": file, "stdin": stdin}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -56,8 +53,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 
 		s, err := key(value, file, stdin)
 		if err != nil {
-			monitor.Error(err)
-			return nil
+			return err
 		}
 
 		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
@@ -65,7 +61,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			return err
 		}
 
-		if err := secret.Write(
+		return secret.Write(
 			monitor,
 			k8sClient,
 			path,
@@ -74,10 +70,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			fmt.Sprintf(rv.Version),
 			secrets.GetAllSecretsFunc(monitor, path != "", rv.Gitops, gitClient, k8sClient, orbConfig),
 			secrets.PushFunc(monitor, rv.Gitops, gitClient, k8sClient),
-		); err != nil {
-			monitor.Error(err)
-		}
-		return nil
+		)
 	}
 	return cmd
 }

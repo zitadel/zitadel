@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/caos/orbos/mntr"
+
 	"github.com/caos/zitadel/pkg/databases"
 	"github.com/spf13/cobra"
 )
@@ -18,11 +20,8 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		}
 	)
 
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv("backuplist", nil, "")
-		if err != nil {
-			return err
-		}
+	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
+		rv := getRv("backuplist", nil, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -32,23 +31,20 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 
 		if !rv.Gitops {
-			return errors.New("backuplist command is only supported with the --gitops flag yet")
+			return mntr.ToUserError(errors.New("backuplist command is only supported with the --gitops flag yet"))
 		}
 
 		if err := gitClient.Configure(orbConfig.URL, []byte(orbConfig.Repokey)); err != nil {
-			monitor.Error(err)
-			return nil
+			return err
 		}
 
 		if err := gitClient.Clone(); err != nil {
-			monitor.Error(err)
-			return nil
+			return err
 		}
 
 		backups, err := databases.ListBackups(monitor, gitClient)
 		if err != nil {
-			monitor.Error(err)
-			return nil
+			return err
 		}
 
 		sort.Slice(backups, func(i, j int) bool {

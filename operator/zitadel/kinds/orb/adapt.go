@@ -1,16 +1,18 @@
 package orb
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam"
 	zitadeldb "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -38,7 +40,9 @@ func AdaptFunc(
 		err error,
 	) {
 		defer func() {
-			err = errors.Wrapf(err, "building %s failed", desiredTree.Common.Kind)
+			if err != nil {
+				err = fmt.Errorf("building %s failed: %w", desiredTree.Common.Kind, err)
+			}
 		}()
 
 		allSecrets = make(map[string]*secret.Secret)
@@ -48,7 +52,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -120,11 +124,8 @@ func AdaptFunc(
 		}
 
 		currentTree.Parsed = &DesiredV0{
-			Common: &tree.Common{
-				Kind:    "zitadel.caos.ch/Orb",
-				Version: "v0",
-			},
-			IAM: iamCurrent,
+			Common: tree.NewCommon("zitadel.caos.ch/Orb", "v0", false),
+			IAM:    iamCurrent,
 		}
 
 		return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (operator.EnsureFunc, error) {

@@ -1,17 +1,19 @@
 package managed
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator/database/kinds/backups"
-	"github.com/pkg/errors"
 )
 
 func BackupList() func(monitor mntr.Monitor, desired *tree.Tree) ([]string, error) {
 	return func(monitor mntr.Monitor, desired *tree.Tree) ([]string, error) {
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
 

@@ -1,14 +1,16 @@
 package backups
 
 import (
+	"fmt"
+
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket"
-	"github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 )
 
 func Adapt(
@@ -43,7 +45,7 @@ func Adapt(
 				labels.MustReplaceAPI(
 					labels.GetAPIFromComponent(componentLabels),
 					"BucketBackup",
-					desiredTree.Common.Version,
+					desiredTree.Common.Version(),
 				),
 				"backup"),
 			checkDBReady,
@@ -55,7 +57,7 @@ func Adapt(
 			customImageRegistry,
 		)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("unknown database kind %s", desiredTree.Common.Kind))
 	}
 }
 
@@ -71,6 +73,6 @@ func GetBackupList(
 	case "databases.caos.ch/BucketBackup":
 		return bucket.BackupList()(monitor, name, desiredTree)
 	default:
-		return nil, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, mntr.ToUserError(fmt.Errorf("unknown database kind %s", desiredTree.Common.Kind))
 	}
 }

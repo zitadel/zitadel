@@ -3,11 +3,13 @@ package zitadel
 import (
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+
+	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
-	"github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 )
 
 type DesiredV0 struct {
@@ -29,7 +31,7 @@ type Spec struct {
 func (s *Spec) validate() (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("validating spec failed: %w", err)
+			err = mntr.ToUserError(fmt.Errorf("validating spec failed: %w", err))
 		}
 	}()
 
@@ -42,5 +44,8 @@ func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
 		Spec:   &Spec{},
 	}
 
-	return desiredKind, errors.Wrap(desiredTree.Original.Decode(desiredKind), "parsing desired state failed")
+	if err := desiredTree.Original.Decode(desiredKind); err != nil {
+		return nil, mntr.ToUserError(fmt.Errorf("parsing desired state failed: %w", err))
+	}
+	return desiredKind, nil
 }

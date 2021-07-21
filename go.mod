@@ -17,7 +17,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.15.6
-	github.com/caos/orbos v1.5.14-0.20210715071410-693c13f08917
+	github.com/caos/orbos v1.5.14-0.20210721123151-e8d9c5c2df11
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
@@ -82,7 +82,7 @@ require (
 	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/square/go-jose.v2 v2.6.0
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.19.2
 	k8s.io/apiextensions-apiserver v0.19.2

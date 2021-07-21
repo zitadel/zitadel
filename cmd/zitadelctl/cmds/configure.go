@@ -3,6 +3,8 @@ package cmds
 import (
 	"errors"
 
+	"github.com/caos/orbos/mntr"
+
 	"github.com/caos/orbos/pkg/tree"
 
 	"github.com/caos/orbos/pkg/cfg"
@@ -35,13 +37,13 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 
-		rv, _ := getRv("configure", map[string]interface{}{"masterkey": newMasterKey != "", "newRepoURL": newRepoURL}, "")
+		rv := getRv("configure", map[string]interface{}{"masterkey": newMasterKey != "", "newRepoURL": newRepoURL}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
 
 		if !rv.Gitops {
-			return errors.New("configure command is only supported with the --gitops flag")
+			return mntr.ToUserError(errors.New("configure command is only supported with the --gitops flag"))
 		}
 
 		if err := orb.Reconfigure(rv.Ctx, rv.Monitor, rv.OrbConfig, newRepoURL, newMasterKey, rv.GitClient, ghClientID, ghClientSecret); err != nil {

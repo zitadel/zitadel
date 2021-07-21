@@ -23,7 +23,7 @@ func main() {
 		OnRecoverPanic: mntr.LogPanic,
 	}
 
-	defer monitor.RecoverPanic()
+	defer func() { monitor.RecoverPanic(recover()) }()
 
 	rootCmd, rootValues := cmds.RootCommand(Version, monitor)
 	rootCmd.Version = fmt.Sprintf("%s\n", Version)

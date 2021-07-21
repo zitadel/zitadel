@@ -1,22 +1,25 @@
 package bucket
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
-	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/database/kinds/backups/core"
-	"github.com/pkg/errors"
+	"fmt"
+	"strings"
+
+	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	"strings"
+
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/tree"
+
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 )
 
 func BackupList() core.BackupListFunc {
 	return func(monitor mntr.Monitor, name string, desired *tree.Tree) ([]string, error) {
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
 

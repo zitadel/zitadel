@@ -3,6 +3,8 @@ package cmds
 import (
 	"errors"
 
+	"github.com/caos/orbos/mntr"
+
 	"github.com/caos/orbos/pkg/git"
 
 	"github.com/caos/orbos/pkg/kubernetes/cli"
@@ -25,10 +27,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 	flags.StringVar(&backup, "backup", "", "Name used for backup folder")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
-		rv, err := getRv("backup", map[string]interface{}{"backup": backup}, "")
-		if err != nil {
-			return err
-		}
+		rv := getRv("backup", map[string]interface{}{"backup": backup}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -39,7 +38,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 		version := rv.Version
 
 		if !rv.Gitops {
-			return errors.New("backup command is only supported with the --gitops flag yet")
+			return mntr.ToUserError(errors.New("backup command is only supported with the --gitops flag yet"))
 		}
 
 		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)

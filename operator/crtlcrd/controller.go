@@ -1,16 +1,19 @@
 package crtlcrd
 
 import (
+	"fmt"
+
+	"k8s.io/apimachinery/pkg/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	ctrl "sigs.k8s.io/controller-runtime"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+
 	databasev1 "github.com/caos/zitadel/operator/api/database/v1"
 	zitadelv1 "github.com/caos/zitadel/operator/api/zitadel/v1"
 	"github.com/caos/zitadel/operator/crtlcrd/database"
 	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
-	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 const (
@@ -39,7 +42,7 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 		LeaderElectionID:   "9adsd12l.caos.ch",
 	})
 	if err != nil {
-		return errors.Wrap(err, "unable to start manager")
+		return fmt.Errorf("unable to start manager: %w", err)
 	}
 
 	k8sClient, err := kubernetes.NewK8sClientWithConfig(monitor, cfg)
@@ -56,7 +59,7 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 				Scheme:    mgr.GetScheme(),
 				Version:   version,
 			}).SetupWithManager(mgr); err != nil {
-				return errors.Wrap(err, "unable to create controller")
+				return fmt.Errorf("unable to create controller: %w", err)
 			}
 		case Zitadel:
 			if err = (&zitadel.Reconciler{
@@ -65,13 +68,13 @@ func Start(monitor mntr.Monitor, version, metricsAddr string, features ...string
 				Scheme:    mgr.GetScheme(),
 				Version:   version,
 			}).SetupWithManager(mgr); err != nil {
-				return errors.Wrap(err, "unable to create controller")
+				return fmt.Errorf("unable to create controller: %w", err)
 			}
 		}
 	}
 
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		return errors.Wrap(err, "problem running manager")
+		return fmt.Errorf("problem running manager: %w", err)
 	}
 	return nil
 }
