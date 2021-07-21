@@ -37,378 +37,284 @@ type Req = AdminSetCustomLoginTextsRequest | SetCustomLoginTextsRequest;
 type Map = AdminSetCustomLoginTextsRequest.AsObject | SetCustomLoginTextsRequest.AsObject;
 
 export function mapRequestValues(map: Partial<Map>, req: Req): Req {
-  if (!!map.emailVerificationDoneText) {
-    const r = new EmailVerificationDoneScreenText();
-    r.setCancelButtonText(map.emailVerificationDoneText?.cancelButtonText ?? '');
-    r.setDescription(map.emailVerificationDoneText?.description ?? '');
-    r.setLoginButtonText(map.emailVerificationDoneText?.loginButtonText ?? '');
-    r.setNextButtonText(map.emailVerificationDoneText?.nextButtonText ?? '');
-    r.setTitle(map.emailVerificationDoneText?.title ?? '');
-
-    req.setEmailVerificationDoneText(r);
-  }
-
-
-  if (!!map.emailVerificationText) {
-    const r = new EmailVerificationScreenText();
-    r.setCodeLabel(map.emailVerificationText?.codeLabel ?? '');
-    r.setDescription(map.emailVerificationText?.description ?? '');
-    r.setNextButtonText(map.emailVerificationText?.nextButtonText ?? '');
-    r.setResendButtonText(map.emailVerificationText?.resendButtonText ?? '');
-    r.setTitle(map.emailVerificationText?.title ?? '');
-
-    req.setEmailVerificationText(r);
-  }
-
-
-  if (!!map.externalUserNotFoundText) {
-    const r = new ExternalUserNotFoundScreenText();
-    r.setAutoRegisterButtonText(map.externalUserNotFoundText?.autoRegisterButtonText ?? '');
-    r.setDescription(map.externalUserNotFoundText?.description ?? '');
-    r.setLinkButtonText(map.externalUserNotFoundText?.linkButtonText ?? '');
-    r.setTitle(map.externalUserNotFoundText?.title ?? '');
-
-    req.setExternalUserNotFoundText(r);
-  }
-
-  if (!!map.footerText) {
-    const r = new FooterText();
-    r.setHelp(map.footerText?.help ?? '');
-    r.setHelpLink(map.footerText?.helpLink ?? '');
-    r.setPrivacyPolicy(map.footerText?.privacyPolicy ?? '');
-    r.setPrivacyPolicyLink(map.footerText?.privacyPolicyLink ?? '');
-    r.setTos(map.footerText?.tos ?? '');
-    r.setTosLink(map.footerText?.tosLink ?? '');
-
-    req.setFooterText(r);
-  }
-
-  if (!!map.initMfaDoneText) {
-    const r = new InitMFADoneScreenText();
-    r.setCancelButtonText(map.initMfaDoneText?.cancelButtonText ?? '');
-    r.setDescription(map.initMfaDoneText?.description ?? '');
-    r.setNextButtonText(map.initMfaDoneText?.nextButtonText ?? '');
-    r.setTitle(map.initMfaDoneText?.title ?? '');
-
-    req.setInitMfaDoneText(r);
-  }
-
-  if (!!map.initMfaOtpText) {
-    const r = new InitMFAOTPScreenText();
-    r.setCancelButtonText(map.initMfaOtpText?.cancelButtonText ?? '');
-    r.setCodeLabel(map.initMfaOtpText?.codeLabel ?? '');
-    r.setDescription(map.initMfaOtpText?.description ?? '');
-    r.setDescriptionOtp(map.initMfaOtpText?.descriptionOtp ?? '');
-    r.setNextButtonText(map.initMfaOtpText?.nextButtonText ?? '');
-    r.setSecretLabel(map.initMfaOtpText?.secretLabel ?? '');
-    r.setTitle(map.initMfaOtpText?.title ?? '');
-
-    req.setInitMfaOtpText(r);
-  }
-
-  if (!!map.initMfaPromptText) {
-    const r = new InitMFAPromptScreenText();
-    r.setDescription(map.initMfaPromptText?.description ?? '');
-    r.setNextButtonText(map.initMfaPromptText?.nextButtonText ?? '');
-    r.setOtpOption(map.initMfaPromptText?.otpOption ?? '');
-    r.setSkipButtonText(map.initMfaPromptText?.skipButtonText ?? '');
-    r.setTitle(map.initMfaPromptText?.title ?? '');
-    r.setU2fOption(map.initMfaPromptText?.otpOption ?? '');
-
-    req.setInitMfaPromptText(r);
-  }
-
-
-  if (!!map.initMfaU2fText) {
-    const r = new InitMFAU2FScreenText();
-    r.setDescription(map.initMfaU2fText?.description ?? '');
-    r.setErrorRetry(map.initMfaU2fText?.errorRetry ?? '');
-    r.setNotSupported(map.initMfaU2fText?.notSupported ?? '');
-    r.setRegisterTokenButtonText(map.initMfaU2fText?.registerTokenButtonText ?? '');
-    r.setTitle(map.initMfaU2fText?.title ?? '');
-    r.setTokenNameLabel(map.initMfaU2fText?.tokenNameLabel ?? '');
-
-    req.setInitMfaU2fText(r);
-  }
-
-  if (!!map.initPasswordDoneText) {
-    const r = new InitPasswordDoneScreenText();
-    r.setCancelButtonText(map.initPasswordDoneText?.cancelButtonText ?? '');
-    r.setDescription(map.initPasswordDoneText?.description ?? '');
-    r.setNextButtonText(map.initPasswordDoneText?.nextButtonText ?? '');
-    r.setTitle(map.initPasswordDoneText?.title ?? '');
-
-    req.setInitPasswordDoneText(r);
-  }
-
-  if (!!map.initPasswordText) {
-    const r = new InitPasswordScreenText();
-    r.setCodeLabel(map.initPasswordText?.description ?? '');
-    r.setDescription(map.initPasswordText?.description ?? '');
-    r.setNewPasswordConfirmLabel(map.initPasswordText?.newPasswordConfirmLabel ?? '');
-    r.setNewPasswordLabel(map.initPasswordText?.newPasswordLabel ?? '');
-    r.setNextButtonText(map.initPasswordText?.nextButtonText ?? '');
-    r.setResendButtonText(map.initPasswordText?.resendButtonText ?? '');
-    r.setTitle(map.initPasswordText?.title ?? '');
-
-    req.setInitPasswordText(r);
-  }
-
-
-  if (!!map.initializeDoneText) {
-    const r = new InitializeUserDoneScreenText();
-    r.setCancelButtonText(map.initializeDoneText?.cancelButtonText ?? '');
-    r.setDescription(map.initializeDoneText?.description ?? '');
-    r.setNextButtonText(map.initializeDoneText?.nextButtonText ?? '');
-    r.setTitle(map.initializeDoneText?.title ?? '');
-
-    req.setInitializeDoneText(r);
-  }
-
-  if (!!map.initializeUserText) {
-    const initializeUserTextRequest = new InitializeUserScreenText();
-    initializeUserTextRequest.setCodeLabel(map.initializeUserText?.codeLabel ?? '');
-    initializeUserTextRequest.setDescription(map.initializeUserText?.description ?? '');
-    initializeUserTextRequest.setNewPasswordConfirmLabel(map.initializeUserText?.newPasswordConfirmLabel ?? '');
-    initializeUserTextRequest.setNewPasswordLabel(map.initializeUserText?.newPasswordLabel ?? '');
-    initializeUserTextRequest.setNextButtonText(map.initializeUserText?.nextButtonText ?? '');
-    initializeUserTextRequest.setResendButtonText(map.initializeUserText?.resendButtonText ?? '');
-    initializeUserTextRequest.setTitle(map.initializeUserText?.title ?? '');
-
-    req.setInitializeUserText(initializeUserTextRequest);
-  }
-
-  if (!!map.linkingUserDoneText) {
-    const r = new LinkingUserDoneScreenText();
-    r.setCancelButtonText(map.linkingUserDoneText?.cancelButtonText ?? '');
-    r.setDescription(map.linkingUserDoneText?.description ?? '');
-    r.setNextButtonText(map.linkingUserDoneText?.nextButtonText ?? '');
-    r.setTitle(map.linkingUserDoneText?.title ?? '');
-
-    req.setLinkingUserDoneText(r);
-  }
-
-  if (!!map.loginText) {
-    const r = new LoginScreenText();
-    r.setDescription(map.loginText?.description ?? '');
-    r.setDescriptionLinkingProcess(map.loginText?.descriptionLinkingProcess ?? '');
-    r.setExternalUserDescription(map.loginText?.externalUserDescription ?? '');
-    r.setLoginNameLabel(map.loginText?.loginNameLabel ?? '');
-    r.setLoginNamePlaceholder(map.loginText?.loginNamePlaceholder ?? '');
-    r.setNextButtonText(map.loginText?.nextButtonText ?? '');
-    r.setRegisterButtonText(map.loginText?.registerButtonText ?? '');
-    r.setTitle(map.loginText?.title ?? '');
-    r.setTitleLinkingProcess(map.loginText?.titleLinkingProcess ?? '');
-    r.setUserMustBeMemberOfOrg(map.loginText?.userMustBeMemberOfOrg ?? '');
-    r.setUserNamePlaceholder(map.loginText?.userNamePlaceholder ?? '');
-
-    req.setLoginText(r);
-  }
-
-  if (!!map.logoutText) {
-    const r = new LogoutDoneScreenText();
-    r.setDescription(map.logoutText?.description ?? '');
-    r.setLoginButtonText(map.logoutText?.loginButtonText ?? '');
-    r.setTitle(map.logoutText?.title ?? '');
-
-    req.setLogoutText(r);
-  }
-
-  if (!!map.mfaProvidersText) {
-    const r = new MFAProvidersText();
-    r.setChooseOther(map.mfaProvidersText?.chooseOther ?? '');
-    r.setOtp(map.mfaProvidersText?.otp ?? '');
-    r.setU2f(map.mfaProvidersText?.u2f ?? '');
-
-    req.setMfaProvidersText(r);
-  }
-
-  if (!!map.passwordChangeDoneText) {
-    const r = new PasswordChangeDoneScreenText();
-    r.setDescription(map.passwordChangeDoneText?.description ?? '');
-    r.setNextButtonText(map.passwordChangeDoneText?.nextButtonText ?? '');
-    r.setTitle(map.passwordChangeDoneText?.title ?? '');
-
-    req.setPasswordChangeDoneText(r);
-  }
-
-  if (!!map.passwordChangeText) {
-    const r = new PasswordChangeScreenText();
-    r.setDescription(map.passwordChangeText?.description ?? '');
-    r.setNextButtonText(map.passwordChangeText?.nextButtonText ?? '');
-    r.setTitle(map.passwordChangeText?.title ?? '');
-
-    req.setPasswordChangeText(r);
-  }
-
-  if (!!map.passwordResetDoneText) {
-    const r = new PasswordResetDoneScreenText();
-    r.setDescription(map.passwordResetDoneText?.description ?? '');
-    r.setNextButtonText(map.passwordResetDoneText?.nextButtonText ?? '');
-    r.setTitle(map.passwordResetDoneText?.title ?? '');
-
-    req.setPasswordResetDoneText(r);
-  }
-
-  if (!!map.passwordText) {
-    const r = new PasswordScreenText();
-    r.setBackButtonText(map.passwordText?.backButtonText ?? '');
-    r.setConfirmation(map.passwordText?.confirmation ?? '');
-    r.setDescription(map.passwordText?.description ?? '');
-    r.setHasLowercase(map.passwordText?.hasLowercase ?? '');
-    r.setHasNumber(map.passwordText?.hasNumber ?? '');
-    r.setHasSymbol(map.passwordText?.hasSymbol ?? '');
-    r.setHasUppercase(map.passwordText?.hasUppercase ?? '');
-    r.setMinLength(map.passwordText?.minLength ?? '');
-    r.setNextButtonText(map.passwordText?.nextButtonText ?? '');
-    r.setPasswordLabel(map.passwordText?.passwordLabel ?? '');
-    r.setResetLinkText(map.passwordText?.resetLinkText ?? '');
-    r.setTitle(map.passwordText?.title ?? '');
-
-    req.setPasswordText(r);
-  }
-
-  if (!!map.passwordlessText) {
-    const r = new PasswordlessScreenText();
-    r.setDescription(map.passwordlessText?.description ?? '');
-    r.setErrorRetry(map.passwordlessText?.errorRetry ?? '');
-    r.setLoginWithPwButtonText(map.passwordlessText?.loginWithPwButtonText ?? '');
-    r.setNotSupported(map.passwordlessText?.notSupported ?? '');
-    r.setTitle(map.passwordlessText?.title ?? '');
-    r.setValidateTokenButtonText(map.passwordlessText?.validateTokenButtonText ?? '');
-
-    req.setPasswordlessText(r);
-  }
-
-  if (!!map.registrationOptionText) {
-    const r = new RegistrationOptionScreenText();
-    r.setDescription(map.registrationOptionText?.description ?? '');
-    r.setExternalLoginDescription(map.registrationOptionText?.externalLoginDescription ?? '');
-    r.setTitle(map.registrationOptionText?.title ?? '');
-    r.setUserNameButtonText(map.registrationOptionText?.userNameButtonText ?? '');
-
-    req.setRegistrationOptionText(r);
-  }
-
-  if (!!map.registrationOrgText) {
-    const r = new RegistrationOrgScreenText();
-    r.setDescription(map.registrationOrgText?.description ?? '');
-    r.setEmailLabel(map.registrationOrgText?.emailLabel ?? '');
-    r.setExternalLoginDescription(map.registrationOrgText?.externalLoginDescription ?? '');
-    r.setFirstnameLabel(map.registrationOrgText?.firstnameLabel ?? '');
-    r.setLastnameLabel(map.registrationOrgText?.lastnameLabel ?? '');
-    r.setOrgnameLabel(map.registrationOrgText?.orgnameLabel ?? '');
-    r.setPasswordConfirmLabel(map.registrationOrgText?.passwordConfirmLabel ?? '');
-    r.setPasswordLabel(map.registrationOrgText?.passwordLabel ?? '');
-    r.setPrivacyConfirm(map.registrationOrgText?.privacyConfirm ?? '');
-    r.setPrivacyLink(map.registrationOrgText?.privacyLink ?? '');
-    r.setPrivacyLinkText(map.registrationOrgText?.privacyLinkText ?? '');
-    r.setSaveButtonText(map.registrationOrgText?.saveButtonText ?? '');
-    r.setTitle(map.registrationOrgText?.title ?? '');
-    r.setTosAndPrivacyLabel(map.registrationOrgText?.tosAndPrivacyLabel ?? '');
-    r.setTosConfirm(map.registrationOrgText?.tosConfirm ?? '');
-    r.setTosLink(map.registrationOrgText?.tosLink ?? '');
-    r.setTosLinkText(map.registrationOrgText?.tosLinkText ?? '');
-    r.setUsernameLabel(map.registrationOrgText?.usernameLabel ?? '');
-
-    req.setRegistrationOrgText(r);
-  }
-
-  if (!!map.registrationUserText) {
-    const r = new RegistrationUserScreenText();
-    r.setBackButtonText(map.registrationUserText?.backButtonText ?? '');
-    r.setDescription(map.registrationUserText?.description ?? '');
-    r.setDescriptionOrgRegister(map.registrationUserText?.descriptionOrgRegister ?? '');
-    r.setEmailLabel(map.registrationUserText?.emailLabel ?? '');
-    r.setExternalLoginDescription(map.registrationUserText?.externalLoginDescription ?? '');
-    r.setFirstnameLabel(map.registrationUserText?.firstnameLabel ?? '');
-    r.setGenderLabel(map.registrationUserText?.genderLabel ?? '');
-    r.setLanguageLabel(map.registrationUserText?.languageLabel ?? '');
-    r.setLastnameLabel(map.registrationUserText?.lastnameLabel ?? '');
-    r.setNextButtonText(map.registrationUserText?.nextButtonText ?? '');
-    r.setPasswordConfirmLabel(map.registrationUserText?.passwordConfirmLabel ?? '');
-    r.setPasswordLabel(map.registrationUserText?.passwordLabel ?? '');
-    r.setPrivacyConfirm(map.registrationUserText?.privacyConfirm ?? '');
-    r.setPrivacyLink(map.registrationUserText?.privacyLink ?? '');
-    r.setPrivacyLinkText(map.registrationUserText?.privacyLinkText ?? '');
-    r.setTitle(map.registrationUserText?.title ?? '');
-    r.setTosAndPrivacyLabel(map.registrationUserText?.tosAndPrivacyLabel ?? '');
-    r.setTosConfirm(map.registrationUserText?.tosConfirm ?? '');
-    r.setTosLink(map.registrationUserText?.tosLink ?? '');
-    r.setTosLinkText(map.registrationUserText?.tosLinkText ?? '');
-    r.setUsernameLabel(map.registrationUserText?.usernameLabel ?? '');
-
-    req.setRegistrationUserText(r);
-  }
-
-  if (!!map.selectAccountText) {
-    const r = new SelectAccountScreenText();
-    r.setDescription(map.selectAccountText?.description ?? '');
-    r.setDescriptionLinkingProcess(map.selectAccountText?.descriptionLinkingProcess ?? '');
-    r.setOtherUser(map.selectAccountText?.otherUser ?? '');
-    r.setSessionStateActive(map.selectAccountText?.sessionStateActive ?? '');
-    r.setSessionStateInactive(map.selectAccountText?.sessionStateInactive ?? '');
-    r.setTitle(map.selectAccountText?.title ?? '');
-    r.setTitleLinkingProcess(map.selectAccountText?.titleLinkingProcess ?? '');
-    r.setUserMustBeMemberOfOrg(map.selectAccountText?.userMustBeMemberOfOrg ?? '');
-
-    req.setSelectAccountText(r);
-  }
-
-
-  if (!!map.successLoginText) {
-    const r = new SuccessLoginScreenText();
-    r.setAutoRedirectDescription(map.successLoginText?.autoRedirectDescription ?? '');
-    r.setNextButtonText(map.successLoginText?.nextButtonText ?? '');
-    r.setRedirectedDescription(map.successLoginText?.redirectedDescription ?? '');
-    r.setTitle(map.successLoginText?.title ?? '');
-
-    req.setSuccessLoginText(r);
-  }
-
-
-  if (!!map.usernameChangeDoneText) {
-    const r = new UsernameChangeDoneScreenText();
-    r.setDescription(map.usernameChangeDoneText?.description ?? '');
-    r.setNextButtonText(map.usernameChangeDoneText?.nextButtonText ?? '');
-    r.setTitle(map.usernameChangeDoneText?.title ?? '');
-
-    req.setUsernameChangeDoneText(r);
-  }
-
-
-  if (!!map.usernameChangeText) {
-    const r = new UsernameChangeScreenText();
-    r.setCancelButtonText(map.usernameChangeText?.cancelButtonText ?? '');
-    r.setDescription(map.usernameChangeText?.description ?? '');
-    r.setNextButtonText(map.usernameChangeText?.nextButtonText ?? '');
-    r.setTitle(map.usernameChangeText?.title ?? '');
-    r.setUsernameLabel(map.usernameChangeText?.usernameLabel ?? '');
-
-    req.setUsernameChangeText(r);
-  }
-
-  if (!!map.verifyMfaOtpText) {
-    const r = new VerifyMFAOTPScreenText();
-    r.setCodeLabel(map.verifyMfaOtpText?.codeLabel ?? '');
-    r.setDescription(map.verifyMfaOtpText?.description ?? '');
-    r.setNextButtonText(map.verifyMfaOtpText?.nextButtonText ?? '');
-    r.setTitle(map.verifyMfaOtpText?.title ?? '');
-
-    req.setVerifyMfaOtpText(r);
-  }
-
-
-  if (!!map.verifyMfaU2fText) {
-    const r = new VerifyMFAU2FScreenText();
-    r.setDescription(map.verifyMfaU2fText?.description ?? '');
-    r.setErrorRetry(map.verifyMfaU2fText?.errorRetry ?? '');
-    r.setNotSupported(map.verifyMfaU2fText?.notSupported ?? '');
-    r.setTitle(map.verifyMfaU2fText?.title ?? '');
-    r.setValidateTokenText(map.verifyMfaU2fText?.validateTokenText ?? '');
-
-    req.setVerifyMfaU2fText(r);
-  }
+  const r0 = new EmailVerificationDoneScreenText();
+  r0.setCancelButtonText(map.emailVerificationDoneText?.cancelButtonText ?? '');
+  r0.setDescription(map.emailVerificationDoneText?.description ?? '');
+  r0.setLoginButtonText(map.emailVerificationDoneText?.loginButtonText ?? '');
+  r0.setNextButtonText(map.emailVerificationDoneText?.nextButtonText ?? '');
+  r0.setTitle(map.emailVerificationDoneText?.title ?? '');
+  req.setEmailVerificationDoneText(r0);
+
+  const r1 = new EmailVerificationScreenText();
+  r1.setCodeLabel(map.emailVerificationText?.codeLabel ?? '');
+  r1.setDescription(map.emailVerificationText?.description ?? '');
+  r1.setNextButtonText(map.emailVerificationText?.nextButtonText ?? '');
+  r1.setResendButtonText(map.emailVerificationText?.resendButtonText ?? '');
+  r1.setTitle(map.emailVerificationText?.title ?? '');
+  req.setEmailVerificationText(r1);
+
+  const r2 = new ExternalUserNotFoundScreenText();
+  r2.setAutoRegisterButtonText(map.externalUserNotFoundText?.autoRegisterButtonText ?? '');
+  r2.setDescription(map.externalUserNotFoundText?.description ?? '');
+  r2.setLinkButtonText(map.externalUserNotFoundText?.linkButtonText ?? '');
+  r2.setTitle(map.externalUserNotFoundText?.title ?? '');
+  req.setExternalUserNotFoundText(r2);
+
+  const r3 = new FooterText();
+  r3.setHelp(map.footerText?.help ?? '');
+  r3.setHelpLink(map.footerText?.helpLink ?? '');
+  r3.setPrivacyPolicy(map.footerText?.privacyPolicy ?? '');
+  r3.setPrivacyPolicyLink(map.footerText?.privacyPolicyLink ?? '');
+  r3.setTos(map.footerText?.tos ?? '');
+  r3.setTosLink(map.footerText?.tosLink ?? '');
+  req.setFooterText(r3);
+
+  const r4 = new InitMFADoneScreenText();
+  r4.setCancelButtonText(map.initMfaDoneText?.cancelButtonText ?? '');
+  r4.setDescription(map.initMfaDoneText?.description ?? '');
+  r4.setNextButtonText(map.initMfaDoneText?.nextButtonText ?? '');
+  r4.setTitle(map.initMfaDoneText?.title ?? '');
+  req.setInitMfaDoneText(r4);
+
+  const r5 = new InitMFAOTPScreenText();
+  r5.setCancelButtonText(map.initMfaOtpText?.cancelButtonText ?? '');
+  r5.setCodeLabel(map.initMfaOtpText?.codeLabel ?? '');
+  r5.setDescription(map.initMfaOtpText?.description ?? '');
+  r5.setDescriptionOtp(map.initMfaOtpText?.descriptionOtp ?? '');
+  r5.setNextButtonText(map.initMfaOtpText?.nextButtonText ?? '');
+  r5.setSecretLabel(map.initMfaOtpText?.secretLabel ?? '');
+  r5.setTitle(map.initMfaOtpText?.title ?? '');
+  req.setInitMfaOtpText(r5);
+
+  const r6 = new InitMFAPromptScreenText();
+  r6.setDescription(map.initMfaPromptText?.description ?? '');
+  r6.setNextButtonText(map.initMfaPromptText?.nextButtonText ?? '');
+  r6.setOtpOption(map.initMfaPromptText?.otpOption ?? '');
+  r6.setSkipButtonText(map.initMfaPromptText?.skipButtonText ?? '');
+  r6.setTitle(map.initMfaPromptText?.title ?? '');
+  r6.setU2fOption(map.initMfaPromptText?.otpOption ?? '');
+  req.setInitMfaPromptText(r6);
+
+
+  const r7 = new InitMFAU2FScreenText();
+  r7.setDescription(map.initMfaU2fText?.description ?? '');
+  r7.setErrorRetry(map.initMfaU2fText?.errorRetry ?? '');
+  r7.setNotSupported(map.initMfaU2fText?.notSupported ?? '');
+  r7.setRegisterTokenButtonText(map.initMfaU2fText?.registerTokenButtonText ?? '');
+  r7.setTitle(map.initMfaU2fText?.title ?? '');
+  r7.setTokenNameLabel(map.initMfaU2fText?.tokenNameLabel ?? '');
+  req.setInitMfaU2fText(r7);
+
+
+  const r8 = new InitPasswordDoneScreenText();
+  r8.setCancelButtonText(map.initPasswordDoneText?.cancelButtonText ?? '');
+  r8.setDescription(map.initPasswordDoneText?.description ?? '');
+  r8.setNextButtonText(map.initPasswordDoneText?.nextButtonText ?? '');
+  r8.setTitle(map.initPasswordDoneText?.title ?? '');
+  req.setInitPasswordDoneText(r8);
+
+  const r9 = new InitPasswordScreenText();
+  r9.setCodeLabel(map.initPasswordText?.description ?? '');
+  r9.setDescription(map.initPasswordText?.description ?? '');
+  r9.setNewPasswordConfirmLabel(map.initPasswordText?.newPasswordConfirmLabel ?? '');
+  r9.setNewPasswordLabel(map.initPasswordText?.newPasswordLabel ?? '');
+  r9.setNextButtonText(map.initPasswordText?.nextButtonText ?? '');
+  r9.setResendButtonText(map.initPasswordText?.resendButtonText ?? '');
+  r9.setTitle(map.initPasswordText?.title ?? '');
+  req.setInitPasswordText(r9);
+
+  const r10 = new InitializeUserDoneScreenText();
+  r10.setCancelButtonText(map.initializeDoneText?.cancelButtonText ?? '');
+  r10.setDescription(map.initializeDoneText?.description ?? '');
+  r10.setNextButtonText(map.initializeDoneText?.nextButtonText ?? '');
+  r10.setTitle(map.initializeDoneText?.title ?? '');
+  req.setInitializeDoneText(r10);
+
+  const r11 = new InitializeUserScreenText();
+  r11.setCodeLabel(map.initializeUserText?.codeLabel ?? '');
+  r11.setDescription(map.initializeUserText?.description ?? '');
+  r11.setNewPasswordConfirmLabel(map.initializeUserText?.newPasswordConfirmLabel ?? '');
+  r11.setNewPasswordLabel(map.initializeUserText?.newPasswordLabel ?? '');
+  r11.setNextButtonText(map.initializeUserText?.nextButtonText ?? '');
+  r11.setResendButtonText(map.initializeUserText?.resendButtonText ?? '');
+  r11.setTitle(map.initializeUserText?.title ?? '');
+
+  req.setInitializeUserText(r11);
+
+  const r12 = new LinkingUserDoneScreenText();
+  r12.setCancelButtonText(map.linkingUserDoneText?.cancelButtonText ?? '');
+  r12.setDescription(map.linkingUserDoneText?.description ?? '');
+  r12.setNextButtonText(map.linkingUserDoneText?.nextButtonText ?? '');
+  r12.setTitle(map.linkingUserDoneText?.title ?? '');
+  req.setLinkingUserDoneText(r12);
+
+  const r13 = new LoginScreenText();
+  r13.setDescription(map.loginText?.description ?? '');
+  r13.setDescriptionLinkingProcess(map.loginText?.descriptionLinkingProcess ?? '');
+  r13.setExternalUserDescription(map.loginText?.externalUserDescription ?? '');
+  r13.setLoginNameLabel(map.loginText?.loginNameLabel ?? '');
+  r13.setLoginNamePlaceholder(map.loginText?.loginNamePlaceholder ?? '');
+  r13.setNextButtonText(map.loginText?.nextButtonText ?? '');
+  r13.setRegisterButtonText(map.loginText?.registerButtonText ?? '');
+  r13.setTitle(map.loginText?.title ?? '');
+  r13.setTitleLinkingProcess(map.loginText?.titleLinkingProcess ?? '');
+  r13.setUserMustBeMemberOfOrg(map.loginText?.userMustBeMemberOfOrg ?? '');
+  r13.setUserNamePlaceholder(map.loginText?.userNamePlaceholder ?? '');
+  req.setLoginText(r13);
+
+  const r14 = new LogoutDoneScreenText();
+  r14.setDescription(map.logoutText?.description ?? '');
+  r14.setLoginButtonText(map.logoutText?.loginButtonText ?? '');
+  r14.setTitle(map.logoutText?.title ?? '');
+  req.setLogoutText(r14);
+
+  const r15 = new MFAProvidersText();
+  r15.setChooseOther(map.mfaProvidersText?.chooseOther ?? '');
+  r15.setOtp(map.mfaProvidersText?.otp ?? '');
+  r15.setU2f(map.mfaProvidersText?.u2f ?? '');
+  req.setMfaProvidersText(r15);
+
+  const r16 = new PasswordChangeDoneScreenText();
+  r16.setDescription(map.passwordChangeDoneText?.description ?? '');
+  r16.setNextButtonText(map.passwordChangeDoneText?.nextButtonText ?? '');
+  r16.setTitle(map.passwordChangeDoneText?.title ?? '');
+  req.setPasswordChangeDoneText(r16);
+
+  const r17 = new PasswordChangeScreenText();
+  r17.setDescription(map.passwordChangeText?.description ?? '');
+  r17.setNextButtonText(map.passwordChangeText?.nextButtonText ?? '');
+  r17.setTitle(map.passwordChangeText?.title ?? '');
+  req.setPasswordChangeText(r17);
+
+  const r18 = new PasswordResetDoneScreenText();
+  r18.setDescription(map.passwordResetDoneText?.description ?? '');
+  r18.setNextButtonText(map.passwordResetDoneText?.nextButtonText ?? '');
+  r18.setTitle(map.passwordResetDoneText?.title ?? '');
+  req.setPasswordResetDoneText(r18);
+
+  const r19 = new PasswordScreenText();
+  r19.setBackButtonText(map.passwordText?.backButtonText ?? '');
+  r19.setConfirmation(map.passwordText?.confirmation ?? '');
+  r19.setDescription(map.passwordText?.description ?? '');
+  r19.setHasLowercase(map.passwordText?.hasLowercase ?? '');
+  r19.setHasNumber(map.passwordText?.hasNumber ?? '');
+  r19.setHasSymbol(map.passwordText?.hasSymbol ?? '');
+  r19.setHasUppercase(map.passwordText?.hasUppercase ?? '');
+  r19.setMinLength(map.passwordText?.minLength ?? '');
+  r19.setNextButtonText(map.passwordText?.nextButtonText ?? '');
+  r19.setPasswordLabel(map.passwordText?.passwordLabel ?? '');
+  r19.setResetLinkText(map.passwordText?.resetLinkText ?? '');
+  r19.setTitle(map.passwordText?.title ?? '');
+  req.setPasswordText(r19);
+
+  const r20 = new PasswordlessScreenText();
+  r20.setDescription(map.passwordlessText?.description ?? '');
+  r20.setErrorRetry(map.passwordlessText?.errorRetry ?? '');
+  r20.setLoginWithPwButtonText(map.passwordlessText?.loginWithPwButtonText ?? '');
+  r20.setNotSupported(map.passwordlessText?.notSupported ?? '');
+  r20.setTitle(map.passwordlessText?.title ?? '');
+  r20.setValidateTokenButtonText(map.passwordlessText?.validateTokenButtonText ?? '');
+  req.setPasswordlessText(r20);
+
+  const r21 = new RegistrationOptionScreenText();
+  r21.setDescription(map.registrationOptionText?.description ?? '');
+  r21.setExternalLoginDescription(map.registrationOptionText?.externalLoginDescription ?? '');
+  r21.setTitle(map.registrationOptionText?.title ?? '');
+  r21.setUserNameButtonText(map.registrationOptionText?.userNameButtonText ?? '');
+  req.setRegistrationOptionText(r21);
+
+  const r22 = new RegistrationOrgScreenText();
+  r22.setDescription(map.registrationOrgText?.description ?? '');
+  r22.setEmailLabel(map.registrationOrgText?.emailLabel ?? '');
+  r22.setExternalLoginDescription(map.registrationOrgText?.externalLoginDescription ?? '');
+  r22.setFirstnameLabel(map.registrationOrgText?.firstnameLabel ?? '');
+  r22.setLastnameLabel(map.registrationOrgText?.lastnameLabel ?? '');
+  r22.setOrgnameLabel(map.registrationOrgText?.orgnameLabel ?? '');
+  r22.setPasswordConfirmLabel(map.registrationOrgText?.passwordConfirmLabel ?? '');
+  r22.setPasswordLabel(map.registrationOrgText?.passwordLabel ?? '');
+  r22.setPrivacyConfirm(map.registrationOrgText?.privacyConfirm ?? '');
+  r22.setPrivacyLink(map.registrationOrgText?.privacyLink ?? '');
+  r22.setPrivacyLinkText(map.registrationOrgText?.privacyLinkText ?? '');
+  r22.setSaveButtonText(map.registrationOrgText?.saveButtonText ?? '');
+  r22.setTitle(map.registrationOrgText?.title ?? '');
+  r22.setTosAndPrivacyLabel(map.registrationOrgText?.tosAndPrivacyLabel ?? '');
+  r22.setTosConfirm(map.registrationOrgText?.tosConfirm ?? '');
+  r22.setTosLink(map.registrationOrgText?.tosLink ?? '');
+  r22.setTosLinkText(map.registrationOrgText?.tosLinkText ?? '');
+  r22.setUsernameLabel(map.registrationOrgText?.usernameLabel ?? '');
+  req.setRegistrationOrgText(r22);
+
+  const r23 = new RegistrationUserScreenText();
+  r23.setBackButtonText(map.registrationUserText?.backButtonText ?? '');
+  r23.setDescription(map.registrationUserText?.description ?? '');
+  r23.setDescriptionOrgRegister(map.registrationUserText?.descriptionOrgRegister ?? '');
+  r23.setEmailLabel(map.registrationUserText?.emailLabel ?? '');
+  r23.setExternalLoginDescription(map.registrationUserText?.externalLoginDescription ?? '');
+  r23.setFirstnameLabel(map.registrationUserText?.firstnameLabel ?? '');
+  r23.setGenderLabel(map.registrationUserText?.genderLabel ?? '');
+  r23.setLanguageLabel(map.registrationUserText?.languageLabel ?? '');
+  r23.setLastnameLabel(map.registrationUserText?.lastnameLabel ?? '');
+  r23.setNextButtonText(map.registrationUserText?.nextButtonText ?? '');
+  r23.setPasswordConfirmLabel(map.registrationUserText?.passwordConfirmLabel ?? '');
+  r23.setPasswordLabel(map.registrationUserText?.passwordLabel ?? '');
+  r23.setPrivacyConfirm(map.registrationUserText?.privacyConfirm ?? '');
+  r23.setPrivacyLink(map.registrationUserText?.privacyLink ?? '');
+  r23.setPrivacyLinkText(map.registrationUserText?.privacyLinkText ?? '');
+  r23.setTitle(map.registrationUserText?.title ?? '');
+  r23.setTosAndPrivacyLabel(map.registrationUserText?.tosAndPrivacyLabel ?? '');
+  r23.setTosConfirm(map.registrationUserText?.tosConfirm ?? '');
+  r23.setTosLink(map.registrationUserText?.tosLink ?? '');
+  r23.setTosLinkText(map.registrationUserText?.tosLinkText ?? '');
+  r23.setUsernameLabel(map.registrationUserText?.usernameLabel ?? '');
+  req.setRegistrationUserText(r23);
+
+  const r24 = new SelectAccountScreenText();
+  r24.setDescription(map.selectAccountText?.description ?? '');
+  r24.setDescriptionLinkingProcess(map.selectAccountText?.descriptionLinkingProcess ?? '');
+  r24.setOtherUser(map.selectAccountText?.otherUser ?? '');
+  r24.setSessionStateActive(map.selectAccountText?.sessionStateActive ?? '');
+  r24.setSessionStateInactive(map.selectAccountText?.sessionStateInactive ?? '');
+  r24.setTitle(map.selectAccountText?.title ?? '');
+  r24.setTitleLinkingProcess(map.selectAccountText?.titleLinkingProcess ?? '');
+  r24.setUserMustBeMemberOfOrg(map.selectAccountText?.userMustBeMemberOfOrg ?? '');
+  req.setSelectAccountText(r24);
+
+
+  const r25 = new SuccessLoginScreenText();
+  r25.setAutoRedirectDescription(map.successLoginText?.autoRedirectDescription ?? '');
+  r25.setNextButtonText(map.successLoginText?.nextButtonText ?? '');
+  r25.setRedirectedDescription(map.successLoginText?.redirectedDescription ?? '');
+  r25.setTitle(map.successLoginText?.title ?? '');
+  req.setSuccessLoginText(r25);
+
+  const r26 = new UsernameChangeDoneScreenText();
+  r26.setDescription(map.usernameChangeDoneText?.description ?? '');
+  r26.setNextButtonText(map.usernameChangeDoneText?.nextButtonText ?? '');
+  r26.setTitle(map.usernameChangeDoneText?.title ?? '');
+  req.setUsernameChangeDoneText(r26);
+
+  const r27 = new UsernameChangeScreenText();
+  r27.setCancelButtonText(map.usernameChangeText?.cancelButtonText ?? '');
+  r27.setDescription(map.usernameChangeText?.description ?? '');
+  r27.setNextButtonText(map.usernameChangeText?.nextButtonText ?? '');
+  r27.setTitle(map.usernameChangeText?.title ?? '');
+  r27.setUsernameLabel(map.usernameChangeText?.usernameLabel ?? '');
+  req.setUsernameChangeText(r27);
+
+  const r28 = new VerifyMFAOTPScreenText();
+  r28.setCodeLabel(map.verifyMfaOtpText?.codeLabel ?? '');
+  r28.setDescription(map.verifyMfaOtpText?.description ?? '');
+  r28.setNextButtonText(map.verifyMfaOtpText?.nextButtonText ?? '');
+  r28.setTitle(map.verifyMfaOtpText?.title ?? '');
+  req.setVerifyMfaOtpText(r28);
+
+  const r29 = new VerifyMFAU2FScreenText();
+  r29.setDescription(map.verifyMfaU2fText?.description ?? '');
+  r29.setErrorRetry(map.verifyMfaU2fText?.errorRetry ?? '');
+  r29.setNotSupported(map.verifyMfaU2fText?.notSupported ?? '');
+  r29.setTitle(map.verifyMfaU2fText?.title ?? '');
+  r29.setValidateTokenText(map.verifyMfaU2fText?.validateTokenText ?? '');
+  req.setVerifyMfaU2fText(r29);
 
   return req;
 }

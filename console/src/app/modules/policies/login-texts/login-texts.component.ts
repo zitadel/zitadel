@@ -88,6 +88,7 @@ const REQUESTMAP = {
   styleUrls: ['./login-texts.component.scss'],
 })
 export class LoginTextsComponent implements OnDestroy {
+  public totalCustomPolicy: { [key: string]: { [key: string]: string; }; } = {};
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
   public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string; }> = new BehaviorSubject({});
 
@@ -162,16 +163,18 @@ export class LoginTextsComponent implements OnDestroy {
     ).pipe(map(m => m[this.currentSubMap]));
 
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
+    this.totalCustomPolicy = (await this.getCurrentValues(reqCustomInit));
     this.getCustomInitMessageTextMap$.next(
-      (await this.getCurrentValues(reqCustomInit))[this.currentSubMap],
+      this.totalCustomPolicy[this.currentSubMap],
     );
   }
 
   public updateCurrentValues(values: { [key: string]: string; }): void {
-    const req = REQUESTMAP[this.serviceType].setFcn;
-    const mappedValues = req({ [this.currentSubMap]: values });
-    this.updateRequest = mappedValues;
-    console.log(mappedValues.toObject());
+    const setFcn = REQUESTMAP[this.serviceType].setFcn;
+    this.totalCustomPolicy[this.currentSubMap] = values;
+
+    this.updateRequest = setFcn(this.totalCustomPolicy);
+    console.log(this.updateRequest.toObject());
     this.updateRequest.setLanguage(this.locale);
   }
 
