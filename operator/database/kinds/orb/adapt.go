@@ -91,22 +91,28 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, migrate, err
 		}
 
+		rec, _ := Reconcile(monitor, desiredKind.Spec, gitops)
+
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)
+		dbOrBackup := false
 		for _, feature := range features {
 			switch feature {
 			case "database", backup.Instant, backup.Normal, restore.Instant, clean.Instant:
-				queriers = append(queriers,
-					operator.ResourceQueryToZitadelQuery(queryNS),
-					queryDB,
-				)
-				destroyers = append(destroyers,
-					destroyDB,
-				)
+				if !dbOrBackup {
+					dbOrBackup = true
+					queriers = append(queriers,
+						operator.ResourceQueryToZitadelQuery(queryNS),
+						queryDB,
+					)
+					destroyers = append(destroyers,
+						destroyDB,
+					)
+				}
 			case "operator":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
-					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+					operator.EnsureFuncToQueryFunc(rec),
 				)
 			}
 		}

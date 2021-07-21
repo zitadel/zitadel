@@ -259,7 +259,7 @@
           </cnsl-info-section>
         </ng-container>
         <mat-slide-toggle class="toggle" color="primary" ngDefaultControl [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) == false"
-            [(ngModel)]="previewData.disableWatermark" (change)="saveWatermark()">
+            [(ngModel)]="previewData.disableWatermark" (change)="savePolicy()">
             {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
         </mat-slide-toggle>
       </div>
