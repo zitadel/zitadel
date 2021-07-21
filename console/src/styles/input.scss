@@ -9,9 +9,6 @@
   $warn-color: mat.get-color-from-palette($warn, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
-  $primary-dark: if($is-dark-theme, #212224, #fafafa);
-  $secondary-dark: if($is-dark-theme, #2d2e30, #ffffff);
-  $inv-color: if($is-dark-theme, #ffffff, #000000);
 
   [cnslInput],
   .mat-select {

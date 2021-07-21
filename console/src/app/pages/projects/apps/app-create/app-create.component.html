@@ -9,7 +9,7 @@
     <h1>{{'APP.PAGES.CREATE_OIDC_DESC_TITLE' | translate}}</h1>
     <p class="desc">{{'APP.PAGES.CREATE_OIDC_DESC_SUB' | translate}}</p>
 
-    <mat-progress-bar class="progress-bar" color="accent" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
     <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
         {{'APP.OIDC.PROSWITCH' | translate}}

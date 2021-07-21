@@ -161,7 +161,7 @@ $caos-light-background: (
 
 $caos-dark-theme-background: (
   status-bar: map_get($caos-dark-background, 300),
-  app-bar: map_get($caos-dark-background, 100),
+  app-bar: map_get($caos-dark-background, 500),
   background: map_get($caos-dark-background, 500),
   hover: rgba(black, 0.04),
   card: map_get($caos-dark-background, 400),
@@ -194,21 +194,21 @@ $caos-light-theme-background: (
 );
 
 $caos-dark-theme-foreground: (
-  base: black,
-  divider: $dark-dividers,
-  dividers: $dark-dividers,
+  base: white,
+  divider: $light-dividers,
+  dividers: $light-dividers,
   disabled: $dark-disabled-text,
   disabled-button: rgba(black, 0.26),
   disabled-text: $dark-disabled-text,
   elevation: black,
-  hint-text: $dark-disabled-text,
-  secondary-text: $dark-secondary-text,
-  icon: rgba(black, 0.54),
-  icons: rgba(black, 0.54),
-  text: rgba(black, 0.87),
-  slider-min: rgba(black, 0.87),
-  slider-off: rgba(black, 0.26),
-  slider-off-active: rgba(black, 0.38)
+  hint-text: $light-disabled-text,
+  secondary-text: $light-secondary-text,
+  icon: rgba(white, 0.54),
+  icons: rgba(white, 0.54),
+  text: rgba(white, 0.87),
+  slider-min: rgba(white, 0.87),
+  slider-off: rgba(white, 0.26),
+  slider-off-active: rgba(white, 0.38)
 );
 
 $caos-light-theme-foreground: (
@@ -233,7 +233,7 @@ $caos-dark-app-theme: (
   primary: mat-palette($caos-dark-primary),
   accent: mat-palette($caos-dark-primary),
   warn: mat-palette($mat-red),
-  is-dark: false,
+  is-dark: true,
   foreground: $caos-dark-theme-foreground,
   background: $caos-dark-theme-background
 );
@@ -246,17 +246,6 @@ $caos-light-app-theme: (
   foreground: $caos-light-theme-foreground,
   background: $caos-light-theme-background
 );
-
-// $light-primary: mat.define-palette($caos-light-primary);
-// $light-accent: mat.define-palette($caos-light-primary);
-// $light-warn: mat.define-palette(mat.$red-palette);
-
-// $dark-primary: mat.define-palette($caos-dark-primary);
-// $dark-accent: mat.define-palette($caos-dark-primary);
-// $dark-warn: mat.define-palette(mat.$red-palette);
-
-// $caos-light-app-theme: mat.define-light-theme($light-primary, $light-accent, $light-warn);
-// $caos-dark-app-theme: mat.define-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 $custom-typography: mat.define-typography-config($font-family: 'Lato');
 
@@ -277,7 +266,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   @include mat.all-component-themes($caos-light-app-theme);
 
   --grey: #697386;
-  --color-main: #5469d4;
+  --color-main: var(--theme-light-primary-500);
   $background: map-get($caos-light-app-theme, background);
 
   .sidenav,
@@ -307,7 +296,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   }
 
   .root-header {
-    box-shadow: inset 0 -1px #e3e8ee;
+    box-shadow: inset 0 -1px map-get($caos-light-theme-foreground, divider);
   }
 }
 
@@ -315,7 +304,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   @include component-themes($caos-dark-app-theme);
   @include mat.all-component-themes($caos-dark-app-theme);
 
-  --color-main: #5282c1;
+  --color-main: var(--theme-dark-primary-500);
   $background: map-get($caos-dark-app-theme, background);
 
   .sidenav,
@@ -328,7 +317,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    background-color: #2d2e30;
+    background-color: map-get($background, background);
     border-radius: 8px;
     transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
@@ -336,7 +325,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-    background-color: #2d2e30;
+    background-color: map-get($background, background);
     transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
 
@@ -348,7 +337,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   }
 
   .root-header {
-    box-shadow: inset 0 -1px #303131;
+    box-shadow: inset 0 -1px map-get($caos-dark-theme-foreground, divider);
   }
 }
 // @include mat.checkbox-theme($candy-app-theme);

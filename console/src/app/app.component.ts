@@ -233,17 +233,28 @@ export class AppComponent implements OnDestroy {
         const darkPrimary = this.labelpolicy.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy.primaryColor || '#5282c1';
 
-        const darkBackPrimary = this.labelpolicy.backgroundColorDark || '#212224';
-        const lightBackPrimary = this.labelpolicy.backgroundColor || '#fafafa';
+        const darkBackground = this.labelpolicy.backgroundColorDark || '#212224';
+        const lightBackground = this.labelpolicy.backgroundColor || '#fafafa';
 
         this.themeService.savePrimaryColor(darkPrimary, true);
         this.themeService.savePrimaryColor(lightPrimary, false);
 
-        this.themeService.saveBackgroundColor(darkBackPrimary, true);
-        this.themeService.saveBackgroundColor(lightBackPrimary, false);
-
-
+        this.themeService.saveBackgroundColor(darkBackground, true);
+        this.themeService.saveBackgroundColor(lightBackground, false);
       }
+    }).catch(error => {
+      console.error(error, 'setting default color values');
+      const darkPrimary = '#5282c1';
+      const lightPrimary = '#5282c1';
+
+      const darkBackground = '#212224';
+      const lightBackground = '#fafafa';
+
+      this.themeService.savePrimaryColor(darkPrimary, true);
+      this.themeService.savePrimaryColor(lightPrimary, false);
+
+      this.themeService.saveBackgroundColor(darkBackground, true);
+      this.themeService.saveBackgroundColor(lightBackground, false);
     });
   }
 

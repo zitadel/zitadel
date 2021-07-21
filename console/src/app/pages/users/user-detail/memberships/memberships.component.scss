@@ -4,9 +4,7 @@
   /* stylelint-disable */
   $primary: map-get($theme, primary);
   $is-dark-theme: map-get($theme, is-dark);
-  $primary-dark: if($is-dark-theme, #212224, #fafafa);
-  $accent: map-get($theme, accent);
-  $accent-color: mat.get-color-from-palette($accent, 500);
+  $primary-color: mat.get-color-from-palette($primary, 500);
   /* stylelint-enable */
 
   .membership-groups {
@@ -92,7 +90,7 @@
             font-size: 8px;
             border-radius: .5rem;
             transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
-            background-color: $accent-color;
+            background-color: $primary-color;
             cursor: pointer;
             flex-direction: column;
             overflow: hidden;
