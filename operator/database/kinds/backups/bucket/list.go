@@ -4,6 +4,8 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"github.com/pkg/errors"
@@ -13,7 +15,7 @@ import (
 )
 
 func BackupList() core.BackupListFunc {
-	return func(monitor mntr.Monitor, name string, desired *tree.Tree) ([]string, error) {
+	return func(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, name string, desired *tree.Tree) ([]string, error) {
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
 			return nil, errors.Wrap(err, "parsing desired state failed")
@@ -24,7 +26,12 @@ func BackupList() core.BackupListFunc {
 			monitor.Verbose()
 		}
 
-		return listFilesWithFilter(desiredKind.Spec.ServiceAccountJSON.Value, desiredKind.Spec.Bucket, name)
+		value, err := read.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
+		if err != nil {
+			return nil, err
+		}
+
+		return listFilesWithFilter(value, desiredKind.Spec.Bucket, name)
 	}
 }
 
