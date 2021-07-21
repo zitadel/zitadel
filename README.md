@@ -114,8 +114,13 @@ See the policy [here](./SECURITY.md)
 
 ## Usage Data
 
-ZITADEL components send errors and usage data to CAOS AG, so that we are able to identify code improvement potential. If you'd rather be anonymous or don't have an internet connection, pass the global flag `--disable-ingestion` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-ingestion` flag.
+ZITADEL components send errors and usage data to CAOS AG, so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-ingestion` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-ingestion` flag.
 
+We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
+
+Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
+
+We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
 ## License
 
 See the exact licensing terms [here](./LICENSE)
