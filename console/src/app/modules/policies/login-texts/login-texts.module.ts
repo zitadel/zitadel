@@ -9,6 +9,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { HasRoleModule } from '../../../directives/has-role/has-role.module';
 import { DetailLayoutModule } from '../../../modules/detail-layout/detail-layout.module';
@@ -49,6 +51,8 @@ import { LoginTextsComponent } from './login-texts.component';
     MatDialogModule,
     WarnDialogModule,
     PolicyGridModule,
+    TimestampToDatePipeModule,
+    LocalizedDatePipeModule,
   ],
 })
 export class LoginTextsPolicyModule { }

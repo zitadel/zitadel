@@ -2,6 +2,17 @@
   [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate"
   [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
 
+
+  <div class="date">
+    <div>
+      <p class="newer-title" *ngIf="newerVersionExists">{{'POLICY.LOGIN_TEXTS.NEWERVERSIONEXISTS' | translate}}</p>
+      <p *ngIf="newerPolicyChangeDate && newerVersionExists">{{'POLICY.LOGIN_TEXTS.CHANGEDATE' | translate}}: {{newerPolicyChangeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm:ss'}}</p>
+      <p class="gray" *ngIf="currentPolicyChangeDate">{{'POLICY.LOGIN_TEXTS.CURRENTDATE' | translate}}: {{currentPolicyChangeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm:ss'}}</p>
+    </div>
+    <button [disabled]="!newerVersionExists" color="primary" mat-raised-button (click)="loadData()">
+    <i class="las la-sync-alt"></i>
+    {{'ACTIONS.REFRESH' | translate}}</button>
+  </div>
   <div class="top-actions">
     <cnsl-form-field class="keys" appearance="outline" >
       <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
@@ -17,11 +28,6 @@
       <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
           <mat-option *ngFor="let loc of LOCALES" [value]="loc">
               <div class="centerline">
-                  <!-- <div class="img-wrapper">
-                      <img height="20px" width="30px"
-                          style="margin-right: 1rem; border-radius: 2px; vertical-align: middle;"
-                          src="../../../../assets/flags/{{loc.toLowerCase()}}.png" />
-                  </div> -->
                   <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
               </div>
           </mat-option>

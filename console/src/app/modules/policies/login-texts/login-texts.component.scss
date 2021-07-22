@@ -2,6 +2,34 @@
   margin: .5rem 0;
 }
 
+.date {
+  display: flex;
+  justify-content: space-between;
+
+  p {
+    margin: .4rem 0;
+    font-size: 14px;
+
+    &.gray {
+      color: var(--grey);
+    }
+  }
+
+  .newer-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    align-self: center;
+
+    i {
+      margin-bottom: 3px;
+      margin-right: .5rem;
+    }
+  }
+}
+
 .top-actions {
   display: flex;
   margin: 0 -.5rem;

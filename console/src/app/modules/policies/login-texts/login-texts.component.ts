@@ -2,8 +2,9 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
+import { map, switchMap, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
   GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
@@ -88,7 +89,11 @@ const REQUESTMAP = {
   styleUrls: ['./login-texts.component.scss'],
 })
 export class LoginTextsComponent implements OnDestroy {
+  public currentPolicyChangeDate!: Timestamp.AsObject | undefined;
+  public newerPolicyChangeDate!: Timestamp.AsObject | undefined;
+
   public totalCustomPolicy: { [key: string]: { [key: string]: string; }; } = {};
+
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
   public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string; }> = new BehaviorSubject({});
 
@@ -107,6 +112,7 @@ export class LoginTextsComponent implements OnDestroy {
   public updateRequest: any;
   public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
 
+  public destroy$: Subject<void> = new Subject();
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
@@ -138,16 +144,36 @@ export class LoginTextsComponent implements OnDestroy {
 
       return this.route.params;
     })).subscribe(() => {
-
+      interval(10000).pipe(
+        // debounceTime(5000),
+        takeUntil(this.destroy$),
+      ).subscribe(x => {
+        this.checkForChanges();
+      });
     });
   }
 
   public getDefaultValues(req: any): Promise<any> {
-    return this.stripDetails((this.service).getDefaultLoginTexts(req));
+    return this.service.getDefaultLoginTexts(req).then((res) => {
+      if (res.customText) {
+        // delete res.customText.details;
+        return Object.assign({}, res.customText);
+      } else {
+        return {};
+      }
+    });
   }
 
   public getCurrentValues(req: any): Promise<any> {
-    return this.stripDetails((this.service as ManagementService).getCustomLoginTexts(req));
+    return (this.service as ManagementService).getCustomLoginTexts(req).then((res) => {
+      if (res.customText) {
+        this.currentPolicyChangeDate = res.customText.details?.changeDate;
+        // delete res.customText.details;
+        return Object.assign({}, res.customText);
+      } else {
+        return {};
+      }
+    });
   }
 
   public changeLocale(selection: MatSelectChange): void {
@@ -169,6 +195,30 @@ export class LoginTextsComponent implements OnDestroy {
     );
   }
 
+  private async patchSingleCurrentMap(): Promise<any> {
+    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
+    const pol = (await this.getCurrentValues(reqCustomInit));
+    this.getCustomInitMessageTextMap$.next(
+      pol[this.currentSubMap],
+    );
+  }
+
+  public checkForChanges(): void {
+    console.log('checkforchanges');
+    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
+
+    (this.service as ManagementService).getCustomLoginTexts(reqCustomInit).then(policy => {
+      this.newerPolicyChangeDate = policy.customText?.details?.changeDate;
+    });
+  }
+
+  public checkForUnsaved(): void {
+    const unsaved = this.getCustomInitMessageTextMap$.getValue();
+    const request = this.updateRequest[this.currentSubMap];
+
+    console.log(unsaved, this.totalCustomPolicy[this.currentSubMap]);
+  }
+
   public updateCurrentValues(values: { [key: string]: string; }): void {
     const setFcn = REQUESTMAP[this.serviceType].setFcn;
     this.totalCustomPolicy[this.currentSubMap] = values;
@@ -182,10 +232,14 @@ export class LoginTextsComponent implements OnDestroy {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       (this.service as ManagementService).setCustomLoginText(this.updateRequest).then(() => {
         this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+        setTimeout(() => {
+          this.patchSingleCurrentMap();
+        }, 1000);
       }).catch(error => this.toast.showError(error));
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       (this.service as AdminService).setCustomLoginText(this.updateRequest).then(() => {
         this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+        // this.loadData();
       }).catch(error => this.toast.showError(error));
     }
   }
@@ -217,23 +271,29 @@ export class LoginTextsComponent implements OnDestroy {
     });
   }
 
-  private stripDetails(prom: Promise<any>): Promise<any> {
-    return prom.then(res => {
-      if (res.customText) {
-        delete res.customText.details;
-        return Object.assign({}, res.customText);
-      } else {
-        return {};
-      }
-    });
-  }
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public async setCurrentType(key: string): Promise<void> {
     this.currentSubMap = key;
 
+    this.checkForUnsaved();
     this.loadData();
+  }
+
+  public get newerVersionExists(): boolean {
+    const toDate = (ts: Timestamp.AsObject) => {
+      return new Date(ts.seconds * 1000 + ts.nanos / 1000 / 1000);
+    };
+    if (this.newerPolicyChangeDate && this.currentPolicyChangeDate) {
+      const ms = toDate(this.newerPolicyChangeDate).getTime() - toDate(this.currentPolicyChangeDate).getTime();
+      // show button if changes are newer than 10s
+      return ms / 1000 > 10;
+    } else {
+      return false;
+    }
   }
 }
