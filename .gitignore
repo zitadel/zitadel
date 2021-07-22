@@ -54,3 +54,7 @@ console/src/app/proto/generated/
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
+
+#testdata
+testing/cypress/videos
+testing/cypress/results
