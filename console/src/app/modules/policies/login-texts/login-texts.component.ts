@@ -4,7 +4,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { map, pairwise, switchMap, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
   GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
@@ -101,7 +101,8 @@ export class LoginTextsComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-  public currentSubMap: string = 'emailVerificationDoneText';
+  // public currentSubMap: string = 'emailVerificationDoneText';
+  private currentSubMap$: BehaviorSubject<string> = new BehaviorSubject<string>('emailVerificationDoneText');
 
   public KeyNamesArray: string[] = KeyNamesArray;
   public locale: string = 'en';
@@ -119,6 +120,7 @@ export class LoginTextsComponent implements OnDestroy {
     private dialog: MatDialog,
     private toast: ToastService,
   ) {
+    this.currentSubMap$.next('emailVerificationDoneText');
     this.sub = this.route.data.pipe(switchMap(data => {
       this.serviceType = data.serviceType;
       switch (this.serviceType) {
@@ -186,12 +188,12 @@ export class LoginTextsComponent implements OnDestroy {
     reqDefaultInit.setLanguage(this.locale);
     this.getDefaultInitMessageTextMap$ = from(
       this.getDefaultValues(reqDefaultInit),
-    ).pipe(map(m => m[this.currentSubMap]));
+    ).pipe(map(m => m[this.currentSubMap$.getValue()]));
 
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
     this.totalCustomPolicy = (await this.getCurrentValues(reqCustomInit));
     this.getCustomInitMessageTextMap$.next(
-      this.totalCustomPolicy[this.currentSubMap],
+      this.totalCustomPolicy[this.currentSubMap$.getValue()],
     );
   }
 
@@ -199,7 +201,7 @@ export class LoginTextsComponent implements OnDestroy {
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
     const pol = (await this.getCurrentValues(reqCustomInit));
     this.getCustomInitMessageTextMap$.next(
-      pol[this.currentSubMap],
+      pol[this.currentSubMap$.getValue()],
     );
   }
 
@@ -212,16 +214,31 @@ export class LoginTextsComponent implements OnDestroy {
     });
   }
 
-  public checkForUnsaved(): void {
-    const unsaved = this.getCustomInitMessageTextMap$.getValue();
-    const request = this.updateRequest[this.currentSubMap];
+  public checkForUnsaved(): Promise<boolean> {
+    const old = this.getCustomInitMessageTextMap$.getValue();
+    const unsaved = this.totalCustomPolicy[this.currentSubMap$.getValue()];
 
-    console.log(unsaved, this.totalCustomPolicy[this.currentSubMap]);
+    console.log(old, unsaved);
+    if (old && unsaved && JSON.stringify(old) !== JSON.stringify(unsaved)) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.SAVE',
+          cancelKey: 'ACTIONS.CONTINUEWITHOUTSAVE',
+          titleKey: 'POLICY.LOGIN_TEXTS.UNSAVED_TITLE',
+          descriptionKey: 'POLICY.LOGIN_TEXTS.UNSAVED_DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      return dialogRef.afterClosed().toPromise();
+    } else {
+      return Promise.resolve(true);
+    }
   }
 
   public updateCurrentValues(values: { [key: string]: string; }): void {
     const setFcn = REQUESTMAP[this.serviceType].setFcn;
-    this.totalCustomPolicy[this.currentSubMap] = values;
+    this.totalCustomPolicy[this.currentSubMap$.getValue()] = values;
 
     this.updateRequest = setFcn(this.totalCustomPolicy);
     console.log(this.updateRequest.toObject());
@@ -278,10 +295,14 @@ export class LoginTextsComponent implements OnDestroy {
   }
 
   public async setCurrentType(key: string): Promise<void> {
-    this.currentSubMap = key;
+    const pair = this.currentSubMap$.asObservable().pipe(pairwise());
 
-    this.checkForUnsaved();
-    this.loadData();
+    this.currentSubMap$.next(key);
+    pair.subscribe(value => console.log(value));
+
+    if (await this.checkForUnsaved()) {
+      this.loadData();
+    };
   }
 
   public get newerVersionExists(): boolean {

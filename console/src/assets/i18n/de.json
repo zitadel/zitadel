@@ -140,7 +140,8 @@
     "CONFIGURE": "Konfigurieren",
     "SEND": "Senden",
     "NEWVALUE": "Neuer Wert",
-    "RESTORE":"Wiederherstellen"
+    "RESTORE":"Wiederherstellen",
+    "CONTINUEWITHOUTSAVE":"Ohne speichern fortfahren"
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -723,6 +724,8 @@
       "KEYNAME":"Login Screen / Interface",
       "RESET_TITLE":"Standardwerte wiederherstellen",
       "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "UNSAVED_TITLE":"Ohne speichern fortfahren?",
+      "UNSAVED_DESCRIPTION":"Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
       "LOCALE":"Sprachcode",
       "LOCALES": {
         "de":"German",

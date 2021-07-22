@@ -13,10 +13,10 @@
     <i class="las la-sync-alt"></i>
     {{'ACTIONS.REFRESH' | translate}}</button>
   </div>
-  <div class="top-actions">
+  <form class="top-actions" [formGroup]="form">
     <cnsl-form-field class="keys" appearance="outline" >
       <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
-      <mat-select [(ngModel)]="currentSubMap" (selectionChange)="setCurrentType($event.value)">
+      <mat-select [(ngModel)]="currentSubMap$" (selectionChange)="setCurrentType($event.value)">
           <mat-option *ngFor="let key of KeyNamesArray" [value]="key">
               {{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate }}
           </mat-option>
@@ -32,8 +32,8 @@
               </div>
           </mat-option>
       </mat-select>
-  </cnsl-form-field>
-  </div>
+    </cnsl-form-field>
+  </form>
 
   <cnsl-info-section class="warn"
     *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false"
