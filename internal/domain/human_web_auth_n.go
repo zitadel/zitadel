@@ -87,8 +87,8 @@ type PasswordlessInitCode struct {
 	Active     bool
 }
 
-func (p *PasswordlessInitCode) Link(baseURL string) string {
-	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, p.AggregateID, p.ResourceOwner, p.CodeID, p.Code)
+func PasswordlessInitCodeLink(baseURL, userID, resourceOwner, codeID, code string) string {
+	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, userID, resourceOwner, codeID, code)
 }
 
 //func NewPasswordlessInitCode(generator crypto.Generator) (*PasswordlessInitCode, string, error) {

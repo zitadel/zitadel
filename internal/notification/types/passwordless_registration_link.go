@@ -21,11 +21,7 @@ func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translat
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.PasswordlessRegistration, &struct{ UserID, CodeID, Code string }{UserID: user.ID, CodeID: code.ID, Code: codeString})
-	if err != nil {
-		return err
-	}
-
+	url := domain.PasswordlessInitCodeLink(systemDefaults.Notifications.Endpoints.PasswordlessRegistration, user.ID, user.ResourceOwner, code.ID, codeString)
 	var args = mapNotifyUserToArgs(user)
 
 	emailCodeData := &PasswordlessRegistrationLinkData{

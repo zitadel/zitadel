@@ -13,6 +13,7 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -418,7 +419,7 @@ func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+		Link:       domain.PasswordlessInitCodeLink(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration, initCode.AggregateID, initCode.ResourceOwner, initCode.CodeID, initCode.Code),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }
