@@ -223,6 +223,12 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordless) {
 			passwordlessKeyToDomain(text, result)
 		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessRegistration) {
+			passwordlessRegistrationKeyToDomain(text, result)
+		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+			passwordlessRegistrationDoneKeyToDomain(text, result)
+		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordChange) {
 			passwordChangeKeyToDomain(text, result)
 		}
@@ -650,6 +656,39 @@ func passwordlessKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 	if text.Key == domain.LoginKeyPasswordlessErrorRetry {
 		result.Passwordless.ErrorRetry = text.Text
+	}
+}
+
+func passwordlessRegistrationKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		result.PasswordlessRegistration.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		result.PasswordlessRegistration.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		result.PasswordlessRegistration.RegisterTokenButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		result.PasswordlessRegistration.TokenNameLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		result.PasswordlessRegistration.NotSupported = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		result.PasswordlessRegistration.ErrorRetry = text.Text
+	}
+}
+
+func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		result.PasswordlessRegistrationDone.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		result.PasswordlessRegistrationDone.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		result.PasswordlessRegistrationDone.NextButtonText = text.Text
 	}
 }
 

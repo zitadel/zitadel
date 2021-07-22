@@ -159,6 +159,19 @@ const (
 	LoginKeyPasswordlessNotSupported            = LoginKeyPasswordless + "NotSupported"
 	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "ErrorRetry"
 
+	LoginKeyPasswordlessRegistration                        = "PasswordlessRegistration."
+	LoginKeyPasswordlessRegistrationTitle                   = LoginKeyPasswordlessRegistration + "Title"
+	LoginKeyPasswordlessRegistrationDescription             = LoginKeyPasswordlessRegistration + "Description"
+	LoginKeyPasswordlessRegistrationRegisterTokenButtonText = LoginKeyPasswordlessRegistration + "RegisterTokenButtonText"
+	LoginKeyPasswordlessRegistrationTokenNameLabel          = LoginKeyPasswordlessRegistration + "TokenNameLabel"
+	LoginKeyPasswordlessRegistrationNotSupported            = LoginKeyPasswordlessRegistration + "NotSupported"
+	LoginKeyPasswordlessRegistrationErrorRetry              = LoginKeyPasswordlessRegistration + "ErrorRetry"
+
+	LoginKeyPasswordlessRegistrationDone               = "PasswordlessRegistrationDone."
+	LoginKeyPasswordlessRegistrationDoneTitle          = LoginKeyPasswordlessRegistrationDone + "Title"
+	LoginKeyPasswordlessRegistrationDoneDescription    = LoginKeyPasswordlessRegistrationDone + "Description"
+	LoginKeyPasswordlessRegistrationDoneNextButtonText = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
+
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"

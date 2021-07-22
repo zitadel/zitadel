@@ -147,6 +147,17 @@ type CustomLoginTextReadModel struct {
 	PasswordlessNotSupported            string
 	PasswordlessErrorRetry              string
 
+	PasswordlessRegistrationTitle                   string
+	PasswordlessRegistrationDescription             string
+	PasswordlessRegistrationRegisterTokenButtonText string
+	PasswordlessRegistrationTokenNameLabel          string
+	PasswordlessRegistrationNotSupported            string
+	PasswordlessRegistrationErrorRetry              string
+
+	PasswordlessRegistrationDoneTitle          string
+	PasswordlessRegistrationDoneDescription    string
+	PasswordlessRegistrationDoneNextButtonText string
+
 	PasswordChangeTitle                   string
 	PasswordChangeDescription             string
 	PasswordChangeOldPasswordLabel        string
@@ -320,6 +331,14 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordlessScreenSetEvent(e)
 				continue
 			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistration) {
+				wm.handlePasswordlessRegistrationScreenSetEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+				wm.handlePasswordlessRegistrationDoneScreenSetEvent(e)
+				continue
+			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordChange) {
 				wm.handlePasswordChangeScreenSetEvent(e)
 				continue
@@ -442,6 +461,14 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordless) {
 				wm.handlePasswordlessScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistration) {
+				wm.handlePasswordlessRegistrationScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+				wm.handlePasswordlessRegistrationDoneScreenRemoveEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordChange) {
@@ -1491,6 +1518,90 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessScreenRemoveEvent(e *polic
 	}
 	if e.Key == domain.LoginKeyPasswordlessErrorRetry {
 		wm.PasswordlessErrorRetry = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		wm.PasswordlessRegistrationTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		wm.PasswordlessRegistrationDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		wm.PasswordlessRegistrationRegisterTokenButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		wm.PasswordlessRegistrationTokenNameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		wm.PasswordlessRegistrationNotSupported = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		wm.PasswordlessRegistrationErrorRetry = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		wm.PasswordlessRegistrationTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		wm.PasswordlessRegistrationDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		wm.PasswordlessRegistrationRegisterTokenButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		wm.PasswordlessRegistrationTokenNameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		wm.PasswordlessRegistrationNotSupported = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		wm.PasswordlessRegistrationErrorRetry = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		wm.PasswordlessRegistrationDoneTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		wm.PasswordlessRegistrationDoneDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		wm.PasswordlessRegistrationDoneNextButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		wm.PasswordlessRegistrationDoneTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		wm.PasswordlessRegistrationDoneDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		wm.PasswordlessRegistrationDoneNextButtonText = ""
 		return
 	}
 }
