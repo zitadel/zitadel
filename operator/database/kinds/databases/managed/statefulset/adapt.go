@@ -307,12 +307,12 @@ func getJoinExec(namespace string, name string, dbPort int, replicaCount int) st
 func getResources(resourcesSFS *k8s.Resources) corev1.ResourceRequirements {
 	internalResources := corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			"cpu":    resource.MustParse("100m"),
-			"memory": resource.MustParse("512Mi"),
+			"cpu":    resource.MustParse("1"),
+			"memory": resource.MustParse("6Gi"),
 		},
 		Limits: corev1.ResourceList{
-			"cpu":    resource.MustParse("100m"),
-			"memory": resource.MustParse("512Mi"),
+			"cpu":    resource.MustParse("4"),
+			"memory": resource.MustParse("8Gi"),
 		},
 	}
 
