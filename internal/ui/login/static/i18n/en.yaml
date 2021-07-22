@@ -142,6 +142,11 @@ PasswordlessRegistration:
   RegisterTokenButtonText: Register Token
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
+PasswordlessRegistrationDone:
+  Title: Passwordless set up
+  Description: Token for passwordless successfully added.
+  NextButtonText: next
+
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
