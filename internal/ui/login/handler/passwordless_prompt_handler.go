@@ -22,7 +22,7 @@ func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if !data.Skip {
-		l.renderPasswordlessRegistration(w, r, authReq, "", "", "", nil)
+		l.renderPasswordlessRegistration(w, r, authReq, "", "", "", "", nil)
 		return
 	}
 	err = l.command.HumanSkipMFAInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
