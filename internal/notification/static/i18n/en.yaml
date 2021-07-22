@@ -1,35 +1,42 @@
 InitCode:
-  Title: Zitadel - Initialize User
+  Title: ZITADEL - Initialize User
   PreHeader: Initialize User
   Subject: Initialize User
   Greeting: Hello {{.FirstName}} {{.LastName}},
-  Text: This user was created in Zitadel. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
+  Text: This user was created in ZITADEL. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
   ButtonText: Finish initialization
 PasswordReset:
-  Title: Zitadel - Reset password
+  Title: ZITADEL - Reset password
   PreHeader: Reset password
   Subject: Reset password
   Greeting: Hello {{.FirstName}} {{.LastName}},
   Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
   ButtonText: Reset password
 VerifyEmail:
-  Title: Zitadel - Verify email
+  Title: ZITADEL - Verify email
   PreHeader: Verify email
   Subject: Verify email
   Greeting: Hello {{.FirstName}} {{.LastName}},
   Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.
   ButtonText: Verify email
 VerifyPhone:
-  Title: Zitadel - Verify phone
+  Title: ZITADEL - Verify phone
   PreHeader: Verify phone
   Subject: Verify phone
   Greeting: Hello {{.FirstName}} {{.LastName}},
   Text: A new phonenumber has been added. Please use the following code to verify it {{.Code}}
   ButtonText: Verify phone
 DomainClaimed:
-  Title: Zitadel - Domain has been claimed
+  Title: ZITADEL - Domain has been claimed
   PreHeader: Change email / username
   Subject: Domain has been claimed
   Greeting: Hello {{.FirstName}} {{.LastName}},
   Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.Username}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
   ButtonText: Login
+PasswordlessRegistration:
+  Title: ZITADEL - Add Passwordless Login
+  PreHeader: Add Passwordless Login
+  Subject: Add Passwordless Login
+  Greeting: Hello {{.FirstName}} {{.LastName}},
+  Text: We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login..
+  Button: Add Passwordless Login
