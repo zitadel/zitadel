@@ -13,10 +13,10 @@
     <i class="las la-sync-alt"></i>
     {{'ACTIONS.REFRESH' | translate}}</button>
   </div>
-  <form class="top-actions" [formGroup]="form">
+  <form *ngIf="form" class="top-actions" [formGroup]="form">
     <cnsl-form-field class="keys" appearance="outline" >
       <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
-      <mat-select [(ngModel)]="currentSubMap$" (selectionChange)="setCurrentType($event.value)">
+      <mat-select formControlName="currentSubMap" name="currentSubMap">
           <mat-option *ngFor="let key of KeyNamesArray" [value]="key">
               {{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate }}
           </mat-option>
@@ -25,7 +25,7 @@
 
     <cnsl-form-field class="language">
       <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
-      <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
+      <mat-select formControlName="locale" name="locale">
           <mat-option *ngFor="let loc of LOCALES" [value]="loc">
               <div class="centerline">
                   <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
