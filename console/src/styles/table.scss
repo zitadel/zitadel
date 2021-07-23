@@ -54,7 +54,7 @@
 
       &:hover {
         td {
-          background: map-get($background, hover); //(if($is-dark-theme, #292a2b, #f4f4f4);
+          background: map-get($background, hover);
         }
       }
     }
