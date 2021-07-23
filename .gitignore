@@ -58,3 +58,4 @@ openapi/**/*.json
 #testdata
 testing/cypress/videos
 testing/cypress/results
+testing/cypress/screenshots
