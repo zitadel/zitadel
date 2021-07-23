@@ -159,6 +159,74 @@ $caos-light-background: (
     )
 );
 
+$caos-dark-warn: (
+  50 : var(--theme-dark-warn-50),
+  100 : var(--theme-dark-warn-100),
+  200 : var(--theme-dark-warn-200),
+  300 : var(--theme-dark-warn-300),
+  400 : var(--theme-dark-warn-400),
+  500 : var(--theme-dark-warn-500),
+  600 : var(--theme-dark-warn-600),
+  700 : var(--theme-dark-warn-700),
+  800 : var(--theme-dark-warn-800),
+  900 : var(--theme-dark-warn-900),
+  A100 : var(--theme-dark-warn-A100),
+  A200 : var(--theme-dark-warn-A200),
+  A400 : var(--theme-dark-warn-A400),
+  A700 : var(--theme-dark-warn-A700),
+  contrast:
+    (
+      50: var(--theme-dark-warn-contrast-50),
+      100: var(--theme-dark-warn-contrast-100),
+      200: var(--theme-dark-warn-contrast-200),
+      300: var(--theme-dark-warn-contrast-300),
+      400: var(--theme-dark-warn-contrast-400),
+      500: var(--theme-dark-warn-contrast-500),
+      600: var(--theme-dark-warn-contrast-600),
+      700: var(--theme-dark-warn-contrast-700),
+      800: var(--theme-dark-warn-contrast-800),
+      900: var(--theme-dark-warn-contrast-900),
+      A100: var(--theme-dark-warn-contrast-A100),
+      A200: var(--theme-dark-warn-contrast-A200),
+      A400: var(--theme-dark-warn-contrast-A400),
+      A700: var(--theme-dark-warn-contrast-A700)
+    )
+);
+
+$caos-light-warn: (
+  50 : var(--theme-light-warn-50),
+  100 : var(--theme-light-warn-100),
+  200 : var(--theme-light-warn-200),
+  300 : var(--theme-light-warn-300),
+  400 : var(--theme-light-warn-400),
+  500 : var(--theme-light-warn-500),
+  600 : var(--theme-light-warn-600),
+  700 : var(--theme-light-warn-700),
+  800 : var(--theme-light-warn-800),
+  900 : var(--theme-light-warn-900),
+  A100 : var(--theme-light-warn-A100),
+  A200 : var(--theme-light-warn-A200),
+  A400 : var(--theme-light-warn-A400),
+  A700 : var(--theme-light-warn-A700),
+  contrast:
+    (
+      50: var(--theme-light-warn-contrast-50),
+      100: var(--theme-light-warn-contrast-100),
+      200: var(--theme-light-warn-contrast-200),
+      300: var(--theme-light-warn-contrast-300),
+      400: var(--theme-light-warn-contrast-400),
+      500: var(--theme-light-warn-contrast-500),
+      600: var(--theme-light-warn-contrast-600),
+      700: var(--theme-light-warn-contrast-700),
+      800: var(--theme-light-warn-contrast-800),
+      900: var(--theme-light-warn-contrast-900),
+      A100: var(--theme-light-warn-contrast-A100),
+      A200: var(--theme-light-warn-contrast-A200),
+      A400: var(--theme-light-warn-contrast-A400),
+      A700: var(--theme-light-warn-contrast-A700)
+    )
+);
+
 $caos-dark-theme-background: (
   status-bar: map_get($caos-dark-background, 300),
   app-bar: map_get($caos-dark-background, 500),
