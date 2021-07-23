@@ -6,6 +6,7 @@
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
 
   .mat-table,
   .mat-paginator {
@@ -53,7 +54,7 @@
 
       &:hover {
         td {
-          background: if($is-dark-theme, #292a2b, #f4f4f4);
+          background: map-get($background, hover); //(if($is-dark-theme, #292a2b, #f4f4f4);
         }
       }
     }

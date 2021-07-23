@@ -173,7 +173,8 @@ $caos-dark-theme-background: (
   selected-disabled-button: map_get($caos-dark-background, 400),
   disabled-button-toggle: map_get($caos-dark-background, 200),
   unselected-chip: map_get($caos-dark-background, 300),
-  disabled-list-option: map_get($caos-dark-background, 200)
+  disabled-list-option: map_get($caos-dark-background, 200),
+  tooltip: map_get($mat-gray, 700)
 );
 
 $caos-light-theme-background: (
@@ -190,16 +191,17 @@ $caos-light-theme-background: (
   selected-disabled-button: map_get($caos-light-background, 400),
   disabled-button-toggle: map_get($caos-light-background, 200),
   unselected-chip: map_get($caos-light-background, 300),
-  disabled-list-option: map_get($caos-light-background, 200)
+  disabled-list-option: map_get($caos-light-background, 200),
+  tooltip: map_get($mat-gray, 700)
 );
 
 $caos-dark-theme-foreground: (
   base: white,
   divider: $light-dividers,
   dividers: $light-dividers,
-  disabled: $dark-disabled-text,
-  disabled-button: rgba(black, 0.26),
-  disabled-text: $dark-disabled-text,
+  disabled: $light-disabled-text,
+  disabled-button: rgba(white, 0.26),
+  disabled-text: $light-disabled-text,
   elevation: black,
   hint-text: $light-disabled-text,
   secondary-text: $light-secondary-text,

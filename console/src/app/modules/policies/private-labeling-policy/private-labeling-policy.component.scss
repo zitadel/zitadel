@@ -6,6 +6,8 @@
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
 
   .policy {
     .header {
@@ -157,8 +159,6 @@
         margin-bottom: 2rem;
 
         .expansion {
-          background: if($is-dark-theme, #2d2e30, #fff) !important;
-
           .header {
             justify-content: flex-start;
           }
@@ -189,8 +189,7 @@
           height: 150px;
           width: 100%;
           border-radius: .5rem;
-          background: if($is-dark-theme, #2d2e30, #fff);
-          border: 1px solid if($is-dark-theme, #4a4b4b, #ddd);
+          border: 1px solid map-get($foreground, divider);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -202,11 +201,8 @@
             flex-direction: column;
             align-items: center;
 
-            .btn {
+            a {
               margin-bottom: .5rem;
-            }
-
-            .btn:not[disabled] {
               cursor: pointer;
             }
 
@@ -231,12 +227,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+               (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+               (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);
@@ -272,32 +267,29 @@
               margin-bottom: 1rem;
 
               .img-wrapper {
-                flex: 1;
                 position: relative;
-                min-height: 80px;
-                border: 1px solid if($is-dark-theme, #ffffff20, #00000020);
-                border-radius: .5rem;
-                max-width: 120px;
+                height: 80px;
+                width: 80px;
+                border-radius: 50vw;
+                background-color: #00000020;
 
                 .dl-btn {
                   z-index: 2;
                   position: absolute;
-                  top: -12px;
-                  left: -12px;
+                  top: 0;
+                  left: 0;
                   cursor: pointer;
                   visibility: hidden;
                 }
 
                 .prev,
                 .curr {
-                  position: absolute;
-                  top: 50%;
-                  transform: translateY(-50%);
+                  top: 0;
                   left: 0;
-                  max-height: 80px;
-                  max-width: 120px;
+                  width: 80px;
+                  height: 80px;
                   object-fit: contain;
-                  border-radius: .5rem;
+                  border-radius: 50%;
                 }
 
                 &:hover {
@@ -412,7 +404,7 @@
             position: absolute;
             top: .5rem;
             left: .5rem;
-            border-radius: 10px !important;
+            border-radius: 8px !important;
             z-index: 1;
 
             span {
