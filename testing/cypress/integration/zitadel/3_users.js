@@ -28,7 +28,7 @@ describe('USER: show personal information', () => {
 
 describe('USERS: show Users ', () => {
     it('PROJECT: show Projects ', () => {
-        cy.get('a[href*="users/list/humans"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
     })
 })
@@ -36,11 +36,11 @@ describe('USERS: show Users ', () => {
 describe('USERS: add User', () => {
     it('USERS: add User', () => {
         //click on org to clear screen
-        cy.get('a[href*="org"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/org')
         cy.wait(1000)
-        cy.get('a[href*="users/list/humans"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
-        cy.get('a[href*="users/create"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/users/create')
         cy.url().should('contain', 'users/create')
         cy.get('[formcontrolname^=email]').type(Cypress.env('newEmail'))
         //force needed due to the prefilled username prefix
@@ -56,11 +56,11 @@ describe('USERS: add User', () => {
 describe('USERS: delete User', () => {
     it('USERS: delete User', () => {
         //click on org to clear screen
-        cy.get('a[href*="org"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/org')
         cy.wait(1000)
-        cy.get('a[href*="users/list/humans"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
-        cy.wait(2000)
+        cy.wait(6000)
         //force due to angular hidden buttons
         cy.get('tr').filter(':contains("demofirst")').find('button').click({force: true})
         cy.get('button').filter(':contains("Delete")').click()

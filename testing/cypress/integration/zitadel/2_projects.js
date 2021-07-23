@@ -9,6 +9,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 
 
 it('LOGIN: Fill in credentials and login', () => {
+
     //console login
     cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
     //wait for console to load
@@ -18,7 +19,7 @@ it('LOGIN: Fill in credentials and login', () => {
 
 describe('PROJECT: show Projects ', () => {
     it('PROJECT: show Projects ', () => {
-        cy.get('a[href*="projects"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/projects')
         cy.url().should('contain', '/projects')
     })
 })
@@ -26,7 +27,7 @@ describe('PROJECT: show Projects ', () => {
 describe('PROJECT: add Project ', () => {
 
     it('PROJECT: add Project ', () => {
-        cy.get('a[href*="projects"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/projects')
         cy.url().should('contain', '/projects')
         cy.get('.add-project-button').click()
         cy.get('input').type("newProjectToTest")
@@ -38,9 +39,9 @@ describe('PROJECT: create app in Project ', () => {
 
     it('PROJECT: create app ', () => {
         //click on org to clear screen
-        cy.get('a[href*="org"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/org')
         cy.wait(1000)
-        cy.get('a[href*="projects"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/projects')
         cy.url().should('contain', '/projects')
         cy.wait(1000)
         cy.get('.card').contains("newProjectToTest").click()
@@ -68,13 +69,14 @@ describe('PROJECT: delete Project ', () => {
     it('PROJECT: delete Project ', () => {
         cy.log(`PROJECT: delete project`);
         //click on org to clear screen
-        cy.get('a[href*="org"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/org')
         //click on Projects 
-        cy.get('a[href*="projects"').eq(0).click()
+        cy.visit('https://console.zitadel.ch/projects')
         cy.url().should('contain', '/projects')
         cy.wait(3000)
         //TODO variable for regex
-        cy.get('tr').filter(':contains("demo")').find('button').click()
+        cy.get('.card').filter(':contains("newProjectToTest")').find('button.delete-button').click()
+        cy.get('button').filter(':contains("Delete")').click()
     })
 })
 
