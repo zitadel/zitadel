@@ -1,10 +1,10 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { map, pairwise, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
   GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
@@ -101,10 +101,7 @@ export class LoginTextsComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-  public currentSubMap: string = 'emailVerificationDoneText';
-
   public KeyNamesArray: string[] = KeyNamesArray;
-  public locale: string = 'en';
   public LOCALES: string[] = ['en'];
 
   private sub: Subscription = new Subscription();
@@ -113,6 +110,11 @@ export class LoginTextsComponent implements OnDestroy {
   public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
 
   public destroy$: Subject<void> = new Subject();
+
+  public form: FormGroup = new FormGroup({
+    currentSubMap: new FormControl('emailVerificationDoneText'),
+    locale: new FormControl('en'),
+  });
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
@@ -151,6 +153,25 @@ export class LoginTextsComponent implements OnDestroy {
         this.checkForChanges();
       });
     });
+
+    this.form.valueChanges.pipe(
+      startWith({ currentSubMap: 'emailVerificationDoneText', locale: 'en' }),
+      pairwise(),
+      takeUntil(this.destroy$),
+    ).subscribe(pair => {
+      this.checkForUnsaved(pair[0].currentSubMap).then((wantsToSave) => {
+        if (wantsToSave) {
+          this.saveCurrentMessage().then(() => {
+            this.loadData();
+          }).catch(() => {
+            // load even if save failed
+            this.loadData();
+          });
+        } else {
+          this.loadData();
+        }
+      });
+    });
   }
 
   public getDefaultValues(req: any): Promise<any> {
@@ -176,11 +197,6 @@ export class LoginTextsComponent implements OnDestroy {
     });
   }
 
-  public changeLocale(selection: MatSelectChange): void {
-    this.locale = selection.value;
-    this.loadData();
-  }
-
   public async loadData(): Promise<any> {
     const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
     reqDefaultInit.setLanguage(this.locale);
@@ -204,7 +220,6 @@ export class LoginTextsComponent implements OnDestroy {
   }
 
   public checkForChanges(): void {
-    console.log('checkforchanges');
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
 
     (this.service as ManagementService).getCustomLoginTexts(reqCustomInit).then(policy => {
@@ -212,11 +227,30 @@ export class LoginTextsComponent implements OnDestroy {
     });
   }
 
-  public checkForUnsaved(): void {
-    const unsaved = this.getCustomInitMessageTextMap$.getValue();
-    const request = this.updateRequest[this.currentSubMap];
+  /**
+   *
+   * @param oldkey which was potentially unsaved
+   * @returns a boolean if saving is desired
+   */
+  public checkForUnsaved(oldkey: string): Promise<boolean> {
+    const old = this.getCustomInitMessageTextMap$.getValue();
+    const unsaved = this.totalCustomPolicy[oldkey];
 
-    console.log(unsaved, this.totalCustomPolicy[this.currentSubMap]);
+    if (old && unsaved && JSON.stringify(old) !== JSON.stringify(unsaved)) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.SAVE',
+          cancelKey: 'ACTIONS.CONTINUEWITHOUTSAVE',
+          titleKey: 'POLICY.LOGIN_TEXTS.UNSAVED_TITLE',
+          descriptionKey: 'POLICY.LOGIN_TEXTS.UNSAVED_DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      return dialogRef.afterClosed().toPromise();
+    } else {
+      return Promise.resolve(false);
+    }
   }
 
   public updateCurrentValues(values: { [key: string]: string; }): void {
@@ -224,23 +258,22 @@ export class LoginTextsComponent implements OnDestroy {
     this.totalCustomPolicy[this.currentSubMap] = values;
 
     this.updateRequest = setFcn(this.totalCustomPolicy);
-    console.log(this.updateRequest.toObject());
     this.updateRequest.setLanguage(this.locale);
   }
 
-  public saveCurrentMessage(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).setCustomLoginText(this.updateRequest).then(() => {
-        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
-        setTimeout(() => {
-          this.patchSingleCurrentMap();
-        }, 1000);
-      }).catch(error => this.toast.showError(error));
-    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      (this.service as AdminService).setCustomLoginText(this.updateRequest).then(() => {
-        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
-        // this.loadData();
-      }).catch(error => this.toast.showError(error));
+  public saveCurrentMessage(): Promise<any> {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return (this.service as ManagementService).setCustomLoginText(this.updateRequest).then(() => {
+          this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+          setTimeout(() => {
+            this.patchSingleCurrentMap();
+          }, 1000);
+        }).catch(error => this.toast.showError(error));
+      case PolicyComponentServiceType.ADMIN:
+        return (this.service as AdminService).setCustomLoginText(this.updateRequest).then(() => {
+          this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+        }).catch(error => this.toast.showError(error));
     }
   }
 
@@ -277,13 +310,6 @@ export class LoginTextsComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public async setCurrentType(key: string): Promise<void> {
-    this.currentSubMap = key;
-
-    this.checkForUnsaved();
-    this.loadData();
-  }
-
   public get newerVersionExists(): boolean {
     const toDate = (ts: Timestamp.AsObject) => {
       return new Date(ts.seconds * 1000 + ts.nanos / 1000 / 1000);
@@ -295,5 +321,13 @@ export class LoginTextsComponent implements OnDestroy {
     } else {
       return false;
     }
+  }
+
+  public get locale(): string {
+    return this.form.get('locale')?.value;
+  }
+
+  public get currentSubMap(): string {
+    return this.form.get('currentSubMap')?.value;
   }
 }
