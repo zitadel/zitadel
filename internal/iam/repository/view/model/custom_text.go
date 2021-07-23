@@ -323,7 +323,7 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 }
 
 func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
+	if text.Key == domain.LoginKeyPasswordTitle {
 		result.Password.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordDescription {
@@ -491,7 +491,7 @@ func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 }
 
 func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyInitUserDone {
+	if text.Key == domain.LoginKeyInitUserDoneTitle {
 		result.InitUserDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneDescription {
@@ -761,8 +761,8 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		result.RegistrationUser.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserPrivacyConfirm {
-		result.RegistrationUser.PrivacyConfirm = text.Text
+	if text.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
+		result.RegistrationUser.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLink {
 		result.RegistrationUser.PrivacyLink = text.Text
@@ -815,17 +815,11 @@ func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLogin
 	if text.Key == domain.LoginKeyRegisterOrgTOSConfirm {
 		result.RegistrationOrg.TOSConfirm = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgTOSLink {
-		result.RegistrationOrg.TOSLink = text.Text
-	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSLinkText {
 		result.RegistrationOrg.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgPrivacyConfirm {
-		result.RegistrationOrg.PrivacyConfirm = text.Text
-	}
-	if text.Key == domain.LoginKeyRegisterOrgPrivacyLink {
-		result.RegistrationOrg.PrivacyLink = text.Text
+	if text.Key == domain.LoginKeyRegisterOrgTosConfirmAnd {
+		result.RegistrationOrg.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
 		result.RegistrationOrg.PrivacyLinkText = text.Text

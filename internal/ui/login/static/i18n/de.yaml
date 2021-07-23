@@ -159,7 +159,7 @@ EmailVerification:
   Description: Du hast ein E-Mail zur Verifizierung deiner E-Mail Adresse bekommen. Gib den Code im untenstehenden Formular ein. Mit erneut versenden, wird dir ein neues E-Mail zugestellt.
   CodeLabel: Code
   NextButtonText: weiter
-  ResendButtonText: erneut sende
+  ResendButtonText: erneut senden
 
 EmailVerificationDone:
   Title: E-Mail Verifizierung

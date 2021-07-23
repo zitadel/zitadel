@@ -149,7 +149,7 @@ const (
 	LoginKeyVerifyMFAU2FDescription       = LoginKeyVerifyMFAU2F + "Description"
 	LoginKeyVerifyMFAU2FNotSupported      = LoginKeyVerifyMFAU2F + "NotSupported"
 	LoginKeyVerifyMFAU2FValidateTokenText = LoginKeyVerifyMFAU2F + "ValidateTokenButtonText"
-	LoginKeyVerifyMFAU2FErrorRetry        = LoginKeyVerifyMFAU2F + "Error.Retry"
+	LoginKeyVerifyMFAU2FErrorRetry        = LoginKeyVerifyMFAU2F + "ErrorRetry"
 
 	LoginKeyPasswordless                        = "Passwordless."
 	LoginKeyPasswordlessTitle                   = LoginKeyPasswordless + "Title"
@@ -164,7 +164,7 @@ const (
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
 	LoginKeyPasswordChangeOldPasswordLabel        = LoginKeyPasswordChange + "OldPasswordLabel"
 	LoginKeyPasswordChangeNewPasswordLabel        = LoginKeyPasswordChange + "NewPasswordLabel"
-	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmationLabel"
+	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmLabel"
 	LoginKeyPasswordChangeCancelButtonText        = LoginKeyPasswordChange + "CancelButtonText"
 	LoginKeyPasswordChangeNextButtonText          = LoginKeyPasswordChange + "NextButtonText"
 
@@ -200,7 +200,7 @@ const (
 	LoginKeyRegistrationUserTOSConfirm               = LoginKeyRegistrationUser + "TosConfirm"
 	LoginKeyRegistrationUserTOSLink                  = LoginKeyRegistrationUser + "TosLink"
 	LoginKeyRegistrationUserTOSLinkText              = LoginKeyRegistrationUser + "TosLinkText"
-	LoginKeyRegistrationUserPrivacyConfirm           = LoginKeyRegistrationUser + "TosConfirmAnd"
+	LoginKeyRegistrationUserTOSConfirmAnd            = LoginKeyRegistrationUser + "TosConfirmAnd"
 	LoginKeyRegistrationUserPrivacyLink              = LoginKeyRegistrationUser + "PrivacyLink"
 	LoginKeyRegistrationUserPrivacyLinkText          = LoginKeyRegistrationUser + "PrivacyLinkText"
 	LoginKeyRegistrationUserExternalLoginDescription = LoginKeyRegistrationUser + "ExternalUserDescription"
@@ -219,10 +219,8 @@ const (
 	LoginKeyRegisterOrgPasswordConfirmLabel     = LoginKeyRegistrationOrg + "PasswordConfirmLabel"
 	LoginKeyRegisterOrgTOSAndPrivacyLabel       = LoginKeyRegistrationOrg + "TosAndPrivacyLabel"
 	LoginKeyRegisterOrgTOSConfirm               = LoginKeyRegistrationOrg + "TosConfirm"
-	LoginKeyRegisterOrgTOSLink                  = LoginKeyRegistrationOrg + "TosLink"
 	LoginKeyRegisterOrgTOSLinkText              = LoginKeyRegistrationOrg + "TosLinkText"
-	LoginKeyRegisterOrgPrivacyConfirm           = LoginKeyRegistrationOrg + "TosConfirmAnd"
-	LoginKeyRegisterOrgPrivacyLink              = LoginKeyRegistrationOrg + "PrivacyLink"
+	LoginKeyRegisterOrgTosConfirmAnd            = LoginKeyRegistrationOrg + "TosConfirmAnd"
 	LoginKeyRegisterOrgPrivacyLinkText          = LoginKeyRegistrationOrg + "PrivacyLinkText"
 	LoginKeyRegisterOrgExternalLoginDescription = LoginKeyRegistrationOrg + "ExternalUserDescription"
 	LoginKeyRegisterOrgSaveButtonText           = LoginKeyRegistrationOrg + "SaveButtonText"
@@ -516,7 +514,7 @@ type RegistrationUserScreenText struct {
 	TOSConfirm               string
 	TOSLink                  string
 	TOSLinkText              string
-	PrivacyConfirm           string
+	TOSConfirmAnd            string
 	PrivacyLink              string
 	PrivacyLinkText          string
 	ExternalLoginDescription string
@@ -536,10 +534,8 @@ type RegistrationOrgScreenText struct {
 	PasswordConfirmLabel     string
 	TOSAndPrivacyLabel       string
 	TOSConfirm               string
-	TOSLink                  string
 	TOSLinkText              string
-	PrivacyConfirm           string
-	PrivacyLink              string
+	TOSConfirmAnd            string
 	PrivacyLinkText          string
 	ExternalLoginDescription string
 	SaveButtonText           string
