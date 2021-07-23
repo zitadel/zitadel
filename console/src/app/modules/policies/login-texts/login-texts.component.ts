@@ -106,7 +106,7 @@ export class LoginTextsComponent implements OnDestroy {
 
   private sub: Subscription = new Subscription();
 
-  public updateRequest: any;
+  public updateRequest!: SetCustomLoginTextsRequest;
   public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
 
   public destroy$: Subject<void> = new Subject();
@@ -262,6 +262,11 @@ export class LoginTextsComponent implements OnDestroy {
   }
 
   public saveCurrentMessage(): Promise<any> {
+    const entirePayload = this.updateRequest.toObject();
+    this.getCustomInitMessageTextMap$.next(
+      (entirePayload as any)[this.currentSubMap],
+    );
+
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).setCustomLoginText(this.updateRequest).then(() => {
