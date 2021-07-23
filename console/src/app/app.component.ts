@@ -224,26 +224,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public loadPrivateLabelling(): void {
-    this.mgmtService.getLabelPolicy().then(labelpolicy => {
-      console.log(labelpolicy.policy);
-
-      if (labelpolicy.policy) {
-        this.labelpolicy = labelpolicy.policy;
-
-        const darkPrimary = this.labelpolicy.primaryColorDark || '#5282c1';
-        const lightPrimary = this.labelpolicy.primaryColor || '#5282c1';
-
-        const darkBackground = this.labelpolicy.backgroundColorDark || '#212224';
-        const lightBackground = this.labelpolicy.backgroundColor || '#fafafa';
-
-        this.themeService.savePrimaryColor(darkPrimary, true);
-        this.themeService.savePrimaryColor(lightPrimary, false);
-
-        this.themeService.saveBackgroundColor(darkBackground, true);
-        this.themeService.saveBackgroundColor(lightBackground, false);
-      }
-    }).catch(error => {
-      console.error(error, 'setting default color values');
+    const setDefaultColors = () => {
       const darkPrimary = '#5282c1';
       const lightPrimary = '#5282c1';
 
@@ -261,6 +242,34 @@ export class AppComponent implements OnDestroy {
 
       this.themeService.saveBackgroundColor(darkBackground, true);
       this.themeService.saveBackgroundColor(lightBackground, false);
+    };
+
+    setDefaultColors();
+
+    this.mgmtService.getLabelPolicy().then(labelpolicy => {
+      console.log(labelpolicy.policy);
+
+      if (labelpolicy.policy) {
+        this.labelpolicy = labelpolicy.policy;
+
+        const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
+        const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
+
+        const darkWarn = this.labelpolicy?.warnColorDark || '#F44336';
+        const lightWarn = this.labelpolicy?.warnColor || '#F44336';
+
+        const darkBackground = this.labelpolicy?.backgroundColorDark || '#212224';
+        const lightBackground = this.labelpolicy?.backgroundColor || '#fafafa';
+
+        this.themeService.savePrimaryColor(darkPrimary, true);
+        this.themeService.savePrimaryColor(lightPrimary, false);
+
+        this.themeService.saveWarnColor(darkWarn, true);
+        this.themeService.saveWarnColor(lightWarn, false);
+
+        this.themeService.saveBackgroundColor(darkBackground, true);
+        this.themeService.saveBackgroundColor(lightBackground, false);
+      }
     });
   }
 
