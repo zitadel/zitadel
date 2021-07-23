@@ -69,13 +69,13 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 	return h
 }
 
-func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) *domain.Human {
-	h := &domain.Human{
+func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool) {
+	human = &domain.Human{
 		Username: req.UserName,
 	}
 	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
 	logging.Log("MANAG-3GUFJ").OnError(err).Debug("language malformed")
-	h.Profile = &domain.Profile{
+	human.Profile = &domain.Profile{
 		FirstName:         req.Profile.FirstName,
 		LastName:          req.Profile.LastName,
 		NickName:          req.Profile.NickName,
@@ -83,22 +83,22 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) *domain
 		PreferredLanguage: preferredLanguage,
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
-	h.Email = &domain.Email{
+	human.Email = &domain.Email{
 		EmailAddress:    req.Email.Email,
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
-		h.Phone = &domain.Phone{
+		human.Phone = &domain.Phone{
 			PhoneNumber:     req.Phone.Phone,
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
 	if req.Password != "" {
-		h.Password = &domain.Password{SecretString: req.Password}
-		h.Password.ChangeRequired = req.PasswordChangeRequired
+		human.Password = &domain.Password{SecretString: req.Password}
+		human.Password.ChangeRequired = req.PasswordChangeRequired
 	}
 
-	return h
+	return human, req.RequestPasswordlessRegistration
 }
 
 func AddMachineUserRequestToDomain(req *mgmt_pb.AddMachineUserRequest) *domain.Machine {

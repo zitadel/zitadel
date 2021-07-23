@@ -125,7 +125,7 @@ func (n *Notification) Reduce(event *models.Event) (err error) {
 		err = n.handlePasswordCode(event)
 	case es_model.DomainClaimed:
 		err = n.handleDomainClaimed(event)
-	case models.EventType(user_repo.HumanPasswordlessInitCodeAddedType):
+	case models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
 		err = n.handlePasswordlessRegistrationLink(event)
 	}
 	if err != nil {

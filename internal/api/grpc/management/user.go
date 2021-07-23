@@ -13,7 +13,6 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/domain"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -95,18 +94,26 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 }
 
 func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
-	human, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, ImportHumanUserRequestToDomain(req))
+	human, passwordless := ImportHumanUserRequestToDomain(req)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ImportHumanUserResponse{
-		UserId: human.AggregateID,
+	resp := &mgmt_pb.ImportHumanUserResponse{
+		UserId: addedHuman.AggregateID,
 		Details: obj_grpc.AddToDetailsPb(
-			human.Sequence,
-			human.ChangeDate,
-			human.ResourceOwner,
+			addedHuman.Sequence,
+			addedHuman.ChangeDate,
+			addedHuman.ResourceOwner,
 		),
-	}, nil
+	}
+	if code != nil {
+		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
+			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Lifetime: durationpb.New(code.Expiration),
+		}
+	}
+	return resp, nil
 }
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
@@ -419,7 +426,7 @@ func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       domain.PasswordlessInitCodeLink(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration, initCode.AggregateID, initCode.ResourceOwner, initCode.CodeID, initCode.Code),
+		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }

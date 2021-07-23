@@ -484,41 +484,7 @@ func (c *Commands) HumanRemovePasswordless(ctx context.Context, userID, webAuthN
 }
 
 func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
-	return c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, false)
-}
-
-func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
-	return c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
-}
-
-func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool) (*domain.PasswordlessInitCode, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
-	}
-
-	codeID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, initCode)
-	if err != nil {
-		return nil, err
-	}
-
-	cryptoCode, code, err := crypto.NewCode(c.passwordlessInitCode)
-	if err != nil {
-		return nil, err
-	}
-	codeEventCreator := func(ctx context.Context, agg *eventstore.Aggregate, id string, code *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
-		return usr_repo.NewHumanPasswordlessInitCodeAddedEvent(ctx, agg, id, code, exp)
-	}
-	if !direct {
-		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, code *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
-			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, code, exp)
-		}
-	}
-	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, c.passwordlessInitCode.Expiry())
+	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, codeEvent)
 	if err != nil {
 		return nil, err
@@ -528,6 +494,50 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 		return nil, err
 	}
 	return writeModelToPasswordlessInitCode(initCode, code), nil
+}
+
+func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
+	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, codeEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(initCode, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToPasswordlessInitCode(initCode, code), nil
+}
+
+func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool) (eventstore.EventPusher, *HumanPasswordlessInitCodeWriteModel, string, error) {
+	if userID == "" {
+		return nil, nil, "", caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
+	}
+
+	codeID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, nil, "", err
+	}
+	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
+	err = c.eventstore.FilterToQueryReducer(ctx, initCode)
+	if err != nil {
+		return nil, nil, "", err
+	}
+
+	cryptoCode, code, err := crypto.NewCode(c.passwordlessInitCode)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	codeEventCreator := func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
+		return usr_repo.NewHumanPasswordlessInitCodeAddedEvent(ctx, agg, id, cryptoCode, exp)
+	}
+	if !direct {
+		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
+			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp)
+		}
+	}
+	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, c.passwordlessInitCode.Expiry())
+	return codeEvent, initCode, code, nil
 }
 
 func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error {

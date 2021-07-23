@@ -4517,6 +4517,7 @@ This is an empty response
 | phone |  ImportHumanUserRequest.Phone | - |  |
 | password |  string | - |  |
 | password_change_required |  bool | - |  |
+| request_passwordless_registration |  bool | - |  |
 
 
 
@@ -4569,6 +4570,19 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
+| passwordless_registration |  ImportHumanUserResponse.PasswordlessRegistration | - |  |
+
+
+
+
+### ImportHumanUserResponse.PasswordlessRegistration
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| link |  string | - |  |
+| lifetime |  google.protobuf.Duration | - |  |
 
 
 

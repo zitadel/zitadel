@@ -79,8 +79,8 @@ func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwor
 	return nil
 }
 
-func (u *Human) IsInitialState() bool {
-	return u.Email == nil || !u.IsEmailVerified || (u.ExternalIDPs == nil || len(u.ExternalIDPs) == 0) && (u.Password == nil || u.SecretString == "")
+func (u *Human) IsInitialState(passwordless bool) bool {
+	return u.Email == nil || !u.IsEmailVerified || (u.ExternalIDPs == nil || len(u.ExternalIDPs) == 0) && !passwordless && (u.Password == nil || u.SecretString == "")
 }
 
 func NewInitUserCode(generator crypto.Generator) (*InitUserCode, error) {

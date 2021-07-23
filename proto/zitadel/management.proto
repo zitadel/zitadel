@@ -2752,11 +2752,18 @@ message ImportHumanUserRequest {
     Phone phone = 4;
     string password = 5;
     bool password_change_required = 6;
+    bool request_passwordless_registration = 7;
 }
 
 message ImportHumanUserResponse {
+    message PasswordlessRegistration {
+        string link = 1;
+        google.protobuf.Duration lifetime = 2;
+    }
+
     string user_id = 1;
     zitadel.v1.ObjectDetails details = 2;
+    PasswordlessRegistration passwordless_registration = 3;
 }
 
 message AddMachineUserRequest {
