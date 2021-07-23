@@ -39,22 +39,22 @@ $caos-dark-primary: (
   A400 : var(--theme-dark-primary-A400),
   A700 : var(--theme-dark-primary-A700),
   contrast:
-    (
-      50: var(--theme-dark-primary-contrast-50),
-      100: var(--theme-dark-primary-contrast-100),
-      200: var(--theme-dark-primary-contrast-200),
-      300: var(--theme-dark-primary-contrast-300),
-      400: var(--theme-dark-primary-contrast-400),
-      500: var(--theme-dark-primary-contrast-500),
-      600: var(--theme-dark-primary-contrast-600),
-      700: var(--theme-dark-primary-contrast-700),
-      800: var(--theme-dark-primary-contrast-800),
-      900: var(--theme-dark-primary-contrast-900),
-      A100: var(--theme-dark-primary-contrast-A100),
-      A200: var(--theme-dark-primary-contrast-A200),
-      A400: var(--theme-dark-primary-contrast-A400),
-      A700: var(--theme-dark-primary-contrast-A700)
-    )
+  (
+    50: var(--theme-dark-primary-contrast-50),
+    100: var(--theme-dark-primary-contrast-100),
+    200: var(--theme-dark-primary-contrast-200),
+    300: var(--theme-dark-primary-contrast-300),
+    400: var(--theme-dark-primary-contrast-400),
+    500: var(--theme-dark-primary-contrast-500),
+    600: var(--theme-dark-primary-contrast-600),
+    700: var(--theme-dark-primary-contrast-700),
+    800: var(--theme-dark-primary-contrast-800),
+    900: var(--theme-dark-primary-contrast-900),
+    A100: var(--theme-dark-primary-contrast-A100),
+    A200: var(--theme-dark-primary-contrast-A200),
+    A400: var(--theme-dark-primary-contrast-A400),
+    A700: var(--theme-dark-primary-contrast-A700)
+  )
 );
 
 $caos-light-primary: (
@@ -73,22 +73,22 @@ $caos-light-primary: (
   A400 : var(--theme-light-primary-A400),
   A700 : var(--theme-light-primary-A700),
   contrast:
-    (
-      50: var(--theme-light-primary-contrast-50),
-      100: var(--theme-light-primary-contrast-100),
-      200: var(--theme-light-primary-contrast-200),
-      300: var(--theme-light-primary-contrast-300),
-      400: var(--theme-light-primary-contrast-400),
-      500: var(--theme-light-primary-contrast-500),
-      600: var(--theme-light-primary-contrast-600),
-      700: var(--theme-light-primary-contrast-700),
-      800: var(--theme-light-primary-contrast-800),
-      900: var(--theme-light-primary-contrast-900),
-      A100: var(--theme-light-primary-contrast-A100),
-      A200: var(--theme-light-primary-contrast-A200),
-      A400: var(--theme-light-primary-contrast-A400),
-      A700: var(--theme-light-primary-contrast-A700)
-    )
+  (
+    50: var(--theme-light-primary-contrast-50),
+    100: var(--theme-light-primary-contrast-100),
+    200: var(--theme-light-primary-contrast-200),
+    300: var(--theme-light-primary-contrast-300),
+    400: var(--theme-light-primary-contrast-400),
+    500: var(--theme-light-primary-contrast-500),
+    600: var(--theme-light-primary-contrast-600),
+    700: var(--theme-light-primary-contrast-700),
+    800: var(--theme-light-primary-contrast-800),
+    900: var(--theme-light-primary-contrast-900),
+    A100: var(--theme-light-primary-contrast-A100),
+    A200: var(--theme-light-primary-contrast-A200),
+    A400: var(--theme-light-primary-contrast-A400),
+    A700: var(--theme-light-primary-contrast-A700)
+  )
 );
 
 $caos-dark-background: (
@@ -107,22 +107,22 @@ $caos-dark-background: (
   A400 : var(--theme-dark-background-A400),
   A700 : var(--theme-dark-background-A700),
   contrast:
-    (
-      50: var(--theme-dark-background-contrast-50),
-      100: var(--theme-dark-background-contrast-100),
-      200: var(--theme-dark-background-contrast-200),
-      300: var(--theme-dark-background-contrast-300),
-      400: var(--theme-dark-background-contrast-400),
-      500: var(--theme-dark-background-contrast-500),
-      600: var(--theme-dark-background-contrast-600),
-      700: var(--theme-dark-background-contrast-700),
-      800: var(--theme-dark-background-contrast-800),
-      900: var(--theme-dark-background-contrast-900),
-      A100: var(--theme-dark-background-contrast-A100),
-      A200: var(--theme-dark-background-contrast-A200),
-      A400: var(--theme-dark-background-contrast-A400),
-      A700: var(--theme-dark-background-contrast-A700)
-    )
+  (
+    50: var(--theme-dark-background-contrast-50),
+    100: var(--theme-dark-background-contrast-100),
+    200: var(--theme-dark-background-contrast-200),
+    300: var(--theme-dark-background-contrast-300),
+    400: var(--theme-dark-background-contrast-400),
+    500: var(--theme-dark-background-contrast-500),
+    600: var(--theme-dark-background-contrast-600),
+    700: var(--theme-dark-background-contrast-700),
+    800: var(--theme-dark-background-contrast-800),
+    900: var(--theme-dark-background-contrast-900),
+    A100: var(--theme-dark-background-contrast-A100),
+    A200: var(--theme-dark-background-contrast-A200),
+    A400: var(--theme-dark-background-contrast-A400),
+    A700: var(--theme-dark-background-contrast-A700)
+  )
 );
 
 $caos-light-background: (
@@ -141,22 +141,22 @@ $caos-light-background: (
   A400 : var(--theme-light-background-A400),
   A700 : var(--theme-light-background-A700),
   contrast:
-    (
-      50: var(--theme-light-background-contrast-50),
-      100: var(--theme-light-background-contrast-100),
-      200: var(--theme-light-background-contrast-200),
-      300: var(--theme-light-background-contrast-300),
-      400: var(--theme-light-background-contrast-400),
-      500: var(--theme-light-background-contrast-500),
-      600: var(--theme-light-background-contrast-600),
-      700: var(--theme-light-background-contrast-700),
-      800: var(--theme-light-background-contrast-800),
-      900: var(--theme-light-background-contrast-900),
-      A100: var(--theme-light-background-contrast-A100),
-      A200: var(--theme-light-background-contrast-A200),
-      A400: var(--theme-light-background-contrast-A400),
-      A700: var(--theme-light-background-contrast-A700)
-    )
+  (
+    50: var(--theme-light-background-contrast-50),
+    100: var(--theme-light-background-contrast-100),
+    200: var(--theme-light-background-contrast-200),
+    300: var(--theme-light-background-contrast-300),
+    400: var(--theme-light-background-contrast-400),
+    500: var(--theme-light-background-contrast-500),
+    600: var(--theme-light-background-contrast-600),
+    700: var(--theme-light-background-contrast-700),
+    800: var(--theme-light-background-contrast-800),
+    900: var(--theme-light-background-contrast-900),
+    A100: var(--theme-light-background-contrast-A100),
+    A200: var(--theme-light-background-contrast-A200),
+    A400: var(--theme-light-background-contrast-A400),
+    A700: var(--theme-light-background-contrast-A700)
+  )
 );
 
 $caos-dark-warn: (
@@ -175,22 +175,22 @@ $caos-dark-warn: (
   A400 : var(--theme-dark-warn-A400),
   A700 : var(--theme-dark-warn-A700),
   contrast:
-    (
-      50: var(--theme-dark-warn-contrast-50),
-      100: var(--theme-dark-warn-contrast-100),
-      200: var(--theme-dark-warn-contrast-200),
-      300: var(--theme-dark-warn-contrast-300),
-      400: var(--theme-dark-warn-contrast-400),
-      500: var(--theme-dark-warn-contrast-500),
-      600: var(--theme-dark-warn-contrast-600),
-      700: var(--theme-dark-warn-contrast-700),
-      800: var(--theme-dark-warn-contrast-800),
-      900: var(--theme-dark-warn-contrast-900),
-      A100: var(--theme-dark-warn-contrast-A100),
-      A200: var(--theme-dark-warn-contrast-A200),
-      A400: var(--theme-dark-warn-contrast-A400),
-      A700: var(--theme-dark-warn-contrast-A700)
-    )
+  (
+    50: var(--theme-dark-warn-contrast-50),
+    100: var(--theme-dark-warn-contrast-100),
+    200: var(--theme-dark-warn-contrast-200),
+    300: var(--theme-dark-warn-contrast-300),
+    400: var(--theme-dark-warn-contrast-400),
+    500: var(--theme-dark-warn-contrast-500),
+    600: var(--theme-dark-warn-contrast-600),
+    700: var(--theme-dark-warn-contrast-700),
+    800: var(--theme-dark-warn-contrast-800),
+    900: var(--theme-dark-warn-contrast-900),
+    A100: var(--theme-dark-warn-contrast-A100),
+    A200: var(--theme-dark-warn-contrast-A200),
+    A400: var(--theme-dark-warn-contrast-A400),
+    A700: var(--theme-dark-warn-contrast-A700)
+  )
 );
 
 $caos-light-warn: (
@@ -209,22 +209,22 @@ $caos-light-warn: (
   A400 : var(--theme-light-warn-A400),
   A700 : var(--theme-light-warn-A700),
   contrast:
-    (
-      50: var(--theme-light-warn-contrast-50),
-      100: var(--theme-light-warn-contrast-100),
-      200: var(--theme-light-warn-contrast-200),
-      300: var(--theme-light-warn-contrast-300),
-      400: var(--theme-light-warn-contrast-400),
-      500: var(--theme-light-warn-contrast-500),
-      600: var(--theme-light-warn-contrast-600),
-      700: var(--theme-light-warn-contrast-700),
-      800: var(--theme-light-warn-contrast-800),
-      900: var(--theme-light-warn-contrast-900),
-      A100: var(--theme-light-warn-contrast-A100),
-      A200: var(--theme-light-warn-contrast-A200),
-      A400: var(--theme-light-warn-contrast-A400),
-      A700: var(--theme-light-warn-contrast-A700)
-    )
+  (
+    50: var(--theme-light-warn-contrast-50),
+    100: var(--theme-light-warn-contrast-100),
+    200: var(--theme-light-warn-contrast-200),
+    300: var(--theme-light-warn-contrast-300),
+    400: var(--theme-light-warn-contrast-400),
+    500: var(--theme-light-warn-contrast-500),
+    600: var(--theme-light-warn-contrast-600),
+    700: var(--theme-light-warn-contrast-700),
+    800: var(--theme-light-warn-contrast-800),
+    900: var(--theme-light-warn-contrast-900),
+    A100: var(--theme-light-warn-contrast-A100),
+    A200: var(--theme-light-warn-contrast-A200),
+    A400: var(--theme-light-warn-contrast-A400),
+    A700: var(--theme-light-warn-contrast-A700)
+  )
 );
 
 $caos-dark-theme-background: (
@@ -421,8 +421,19 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
-    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family:
+    'Lato',
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
 }
 
 h1 {
