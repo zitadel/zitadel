@@ -149,7 +149,7 @@ const (
 	LoginKeyVerifyMFAU2FDescription       = LoginKeyVerifyMFAU2F + "Description"
 	LoginKeyVerifyMFAU2FNotSupported      = LoginKeyVerifyMFAU2F + "NotSupported"
 	LoginKeyVerifyMFAU2FValidateTokenText = LoginKeyVerifyMFAU2F + "ValidateTokenButtonText"
-	LoginKeyVerifyMFAU2FErrorRetry        = LoginKeyVerifyMFAU2F + "Error.Retry"
+	LoginKeyVerifyMFAU2FErrorRetry        = LoginKeyVerifyMFAU2F + "ErrorRetry"
 
 	LoginKeyPasswordless                        = "Passwordless."
 	LoginKeyPasswordlessTitle                   = LoginKeyPasswordless + "Title"
@@ -164,7 +164,7 @@ const (
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
 	LoginKeyPasswordChangeOldPasswordLabel        = LoginKeyPasswordChange + "OldPasswordLabel"
 	LoginKeyPasswordChangeNewPasswordLabel        = LoginKeyPasswordChange + "NewPasswordLabel"
-	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmationLabel"
+	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmLabel"
 	LoginKeyPasswordChangeCancelButtonText        = LoginKeyPasswordChange + "CancelButtonText"
 	LoginKeyPasswordChangeNextButtonText          = LoginKeyPasswordChange + "NextButtonText"
 

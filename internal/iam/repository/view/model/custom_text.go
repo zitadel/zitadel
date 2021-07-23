@@ -323,7 +323,7 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 }
 
 func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
+	if text.Key == domain.LoginKeyPasswordTitle {
 		result.Password.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordDescription {
@@ -491,7 +491,7 @@ func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 }
 
 func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyInitUserDone {
+	if text.Key == domain.LoginKeyInitUserDoneTitle {
 		result.InitUserDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneDescription {
