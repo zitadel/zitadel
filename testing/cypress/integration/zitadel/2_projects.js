@@ -32,6 +32,8 @@ describe('PROJECT: add Project ', () => {
         cy.get('.add-project-button').click()
         cy.get('input').type("newProjectToTest")
         cy.get('[type^=submit]').click()
+        //let the project get processed
+        cy.wait(5000)
     })
 })
 
