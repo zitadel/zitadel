@@ -1,3 +1,10 @@
 {
+  "supportFile": "./cypress/support/index.js",
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "reportDir": "cypress/results",
+    "overwrite": true,
+    "html": true,
+    "json": true
   }
-
+}
