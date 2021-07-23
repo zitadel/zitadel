@@ -690,6 +690,13 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 		step = &domain.PasswordlessStep{}
 	}
 
+	if user.PasswordlessInitRequired {
+		return &domain.PasswordlessRegistrationPromptStep{
+			Required: true,
+			Enabled:  false,
+		}
+	}
+
 	if !user.PasswordSet {
 		return &domain.InitPasswordStep{}
 	}
