@@ -247,11 +247,17 @@ export class AppComponent implements OnDestroy {
       const darkPrimary = '#5282c1';
       const lightPrimary = '#5282c1';
 
+      const darkWarn = '#F44336';
+      const lightWarn = '#F44336';
+
       const darkBackground = '#212224';
       const lightBackground = '#fafafa';
 
       this.themeService.savePrimaryColor(darkPrimary, true);
       this.themeService.savePrimaryColor(lightPrimary, false);
+
+      this.themeService.saveWarnColor(darkWarn, true);
+      this.themeService.saveWarnColor(lightWarn, false);
 
       this.themeService.saveBackgroundColor(darkBackground, true);
       this.themeService.saveBackgroundColor(lightBackground, false);

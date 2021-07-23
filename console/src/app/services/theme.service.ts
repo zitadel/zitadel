@@ -15,31 +15,37 @@ export class ThemeService {
   public isDarkTheme: Observable<boolean> = this._darkTheme.asObservable();
 
   private primaryColorPalette: Color[] = [];
+  private warnColorPalette: Color[] = [];
   private backgroundColorPalette: Color[] = [];
 
   setDarkTheme(isDarkTheme: boolean): void {
     this._darkTheme.next(isDarkTheme);
   }
 
-  public updateTheme(colors: Color[], type: string, theme: string) {
+  public updateTheme(colors: Color[], type: string, theme: string): void {
     colors.forEach(color => {
       document.documentElement.style.setProperty(
         `--theme-${theme}-${type}-${color.name}`,
-        color.hex
+        color.hex,
       );
       document.documentElement.style.setProperty(
         `--theme-${theme}-${type}-contrast-${color.name}`,
-        color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff'
+        color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff',
       );
     });
   }
 
-  public savePrimaryColor(color: string, isDark: boolean) {
+  public savePrimaryColor(color: string, isDark: boolean): void {
     this.primaryColorPalette = this.computeColors(color);
     this.updateTheme(this.primaryColorPalette, 'primary', isDark ? 'dark' : 'light');
   }
 
-  public saveBackgroundColor(color: string, isDark: boolean) {
+  public saveWarnColor(color: string, isDark: boolean): void {
+    this.warnColorPalette = this.computeColors(color);
+    this.updateTheme(this.warnColorPalette, 'warn', isDark ? 'dark' : 'light');
+  }
+
+  public saveBackgroundColor(color: string, isDark: boolean): void {
     this.backgroundColorPalette = this.computeColors(color);
     this.updateTheme(this.backgroundColorPalette, 'background', isDark ? 'dark' : 'light');
   }
@@ -59,7 +65,7 @@ export class ThemeService {
       this.getColorObject(tinycolor(hex).lighten(50).saturate(30), 'A100'),
       this.getColorObject(tinycolor(hex).lighten(30).saturate(30), 'A200'),
       this.getColorObject(tinycolor(hex).lighten(10).saturate(15), 'A400'),
-      this.getColorObject(tinycolor(hex).lighten(5).saturate(5), 'A700')
+      this.getColorObject(tinycolor(hex).lighten(5).saturate(5), 'A700'),
     ];
   }
 
@@ -68,7 +74,7 @@ export class ThemeService {
     return {
       name: name,
       hex: c.toHexString(),
-      darkContrast: c.isLight()
+      darkContrast: c.isLight(),
     };
   }
 }
