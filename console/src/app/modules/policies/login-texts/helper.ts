@@ -232,14 +232,13 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r22.setOrgnameLabel(map.registrationOrgText?.orgnameLabel ?? '');
   r22.setPasswordConfirmLabel(map.registrationOrgText?.passwordConfirmLabel ?? '');
   r22.setPasswordLabel(map.registrationOrgText?.passwordLabel ?? '');
-  r22.setPrivacyConfirm(map.registrationOrgText?.privacyConfirm ?? '');
-  r22.setPrivacyLink(map.registrationOrgText?.privacyLink ?? '');
+  r22.setTosConfirmAnd(map.registrationOrgText?.tosConfirm ?? '');
   r22.setPrivacyLinkText(map.registrationOrgText?.privacyLinkText ?? '');
   r22.setSaveButtonText(map.registrationOrgText?.saveButtonText ?? '');
   r22.setTitle(map.registrationOrgText?.title ?? '');
   r22.setTosAndPrivacyLabel(map.registrationOrgText?.tosAndPrivacyLabel ?? '');
   r22.setTosConfirm(map.registrationOrgText?.tosConfirm ?? '');
-  r22.setTosLink(map.registrationOrgText?.tosLink ?? '');
+  r22.setTosConfirmAnd(map.registrationOrgText?.tosConfirmAnd ?? '');
   r22.setTosLinkText(map.registrationOrgText?.tosLinkText ?? '');
   r22.setUsernameLabel(map.registrationOrgText?.usernameLabel ?? '');
   req.setRegistrationOrgText(r22);
@@ -257,14 +256,13 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r23.setNextButtonText(map.registrationUserText?.nextButtonText ?? '');
   r23.setPasswordConfirmLabel(map.registrationUserText?.passwordConfirmLabel ?? '');
   r23.setPasswordLabel(map.registrationUserText?.passwordLabel ?? '');
-  r23.setPrivacyConfirm(map.registrationUserText?.privacyConfirm ?? '');
-  r23.setPrivacyLink(map.registrationUserText?.privacyLink ?? '');
+  r23.setTosConfirm(map.registrationUserText?.tosConfirm ?? '');
+  r23.setTosConfirmAnd(map.registrationUserText?.tosConfirmAnd ?? '');
+  r23.setTosLinkText(map.registrationUserText?.tosLinkText ?? '');
   r23.setPrivacyLinkText(map.registrationUserText?.privacyLinkText ?? '');
   r23.setTitle(map.registrationUserText?.title ?? '');
   r23.setTosAndPrivacyLabel(map.registrationUserText?.tosAndPrivacyLabel ?? '');
   r23.setTosConfirm(map.registrationUserText?.tosConfirm ?? '');
-  r23.setTosLink(map.registrationUserText?.tosLink ?? '');
-  r23.setTosLinkText(map.registrationUserText?.tosLinkText ?? '');
   r23.setUsernameLabel(map.registrationUserText?.usernameLabel ?? '');
   req.setRegistrationUserText(r23);
 
