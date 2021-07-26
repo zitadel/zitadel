@@ -1,24 +1,7 @@
 <div class="wrapper max-width-container">
-    <div class="header" *ngIf="(authService.user | async) || {} as user">
-        <app-avatar [routerLink]="['/users/me']"
-            *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-            class="avatar"
-            [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-            [forColor]="user?.preferredLoginName"
-            [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
-            [size]="100">
-        </app-avatar>
-        <h3
-            *ngIf="user && (user.human?.profile?.displayName || user.human?.profile?.firstName || user.human?.profile?.lastName); else loader">
-            {{'HOME.WELCOME' | translate}},
-            {{user?.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + '
-            '+ user.human?.profile?.lastName)}}</h3>
-        <p>{{user?.human?.profile?.userName}}</p>
-
+    <div class="header">
+        <h1 class="title">{{'HOME.WELCOME' | translate}}</h1>
         <p class="wlc_stnce">{{'HOME.WELCOMESENTENCE' | translate}}</p>
-        <ng-template #loader>
-            <mat-spinner diameter="50"></mat-spinner>
-        </ng-template>
     </div>
 
     <div class="container">

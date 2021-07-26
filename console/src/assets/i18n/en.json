@@ -60,7 +60,7 @@
     "IAM": "Identity and Access Management",
     "IAM_DESC": "Manage your organisations and administrators.",
     "IAM_BUTTON": "Manage ZITADEL",
-    "WELCOME": "Welcome",
+    "WELCOME": "Get started with ZITADEL",
     "WELCOMESENTENCE": "Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
     "DISCLAIMER": "You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
     "DISCLAIMERLINK": "Further information",
@@ -107,6 +107,9 @@
   },
   "ACTIONS": {
     "SET":"Set",
+    "RESETDEFAULT":"Reset to Default",
+    "RESETTO":"Reset to: ",
+    "RESETCURRENT":"Reset to current",
     "SHOW":"Show",
     "HIDE":"Hide",
     "SAVE": "Save",
@@ -136,7 +139,9 @@
     "PIN": "Pin / Unpin",
     "CONFIGURE": "Configure",
     "SEND": "Send",
-    "NEWVALUE": "New Value"
+    "NEWVALUE": "New Value",
+    "RESTORE":"Restore",
+    "CONTINUEWITHOUTSAVE":"Continue without saving"
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
@@ -628,7 +633,8 @@
       "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
       "LABELPOLICYWATERMARK": "Label Policy - watermark",
       "CUSTOMDOMAIN": "Domain Verification - available",
-      "CUSTOMTEXT": "Custom texts"
+      "CUSTOMTEXT": "Custom texts",
+      "PRIVACYPOLICY":"Privacy Policy and TOS - custom"
     },
     "TIERSTATES": {
       "0": "Active",
@@ -700,6 +706,87 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
       "SAVED": "Saved successfully!"
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Privacy Policy and TOS",
+      "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",
+      "TOSLINK":"Link to Terms of Service",
+      "POLICYLINK":"Link to Privacy Policy",
+      "SAVED": "Saved successfully!",
+      "RESET_TITLE":"Restore Default Values",
+      "RESET_DESCRIPTION":"You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE":"Login Interface Texts",
+      "DESCRIPTION": "Define your texts for the login interfaces. If texts are empty, the default Value shown as the placeholder will be used.",
+      "DESCRIPTION_SHORT":"Define your texts for the login interfaces.",
+      "NEWERVERSIONEXISTS":"Newer Version exists",
+      "CURRENTDATE":"Current configuration",
+      "CHANGEDATE":"Newer Version from",
+      "KEYNAME":"Login Screen / Interface",
+      "RESET_TITLE":"Restore Default Values",
+      "RESET_DESCRIPTION":"You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
+      "UNSAVED_TITLE":"Continue without saving?",
+      "UNSAVED_DESCRIPTION":"Your have made changes without saving. Do you want to save now?",
+      "LOCALE":"Locale Code",
+      "LOCALES": {
+        "de":"German",
+        "en":"English",
+        "it":"Italian",
+        "fr":"French"
+      },
+      "KEYS": {
+        "emailVerificationDoneText":"Email verification done",
+        "emailVerificationText":"Email verification",
+        "externalUserNotFoundText":"External user not found",
+        "footerText":"Footer",
+        "initMfaDoneText":"Initialize MFA done",
+        "initMfaOtpText":"Initialize MFA",
+        "initMfaPromptText":"Initialize MFA Prompt",
+        "initMfaU2fText":"Initialize Universal Second Factor",
+        "initPasswordDoneText":"Initialize password done",
+        "initPasswordText":"Initialize password",
+        "initializeDoneText":"Initialize user done",
+        "initializeUserText":"Initialize user",
+        "linkingUserDoneText":"Linking user done",
+        "loginText":"Login",
+        "logoutText":"Logout",
+        "mfaProvidersText":"MFA Providers",
+        "passwordChangeDoneText":"Password change done",
+        "passwordChangeText":"Password change",
+        "passwordResetDoneText":"Password reset done",
+        "passwordText":"Password",
+        "passwordlessText":"Passwordless",
+        "registrationOptionText":"Registration Options",
+        "registrationOrgText":"Register Org",
+        "registrationUserText":"Register User",
+        "selectAccountText":"Select Account",
+        "successLoginText":"Login with success",
+        "usernameChangeDoneText":"Username change done",
+        "usernameChangeText":"Username change",
+        "verifyMfaOtpText":"Verify OTP",
+        "verifyMfaU2fText":"Verify Universal Second Factor"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE":"Message Texts",
+      "DESCRIPTION": "Define your texts for your notication mails.",
+      "TYPES": {
+        "INIT":"Initialization",
+        "VE":"Verify Email",
+        "VP":"Verify Phone",
+        "PR":"Password Reset",
+        "DC":"Domain Claim"
+      },
+      "CHIPS": {
+        "firstname":"Firstname",
+        "lastname":"Lastname",
+        "code":"Code",
+        "preferredLoginName":"Preferred Login Name"
+      },
+      "TOAST": {
+        "UPDATED":"Custom Texts saved."
+      }
     },
     "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
     "BTN_INSTALL": "Setup",

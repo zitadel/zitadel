@@ -24,15 +24,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_COMPLEXITY_LINK,
-  IAM_LOGIN_POLICY_LINK,
-  IAM_POLICY_LINK,
-  ORG_COMPLEXITY_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_LOGIN_POLICY_LINK,
-} from '../../policy-grid/policy-links';
+import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -85,11 +77,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
-  public nextLinks: CnslLinks[] = [
-    IAM_COMPLEXITY_LINK,
-    IAM_POLICY_LINK,
-    IAM_LOGIN_POLICY_LINK,
-  ];
 
   public Theme: any = Theme;
   public Preview: any = Preview;
@@ -99,7 +86,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
   private org!: Org.AsObject;
-
+  public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -121,19 +108,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.nextLinks = [
-            ORG_IAM_POLICY_LINK,
-            ORG_LOGIN_POLICY_LINK,
-            ORG_COMPLEXITY_LINK,
-          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.nextLinks = [
-            IAM_POLICY_LINK,
-            IAM_LOGIN_POLICY_LINK,
-            IAM_COMPLEXITY_LINK,
-          ];
           break;
       }
 

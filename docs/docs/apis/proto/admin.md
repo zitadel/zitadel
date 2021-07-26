@@ -936,6 +936,20 @@ it impacts all organisations without customized login ui texts
     PUT: /text/login/{language}
 
 
+### ResetCustomLoginTextToDefault
+
+> **rpc** ResetCustomLoginTextToDefault([ResetCustomLoginTextsToDefaultRequest](#resetcustomlogintextstodefaultrequest))
+[ResetCustomLoginTextsToDefaultResponse](#resetcustomlogintextstodefaultresponse)
+
+Removes the custom texts for login ui
+it impacts all organisations without customized login ui texts
+The default text form translation file will trigger after
+
+
+
+    DELETE: /text/login/{language}
+
+
 ### ListIAMMemberRoles
 
 > **rpc** ListIAMMemberRoles([ListIAMMemberRolesRequest](#listiammemberrolesrequest))
@@ -2307,6 +2321,28 @@ This is an empty request
 
 
 ### RemoveSecondFactorFromLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomLoginTextsToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomLoginTextsToDefaultResponse
 
 
 

@@ -152,6 +152,10 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 
 @include mat.core($custom-typography);
 
+// textarea {
+//   font-family: 'Lato';
+// }
+
 // default theme
 @include component-themes($dark-theme);
 @include mat.all-component-themes($dark-theme);

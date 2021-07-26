@@ -5,7 +5,11 @@ export enum PolicyComponentType {
   IAM = 'iam',
   LOGIN = 'login',
   PRIVATELABEL = 'privatelabel',
+  MESSAGETEXTS = 'messagetexts',
+  LOGINTEXTS = 'logintexts',
+  PRIVACYPOLICY = 'privacypolicy',
 }
+
 export enum PolicyComponentServiceType {
   MGMT = 'mgmt',
   ADMIN = 'admin',

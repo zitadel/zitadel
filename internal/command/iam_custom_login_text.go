@@ -28,6 +28,26 @@ func (c *Commands) SetCustomIAMLoginText(ctx context.Context, loginText *domain.
 	return writeModelToObjectDetails(&existingMailText.WriteModel), nil
 }
 
+func (c *Commands) RemoveCustomIAMLoginTexts(ctx context.Context, lang language.Tag) (*domain.ObjectDetails, error) {
+	if lang == language.Und {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Gfbg3", "Errors.CustomText.Invalid")
+	}
+	customText, err := c.defaultLoginTextWriteModelByID(ctx, lang)
+	if err != nil {
+		return nil, err
+	}
+	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-fru44", "Errors.CustomText.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&customText.WriteModel)
+	pushedEvents, err := c.eventstore.PushEvents(ctx, iam.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
+	err = AppendAndReduce(customText, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&customText.WriteModel), nil
+}
+
 func (c *Commands) setCustomIAMLoginText(ctx context.Context, iamAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.EventPusher, *IAMCustomLoginTextReadModel, error) {
 	if !text.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomText.Invalid")

@@ -1,0 +1,60 @@
+<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+  [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate"
+  [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
+
+
+  <div class="date">
+    <div>
+      <p class="newer-title" *ngIf="newerVersionExists">{{'POLICY.LOGIN_TEXTS.NEWERVERSIONEXISTS' | translate}}</p>
+      <p *ngIf="newerPolicyChangeDate && newerVersionExists">{{'POLICY.LOGIN_TEXTS.CHANGEDATE' | translate}}: {{newerPolicyChangeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm:ss'}}</p>
+      <p class="gray" *ngIf="currentPolicyChangeDate">{{'POLICY.LOGIN_TEXTS.CURRENTDATE' | translate}}: {{currentPolicyChangeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm:ss'}}</p>
+    </div>
+    <button [disabled]="!newerVersionExists" color="primary" mat-raised-button (click)="loadData()">
+    <i class="las la-sync-alt"></i>
+    {{'ACTIONS.REFRESH' | translate}}</button>
+  </div>
+  <form *ngIf="form" class="top-actions" [formGroup]="form">
+    <cnsl-form-field class="keys" appearance="outline" >
+      <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
+      <mat-select formControlName="currentSubMap" name="currentSubMap">
+          <mat-option *ngFor="let key of KeyNamesArray" [value]="key">
+              {{'POLICY.LOGIN_TEXTS.KEYS.'+key | translate }}
+          </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="language">
+      <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
+      <mat-select formControlName="locale" name="locale">
+          <mat-option *ngFor="let loc of LOCALES" [value]="loc">
+              <div class="centerline">
+                  <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
+              </div>
+          </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+  </form>
+
+  <cnsl-info-section class="warn"
+    *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false"
+    type="WARN">
+    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
+    'custom_text'})}}
+  </cnsl-info-section>
+
+  <div class="divider"></div>
+
+  <div class="content" >
+    <cnsl-edit-text label="one" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+      $event)"></cnsl-edit-text>
+  </div>
+
+  <div class="actions">
+    <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="resetDefault()" color="warn" type="submit"
+    mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
+    <button class="save-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
+      mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+  </div>
+
+  <app-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></app-policy-grid>
+</app-detail-layout>

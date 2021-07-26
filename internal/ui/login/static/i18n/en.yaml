@@ -1,7 +1,7 @@
 Login:
   Title: Welcome back!
-  Description: Enter your logindata.
-  TitleLinking: Login for userlinking
+  Description: Enter your login data.
+  TitleLinking: Login for user linking
   DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
   LoginNameLabel: Loginname
   UsernamePlaceHolder: username
@@ -14,7 +14,7 @@ Login:
 SelectAccount:
   Title: Select account
   Description: Use your ZITADEL-Account
-  TitleLinking: Select account for userlinking
+  TitleLinking: Select account for user linking
   DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
   SessionState0: active
@@ -23,9 +23,9 @@ SelectAccount:
 
 Password:
   Title: Password
-  Description: Enter your logindata.
+  Description: Enter your login data.
   PasswordLabel: Password
-  MinLength: Minimumlength
+  MinLength: Minimum length
   HasUppercase: Uppercase letter
   HasLowercase: Lowercase letter
   HasNumber: Number
@@ -82,8 +82,8 @@ InitMFAPrompt:
   Description: Would you like to setup multifactor authentication?
   Provider0: OTP (One Time Password)
   Provider1: U2F (Universal 2nd Factor)
-  NextButtonText: weiter
-  SkipButtonText: überspringen
+  NextButtonText: next
+  SkipButtonText: skip
 
 InitMFAOTP:
   Title: Multifactor Verification
@@ -132,7 +132,7 @@ Passwordless:
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new challenge or choose a different method.
   LoginWithPwButtonText: Login with password
-  ValidateTokenButtonText: Token validieren
+  ValidateTokenButtonText: Validate Token
 
 PasswordlessRegistration:
   Title: Passwordless setup
@@ -152,7 +152,7 @@ PasswordChange:
   Description: Change your password. Enter your old and new password.
   OldPasswordLabel: Old Password
   NewPasswordLabel: New Password
-  NewPasswordConfirmationLabel: Password confirmation
+  NewPasswordConfirmLabel: Password confirmation
   CancelButtonText: cancel
   NextButtonText: next
 
@@ -255,7 +255,7 @@ ExternalNotFoundOption:
 Footer:
   PoweredBy: Powered By
   Tos: TOS
-  Privacy: Privacy policy
+  PrivacyPolicy: Privacy policy
   Help: Help
   HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 

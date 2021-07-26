@@ -1778,6 +1778,19 @@ service AdminService {
         };
     }
 
+    // Removes the custom texts for login ui
+    // it impacts all organisations without customized login ui texts
+    // The default text form translation file will trigger after
+    rpc ResetCustomLoginTextToDefault(ResetCustomLoginTextsToDefaultRequest) returns (ResetCustomLoginTextsToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/login/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
     //Returns the IAM roles visible for the requested user 
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
@@ -3385,6 +3398,14 @@ message SetCustomLoginTextsRequest {
 }
 
 message SetCustomLoginTextsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomLoginTextsToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomLoginTextsToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

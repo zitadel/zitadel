@@ -47,7 +47,6 @@ UsernameChangeDone:
   Description: Der Username wurde erfolgreich geändert.
   NextButtonText: next
 
-
 InitPassword:
   Title: Passwort setzen
   Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um ein neues Passwort zu setzen.
@@ -153,7 +152,7 @@ PasswordChange:
   Description: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
   OldPasswordLabel: Altes Passwort
   NewPasswordLabel: Neues Passwort
-  NewPasswordConfirmationLabel: Passwort Bestätigung
+  NewPasswordConfirmLabel: Passwort Bestätigung
   CancelButtonText: abbrechen
   NextButtonText: weiter
 
@@ -172,7 +171,7 @@ EmailVerification:
   Description: Du hast ein E-Mail zur Verifizierung deiner E-Mail Adresse bekommen. Gib den Code im untenstehenden Formular ein. Mit erneut versenden, wird dir ein neues E-Mail zugestellt.
   CodeLabel: Code
   NextButtonText: weiter
-  ResendButtonText: erneut sende
+  ResendButtonText: erneut senden
 
 EmailVerificationDone:
   Title: E-Mail Verifizierung
@@ -230,6 +229,17 @@ RegistrationOrg:
   PrivacyLinkText: Datenschutzerklärung
   SaveButtonText: speichern
 
+LoginSuccess:
+  Title: Erfolgreich eingeloggt
+  AutoRedirectDescription: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+  RedirectedDescription: Du kannst diese Fenster nun schliessen.
+  NextButtonText: weiter
+
+LogoutDone:
+  Title: Ausgeloggt
+  Description: Du wurdest erfolgreich ausgeloggt.
+  LoginButtonText: anmelden
+
 LinkingUsersDone:
   Title: Benutzerlinking
   Description: Benuzterlinking erledigt.
@@ -242,21 +252,10 @@ ExternalNotFoundOption:
   LinkButtonText: Verlinken
   AutoRegisterButtonText: Automatisches registrieren
 
-LoginSuccess:
-  Title: Erfolgreich eingeloggt
-  AutoRedirectDescription: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
-  RedirectedDescription: Du kannst diese Fenster nun schliessen.
-  NextButtonText: weiter
-
-LogoutDone:
-  Title: Ausgeloggt
-  Description: Du wurdest erfolgreich ausgeloggt.
-  LoginButtonText: anmelden
-
 Footer:
   PoweredBy: Powered By
   Tos: AGB
-  Privacy: Datenschutzerklärung
+  PrivacyPolicy: Datenschutzerklärung
   Help: Hilfe
   HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 

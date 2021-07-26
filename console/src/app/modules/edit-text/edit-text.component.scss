@@ -1,0 +1,96 @@
+.block {
+  display: block;
+
+  .flex {
+    display: flex;
+
+    .formfield {
+      flex: 1;
+
+      .text {
+        min-height: 80px;
+      }
+
+      &.hovering {
+        background-color: red;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0;
+        margin: 0 -.25rem;
+        transition: all .2s ease;
+
+        .chip {
+          border-radius: 50vw;
+          padding: 4px .5rem;
+          font-size: 12px;
+          background: #5282c1;
+          color: white;
+          margin: .25rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+
+          * {
+            transition: all .2s ease;
+          }
+
+          i {
+            opacity: .5;
+            font-size: 1.1rem;
+            margin-left: .5rem;
+          }
+
+          .key {
+            display: inline-block;
+          }
+
+          .value {
+            display: none;
+          }
+
+          &:hover {
+            i {
+              opacity: 1;
+            }
+
+            .key {
+              display: none;
+            }
+
+            .value {
+              display: inline-block;
+            }
+          }
+        }
+      }
+
+      &.cnsl-focused {
+        .chips {
+          opacity: 1;
+          cursor: copy;
+        }
+      }
+
+      .chips:hover {
+        visibility: visible;
+      }
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-self: flex-start;
+      margin-top: 30px;
+    }
+  }
+}
+
+.info {
+  display: block;
+  margin-right: 40px;
+  margin-bottom: 1.5rem;
+}
