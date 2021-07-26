@@ -22,6 +22,7 @@ import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.s
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
@@ -95,6 +96,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
     private storageService: StorageService,
+    private themeService: ThemeService,
   ) {
     const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
 
@@ -587,6 +589,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
               if (data.policy) {
                 this.data = data.policy;
+                this.applyToConsole(data.policy);
                 this.loadImages();
               }
             });
@@ -603,6 +606,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
               if (data.policy) {
                 this.data = data.policy;
+                this.applyToConsole(data.policy);
                 this.loadImages();
               }
             });
@@ -611,6 +615,26 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
           this.toast.showError(error);
         });
     }
+  }
+
+  private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
+    const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
+    const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
+
+    const darkWarn = labelpolicy?.warnColorDark || '#F44336';
+    const lightWarn = labelpolicy?.warnColor || '#F44336';
+
+    const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
+    const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
+
+    this.themeService.savePrimaryColor(darkPrimary, true);
+    this.themeService.savePrimaryColor(lightPrimary, false);
+
+    this.themeService.saveWarnColor(darkWarn, true);
+    this.themeService.saveWarnColor(lightWarn, false);
+
+    this.themeService.saveBackgroundColor(darkBackground, true);
+    this.themeService.saveBackgroundColor(lightBackground, false);
   }
 
   public resetPolicy(): Promise<any> {
