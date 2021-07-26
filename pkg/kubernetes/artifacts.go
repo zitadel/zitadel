@@ -256,6 +256,10 @@ status:
 		}}
 	}
 
+	if _, _, analyticsEnabled := mntr.Environment(); !analyticsEnabled {
+		cmd = append(cmd, "--disable-analytics")
+	}
+
 	deployment := &apps.Deployment{
 		ObjectMeta: mach.ObjectMeta{
 			Name:      nameLabels.Name(),
@@ -599,6 +603,10 @@ status:
 			ReadOnly:  true,
 			MountPath: "/secrets",
 		}}
+	}
+
+	if _, _, analyticsEnabled := mntr.Environment(); !analyticsEnabled {
+		cmd = append(cmd, "--disable-analytics")
 	}
 
 	deployment := &apps.Deployment{
