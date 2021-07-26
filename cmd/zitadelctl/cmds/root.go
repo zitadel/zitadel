@@ -41,7 +41,7 @@ func RootCommand(version string, monitor mntr.Monitor) (*cobra.Command, GetRootV
 		}
 		orbConfigPath    string
 		verbose          bool
-		disableIngestion bool
+		disableAnalytics bool
 	)
 	cmd := &cobra.Command{
 		Use:   "zitadelctl [flags]",
@@ -71,7 +71,7 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 	flags.StringVarP(&orbConfigPath, "orbconfig", "f", "~/.orb/config", "Path to the file containing the orbs git repo URL, deploy key and the master key for encrypting and decrypting secrets")
 	flags.StringVarP(&rv.Kubeconfig, "kubeconfig", "k", "~/.kube/config", "Path to the kubeconfig file to the cluster zitadelctl should target")
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
-	flags.BoolVar(&disableIngestion, "disable-ingestion", false, "Don't help CAOS AG to improve ZITADEL by sending them errors and usage data")
+	flags.BoolVar(&disableAnalytics, "disable-analytics", false, "Don't help CAOS AG to improve ZITADEL by sending them errors and usage data")
 
 	return cmd, func(command string, tags map[string]interface{}, component string, moreComponents ...string) *RootValues {
 
@@ -100,7 +100,7 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 			component = "zitadelctl"
 		}
 
-		if !disableIngestion {
+		if !disableAnalytics {
 			if err := mntr.Ingest(rv.Monitor, "zitadel", version, env, component, moreComponents...); err != nil {
 				panic(err)
 			}

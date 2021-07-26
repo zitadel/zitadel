@@ -114,7 +114,7 @@ See the policy [here](./SECURITY.md)
 
 ## Usage Data
 
-ZITADEL components send errors and usage data to CAOS AG, so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-ingestion` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-ingestion` flag.
+ZITADEL components send errors and usage data to CAOS Ltd., so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-analytics` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-analytics` flag.
 
 We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
 
