@@ -15,6 +15,8 @@ You can connect to [ZITADEL on localhost:4200](http://localhost:4200) as soon as
 ++=========++
 ```
 
+Make sure to enable `"features": { "buildkit": true }` in your docker settings!
+
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 && docker-compose -f ./build/local/docker-compose-local.yml --profile database -p zitadel up --exit-code-from db-migrations \
