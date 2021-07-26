@@ -47,7 +47,6 @@ UsernameChangeDone:
   Description: Der Username wurde erfolgreich geändert.
   NextButtonText: next
 
-
 InitPassword:
   Title: Passwort setzen
   Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um ein neues Passwort zu setzen.
@@ -140,7 +139,7 @@ PasswordChange:
   Description: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
   OldPasswordLabel: Altes Passwort
   NewPasswordLabel: Neues Passwort
-  NewPasswordConfirmationLabel: Passwort Bestätigung
+  NewPasswordConfirmLabel: Passwort Bestätigung
   CancelButtonText: abbrechen
   NextButtonText: weiter
 
@@ -217,6 +216,17 @@ RegistrationOrg:
   PrivacyLinkText: Datenschutzerklärung
   SaveButtonText: speichern
 
+LoginSuccess:
+  Title: Erfolgreich eingeloggt
+  AutoRedirectDescription: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
+  RedirectedDescription: Du kannst diese Fenster nun schliessen.
+  NextButtonText: weiter
+
+LogoutDone:
+  Title: Ausgeloggt
+  Description: Du wurdest erfolgreich ausgeloggt.
+  LoginButtonText: anmelden
+
 LinkingUsersDone:
   Title: Benutzerlinking
   Description: Benuzterlinking erledigt.
@@ -228,17 +238,6 @@ ExternalNotFoundOption:
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
   AutoRegisterButtonText: Automatisches registrieren
-
-LoginSuccess:
-  Title: Erfolgreich eingeloggt
-  AutoRedirectDescription: Du wirst automatisch zurück in die Applikation geleitet. Danach kannst du diese Fenster schliessen.
-  RedirectedDescription: Du kannst diese Fenster nun schliessen.
-  NextButtonText: weiter
-
-LogoutDone:
-  Title: Ausgeloggt
-  Description: Du wurdest erfolgreich ausgeloggt.
-  LoginButtonText: anmelden
 
 Footer:
   PoweredBy: Powered By

@@ -750,9 +750,6 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
 		result.RegistrationUser.PrivacyLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserExternalLoginDescription {
-		result.RegistrationUser.ExternalLoginDescription = text.Text
-	}
 	if text.Key == domain.LoginKeyRegistrationUserNextButtonText {
 		result.RegistrationUser.NextButtonText = text.Text
 	}
@@ -803,9 +800,6 @@ func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLogin
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
 		result.RegistrationOrg.PrivacyLinkText = text.Text
-	}
-	if text.Key == domain.LoginKeyRegisterOrgExternalLoginDescription {
-		result.RegistrationOrg.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgSaveButtonText {
 		result.RegistrationOrg.SaveButtonText = text.Text
@@ -873,14 +867,8 @@ func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterTOS {
 		result.Footer.TOS = text.Text
 	}
-	if text.Key == domain.LoginKeyFooterTOSLink {
-		result.Footer.TOSLink = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterPrivacy {
+	if text.Key == domain.LoginKeyFooterPrivacyPolicy {
 		result.Footer.PrivacyPolicy = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterPrivacyLink {
-		result.Footer.PrivacyPolicyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterHelp {
 		result.Footer.Help = text.Text

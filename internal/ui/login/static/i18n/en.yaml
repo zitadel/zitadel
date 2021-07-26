@@ -139,7 +139,7 @@ PasswordChange:
   Description: Change your password. Enter your old and new password.
   OldPasswordLabel: Old Password
   NewPasswordLabel: New Password
-  NewPasswordConfirmationLabel: Password confirmation
+  NewPasswordConfirmLabel: Password confirmation
   CancelButtonText: cancel
   NextButtonText: next
 

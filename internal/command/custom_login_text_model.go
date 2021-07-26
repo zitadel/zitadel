@@ -168,44 +168,42 @@ type CustomLoginTextReadModel struct {
 	RegistrationOptionUserNameButtonText       string
 	RegistrationOptionExternalLoginDescription string
 
-	RegistrationUserTitle                    string
-	RegistrationUserDescription              string
-	RegistrationUserDescriptionOrgRegister   string
-	RegistrationUserFirstnameLabel           string
-	RegistrationUserLastnameLabel            string
-	RegistrationUserEmailLabel               string
-	RegistrationUserUsernameLabel            string
-	RegistrationUserLanguageLabel            string
-	RegistrationUserGenderLabel              string
-	RegistrationUserPasswordLabel            string
-	RegistrationUserPasswordConfirmLabel     string
-	RegistrationUserTOSAndPrivacyLabel       string
-	RegistrationUserTOSConfirm               string
-	RegistrationUserTOSLink                  string
-	RegistrationUserTOSLinkText              string
-	RegistrationUserTOSConfirmAnd            string
-	RegistrationUserPrivacyLink              string
-	RegistrationUserPrivacyLinkText          string
-	RegistrationUserExternalLoginDescription string
-	RegistrationUserNextButtonText           string
-	RegistrationUserBackButtonText           string
+	RegistrationUserTitle                  string
+	RegistrationUserDescription            string
+	RegistrationUserDescriptionOrgRegister string
+	RegistrationUserFirstnameLabel         string
+	RegistrationUserLastnameLabel          string
+	RegistrationUserEmailLabel             string
+	RegistrationUserUsernameLabel          string
+	RegistrationUserLanguageLabel          string
+	RegistrationUserGenderLabel            string
+	RegistrationUserPasswordLabel          string
+	RegistrationUserPasswordConfirmLabel   string
+	RegistrationUserTOSAndPrivacyLabel     string
+	RegistrationUserTOSConfirm             string
+	RegistrationUserTOSLink                string
+	RegistrationUserTOSLinkText            string
+	RegistrationUserTOSConfirmAnd          string
+	RegistrationUserPrivacyLink            string
+	RegistrationUserPrivacyLinkText        string
+	RegistrationUserNextButtonText         string
+	RegistrationUserBackButtonText         string
 
-	RegisterOrgTitle                    string
-	RegisterOrgDescription              string
-	RegisterOrgOrgNameLabel             string
-	RegisterOrgFirstnameLabel           string
-	RegisterOrgLastnameLabel            string
-	RegisterOrgUsernameLabel            string
-	RegisterOrgEmailLabel               string
-	RegisterOrgPasswordLabel            string
-	RegisterOrgPasswordConfirmLabel     string
-	RegisterOrgTOSAndPrivacyLabel       string
-	RegisterOrgTOSConfirm               string
-	RegisterOrgTOSLinkText              string
-	RegisterOrgTOSConfirmAnd            string
-	RegisterOrgPrivacyLinkText          string
-	RegisterOrgExternalLoginDescription string
-	RegisterOrgSaveButtonText           string
+	RegisterOrgTitle                string
+	RegisterOrgDescription          string
+	RegisterOrgOrgNameLabel         string
+	RegisterOrgFirstnameLabel       string
+	RegisterOrgLastnameLabel        string
+	RegisterOrgUsernameLabel        string
+	RegisterOrgEmailLabel           string
+	RegisterOrgPasswordLabel        string
+	RegisterOrgPasswordConfirmLabel string
+	RegisterOrgTOSAndPrivacyLabel   string
+	RegisterOrgTOSConfirm           string
+	RegisterOrgTOSLinkText          string
+	RegisterOrgTOSConfirmAnd        string
+	RegisterOrgPrivacyLinkText      string
+	RegisterOrgSaveButtonText       string
 
 	LinkingUserDoneTitle            string
 	LinkingUserDoneDescription      string
@@ -226,12 +224,10 @@ type CustomLoginTextReadModel struct {
 	LogoutDoneDescription     string
 	LogoutDoneLoginButtonText string
 
-	FooterTOS               string
-	FooterTOSLink           string
-	FooterPrivacyPolicy     string
-	FooterPrivacyPolicyLink string
-	FooterHelp              string
-	FooterHelpLink          string
+	FooterTOS           string
+	FooterPrivacyPolicy string
+	FooterHelp          string
+	FooterHelpLink      string
 }
 
 func (wm *CustomLoginTextReadModel) Reduce() error {
@@ -1718,10 +1714,6 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenSetEvent(e *poli
 		wm.RegistrationUserPrivacyLinkText = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyRegistrationUserExternalLoginDescription {
-		wm.RegistrationUserExternalLoginDescription = e.Text
-		return
-	}
 	if e.Key == domain.LoginKeyRegistrationUserNextButtonText {
 		wm.RegistrationUserNextButtonText = e.Text
 		return
@@ -1797,10 +1789,6 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenRemoveEvent(e *p
 		wm.RegistrationUserPrivacyLinkText = ""
 		return
 	}
-	if e.Key == domain.LoginKeyRegistrationUserExternalLoginDescription {
-		wm.RegistrationUserExternalLoginDescription = ""
-		return
-	}
 	if e.Key == domain.LoginKeyRegistrationUserNextButtonText {
 		wm.RegistrationUserNextButtonText = ""
 		return
@@ -1868,10 +1856,6 @@ func (wm *CustomLoginTextReadModel) handleRegistrationOrgScreenSetEvent(e *polic
 		wm.RegisterOrgPrivacyLinkText = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyRegisterOrgExternalLoginDescription {
-		wm.RegisterOrgExternalLoginDescription = e.Text
-		return
-	}
 	if e.Key == domain.LoginKeyRegisterOrgSaveButtonText {
 		wm.RegisterOrgSaveButtonText = e.Text
 		return
@@ -1933,10 +1917,6 @@ func (wm *CustomLoginTextReadModel) handleRegistrationOrgScreenRemoveEvent(e *po
 	}
 	if e.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
 		wm.RegisterOrgPrivacyLinkText = ""
-		return
-	}
-	if e.Key == domain.LoginKeyRegisterOrgExternalLoginDescription {
-		wm.RegisterOrgExternalLoginDescription = ""
 		return
 	}
 	if e.Key == domain.LoginKeyRegisterOrgSaveButtonText {
@@ -2094,16 +2074,8 @@ func (wm *CustomLoginTextReadModel) handleFooterTextSetEvent(e *policy.CustomTex
 		wm.FooterTOS = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyFooterTOSLink {
-		wm.FooterTOSLink = e.Text
-		return
-	}
-	if e.Key == domain.LoginKeyFooterPrivacy {
+	if e.Key == domain.LoginKeyFooterPrivacyPolicy {
 		wm.FooterPrivacyPolicy = e.Text
-		return
-	}
-	if e.Key == domain.LoginKeyFooterPrivacyLink {
-		wm.FooterPrivacyPolicyLink = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyFooterHelp {
@@ -2121,16 +2093,8 @@ func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.Custom
 		wm.FooterTOS = ""
 		return
 	}
-	if e.Key == domain.LoginKeyFooterTOSLink {
-		wm.FooterTOSLink = ""
-		return
-	}
-	if e.Key == domain.LoginKeyFooterPrivacy {
+	if e.Key == domain.LoginKeyFooterPrivacyPolicy {
 		wm.FooterPrivacyPolicy = ""
-		return
-	}
-	if e.Key == domain.LoginKeyFooterPrivacyLink {
-		wm.FooterPrivacyPolicyLink = ""
 		return
 	}
 	if e.Key == domain.LoginKeyFooterHelp {

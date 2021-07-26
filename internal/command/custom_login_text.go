@@ -743,10 +743,6 @@ func (c *Commands) createRegistrationUserEvents(ctx context.Context, agg *events
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserExternalLoginDescription, existingText.RegistrationUserExternalLoginDescription, text.RegistrationUser.ExternalLoginDescription, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserNextButtonText, existingText.RegistrationUserNextButtonText, text.RegistrationUser.NextButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -813,10 +809,6 @@ func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventst
 		events = append(events, event)
 	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegisterOrgPrivacyLinkText, existingText.RegisterOrgPrivacyLinkText, text.RegistrationOrg.PrivacyLinkText, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegisterOrgExternalLoginDescription, existingText.RegisterOrgExternalLoginDescription, text.RegistrationOrg.ExternalLoginDescription, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -913,15 +905,7 @@ func (c *Commands) createFooterTextEvents(ctx context.Context, agg *eventstore.A
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterTOSLink, existingText.FooterTOSLink, text.Footer.TOSLink, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterPrivacy, existingText.FooterPrivacyPolicy, text.Footer.PrivacyPolicy, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterPrivacyLink, existingText.FooterPrivacyPolicyLink, text.Footer.PrivacyPolicyLink, text.Language, defaultText)
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterPrivacyPolicy, existingText.FooterPrivacyPolicy, text.Footer.PrivacyPolicy, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
