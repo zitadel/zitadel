@@ -13,9 +13,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-func SetQueriedForDatabases(databases []string) map[string]interface{} {
+func SetQueriedForDatabases(databases, users []string) map[string]interface{} {
 	queried := map[string]interface{}{}
-	core.SetQueriedForDatabaseDBList(queried, databases)
+	core.SetQueriedForDatabaseDBList(queried, databases, users)
 
 	return queried
 }

@@ -24,15 +24,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_COMPLEXITY_LINK,
-  IAM_LOGIN_POLICY_LINK,
-  IAM_POLICY_LINK,
-  ORG_COMPLEXITY_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_LOGIN_POLICY_LINK,
-} from '../../policy-grid/policy-links';
+import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -85,11 +77,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
-  public nextLinks: CnslLinks[] = [
-    IAM_COMPLEXITY_LINK,
-    IAM_POLICY_LINK,
-    IAM_LOGIN_POLICY_LINK,
-  ];
 
   public Theme: any = Theme;
   public Preview: any = Preview;
@@ -99,7 +86,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
   private org!: Org.AsObject;
-
+  public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -121,19 +108,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.nextLinks = [
-            ORG_IAM_POLICY_LINK,
-            ORG_LOGIN_POLICY_LINK,
-            ORG_COMPLEXITY_LINK,
-          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.nextLinks = [
-            IAM_POLICY_LINK,
-            IAM_LOGIN_POLICY_LINK,
-            IAM_COMPLEXITY_LINK,
-          ];
           break;
       }
 
@@ -354,8 +331,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
     this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
       this.getPreviewData().then(data => {
-        console.log('preview', data);
-
         if (data.policy) {
           this.previewData = data.policy;
           this.loading = false;
@@ -371,8 +346,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       });
 
       this.getData().then(data => {
-        console.log('data', data);
-
         if (data.policy) {
           this.data = data.policy;
           this.loading = false;
@@ -506,7 +479,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
     return this.assetService.load(`${url}`, this.org.id).then(data => {
-      console.log(data);
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();
@@ -529,6 +501,18 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public savePolicy(): Promise<any> {
+    const reloadPolicy = () => {
+      setTimeout(() => {
+        this.loadingImages = true;
+        this.getData().then(data => {
+
+          if (data.policy) {
+            this.data = data.policy;
+            this.loadImages();
+          }
+        });
+      }, 500);
+    };
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.previewData as LabelPolicy.AsObject).isDefault) {
@@ -537,6 +521,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
           return (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
+
+            reloadPolicy();
           }).catch((error: HttpErrorResponse) => {
             this.toast.showError(error);
           });
@@ -546,6 +532,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
           return (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
+
+            reloadPolicy();
           }).catch(error => {
             this.toast.showError(error);
           });
@@ -554,46 +542,11 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
         return (this.service as AdminService).updateLabelPolicy(req).then(() => {
+          reloadPolicy();
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
           this.toast.showError(error);
         });
-    }
-  }
-
-  public saveWatermark(): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        if ((this.previewData as LabelPolicy.AsObject).isDefault) {
-          const req0 = new AddCustomLabelPolicyRequest();
-          req0.setDisableWatermark(this.previewData.disableWatermark);
-
-          (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch((error: HttpErrorResponse) => {
-            this.toast.showError(error);
-          });
-        } else {
-          const req1 = new UpdateCustomLabelPolicyRequest();
-          req1.setDisableWatermark(this.previewData.disableWatermark);
-
-          (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-        }
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        const req = new UpdateLabelPolicyRequest();
-        req.setDisableWatermark(this.data.disableWatermark);
-
-        (this.service as AdminService).updateLabelPolicy(req).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-        break;
     }
   }
 

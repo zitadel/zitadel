@@ -45,7 +45,7 @@ func SetQueriedForDatabase(queried map[string]interface{}, databaseCurrent *tree
 	queried[queriedName] = databaseCurrent
 }
 
-func SetQueriedForDatabaseDBList(queried map[string]interface{}, databases []string) {
+func SetQueriedForDatabaseDBList(queried map[string]interface{}, databases, users []string) {
 	currentDBList := &CurrentDBList{
 		Common: &tree.Common{
 			Kind:    "DBList",
@@ -53,6 +53,7 @@ func SetQueriedForDatabaseDBList(queried map[string]interface{}, databases []str
 		},
 		Current: &DatabaseCurrentDBList{
 			Databases: databases,
+			Users:     users,
 		},
 	}
 

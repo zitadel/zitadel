@@ -3,6 +3,8 @@ package admin
 import (
 	"context"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	text_grpc "github.com/caos/zitadel/internal/api/grpc/text"
 	"github.com/caos/zitadel/internal/domain"
@@ -97,7 +99,7 @@ func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *admin
 	}, nil
 }
 
-func (s *Server) SetVerifyEmailMessageCustomText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailMessageTextResponse, error) {
+func (s *Server) SetDefaultVerifyEmailMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailMessageTextResponse, error) {
 	result, err := s.command.SetDefaultMessageText(ctx, SetVerifyEmailCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -204,6 +206,20 @@ func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustom
 		return nil, err
 	}
 	return &admin_pb.SetCustomLoginTextsResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *admin_pb.ResetCustomLoginTextsToDefaultRequest) (*admin_pb.ResetCustomLoginTextsToDefaultResponse, error) {
+	result, err := s.command.RemoveCustomIAMLoginTexts(ctx, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomLoginTextsToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.EventDate,

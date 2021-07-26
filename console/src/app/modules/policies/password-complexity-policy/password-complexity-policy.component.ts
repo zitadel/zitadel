@@ -13,15 +13,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_LOGIN_POLICY_LINK,
-  IAM_POLICY_LINK,
-  IAM_PRIVATELABEL_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_LOGIN_POLICY_LINK,
-  ORG_PRIVATELABEL_LINK,
-} from '../../policy-grid/policy-links';
+import { COMPLEXITY_POLICY, GridPolicy } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -39,7 +31,8 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
-  public nextLinks: CnslLinks[] = [];
+  public currentPolicy: GridPolicy = COMPLEXITY_POLICY;
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
@@ -51,19 +44,9 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.nextLinks = [
-            ORG_IAM_POLICY_LINK,
-            ORG_LOGIN_POLICY_LINK,
-            ORG_PRIVATELABEL_LINK,
-          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.nextLinks = [
-            IAM_POLICY_LINK,
-            IAM_LOGIN_POLICY_LINK,
-            IAM_PRIVATELABEL_LINK,
-          ];
           break;
       }
 

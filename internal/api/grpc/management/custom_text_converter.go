@@ -113,6 +113,8 @@ func SetLoginCustomTextToDomain(req *mgmt_pb.SetCustomLoginTextsRequest) *domain
 	result.RegisterOption = text.RegistrationOptionScreenTextPbToDomain(req.RegistrationOptionText)
 	result.RegistrationUser = text.RegistrationUserScreenTextPbToDomain(req.RegistrationUserText)
 	result.RegistrationOrg = text.RegistrationOrgScreenTextPbToDomain(req.RegistrationOrgText)
+	result.LinkingUsersDone = text.LinkingUserDoneScreenTextPbToDomain(req.LinkingUserDoneText)
+	result.ExternalNotFoundOption = text.ExternalUserNotFoundScreenTextPbToDomain(req.ExternalUserNotFoundText)
 	result.LoginSuccess = text.SuccessLoginScreenTextPbToDomain(req.SuccessLoginText)
 	result.LogoutDone = text.LogoutDoneScreenTextPbToDomain(req.LogoutText)
 	result.Footer = text.FooterTextPbToDomain(req.FooterText)

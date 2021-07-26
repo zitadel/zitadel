@@ -219,6 +219,5 @@
         </app-card>
     </ng-template>
 
-    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
-
+    <app-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="security"></app-policy-grid>
 </app-detail-layout>
