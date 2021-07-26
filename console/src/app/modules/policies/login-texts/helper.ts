@@ -64,9 +64,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r3.setHelp(map.footerText?.help ?? '');
   r3.setHelpLink(map.footerText?.helpLink ?? '');
   r3.setPrivacyPolicy(map.footerText?.privacyPolicy ?? '');
-  r3.setPrivacyPolicyLink(map.footerText?.privacyPolicyLink ?? '');
   r3.setTos(map.footerText?.tos ?? '');
-  r3.setTosLink(map.footerText?.tosLink ?? '');
   req.setFooterText(r3);
 
   const r4 = new InitMFADoneScreenText();
@@ -184,6 +182,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r17.setDescription(map.passwordChangeText?.description ?? '');
   r17.setNextButtonText(map.passwordChangeText?.nextButtonText ?? '');
   r17.setTitle(map.passwordChangeText?.title ?? '');
+  r17.setNewPasswordLabel(map.passwordChangeText?.newPasswordLabel ?? '');
+  r17.setNewPasswordConfirmLabel(map.passwordChangeText?.newPasswordConfirmLabel ?? '');
+  r17.setCancelButtonText(map.passwordChangeText?.cancelButtonText ?? '');
+  r17.setOldPasswordLabel(map.passwordChangeText?.oldPasswordLabel ?? '');
   req.setPasswordChangeText(r17);
 
   const r18 = new PasswordResetDoneScreenText();
@@ -226,7 +228,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   const r22 = new RegistrationOrgScreenText();
   r22.setDescription(map.registrationOrgText?.description ?? '');
   r22.setEmailLabel(map.registrationOrgText?.emailLabel ?? '');
-  r22.setExternalLoginDescription(map.registrationOrgText?.externalLoginDescription ?? '');
   r22.setFirstnameLabel(map.registrationOrgText?.firstnameLabel ?? '');
   r22.setLastnameLabel(map.registrationOrgText?.lastnameLabel ?? '');
   r22.setOrgnameLabel(map.registrationOrgText?.orgnameLabel ?? '');
@@ -248,7 +249,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r23.setDescription(map.registrationUserText?.description ?? '');
   r23.setDescriptionOrgRegister(map.registrationUserText?.descriptionOrgRegister ?? '');
   r23.setEmailLabel(map.registrationUserText?.emailLabel ?? '');
-  r23.setExternalLoginDescription(map.registrationUserText?.externalLoginDescription ?? '');
   r23.setFirstnameLabel(map.registrationUserText?.firstnameLabel ?? '');
   r23.setGenderLabel(map.registrationUserText?.genderLabel ?? '');
   r23.setLanguageLabel(map.registrationUserText?.languageLabel ?? '');
@@ -276,7 +276,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r24.setTitleLinkingProcess(map.selectAccountText?.titleLinkingProcess ?? '');
   r24.setUserMustBeMemberOfOrg(map.selectAccountText?.userMustBeMemberOfOrg ?? '');
   req.setSelectAccountText(r24);
-
 
   const r25 = new SuccessLoginScreenText();
   r25.setAutoRedirectDescription(map.successLoginText?.autoRedirectDescription ?? '');
