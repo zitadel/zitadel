@@ -359,9 +359,9 @@ An sms will be sent to the given phone number to finish the phone verification p
     POST: /users/{user_id}/phone/_resend_verification
 
 
-### RemoveMyAvatar
+### RemoveHumanAvatar
 
-> **rpc** RemoveMyAvatar([RemoveHumanAvatarRequest](#removehumanavatarrequest))
+> **rpc** RemoveHumanAvatar([RemoveHumanAvatarRequest](#removehumanavatarrequest))
 [RemoveHumanAvatarResponse](#removehumanavatarresponse)
 
 Removes the avatar number of the human
