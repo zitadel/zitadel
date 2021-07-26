@@ -47,4 +47,31 @@ describe('PERMISSIONS: add Role ', () => {
     })
 })
 
+describe('PERMISSIONS: add Grant ', () => {
+
+    it('PERMISSIONS: add Grant ', () => {
+        cy.visit(Cypress.env('consoleUrl') + '/projects')
+        cy.url().should('contain', '/projects')
+        cy.wait(10000)
+        cy.get('.card').filter(':contains("newProjectToTest")', { timeout: 30000 }).click()
+        cy.get('.app-container').filter(':contains("newAppToTest")').should('be.visible').click()
+        let projectID
+        cy.url().then(url => {
+            cy.log(url.split('/')[4])
+            projectID = url.split('/')[4]
+          });
+        
+        cy.then(() => cy.visit(Cypress.env('consoleUrl') + '/grant-create/project/' + projectID ))
+        cy.get('input').type("demo")
+        cy.get('[role^=listbox]').filter(':contains("demo@caos-demo.zitadel.ch")' ).should('be.visible').click()
+        cy.wait(5000)
+        //cy.get('.button').contains('Continue').click()
+        cy.get('button').filter(':contains("Continue")', { timeout: 30000 }).click()
+        cy.wait(5000)
+        cy.get('tr').filter(':contains("demo")').find('label').click()
+        cy.get('button').filter(':contains("Save")').should('be.visible').click()
+        //let the project get processed
+    })
+})
+
 

@@ -27,12 +27,15 @@ describe('CLEANUP: delete User', () => {
         cy.wait(10000)
         //force due to angular hidden buttons
         cy.get('tr').filter(':contains("demofirst")').find('button', { timeout: 30000 }).click({force: true})
+        //wait for the delete dialog
+        cy.wait(2000)
         cy.get('button').filter(':contains("Delete")').click()
+        cy.wait(5000)
     })
 })
 
-describe('MACHINES: delete Machine', () => {
-    it('MACHINES: delete Machine', () => {
+describe('CLEANUP: delete Machine', () => {
+    it('CLEANUP: delete Machine', () => {
         //click on org to clear screen
         cy.visit(Cypress.env('consoleUrl') + '/org')
         cy.wait(1000)
@@ -40,8 +43,11 @@ describe('MACHINES: delete Machine', () => {
         cy.url().should('contain', 'users/list/machines')
         cy.wait(10000)
         //force due to angular hidden buttons
-        cy.get('tr').filter(':contains("demomachineusername")').find('button', { timeout: 30000 }).click({force: true})
+        cy.get('tr').filter(':contains("machineusername")').find('button', { timeout: 30000 }).click({force: true})
+        //wait for the delete dialog
+        cy.wait(2000)
         cy.get('button').filter(':contains("Delete")').click()
+        cy.wait(5000)
     })
 })
 

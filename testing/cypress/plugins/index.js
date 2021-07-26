@@ -10,9 +10,9 @@ module.exports = (on, config) => {
   config.env.newLastName = "demolastname"
   config.env.newPhonenumber = "+41 123456789"
 
-  config.env.newMachineUserName = "demomachineusername"
-  config.env.newMachineName = "demoname"
-  config.env.newMachineDesription = "demodescription"
+  config.env.newMachineUserName = "machineusername"
+  config.env.newMachineName = "name"
+  config.env.newMachineDesription = "description"
 
 
   // IMPORTANT return the updated config object
