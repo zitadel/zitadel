@@ -42,8 +42,9 @@ describe('PERMISSIONS: add Role ', () => {
         cy.get('[formcontrolname^=key]').type("newdemorole")
         cy.get('[formcontrolname^=displayName]').type("newdemodisplayname")
         cy.get('[formcontrolname^=group]').type("newdemogroupname")
-        cy.get('[type^=submit]').filter(':contains("Save")').should('be.visible').click()
-        //let the project get processed
+        cy.get('button').filter(':contains("Save")').should('be.visible').click()
+        //let the Role get processed
+        cy.wait(5000)
     })
 })
 
@@ -70,7 +71,8 @@ describe('PERMISSIONS: add Grant ', () => {
         cy.wait(5000)
         cy.get('tr').filter(':contains("demo")').find('label').click()
         cy.get('button').filter(':contains("Save")').should('be.visible').click()
-        //let the project get processed
+        //let the grant get processed
+        cy.wait(5000)
     })
 })
 
