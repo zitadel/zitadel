@@ -110,6 +110,8 @@ import {
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveSecondFactorFromLoginPolicyRequest,
   RemoveSecondFactorFromLoginPolicyResponse,
+  ResetCustomLoginTextsToDefaultRequest,
+  ResetCustomLoginTextsToDefaultResponse,
   ResetCustomOrgIAMPolicyToDefaultRequest,
   ResetCustomOrgIAMPolicyToDefaultResponse,
   ResetOrgFeaturesRequest,
@@ -184,6 +186,12 @@ export class AdminService {
   public setCustomLoginText(req: SetCustomLoginTextsRequest):
     Promise<SetCustomLoginTextsResponse.AsObject> {
     return this.grpcService.admin.setCustomLoginText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomLoginTextToDefault(lang: string): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
+    const req = new ResetCustomLoginTextsToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomLoginTextToDefault(req, null).then(resp => resp.toObject());
   }
 
   // message texts

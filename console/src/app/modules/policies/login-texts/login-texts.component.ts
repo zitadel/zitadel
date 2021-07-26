@@ -304,6 +304,14 @@ export class LoginTextsComponent implements OnDestroy {
           }).catch(error => {
             this.toast.showError(error);
           });
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+          (this.service as AdminService).resetCustomLoginTextToDefault(this.locale).then(() => {
+            setTimeout(() => {
+              this.loadData();
+            }, 1000);
+          }).catch(error => {
+            this.toast.showError(error);
+          });
         }
       }
     });
