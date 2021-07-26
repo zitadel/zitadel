@@ -14,7 +14,7 @@ import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
-import { LabelPolicy } from './proto/generated/zitadel/policy_pb';
+import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
@@ -61,6 +61,7 @@ export class AppComponent implements OnDestroy {
 
   public hideAdminWarn: boolean = true;
   public language: string = 'en';
+  public privacyPolicy!: PrivacyPolicy.AsObject;
   constructor(
     public viewPortScroller: ViewportScroller,
     @Inject('windowObject') public window: Window,
@@ -211,6 +212,8 @@ export class AppComponent implements OnDestroy {
     });
 
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
+
+    this.loadPolicies();
   }
 
   public ngOnDestroy(): void {
@@ -247,8 +250,6 @@ export class AppComponent implements OnDestroy {
     setDefaultColors();
 
     this.mgmtService.getLabelPolicy().then(labelpolicy => {
-      console.log(labelpolicy.policy);
-
       if (labelpolicy.policy) {
         this.labelpolicy = labelpolicy.policy;
 
@@ -269,6 +270,15 @@ export class AppComponent implements OnDestroy {
 
         this.themeService.saveBackgroundColor(darkBackground, true);
         this.themeService.saveBackgroundColor(lightBackground, false);
+      }
+    });
+  }
+
+  public loadPolicies(): void {
+    this.mgmtService.getPrivacyPolicy().then(privacypolicy => {
+
+      if (privacypolicy.policy) {
+        this.privacyPolicy = privacypolicy.policy;
       }
     });
   }

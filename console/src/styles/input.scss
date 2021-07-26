@@ -29,7 +29,8 @@
     border-radius: 4px;
     height: 40px;
     padding: 10px;
-    transition: border-color .2s ease-in-out;
+    transition: border-color .2s ease-in-out, background-color .3s cubic-bezier(.645, .045, .355, 1),
+      color .3s cubic-bezier(.645, .045, .355, 1);
     width: 100%;
     color: mat.get-color-from-palette($foreground, text);
     margin-bottom: 2px;
