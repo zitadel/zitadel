@@ -15,9 +15,9 @@ it('LOGIN: Fill in credentials and login', () => {
     cy.wait(5000)
 })
 
-describe('USER: show personal information', () => {
+describe('USERS: show personal information', () => {
     // user interaction
-    it('USER: show personal information', () => {
+    it('USERS: show personal information', () => {
         cy.log(`USER: show personal information`);
         //click on user information 
         cy.get('a[href*="users/me"').eq(0).click()
@@ -27,8 +27,8 @@ describe('USER: show personal information', () => {
 
 
 describe('USERS: show Users ', () => {
-    it('PROJECT: show Projects ', () => {
-        cy.visit('https://console.zitadel.ch/users/list/humans')
+    it('USERS: show Users ', () => {
+        cy.visit(Cypress.env('consoleUrl') + '/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
     })
 })
@@ -36,11 +36,11 @@ describe('USERS: show Users ', () => {
 describe('USERS: add User', () => {
     it('USERS: add User', () => {
         //click on org to clear screen
-        cy.visit('https://console.zitadel.ch/org')
+        cy.visit(Cypress.env('consoleUrl') + '/org')
         cy.wait(1000)
-        cy.visit('https://console.zitadel.ch/users/list/humans')
+        cy.visit(Cypress.env('consoleUrl') + '/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
-        cy.visit('https://console.zitadel.ch/users/create')
+        cy.visit(Cypress.env('consoleUrl') + '/users/create')
         cy.url().should('contain', 'users/create')
         cy.get('[formcontrolname^=email]').type(Cypress.env('newEmail'))
         //force needed due to the prefilled username prefix
@@ -49,6 +49,7 @@ describe('USERS: add User', () => {
         cy.get('[formcontrolname^=lastName]').type(Cypress.env('newLastName'))
         cy.get('[formcontrolname^=phone]').type(Cypress.env('newPhonenumber'))
         cy.get('button').filter(':contains("Create")').should('be.visible').click()
+        cy.wait(3000)
 
     })
 })
@@ -56,13 +57,13 @@ describe('USERS: add User', () => {
 describe('USERS: delete User', () => {
     it('USERS: delete User', () => {
         //click on org to clear screen
-        cy.visit('https://console.zitadel.ch/org')
+        cy.visit(Cypress.env('consoleUrl') + '/org')
         cy.wait(1000)
-        cy.visit('https://console.zitadel.ch/users/list/humans')
+        cy.visit(Cypress.env('consoleUrl') + '/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
-        cy.wait(6000)
+        cy.wait(10000)
         //force due to angular hidden buttons
-        cy.get('tr').filter(':contains("demofirst")').find('button').click({force: true})
+        cy.get('tr').filter(':contains("demofirst")').find('button', { timeout: 30000 }).click({force: true})
         cy.get('button').filter(':contains("Delete")').click()
     })
 })

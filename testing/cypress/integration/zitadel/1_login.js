@@ -9,9 +9,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 
 describe('LOGIN: Basic User/PW console.zitadel.ch', () => {
     it('LOGIN: Fill in credentials and login', () => {
-       // const username = Cypress.env('username')
-       // const password = Cypress.env('password')
-       // const consoleUrl = Cypress.env('consoleUrl')
+
 
         //console login
         cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))

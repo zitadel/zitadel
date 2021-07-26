@@ -19,7 +19,7 @@ it('LOGIN: Fill in credentials and login', () => {
 
 describe('PROJECT: show Projects ', () => {
     it('PROJECT: show Projects ', () => {
-        cy.visit('https://console.zitadel.ch/projects')
+        cy.visit(Cypress.env('consoleUrl') + '/projects')
         cy.url().should('contain', '/projects')
     })
 })
@@ -27,7 +27,7 @@ describe('PROJECT: show Projects ', () => {
 describe('PROJECT: add Project ', () => {
 
     it('PROJECT: add Project ', () => {
-        cy.visit('https://console.zitadel.ch/projects')
+        cy.visit(Cypress.env('consoleUrl') + '/projects')
         cy.url().should('contain', '/projects')
         cy.get('.add-project-button').click()
         cy.get('input').type("newProjectToTest")
@@ -41,12 +41,12 @@ describe('PROJECT: create app in Project ', () => {
 
     it('PROJECT: create app ', () => {
         //click on org to clear screen
-        cy.visit('https://console.zitadel.ch/org')
+        cy.visit(Cypress.env('consoleUrl') + '/org')
         cy.wait(1000)
-        cy.visit('https://console.zitadel.ch/projects')
+        cy.visit(Cypress.env('consoleUrl') + '/projects')
         cy.url().should('contain', '/projects')
-        cy.wait(1000)
-        cy.get('.card').contains("newProjectToTest").click()
+        cy.wait(15000)
+        cy.get('.card').contains("newProjectToTest", { timeout: 25000 }).click()
         cy.get('.cnsl-app-card').filter(':contains("add")').click()
         cy.get('[formcontrolname^=name]').type("newAppToTest")
         // select webapp
@@ -61,9 +61,9 @@ describe('PROJECT: create app in Project ', () => {
         cy.get('[type^=submit]').filter(':contains("Continue")').should('be.visible').eq(2).click()
         cy.get('button').filter(':contains("Create")').should('be.visible').click()
         //wait for application to be created
-        cy.wait(3000)
+        cy.wait(5000)
         //TODO: check client ID/Secret
-        cy.get('button').filter(':contains("Close")').should('be.visible').click()
+        cy.get('button').filter(':contains("Close")' , { timeout: 30000 }).should('be.visible').click()
     })
 })
 
@@ -71,13 +71,13 @@ describe('PROJECT: delete Project ', () => {
     it('PROJECT: delete Project ', () => {
         cy.log(`PROJECT: delete project`);
         //click on org to clear screen
-        cy.visit('https://console.zitadel.ch/org')
+        cy.visit(Cypress.env('consoleUrl') + '/org')
         //click on Projects 
-        cy.visit('https://console.zitadel.ch/projects')
+        cy.visit(Cypress.env('consoleUrl') + '/projects')
         cy.url().should('contain', '/projects')
-        cy.wait(3000)
+        cy.wait(10000)
         //TODO variable for regex
-        cy.get('.card').filter(':contains("newProjectToTest")').find('button.delete-button').click()
+        cy.get('.card').filter(':contains("newProjectToTest")', { timeout: 30000 }).find('button.delete-button').click()
         cy.get('button').filter(':contains("Delete")').click()
     })
 })
