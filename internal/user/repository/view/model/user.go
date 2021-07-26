@@ -92,12 +92,11 @@ type HumanView struct {
 	MFAInitSkipped           time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
 	InitRequired             bool           `json:"-" gorm:"column:init_required"`
 	PasswordlessInitRequired bool           `json:"-" gorm:"column:passwordless_init_required"`
-
-	PasswordSet            bool           `json:"-" gorm:"column:password_set"`
-	PasswordChangeRequired bool           `json:"-" gorm:"column:password_change_required"`
-	UsernameChangeRequired bool           `json:"-" gorm:"column:username_change_required"`
-	PasswordChanged        time.Time      `json:"-" gorm:"column:password_change"`
-	PasswordlessTokens     WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
+	PasswordInitRequired     bool           `json:"-" gorm:"column:password_init_required"`
+	PasswordChangeRequired   bool           `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired   bool           `json:"-" gorm:"column:username_change_required"`
+	PasswordChanged          time.Time      `json:"-" gorm:"column:password_change"`
+	PasswordlessTokens       WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
 }
 
 type WebAuthNTokens []*WebAuthNView
@@ -153,7 +152,7 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 	}
 	if !user.HumanView.IsZero() {
 		userView.HumanView = &model.HumanView{
-			PasswordSet:              user.PasswordSet,
+			PasswordInitRequired:     user.PasswordInitRequired,
 			PasswordChangeRequired:   user.PasswordChangeRequired,
 			PasswordChanged:          user.PasswordChanged,
 			PasswordlessTokens:       WebauthnTokensToModel(user.PasswordlessTokens),
@@ -350,8 +349,9 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.AvatarKey = ""
 	case models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
 		models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
-		if !u.PasswordSet {
+		if u.PasswordInitRequired {
 			u.PasswordlessInitRequired = true
+			u.PasswordInitRequired = false
 		}
 	}
 	u.ComputeObject()
@@ -377,7 +377,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
-	u.PasswordSet = password.Secret != nil
+	u.PasswordInitRequired = password.Secret == nil
 	u.PasswordChangeRequired = password.ChangeRequired
 	u.PasswordChanged = event.CreationDate
 	return nil
@@ -506,6 +506,7 @@ func (u *UserView) ComputeMFAMaxSetUp() {
 	for _, token := range u.PasswordlessTokens {
 		if token.State == int32(model.MFAStateReady) {
 			u.MFAMaxSetUp = int32(req_model.MFALevelMultiFactor)
+			u.PasswordlessInitRequired = false
 			return
 		}
 	}

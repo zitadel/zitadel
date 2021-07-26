@@ -678,7 +678,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 
 func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) domain.NextStep {
 	if user.InitRequired {
-		return &domain.InitUserStep{PasswordSet: user.PasswordSet}
+		return &domain.InitUserStep{PasswordSet: !user.PasswordInitRequired}
 	}
 
 	var step domain.NextStep
@@ -692,12 +692,12 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 
 	if user.PasswordlessInitRequired {
 		return &domain.PasswordlessRegistrationPromptStep{
-			Required: true,
-			Enabled:  false,
+			SetupEnabled: false,
+			Required:     true,
 		}
 	}
 
-	if !user.PasswordSet {
+	if user.PasswordInitRequired {
 		return &domain.InitPasswordStep{}
 	}
 
@@ -764,7 +764,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 }
 
 func (repo *AuthRequestRepo) checkPasswordlessRegistration(user *user_model.UserView) domain.NextStep {
-	if user.MFAMaxSetUp > model.MFALevelMultiFactor || checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime) { //TODO: PasswordlessInitSkipped
+	if user.MFAMaxSetUp >= model.MFALevelMultiFactor || checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime) { //TODO: PasswordlessInitSkipped
 		return nil
 	}
 	return &domain.PasswordlessRegistrationPromptStep{}

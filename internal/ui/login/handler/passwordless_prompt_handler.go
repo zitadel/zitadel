@@ -11,11 +11,17 @@ const (
 )
 
 type passwordlessPromptData struct {
+	userData
+	SetupEnabled bool
+	Required     bool
+}
+
+type passwordlessPromptFormData struct {
 	Skip bool `schema:"skip"`
 }
 
 func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request) {
-	data := new(passwordlessPromptData)
+	data := new(passwordlessPromptFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -33,12 +39,16 @@ func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request)
 	l.handleLogin(w, r)
 }
 
-func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, step *domain.PasswordlessRegistrationPromptStep, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "Passwordless Prompt", errID, errMessage)
+	data := &passwordlessPromptData{
+		userData:     l.getUserData(r, authReq, "Passwordless Prompt", errID, errMessage),
+		SetupEnabled: step.SetupEnabled,
+		Required:     step.Required,
+	}
 
 	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordlessPrompt], data, nil)

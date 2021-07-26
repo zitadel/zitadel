@@ -101,8 +101,8 @@ func (s *PasswordlessStep) Type() NextStepType {
 }
 
 type PasswordlessRegistrationPromptStep struct {
-	Required bool
-	Enabled  bool
+	Required     bool
+	SetupEnabled bool
 }
 
 func (s *PasswordlessRegistrationPromptStep) Type() NextStepType {
