@@ -1,0 +1,108 @@
+.spinner-wr {
+  margin: .5rem 0;
+}
+
+.date {
+  display: flex;
+  justify-content: space-between;
+
+  p {
+    margin: .4rem 0;
+    font-size: 14px;
+
+    &.gray {
+      color: var(--grey);
+    }
+  }
+
+  .newer-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    align-self: center;
+
+    i {
+      margin-bottom: 3px;
+      margin-right: .5rem;
+    }
+  }
+}
+
+.top-actions {
+  display: flex;
+  margin: 0 -.5rem;
+  flex-wrap: wrap;
+
+  .keys {
+    flex: 1;
+    margin: 0 .5rem;
+    min-width: 150px;
+  }
+
+  .language {
+    margin: 0 .5rem;
+    min-width: 150px;
+
+    .lighter {
+      font-size: 12px;
+      color: var(--grey);
+      padding: 0 .5rem;
+    }
+  }
+}
+
+.centerline {
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  padding-top: 1rem;
+}
+
+.chips {
+  display: flex;
+  margin: 0 -.25rem;
+
+  .chip {
+    border-radius: 50vw;
+    padding: 2px .5rem;
+    font-size: 12px;
+    background: #cbf4c9;
+    color: #0e6245;
+    margin: .25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(#81868a, .5);
+  margin: 1.5rem 0 0 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+
+  .save-button,
+  .reset-button {
+    display: block;
+    margin: 0 .25rem 3rem .25rem;
+  }
+
+  .reset-button {
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-bottom: 3px;
+    }
+  }
+}

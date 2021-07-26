@@ -16,7 +16,6 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
 )
 
 const (
@@ -37,19 +36,6 @@ type CustomTextView struct {
 	Text     string `json:"Text" gorm:"column:text"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
-}
-
-func CustomTextViewFromModel(template *model.CustomTextView) *CustomTextView {
-	return &CustomTextView{
-		AggregateID:  template.AggregateID,
-		Sequence:     template.Sequence,
-		CreationDate: template.CreationDate,
-		ChangeDate:   template.ChangeDate,
-		Language:     template.Language.String(),
-		Template:     template.Template,
-		Key:          template.Key,
-		Text:         template.Text,
-	}
 }
 
 func CustomTextViewsToDomain(texts []*CustomTextView) []*domain.CustomText {
@@ -323,7 +309,7 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 }
 
 func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
+	if text.Key == domain.LoginKeyPasswordTitle {
 		result.Password.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordDescription {
@@ -491,7 +477,7 @@ func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 }
 
 func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyInitUserDone {
+	if text.Key == domain.LoginKeyInitUserDoneTitle {
 		result.InitUserDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneDescription {
@@ -755,23 +741,14 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyRegistrationUserTOSConfirm {
 		result.RegistrationUser.TOSConfirm = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserTOSLink {
-		result.RegistrationUser.TOSLink = text.Text
-	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		result.RegistrationUser.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserPrivacyConfirm {
-		result.RegistrationUser.PrivacyConfirm = text.Text
-	}
-	if text.Key == domain.LoginKeyRegistrationUserPrivacyLink {
-		result.RegistrationUser.PrivacyLink = text.Text
+	if text.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
+		result.RegistrationUser.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
 		result.RegistrationUser.PrivacyLinkText = text.Text
-	}
-	if text.Key == domain.LoginKeyRegistrationUserExternalLoginDescription {
-		result.RegistrationUser.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserNextButtonText {
 		result.RegistrationUser.NextButtonText = text.Text
@@ -815,23 +792,14 @@ func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLogin
 	if text.Key == domain.LoginKeyRegisterOrgTOSConfirm {
 		result.RegistrationOrg.TOSConfirm = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgTOSLink {
-		result.RegistrationOrg.TOSLink = text.Text
-	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSLinkText {
 		result.RegistrationOrg.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgPrivacyConfirm {
-		result.RegistrationOrg.PrivacyConfirm = text.Text
-	}
-	if text.Key == domain.LoginKeyRegisterOrgPrivacyLink {
-		result.RegistrationOrg.PrivacyLink = text.Text
+	if text.Key == domain.LoginKeyRegisterOrgTosConfirmAnd {
+		result.RegistrationOrg.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
 		result.RegistrationOrg.PrivacyLinkText = text.Text
-	}
-	if text.Key == domain.LoginKeyRegisterOrgExternalLoginDescription {
-		result.RegistrationOrg.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgSaveButtonText {
 		result.RegistrationOrg.SaveButtonText = text.Text
@@ -899,14 +867,8 @@ func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterTOS {
 		result.Footer.TOS = text.Text
 	}
-	if text.Key == domain.LoginKeyFooterTOSLink {
-		result.Footer.TOSLink = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterPrivacy {
+	if text.Key == domain.LoginKeyFooterPrivacyPolicy {
 		result.Footer.PrivacyPolicy = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterPrivacyLink {
-		result.Footer.PrivacyPolicyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterHelp {
 		result.Footer.Help = text.Text

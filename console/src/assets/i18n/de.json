@@ -60,7 +60,7 @@
     "IAM": "Identity- und Access-Management",
     "IAM_DESC": "Verwalte Deine Organisationen und Administratoren.",
     "IAM_BUTTON": "ZITADEL verwalten",
-    "WELCOME": "Willkommen",
+    "WELCOME": "Loslegen mit ZITADEL",
     "WELCOMESENTENCE": "Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
     "DISCLAIMER": "Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
@@ -107,6 +107,9 @@
   },
   "ACTIONS": {
     "SET":"Übernehmen",
+    "RESETDEFAULT":"Auf Standard zurücksetzen",
+    "RESETTO":"Zurücksetzen auf: ",
+    "RESETCURRENT":"Auf aktuellen Wert zurücksetzen",
     "SHOW":"Aufklappen",
     "HIDE":"Zuklappen",
     "SAVE": "Speichern",
@@ -136,7 +139,9 @@
     "PIN": "Anpinnen",
     "CONFIGURE": "Konfigurieren",
     "SEND": "Senden",
-    "NEWVALUE": "Neuer Wert"
+    "NEWVALUE": "Neuer Wert",
+    "RESTORE":"Wiederherstellen",
+    "CONTINUEWITHOUTSAVE":"Ohne speichern fortfahren"
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -628,7 +633,8 @@
       "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
       "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
-      "CUSTOMTEXT": "Benutzerdefinierte Texte"
+      "CUSTOMTEXT": "Benutzerdefinierte Texte",
+      "PRIVACYPOLICY":"Datenschutzrichtlinie und AGB - benutzerdefiniert"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -698,6 +704,87 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "SAVED": "Erfolgreich gespeichert."
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Datenschutzbestimmungen und AGB",
+      "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
+      "TOSLINK":"Link zu den Allgemeinen Geschäftsbedingungen",
+      "POLICYLINK":"Link zur den Datenschutzrichtlinien",
+      "SAVED": "Saved successfully!",
+      "RESET_TITLE":"Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION":"Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE":"Login Interface Texte",
+      "DESCRIPTION": "Definiere die Texte für das Logininterface. Wenn Texte leer sind, wird der als Platzhalter angezeigte Standardwert verwendet.",
+      "DESCRIPTION_SHORT":"Definiere die Texte für das Logininterface.",
+     "NEWERVERSIONEXISTS":"Neuere Version verfügbar",
+      "CURRENTDATE":"Momentaner Stand",
+      "CHANGEDATE":"Neuer Stand vom",
+      "KEYNAME":"Login Screen / Interface",
+      "RESET_TITLE":"Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "UNSAVED_TITLE":"Ohne speichern fortfahren?",
+      "UNSAVED_DESCRIPTION":"Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
+      "LOCALE":"Sprachcode",
+      "LOCALES": {
+        "de":"German",
+        "en":"English",
+        "it":"Italian",
+        "fr":"French"
+      },
+      "KEYS": {
+        "emailVerificationDoneText":"Email Verification erfolgreich",
+        "emailVerificationText":"Email Verification",
+        "externalUserNotFoundText":"Externer Benutzer nicht gefunden",
+        "footerText":"Fusszeile",
+        "initMfaDoneText":"MFA Initialisierung erfolgreich",
+        "initMfaOtpText":"MFA Initialisierung",
+        "initMfaPromptText":"MFA Einrichtungsaufforderung",
+        "initMfaU2fText":"Universeller Zweitfaktor Initialisierung",
+        "initPasswordDoneText":"Passwort Initialisierung erfolgreich",
+        "initPasswordText":"Password Initialisierung",
+        "initializeDoneText":"Benutzereinrichtung erfolgreich",
+        "initializeUserText":"Benutzereinrichtung",
+        "linkingUserDoneText":"Benutzerverlinkung erfolgreich",
+        "loginText":"Anmelden",
+        "logoutText":"Abmelden",
+        "mfaProvidersText":"MFA Provider",
+        "passwordChangeDoneText":"Passwortwechsel erfolgreich",
+        "passwordChangeText":"Passwortwechsel",
+        "passwordResetDoneText":"Passwort zurücksetzen erfolgreich",
+        "passwordText":"Passwort",
+        "passwordlessText":"Passwortlose Authentifizierung",
+        "registrationOptionText":"Registrierungsoptionen",
+        "registrationOrgText":"Organisation registrieren",
+        "registrationUserText":"Benutzer registrieren",
+        "selectAccountText":"Account wählen",
+        "successLoginText":"Erfolgreiche Anmeldung",
+        "usernameChangeDoneText":"Benutzernamenwechsel erfolgreich",
+        "usernameChangeText":"Benutzernamenwechsel",
+        "verifyMfaOtpText":"OTP Verifikation",
+        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE":"Email Texte",
+      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
+      "TYPES": {
+        "INIT":"Initialisierung",
+        "VE":"Emailverifikation",
+        "VP":"Telefonnummerverifikation",
+        "PR":"Password Wiederherstellung",
+        "DC":"Domainbeanspruchung"
+      },
+      "CHIPS": {
+        "firstname":"Vorname",
+        "lastname":"Nachname",
+        "code":"Code",
+        "preferredLoginName":"Bevorzugter Anmeldename"
+      },
+      "TOAST": {
+        "UPDATED":"Benutzerdefinierte Texte gespeichert."
+      }
     },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
     "BTN_INSTALL": "Installieren",

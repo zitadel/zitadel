@@ -279,5 +279,5 @@
       </div>
     </div>
 
-    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
+    <app-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></app-policy-grid>
 </div>
