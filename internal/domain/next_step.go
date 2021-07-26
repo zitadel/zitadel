@@ -94,7 +94,9 @@ func (s *ExternalLoginStep) Type() NextStepType {
 	return NextStepExternalLogin
 }
 
-type PasswordlessStep struct{}
+type PasswordlessStep struct {
+	PasswordSet bool
+}
 
 func (s *PasswordlessStep) Type() NextStepType {
 	return NextStepPasswordless

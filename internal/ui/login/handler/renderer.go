@@ -255,7 +255,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.PasswordStep:
 		l.renderPassword(w, r, authReq, nil)
 	case *domain.PasswordlessStep:
-		l.renderPasswordlessVerification(w, r, authReq, nil)
+		l.renderPasswordlessVerification(w, r, authReq, step.PasswordSet, nil)
 	case *domain.PasswordlessRegistrationPromptStep:
 		l.renderPasswordlessPrompt(w, r, authReq, step, nil)
 	case *domain.MFAVerificationStep:

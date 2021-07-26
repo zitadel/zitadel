@@ -32,6 +32,7 @@ type UserView struct {
 }
 
 type HumanView struct {
+	PasswordSet              bool
 	PasswordInitRequired     bool
 	PasswordChangeRequired   bool
 	UsernameChangeRequired   bool

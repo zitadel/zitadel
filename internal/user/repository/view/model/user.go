@@ -93,6 +93,7 @@ type HumanView struct {
 	InitRequired             bool           `json:"-" gorm:"column:init_required"`
 	PasswordlessInitRequired bool           `json:"-" gorm:"column:passwordless_init_required"`
 	PasswordInitRequired     bool           `json:"-" gorm:"column:password_init_required"`
+	PasswordSet              bool           `json:"-" gorm:"column:password_set"`
 	PasswordChangeRequired   bool           `json:"-" gorm:"column:password_change_required"`
 	UsernameChangeRequired   bool           `json:"-" gorm:"column:username_change_required"`
 	PasswordChanged          time.Time      `json:"-" gorm:"column:password_change"`
@@ -152,6 +153,7 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 	}
 	if !user.HumanView.IsZero() {
 		userView.HumanView = &model.HumanView{
+			PasswordSet:              user.PasswordSet,
 			PasswordInitRequired:     user.PasswordInitRequired,
 			PasswordChangeRequired:   user.PasswordChangeRequired,
 			PasswordChanged:          user.PasswordChanged,
@@ -349,7 +351,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.AvatarKey = ""
 	case models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
 		models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
-		if u.PasswordInitRequired {
+		if !u.PasswordSet {
 			u.PasswordlessInitRequired = true
 			u.PasswordInitRequired = false
 		}
@@ -377,7 +379,8 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
-	u.PasswordInitRequired = password.Secret == nil
+	u.PasswordSet = password.Secret != nil
+	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
 	u.PasswordChanged = event.CreationDate
 	return nil

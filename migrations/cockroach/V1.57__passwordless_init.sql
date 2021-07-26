@@ -2,14 +2,11 @@ ALTER TABLE adminapi.users ADD COLUMN passwordless_init_required boolean;
 ALTER TABLE auth.users ADD COLUMN passwordless_init_required boolean;
 ALTER TABLE management.users ADD COLUMN passwordless_init_required boolean;
 
-BEGIN;
-ALTER TABLE adminapi.users RENAME COLUMN password_set TO password_init_required;
-UPDATE adminapi.users set password_init_required = NOT password_init_required;
+ALTER TABLE adminapi.users ADD COLUMN password_init_required BOOLEAN;
+UPDATE adminapi.users set password_init_required = NOT password_set;
 
-ALTER TABLE auth.users RENAME COLUMN password_set TO password_init_required;
-UPDATE auth.users set password_init_required = NOT password_init_required;
+ALTER TABLE auth.users ADD COLUMN password_init_required BOOLEAN;
+UPDATE auth.users set password_init_required = NOT password_set;
 
-ALTER TABLE management.users RENAME COLUMN password_set TO password_init_required;
-UPDATE management.users set password_init_required = NOT password_init_required;
-
-COMMIT;
+ALTER TABLE management.users ADD COLUMN password_init_required BOOLEAN;
+UPDATE management.users set password_init_required = NOT password_set;

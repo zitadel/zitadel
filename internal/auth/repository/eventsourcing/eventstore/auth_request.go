@@ -678,7 +678,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 
 func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) domain.NextStep {
 	if user.InitRequired {
-		return &domain.InitUserStep{PasswordSet: !user.PasswordInitRequired}
+		return &domain.InitUserStep{PasswordSet: user.PasswordSet}
 	}
 
 	var step domain.NextStep
@@ -687,7 +687,9 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
-		step = &domain.PasswordlessStep{}
+		step = &domain.PasswordlessStep{
+			PasswordSet: user.PasswordSet,
+		}
 	}
 
 	if user.PasswordlessInitRequired {
