@@ -106,6 +106,13 @@ func (m *CustomText) processCustomText(event *es_models.Event) (err error) {
 			return err
 		}
 		return m.view.DeleteCustomText(event.AggregateID, text.Template, text.Language, text.Key, event)
+	case iam_es_model.CustomTextMessageRemoved, model.CustomTextMessageRemoved:
+		text := new(iam_model.CustomTextView)
+		err = text.SetData(event)
+		if err != nil {
+			return err
+		}
+		return m.view.DeleteCustomTextTemplate(event.AggregateID, text.Template, text.Language, event)
 	default:
 		return m.view.ProcessedCustomTextSequence(event)
 	}

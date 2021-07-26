@@ -31,6 +31,8 @@ func (wm *IAMCustomLoginTextReadModel) AppendEvents(events ...eventstore.EventRe
 			wm.CustomLoginTextReadModel.AppendEvents(&e.CustomTextSetEvent)
 		case *iam.CustomTextRemovedEvent:
 			wm.CustomLoginTextReadModel.AppendEvents(&e.CustomTextRemovedEvent)
+		case *iam.CustomTextTemplateRemovedEvent:
+			wm.CustomLoginTextReadModel.AppendEvents(&e.CustomTextTemplateRemovedEvent)
 		}
 	}
 }
@@ -47,6 +49,7 @@ func (wm *IAMCustomLoginTextReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(iam.AggregateType).
 		EventTypes(
 			iam.CustomTextSetEventType,
-			iam.CustomTextRemovedEventType).
+			iam.CustomTextRemovedEventType,
+			iam.CustomTextTemplateRemovedEventType).
 		Builder()
 }

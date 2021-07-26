@@ -36,6 +36,14 @@ func (v *View) DeleteCustomText(aggregateID, textType, lang, key string, event *
 	return v.ProcessedCustomTextSequence(event)
 }
 
+func (v *View) DeleteCustomTextTemplate(aggregateID, textType, lang string, event *models.Event) error {
+	err := view.DeleteCustomTextTemplate(v.Db, customTextTable, aggregateID, textType, lang)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedCustomTextSequence(event)
+}
+
 func (v *View) GetLatestCustomTextSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(customTextTable)
 }
