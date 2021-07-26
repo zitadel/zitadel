@@ -1,9 +1,16 @@
+@mixin granted-project-grid-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .view-toggle {
+    border-bottom: 1px solid map-get($foreground, divider);
+  }
+}
+
 .view-toggle {
   width: 100%;
   display: flex;
   justify-content: flex-end;
   padding-bottom: .5rem;
-  border-bottom: 1px solid #2d2e30;
 
   .anim-list {
     display: flex;
