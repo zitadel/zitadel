@@ -67,18 +67,3 @@ describe('PROJECT: create app in Project ', () => {
     })
 })
 
-describe('PROJECT: delete Project ', () => {
-    it('PROJECT: delete Project ', () => {
-        cy.log(`PROJECT: delete project`);
-        //click on org to clear screen
-        cy.visit(Cypress.env('consoleUrl') + '/org')
-        //click on Projects 
-        cy.visit(Cypress.env('consoleUrl') + '/projects')
-        cy.url().should('contain', '/projects')
-        cy.wait(10000)
-        //TODO variable for regex
-        cy.get('.card').filter(':contains("newProjectToTest")', { timeout: 30000 }).find('button.delete-button').click()
-        cy.get('button').filter(':contains("Delete")').click()
-    })
-})
-

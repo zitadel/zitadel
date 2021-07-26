@@ -54,16 +54,4 @@ describe('USERS: add User', () => {
     })
 })
 
-describe('USERS: delete User', () => {
-    it('USERS: delete User', () => {
-        //click on org to clear screen
-        cy.visit(Cypress.env('consoleUrl') + '/org')
-        cy.wait(1000)
-        cy.visit(Cypress.env('consoleUrl') + '/users/list/humans')
-        cy.url().should('contain', 'users/list/humans')
-        cy.wait(10000)
-        //force due to angular hidden buttons
-        cy.get('tr').filter(':contains("demofirst")').find('button', { timeout: 30000 }).click({force: true})
-        cy.get('button').filter(':contains("Delete")').click()
-    })
-})
+

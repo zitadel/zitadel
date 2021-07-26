@@ -41,16 +41,3 @@ describe('MACHINES: add Machine', () => {
     })
 })
 
-describe('MACHINES: delete Machine', () => {
-    it('MACHINES: delete Machine', () => {
-        //click on org to clear screen
-        cy.visit(Cypress.env('consoleUrl') + '/org')
-        cy.wait(1000)
-        cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
-        cy.url().should('contain', 'users/list/machines')
-        cy.wait(10000)
-        //force due to angular hidden buttons
-        cy.get('tr').filter(':contains("demomachineusername")').find('button', { timeout: 30000 }).click({force: true})
-        cy.get('button').filter(':contains("Delete")').click()
-    })
-})
