@@ -242,7 +242,7 @@ ExternalNotFoundOption:
 Footer:
   PoweredBy: Powered By
   Tos: AGB
-  Privacy: Datenschutzerklärung
+  PrivacyPolicy: Datenschutzerklärung
   Help: Hilfe
   HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
