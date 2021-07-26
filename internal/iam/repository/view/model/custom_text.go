@@ -16,7 +16,6 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
 )
 
 const (
@@ -37,19 +36,6 @@ type CustomTextView struct {
 	Text     string `json:"Text" gorm:"column:text"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
-}
-
-func CustomTextViewFromModel(template *model.CustomTextView) *CustomTextView {
-	return &CustomTextView{
-		AggregateID:  template.AggregateID,
-		Sequence:     template.Sequence,
-		CreationDate: template.CreationDate,
-		ChangeDate:   template.ChangeDate,
-		Language:     template.Language.String(),
-		Template:     template.Template,
-		Key:          template.Key,
-		Text:         template.Text,
-	}
 }
 
 func CustomTextViewsToDomain(texts []*CustomTextView) []*domain.CustomText {
@@ -755,17 +741,11 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyRegistrationUserTOSConfirm {
 		result.RegistrationUser.TOSConfirm = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserTOSLink {
-		result.RegistrationUser.TOSLink = text.Text
-	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		result.RegistrationUser.TOSLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
 		result.RegistrationUser.TOSConfirmAnd = text.Text
-	}
-	if text.Key == domain.LoginKeyRegistrationUserPrivacyLink {
-		result.RegistrationUser.PrivacyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
 		result.RegistrationUser.PrivacyLinkText = text.Text

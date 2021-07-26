@@ -731,19 +731,11 @@ func (c *Commands) createRegistrationUserEvents(ctx context.Context, agg *events
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserTOSLink, existingText.RegistrationUserTOSLink, text.RegistrationUser.TOSLink, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserTOSLinkText, existingText.RegistrationUserTOSLinkText, text.RegistrationUser.TOSLinkText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserTOSConfirmAnd, existingText.RegistrationUserTOSConfirmAnd, text.RegistrationUser.TOSConfirmAnd, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserPrivacyLink, existingText.RegistrationUserPrivacyLink, text.RegistrationUser.PrivacyLink, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

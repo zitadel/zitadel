@@ -766,22 +766,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -861,22 +851,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1196,10 +1176,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						NextButtonText:           "NextButtonText",
@@ -1217,10 +1195,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						SaveButtonText:           "SaveButtonText",
@@ -1982,22 +1958,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2077,22 +2043,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2930,22 +2886,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, language.English,
 								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3025,22 +2971,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, language.English,
 								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3927,22 +3863,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4022,22 +3948,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4872,22 +4788,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, language.English,
 							),
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4967,22 +4873,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, language.English,
 							),
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, language.English,
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5820,22 +5716,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -5915,22 +5801,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6250,10 +6126,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						NextButtonText:           "NextButtonText",
@@ -6271,10 +6145,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						SaveButtonText:           "SaveButtonText",

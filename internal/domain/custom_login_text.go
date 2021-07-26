@@ -198,10 +198,8 @@ const (
 	LoginKeyRegistrationUserPasswordConfirmLabel     = LoginKeyRegistrationUser + "PasswordConfirmLabel"
 	LoginKeyRegistrationUserTOSAndPrivacyLabel       = LoginKeyRegistrationUser + "TosAndPrivacyLabel"
 	LoginKeyRegistrationUserTOSConfirm               = LoginKeyRegistrationUser + "TosConfirm"
-	LoginKeyRegistrationUserTOSLink                  = LoginKeyRegistrationUser + "TosLink"
 	LoginKeyRegistrationUserTOSLinkText              = LoginKeyRegistrationUser + "TosLinkText"
 	LoginKeyRegistrationUserTOSConfirmAnd            = LoginKeyRegistrationUser + "TosConfirmAnd"
-	LoginKeyRegistrationUserPrivacyLink              = LoginKeyRegistrationUser + "PrivacyLink"
 	LoginKeyRegistrationUserPrivacyLinkText          = LoginKeyRegistrationUser + "PrivacyLinkText"
 	LoginKeyRegistrationUserExternalLoginDescription = LoginKeyRegistrationUser + "ExternalUserDescription"
 	LoginKeyRegistrationUserNextButtonText           = LoginKeyRegistrationUser + "NextButtonText"
@@ -512,10 +510,8 @@ type RegistrationUserScreenText struct {
 	PasswordConfirmLabel     string
 	TOSAndPrivacyLabel       string
 	TOSConfirm               string
-	TOSLink                  string
 	TOSLinkText              string
 	TOSConfirmAnd            string
-	PrivacyLink              string
 	PrivacyLinkText          string
 	ExternalLoginDescription string
 	NextButtonText           string

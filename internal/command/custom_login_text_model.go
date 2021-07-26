@@ -1706,20 +1706,12 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenSetEvent(e *poli
 		wm.RegistrationUserTOSConfirm = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyRegistrationUserTOSLink {
-		wm.RegistrationUserTOSLink = e.Text
-		return
-	}
 	if e.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		wm.RegistrationUserTOSLinkText = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
 		wm.RegistrationUserTOSConfirmAnd = e.Text
-		return
-	}
-	if e.Key == domain.LoginKeyRegistrationUserPrivacyLink {
-		wm.RegistrationUserPrivacyLink = e.Text
 		return
 	}
 	if e.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
@@ -1793,20 +1785,12 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenRemoveEvent(e *p
 		wm.RegistrationUserTOSConfirm = ""
 		return
 	}
-	if e.Key == domain.LoginKeyRegistrationUserTOSLink {
-		wm.RegistrationUserTOSLink = ""
-		return
-	}
 	if e.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		wm.RegistrationUserTOSLinkText = ""
 		return
 	}
 	if e.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
 		wm.RegistrationUserTOSConfirmAnd = ""
-		return
-	}
-	if e.Key == domain.LoginKeyRegistrationUserPrivacyLink {
-		wm.RegistrationUserPrivacyLink = ""
 		return
 	}
 	if e.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {

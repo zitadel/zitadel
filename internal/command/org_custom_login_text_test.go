@@ -783,22 +783,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -878,22 +868,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1214,10 +1194,8 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						NextButtonText:           "NextButtonText",
@@ -1235,10 +1213,8 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						SaveButtonText:           "SaveButtonText",
@@ -2000,22 +1976,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2095,22 +2061,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2948,22 +2904,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextRemovedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, language.English,
 								),
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3043,22 +2989,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextRemovedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, language.English,
 								),
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3946,22 +3882,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4041,22 +3967,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4891,22 +4807,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, language.English,
 							),
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4986,22 +4892,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, language.English,
 							),
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
-							),
-						),
-						eventFromEventPusher(
-							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, language.English,
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5839,22 +5735,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLink, "PrivacyLink", language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -5934,22 +5820,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLink, "TOSLink", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
-								),
-							),
-							eventFromEventPusher(
-								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLink, "PrivacyLink", language.English,
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6270,10 +6146,8 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						NextButtonText:           "NextButtonText",
@@ -6291,10 +6165,8 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						PasswordConfirmLabel:     "PasswordConfirmLabel",
 						TOSAndPrivacyLabel:       "TOSAndPrivacyLabel",
 						TOSConfirm:               "TOSConfirm",
-						TOSLink:                  "TOSLink",
 						TOSLinkText:              "TOSLinkText",
-						PrivacyConfirm:           "PrivacyConfirm",
-						PrivacyLink:              "PrivacyLink",
+						TOSConfirmAnd:            "TOSConfirmAnd",
 						PrivacyLinkText:          "PrivacyLinkText",
 						ExternalLoginDescription: "ExternalLoginDescription",
 						SaveButtonText:           "SaveButtonText",
