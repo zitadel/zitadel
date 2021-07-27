@@ -6454,8 +6454,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
-| link |  string | - |  |
-| expiration |  google.protobuf.Duration | - |  |
 
 
 

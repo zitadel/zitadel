@@ -425,9 +425,7 @@ func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
-		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
-		Expiration: durationpb.New(initCode.Expiration),
+		Details: object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 

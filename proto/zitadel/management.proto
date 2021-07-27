@@ -3004,8 +3004,6 @@ message SendPasswordlessRegistrationRequest {
 
 message SendPasswordlessRegistrationResponse {
     zitadel.v1.ObjectDetails details = 1;
-    string link = 2;
-    google.protobuf.Duration expiration = 3;
 }
 
 message RemoveHumanPasswordlessRequest {
