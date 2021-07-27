@@ -72,8 +72,8 @@ jobs:
           context: .
           file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha,scope=zitadel
-          cache-to: type=gha,mode=max,scope=zitadel
+          cache-from: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel
       - uses: actions/upload-artifact@v2
         with:
@@ -99,7 +99,7 @@ jobs:
           file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
           target: go-codecov
-          cache-from: type=gha,scope=zitadel
+          cache-from: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel
       - uses: codecov/codecov-action@v1
         with:
@@ -124,8 +124,8 @@ jobs:
           context: .
           file: ./build/console/Dockerfile
           platforms: linux/amd64
-          #cache-from: type=gha,scope=zitadel-console
-          cache-to: type=gha,mode=max,scope=zitadel-console
+          cache-from: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel-console
       - uses: actions/upload-artifact@v2
         with:
@@ -167,8 +167,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=gha,scope=zitadel-image
-          cache-to: type=gha,mode=max,scope=zitadel-image
+          cache-from: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }}
 
   zitadel-operator:
     name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
@@ -195,7 +195,7 @@ jobs:
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
           cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-to: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
@@ -312,8 +312,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=gha,scope=zitadel-cockroachdb
-          cache-to: type=gha,mode=max,scope=zitadel-cockroachdb
+          cache-from: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }}
 
   release:
     name: Semantic Release Images and Artifacts
