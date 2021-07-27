@@ -45,7 +45,7 @@ docker-compose -f ./build/local/docker-compose-local.yml --profile database --pr
 
 ```Bash
 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend --profile setup -p zitadel rm
-docker system prune -a
+```
 
 If you are **confident** that you don't need to run the same ZITADEL instance again, go ahead and delete the `.keys` folder and reset the `environment.json` as well.
 
