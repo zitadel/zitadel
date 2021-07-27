@@ -52,6 +52,6 @@ echo -e "++=====================================================================
 ||                                                                                       ||
 ++=======================================================================================++"
 
-echo "access the console here http://localhost:4200"
+echo "access the console here http://localhost:${FE_PORT}"
 echo "access the login here http://localhost:50003/login"
 echo "access the apis here http://localhost:50002"
