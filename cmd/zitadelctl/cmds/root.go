@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"context"
+	"os"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
@@ -40,6 +41,7 @@ func RootCommand(version string) (*cobra.Command, GetRootValues) {
 			ErrFunc: func(err error) error {
 				if err != nil {
 					monitor.Error(err)
+					os.Exit(1)
 				}
 				return nil
 			},
