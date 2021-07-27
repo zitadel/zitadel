@@ -12,15 +12,9 @@ const (
 
 type passwordlessPromptData struct {
 	userData
-	SetupEnabled bool
-	Required     bool
-	MFAProviders []domain.MFAType
 }
 
-type passwordlessPromptFormData struct {
-	MFAProvider domain.MFAType `schema:"provider"`
-	Skip        bool           `schema:"skip"`
-}
+type passwordlessPromptFormData struct{}
 
 func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request) {
 	data := new(passwordlessPromptFormData)
@@ -29,28 +23,16 @@ func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request)
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if !data.Skip {
-		l.renderPasswordlessRegistration(w, r, authReq, "", "", "", "", nil)
-		return
-	}
-	err = l.command.HumanSkipMFAInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	l.handleLogin(w, r)
+	l.renderPasswordlessRegistration(w, r, authReq, "", "", "", "", nil)
 }
 
-func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, step *domain.PasswordlessRegistrationPromptStep, err error) {
+func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := &passwordlessPromptData{
-		userData:     l.getUserData(r, authReq, "Passwordless Prompt", errID, errMessage),
-		SetupEnabled: step.SetupEnabled,
-		Required:     step.Required,
-		MFAProviders: step.MFAProviders,
+		userData: l.getUserData(r, authReq, "Passwordless Prompt", errID, errMessage),
 	}
 
 	translator := l.getTranslator(authReq)

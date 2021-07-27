@@ -19,10 +19,11 @@ const (
 
 type passwordlessRegistrationData struct {
 	webAuthNData
-	Code   string
-	CodeID string
-	UserID string
-	OrgID  string
+	Code     string
+	CodeID   string
+	UserID   string
+	OrgID    string
+	Disabled bool
 }
 
 type passwordlessRegistrationFormData struct {
@@ -32,7 +33,6 @@ type passwordlessRegistrationFormData struct {
 	UserID    string `schema:"userID"`
 	OrgID     string `schema:"orgID"`
 	TokenName string `schema:"name"`
-	Resend    bool   `schema:"resend"`
 }
 
 func (l *Login) handlePasswordlessRegistration(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +45,7 @@ func (l *Login) handlePasswordlessRegistration(w http.ResponseWriter, r *http.Re
 
 func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, orgID, codeID, code string, err error) {
 	var errID, errMessage, credentialData string
+	var disabled bool
 	if authReq != nil {
 		userID = authReq.UserID
 		orgID = authReq.UserOrgID
@@ -59,6 +60,7 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	}
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
+		disabled = true
 	}
 	if webAuthNToken != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNToken.CredentialCreationData)
@@ -72,6 +74,7 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		codeID,
 		userID,
 		orgID,
+		disabled,
 	}
 	translator := l.getTranslator(authReq)
 	if authReq == nil {
@@ -97,10 +100,6 @@ func (l *Login) handlePasswordlessRegistrationCheck(w http.ResponseWriter, r *ht
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if formData.Resend {
-		l.resendPasswordlessRegistration(w, r, authReq, formData.UserID)
-		return
-	}
 	l.checkPasswordlessRegistration(w, r, authReq, formData, nil)
 }
 
@@ -120,7 +119,7 @@ func (l *Login) checkPasswordlessRegistration(w http.ResponseWriter, r *http.Req
 		l.renderPasswordlessRegistration(w, r, authReq, formData.UserID, formData.OrgID, formData.CodeID, formData.Code, err)
 		return
 	}
-	l.renderPasswordResetDone(w, r, authReq, nil)
+	l.renderPasswordlessRegistrationDone(w, r, authReq, nil)
 }
 
 func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
@@ -130,13 +129,4 @@ func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *htt
 	}
 	data := l.getUserData(r, authReq, "Passwordless Registration Done", errID, errMessage)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
-}
-
-func (l *Login) resendPasswordlessRegistration(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string) {
-	userOrgID := ""
-	if authReq != nil {
-		userOrgID = authReq.UserOrgID
-	}
-	_, err := l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID) //TODO: resend pw less
-	l.renderPasswordlessRegistration(w, r, authReq, userID, "", "", "", err)
 }

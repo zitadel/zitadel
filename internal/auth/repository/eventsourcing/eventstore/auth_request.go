@@ -693,10 +693,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	}
 
 	if user.PasswordlessInitRequired {
-		return &domain.PasswordlessRegistrationPromptStep{
-			SetupEnabled: false,
-			Required:     true,
-		}
+		return &domain.PasswordlessRegistrationPromptStep{}
 	}
 
 	if user.PasswordInitRequired {
@@ -725,15 +722,6 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 		if len(types) == 0 {
 			return nil, true, nil
-		}
-		for i, mfaType := range types {
-			if mfaType == domain.MFATypeU2FUserVerification {
-				return &domain.PasswordlessRegistrationPromptStep{
-					Required:     promptRequired,
-					SetupEnabled: true,
-					MFAProviders: types[:i],
-				}, false, nil
-			}
 		}
 		return &domain.MFAPromptStep{
 			Required:     promptRequired,
@@ -772,13 +760,6 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 		return true
 	}
 	return checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime)
-}
-
-func (repo *AuthRequestRepo) checkPasswordlessRegistration(user *user_model.UserView) domain.NextStep {
-	if user.MFAMaxSetUp >= model.MFALevelMultiFactor || checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime) { //TODO: PasswordlessInitSkipped
-		return nil
-	}
-	return &domain.PasswordlessRegistrationPromptStep{}
 }
 
 func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
