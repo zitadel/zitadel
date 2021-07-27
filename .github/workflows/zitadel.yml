@@ -2,15 +2,13 @@ name: ZITADEL Release
 on:
   push:
     branches:
-      - 'main'
+      - '**'
     tags-ignore:
       - '**'
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  NODE_VERSION: '12'
-  GO_VERSION: '1.15'
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
   CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts'
@@ -56,65 +54,130 @@ jobs:
           echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
           echo "::set-output name=version::${VERSION}"
 
-  zitadel-image:
+  zitadel:
     name: Build ZITADEL
     needs: refs
     runs-on: ubuntu-18.04
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-zitadel-${{ hashFiles('**/go.sum', 'console/package-lock.json', 'build/dockerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-zitadel-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/zitadel/Dockerfile
+          platforms: linux/amd64
+          cache-from: type=gha,scope=zitadel
+          cache-to: type=gha,mode=max,scope=zitadel
+          outputs: type=local,dest=/tmp/zitadel
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadel
+          path: /tmp/zitadel/
+
+  zitadel-codecov:
+    name: Upload ZITADEL Codecov
+    needs: [refs, zitadel]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/zitadel/Dockerfile
+          platforms: linux/amd64
+          target: go-codecov
+          cache-from: type=gha,scope=zitadel
+          outputs: type=local,dest=/tmp/zitadel
+      - uses: codecov/codecov-action@v1
+        with:
+          name: zitadel-codecov
+          files: /tmp/zitadel/profile.cov
+
+  zitadel-console:
+    name: Build ZITADEL Console
+    needs: refs
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/console/Dockerfile
+          platforms: linux/amd64
+          cache-from: type=gha,scope=zitadel-console
+          cache-to: type=gha,mode=max,scope=zitadel-console
+          outputs: type=local,dest=/tmp/zitadel-console
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadel-console
+          path: /tmp/zitadel-console/
+
+  zitadel-image:
+    name: Package ZITADEL Image
+    needs: [refs, zitadel, zitadel-console]
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: zitadel
+          path: .download/zitadel
+      - uses: actions/download-artifact@v2
+        with:
+          name: zitadel-console
+          path: .download/zitadel/console
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ${{ env.REGISTRY }}
-      - run: ls -la
       - uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./build/dockerfile
+          file: ./build/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/dockerfile
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
-          push: false
-          cache-from: type=local,src=/tmp/.buildx-cache-new
-          target: go-codecov
-          outputs: type=local,dest=/tmp/zitadel
-      - uses: codecov/codecov-action@v1
-        with:
-          files: /tmp/zitadel/profile.cov
-          name: codecov-go
-      -
-        # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896
-        name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          cache-from: type=gha,scope=zitadel-image
+          cache-to: type=gha,mode=max,scope=zitadel-image
 
-  operator-image:
+  zitadel-operator:
+    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
     needs: refs
     runs-on: ubuntu-18.04
-    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
@@ -122,33 +185,22 @@ jobs:
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-${{ hashFiles('**/go.sum', 'build/operator/Dockerfile') }}
-          restore-keys: |
-            ${{ matrix.goos }}-${{ matrix.goarch }}-operator-image-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
         with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ${{ env.REGISTRY }}
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
       - uses: docker/build-push-action@v2
-        name: onlybuild
         with:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: false
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
@@ -163,61 +215,97 @@ jobs:
         with:
           name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
           path: /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
+
+  zitadel-operator-codecov:
+    name: Upload ZITADEL Operator Codecov ${{ matrix.goos }}-${{ matrix.goarch }}
+    needs: [refs, zitadel-operator]
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        goos: [ 'linux' ]
+        goarch: [ 'amd64' ]
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
       - uses: docker/build-push-action@v2
-        if: ${{ matrix.goos == 'linux' && matrix.goarch == 'amd64' }}
-        name: buildandpush
         with:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: true
-          cache-from: type=local,src=/tmp/.buildx-cache-new
-          build-args: |
-            OS=${{ matrix.goos }}
-            ARCH=${{ matrix.goarch }}
-            VERSION=${{ needs.refs.outputs.version }}
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/operator/Dockerfile
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:coverage
-          push: false
-          cache-from: type=local,src=/tmp/.buildx-cache-new
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           target: go-codecov
           outputs: type=local,dest=/tmp/operator
       - uses: codecov/codecov-action@v1
         with:
           files: /tmp/operator/profile.cov
           name: codecov-go
-      -
-        # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896
-        name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-  crdb-image:
-    name: Build CockroachDB Image
-    needs: refs
+  zitadel-operator-image:
+    name: Package ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
+    needs: [refs, zitadel-operator]
     runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    strategy:
+      matrix:
+        goos: [ 'linux' ]
+        goarch: [ 'amd64' ]
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-crdb-image-${{ hashFiles('build/cr-backup/Dockerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-crdb-image-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/operator/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
+          push: true
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          build-args: |
+            OS=${{ matrix.goos }}
+            ARCH=${{ matrix.goarch }}
+            VERSION=${{ needs.refs.outputs.version }}
+
+  crdb-image:
+    name: Package ZITADEL CockroachDB Image
+    needs: refs
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          ## Workaround until https://github.com/docker/build-push-action/issues/252#issuecomment-804898823 is merged
+          version: v0.6.0-rc1
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: --debug
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -232,13 +320,14 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+          cache-from: type=gha,scope=zitadel-cockroachdb
+          cache-to: type=gha,mode=max,scope=zitadel-cockroachdb
 
   release:
     name: Semantic Release Images and Artifacts
     runs-on: ubuntu-18.04
-    needs: [ refs, zitadel-image, operator-image, crdb-image ]
+    needs: [ refs, zitadel-image, zitadel-operator-image, crdb-image ]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     env:
       DOCKER_USERNAME: ${{ github.repository_owner }}
       DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -335,8 +424,8 @@ jobs:
           prerelease: true
           draft: false
           allowUpdates: true
-      - uses: actions/checkout@v2
       - name: Create Sentry release
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
