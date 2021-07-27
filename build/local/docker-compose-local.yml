@@ -103,7 +103,7 @@ services:
       - minio
     build:
       context: ../..
-      dockerfile: build/dockerfile
+      dockerfile: build/zitadel/Dockerfile
       target: dev-go-build
       args:
         ENV: dev
@@ -164,7 +164,7 @@ services:
       - grpc-web-gateway
     build:
       context: ../..
-      dockerfile: build/dockerfile
+      dockerfile: build/console/Dockerfile
       target: dev-angular-build
       args:
         ENV: dev
