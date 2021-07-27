@@ -125,7 +125,7 @@ jobs:
           file: ./build/console/Dockerfile
           platforms: linux/amd64
           cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel-console
       - uses: actions/upload-artifact@v2
         with:
@@ -168,7 +168,7 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: true
           cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }},mode=max
 
   zitadel-operator:
     name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
@@ -195,7 +195,7 @@ jobs:
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
           cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          cache-to: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-to: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }},mode=max
           outputs: type=local,dest=/tmp/operator
           build-args: |
             OS=${{ matrix.goos }}
