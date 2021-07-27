@@ -41,15 +41,13 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend --profile setup -p zitadel up
 ```
 
-### Delete the quickstart
+### Remove the quickstart
 
 ```Bash
 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend --profile setup -p zitadel rm
-```
+docker system prune -a```
 
-```Bash
-docker system prune -a
-```
+If you are **confident** that you don't ned to run the same ZITADEL instance again, go ahead an delete the `.keys` folder and reset the `enviroment.json` as well.
 
 ```Bash
 rm -rf .keys
