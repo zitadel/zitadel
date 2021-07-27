@@ -14,10 +14,12 @@ type passwordlessPromptData struct {
 	userData
 	SetupEnabled bool
 	Required     bool
+	MFAProviders []domain.MFAType
 }
 
 type passwordlessPromptFormData struct {
-	Skip bool `schema:"skip"`
+	MFAProvider domain.MFAType `schema:"provider"`
+	Skip        bool           `schema:"skip"`
 }
 
 func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +50,7 @@ func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request,
 		userData:     l.getUserData(r, authReq, "Passwordless Prompt", errID, errMessage),
 		SetupEnabled: step.SetupEnabled,
 		Required:     step.Required,
+		MFAProviders: step.MFAProviders,
 	}
 
 	translator := l.getTranslator(authReq)

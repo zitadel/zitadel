@@ -177,9 +177,7 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 			for _, factor := range policy.MultiFactors {
 				switch factor {
 				case domain.MultiFactorTypeU2FWithPIN:
-					if u.IsPasswordlessReady() {
-						types = append(types, domain.MFATypeU2F)
-					}
+					types = append(types, domain.MFATypeU2FUserVerification)
 				}
 			}
 		}

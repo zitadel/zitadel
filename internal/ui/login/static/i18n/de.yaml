@@ -134,6 +134,14 @@ Passwordless:
   LoginWithPwButtonText: Mit Passwort anmelden
   ValidateTokenButtonText: Token validieren
 
+PasswordlessPrompt:
+  Title: Passwortloser Login hinzufügen
+  Description: Möchtest du einen Passwortloser Login hinzufügen?
+  DescriptionInit: Du musst zuerst den Passwortlosen Login hinzufügen. Nutze dazu den Link, den du erhalten um dein Gerät zu registrieren.
+  PasswordlessButtonText: Werde Passwortlos
+  NextButtonText: weiter
+  SkipButtonText: überspringen
+
 PasswordlessRegistration:
   Title: Passwortloser Login hinzufügen
   Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.

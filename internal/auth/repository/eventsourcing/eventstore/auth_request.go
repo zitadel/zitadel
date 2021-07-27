@@ -633,11 +633,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
 		return steps, nil
 	}
-
-	step = repo.checkPasswordlessRegistration(user)
-	if step != nil {
-		return append(steps, step), nil
-	}
+	//
+	//step = repo.checkPasswordlessRegistration(user)
+	//if step != nil {
+	//	return append(steps, step), nil
+	//}
 
 	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
 		return append(steps, &domain.LinkUsersStep{}), nil
@@ -725,6 +725,15 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 		if len(types) == 0 {
 			return nil, true, nil
+		}
+		for i, mfaType := range types {
+			if mfaType == domain.MFATypeU2FUserVerification {
+				return &domain.PasswordlessRegistrationPromptStep{
+					Required:     promptRequired,
+					SetupEnabled: true,
+					MFAProviders: types[:i],
+				}, false, nil
+			}
 		}
 		return &domain.MFAPromptStep{
 			Required:     promptRequired,
