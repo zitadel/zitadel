@@ -55,7 +55,9 @@ func AdaptFunc(
 
 		desiredKind, err := parseDesiredV0(desired)
 
-		if desiredKind != nil &&
+		_, _, sendAnalytics := mntr.Environment()
+		if sendAnalytics &&
+			desiredKind != nil &&
 			desiredKind.Spec != nil &&
 			desiredKind.Spec.Configuration != nil &&
 			desiredKind.Spec.Configuration.DNS != nil &&
