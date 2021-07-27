@@ -10,8 +10,8 @@ fe_status=""
 
 while [[ $be_status -ne 200 || $fe_status -ne 200 ]]; do
     sleep 5
-    be_status=$(curl -s -o /dev/null -I -w "%{http_code}" localhost:${BE_PORT}/clientID)
-    fe_status=$(curl -s -o /dev/null -I -w "%{http_code}" localhost:${FE_PORT}/assets/environment.json)
+    be_status=$(curl -s -o /dev/null -I -w "%{http_code}" host.docker.internal:${BE_PORT}/clientID)
+    fe_status=$(curl -s -o /dev/null -I -w "%{http_code}" host.docker.internal:${FE_PORT}/assets/environment.json)
     echo "backend (${be_status}) or frontend (${fe_status}) not ready yet"
 done
 
