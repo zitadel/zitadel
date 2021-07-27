@@ -15,8 +15,6 @@ You can connect to [ZITADEL on localhost:4200](http://localhost:4200) as soon as
 ++=========++
 ```
 
-Make sure to enable `"features": { "buildkit": true }` in your docker settings!
-
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 && docker-compose -f ./build/local/docker-compose-local.yml --profile database -p zitadel up --exit-code-from db-migrations \
@@ -25,3 +23,38 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 ```
 
 For a more detailed guide take a look at the [development guide](./development.md)
+
+## FAQ
+
+### Build Errors
+
+If you experience strange docker error you might need to check that `buildkit` is enabled.
+
+Make sure to enable `"features": { "buildkit": true }` in your docker settings!
+
+### Error 412
+
+If the line `backend (412), environment (000) or console (000) not ready yet ==> retrying in 5 seconds` contains a `412` you struck a race condition within the start process (It should exit 1 when this happens). This will be fixed in a future release. You can work around it by restarting the containers.
+
+```Bash
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
+docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend --profile setup -p zitadel up
+```
+
+### Delete the quickstart
+
+```Bash
+docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend --profile setup -p zitadel rm
+```
+
+```Bash
+docker system prune -a
+```
+
+```Bash
+rm -rf .keys
+```
+
+```Bash
+git reset build/local/environment.json
+```

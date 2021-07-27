@@ -3,5 +3,5 @@
   "mgmtServiceUrl": "http://localhost:50000",
   "adminServiceUrl": "http://localhost:50000",
   "issuer": "http://localhost:50002/oauth/v2",
-  "clientid": "@zitadel"
+  "clientid": "118951859720421380@zitadel"
 }

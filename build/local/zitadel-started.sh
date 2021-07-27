@@ -6,13 +6,19 @@
 # ------------------------------
 
 be_status=""
-fe_status=""
+env_status=""
+console_status=""
 
-while [[ $be_status -ne 200 || $fe_status -ne 200 ]]; do
+while [[ $be_status != 200 && $console_status != 200 ]]; do
     sleep 5
+    ## This is a workaround for a race condition
+    if [[ $be_status -eq 412 ]]; then
+        echo "please restart the process once again to get rid of the 412 error!"
+    fi
     be_status=$(curl -s -o /dev/null -I -w "%{http_code}" host.docker.internal:${BE_PORT}/clientID)
-    fe_status=$(curl -s -o /dev/null -I -w "%{http_code}" host.docker.internal:${FE_PORT}/assets/environment.json)
-    echo "backend (${be_status}) or frontend (${fe_status}) not ready yet"
+    env_status=$(curl -s -o /dev/null -I -w "%{http_code}" host.docker.internal:${FE_PORT}/assets/environment.json)
+    console_status=$(curl -s -o /dev/null -I -w "%{http_code}" host.docker.internal:${FE_PORT}/index.html)
+    echo "backend (${be_status}), environment (${env_status}) or console (${console_status}) not ready yet ==> retrying in 5 seconds"
 done
 
 echo -e "++=======================================================================================++
