@@ -97,7 +97,6 @@ Delegate the right to assign roles to another organization
 Customize login and console with your design  
 ![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
-
 ## How To Contribute
 
 Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
