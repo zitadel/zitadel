@@ -63,6 +63,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 		if err != nil && !rv.Gitops {
 			return err
 		}
+		err = nil
 
 		if err := secret.Write(
 			monitor,
