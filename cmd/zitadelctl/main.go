@@ -31,6 +31,7 @@ func main() {
 	)
 
 	if err := rootCmd.Execute(); err != nil {
+		monitor.Error(mntr.ToUserError(err))
 		os.Exit(1)
 	}
 }
