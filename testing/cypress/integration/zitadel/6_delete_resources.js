@@ -35,7 +35,7 @@ describe('CLEANUP: delete User', () => {
             cy.get('button').should('contain', 'Delete');
         })
         cy.get('button').filter(':contains("Delete")').click().then(() => {
-            cy.wait(2000)
+            cy.wait(3000)
             cy.visit(Cypress.env('consoleUrl') + '/users/list/humans');
             cy.get('[text*=demofirst]', { timeout: 30000 }).should('not.exist');
             })
@@ -58,7 +58,7 @@ describe('CLEANUP: delete Machine', () => {
             cy.get('button').should('contain', 'Delete');
         })
         cy.get('button').filter(':contains("Delete")').click().then(() => {
-            cy.wait(2000)
+            cy.wait(3000)
             cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
             cy.get('[text*=machineusername]', { timeout: 30000 }).should('not.exist');
         })

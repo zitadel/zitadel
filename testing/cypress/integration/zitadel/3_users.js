@@ -50,6 +50,7 @@ describe('USERS: add User', () => {
         cy.get('[formcontrolname^=lastName]').type(Cypress.env('newLastName'))
         cy.get('[formcontrolname^=phone]').type(Cypress.env('newPhonenumber'))
         cy.get('button').filter(':contains("Create")').should('be.visible').click().then(() => {
+            cy.wait(2000)
             cy.visit(Cypress.env('consoleUrl') + '/users/list/humans');
             cy.get('tr', { timeout: 30000 }).should('contain.text', "demofirst").and('exist');
         })
