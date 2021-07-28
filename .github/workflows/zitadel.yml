@@ -124,7 +124,7 @@ jobs:
           context: .
           file: ./build/console/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha,scope=${{ github.workflow }}
+          #cache-from: type=gha,scope=${{ github.workflow }}
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel-console
       - uses: actions/upload-artifact@v2
