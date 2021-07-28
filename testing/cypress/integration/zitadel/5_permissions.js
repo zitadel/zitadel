@@ -27,9 +27,13 @@ describe('PERMISSIONS: show Projects ', () => {
 describe('PERMISSIONS: add Role ', () => {
 
     it('PERMISSIONS: add Role ', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/projects')
-        cy.url().should('contain', '/projects')
-        cy.wait(10000)
+        cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
+            cy.url().should('contain', '/org');
+        })
+        cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
+            cy.url({ timeout: 30000 }).should('contain', '/projects');
+            cy.get('.card', { timeout: 30000 }).should('contain.text', "newProjectToTest")
+        })
         cy.get('.card').filter(':contains("newProjectToTest")', { timeout: 30000 }).click()
         cy.get('.app-container').filter(':contains("newAppToTest")').should('be.visible').click()
         let projectID
@@ -51,9 +55,13 @@ describe('PERMISSIONS: add Role ', () => {
 describe('PERMISSIONS: add Grant ', () => {
 
     it('PERMISSIONS: add Grant ', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/projects')
-        cy.url().should('contain', '/projects')
-        cy.wait(10000)
+        cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
+            cy.url().should('contain', '/org');
+        })
+        cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
+            cy.url({ timeout: 30000 }).should('contain', '/projects');
+            cy.get('.card', { timeout: 30000 }).should('contain.text', "newProjectToTest")
+        })
         cy.get('.card').filter(':contains("newProjectToTest")', { timeout: 30000 }).click()
         cy.get('.app-container').filter(':contains("newAppToTest")').should('be.visible').click()
         let projectID

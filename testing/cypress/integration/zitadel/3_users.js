@@ -36,8 +36,9 @@ describe('USERS: show Users ', () => {
 describe('USERS: add User', () => {
     it('USERS: add User', () => {
         //click on org to clear screen
-        cy.visit(Cypress.env('consoleUrl') + '/org')
-        cy.wait(1000)
+        cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
+            cy.url().should('contain', '/org');
+        })
         cy.visit(Cypress.env('consoleUrl') + '/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
         cy.visit(Cypress.env('consoleUrl') + '/users/create')
@@ -48,9 +49,10 @@ describe('USERS: add User', () => {
         cy.get('[formcontrolname^=firstName]').type(Cypress.env('newFirstName'))
         cy.get('[formcontrolname^=lastName]').type(Cypress.env('newLastName'))
         cy.get('[formcontrolname^=phone]').type(Cypress.env('newPhonenumber'))
-        cy.get('button').filter(':contains("Create")').should('be.visible').click()
-        cy.wait(3000)
-
+        cy.get('button').filter(':contains("Create")').should('be.visible').click().then(() => {
+            cy.visit(Cypress.env('consoleUrl') + '/users/list/humans');
+            cy.get('tr', { timeout: 30000 }).should('contain.text', "demofirst").and('exist');
+        })
     })
 })
 
