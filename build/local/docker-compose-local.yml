@@ -75,7 +75,7 @@ services:
       - keys
     build:
       context: ../..
-      dockerfile: build/dockerfile
+      dockerfile: build/zitadel/Dockerfile
       target: dev-go-build
       args:
         ENV: dev
@@ -126,10 +126,12 @@ services:
         'start',
       ]
 
-  zitadel-setted-up:
+  zitadel-started-up:
     profiles: ['setup']
     networks:
       - zitadel
+    extra_hosts:
+      host.docker.internal: host-gateway
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.started
@@ -170,7 +172,7 @@ services:
         ENV: dev
     volumes:
       - ./environment.json:/console/src/assets/environment.json
-    command: sh -c "ng serve --host 0.0.0.0"
+    command: sh -c "ng serve --host 0.0.0.0 --disable-host-check"
     ports:
       - 4200:4200
 
