@@ -19,7 +19,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Single Page Applications',
-      items: ['quickstarts/angular', 'quickstarts/react', 'quickstarts/nextjs'],
+      items: ['quickstarts/angular', 'quickstarts/react'],
       collapsed: false,
     },
     {
@@ -31,7 +31,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Frameworks',
-      items: ['quickstarts/flutter'],
+      items: ['quickstarts/flutter', 'quickstarts/nextjs'],
       collapsed: false,
     },
     {
