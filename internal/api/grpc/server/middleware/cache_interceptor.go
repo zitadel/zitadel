@@ -13,13 +13,17 @@ import (
 	_ "github.com/caos/zitadel/internal/statik"
 )
 
-func CacheInterceptor() grpc.UnaryServerInterceptor {
+func NoCacheInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		header := metadata.Pairs(
-			runtime.MetadataHeaderPrefix+"cache-control", "no-store",
-			runtime.MetadataHeaderPrefix+"expires", time.Now().UTC().Format(http.TimeFormat),
-			runtime.MetadataHeaderPrefix+"pragma", "no-cache",
-		)
+		headers := map[string]string{
+			"cache-control": "no-store",
+			"expires":       time.Now().UTC().Format(http.TimeFormat),
+			"pragma":        "no-cache",
+		}
+		header := metadata.New(headers)
+		for key, value := range headers {
+			header.Append(runtime.MetadataHeaderPrefix+key, value)
+		}
 		err := grpc.SendHeader(ctx, header)
 		logging.Log("MIDDLE-efh41").OnError(err).WithField("req", info.FullMethod).Warn("cannot send cache-control on grpc response")
 		resp, err := handler(ctx, req)

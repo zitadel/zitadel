@@ -81,9 +81,27 @@ func AssetsCacheInterceptor(maxAge, sharedMaxAge time.Duration, h http.Handler) 
 
 func CacheInterceptorOpts(h http.Handler, cache *Cache) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		cache.serializeHeaders(w)
-		h.ServeHTTP(w, req)
+		cachingResponseWriter := &cachingResponseWriter{
+			ResponseWriter: w,
+			Cache:          cache,
+		}
+		h.ServeHTTP(cachingResponseWriter, req)
 	})
+}
+
+type cachingResponseWriter struct {
+	http.ResponseWriter
+	*Cache
+}
+
+func (w *cachingResponseWriter) WriteHeader(code int) {
+	if code >= 400 {
+		NeverCacheOptions.serializeHeaders(w.ResponseWriter)
+		w.ResponseWriter.WriteHeader(code)
+		return
+	}
+	w.Cache.serializeHeaders(w.ResponseWriter)
+	w.ResponseWriter.WriteHeader(code)
 }
 
 func (c *Cache) serializeHeaders(w http.ResponseWriter) {
