@@ -73,7 +73,7 @@ jobs:
           file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
           cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel
       - uses: actions/upload-artifact@v2
         with:
