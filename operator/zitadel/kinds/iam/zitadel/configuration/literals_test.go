@@ -463,6 +463,7 @@ func TestConfiguration_LiteralsSecretVars(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      "",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "",
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredEmpty)
 	assert.NoError(t, err)
@@ -479,6 +480,7 @@ func TestConfiguration_LiteralsSecretVarsFull(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      "sid",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "accesskeyid",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "secretaccesskey",
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 
@@ -536,6 +538,7 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      sid,
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     akid,
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": sak,
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 
