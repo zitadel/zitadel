@@ -72,7 +72,7 @@ jobs:
           context: .
           file: ./build/zitadel/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha,scope=${{ github.workflow }}
+#          cache-from: type=gha,scope=${{ github.workflow }}
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel
       - uses: actions/upload-artifact@v2
@@ -124,7 +124,7 @@ jobs:
           context: .
           file: ./build/console/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha,scope=${{ github.workflow }}
+#          cache-from: type=gha,scope=${{ github.workflow }}
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel-console
       - uses: actions/upload-artifact@v2
@@ -194,7 +194,7 @@ jobs:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+#          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           cache-to: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }},mode=max
           outputs: type=local,dest=/tmp/operator
           build-args: |
