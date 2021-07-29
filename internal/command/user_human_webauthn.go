@@ -550,9 +550,9 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 		return err
 	}
 
-	//if !isUserStateExists(existingUser.UserState) {
-	//	return caos_errs.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
-	//}
+	if initCode.State != domain.PasswordlessInitCodeStateRequested {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-Gdfg3", "Errors.User.Code.NotFound")
+	}
 
 	_, err = c.eventstore.PushEvents(ctx,
 		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID),
