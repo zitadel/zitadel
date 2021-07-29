@@ -1,6 +1,6 @@
 module.exports = (on, config) => {
   // modify the config values
-  config.defaultCommandTimeout = 20000
+  config.defaultCommandTimeout = 60000
 
   //config.env.consoleUrl = "https://console.zitadel.ch"
 

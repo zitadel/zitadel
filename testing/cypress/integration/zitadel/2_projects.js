@@ -20,7 +20,7 @@ it('LOGIN: Fill in credentials and login', () => {
 describe('PROJECT: show Projects ', () => {
     it('PROJECT: show Projects ', () => {
         cy.visit(Cypress.env('consoleUrl') + '/projects')
-        cy.url({ timeout: 30000 }).should('contain', '/projects')
+        cy.url().should('contain', '/projects')
     })
 })
 
@@ -29,12 +29,12 @@ describe('PROJECT: add Project ', () => {
     it('PROJECT: add Project ', () => {
         cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
             cy.url().should('contain', '/projects');
-            cy.get('.add-project-button', { timeout: 30000 })
+            cy.get('.add-project-button')
         })
         cy.get('.add-project-button').click({ force: true })
         cy.get('input').type("newProjectToTest")
         cy.get('[type^=submit]').click().then(() => {
-            cy.get('h1', { timeout: 30000 }).should('contain', "Project newProjectToTest")
+            cy.get('h1').should('contain', "Project newProjectToTest")
         })
     })
 })
@@ -47,10 +47,10 @@ describe('PROJECT: create app in Project ', () => {
             cy.url().should('contain', '/org');
         })
         cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
-            cy.url({ timeout: 30000 }).should('contain', '/projects');
-            cy.get('.card', { timeout: 30000 }).should('contain.text', "newProjectToTest")
+            cy.url().should('contain', '/projects');
+            cy.get('.card').should('contain.text', "newProjectToTest")
         })
-        cy.get('.card', { timeout: 30000 }).contains("newProjectToTest", { timeout: 25000 }).click()
+        cy.get('.card').contains("newProjectToTest").click()
         cy.get('.cnsl-app-card').filter(':contains("add")').click()
         cy.get('[formcontrolname^=name]').type("newAppToTest")
         // select webapp
@@ -64,10 +64,10 @@ describe('PROJECT: create app in Project ', () => {
         cy.get('cnsl-redirect-uris').eq(1).type("https://testlogouturl.org")
         cy.get('[type^=submit]').filter(':contains("Continue")').should('be.visible').eq(2).click()
         cy.get('button').filter(':contains("Create")').should('be.visible').click().then(() => {
-            cy.get('[id*=overlay]', { timeout: 30000 }).should('exist')
+            cy.get('[id*=overlay]').should('exist')
         })
         //TODO: check client ID/Secret
-        cy.get('button').filter(':contains("Close")', { timeout: 30000 }).should('exist').click()
+        cy.get('button').filter(':contains("Close")').should('exist').click()
     })
 })
 

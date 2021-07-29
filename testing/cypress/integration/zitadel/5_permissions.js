@@ -59,10 +59,10 @@ describe('PERMISSIONS: add Grant ', () => {
             cy.url().should('contain', '/org');
         })
         cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
-            cy.url({ timeout: 30000 }).should('contain', '/projects');
-            cy.get('.card', { timeout: 30000 }).should('contain.text', "newProjectToTest")
+            cy.url().should('contain', '/projects');
+            cy.get('.card').should('contain.text', "newProjectToTest")
         })
-        cy.get('.card').filter(':contains("newProjectToTest")', { timeout: 30000 }).click()
+        cy.get('.card').filter(':contains("newProjectToTest")').click()
         cy.get('.app-container').filter(':contains("newAppToTest")').should('be.visible').click()
         let projectID
         cy.url().then(url => {
@@ -75,7 +75,7 @@ describe('PERMISSIONS: add Grant ', () => {
         cy.get('[role^=listbox]').filter(':contains("demo@caos-demo.zitadel.ch")' ).should('be.visible').click()
         cy.wait(5000)
         //cy.get('.button').contains('Continue').click()
-        cy.get('button').filter(':contains("Continue")', { timeout: 30000 }).click()
+        cy.get('button').filter(':contains("Continue")').click()
         cy.wait(5000)
         cy.get('tr').filter(':contains("demo")').find('label').click()
         cy.get('button').filter(':contains("Save")').should('be.visible').click()

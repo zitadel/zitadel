@@ -39,7 +39,7 @@ describe('MACHINES: add Machine', () => {
         cy.get('button').filter(':contains("Create")').should('be.visible').click().then(() => {
             cy.wait(3000)
             cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
-            cy.get('tr', { timeout: 30000 }).should('contain.text', "machineusername").and('exist');
+            cy.get('tr').should('contain.text', "machineusername").and('exist');
         })
     })
 })
