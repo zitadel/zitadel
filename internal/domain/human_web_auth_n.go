@@ -73,7 +73,7 @@ type PasswordlessInitCodeState int32
 
 const (
 	PasswordlessInitCodeStateUnspecified PasswordlessInitCodeState = iota
-	PasswordlessInitCodeStateAdded
+	PasswordlessInitCodeStateRequested
 	PasswordlessInitCodeStateActive
 	PasswordlessInitCodeStateRemoved
 )
@@ -84,7 +84,7 @@ type PasswordlessInitCode struct {
 	CodeID     string
 	Code       string
 	Expiration time.Duration
-	Active     bool
+	State      PasswordlessInitCodeState
 }
 
 func (p *PasswordlessInitCode) Link(baseURL string) string {
@@ -94,14 +94,3 @@ func (p *PasswordlessInitCode) Link(baseURL string) string {
 func PasswordlessInitCodeLink(baseURL, userID, resourceOwner, codeID, code string) string {
 	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, userID, resourceOwner, codeID, code)
 }
-
-//func NewPasswordlessInitCode(generator crypto.Generator) (*PasswordlessInitCode, string, error) {
-//	initCodeCrypto, code, err := crypto.NewCode(generator)
-//	if err != nil {
-//		return nil, "", err
-//	}
-//	return &PasswordlessInitCode{
-//		Code:   initCodeCrypto,
-//		Expiry: generator.Expiry(),
-//	}, code, nil
-//}

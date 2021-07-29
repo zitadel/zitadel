@@ -633,11 +633,6 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
 		return steps, nil
 	}
-	//
-	//step = repo.checkPasswordlessRegistration(user)
-	//if step != nil {
-	//	return append(steps, step), nil
-	//}
 
 	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
 		return append(steps, &domain.LinkUsersStep{}), nil

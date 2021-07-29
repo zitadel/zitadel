@@ -150,6 +150,6 @@ func writeModelToPasswordlessInitCode(initCodeModel *HumanPasswordlessInitCodeWr
 		CodeID:     initCodeModel.CodeID,
 		Code:       code,
 		Expiration: initCodeModel.Expiration,
-		Active:     initCodeModel.Active,
+		State:      initCodeModel.State,
 	}
 }

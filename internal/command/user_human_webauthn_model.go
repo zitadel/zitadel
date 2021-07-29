@@ -441,7 +441,6 @@ type HumanPasswordlessInitCodeWriteModel struct {
 	Attempts   uint8
 	CryptoCode *crypto.CryptoValue
 	Expiration time.Duration
-	Active     bool
 	State      domain.PasswordlessInitCodeState
 }
 
@@ -492,13 +491,13 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 		case *user.HumanPasswordlessInitCodeRequestedEvent:
 			wm.appendRequestedEvent(e)
 		case *user.HumanPasswordlessInitCodeSentEvent:
-			wm.Active = true
+			wm.State = domain.PasswordlessInitCodeStateActive
 		case *user.HumanPasswordlessInitCodeCheckFailedEvent:
 			wm.appendCheckFailedEvent(e)
 		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
-			wm.Active = false
+			wm.State = domain.PasswordlessInitCodeStateRemoved
 		case *user.UserRemovedEvent:
-			wm.Active = false
+			wm.State = domain.PasswordlessInitCodeStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -507,18 +506,19 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 func (wm *HumanPasswordlessInitCodeWriteModel) appendAddedEvent(e *user.HumanPasswordlessInitCodeAddedEvent) {
 	wm.CryptoCode = e.Code
 	wm.Expiration = e.Expiry
-	wm.Active = true
+	wm.State = domain.PasswordlessInitCodeStateActive
 }
 
 func (wm *HumanPasswordlessInitCodeWriteModel) appendRequestedEvent(e *user.HumanPasswordlessInitCodeRequestedEvent) {
 	wm.CryptoCode = e.Code
 	wm.Expiration = e.Expiry
+	wm.State = domain.PasswordlessInitCodeStateRequested
 }
 
 func (wm *HumanPasswordlessInitCodeWriteModel) appendCheckFailedEvent(e *user.HumanPasswordlessInitCodeCheckFailedEvent) {
 	wm.Attempts++
 	if wm.Attempts == 3 { //TODO: config?
-		wm.Active = false
+		wm.State = domain.PasswordlessInitCodeStateRemoved
 	}
 }
 
