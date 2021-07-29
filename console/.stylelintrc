@@ -4,6 +4,7 @@
   ],
   "extends": "stylelint-config-standard",
   "rules": {
+    "value-keyword-case": null,
     "at-rule-no-unknown": null,
     "no-descending-specificity": null,
     "at-rule-empty-line-before": [

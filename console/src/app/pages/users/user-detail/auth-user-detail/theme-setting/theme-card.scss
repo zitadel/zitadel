@@ -3,12 +3,14 @@
 @mixin theme-card($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
   /* stylelint-enable */
 
   .theme-conent,
   .crescent {
-    background-color: $primary-dark;
+    background-color: $back;
     transition: background-color .3s cubic-bezier(.645, .045, .355, 1); // cubic-bezier(.645, .045, .355, 1);
   }
 }
