@@ -409,8 +409,8 @@ func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.
 
 	for _, text := range allCustomTexts {
 		msg := i18n.Message{
-			ID:   text.Key,
-			Text: text.Template + "." + text.Text,
+			ID:   text.Template + "." + text.Key,
+			Text: text.Text,
 		}
 		translator.AddMessages(language.Make(text.Language), msg)
 	}
