@@ -199,9 +199,11 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 		}
 
 		_, dsns, doIngest := mntr.Environment()
+		zitadelDsn := ""
 		if doIngest {
-			literalsSecretVars["SENTRY_DSN"] = dsns["zitadel"]
+			zitadelDsn = dsns["zitadel"]
 		}
+		literalsSecretVars["SENTRY_DSN"] = zitadelDsn
 	}
 	return literalsSecretVars, nil
 }
