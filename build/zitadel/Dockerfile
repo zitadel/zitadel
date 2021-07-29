@@ -142,9 +142,9 @@ COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
 #######################
 FROM go-test as prod-go-build
 ARG BUILDARCH
-ARG VERSION=dev
+ARG VERSION=""
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION} -extldflags \"-static\"" -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
 
 #######################
 ## Go dev build
