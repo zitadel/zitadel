@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card" [ngClass]="{'nomargin': nomargin}">
     <div *ngIf="title || description" class="header" [ngClass]="{'bottom-margin': expanded}">
         <div *ngIf="title" class="row">
             <h2 class="title">{{title}}</h2>

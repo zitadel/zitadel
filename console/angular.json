@@ -30,7 +30,9 @@
             "styles": [
               "src/styles.scss"  
             ],
-            "scripts": [],
+            "scripts": [
+              "./node_modules/tinycolor2/dist/tinycolor-min.js"
+            ],
             "allowedCommonJsDependencies": [
                 "@angular/common/locales/de",
                 "src/app/proto/generated/**",
@@ -132,7 +134,9 @@
               "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/tinycolor2/dist/tinycolor-min.js"
+            ]
           }
         },
         "lint": {

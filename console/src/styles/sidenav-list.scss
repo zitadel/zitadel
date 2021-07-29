@@ -3,36 +3,49 @@
 @mixin sidenav-list-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
+  $background: map-get($theme, background);
   $accent: map-get($theme, accent);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $accent-color: mat.get-color-from-palette($accent, 500);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
   $foreground: map-get($theme, foreground);
-  $sec-dark: mat.get-color-from-palette($primary, A800);
   $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
   /* stylelint-enable */
 
   .meta {
-    box-shadow: inset 1px 0 if($is-dark-theme, #303131, #e3e8ee);
+    box-shadow: inset 1px 0 map-get($foreground, divider);
   }
 
   .sidenav {
-    box-shadow: inset -1px 0 if($is-dark-theme, #303131, #e3e8ee);
+    box-shadow: inset -1px 0 map-get($foreground, divider);
     transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
   }
 
   .nav-item {
     color: mat.get-color-from-palette($foreground, text) !important;
+    transition: all .2s ease;
+
+    i {
+      opacity: .6;
+    }
 
     &:hover {
-      background-color: if($is-dark-theme, $sec-dark, rgb(84 105 212 / 6%));
+      // font-weight: 600;
       border-top-right-radius: 1.5rem;
       border-bottom-right-radius: 1.5rem;
+
+      i {
+        opacity: 1;
+      }
     }
 
     &.active {
       color: $primary-color !important;
-      background-color: if($is-dark-theme, rgba($color: $primary-color, $alpha: .1), rgb(84 105 212 / 6%)) !important;
+      // background-color: if($is-dark-theme, rgba($color: $primary-color, $alpha: .1), rgb(84 105 212 / 6%)) !important;
+
+      i {
+        opacity: 1;
+      }
     }
 
     .c_label {
@@ -45,7 +58,7 @@
 
   .mat-menu-content,
   .mat-menu-panel {
-    background-color: $primary-dark;
+    background-color: $back;
     border-radius: .5rem;
 
     @include mat.elevation(5);
@@ -57,8 +70,7 @@
   }
 
   .root-header {
-    box-shadow: inset 0 -1px #e3e8ee;
-    background-color: $primary-dark !important;
+    background-color: $back !important;
     transition: all .3s cubic-bezier(.645, .045, .355, 1);
 
     .slash {
@@ -66,7 +78,6 @@
     }
 
     .org-button {
-      border: 1px solid if($is-dark-theme, #303131, #e3e8ee);
       transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
     }
   }
@@ -118,11 +129,11 @@
 
   .divider {
     .span {
-      border-color: if($is-dark-theme, #303131, #e3e8ee);
+      border-color: map-get($foreground, divider);
     }
 
     .line {
-      background-color: if($is-dark-theme, #303131, #e3e8ee);
+      background-color: map-get($foreground, divider);
     }
   }
 }
