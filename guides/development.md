@@ -19,7 +19,7 @@ This part is relevant if you start the backend or console without docker compose
 This command generates the grpc stub for console into the folder console/src/app/proto/generated for local development.
 
 ```bash
-DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-fe --target npm-copy -o .
+DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
 ```
 
 ### Backend
@@ -28,7 +28,7 @@ With this command you can generate the stub for the backend.
 
 ```bash
 # generates grpc stub
-DOCKER_BUILDKIT=1 docker build -f build/dockerfile . -t zitadel:gen-be --target go-copy -o .
+DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
 # generates keys for cryptography
 DOCKER_BUILDKIT=1 docker build --target copy-keys -f build/local/Dockerfile.keys . -o .keys
 ```

@@ -18,21 +18,23 @@
     }
   }
 
-  .container {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -1rem;
+  .gridcontainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
     justify-content: space-evenly;
+
+    @media only screen and (max-width: 899px) {
+      grid-template-columns: 1fr;
+    }
 
     .onboard,
     .quickstart {
       text-decoration: none;
       cursor: pointer;
       box-sizing: border-box;
-      flex: 1 0 45%;
       position: relative;
       border-radius: .5rem;
-      margin: 1rem;
       padding: 1.5rem;
       box-shadow: 0 3px 8px 0 rgb(0 0 0 / 6%);
 
@@ -96,11 +98,13 @@
       }
     }
 
-    .item {
-      flex: 1 0 45%;
-      margin: 0 1rem;
+    .griditem {
       display: flex;
       flex-direction: column;
+
+      .card {
+        margin: 0 !important;
+      }
 
       .top {
         h2 {
