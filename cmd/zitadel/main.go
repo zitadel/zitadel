@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -98,10 +99,15 @@ const (
 
 func main() {
 	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
+
+	sentryVersion := version
+	if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(version)) {
+		sentryVersion = "dev"
+	}
 	if enableSentry {
 		err := sentry.Init(sentry.ClientOptions{
 			Environment: os.Getenv("SENTRY_ENVIRONMENT"),
-			Release:     fmt.Sprintf("zitadel-%s", version),
+			Release:     fmt.Sprintf("zitadel-%s", sentryVersion),
 		})
 		if err != nil {
 			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
