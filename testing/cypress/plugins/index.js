@@ -6,6 +6,7 @@ module.exports = (on, config) => {
 
   config.env.newEmail = "demo@caos.ch"
   config.env.newUserName = "demo"
+  config.env.fullUserName = "demo@caos-demo.zitadel.dev"
   config.env.newFirstName = "demofirstname"
   config.env.newLastName = "demolastname"
   config.env.newPhonenumber = "+41 123456789"

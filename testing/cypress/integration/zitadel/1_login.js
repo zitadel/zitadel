@@ -7,7 +7,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 })
 // ###############################
 
-describe('LOGIN: Basic User/PW console.zitadel.ch', () => {
+describe('LOGIN: Basic User/PW console.zitadel', () => {
     it('LOGIN: Fill in credentials and login', () => {
 
 
