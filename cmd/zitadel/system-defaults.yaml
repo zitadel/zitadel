@@ -45,9 +45,9 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
     PasswordlessInitCode:
-      Length: 6
+      Length: 12
       Expiry: '1h'
-      IncludeLowerLetters: false
+      IncludeLowerLetters: true
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
