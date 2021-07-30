@@ -100,11 +100,11 @@ const (
 func main() {
 	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
 
-	sentryVersion := version
-	if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(version)) {
-		sentryVersion = "dev"
-	}
 	if enableSentry {
+		sentryVersion := version
+		if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(version)) {
+			sentryVersion = "dev"
+		}
 		err := sentry.Init(sentry.ClientOptions{
 			Environment: os.Getenv("SENTRY_ENVIRONMENT"),
 			Release:     fmt.Sprintf("zitadel-%s", sentryVersion),
