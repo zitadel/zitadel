@@ -138,7 +138,6 @@ PasswordlessPrompt:
   Title: Passwordless setup
   Description: Would you like to setup passwordless login?
   DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
-  Alternative2FA: 'Or at least register a second factor:'
   PasswordlessButtonText: Go passwordless
   NextButtonText: next
   SkipButtonText: skip
