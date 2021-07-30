@@ -398,18 +398,18 @@ func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.
 		return nil, err
 	}
 	allCustomTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(domain.IAMID, textType)
-	if err == nil {
+	if err != nil {
 		return translator, nil
 	}
 	customTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(orgID, textType)
-	if err == nil {
+	if err != nil {
 		return translator, nil
 	}
 	allCustomTexts = append(allCustomTexts, customTexts...)
 
 	for _, text := range allCustomTexts {
 		msg := i18n.Message{
-			ID:   text.Key,
+			ID:   text.Template + "." + text.Key,
 			Text: text.Text,
 		}
 		translator.AddMessages(language.Make(text.Language), msg)
