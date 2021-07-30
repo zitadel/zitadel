@@ -51,6 +51,7 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 		VerifyMfaOtpText:                 VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
 		VerifyMfaU2FText:                 VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
 		PasswordlessText:                 PasswordlessScreenTextToPb(text.Passwordless),
+		PasswordlessPromptText:           PasswordlessPromptScreenTextToPb(text.PasswordlessPrompt),
 		PasswordlessRegistrationText:     PasswordlessRegistrationScreenTextToPb(text.PasswordlessRegistration),
 		PasswordlessRegistrationDoneText: PasswordlessRegistrationDoneScreenTextToPb(text.PasswordlessRegistrationDone),
 		PasswordChangeText:               PasswordChangeScreenTextToPb(text.PasswordChange),
@@ -271,6 +272,17 @@ func PasswordlessScreenTextToPb(text domain.PasswordlessScreenText) *text_pb.Pas
 		ValidateTokenButtonText: text.ValidateTokenButtonText,
 		NotSupported:            text.NotSupported,
 		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessPromptScreenTextToPb(text domain.PasswordlessPromptScreenText) *text_pb.PasswordlessPromptScreenText {
+	return &text_pb.PasswordlessPromptScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionInit:        text.DescriptionInit,
+		PasswordlessButtonText: text.PasswordlessButtonText,
+		NextButtonText:         text.NextButtonText,
+		SkipButtonText:         text.SkipButtonText,
 	}
 }
 
