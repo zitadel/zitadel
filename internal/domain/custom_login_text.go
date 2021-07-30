@@ -159,6 +159,14 @@ const (
 	LoginKeyPasswordlessNotSupported            = LoginKeyPasswordless + "NotSupported"
 	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "ErrorRetry"
 
+	LoginKeyPasswordlessPrompt                       = "PasswordlessPrompt."
+	LoginKeyPasswordlessPromptTitle                  = LoginKeyPasswordlessPrompt + "Title"
+	LoginKeyPasswordlessPromptDescription            = LoginKeyPasswordlessPrompt + "Description"
+	LoginKeyPasswordlessPromptDescriptionInit        = LoginKeyPasswordlessPrompt + "DescriptionInit"
+	LoginKeyPasswordlessPromptPasswordlessButtonText = LoginKeyPasswordlessPrompt + "PasswordlessButtonText"
+	LoginKeyPasswordlessPromptNextButtonText         = LoginKeyPasswordlessPrompt + "NextButtonText"
+	LoginKeyPasswordlessPromptSkipButtonText         = LoginKeyPasswordlessPrompt + "SkipButtonText"
+
 	LoginKeyPasswordlessRegistration                        = "PasswordlessRegistration."
 	LoginKeyPasswordlessRegistrationTitle                   = LoginKeyPasswordlessRegistration + "Title"
 	LoginKeyPasswordlessRegistrationDescription             = LoginKeyPasswordlessRegistration + "Description"
@@ -290,6 +298,7 @@ type CustomLoginText struct {
 	VerifyMFAOTP                 VerifyMFAOTPScreenText
 	VerifyMFAU2F                 VerifyMFAU2FScreenText
 	Passwordless                 PasswordlessScreenText
+	PasswordlessPrompt           PasswordlessPromptScreenText
 	PasswordlessRegistration     PasswordlessRegistrationScreenText
 	PasswordlessRegistrationDone PasswordlessRegistrationDoneScreenText
 	PasswordChange               PasswordChangeScreenText
@@ -578,6 +587,15 @@ type FooterText struct {
 	PrivacyPolicy string
 	Help          string
 	HelpLink      string
+}
+
+type PasswordlessPromptScreenText struct {
+	Title                  string
+	Description            string
+	DescriptionInit        string
+	PasswordlessButtonText string
+	NextButtonText         string
+	SkipButtonText         string
 }
 
 type PasswordlessRegistrationScreenText struct {

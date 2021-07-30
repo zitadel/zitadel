@@ -209,6 +209,9 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordless) {
 			passwordlessKeyToDomain(text, result)
 		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessPrompt) {
+			passwordlessPromptKeyToDomain(text, result)
+		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessRegistration) {
 			passwordlessRegistrationKeyToDomain(text, result)
 		}
@@ -642,6 +645,27 @@ func passwordlessKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 	if text.Key == domain.LoginKeyPasswordlessErrorRetry {
 		result.Passwordless.ErrorRetry = text.Text
+	}
+}
+
+func passwordlessPromptKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyPasswordlessPromptTitle {
+		result.PasswordlessPrompt.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptDescription {
+		result.PasswordlessPrompt.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptDescriptionInit {
+		result.PasswordlessPrompt.DescriptionInit = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptPasswordlessButtonText {
+		result.PasswordlessPrompt.PasswordlessButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptNextButtonText {
+		result.PasswordlessPrompt.NextButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptSkipButtonText {
+		result.PasswordlessPrompt.SkipButtonText = text.Text
 	}
 }
 

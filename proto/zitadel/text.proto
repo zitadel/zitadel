@@ -79,8 +79,9 @@ message LoginCustomText {
     SuccessLoginScreenText success_login_text = 29;
     LogoutDoneScreenText logout_text = 30;
     FooterText footer_text = 31;
-    PasswordlessRegistrationScreenText passwordless_registration_text = 32;
-    PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 33;
+    PasswordlessPromptScreenText passwordless_prompt_text = 32;
+    PasswordlessRegistrationScreenText passwordless_registration_text = 33;
+    PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
 }
 
 message SelectAccountScreenText {
@@ -360,6 +361,15 @@ message FooterText {
     string privacy_policy = 3 [(validate.rules).string = {max_len: 200}];
     string help = 5 [(validate.rules).string = {max_len: 200}];
     string help_link = 6 [(validate.rules).string = {max_len: 500}];
+}
+
+message PasswordlessPromptScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string description_init = 3 [(validate.rules).string = {max_len: 500}];
+    string passwordless_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string skip_button_text = 6 [(validate.rules).string = {max_len: 100}];
 }
 
 message PasswordlessRegistrationScreenText {

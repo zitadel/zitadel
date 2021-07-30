@@ -32,6 +32,7 @@ func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore
 	events = append(events, c.createVerifyMFAOTPEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createVerifyMFAU2FEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createPasswordlessEvents(ctx, agg, existingText, text, defaultText)...)
+	events = append(events, c.createPasswordlessPromptEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createPasswordlessRegistrationEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createPasswordlessRegistrationDoneEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createPasswordChangeEvents(ctx, agg, existingText, text, defaultText)...)
@@ -614,6 +615,35 @@ func (c *Commands) createPasswordlessRegistrationEvents(ctx context.Context, agg
 		events = append(events, event)
 	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessRegistrationErrorRetry, existingText.PasswordlessRegistrationErrorRetry, text.PasswordlessRegistration.ErrorRetry, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	return events
+}
+
+func (c *Commands) createPasswordlessPromptEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
+	events := make([]eventstore.EventPusher, 0)
+	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptTitle, existingText.PasswordlessPromptTitle, text.PasswordlessPrompt.Title, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptDescription, existingText.PasswordlessPromptDescription, text.PasswordlessPrompt.Description, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptDescriptionInit, existingText.PasswordlessPromptDescriptionInit, text.PasswordlessPrompt.DescriptionInit, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, existingText.PasswordlessPromptPasswordlessButtonText, text.PasswordlessPrompt.PasswordlessButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptNextButtonText, existingText.PasswordlessPromptNextButtonText, text.PasswordlessPrompt.NextButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptSkipButtonText, existingText.PasswordlessPromptSkipButtonText, text.PasswordlessPrompt.SkipButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

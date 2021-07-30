@@ -681,6 +681,20 @@ func PasswordlessScreenTextPbToDomain(text *text_pb.PasswordlessScreenText) doma
 	}
 }
 
+func PasswordlessPromptScreenTextPbToDomain(text *text_pb.PasswordlessPromptScreenText) domain.PasswordlessPromptScreenText {
+	if text == nil {
+		return domain.PasswordlessPromptScreenText{}
+	}
+	return domain.PasswordlessPromptScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionInit:        text.DescriptionInit,
+		PasswordlessButtonText: text.PasswordlessButtonText,
+		NextButtonText:         text.NextButtonText,
+		SkipButtonText:         text.SkipButtonText,
+	}
+}
+
 func PasswordlessRegistrationScreenTextPbToDomain(text *text_pb.PasswordlessRegistrationScreenText) domain.PasswordlessRegistrationScreenText {
 	if text == nil {
 		return domain.PasswordlessRegistrationScreenText{}
