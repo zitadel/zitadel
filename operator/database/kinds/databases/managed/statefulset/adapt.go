@@ -1,14 +1,16 @@
 package statefulset
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/helpers"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/caos/orbos/mntr"
@@ -16,11 +18,10 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/kubernetes/resources"
 	"github.com/caos/orbos/pkg/kubernetes/resources/statefulset"
-	"github.com/pkg/errors"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/caos/orbos/pkg/labels"
+
+	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/helpers"
 )
 
 const (
@@ -55,7 +56,7 @@ func AdaptFunc(
 	image string,
 	serviceAccountName string,
 	replicaCount int,
-	storageCapacity string,
+	storageCapacity resource.Quantity,
 	dbPort int32,
 	httpPort int32,
 	storageClass string,
@@ -71,11 +72,6 @@ func AdaptFunc(
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "statefulset")
-
-	quantity, err := resource.ParseQuantity(storageCapacity)
-	if err != nil {
-		return nil, nil, nil, nil, nil, err
-	}
 
 	name := sfsSelectable.Name()
 	k8sSelectable := labels.MustK8sMap(sfsSelectable)
@@ -197,7 +193,7 @@ func AdaptFunc(
 					},
 					Resources: corev1.ResourceRequirements{
 						Requests: corev1.ResourceList{
-							"storage": quantity,
+							"storage": storageCapacity,
 						},
 					},
 					StorageClassName: &storageClass,
@@ -219,8 +215,7 @@ func AdaptFunc(
 	checkDBRunning := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("waiting for statefulset to be running")
 		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, false, 60*time.Second); err != nil {
-			internalMonitor.Error(errors.Wrap(err, "error while waiting for statefulset to be running"))
-			return err
+			return fmt.Errorf("error while waiting for statefulset to be running: %w", err)
 		}
 		internalMonitor.Info("statefulset is running")
 		return nil
@@ -232,7 +227,6 @@ func AdaptFunc(
 			internalMonitor.Info("statefulset is not ready")
 			return nil
 		}
-		internalMonitor.Info("statefulset is ready")
 		return errors.New("statefulset is ready")
 	}
 
@@ -256,8 +250,7 @@ func AdaptFunc(
 	checkDBReady := func(k8sClient kubernetes.ClientInt) error {
 		internalMonitor.Info("waiting for statefulset to be ready")
 		if err := k8sClient.WaitUntilStatefulsetIsReady(namespace, name, true, true, 60*time.Second); err != nil {
-			internalMonitor.Error(errors.Wrap(err, "error while waiting for statefulset to be ready"))
-			return err
+			return fmt.Errorf("error while waiting for statefulset to be ready: %w", err)
 		}
 		internalMonitor.Info("statefulset is ready")
 		return nil

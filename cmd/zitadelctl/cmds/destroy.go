@@ -46,10 +46,7 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 
-		rv, err := getRv()
-		if err != nil {
-			return err
-		}
+		rv := getRv("destroy", nil, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()

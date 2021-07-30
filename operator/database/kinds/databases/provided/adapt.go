@@ -1,12 +1,14 @@
 package provided
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator"
-	"github.com/pkg/errors"
 )
 
 func Adapter() operator.AdaptFunc {
@@ -25,15 +27,12 @@ func Adapter() operator.AdaptFunc {
 	) {
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
 
 		currentDB := &Current{
-			Common: &tree.Common{
-				Kind:    "databases.caos.ch/ProvidedDatabase",
-				Version: "v0",
-			},
+			Common: tree.NewCommon("databases.caos.ch/ProvidedDatabase", "v0", false),
 		}
 		current.Parsed = currentDB
 

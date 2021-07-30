@@ -22,20 +22,15 @@ type RootValues struct {
 	ErrFunc    errFunc
 }
 
-type GetRootValues func() (*RootValues, error)
+type GetRootValues func(command string, tags map[string]interface{}, component string, moreComponents ...string) *RootValues
 
 type errFunc func(err error) error
 
-func RootCommand(version string) (*cobra.Command, GetRootValues) {
+func RootCommand(version string, monitor mntr.Monitor) (*cobra.Command, GetRootValues) {
 
 	var (
-		ctx     = context.Background()
-		monitor = mntr.Monitor{
-			OnInfo:   mntr.LogMessage,
-			OnChange: mntr.LogMessage,
-			OnError:  mntr.LogError,
-		}
-		rv = &RootValues{
+		ctx = context.Background()
+		rv  = &RootValues{
 			Ctx:     ctx,
 			Version: version,
 			ErrFunc: func(err error) error {
@@ -46,8 +41,9 @@ func RootCommand(version string) (*cobra.Command, GetRootValues) {
 				return nil
 			},
 		}
-		orbConfigPath string
-		verbose       bool
+		orbConfigPath    string
+		verbose          bool
+		disableAnalytics bool
 	)
 	cmd := &cobra.Command{
 		Use:   "zitadelctl [flags]",
@@ -77,8 +73,9 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 	flags.StringVarP(&orbConfigPath, "orbconfig", "f", "~/.orb/config", "Path to the file containing the orbs git repo URL, deploy key and the master key for encrypting and decrypting secrets")
 	flags.StringVarP(&rv.Kubeconfig, "kubeconfig", "k", "~/.kube/config", "Path to the kubeconfig file to the cluster zitadelctl should target")
 	flags.BoolVar(&verbose, "verbose", false, "Print debug levelled logs")
+	flags.BoolVar(&disableAnalytics, "disable-analytics", false, "Don't help CAOS AG to improve ZITADEL by sending them errors and usage data")
 
-	return cmd, func() (*RootValues, error) {
+	return cmd, func(command string, tags map[string]interface{}, component string, moreComponents ...string) *RootValues {
 
 		if verbose {
 			monitor = monitor.Verbose()
@@ -88,15 +85,31 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 		rv.Kubeconfig = helpers.PruneHome(rv.Kubeconfig)
 		rv.GitClient = git.New(ctx, monitor, "zitadel", "orbos@caos.ch")
 
-		var err error
 		if rv.Gitops {
 			prunedPath := helpers.PruneHome(orbConfigPath)
-			rv.OrbConfig, err = orb.ParseOrbConfig(prunedPath)
+			rv.OrbConfig, _ = orb.ParseOrbConfig(prunedPath)
 			if rv.OrbConfig == nil {
 				rv.OrbConfig = &orb.Orb{Path: prunedPath}
 			}
 		}
 
-		return rv, err
+		env := "unknown"
+		if orbID, err := rv.OrbConfig.ID(); err == nil {
+			env = orbID
+		}
+
+		if component == "" {
+			component = "zitadelctl"
+		}
+
+		if !disableAnalytics {
+			if err := mntr.Ingest(rv.Monitor, "zitadel", version, env, component, moreComponents...); err != nil {
+				panic(err)
+			}
+		}
+
+		rv.Monitor.WithFields(map[string]interface{}{"command": command, "gitops": rv.Gitops}).WithFields(tags).CaptureMessage("zitadelctl invoked")
+
+		return rv
 	}
 }

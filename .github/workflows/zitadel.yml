@@ -75,6 +75,8 @@ jobs:
 #          cache-from: type=gha,scope=${{ github.workflow }} (https://github.com/caos/zitadel/issues/2102)
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel
+          build-args: |
+            VERSION=${{ needs.refs.outputs.version }}
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel
@@ -424,4 +426,5 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          version: ${{ steps.semantic.outputs.new_release_version }}
+          version: zitadel-${{ needs.refs.outputs.version }}
+          projects: "console database-operator zitadel zitadel-operator zitadelctl"

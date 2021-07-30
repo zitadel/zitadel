@@ -1,9 +1,12 @@
 package orb
 
 import (
-	"github.com/caos/orbos/pkg/tree"
-	"github.com/pkg/errors"
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/tree"
 )
 
 type DesiredV0 struct {
@@ -28,9 +31,9 @@ func ParseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
 	desiredKind := &DesiredV0{Common: desiredTree.Common}
 
 	if err := desiredTree.Original.Decode(desiredKind); err != nil {
-		return nil, errors.Wrap(err, "parsing desired state failed")
+		return nil, mntr.ToUserError(fmt.Errorf("parsing desired state failed: %w", err))
 	}
-	desiredKind.Common.Version = "v0"
+	desiredKind.Common.OverwriteVersion("v0")
 
 	return desiredKind, nil
 }

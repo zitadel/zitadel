@@ -1,18 +1,20 @@
 package orb
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator/database/kinds/databases"
-	"github.com/pkg/errors"
 )
 
 func BackupListFunc() func(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, desiredTree *tree.Tree) (strings []string, err error) {
 	return func(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, desiredTree *tree.Tree) (strings []string, err error) {
 		desiredKind, err := ParseDesiredV0(desiredTree)
 		if err != nil {
-			return nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desiredTree.Parsed = desiredKind
 

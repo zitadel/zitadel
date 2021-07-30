@@ -1,6 +1,10 @@
 package bucket
 
 import (
+	"fmt"
+
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
@@ -8,14 +12,13 @@ import (
 	secretpkg "github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
+	coreDB "github.com/caos/zitadel/operator/database/kinds/databases/core"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
-	coreDB "github.com/caos/zitadel/operator/database/kinds/databases/core"
-	"github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -53,7 +56,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
 

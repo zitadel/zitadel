@@ -1,14 +1,16 @@
 package operator
 
 import (
+	"fmt"
+
+	"gopkg.in/yaml.v3"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 )
 
 type AdaptFunc func(
@@ -84,7 +86,7 @@ func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryF
 	for _, querier := range queriers {
 		ensurer, err := querier(k8sClient, queried)
 		if err != nil {
-			return nil, errors.Wrap(err, "error while querying")
+			return nil, fmt.Errorf("error while querying: %w", err)
 		}
 		ensurers = append(ensurers, ensurer)
 	}
@@ -101,7 +103,7 @@ func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryF
 		}
 		for _, ensurer := range ensurers {
 			if err := ensurer(k8sClient); err != nil {
-				return errors.Wrap(err, "error while ensuring")
+				return fmt.Errorf("error while ensuring: %w", err)
 			}
 		}
 		if infoLogs {
@@ -118,7 +120,7 @@ func DestroyersToDestroyFunc(monitor mntr.Monitor, destroyers []DestroyFunc) Des
 		monitor.Info("destroying...")
 		for _, destroyer := range destroyers {
 			if err := destroyer(k8sClient); err != nil {
-				return errors.Wrap(err, "error while destroying")
+				return fmt.Errorf("error while destroying: %w", err)
 			}
 		}
 		monitor.Info("destroyed")

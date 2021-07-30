@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -40,6 +42,9 @@ import (
 	"github.com/caos/zitadel/internal/ui/login"
 	"github.com/caos/zitadel/openapi"
 )
+
+// build argument
+var version = "dev"
 
 type Config struct {
 	Log            logging.Config
@@ -94,8 +99,16 @@ const (
 
 func main() {
 	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
+
 	if enableSentry {
-		err := sentry.Init(sentry.ClientOptions{})
+		sentryVersion := version
+		if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(version)) {
+			sentryVersion = "dev"
+		}
+		err := sentry.Init(sentry.ClientOptions{
+			Environment: os.Getenv("SENTRY_ENVIRONMENT"),
+			Release:     fmt.Sprintf("zitadel-%s", sentryVersion),
+		})
 		if err != nil {
 			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
 		}
