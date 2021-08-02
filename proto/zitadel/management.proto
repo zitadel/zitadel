@@ -4655,7 +4655,6 @@ message SetCustomPasswordlessRegistrationMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
 message ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
