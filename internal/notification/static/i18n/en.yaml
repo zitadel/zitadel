@@ -38,5 +38,5 @@ PasswordlessRegistration:
   PreHeader: Add Passwordless Login
   Subject: Add Passwordless Login
   Greeting: Hello {{.FirstName}} {{.LastName}},
-  Text: We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login..
+  Text: We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login.
   ButtonText: Add Passwordless Login
