@@ -1,15 +1,19 @@
 package databases
 
 import (
+	"fmt"
+
+	core "k8s.io/api/core/v1"
+
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
 	"github.com/caos/zitadel/operator/database/kinds/databases/provided"
-	"github.com/pkg/errors"
-	core "k8s.io/api/core/v1"
 )
 
 const (
@@ -59,12 +63,13 @@ func Adapt(
 	case "databases.caos.ch/ProvidedDatabase":
 		return provided.Adapter()(internalMonitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("unknown database kind %s: %w", desiredTree.Common.Kind, err))
 	}
 }
 
 func GetBackupList(
 	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
 	desiredTree *tree.Tree,
 ) (
 	[]string,
@@ -72,10 +77,10 @@ func GetBackupList(
 ) {
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
-		return managed.BackupList()(monitor, desiredTree)
+		return managed.BackupList()(monitor, k8sClient, desiredTree)
 	case "databases.caos.ch/ProvidedDatabse":
-		return nil, errors.Errorf("no backups supported for database kind %s", desiredTree.Common.Kind)
+		return nil, mntr.ToUserError(fmt.Errorf("no backups supported for database kind %s", desiredTree.Common.Kind))
 	default:
-		return nil, errors.Errorf("unknown database kind %s", desiredTree.Common.Kind)
+		return nil, mntr.ToUserError(fmt.Errorf("unknown database kind %s", desiredTree.Common.Kind))
 	}
 }

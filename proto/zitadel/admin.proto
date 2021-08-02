@@ -1692,12 +1692,49 @@ service AdminService {
     }
 
     //Sets the default custom text for domain claimed phone message
-    // it impacts all organisations without customized verify phone message text
+    // it impacts all organisations without customized domain claimed message text
     // The Following Variables can be used:
     // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
-            put: "/text/message/verifyphone/{language}";
+            put: "/text/message/domainclaimed/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default text for passwordless registration message (translation file)
+    rpc GetDefaultPasswordlessRegistrationMessageText(GetDefaultPasswordlessRegistrationMessageTextRequest) returns (GetDefaultPasswordlessRegistrationMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/passwordless_registration/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for passwordless registration message (overwritten in eventstore)
+    rpc GetCustomPasswordlessRegistrationMessageText(GetCustomPasswordlessRegistrationMessageTextRequest) returns (GetCustomPasswordlessRegistrationMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/passwordless_registration/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for passwordless registration message
+    // it impacts all organisations without customized passwordless registration message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultPasswordlessRegistrationMessageText(SetDefaultPasswordlessRegistrationMessageTextRequest) returns (SetDefaultPasswordlessRegistrationMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/passwordless_registration/{language}";
             body: "*";
         };
 
@@ -1738,6 +1775,19 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom texts for login ui
+    // it impacts all organisations without customized login ui texts
+    // The default text form translation file will trigger after
+    rpc ResetCustomLoginTextToDefault(ResetCustomLoginTextsToDefaultRequest) returns (ResetCustomLoginTextsToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/login/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
         };
     }
 
@@ -3254,6 +3304,42 @@ message SetDefaultDomainClaimedMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetDefaultPasswordlessRegistrationMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultPasswordlessRegistrationMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomPasswordlessRegistrationMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomPasswordlessRegistrationMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultPasswordlessRegistrationMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultPasswordlessRegistrationMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultLoginTextsRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3307,9 +3393,20 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.SuccessLoginScreenText success_login_text = 29;
     zitadel.text.v1.LogoutDoneScreenText logout_text = 30;
     zitadel.text.v1.FooterText footer_text = 31;
+    zitadel.text.v1.PasswordlessPromptScreenText passwordless_prompt_text = 32;
+    zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
+    zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
 }
 
 message SetCustomLoginTextsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomLoginTextsToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomLoginTextsToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

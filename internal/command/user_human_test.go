@@ -652,19 +652,22 @@ func TestCommandSide_AddHuman(t *testing.T) {
 
 func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		secretGenerator crypto.Generator
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore           *eventstore.Eventstore
+		idGenerator          id.Generator
+		secretGenerator      crypto.Generator
+		userPasswordAlg      crypto.HashAlgorithm
+		passwordlessInitCode crypto.Generator
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
-		human *domain.Human
+		ctx          context.Context
+		orgID        string
+		human        *domain.Human
+		passwordless bool
 	}
 	type res struct {
-		want *domain.Human
-		err  func(error) bool
+		wantHuman *domain.Human
+		wantCode  *domain.PasswordlessInitCode
+		err       func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -869,7 +872,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.Human{
+				wantHuman: &domain.Human{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
@@ -950,7 +953,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.Human{
+				wantHuman: &domain.Human{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
@@ -967,6 +970,218 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 					State: domain.UserStateActive,
+				},
+			},
+		},
+		{
+			name: "add human email verified passwordless only, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("", false, ""),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
+								user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"code1",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				secretGenerator:      GetMockSecretGenerator(t),
+				userPasswordAlg:      crypto.CreateMockHashAlg(gomock.NewController(t)),
+				passwordlessInitCode: GetMockSecretGenerator(t),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+				},
+				passwordless: true,
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
+				},
+				wantCode: &domain.PasswordlessInitCode{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Expiration: time.Hour,
+					CodeID:     "code1",
+					Code:       "a",
+					State:      domain.PasswordlessInitCodeStateActive,
+				},
+			},
+		},
+		{
+			name: "add human email verified passwordless and password change not required, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("password", false, ""),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
+								user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"code1",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				secretGenerator:      GetMockSecretGenerator(t),
+				userPasswordAlg:      crypto.CreateMockHashAlg(gomock.NewController(t)),
+				passwordlessInitCode: GetMockSecretGenerator(t),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Password: &domain.Password{
+						SecretString:   "password",
+						ChangeRequired: false,
+					},
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+				},
+				passwordless: true,
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
+				},
+				wantCode: &domain.PasswordlessInitCode{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Expiration: time.Hour,
+					CodeID:     "code1",
+					Code:       "a",
+					State:      domain.PasswordlessInitCodeStateActive,
 				},
 			},
 		},
@@ -1052,7 +1267,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.Human{
+				wantHuman: &domain.Human{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
@@ -1151,7 +1366,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.Human{
+				wantHuman: &domain.Human{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
@@ -1182,8 +1397,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				initializeUserCode:    tt.fields.secretGenerator,
 				phoneVerificationCode: tt.fields.secretGenerator,
 				userPasswordAlg:       tt.fields.userPasswordAlg,
+				passwordlessInitCode:  tt.fields.passwordlessInitCode,
 			}
-			got, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1191,7 +1407,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assert.Equal(t, tt.res.wantHuman, gotHuman)
+				assert.Equal(t, tt.res.wantCode, gotCode)
 			}
 		})
 	}

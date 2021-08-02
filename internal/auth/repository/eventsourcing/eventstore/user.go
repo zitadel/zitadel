@@ -139,9 +139,11 @@ func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID s
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(userSessions))
-	for i, session := range userSessions {
-		userIDs[i] = session.UserID
+	userIDs := make([]string, 0, len(userSessions))
+	for _, session := range userSessions {
+		if session.State == int32(domain.UserSessionStateActive) {
+			userIDs = append(userIDs, session.UserID)
+		}
 	}
 	return userIDs, nil
 }

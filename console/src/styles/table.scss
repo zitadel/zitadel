@@ -3,14 +3,10 @@
 @mixin table-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $warn: map-get($theme, warn);
-  $warn-color: mat.get-color-from-palette($warn, 500);
   $primary-color: mat.get-color-from-palette($primary, 500);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
-  $secondary-dark: mat.get-color-from-palette($primary, A800);
-  $inv-color: mat.get-color-from-palette($primary, A600);
-  $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
 
   .mat-table,
   .mat-paginator {
@@ -58,7 +54,7 @@
 
       &:hover {
         td {
-          background: if($is-dark-theme, #292a2b, #f4f4f4); // rgba($inv-color, .05);
+          background: map-get($background, hover);
         }
       }
     }

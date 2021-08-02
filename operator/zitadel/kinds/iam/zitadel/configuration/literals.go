@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/orbos/mntr"
+
 	"github.com/caos/orbos/pkg/secret/read"
 
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -19,7 +21,6 @@ func literalsConfigMap(
 	desired *Configuration,
 	users map[string]string,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
-	version *string,
 	queried map[string]interface{},
 ) map[string]string {
 
@@ -110,12 +111,11 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_MULTI_DELETE"] = strconv.FormatBool(desired.AssetStorage.MultiDelete)
 		}
-		if desired.Sentry != nil {
-			literalsConfigMap["SENTRY_ENVIRONMENT"] = desired.Sentry.Environment
-			literalsConfigMap["SENTRY_RELEASE"] = *version
-			literalsConfigMap["SENTRY_USAGE"] = desired.Sentry.Usage
-		}
 	}
+
+	sentryEnv, _, doIngest := mntr.Environment()
+	literalsConfigMap["SENTRY_ENVIRONMENT"] = sentryEnv
+	literalsConfigMap["SENTRY_USAGE"] = strconv.FormatBool(doIngest)
 
 	db, err := database.GetDatabaseInQueried(queried)
 	if err == nil {
@@ -197,16 +197,13 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
 			}
 		}
-		if desired.Sentry != nil {
-			as := desired.Sentry
-			if as.SentryDSN != nil || as.ExistingSentryDSN != nil {
-				value, err := read.GetSecretValue(k8sClient, as.SentryDSN, as.ExistingSentryDSN)
-				if err != nil {
-					return nil, err
-				}
-				literalsSecretVars["SENTRY_DSN"] = value
-			}
+
+		_, dsns, doIngest := mntr.Environment()
+		zitadelDsn := ""
+		if doIngest {
+			zitadelDsn = dsns["zitadel"]
 		}
+		literalsSecretVars["SENTRY_DSN"] = zitadelDsn
 	}
 	return literalsSecretVars, nil
 }

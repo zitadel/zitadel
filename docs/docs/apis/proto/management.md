@@ -431,9 +431,9 @@ An sms will be sent to the given phone number to finish the phone verification p
     POST: /users/{user_id}/phone/_resend_verification
 
 
-### RemoveMyAvatar
+### RemoveHumanAvatar
 
-> **rpc** RemoveMyAvatar([RemoveHumanAvatarRequest](#removehumanavatarrequest))
+> **rpc** RemoveHumanAvatar([RemoveHumanAvatarRequest](#removehumanavatarrequest))
 [RemoveHumanAvatarResponse](#removehumanavatarresponse)
 
 Removes the avatar number of the human
@@ -522,11 +522,25 @@ The u2f (universial second factor) will be removed from the user
 > **rpc** ListHumanPasswordless([ListHumanPasswordlessRequest](#listhumanpasswordlessrequest))
 [ListHumanPasswordlessResponse](#listhumanpasswordlessresponse)
 
-Returns all configured passwordless authentications
+Returns all configured passwordless authenticators
 
 
 
     POST: /users/{user_id}/passwordless/_search
+
+
+### SendPasswordlessRegistration
+
+> **rpc** SendPasswordlessRegistration([SendPasswordlessRegistrationRequest](#sendpasswordlessregistrationrequest))
+[SendPasswordlessRegistrationResponse](#sendpasswordlessregistrationresponse)
+
+Adds a new passwordless authenticator link to the user and sends it to the registered email address
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/{user_id}/passwordless/_send_link
 
 
 ### RemoveHumanPasswordless
@@ -534,7 +548,7 @@ Returns all configured passwordless authentications
 > **rpc** RemoveHumanPasswordless([RemoveHumanPasswordlessRequest](#removehumanpasswordlessrequest))
 [RemoveHumanPasswordlessResponse](#removehumanpasswordlessresponse)
 
-Removed a configured passwordless authentication
+Removed a configured passwordless authenticator
 
 
 
@@ -2216,8 +2230,7 @@ Returns the default text for initial message
 > **rpc** SetCustomInitMessageText([SetCustomInitMessageTextRequest](#setcustominitmessagetextrequest))
 [SetCustomInitMessageTextResponse](#setcustominitmessagetextresponse)
 
-Sets the default custom text for initial message
-it impacts all organisations without customized initial message text
+Sets the custom text for initial message
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2268,8 +2281,7 @@ Returns the default text for password reset message
 > **rpc** SetCustomPasswordResetMessageText([SetCustomPasswordResetMessageTextRequest](#setcustompasswordresetmessagetextrequest))
 [SetCustomPasswordResetMessageTextResponse](#setcustompasswordresetmessagetextresponse)
 
-Sets the default custom text for password reset message
-it impacts all organisations without customized password reset message text
+Sets the custom text for password reset message
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2320,8 +2332,7 @@ Returns the default text for verify email message
 > **rpc** SetCustomVerifyEmailMessageText([SetCustomVerifyEmailMessageTextRequest](#setcustomverifyemailmessagetextrequest))
 [SetCustomVerifyEmailMessageTextResponse](#setcustomverifyemailmessagetextresponse)
 
-Sets the default custom text for verify email message
-it impacts all organisations without customized verify email message text
+Sets the custom text for verify email message
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2373,7 +2384,6 @@ Returns the custom text for verify email message
 [SetCustomVerifyPhoneMessageTextResponse](#setcustomverifyphonemessagetextresponse)
 
 Sets the default custom text for verify email message
-it impacts all organisations without customized verify email message text
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2424,8 +2434,7 @@ Returns the custom text for domain claimed message
 > **rpc** SetCustomDomainClaimedMessageCustomText([SetCustomDomainClaimedMessageTextRequest](#setcustomdomainclaimedmessagetextrequest))
 [SetCustomDomainClaimedMessageTextResponse](#setcustomdomainclaimedmessagetextresponse)
 
-Sets the default custom text for domain claimed message
-it impacts all organisations without customized domain claimed message text
+Sets the custom text for domain claimed message
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2439,12 +2448,63 @@ The Following Variables can be used:
 > **rpc** ResetCustomDomainClaimedMessageTextToDefault([ResetCustomDomainClaimedMessageTextToDefaultRequest](#resetcustomdomainclaimedmessagetexttodefaultrequest))
 [ResetCustomDomainClaimedMessageTextToDefaultResponse](#resetcustomdomainclaimedmessagetexttodefaultresponse)
 
-Removes the custom init message text of the organisation
+Removes the custom domain claimed message text of the organisation
 The default text of the IAM will trigger after
 
 
 
     DELETE: /text/message/domainclaimed/{language}
+
+
+### GetCustomPasswordlessRegistrationMessageText
+
+> **rpc** GetCustomPasswordlessRegistrationMessageText([GetCustomPasswordlessRegistrationMessageTextRequest](#getcustompasswordlessregistrationmessagetextrequest))
+[GetCustomPasswordlessRegistrationMessageTextResponse](#getcustompasswordlessregistrationmessagetextresponse)
+
+Returns the custom text for passwordless link message
+
+
+
+    GET: /text/message/passwordless_registration/{language}
+
+
+### GetDefaultPasswordlessRegistrationMessageText
+
+> **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
+[GetDefaultPasswordlessRegistrationMessageTextResponse](#getdefaultpasswordlessregistrationmessagetextresponse)
+
+Returns the custom text for passwordless link message
+
+
+
+    GET: /text/default/message/passwordless_registration/{language}
+
+
+### SetCustomPasswordlessRegistrationMessageCustomText
+
+> **rpc** SetCustomPasswordlessRegistrationMessageCustomText([SetCustomPasswordlessRegistrationMessageTextRequest](#setcustompasswordlessregistrationmessagetextrequest))
+[SetCustomPasswordlessRegistrationMessageTextResponse](#setcustompasswordlessregistrationmessagetextresponse)
+
+Sets the custom text for passwordless link message
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+    PUT: /text/message/passwordless_registration/{language}
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefault
+
+> **rpc** ResetCustomPasswordlessRegistrationMessageTextToDefault([ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest](#resetcustompasswordlessregistrationmessagetexttodefaultrequest))
+[ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse](#resetcustompasswordlessregistrationmessagetexttodefaultresponse)
+
+Removes the custom passwordless link message text of the organisation
+The default text of the IAM will trigger after
+
+
+
+    DELETE: /text/message/passwordless_registration/{language}
 
 
 ### GetCustomLoginTexts
@@ -3728,6 +3788,28 @@ This is an empty request
 
 
 
+### GetCustomPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordlessRegistrationMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomVerifyEmailMessageTextRequest
 
 
@@ -3935,6 +4017,28 @@ This is an empty request
 
 
 ### GetDefaultPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextResponse
 
 
 
@@ -4566,6 +4670,7 @@ This is an empty response
 | phone |  ImportHumanUserRequest.Phone | - |  |
 | password |  string | - |  |
 | password_change_required |  bool | - |  |
+| request_passwordless_registration |  bool | - |  |
 
 
 
@@ -4618,6 +4723,19 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
+| passwordless_registration |  ImportHumanUserResponse.PasswordlessRegistration | - |  |
+
+
+
+
+### ImportHumanUserResponse.PasswordlessRegistration
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| link |  string | - |  |
+| lifetime |  google.protobuf.Duration | - |  |
 
 
 
@@ -6328,6 +6446,28 @@ This is an empty request
 
 
 
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
+This is an empty request
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomVerifyEmailMessageTextToDefaultRequest
 
 
@@ -6497,6 +6637,28 @@ This is an empty request
 
 
 
+### SendPasswordlessRegistrationRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SendPasswordlessRegistrationResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetCustomDomainClaimedMessageTextRequest
 
 
@@ -6592,6 +6754,9 @@ This is an empty request
 | success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 | logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
 | footer_text |  zitadel.text.v1.FooterText | - |  |
+| passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
+| passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
 
 
 
@@ -6626,6 +6791,35 @@ This is an empty request
 
 
 ### SetCustomPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetCustomPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetCustomPasswordlessRegistrationMessageTextResponse
 
 
 

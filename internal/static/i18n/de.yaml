@@ -485,6 +485,11 @@ EventTypes:
             changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
       signed:
         out: Benutzer erfolgreich abgemeldet
+      refresh:
+        token:
+          added: Refresh Token ausgestellt
+          renewed: Refresh Token erneuert
+          removed: Refresh Token gelöscht
     locked: Benutzer gesperrt
     unlocked: Benutzer entsperrt
     deactivated: Benutzer deaktiviert
@@ -636,6 +641,10 @@ EventTypes:
           removed: Schrift von Label Richtlinie entfernt
         assets:
           removed: Dateien von Label Richtlinie entfernt
+      privacy:
+        added: Datenschutzbestimmung und AGB hinzugefügt
+        changed: Datenschutzbestimmung und AGB geändert
+        removed: Datenschutzbestimmung und AGB entfernt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert

@@ -851,13 +851,52 @@ Returns the custom text for domain claimed message (overwritten in eventstore)
 [SetDefaultDomainClaimedMessageTextResponse](#setdefaultdomainclaimedmessagetextresponse)
 
 Sets the default custom text for domain claimed phone message
-it impacts all organisations without customized verify phone message text
+it impacts all organisations without customized domain claimed message text
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
-    PUT: /text/message/verifyphone/{language}
+    PUT: /text/message/domainclaimed/{language}
+
+
+### GetDefaultPasswordlessRegistrationMessageText
+
+> **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
+[GetDefaultPasswordlessRegistrationMessageTextResponse](#getdefaultpasswordlessregistrationmessagetextresponse)
+
+Returns the default text for passwordless registration message (translation file)
+
+
+
+    GET: /text/default/message/passwordless_registration/{language}
+
+
+### GetCustomPasswordlessRegistrationMessageText
+
+> **rpc** GetCustomPasswordlessRegistrationMessageText([GetCustomPasswordlessRegistrationMessageTextRequest](#getcustompasswordlessregistrationmessagetextrequest))
+[GetCustomPasswordlessRegistrationMessageTextResponse](#getcustompasswordlessregistrationmessagetextresponse)
+
+Returns the custom text for passwordless registration message (overwritten in eventstore)
+
+
+
+    GET: /text/message/passwordless_registration/{language}
+
+
+### SetDefaultPasswordlessRegistrationMessageText
+
+> **rpc** SetDefaultPasswordlessRegistrationMessageText([SetDefaultPasswordlessRegistrationMessageTextRequest](#setdefaultpasswordlessregistrationmessagetextrequest))
+[SetDefaultPasswordlessRegistrationMessageTextResponse](#setdefaultpasswordlessregistrationmessagetextresponse)
+
+Sets the default custom text for passwordless registration message
+it impacts all organisations without customized passwordless registration message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+    PUT: /text/message/passwordless_registration/{language}
 
 
 ### GetDefaultLoginTexts
@@ -895,6 +934,20 @@ it impacts all organisations without customized login ui texts
 
 
     PUT: /text/login/{language}
+
+
+### ResetCustomLoginTextToDefault
+
+> **rpc** ResetCustomLoginTextToDefault([ResetCustomLoginTextsToDefaultRequest](#resetcustomlogintextstodefaultrequest))
+[ResetCustomLoginTextsToDefaultResponse](#resetcustomlogintextstodefaultresponse)
+
+Removes the custom texts for login ui
+it impacts all organisations without customized login ui texts
+The default text form translation file will trigger after
+
+
+
+    DELETE: /text/login/{language}
 
 
 ### ListIAMMemberRoles
@@ -1352,6 +1405,28 @@ This is an empty response
 
 
 
+### GetCustomPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordlessRegistrationMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomVerifyEmailMessageTextRequest
 
 
@@ -1491,6 +1566,28 @@ This is an empty response
 
 
 ### GetDefaultPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextResponse
 
 
 
@@ -2234,6 +2331,28 @@ This is an empty request
 
 
 
+### ResetCustomLoginTextsToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomLoginTextsToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomOrgIAMPolicyToDefaultRequest
 
 
@@ -2315,6 +2434,9 @@ This is an empty request
 | success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 | logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
 | footer_text |  zitadel.text.v1.FooterText | - |  |
+| passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
+| passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
 
 
 
@@ -2444,6 +2566,35 @@ This is an empty request
 
 
 ### SetDefaultPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultPasswordlessRegistrationMessageTextResponse
 
 
 

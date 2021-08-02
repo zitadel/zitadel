@@ -105,7 +105,7 @@ func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*
 	return iam_view_model.PasswordComplexityViewToModel(policy), err
 }
 
-func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*iam_model.LabelPolicyView, error) {
+func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
 	orgPolicy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
 		orgPolicy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
@@ -113,7 +113,19 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*i
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.LabelPolicyViewToModel(orgPolicy), nil
+	return orgPolicy.ToDomain(), nil
+}
+
+func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*domain.CustomText, error) {
+	loginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(domain.IAMID, domain.LoginCustomText)
+	if err != nil {
+		return nil, err
+	}
+	orgLoginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(orgID, domain.LoginCustomText)
+	if err != nil {
+		return nil, err
+	}
+	return append(iam_view_model.CustomTextViewsToDomain(loginTexts), iam_view_model.CustomTextViewsToDomain(orgLoginTexts)...), nil
 }
 
 func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {

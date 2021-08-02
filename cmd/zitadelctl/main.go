@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/caos/orbos/mntr"
+
 	"github.com/caos/zitadel/cmd/zitadelctl/cmds"
 )
 
@@ -14,7 +16,16 @@ var (
 )
 
 func main() {
-	rootCmd, rootValues := cmds.RootCommand(Version)
+	monitor := mntr.Monitor{
+		OnInfo:         mntr.LogMessage,
+		OnChange:       mntr.LogMessage,
+		OnError:        mntr.LogError,
+		OnRecoverPanic: mntr.LogPanic,
+	}
+
+	defer func() { monitor.RecoverPanic(recover()) }()
+
+	rootCmd, rootValues := cmds.RootCommand(Version, monitor)
 	rootCmd.Version = fmt.Sprintf("%s\n", Version)
 
 	rootCmd.AddCommand(
@@ -27,6 +38,7 @@ func main() {
 		cmds.BackupCommand(rootValues),
 		cmds.StartDatabase(rootValues),
 		cmds.ConfigCommand(rootValues, githubClientID, githubClientSecret),
+		cmds.TeardownCommand(rootValues),
 	)
 
 	if err := rootCmd.Execute(); err != nil {

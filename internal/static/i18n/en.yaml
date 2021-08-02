@@ -485,6 +485,11 @@ EventTypes:
             changed: Checksum of the Passwordless Login Token has been changed
       signed:
         out: User signed out
+      refresh:
+        token:
+          added: Refresh Token created
+          renewed: Refresh Token renewed
+          removed: Refresh Token removed
     locked: User locked
     unlocked: User unlocked
     deactivated: User deactivated
@@ -582,6 +587,11 @@ EventTypes:
         config:
           added: SAML IDP configuration added
           changed: SAML IDP configuration changed
+    customtext:
+      set: Custom text set
+      removed: Custom text removed
+      template:
+        removed: Custom text template removed
     policy:
       login:
         added: Login Policy added
@@ -631,6 +641,10 @@ EventTypes:
           removed: Font removed from Label Policy
         assets:
           removed: Assets removed from Label Policy
+      privacy:
+        added: Privacy policy and TOS added
+        changed: Privacy policy and TOS changed
+        removed: Privacy policy and TOS removed
   project:
     added: Project added
     changed: Project changed

@@ -1,13 +1,16 @@
 <span class="title" mat-dialog-title>{{data.titleKey | translate: data.titleParam}}</span>
 <div mat-dialog-content>
-    <p class="desc"> {{data.descriptionKey | translate: data.descriptionParam}}</p>
+  <div class="icon-wrapper" *ngIf="data.icon">
+    <i  class="icon {{data.icon}}"></i>
+  </div>
+  <p class="desc"> {{data.descriptionKey | translate: data.descriptionParam}}</p>
 </div>
 <div mat-dialog-actions class="action">
-    <button *ngIf="data.cancelKey" mat-button (click)="closeDialog()">
-        {{data.cancelKey | translate}}
-    </button>
-    <span class="fill-space"></span>
-    <button color="warn" mat-raised-button class="ok-button" (click)="closeDialogWithSuccess()">
-        {{data.confirmKey | translate}}
-    </button>
+  <button *ngIf="data.cancelKey" mat-button (click)="closeDialog()">
+      {{data.cancelKey | translate}}
+  </button>
+  <span class="fill-space"></span>
+  <button color="warn" mat-raised-button class="ok-button" (click)="closeDialogWithSuccess()">
+      {{data.confirmKey | translate}}
+  </button>
 </div>

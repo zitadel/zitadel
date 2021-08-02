@@ -39,6 +39,7 @@ type SecretGenerators struct {
 	EmailVerificationCode    crypto.GeneratorConfig
 	PhoneVerificationCode    crypto.GeneratorConfig
 	PasswordVerificationCode crypto.GeneratorConfig
+	PasswordlessInitCode     crypto.GeneratorConfig
 	MachineKeySize           uint32
 	ApplicationKeySize       uint32
 }
@@ -73,10 +74,11 @@ type Notifications struct {
 }
 
 type Endpoints struct {
-	InitCode      string
-	PasswordReset string
-	VerifyEmail   string
-	DomainClaimed string
+	InitCode                 string
+	PasswordReset            string
+	VerifyEmail              string
+	DomainClaimed            string
+	PasswordlessRegistration string
 }
 
 type Providers struct {

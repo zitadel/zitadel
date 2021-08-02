@@ -8,14 +8,14 @@
     </div>
     <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
         <ng-template appHasRole [appHasRole]="['policy.delete']">
-            <button *ngIf="!isDefault" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
+            <button *ngIf="!isDefault" color="primary" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
                 mat-stroked-button>
                 {{'POLICY.RESET' | translate}}
             </button>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['policy.write']">
-            <button *ngIf="isDefault" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
+            <button *ngIf="isDefault" color="primary" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
                 mat-raised-button>
                 {{'POLICY.CREATECUSTOM' | translate}}
             </button>
@@ -219,6 +219,5 @@
         </app-card>
     </ng-template>
 
-    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
-
+    <app-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="security"></app-policy-grid>
 </app-detail-layout>

@@ -32,36 +32,39 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 			text.ChangeDate,
 			text.AggregateID,
 		),
-		SelectAccountText:         SelectAccountScreenToPb(text.SelectAccount),
-		LoginText:                 LoginScreenTextToPb(text.Login),
-		PasswordText:              PasswordScreenTextToPb(text.Password),
-		UsernameChangeText:        UsernameChangeScreenTextToPb(text.UsernameChange),
-		UsernameChangeDoneText:    UsernameChangeDoneScreenTextToPb(text.UsernameChangeDone),
-		InitPasswordText:          InitPasswordScreenTextToPb(text.InitPassword),
-		InitPasswordDoneText:      InitPasswordDoneScreenTextToPb(text.InitPasswordDone),
-		EmailVerificationText:     EmailVerificationScreenTextToPb(text.EmailVerification),
-		EmailVerificationDoneText: EmailVerificationDoneScreenTextToPb(text.EmailVerificationDone),
-		InitializeUserText:        InitializeUserScreenTextToPb(text.InitUser),
-		InitializeDoneText:        InitializeUserDoneScreenTextToPb(text.InitUserDone),
-		InitMfaPromptText:         InitMFAPromptScreenTextToPb(text.InitMFAPrompt),
-		InitMfaOtpText:            InitMFAOTPScreenTextToPb(text.InitMFAOTP),
-		InitMfaU2FText:            InitMFAU2FScreenTextToPb(text.InitMFAU2F),
-		InitMfaDoneText:           InitMFADoneScreenTextToPb(text.InitMFADone),
-		MfaProvidersText:          MFAProvidersTextToPb(text.MFAProvider),
-		VerifyMfaOtpText:          VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
-		VerifyMfaU2FText:          VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
-		PasswordlessText:          PasswordlessScreenTextToPb(text.Passwordless),
-		PasswordChangeText:        PasswordChangeScreenTextToPb(text.PasswordChange),
-		PasswordChangeDoneText:    PasswordChangeDoneScreenTextToPb(text.PasswordChangeDone),
-		PasswordResetDoneText:     PasswordResetDoneScreenTextToPb(text.PasswordResetDone),
-		RegistrationOptionText:    RegistrationOptionScreenTextToPb(text.RegisterOption),
-		RegistrationUserText:      RegistrationUserScreenTextToPb(text.RegistrationUser),
-		RegistrationOrgText:       RegistrationOrgScreenTextToPb(text.RegistrationOrg),
-		LinkingUserDoneText:       LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
-		ExternalUserNotFoundText:  ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
-		SuccessLoginText:          SuccessLoginScreenTextToPb(text.LoginSuccess),
-		LogoutText:                LogoutDoneScreenTextToPb(text.LogoutDone),
-		FooterText:                FooterTextToPb(text.Footer),
+		SelectAccountText:                SelectAccountScreenToPb(text.SelectAccount),
+		LoginText:                        LoginScreenTextToPb(text.Login),
+		PasswordText:                     PasswordScreenTextToPb(text.Password),
+		UsernameChangeText:               UsernameChangeScreenTextToPb(text.UsernameChange),
+		UsernameChangeDoneText:           UsernameChangeDoneScreenTextToPb(text.UsernameChangeDone),
+		InitPasswordText:                 InitPasswordScreenTextToPb(text.InitPassword),
+		InitPasswordDoneText:             InitPasswordDoneScreenTextToPb(text.InitPasswordDone),
+		EmailVerificationText:            EmailVerificationScreenTextToPb(text.EmailVerification),
+		EmailVerificationDoneText:        EmailVerificationDoneScreenTextToPb(text.EmailVerificationDone),
+		InitializeUserText:               InitializeUserScreenTextToPb(text.InitUser),
+		InitializeDoneText:               InitializeUserDoneScreenTextToPb(text.InitUserDone),
+		InitMfaPromptText:                InitMFAPromptScreenTextToPb(text.InitMFAPrompt),
+		InitMfaOtpText:                   InitMFAOTPScreenTextToPb(text.InitMFAOTP),
+		InitMfaU2FText:                   InitMFAU2FScreenTextToPb(text.InitMFAU2F),
+		InitMfaDoneText:                  InitMFADoneScreenTextToPb(text.InitMFADone),
+		MfaProvidersText:                 MFAProvidersTextToPb(text.MFAProvider),
+		VerifyMfaOtpText:                 VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
+		VerifyMfaU2FText:                 VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
+		PasswordlessText:                 PasswordlessScreenTextToPb(text.Passwordless),
+		PasswordlessPromptText:           PasswordlessPromptScreenTextToPb(text.PasswordlessPrompt),
+		PasswordlessRegistrationText:     PasswordlessRegistrationScreenTextToPb(text.PasswordlessRegistration),
+		PasswordlessRegistrationDoneText: PasswordlessRegistrationDoneScreenTextToPb(text.PasswordlessRegistrationDone),
+		PasswordChangeText:               PasswordChangeScreenTextToPb(text.PasswordChange),
+		PasswordChangeDoneText:           PasswordChangeDoneScreenTextToPb(text.PasswordChangeDone),
+		PasswordResetDoneText:            PasswordResetDoneScreenTextToPb(text.PasswordResetDone),
+		RegistrationOptionText:           RegistrationOptionScreenTextToPb(text.RegisterOption),
+		RegistrationUserText:             RegistrationUserScreenTextToPb(text.RegistrationUser),
+		RegistrationOrgText:              RegistrationOrgScreenTextToPb(text.RegistrationOrg),
+		LinkingUserDoneText:              LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
+		ExternalUserNotFoundText:         ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
+		SuccessLoginText:                 SuccessLoginScreenTextToPb(text.LoginSuccess),
+		LogoutText:                       LogoutDoneScreenTextToPb(text.LogoutDone),
+		FooterText:                       FooterTextToPb(text.Footer),
 	}
 }
 
@@ -272,6 +275,36 @@ func PasswordlessScreenTextToPb(text domain.PasswordlessScreenText) *text_pb.Pas
 	}
 }
 
+func PasswordlessPromptScreenTextToPb(text domain.PasswordlessPromptScreenText) *text_pb.PasswordlessPromptScreenText {
+	return &text_pb.PasswordlessPromptScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionInit:        text.DescriptionInit,
+		PasswordlessButtonText: text.PasswordlessButtonText,
+		NextButtonText:         text.NextButtonText,
+		SkipButtonText:         text.SkipButtonText,
+	}
+}
+
+func PasswordlessRegistrationScreenTextToPb(text domain.PasswordlessRegistrationScreenText) *text_pb.PasswordlessRegistrationScreenText {
+	return &text_pb.PasswordlessRegistrationScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		RegisterTokenButtonText: text.RegisterTokenButtonText,
+		TokenNameLabel:          text.TokenNameLabel,
+		NotSupported:            text.NotSupported,
+		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessRegistrationDoneScreenTextToPb(text domain.PasswordlessRegistrationDoneScreenText) *text_pb.PasswordlessRegistrationDoneScreenText {
+	return &text_pb.PasswordlessRegistrationDoneScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		NextButtonText: text.NextButtonText,
+	}
+}
+
 func PasswordChangeScreenTextToPb(text domain.PasswordChangeScreenText) *text_pb.PasswordChangeScreenText {
 	return &text_pb.PasswordChangeScreenText{
 		Title:                   text.Title,
@@ -311,50 +344,44 @@ func RegistrationOptionScreenTextToPb(text domain.RegistrationOptionScreenText) 
 
 func RegistrationUserScreenTextToPb(text domain.RegistrationUserScreenText) *text_pb.RegistrationUserScreenText {
 	return &text_pb.RegistrationUserScreenText{
-		Title:                    text.Title,
-		Description:              text.Description,
-		DescriptionOrgRegister:   text.DescriptionOrgRegister,
-		FirstnameLabel:           text.FirstnameLabel,
-		LastnameLabel:            text.LastnameLabel,
-		EmailLabel:               text.EmailLabel,
-		UsernameLabel:            text.UsernameLabel,
-		LanguageLabel:            text.LanguageLabel,
-		GenderLabel:              text.GenderLabel,
-		PasswordLabel:            text.PasswordLabel,
-		PasswordConfirmLabel:     text.PasswordConfirmLabel,
-		TosAndPrivacyLabel:       text.TOSAndPrivacyLabel,
-		TosConfirm:               text.TOSConfirm,
-		TosLink:                  text.TOSLink,
-		TosLinkText:              text.TOSLinkText,
-		PrivacyConfirm:           text.PrivacyConfirm,
-		PrivacyLink:              text.PrivacyLink,
-		PrivacyLinkText:          text.PrivacyLinkText,
-		ExternalLoginDescription: text.ExternalLoginDescription,
-		NextButtonText:           text.NextButtonText,
-		BackButtonText:           text.BackButtonText,
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionOrgRegister: text.DescriptionOrgRegister,
+		FirstnameLabel:         text.FirstnameLabel,
+		LastnameLabel:          text.LastnameLabel,
+		EmailLabel:             text.EmailLabel,
+		UsernameLabel:          text.UsernameLabel,
+		LanguageLabel:          text.LanguageLabel,
+		GenderLabel:            text.GenderLabel,
+		PasswordLabel:          text.PasswordLabel,
+		PasswordConfirmLabel:   text.PasswordConfirmLabel,
+		TosAndPrivacyLabel:     text.TOSAndPrivacyLabel,
+		TosConfirm:             text.TOSConfirm,
+		TosLinkText:            text.TOSLinkText,
+		TosConfirmAnd:          text.TOSConfirmAnd,
+		PrivacyLinkText:        text.PrivacyLinkText,
+		NextButtonText:         text.NextButtonText,
+		BackButtonText:         text.BackButtonText,
 	}
 }
 
 func RegistrationOrgScreenTextToPb(text domain.RegistrationOrgScreenText) *text_pb.RegistrationOrgScreenText {
 	return &text_pb.RegistrationOrgScreenText{
-		Title:                    text.Title,
-		Description:              text.Description,
-		OrgnameLabel:             text.OrgNameLabel,
-		FirstnameLabel:           text.FirstnameLabel,
-		LastnameLabel:            text.LastnameLabel,
-		EmailLabel:               text.EmailLabel,
-		UsernameLabel:            text.UsernameLabel,
-		PasswordLabel:            text.PasswordLabel,
-		PasswordConfirmLabel:     text.PasswordConfirmLabel,
-		TosAndPrivacyLabel:       text.TOSAndPrivacyLabel,
-		TosConfirm:               text.TOSConfirm,
-		TosLink:                  text.TOSLink,
-		TosLinkText:              text.TOSLinkText,
-		PrivacyConfirm:           text.PrivacyConfirm,
-		PrivacyLink:              text.PrivacyLink,
-		PrivacyLinkText:          text.PrivacyLinkText,
-		ExternalLoginDescription: text.ExternalLoginDescription,
-		SaveButtonText:           text.SaveButtonText,
+		Title:                text.Title,
+		Description:          text.Description,
+		OrgnameLabel:         text.OrgNameLabel,
+		FirstnameLabel:       text.FirstnameLabel,
+		LastnameLabel:        text.LastnameLabel,
+		EmailLabel:           text.EmailLabel,
+		UsernameLabel:        text.UsernameLabel,
+		PasswordLabel:        text.PasswordLabel,
+		PasswordConfirmLabel: text.PasswordConfirmLabel,
+		TosAndPrivacyLabel:   text.TOSAndPrivacyLabel,
+		TosConfirm:           text.TOSConfirm,
+		TosLinkText:          text.TOSLinkText,
+		TosConfirmAnd:        text.TOSConfirmAnd,
+		PrivacyLinkText:      text.PrivacyLinkText,
+		SaveButtonText:       text.SaveButtonText,
 	}
 }
 
@@ -395,12 +422,10 @@ func LogoutDoneScreenTextToPb(text domain.LogoutDoneScreenText) *text_pb.LogoutD
 
 func FooterTextToPb(text domain.FooterText) *text_pb.FooterText {
 	return &text_pb.FooterText{
-		Tos:               text.TOS,
-		TosLink:           text.TOSLink,
-		PrivacyPolicy:     text.PrivacyPolicy,
-		PrivacyPolicyLink: text.PrivacyPolicyLink,
-		Help:              text.Help,
-		HelpLink:          text.HelpLink,
+		Tos:           text.TOS,
+		PrivacyPolicy: text.PrivacyPolicy,
+		Help:          text.Help,
+		HelpLink:      text.HelpLink,
 	}
 }
 
@@ -668,6 +693,45 @@ func PasswordlessScreenTextPbToDomain(text *text_pb.PasswordlessScreenText) doma
 	}
 }
 
+func PasswordlessPromptScreenTextPbToDomain(text *text_pb.PasswordlessPromptScreenText) domain.PasswordlessPromptScreenText {
+	if text == nil {
+		return domain.PasswordlessPromptScreenText{}
+	}
+	return domain.PasswordlessPromptScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionInit:        text.DescriptionInit,
+		PasswordlessButtonText: text.PasswordlessButtonText,
+		NextButtonText:         text.NextButtonText,
+		SkipButtonText:         text.SkipButtonText,
+	}
+}
+
+func PasswordlessRegistrationScreenTextPbToDomain(text *text_pb.PasswordlessRegistrationScreenText) domain.PasswordlessRegistrationScreenText {
+	if text == nil {
+		return domain.PasswordlessRegistrationScreenText{}
+	}
+	return domain.PasswordlessRegistrationScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		RegisterTokenButtonText: text.RegisterTokenButtonText,
+		TokenNameLabel:          text.TokenNameLabel,
+		NotSupported:            text.NotSupported,
+		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessRegistrationDoneScreenTextPbToDomain(text *text_pb.PasswordlessRegistrationDoneScreenText) domain.PasswordlessRegistrationDoneScreenText {
+	if text == nil {
+		return domain.PasswordlessRegistrationDoneScreenText{}
+	}
+	return domain.PasswordlessRegistrationDoneScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		NextButtonText: text.NextButtonText,
+	}
+}
+
 func PasswordChangeScreenTextPbToDomain(text *text_pb.PasswordChangeScreenText) domain.PasswordChangeScreenText {
 	if text == nil {
 		return domain.PasswordChangeScreenText{}
@@ -722,27 +786,24 @@ func RegistrationUserScreenTextPbToDomain(text *text_pb.RegistrationUserScreenTe
 		return domain.RegistrationUserScreenText{}
 	}
 	return domain.RegistrationUserScreenText{
-		Title:                    text.Title,
-		Description:              text.Description,
-		DescriptionOrgRegister:   text.DescriptionOrgRegister,
-		FirstnameLabel:           text.FirstnameLabel,
-		LastnameLabel:            text.LastnameLabel,
-		EmailLabel:               text.EmailLabel,
-		UsernameLabel:            text.UsernameLabel,
-		LanguageLabel:            text.LanguageLabel,
-		GenderLabel:              text.GenderLabel,
-		PasswordLabel:            text.PasswordLabel,
-		PasswordConfirmLabel:     text.PasswordConfirmLabel,
-		TOSAndPrivacyLabel:       text.TosAndPrivacyLabel,
-		TOSConfirm:               text.TosConfirm,
-		TOSLink:                  text.TosLink,
-		TOSLinkText:              text.TosLinkText,
-		PrivacyConfirm:           text.PrivacyConfirm,
-		PrivacyLink:              text.PrivacyLink,
-		PrivacyLinkText:          text.PrivacyLinkText,
-		ExternalLoginDescription: text.ExternalLoginDescription,
-		NextButtonText:           text.NextButtonText,
-		BackButtonText:           text.BackButtonText,
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionOrgRegister: text.DescriptionOrgRegister,
+		FirstnameLabel:         text.FirstnameLabel,
+		LastnameLabel:          text.LastnameLabel,
+		EmailLabel:             text.EmailLabel,
+		UsernameLabel:          text.UsernameLabel,
+		LanguageLabel:          text.LanguageLabel,
+		GenderLabel:            text.GenderLabel,
+		PasswordLabel:          text.PasswordLabel,
+		PasswordConfirmLabel:   text.PasswordConfirmLabel,
+		TOSAndPrivacyLabel:     text.TosAndPrivacyLabel,
+		TOSConfirm:             text.TosConfirm,
+		TOSLinkText:            text.TosLinkText,
+		TOSConfirmAnd:          text.TosConfirmAnd,
+		PrivacyLinkText:        text.PrivacyLinkText,
+		NextButtonText:         text.NextButtonText,
+		BackButtonText:         text.BackButtonText,
 	}
 }
 
@@ -751,24 +812,21 @@ func RegistrationOrgScreenTextPbToDomain(text *text_pb.RegistrationOrgScreenText
 		return domain.RegistrationOrgScreenText{}
 	}
 	return domain.RegistrationOrgScreenText{
-		Title:                    text.Title,
-		Description:              text.Description,
-		OrgNameLabel:             text.OrgnameLabel,
-		FirstnameLabel:           text.FirstnameLabel,
-		LastnameLabel:            text.LastnameLabel,
-		EmailLabel:               text.EmailLabel,
-		UsernameLabel:            text.UsernameLabel,
-		PasswordLabel:            text.PasswordLabel,
-		PasswordConfirmLabel:     text.PasswordConfirmLabel,
-		TOSAndPrivacyLabel:       text.TosAndPrivacyLabel,
-		TOSConfirm:               text.TosConfirm,
-		TOSLink:                  text.TosLink,
-		TOSLinkText:              text.TosLinkText,
-		PrivacyConfirm:           text.PrivacyConfirm,
-		PrivacyLink:              text.PrivacyLink,
-		PrivacyLinkText:          text.PrivacyLinkText,
-		ExternalLoginDescription: text.ExternalLoginDescription,
-		SaveButtonText:           text.SaveButtonText,
+		Title:                text.Title,
+		Description:          text.Description,
+		OrgNameLabel:         text.OrgnameLabel,
+		FirstnameLabel:       text.FirstnameLabel,
+		LastnameLabel:        text.LastnameLabel,
+		EmailLabel:           text.EmailLabel,
+		UsernameLabel:        text.UsernameLabel,
+		PasswordLabel:        text.PasswordLabel,
+		PasswordConfirmLabel: text.PasswordConfirmLabel,
+		TOSAndPrivacyLabel:   text.TosAndPrivacyLabel,
+		TOSConfirm:           text.TosConfirm,
+		TOSLinkText:          text.TosLinkText,
+		TOSConfirmAnd:        text.TosConfirmAnd,
+		PrivacyLinkText:      text.PrivacyLinkText,
+		SaveButtonText:       text.SaveButtonText,
 	}
 }
 
@@ -824,11 +882,9 @@ func FooterTextPbToDomain(text *text_pb.FooterText) domain.FooterText {
 		return domain.FooterText{}
 	}
 	return domain.FooterText{
-		TOS:               text.Tos,
-		TOSLink:           text.TosLink,
-		PrivacyPolicy:     text.PrivacyPolicy,
-		PrivacyPolicyLink: text.PrivacyPolicyLink,
-		Help:              text.Help,
-		HelpLink:          text.HelpLink,
+		TOS:           text.Tos,
+		PrivacyPolicy: text.PrivacyPolicy,
+		Help:          text.Help,
+		HelpLink:      text.HelpLink,
 	}
 }

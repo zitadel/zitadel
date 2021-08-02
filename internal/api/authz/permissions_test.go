@@ -15,8 +15,8 @@ type testVerifier struct {
 	memberships []*Membership
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, error) {
-	return "userID", "agentID", "de", "orgID", nil
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
+	return "userID", "agentID", "clientID", "de", "orgID", nil
 }
 func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*Membership, error) {
 	return v.memberships, nil
