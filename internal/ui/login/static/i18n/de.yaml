@@ -148,7 +148,7 @@ PasswordlessRegistration:
   TokenNameLabel: Name des Tokens / Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Token registrieren
-  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle eine andere Methode.
 
 PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
