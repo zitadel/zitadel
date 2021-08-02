@@ -97,7 +97,7 @@ InitMFAOTP:
 InitMFAU2F:
   Title: Multifactor Setup U2F / WebAuthN
   Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
-  TokenNameLabel: Name of the tokens / machine
+  TokenNameLabel: Name of the token / machine
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Register Token
   ErrorRetry: Retry, create a new challenge or choose a different method.
@@ -133,6 +133,27 @@ Passwordless:
   ErrorRetry: Retry, create a new challenge or choose a different method.
   LoginWithPwButtonText: Login with password
   ValidateTokenButtonText: Validate Token
+
+PasswordlessPrompt:
+  Title: Passwordless setup
+  Description: Would you like to setup passwordless login?
+  DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
+  PasswordlessButtonText: Go passwordless
+  NextButtonText: next
+  SkipButtonText: skip
+
+PasswordlessRegistration:
+  Title: Passwordless setup
+  Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
+  TokenNameLabel: Name of the token / machine
+  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Register Token
+  ErrorRetry: Retry, create a new challenge or choose a different method.
+
+PasswordlessRegistrationDone:
+  Title: Passwordless set up
+  Description: Token for passwordless successfully added.
+  NextButtonText: next
 
 PasswordChange:
   Title: Change Password

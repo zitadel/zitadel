@@ -37,35 +37,38 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		staticStorage: staticStorage,
 	}
 	tmplMapping := map[string]string{
-		tmplError:                    "error.html",
-		tmplLogin:                    "login.html",
-		tmplUserSelection:            "select_user.html",
-		tmplPassword:                 "password.html",
-		tmplPasswordlessVerification: "passwordless.html",
-		tmplMFAVerify:                "mfa_verify_otp.html",
-		tmplMFAPrompt:                "mfa_prompt.html",
-		tmplMFAInitVerify:            "mfa_init_otp.html",
-		tmplMFAU2FInit:               "mfa_init_u2f.html",
-		tmplU2FVerification:          "mfa_verification_u2f.html",
-		tmplMFAInitDone:              "mfa_init_done.html",
-		tmplMailVerification:         "mail_verification.html",
-		tmplMailVerified:             "mail_verified.html",
-		tmplInitPassword:             "init_password.html",
-		tmplInitPasswordDone:         "init_password_done.html",
-		tmplInitUser:                 "init_user.html",
-		tmplInitUserDone:             "init_user_done.html",
-		tmplPasswordResetDone:        "password_reset_done.html",
-		tmplChangePassword:           "change_password.html",
-		tmplChangePasswordDone:       "change_password_done.html",
-		tmplRegisterOption:           "register_option.html",
-		tmplRegister:                 "register.html",
-		tmplLogoutDone:               "logout_done.html",
-		tmplRegisterOrg:              "register_org.html",
-		tmplChangeUsername:           "change_username.html",
-		tmplChangeUsernameDone:       "change_username_done.html",
-		tmplLinkUsersDone:            "link_users_done.html",
-		tmplExternalNotFoundOption:   "external_not_found_option.html",
-		tmplLoginSuccess:             "login_success.html",
+		tmplError:                        "error.html",
+		tmplLogin:                        "login.html",
+		tmplUserSelection:                "select_user.html",
+		tmplPassword:                     "password.html",
+		tmplPasswordlessVerification:     "passwordless.html",
+		tmplPasswordlessRegistration:     "passwordless_registration.html",
+		tmplPasswordlessRegistrationDone: "passwordless_registration_done.html",
+		tmplPasswordlessPrompt:           "passwordless_prompt.html",
+		tmplMFAVerify:                    "mfa_verify_otp.html",
+		tmplMFAPrompt:                    "mfa_prompt.html",
+		tmplMFAInitVerify:                "mfa_init_otp.html",
+		tmplMFAU2FInit:                   "mfa_init_u2f.html",
+		tmplU2FVerification:              "mfa_verification_u2f.html",
+		tmplMFAInitDone:                  "mfa_init_done.html",
+		tmplMailVerification:             "mail_verification.html",
+		tmplMailVerified:                 "mail_verified.html",
+		tmplInitPassword:                 "init_password.html",
+		tmplInitPasswordDone:             "init_password_done.html",
+		tmplInitUser:                     "init_user.html",
+		tmplInitUserDone:                 "init_user_done.html",
+		tmplPasswordResetDone:            "password_reset_done.html",
+		tmplChangePassword:               "change_password.html",
+		tmplChangePasswordDone:           "change_password_done.html",
+		tmplRegisterOption:               "register_option.html",
+		tmplRegister:                     "register.html",
+		tmplLogoutDone:                   "logout_done.html",
+		tmplRegisterOrg:                  "register_org.html",
+		tmplChangeUsername:               "change_username.html",
+		tmplChangeUsernameDone:           "change_username_done.html",
+		tmplLinkUsersDone:                "link_users_done.html",
+		tmplExternalNotFoundOption:       "external_not_found_option.html",
+		tmplLoginSuccess:                 "login_success.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -126,6 +129,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		},
 		"passwordLessVerificationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointPasswordlessLogin)
+		},
+		"passwordLessRegistrationUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointPasswordlessRegistration)
+		},
+		"passwordlessPromptUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointPasswordlessPrompt)
 		},
 		"passwordResetUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
@@ -246,7 +255,9 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.PasswordStep:
 		l.renderPassword(w, r, authReq, nil)
 	case *domain.PasswordlessStep:
-		l.renderPasswordlessVerification(w, r, authReq, nil)
+		l.renderPasswordlessVerification(w, r, authReq, step.PasswordSet, nil)
+	case *domain.PasswordlessRegistrationPromptStep:
+		l.renderPasswordlessPrompt(w, r, authReq, nil)
 	case *domain.MFAVerificationStep:
 		l.renderMFAVerify(w, r, authReq, step, err)
 	case *domain.RedirectToCallbackStep:

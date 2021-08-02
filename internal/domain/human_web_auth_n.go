@@ -2,6 +2,9 @@ package domain
 
 import (
 	"bytes"
+	"fmt"
+	"time"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -64,4 +67,30 @@ func GetTokenByKeyID(tokens []*WebAuthNToken, keyID []byte) (int, *WebAuthNToken
 		}
 	}
 	return -1, nil
+}
+
+type PasswordlessInitCodeState int32
+
+const (
+	PasswordlessInitCodeStateUnspecified PasswordlessInitCodeState = iota
+	PasswordlessInitCodeStateRequested
+	PasswordlessInitCodeStateActive
+	PasswordlessInitCodeStateRemoved
+)
+
+type PasswordlessInitCode struct {
+	es_models.ObjectRoot
+
+	CodeID     string
+	Code       string
+	Expiration time.Duration
+	State      PasswordlessInitCodeState
+}
+
+func (p *PasswordlessInitCode) Link(baseURL string) string {
+	return PasswordlessInitCodeLink(baseURL, p.AggregateID, p.ResourceOwner, p.CodeID, p.Code)
+}
+
+func PasswordlessInitCodeLink(baseURL, userID, resourceOwner, codeID, code string) string {
+	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, userID, resourceOwner, codeID, code)
 }

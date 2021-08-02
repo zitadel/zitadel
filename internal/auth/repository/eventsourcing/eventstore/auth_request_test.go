@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -131,14 +132,16 @@ func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID strin
 }
 
 type mockViewUser struct {
-	InitRequired           bool
-	PasswordSet            bool
-	PasswordChangeRequired bool
-	IsEmailVerified        bool
-	OTPState               int32
-	MFAMaxSetUp            int32
-	MFAInitSkipped         time.Time
-	PasswordlessTokens     user_view_model.WebAuthNTokens
+	InitRequired             bool
+	PasswordInitRequired     bool
+	PasswordSet              bool
+	PasswordChangeRequired   bool
+	IsEmailVerified          bool
+	OTPState                 int32
+	MFAMaxSetUp              int32
+	MFAInitSkipped           time.Time
+	PasswordlessInitRequired bool
+	PasswordlessTokens       user_view_model.WebAuthNTokens
 }
 
 type mockLoginPolicy struct {
@@ -154,15 +157,17 @@ func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 		State:    int32(user_model.UserStateActive),
 		UserName: "UserName",
 		HumanView: &user_view_model.HumanView{
-			FirstName:              "FirstName",
-			InitRequired:           m.InitRequired,
-			PasswordSet:            m.PasswordSet,
-			PasswordChangeRequired: m.PasswordChangeRequired,
-			IsEmailVerified:        m.IsEmailVerified,
-			OTPState:               m.OTPState,
-			MFAMaxSetUp:            m.MFAMaxSetUp,
-			MFAInitSkipped:         m.MFAInitSkipped,
-			PasswordlessTokens:     m.PasswordlessTokens,
+			FirstName:                "FirstName",
+			InitRequired:             m.InitRequired,
+			PasswordInitRequired:     m.PasswordInitRequired,
+			PasswordSet:              m.PasswordSet,
+			PasswordChangeRequired:   m.PasswordChangeRequired,
+			IsEmailVerified:          m.IsEmailVerified,
+			OTPState:                 m.OTPState,
+			MFAMaxSetUp:              m.MFAMaxSetUp,
+			MFAInitSkipped:           m.MFAInitSkipped,
+			PasswordlessInitRequired: m.PasswordlessInitRequired,
+			PasswordlessTokens:       m.PasswordlessTokens,
 		},
 	}, nil
 }
@@ -486,7 +491,37 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"passwordless not verified, passwordless check step",
+			"passwordless not initialised, passwordless prompt step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordlessInitRequired: true,
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MultiFactorCheckLifeTime: 10 * time.Hour,
+			},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
+			[]domain.NextStep{&domain.PasswordlessRegistrationPromptStep{}},
+			nil,
+		},
+		{
+			"passwordless not verified, no password set, passwordless check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
+				},
+				userEventProvider:        &mockEventUser{},
+				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				MultiFactorCheckLifeTime: 10 * time.Hour,
+			},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
+			[]domain.NextStep{&domain.PasswordlessStep{}},
+			nil,
+		},
+		{
+			"passwordless not verified, passwordless check step, downgrade possible",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
 				userViewProvider: &mockViewUser{
@@ -498,7 +533,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
-			[]domain.NextStep{&domain.PasswordlessStep{}},
+			[]domain.NextStep{&domain.PasswordlessStep{PasswordSet: true}},
 			nil,
 		},
 		{
@@ -533,9 +568,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"password not set, init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
-				userViewProvider:        &mockViewUser{},
-				userEventProvider:       &mockEventUser{},
-				orgViewProvider:         &mockViewOrg{State: org_model.OrgStateActive},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.InitPasswordStep{}},
@@ -1510,6 +1547,7 @@ func Test_userByID(t *testing.T) {
 			"new user events, new view model state",
 			args{
 				viewProvider: &mockViewUser{
+					PasswordSet:            true,
 					PasswordChangeRequired: true,
 				},
 				eventProvider: &mockEventUser{
@@ -1518,7 +1556,7 @@ func Test_userByID(t *testing.T) {
 						Type:          user_es_model.UserPasswordChanged,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
-							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false})
+							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
 							return data
 						}(),
 					},
@@ -1529,6 +1567,7 @@ func Test_userByID(t *testing.T) {
 				State:      user_model.UserStateActive,
 				UserName:   "UserName",
 				HumanView: &user_model.HumanView{
+					PasswordSet:            true,
 					PasswordChangeRequired: false,
 					PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
 					FirstName:              "FirstName",

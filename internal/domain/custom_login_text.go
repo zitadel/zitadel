@@ -159,6 +159,27 @@ const (
 	LoginKeyPasswordlessNotSupported            = LoginKeyPasswordless + "NotSupported"
 	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "ErrorRetry"
 
+	LoginKeyPasswordlessPrompt                       = "PasswordlessPrompt."
+	LoginKeyPasswordlessPromptTitle                  = LoginKeyPasswordlessPrompt + "Title"
+	LoginKeyPasswordlessPromptDescription            = LoginKeyPasswordlessPrompt + "Description"
+	LoginKeyPasswordlessPromptDescriptionInit        = LoginKeyPasswordlessPrompt + "DescriptionInit"
+	LoginKeyPasswordlessPromptPasswordlessButtonText = LoginKeyPasswordlessPrompt + "PasswordlessButtonText"
+	LoginKeyPasswordlessPromptNextButtonText         = LoginKeyPasswordlessPrompt + "NextButtonText"
+	LoginKeyPasswordlessPromptSkipButtonText         = LoginKeyPasswordlessPrompt + "SkipButtonText"
+
+	LoginKeyPasswordlessRegistration                        = "PasswordlessRegistration."
+	LoginKeyPasswordlessRegistrationTitle                   = LoginKeyPasswordlessRegistration + "Title"
+	LoginKeyPasswordlessRegistrationDescription             = LoginKeyPasswordlessRegistration + "Description"
+	LoginKeyPasswordlessRegistrationRegisterTokenButtonText = LoginKeyPasswordlessRegistration + "RegisterTokenButtonText"
+	LoginKeyPasswordlessRegistrationTokenNameLabel          = LoginKeyPasswordlessRegistration + "TokenNameLabel"
+	LoginKeyPasswordlessRegistrationNotSupported            = LoginKeyPasswordlessRegistration + "NotSupported"
+	LoginKeyPasswordlessRegistrationErrorRetry              = LoginKeyPasswordlessRegistration + "ErrorRetry"
+
+	LoginKeyPasswordlessRegistrationDone               = "PasswordlessRegistrationDone."
+	LoginKeyPasswordlessRegistrationDoneTitle          = LoginKeyPasswordlessRegistrationDone + "Title"
+	LoginKeyPasswordlessRegistrationDoneDescription    = LoginKeyPasswordlessRegistrationDone + "Description"
+	LoginKeyPasswordlessRegistrationDoneNextButtonText = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
+
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
@@ -258,36 +279,39 @@ type CustomLoginText struct {
 	Default  bool
 	Language language.Tag
 
-	SelectAccount          SelectAccountScreenText
-	Login                  LoginScreenText
-	Password               PasswordScreenText
-	UsernameChange         UsernameChangeScreenText
-	UsernameChangeDone     UsernameChangeDoneScreenText
-	InitPassword           InitPasswordScreenText
-	InitPasswordDone       InitPasswordDoneScreenText
-	EmailVerification      EmailVerificationScreenText
-	EmailVerificationDone  EmailVerificationDoneScreenText
-	InitUser               InitializeUserScreenText
-	InitUserDone           InitializeUserDoneScreenText
-	InitMFAPrompt          InitMFAPromptScreenText
-	InitMFAOTP             InitMFAOTPScreenText
-	InitMFAU2F             InitMFAU2FScreenText
-	InitMFADone            InitMFADoneScreenText
-	MFAProvider            MFAProvidersText
-	VerifyMFAOTP           VerifyMFAOTPScreenText
-	VerifyMFAU2F           VerifyMFAU2FScreenText
-	Passwordless           PasswordlessScreenText
-	PasswordChange         PasswordChangeScreenText
-	PasswordChangeDone     PasswordChangeDoneScreenText
-	PasswordResetDone      PasswordResetDoneScreenText
-	RegisterOption         RegistrationOptionScreenText
-	RegistrationUser       RegistrationUserScreenText
-	RegistrationOrg        RegistrationOrgScreenText
-	LinkingUsersDone       LinkingUserDoneScreenText
-	ExternalNotFoundOption ExternalUserNotFoundScreenText
-	LoginSuccess           SuccessLoginScreenText
-	LogoutDone             LogoutDoneScreenText
-	Footer                 FooterText
+	SelectAccount                SelectAccountScreenText
+	Login                        LoginScreenText
+	Password                     PasswordScreenText
+	UsernameChange               UsernameChangeScreenText
+	UsernameChangeDone           UsernameChangeDoneScreenText
+	InitPassword                 InitPasswordScreenText
+	InitPasswordDone             InitPasswordDoneScreenText
+	EmailVerification            EmailVerificationScreenText
+	EmailVerificationDone        EmailVerificationDoneScreenText
+	InitUser                     InitializeUserScreenText
+	InitUserDone                 InitializeUserDoneScreenText
+	InitMFAPrompt                InitMFAPromptScreenText
+	InitMFAOTP                   InitMFAOTPScreenText
+	InitMFAU2F                   InitMFAU2FScreenText
+	InitMFADone                  InitMFADoneScreenText
+	MFAProvider                  MFAProvidersText
+	VerifyMFAOTP                 VerifyMFAOTPScreenText
+	VerifyMFAU2F                 VerifyMFAU2FScreenText
+	Passwordless                 PasswordlessScreenText
+	PasswordlessPrompt           PasswordlessPromptScreenText
+	PasswordlessRegistration     PasswordlessRegistrationScreenText
+	PasswordlessRegistrationDone PasswordlessRegistrationDoneScreenText
+	PasswordChange               PasswordChangeScreenText
+	PasswordChangeDone           PasswordChangeDoneScreenText
+	PasswordResetDone            PasswordResetDoneScreenText
+	RegisterOption               RegistrationOptionScreenText
+	RegistrationUser             RegistrationUserScreenText
+	RegistrationOrg              RegistrationOrgScreenText
+	LinkingUsersDone             LinkingUserDoneScreenText
+	ExternalNotFoundOption       ExternalUserNotFoundScreenText
+	LoginSuccess                 SuccessLoginScreenText
+	LogoutDone                   LogoutDoneScreenText
+	Footer                       FooterText
 }
 
 func (m *CustomLoginText) IsValid() bool {
@@ -563,4 +587,28 @@ type FooterText struct {
 	PrivacyPolicy string
 	Help          string
 	HelpLink      string
+}
+
+type PasswordlessPromptScreenText struct {
+	Title                  string
+	Description            string
+	DescriptionInit        string
+	PasswordlessButtonText string
+	NextButtonText         string
+	SkipButtonText         string
+}
+
+type PasswordlessRegistrationScreenText struct {
+	Title                   string
+	Description             string
+	RegisterTokenButtonText string
+	TokenNameLabel          string
+	NotSupported            string
+	ErrorRetry              string
+}
+
+type PasswordlessRegistrationDoneScreenText struct {
+	Title          string
+	Description    string
+	NextButtonText string
 }

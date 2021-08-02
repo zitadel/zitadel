@@ -134,6 +134,27 @@ Passwordless:
   LoginWithPwButtonText: Mit Passwort anmelden
   ValidateTokenButtonText: Token validieren
 
+PasswordlessPrompt:
+  Title: Passwortloser Login hinzufügen
+  Description: Möchtest du einen passwortlosen Login hinzufügen?
+  DescriptionInit: Du musst zuerst den Passwortlosen Login hinzufügen. Nutze dazu den Link, den du erhalten hast um dein Gerät zu registrieren.
+  PasswordlessButtonText: Werde Passwortlos
+  NextButtonText: weiter
+  SkipButtonText: überspringen
+
+PasswordlessRegistration:
+  Title: Passwortloser Login hinzufügen
+  Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
+  TokenNameLabel: Name des Tokens / Geräts
+  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Token registrieren
+  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle eine andere Methode.
+
+PasswordlessRegistrationDone:
+  Title: Passwortloser Login erstellt
+  Description: Token für passwortlosen Login erfolgreich hinzugefügt.
+  NextButtonText: weiter
+
 PasswordChange:
   Title: Passwort ändern
   Description: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.

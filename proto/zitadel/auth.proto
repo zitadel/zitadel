@@ -9,6 +9,7 @@ import "zitadel/policy.proto";
 import "zitadel/idp.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -76,7 +77,7 @@ service AuthService {
         option (google.api.http) = {
             post: "/users/me/changes/_search"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
@@ -132,7 +133,7 @@ service AuthService {
             put: "/users/me/username"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
@@ -407,7 +408,7 @@ service AuthService {
         };
     }
 
-    // Returns all configured passwordless authentications of the authorized user
+    // Returns all configured passwordless authenticators of the authorized user
     rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless/_search"
@@ -417,11 +418,37 @@ service AuthService {
         };
     }
 
-    // Adds a new passwordless authentications to the authorized user
+    // Adds a new passwordless authenticator to the authorized user
     // Multiple passwordless authentications can be configured
     rpc AddMyPasswordless(AddMyPasswordlessRequest) returns (AddMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Adds a new passwordless authenticator link to the authorized user and returns it directly
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc AddMyPasswordlessLink(AddMyPasswordlessLinkRequest) returns (AddMyPasswordlessLinkResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_link"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Adds a new passwordless authenticator link to the authorized user and sends it to the registered email address
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc SendMyPasswordlessLink(SendMyPasswordlessLinkRequest) returns (SendMyPasswordlessLinkResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_send_link"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -775,7 +802,7 @@ message RemoveMyAuthFactorU2FResponse {
 message ListMyPasswordlessRequest {}
 
 message ListMyPasswordlessResponse {
-    repeated zitadel.user.v1.WebAuthNToken result = 1; 
+    repeated zitadel.user.v1.WebAuthNToken result = 1;
 }
 
 //This is an empty request
@@ -784,6 +811,22 @@ message AddMyPasswordlessRequest {}
 message AddMyPasswordlessResponse {
     zitadel.user.v1.WebAuthNKey key = 1;
     zitadel.v1.ObjectDetails details = 2;
+}
+
+//This is an empty request
+message AddMyPasswordlessLinkRequest {}
+
+message AddMyPasswordlessLinkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
+}
+
+//This is an empty request
+message SendMyPasswordlessLinkRequest {}
+
+message SendMyPasswordlessLinkResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message VerifyMyPasswordlessRequest {

@@ -147,6 +147,24 @@ type CustomLoginTextReadModel struct {
 	PasswordlessNotSupported            string
 	PasswordlessErrorRetry              string
 
+	PasswordlessPromptTitle                  string
+	PasswordlessPromptDescription            string
+	PasswordlessPromptDescriptionInit        string
+	PasswordlessPromptPasswordlessButtonText string
+	PasswordlessPromptNextButtonText         string
+	PasswordlessPromptSkipButtonText         string
+
+	PasswordlessRegistrationTitle                   string
+	PasswordlessRegistrationDescription             string
+	PasswordlessRegistrationRegisterTokenButtonText string
+	PasswordlessRegistrationTokenNameLabel          string
+	PasswordlessRegistrationNotSupported            string
+	PasswordlessRegistrationErrorRetry              string
+
+	PasswordlessRegistrationDoneTitle          string
+	PasswordlessRegistrationDoneDescription    string
+	PasswordlessRegistrationDoneNextButtonText string
+
 	PasswordChangeTitle                   string
 	PasswordChangeDescription             string
 	PasswordChangeOldPasswordLabel        string
@@ -314,6 +332,18 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordlessScreenSetEvent(e)
 				continue
 			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessPrompt) {
+				wm.handlePasswordlessPromptScreenSetEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistration) {
+				wm.handlePasswordlessRegistrationScreenSetEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+				wm.handlePasswordlessRegistrationDoneScreenSetEvent(e)
+				continue
+			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordChange) {
 				wm.handlePasswordChangeScreenSetEvent(e)
 				continue
@@ -436,6 +466,18 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordless) {
 				wm.handlePasswordlessScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessPrompt) {
+				wm.handlePasswordlessPromptScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistration) {
+				wm.handlePasswordlessRegistrationScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+				wm.handlePasswordlessRegistrationDoneScreenRemoveEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordChange) {
@@ -1485,6 +1527,144 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessScreenRemoveEvent(e *polic
 	}
 	if e.Key == domain.LoginKeyPasswordlessErrorRetry {
 		wm.PasswordlessErrorRetry = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessPromptScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessPromptTitle {
+		wm.PasswordlessPromptTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescription {
+		wm.PasswordlessPromptDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescriptionInit {
+		wm.PasswordlessPromptDescriptionInit = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptPasswordlessButtonText {
+		wm.PasswordlessPromptPasswordlessButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptNextButtonText {
+		wm.PasswordlessPromptNextButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptSkipButtonText {
+		wm.PasswordlessPromptSkipButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessPromptScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessPromptTitle {
+		wm.PasswordlessPromptTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescription {
+		wm.PasswordlessPromptDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescriptionInit {
+		wm.PasswordlessPromptDescriptionInit = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptPasswordlessButtonText {
+		wm.PasswordlessPromptPasswordlessButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptNextButtonText {
+		wm.PasswordlessPromptNextButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptSkipButtonText {
+		wm.PasswordlessPromptSkipButtonText = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		wm.PasswordlessRegistrationTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		wm.PasswordlessRegistrationDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		wm.PasswordlessRegistrationRegisterTokenButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		wm.PasswordlessRegistrationTokenNameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		wm.PasswordlessRegistrationNotSupported = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		wm.PasswordlessRegistrationErrorRetry = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		wm.PasswordlessRegistrationTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		wm.PasswordlessRegistrationDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		wm.PasswordlessRegistrationRegisterTokenButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		wm.PasswordlessRegistrationTokenNameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		wm.PasswordlessRegistrationNotSupported = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		wm.PasswordlessRegistrationErrorRetry = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		wm.PasswordlessRegistrationDoneTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		wm.PasswordlessRegistrationDoneDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		wm.PasswordlessRegistrationDoneNextButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		wm.PasswordlessRegistrationDoneTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		wm.PasswordlessRegistrationDoneDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		wm.PasswordlessRegistrationDoneNextButtonText = ""
 		return
 	}
 }

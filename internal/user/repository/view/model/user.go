@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -69,33 +70,34 @@ const (
 )
 
 type HumanView struct {
-	FirstName         string         `json:"firstName" gorm:"column:first_name"`
-	LastName          string         `json:"lastName" gorm:"column:last_name"`
-	NickName          string         `json:"nickName" gorm:"column:nick_name"`
-	DisplayName       string         `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender            int32          `json:"gender" gorm:"column:gender"`
-	AvatarKey         string         `json:"storeKey" gorm:"column:avatar_key"`
-	Email             string         `json:"email" gorm:"column:email"`
-	IsEmailVerified   bool           `json:"-" gorm:"column:is_email_verified"`
-	Phone             string         `json:"phone" gorm:"column:phone"`
-	IsPhoneVerified   bool           `json:"-" gorm:"column:is_phone_verified"`
-	Country           string         `json:"country" gorm:"column:country"`
-	Locality          string         `json:"locality" gorm:"column:locality"`
-	PostalCode        string         `json:"postalCode" gorm:"column:postal_code"`
-	Region            string         `json:"region" gorm:"column:region"`
-	StreetAddress     string         `json:"streetAddress" gorm:"column:street_address"`
-	OTPState          int32          `json:"-" gorm:"column:otp_state"`
-	U2FTokens         WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
-	MFAMaxSetUp       int32          `json:"-" gorm:"column:mfa_max_set_up"`
-	MFAInitSkipped    time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
-	InitRequired      bool           `json:"-" gorm:"column:init_required"`
-
-	PasswordSet            bool           `json:"-" gorm:"column:password_set"`
-	PasswordChangeRequired bool           `json:"-" gorm:"column:password_change_required"`
-	UsernameChangeRequired bool           `json:"-" gorm:"column:username_change_required"`
-	PasswordChanged        time.Time      `json:"-" gorm:"column:password_change"`
-	PasswordlessTokens     WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
+	FirstName                string         `json:"firstName" gorm:"column:first_name"`
+	LastName                 string         `json:"lastName" gorm:"column:last_name"`
+	NickName                 string         `json:"nickName" gorm:"column:nick_name"`
+	DisplayName              string         `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage        string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender                   int32          `json:"gender" gorm:"column:gender"`
+	AvatarKey                string         `json:"storeKey" gorm:"column:avatar_key"`
+	Email                    string         `json:"email" gorm:"column:email"`
+	IsEmailVerified          bool           `json:"-" gorm:"column:is_email_verified"`
+	Phone                    string         `json:"phone" gorm:"column:phone"`
+	IsPhoneVerified          bool           `json:"-" gorm:"column:is_phone_verified"`
+	Country                  string         `json:"country" gorm:"column:country"`
+	Locality                 string         `json:"locality" gorm:"column:locality"`
+	PostalCode               string         `json:"postalCode" gorm:"column:postal_code"`
+	Region                   string         `json:"region" gorm:"column:region"`
+	StreetAddress            string         `json:"streetAddress" gorm:"column:street_address"`
+	OTPState                 int32          `json:"-" gorm:"column:otp_state"`
+	U2FTokens                WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
+	MFAMaxSetUp              int32          `json:"-" gorm:"column:mfa_max_set_up"`
+	MFAInitSkipped           time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired             bool           `json:"-" gorm:"column:init_required"`
+	PasswordlessInitRequired bool           `json:"-" gorm:"column:passwordless_init_required"`
+	PasswordInitRequired     bool           `json:"-" gorm:"column:password_init_required"`
+	PasswordSet              bool           `json:"-" gorm:"column:password_set"`
+	PasswordChangeRequired   bool           `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired   bool           `json:"-" gorm:"column:username_change_required"`
+	PasswordChanged          time.Time      `json:"-" gorm:"column:password_change"`
+	PasswordlessTokens       WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
 }
 
 type WebAuthNTokens []*WebAuthNView
@@ -151,32 +153,34 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 	}
 	if !user.HumanView.IsZero() {
 		userView.HumanView = &model.HumanView{
-			PasswordSet:            user.PasswordSet,
-			PasswordChangeRequired: user.PasswordChangeRequired,
-			PasswordChanged:        user.PasswordChanged,
-			PasswordlessTokens:     WebauthnTokensToModel(user.PasswordlessTokens),
-			U2FTokens:              WebauthnTokensToModel(user.U2FTokens),
-			FirstName:              user.FirstName,
-			LastName:               user.LastName,
-			NickName:               user.NickName,
-			DisplayName:            user.DisplayName,
-			AvatarKey:              user.AvatarKey,
-			AvatarURL:              domain.AvatarURL(prefixAvatarURL, user.ResourceOwner, user.AvatarKey),
-			PreferredLanguage:      user.PreferredLanguage,
-			Gender:                 model.Gender(user.Gender),
-			Email:                  user.Email,
-			IsEmailVerified:        user.IsEmailVerified,
-			Phone:                  user.Phone,
-			IsPhoneVerified:        user.IsPhoneVerified,
-			Country:                user.Country,
-			Locality:               user.Locality,
-			PostalCode:             user.PostalCode,
-			Region:                 user.Region,
-			StreetAddress:          user.StreetAddress,
-			OTPState:               model.MFAState(user.OTPState),
-			MFAMaxSetUp:            req_model.MFALevel(user.MFAMaxSetUp),
-			MFAInitSkipped:         user.MFAInitSkipped,
-			InitRequired:           user.InitRequired,
+			PasswordSet:              user.PasswordSet,
+			PasswordInitRequired:     user.PasswordInitRequired,
+			PasswordChangeRequired:   user.PasswordChangeRequired,
+			PasswordChanged:          user.PasswordChanged,
+			PasswordlessTokens:       WebauthnTokensToModel(user.PasswordlessTokens),
+			U2FTokens:                WebauthnTokensToModel(user.U2FTokens),
+			FirstName:                user.FirstName,
+			LastName:                 user.LastName,
+			NickName:                 user.NickName,
+			DisplayName:              user.DisplayName,
+			AvatarKey:                user.AvatarKey,
+			AvatarURL:                domain.AvatarURL(prefixAvatarURL, user.ResourceOwner, user.AvatarKey),
+			PreferredLanguage:        user.PreferredLanguage,
+			Gender:                   model.Gender(user.Gender),
+			Email:                    user.Email,
+			IsEmailVerified:          user.IsEmailVerified,
+			Phone:                    user.Phone,
+			IsPhoneVerified:          user.IsPhoneVerified,
+			Country:                  user.Country,
+			Locality:                 user.Locality,
+			PostalCode:               user.PostalCode,
+			Region:                   user.Region,
+			StreetAddress:            user.StreetAddress,
+			OTPState:                 model.MFAState(user.OTPState),
+			MFAMaxSetUp:              req_model.MFALevel(user.MFAMaxSetUp),
+			MFAInitSkipped:           user.MFAInitSkipped,
+			InitRequired:             user.InitRequired,
+			PasswordlessInitRequired: user.PasswordlessInitRequired,
 		}
 	}
 
@@ -345,6 +349,12 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.setData(event)
 	case es_model.HumanAvatarRemoved:
 		u.AvatarKey = ""
+	case models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
+		models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
+		if !u.PasswordSet {
+			u.PasswordlessInitRequired = true
+			u.PasswordInitRequired = false
+		}
 	}
 	u.ComputeObject()
 	return err
@@ -370,6 +380,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil
+	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
 	u.PasswordChanged = event.CreationDate
 	return nil
@@ -498,6 +509,7 @@ func (u *UserView) ComputeMFAMaxSetUp() {
 	for _, token := range u.PasswordlessTokens {
 		if token.State == int32(model.MFAStateReady) {
 			u.MFAMaxSetUp = int32(req_model.MFALevelMultiFactor)
+			u.PasswordlessInitRequired = false
 			return
 		}
 	}

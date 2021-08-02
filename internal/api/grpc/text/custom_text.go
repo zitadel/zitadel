@@ -32,36 +32,39 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 			text.ChangeDate,
 			text.AggregateID,
 		),
-		SelectAccountText:         SelectAccountScreenToPb(text.SelectAccount),
-		LoginText:                 LoginScreenTextToPb(text.Login),
-		PasswordText:              PasswordScreenTextToPb(text.Password),
-		UsernameChangeText:        UsernameChangeScreenTextToPb(text.UsernameChange),
-		UsernameChangeDoneText:    UsernameChangeDoneScreenTextToPb(text.UsernameChangeDone),
-		InitPasswordText:          InitPasswordScreenTextToPb(text.InitPassword),
-		InitPasswordDoneText:      InitPasswordDoneScreenTextToPb(text.InitPasswordDone),
-		EmailVerificationText:     EmailVerificationScreenTextToPb(text.EmailVerification),
-		EmailVerificationDoneText: EmailVerificationDoneScreenTextToPb(text.EmailVerificationDone),
-		InitializeUserText:        InitializeUserScreenTextToPb(text.InitUser),
-		InitializeDoneText:        InitializeUserDoneScreenTextToPb(text.InitUserDone),
-		InitMfaPromptText:         InitMFAPromptScreenTextToPb(text.InitMFAPrompt),
-		InitMfaOtpText:            InitMFAOTPScreenTextToPb(text.InitMFAOTP),
-		InitMfaU2FText:            InitMFAU2FScreenTextToPb(text.InitMFAU2F),
-		InitMfaDoneText:           InitMFADoneScreenTextToPb(text.InitMFADone),
-		MfaProvidersText:          MFAProvidersTextToPb(text.MFAProvider),
-		VerifyMfaOtpText:          VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
-		VerifyMfaU2FText:          VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
-		PasswordlessText:          PasswordlessScreenTextToPb(text.Passwordless),
-		PasswordChangeText:        PasswordChangeScreenTextToPb(text.PasswordChange),
-		PasswordChangeDoneText:    PasswordChangeDoneScreenTextToPb(text.PasswordChangeDone),
-		PasswordResetDoneText:     PasswordResetDoneScreenTextToPb(text.PasswordResetDone),
-		RegistrationOptionText:    RegistrationOptionScreenTextToPb(text.RegisterOption),
-		RegistrationUserText:      RegistrationUserScreenTextToPb(text.RegistrationUser),
-		RegistrationOrgText:       RegistrationOrgScreenTextToPb(text.RegistrationOrg),
-		LinkingUserDoneText:       LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
-		ExternalUserNotFoundText:  ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
-		SuccessLoginText:          SuccessLoginScreenTextToPb(text.LoginSuccess),
-		LogoutText:                LogoutDoneScreenTextToPb(text.LogoutDone),
-		FooterText:                FooterTextToPb(text.Footer),
+		SelectAccountText:                SelectAccountScreenToPb(text.SelectAccount),
+		LoginText:                        LoginScreenTextToPb(text.Login),
+		PasswordText:                     PasswordScreenTextToPb(text.Password),
+		UsernameChangeText:               UsernameChangeScreenTextToPb(text.UsernameChange),
+		UsernameChangeDoneText:           UsernameChangeDoneScreenTextToPb(text.UsernameChangeDone),
+		InitPasswordText:                 InitPasswordScreenTextToPb(text.InitPassword),
+		InitPasswordDoneText:             InitPasswordDoneScreenTextToPb(text.InitPasswordDone),
+		EmailVerificationText:            EmailVerificationScreenTextToPb(text.EmailVerification),
+		EmailVerificationDoneText:        EmailVerificationDoneScreenTextToPb(text.EmailVerificationDone),
+		InitializeUserText:               InitializeUserScreenTextToPb(text.InitUser),
+		InitializeDoneText:               InitializeUserDoneScreenTextToPb(text.InitUserDone),
+		InitMfaPromptText:                InitMFAPromptScreenTextToPb(text.InitMFAPrompt),
+		InitMfaOtpText:                   InitMFAOTPScreenTextToPb(text.InitMFAOTP),
+		InitMfaU2FText:                   InitMFAU2FScreenTextToPb(text.InitMFAU2F),
+		InitMfaDoneText:                  InitMFADoneScreenTextToPb(text.InitMFADone),
+		MfaProvidersText:                 MFAProvidersTextToPb(text.MFAProvider),
+		VerifyMfaOtpText:                 VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
+		VerifyMfaU2FText:                 VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
+		PasswordlessText:                 PasswordlessScreenTextToPb(text.Passwordless),
+		PasswordlessPromptText:           PasswordlessPromptScreenTextToPb(text.PasswordlessPrompt),
+		PasswordlessRegistrationText:     PasswordlessRegistrationScreenTextToPb(text.PasswordlessRegistration),
+		PasswordlessRegistrationDoneText: PasswordlessRegistrationDoneScreenTextToPb(text.PasswordlessRegistrationDone),
+		PasswordChangeText:               PasswordChangeScreenTextToPb(text.PasswordChange),
+		PasswordChangeDoneText:           PasswordChangeDoneScreenTextToPb(text.PasswordChangeDone),
+		PasswordResetDoneText:            PasswordResetDoneScreenTextToPb(text.PasswordResetDone),
+		RegistrationOptionText:           RegistrationOptionScreenTextToPb(text.RegisterOption),
+		RegistrationUserText:             RegistrationUserScreenTextToPb(text.RegistrationUser),
+		RegistrationOrgText:              RegistrationOrgScreenTextToPb(text.RegistrationOrg),
+		LinkingUserDoneText:              LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
+		ExternalUserNotFoundText:         ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
+		SuccessLoginText:                 SuccessLoginScreenTextToPb(text.LoginSuccess),
+		LogoutText:                       LogoutDoneScreenTextToPb(text.LogoutDone),
+		FooterText:                       FooterTextToPb(text.Footer),
 	}
 }
 
@@ -269,6 +272,36 @@ func PasswordlessScreenTextToPb(text domain.PasswordlessScreenText) *text_pb.Pas
 		ValidateTokenButtonText: text.ValidateTokenButtonText,
 		NotSupported:            text.NotSupported,
 		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessPromptScreenTextToPb(text domain.PasswordlessPromptScreenText) *text_pb.PasswordlessPromptScreenText {
+	return &text_pb.PasswordlessPromptScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionInit:        text.DescriptionInit,
+		PasswordlessButtonText: text.PasswordlessButtonText,
+		NextButtonText:         text.NextButtonText,
+		SkipButtonText:         text.SkipButtonText,
+	}
+}
+
+func PasswordlessRegistrationScreenTextToPb(text domain.PasswordlessRegistrationScreenText) *text_pb.PasswordlessRegistrationScreenText {
+	return &text_pb.PasswordlessRegistrationScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		RegisterTokenButtonText: text.RegisterTokenButtonText,
+		TokenNameLabel:          text.TokenNameLabel,
+		NotSupported:            text.NotSupported,
+		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessRegistrationDoneScreenTextToPb(text domain.PasswordlessRegistrationDoneScreenText) *text_pb.PasswordlessRegistrationDoneScreenText {
+	return &text_pb.PasswordlessRegistrationDoneScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		NextButtonText: text.NextButtonText,
 	}
 }
 
@@ -657,6 +690,45 @@ func PasswordlessScreenTextPbToDomain(text *text_pb.PasswordlessScreenText) doma
 		ValidateTokenButtonText: text.ValidateTokenButtonText,
 		NotSupported:            text.NotSupported,
 		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessPromptScreenTextPbToDomain(text *text_pb.PasswordlessPromptScreenText) domain.PasswordlessPromptScreenText {
+	if text == nil {
+		return domain.PasswordlessPromptScreenText{}
+	}
+	return domain.PasswordlessPromptScreenText{
+		Title:                  text.Title,
+		Description:            text.Description,
+		DescriptionInit:        text.DescriptionInit,
+		PasswordlessButtonText: text.PasswordlessButtonText,
+		NextButtonText:         text.NextButtonText,
+		SkipButtonText:         text.SkipButtonText,
+	}
+}
+
+func PasswordlessRegistrationScreenTextPbToDomain(text *text_pb.PasswordlessRegistrationScreenText) domain.PasswordlessRegistrationScreenText {
+	if text == nil {
+		return domain.PasswordlessRegistrationScreenText{}
+	}
+	return domain.PasswordlessRegistrationScreenText{
+		Title:                   text.Title,
+		Description:             text.Description,
+		RegisterTokenButtonText: text.RegisterTokenButtonText,
+		TokenNameLabel:          text.TokenNameLabel,
+		NotSupported:            text.NotSupported,
+		ErrorRetry:              text.ErrorRetry,
+	}
+}
+
+func PasswordlessRegistrationDoneScreenTextPbToDomain(text *text_pb.PasswordlessRegistrationDoneScreenText) domain.PasswordlessRegistrationDoneScreenText {
+	if text == nil {
+		return domain.PasswordlessRegistrationDoneScreenText{}
+	}
+	return domain.PasswordlessRegistrationDoneScreenText{
+		Title:          text.Title,
+		Description:    text.Description,
+		NextButtonText: text.NextButtonText,
 	}
 }
 
