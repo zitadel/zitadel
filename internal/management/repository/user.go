@@ -17,8 +17,8 @@ type UserRepository interface {
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
 	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
 
-	GetMetaDataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.MetaData, error)
-	SearchMetaData(ctx context.Context, userID, resourceOwner string, req *domain.MetaDataSearchRequest) (*domain.MetaDataSearchResponse, error)
+	GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error)
+	SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error)
 
 	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error)
 

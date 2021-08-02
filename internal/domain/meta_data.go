@@ -7,64 +7,64 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
-type MetaData struct {
+type Metadata struct {
 	es_models.ObjectRoot
 
-	State MetaDataState
+	State MetadataState
 	Key   string
 	Value string
 }
 
-type MetaDataState int32
+type MetadataState int32
 
 const (
-	MetaDataStateUnspecified MetaDataState = iota
-	MetaDataStateActive
-	MetaDataStateRemoved
+	MetadataStateUnspecified MetadataState = iota
+	MetadataStateActive
+	MetadataStateRemoved
 )
 
-func (u *MetaData) IsValid() bool {
+func (u *Metadata) IsValid() bool {
 	return u.Key != "" && u.Value != ""
 }
 
-func (s MetaDataState) Exists() bool {
-	return s != MetaDataStateUnspecified && s != MetaDataStateRemoved
+func (s MetadataState) Exists() bool {
+	return s != MetadataStateUnspecified && s != MetadataStateRemoved
 }
 
-type MetaDataSearchRequest struct {
+type MetadataSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn MetaDataSearchKey
+	SortingColumn MetadataSearchKey
 	Asc           bool
-	Queries       []*MetaDataSearchQuery
+	Queries       []*MetadataSearchQuery
 }
 
-type MetaDataSearchKey int32
+type MetadataSearchKey int32
 
 const (
-	MetaDataSearchKeyUnspecified MetaDataSearchKey = iota
-	MetaDataSearchKeyAggregateID
-	MetaDataSearchKeyResourceOwner
-	MetaDataSearchKeyKey
-	MetaDataSearchKeyValue
+	MetadataSearchKeyUnspecified MetadataSearchKey = iota
+	MetadataSearchKeyAggregateID
+	MetadataSearchKeyResourceOwner
+	MetadataSearchKeyKey
+	MetadataSearchKeyValue
 )
 
-type MetaDataSearchQuery struct {
-	Key    MetaDataSearchKey
+type MetadataSearchQuery struct {
+	Key    MetadataSearchKey
 	Method SearchMethod
 	Value  interface{}
 }
 
-type MetaDataSearchResponse struct {
+type MetadataSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*MetaData
+	Result      []*Metadata
 	Sequence    uint64
 	Timestamp   time.Time
 }
 
-func (r *MetaDataSearchRequest) EnsureLimit(limit uint64) error {
+func (r *MetadataSearchRequest) EnsureLimit(limit uint64) error {
 	if r.Limit > limit {
 		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-0ds32", "Errors.Limit.ExceedsDefault")
 	}
@@ -74,10 +74,10 @@ func (r *MetaDataSearchRequest) EnsureLimit(limit uint64) error {
 	return nil
 }
 
-func (r *MetaDataSearchRequest) AppendAggregateIDQuery(aggregateID string) {
-	r.Queries = append(r.Queries, &MetaDataSearchQuery{Key: MetaDataSearchKeyAggregateID, Method: SearchMethodEquals, Value: aggregateID})
+func (r *MetadataSearchRequest) AppendAggregateIDQuery(aggregateID string) {
+	r.Queries = append(r.Queries, &MetadataSearchQuery{Key: MetadataSearchKeyAggregateID, Method: SearchMethodEquals, Value: aggregateID})
 }
 
-func (r *MetaDataSearchRequest) AppendResourceOwnerQuery(resourceOwner string) {
-	r.Queries = append(r.Queries, &MetaDataSearchQuery{Key: MetaDataSearchKeyResourceOwner, Method: SearchMethodEquals, Value: resourceOwner})
+func (r *MetadataSearchRequest) AppendResourceOwnerQuery(resourceOwner string) {
+	r.Queries = append(r.Queries, &MetadataSearchQuery{Key: MetadataSearchKeyResourceOwner, Method: SearchMethodEquals, Value: resourceOwner})
 }

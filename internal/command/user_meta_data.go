@@ -9,14 +9,14 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func (c *Commands) SetUserMetaData(ctx context.Context, metaData *domain.MetaData, userID, resourceOwner string) (_ *domain.MetaData, err error) {
+func (c *Commands) SetUserMetadata(ctx context.Context, metaData *domain.Metadata, userID, resourceOwner string) (_ *domain.Metadata, err error) {
 	err = c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	setMetaData := NewUserMetaDataWriteModel(userID, resourceOwner, metaData.Key)
-	userAgg := UserAggregateFromWriteModel(&setMetaData.WriteModel)
-	event, err := c.setUserMetaData(ctx, userAgg, metaData)
+	setMetadata := NewUserMetadataWriteModel(userID, resourceOwner, metaData.Key)
+	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
+	event, err := c.setUserMetadata(ctx, userAgg, metaData)
 	if err != nil {
 		return nil, err
 	}
@@ -25,16 +25,16 @@ func (c *Commands) SetUserMetaData(ctx context.Context, metaData *domain.MetaDat
 		return nil, err
 	}
 
-	err = AppendAndReduce(setMetaData, pushedEvents...)
+	err = AppendAndReduce(setMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToUserMetaData(setMetaData), nil
+	return writeModelToUserMetadata(setMetadata), nil
 }
 
-func (c *Commands) BulkSetUserMetaData(ctx context.Context, userID, resourceOwner string, metaDatas ...*domain.MetaData) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwner string, metaDatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
 	if len(metaDatas) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.MetaData.NoData")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
 	err = c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
@@ -42,10 +42,10 @@ func (c *Commands) BulkSetUserMetaData(ctx context.Context, userID, resourceOwne
 	}
 
 	events := make([]eventstore.EventPusher, len(metaDatas))
-	setMetaData := NewUserMetaDataListWriteModel(userID, resourceOwner)
-	userAgg := UserAggregateFromWriteModel(&setMetaData.WriteModel)
+	setMetadata := NewUserMetadataListWriteModel(userID, resourceOwner)
+	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	for i, data := range metaDatas {
-		event, err := c.setUserMetaData(ctx, userAgg, data)
+		event, err := c.setUserMetadata(ctx, userAgg, data)
 		if err != nil {
 			return nil, err
 		}
@@ -57,18 +57,18 @@ func (c *Commands) BulkSetUserMetaData(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 
-	err = AppendAndReduce(setMetaData, pushedEvents...)
+	err = AppendAndReduce(setMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&setMetaData.WriteModel), nil
+	return writeModelToObjectDetails(&setMetadata.WriteModel), nil
 }
 
-func (c *Commands) setUserMetaData(ctx context.Context, userAgg *eventstore.Aggregate, metaData *domain.MetaData) (pusher eventstore.EventPusher, err error) {
+func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metaData *domain.Metadata) (pusher eventstore.EventPusher, err error) {
 	if !metaData.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2m00f", "Errors.MetaData.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid")
 	}
-	pusher = user.NewMetaDataSetEvent(
+	pusher = user.NewMetadataSetEvent(
 		ctx,
 		userAgg,
 		metaData.Key,
@@ -77,23 +77,23 @@ func (c *Commands) setUserMetaData(ctx context.Context, userAgg *eventstore.Aggr
 	return pusher, nil
 }
 
-func (c *Commands) RemoveUserMetaData(ctx context.Context, metaDataKey, userID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveUserMetadata(ctx context.Context, metaDataKey, userID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
 	if metaDataKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2n0fs", "Errors.MetaData.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2n0fs", "Errors.Metadata.Invalid")
 	}
 	err = c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	removeMetaData, err := c.getUserMetaDataModelByID(ctx, userID, resourceOwner, metaDataKey)
+	removeMetadata, err := c.getUserMetadataModelByID(ctx, userID, resourceOwner, metaDataKey)
 	if err != nil {
 		return nil, err
 	}
-	if !removeMetaData.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "META-ncnw3", "Errors.MetaData.NotFound")
+	if !removeMetadata.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "META-ncnw3", "Errors.Metadata.NotFound")
 	}
-	userAgg := UserAggregateFromWriteModel(&removeMetaData.WriteModel)
-	event, err := c.removeUserMetaData(ctx, userAgg, metaDataKey)
+	userAgg := UserAggregateFromWriteModel(&removeMetadata.WriteModel)
+	event, err := c.removeUserMetadata(ctx, userAgg, metaDataKey)
 	if err != nil {
 		return nil, err
 	}
@@ -102,16 +102,16 @@ func (c *Commands) RemoveUserMetaData(ctx context.Context, metaDataKey, userID, 
 		return nil, err
 	}
 
-	err = AppendAndReduce(removeMetaData, pushedEvents...)
+	err = AppendAndReduce(removeMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&removeMetaData.WriteModel), nil
+	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) BulkRemoveUserMetaData(ctx context.Context, userID, resourceOwner string, metaDataKeys ...string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceOwner string, metaDataKeys ...string) (_ *domain.ObjectDetails, err error) {
 	if len(metaDataKeys) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.MetaData.NoData")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
 	err = c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
@@ -119,19 +119,19 @@ func (c *Commands) BulkRemoveUserMetaData(ctx context.Context, userID, resourceO
 	}
 
 	events := make([]eventstore.EventPusher, len(metaDataKeys))
-	removeMetaData, err := c.getUserMetaDataListModelByID(ctx, userID, resourceOwner)
+	removeMetadata, err := c.getUserMetadataListModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	userAgg := UserAggregateFromWriteModel(&removeMetaData.WriteModel)
+	userAgg := UserAggregateFromWriteModel(&removeMetadata.WriteModel)
 	for i, key := range metaDataKeys {
 		if key == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-m29ds", "Errors.MetaData.Invalid")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-m29ds", "Errors.Metadata.Invalid")
 		}
-		if _, found := removeMetaData.metaDataList[key]; !found {
-			return nil, caos_errs.ThrowNotFound(nil, "META-2nnds", "Errors.MetaData.KeyNotExisting")
+		if _, found := removeMetadata.metaDataList[key]; !found {
+			return nil, caos_errs.ThrowNotFound(nil, "META-2nnds", "Errors.Metadata.KeyNotExisting")
 		}
-		event, err := c.removeUserMetaData(ctx, userAgg, key)
+		event, err := c.removeUserMetadata(ctx, userAgg, key)
 		if err != nil {
 			return nil, err
 		}
@@ -143,15 +143,15 @@ func (c *Commands) BulkRemoveUserMetaData(ctx context.Context, userID, resourceO
 		return nil, err
 	}
 
-	err = AppendAndReduce(removeMetaData, pushedEvents...)
+	err = AppendAndReduce(removeMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&removeMetaData.WriteModel), nil
+	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) removeUserMetaData(ctx context.Context, userAgg *eventstore.Aggregate, metaDataKey string) (pusher eventstore.EventPusher, err error) {
-	pusher = user.NewMetaDataRemovedEvent(
+func (c *Commands) removeUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metaDataKey string) (pusher eventstore.EventPusher, err error) {
+	pusher = user.NewMetadataRemovedEvent(
 		ctx,
 		userAgg,
 		metaDataKey,
@@ -159,20 +159,20 @@ func (c *Commands) removeUserMetaData(ctx context.Context, userAgg *eventstore.A
 	return pusher, nil
 }
 
-func (c *Commands) getUserMetaDataModelByID(ctx context.Context, userID, resourceOwner, key string) (*UserMetaDataWriteModel, error) {
-	userMetaDataWriteModel := NewUserMetaDataWriteModel(userID, resourceOwner, key)
-	err := c.eventstore.FilterToQueryReducer(ctx, userMetaDataWriteModel)
+func (c *Commands) getUserMetadataModelByID(ctx context.Context, userID, resourceOwner, key string) (*UserMetadataWriteModel, error) {
+	userMetadataWriteModel := NewUserMetadataWriteModel(userID, resourceOwner, key)
+	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}
-	return userMetaDataWriteModel, nil
+	return userMetadataWriteModel, nil
 }
 
-func (c *Commands) getUserMetaDataListModelByID(ctx context.Context, userID, resourceOwner string) (*UserMetaDataListWriteModel, error) {
-	userMetaDataWriteModel := NewUserMetaDataListWriteModel(userID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, userMetaDataWriteModel)
+func (c *Commands) getUserMetadataListModelByID(ctx context.Context, userID, resourceOwner string) (*UserMetadataListWriteModel, error) {
+	userMetadataWriteModel := NewUserMetadataListWriteModel(userID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}
-	return userMetaDataWriteModel, nil
+	return userMetadataWriteModel, nil
 }

@@ -14,13 +14,13 @@ import (
 )
 
 const (
-	MetaDataKeyAggregateID   = "aggregate_id"
-	MetaDataKeyResourceOwner = "resource_owner"
-	MetaDataKeyKey           = "key"
-	MetaDataKeyValue         = "value"
+	MetadataKeyAggregateID   = "aggregate_id"
+	MetadataKeyResourceOwner = "resource_owner"
+	MetadataKeyKey           = "key"
+	MetadataKeyValue         = "value"
 )
 
-type MetaDataView struct {
+type MetadataView struct {
 	AggregateID   string    `json:"-" gorm:"column:aggregate_id;primary_key"`
 	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
 	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
@@ -32,16 +32,16 @@ type MetaDataView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func MetaDataViewsToDomain(texts []*MetaDataView) []*domain.MetaData {
-	result := make([]*domain.MetaData, len(texts))
+func MetadataViewsToDomain(texts []*MetadataView) []*domain.Metadata {
+	result := make([]*domain.Metadata, len(texts))
 	for i, text := range texts {
-		result[i] = MetaDataViewToDomain(text)
+		result[i] = MetadataViewToDomain(text)
 	}
 	return result
 }
 
-func MetaDataViewToDomain(data *MetaDataView) *domain.MetaData {
-	return &domain.MetaData{
+func MetadataViewToDomain(data *MetadataView) *domain.Metadata {
+	return &domain.Metadata{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:  data.AggregateID,
 			Sequence:     data.Sequence,
@@ -53,28 +53,25 @@ func MetaDataViewToDomain(data *MetaDataView) *domain.MetaData {
 	}
 }
 
-func (i *MetaDataView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
+func (md *MetadataView) AppendEvent(event *models.Event) (err error) {
+	md.Sequence = event.Sequence
 	switch event.Type {
-	case usr_model.UserMetaDataSet:
-		i.setRootData(event)
-		err = i.SetData(event)
-		if err != nil {
-			return err
-		}
+	case usr_model.UserMetadataSet:
+		md.setRootData(event)
+		err = md.SetData(event)
 	}
 	return err
 }
 
-func (r *MetaDataView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
-	r.ResourceOwner = event.ResourceOwner
-	r.ChangeDate = event.CreationDate
-	r.Sequence = event.Sequence
+func (md *MetadataView) setRootData(event *models.Event) {
+	md.AggregateID = event.AggregateID
+	md.ResourceOwner = event.ResourceOwner
+	md.ChangeDate = event.CreationDate
+	md.Sequence = event.Sequence
 }
 
-func (r *MetaDataView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (md *MetadataView) SetData(event *models.Event) error {
+	if err := json.Unmarshal(event.Data, md); err != nil {
 		logging.Log("MODEL-3n9fs").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-5CVaR", "Could not unmarshal data")
 	}

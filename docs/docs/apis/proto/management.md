@@ -236,10 +236,10 @@ Changes the username
     GET: /users/{user_id}/username
 
 
-### SetUserMetaData
+### SetUserMetadata
 
-> **rpc** SetUserMetaData([SetUserMetaDataRequest](#setusermetadatarequest))
-[SetUserMetaDataResponse](#setusermetadataresponse)
+> **rpc** SetUserMetadata([SetUserMetadataRequest](#setusermetadatarequest))
+[SetUserMetadataResponse](#setusermetadataresponse)
 
 Sets a user meta data by key
 
@@ -248,10 +248,10 @@ Sets a user meta data by key
     POST: /users/{id}/metadata/{key}
 
 
-### BulkSetUserMetaData
+### BulkSetUserMetadata
 
-> **rpc** BulkSetUserMetaData([BulkSetUserMetaDataRequest](#bulksetusermetadatarequest))
-[BulkSetUserMetaDataResponse](#bulksetusermetadataresponse)
+> **rpc** BulkSetUserMetadata([BulkSetUserMetadataRequest](#bulksetusermetadatarequest))
+[BulkSetUserMetadataResponse](#bulksetusermetadataresponse)
 
 Set a list of user meta data
 
@@ -260,10 +260,10 @@ Set a list of user meta data
     POST: /users/{id}/metadata/_bulk
 
 
-### ListUserMetaData
+### ListUserMetadata
 
-> **rpc** ListUserMetaData([ListUserMetaDataRequest](#listusermetadatarequest))
-[ListUserMetaDataResponse](#listusermetadataresponse)
+> **rpc** ListUserMetadata([ListUserMetadataRequest](#listusermetadatarequest))
+[ListUserMetadataResponse](#listusermetadataresponse)
 
 Returns the user meta data
 
@@ -272,10 +272,10 @@ Returns the user meta data
     POST: /users/{id}/metadata/_search
 
 
-### GetUserMetaData
+### GetUserMetadata
 
-> **rpc** GetUserMetaData([GetUserMetaDataRequest](#getusermetadatarequest))
-[GetUserMetaDataResponse](#getusermetadataresponse)
+> **rpc** GetUserMetadata([GetUserMetadataRequest](#getusermetadatarequest))
+[GetUserMetadataResponse](#getusermetadataresponse)
 
 Returns the user meta data by key
 
@@ -284,10 +284,10 @@ Returns the user meta data by key
     GET: /users/{id}/metadata/{key}
 
 
-### RemoveUserMetaData
+### RemoveUserMetadata
 
-> **rpc** RemoveUserMetaData([RemoveUserMetaDataRequest](#removeusermetadatarequest))
-[RemoveUserMetaDataResponse](#removeusermetadataresponse)
+> **rpc** RemoveUserMetadata([RemoveUserMetadataRequest](#removeusermetadatarequest))
+[RemoveUserMetadataResponse](#removeusermetadataresponse)
 
 Removes a user meta data by key
 
@@ -296,10 +296,10 @@ Removes a user meta data by key
     DELETE: /users/{id}/metadata/{key}
 
 
-### BulkRemoveUserMetaData
+### BulkRemoveUserMetadata
 
-> **rpc** BulkRemoveUserMetaData([BulkRemoveUserMetaDataRequest](#bulkremoveusermetadatarequest))
-[BulkRemoveUserMetaDataResponse](#bulkremoveusermetadataresponse)
+> **rpc** BulkRemoveUserMetadata([BulkRemoveUserMetadataRequest](#bulkremoveusermetadatarequest))
+[BulkRemoveUserMetadataResponse](#bulkremoveusermetadataresponse)
 
 Set a list of user meta data
 
@@ -3359,19 +3359,19 @@ This is an empty request
 
 
 
-### BulkRemoveUserMetaDataRequest
+### BulkRemoveUserMetadataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| keys | repeated string | - |  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
 
 
 
 
-### BulkRemoveUserMetaDataResponse
+### BulkRemoveUserMetadataResponse
 
 
 
@@ -3382,19 +3382,19 @@ This is an empty request
 
 
 
-### BulkSetUserMetaDataRequest
+### BulkSetUserMetadataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| meta_data | repeated BulkSetUserMetaDataRequest.MetaData | - |  |
+| metadata | repeated BulkSetUserMetadataRequest.Metadata | - |  |
 
 
 
 
-### BulkSetUserMetaDataRequest.MetaData
+### BulkSetUserMetadataRequest.Metadata
 
 
 
@@ -3406,7 +3406,7 @@ This is an empty request
 
 
 
-### BulkSetUserMetaDataResponse
+### BulkSetUserMetadataResponse
 
 
 
@@ -4506,7 +4506,7 @@ This is an empty request
 
 
 
-### GetUserMetaDataRequest
+### GetUserMetadataRequest
 
 
 
@@ -4518,13 +4518,13 @@ This is an empty request
 
 
 
-### GetUserMetaDataResponse
+### GetUserMetadataResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| meta_data |  zitadel.metadata.v1.MetaData | - |  |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -5299,7 +5299,7 @@ This is an empty request
 
 
 
-### ListUserMetaDataRequest
+### ListUserMetadataRequest
 
 
 
@@ -5307,19 +5307,19 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | query |  zitadel.v1.ListQuery | - |  |
-| queries | repeated zitadel.metadata.v1.MetaDataQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
 
 
 
 
-### ListUserMetaDataResponse
+### ListUserMetadataResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.metadata.v1.MetaData | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -6128,7 +6128,7 @@ This is an empty response
 
 
 
-### RemoveUserMetaDataRequest
+### RemoveUserMetadataRequest
 
 
 
@@ -6140,7 +6140,7 @@ This is an empty response
 
 
 
-### RemoveUserMetaDataResponse
+### RemoveUserMetadataResponse
 
 
 
@@ -6763,7 +6763,7 @@ This is an empty request
 
 
 
-### SetUserMetaDataRequest
+### SetUserMetadataRequest
 
 
 
@@ -6776,13 +6776,13 @@ This is an empty request
 
 
 
-### SetUserMetaDataResponse
+### SetUserMetadataResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 

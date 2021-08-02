@@ -44,6 +44,6 @@ type myUserRepo interface {
 
 	SearchMyUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
 
-	GetMyMetaDataByKey(ctx context.Context, key string) (*domain.MetaData, error)
-	SearchMyMetaData(ctx context.Context, req *domain.MetaDataSearchRequest) (*domain.MetaDataSearchResponse, error)
+	GetMyMetadataByKey(ctx context.Context, key string) (*domain.Metadata, error)
+	SearchMyMetadata(ctx context.Context, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error)
 }

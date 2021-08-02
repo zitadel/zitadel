@@ -9,55 +9,55 @@ import (
 )
 
 const (
-	MetaDataSetType     = userEventTypePrefix + metadata.SetEventType
-	MetaDataRemovedType = userEventTypePrefix + metadata.RemovedEventType
+	MetadataSetType     = userEventTypePrefix + metadata.SetEventType
+	MetadataRemovedType = userEventTypePrefix + metadata.RemovedEventType
 )
 
-type MetaDataSetEvent struct {
+type MetadataSetEvent struct {
 	metadata.SetEvent
 }
 
-func NewMetaDataSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, key, value string) *MetaDataSetEvent {
-	return &MetaDataSetEvent{
+func NewMetadataSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, key, value string) *MetadataSetEvent {
+	return &MetadataSetEvent{
 		SetEvent: *metadata.NewSetEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				MetaDataSetType),
+				MetadataSetType),
 			key,
 			value),
 	}
 }
 
-func MetaDataSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MetadataSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := metadata.SetEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &MetaDataSetEvent{SetEvent: *e.(*metadata.SetEvent)}, nil
+	return &MetadataSetEvent{SetEvent: *e.(*metadata.SetEvent)}, nil
 }
 
-type MetaDataRemovedEvent struct {
+type MetadataRemovedEvent struct {
 	metadata.RemovedEvent
 }
 
-func NewMetaDataRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, key string) *MetaDataRemovedEvent {
-	return &MetaDataRemovedEvent{
+func NewMetadataRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, key string) *MetadataRemovedEvent {
+	return &MetadataRemovedEvent{
 		RemovedEvent: *metadata.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				MetaDataRemovedType),
+				MetadataRemovedType),
 			key),
 	}
 }
 
-func MetaDataRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MetadataRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e, err := metadata.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &MetaDataRemovedEvent{RemovedEvent: *e.(*metadata.RemovedEvent)}, nil
+	return &MetadataRemovedEvent{RemovedEvent: *e.(*metadata.RemovedEvent)}, nil
 }

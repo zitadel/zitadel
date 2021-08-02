@@ -8,7 +8,7 @@ package zitadel.metadata.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/metadata";
 
-message MetaData {
+message Metadata {
     zitadel.v1.ObjectDetails details = 1;
     string key = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -22,15 +22,15 @@ message MetaData {
     ];
 }
 
-message MetaDataQuery {
+message MetadataQuery {
     oneof query {
         option (validate.required) = true;
-        MetaDataKeyQuery key_query = 1;
-        MetaDataValueQuery value_query = 2;
+        MetadataKeyQuery key_query = 1;
+        MetadataValueQuery value_query = 2;
     }
 }
 
-message MetaDataKeyQuery {
+message MetadataKeyQuery {
     string key = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -45,7 +45,7 @@ message MetaDataKeyQuery {
     ];
 }
 
-message MetaDataValueQuery {
+message MetadataValueQuery {
     string value = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

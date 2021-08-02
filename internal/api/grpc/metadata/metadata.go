@@ -6,16 +6,16 @@ import (
 	meta_pb "github.com/caos/zitadel/pkg/grpc/metadata"
 )
 
-func MetaDataListToPb(dataList []*domain.MetaData) []*meta_pb.MetaData {
-	u := make([]*meta_pb.MetaData, len(dataList))
+func MetadataListToPb(dataList []*domain.Metadata) []*meta_pb.Metadata {
+	mds := make([]*meta_pb.Metadata, len(dataList))
 	for i, data := range dataList {
-		u[i] = DomainMetaDataToPb(data)
+		mds[i] = DomainMetadataToPb(data)
 	}
-	return u
+	return mds
 }
 
-func DomainMetaDataToPb(data *domain.MetaData) *meta_pb.MetaData {
-	return &meta_pb.MetaData{
+func DomainMetadataToPb(data *domain.Metadata) *meta_pb.Metadata {
+	return &meta_pb.Metadata{
 		Key:   data.Key,
 		Value: data.Value,
 		Details: object.ToViewDetailsPb(
@@ -27,36 +27,36 @@ func DomainMetaDataToPb(data *domain.MetaData) *meta_pb.MetaData {
 	}
 }
 
-func MetaDataQueriesToModel(queries []*meta_pb.MetaDataQuery) []*domain.MetaDataSearchQuery {
-	q := make([]*domain.MetaDataSearchQuery, len(queries))
+func MetadataQueriesToModel(queries []*meta_pb.MetadataQuery) []*domain.MetadataSearchQuery {
+	q := make([]*domain.MetadataSearchQuery, len(queries))
 	for i, query := range queries {
-		q[i] = MetaDataQueryToModel(query)
+		q[i] = MetadataQueryToModel(query)
 	}
 	return q
 }
 
-func MetaDataQueryToModel(query *meta_pb.MetaDataQuery) *domain.MetaDataSearchQuery {
+func MetadataQueryToModel(query *meta_pb.MetadataQuery) *domain.MetadataSearchQuery {
 	switch q := query.Query.(type) {
-	case *meta_pb.MetaDataQuery_KeyQuery:
-		return MetaDataKeyQueryToModel(q.KeyQuery)
-	case *meta_pb.MetaDataQuery_ValueQuery:
-		return MetaDataValueQueryToModel(q.ValueQuery)
+	case *meta_pb.MetadataQuery_KeyQuery:
+		return MetadataKeyQueryToModel(q.KeyQuery)
+	case *meta_pb.MetadataQuery_ValueQuery:
+		return MetadataValueQueryToModel(q.ValueQuery)
 	default:
 		return nil
 	}
 }
 
-func MetaDataKeyQueryToModel(q *meta_pb.MetaDataKeyQuery) *domain.MetaDataSearchQuery {
-	return &domain.MetaDataSearchQuery{
-		Key:    domain.MetaDataSearchKeyKey,
+func MetadataKeyQueryToModel(q *meta_pb.MetadataKeyQuery) *domain.MetadataSearchQuery {
+	return &domain.MetadataSearchQuery{
+		Key:    domain.MetadataSearchKeyKey,
 		Method: object.TextMethodToModel(q.Method),
 		Value:  q.Key,
 	}
 }
 
-func MetaDataValueQueryToModel(q *meta_pb.MetaDataValueQuery) *domain.MetaDataSearchQuery {
-	return &domain.MetaDataSearchQuery{
-		Key:    domain.MetaDataSearchKeyValue,
+func MetadataValueQueryToModel(q *meta_pb.MetadataValueQuery) *domain.MetadataSearchQuery {
+	return &domain.MetadataSearchQuery{
+		Key:    domain.MetadataSearchKeyValue,
 		Method: object.TextMethodToModel(q.Method),
 		Value:  q.Value,
 	}

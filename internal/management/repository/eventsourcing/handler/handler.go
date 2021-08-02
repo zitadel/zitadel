@@ -85,8 +85,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
 		newCustomText(
 			handler{view, bulkLimit, configs.cycleDuration("CustomText"), errorCount, es}),
-		newMetaData(
-			handler{view, bulkLimit, configs.cycleDuration("MetaData"), errorCount, es}),
+		newMetadata(
+			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}
 }
 

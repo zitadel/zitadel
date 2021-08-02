@@ -287,7 +287,7 @@ service ManagementService {
     }
 
     // Sets a user meta data by key
-    rpc SetUserMetaData(SetUserMetaDataRequest) returns (SetUserMetaDataResponse) {
+    rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/{key}"
             body: "*"
@@ -299,7 +299,7 @@ service ManagementService {
     }
 
     // Set a list of user meta data
-    rpc BulkSetUserMetaData(BulkSetUserMetaDataRequest) returns (BulkSetUserMetaDataResponse) {
+    rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_bulk"
             body: "*"
@@ -311,7 +311,7 @@ service ManagementService {
     }
 
     // Returns the user meta data
-    rpc ListUserMetaData(ListUserMetaDataRequest) returns (ListUserMetaDataResponse) {
+    rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_search"
             body: "*"
@@ -323,7 +323,7 @@ service ManagementService {
     }
 
     // Returns the user meta data by key
-    rpc GetUserMetaData(GetUserMetaDataRequest) returns (GetUserMetaDataResponse) {
+    rpc GetUserMetadata(GetUserMetadataRequest) returns (GetUserMetadataResponse) {
         option (google.api.http) = {
             get: "/users/{id}/metadata/{key}"
         };
@@ -334,7 +334,7 @@ service ManagementService {
     }
 
     // Removes a user meta data by key
-    rpc RemoveUserMetaData(RemoveUserMetaDataRequest) returns (RemoveUserMetaDataResponse) {
+    rpc RemoveUserMetadata(RemoveUserMetadataRequest) returns (RemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/{key}"
         };
@@ -345,7 +345,7 @@ service ManagementService {
     }
 
     // Set a list of user meta data
-    rpc BulkRemoveUserMetaData(BulkRemoveUserMetaDataRequest) returns (BulkRemoveUserMetaDataResponse) {
+    rpc BulkRemoveUserMetadata(BulkRemoveUserMetadataRequest) returns (BulkRemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/_bulk"
             body: "*"
@@ -2834,65 +2834,65 @@ message UpdateUserNameResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListUserMetaDataRequest {
+message ListUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.v1.ListQuery query = 2;
-    repeated zitadel.metadata.v1.MetaDataQuery queries = 3;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 3;
 }
 
-message ListUserMetaDataResponse {
+message ListUserMetadataResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.metadata.v1.MetaData result = 2;
+    repeated zitadel.metadata.v1.Metadata result = 2;
 }
 
-message GetUserMetaDataRequest {
+message GetUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetUserMetaDataResponse {
-    zitadel.metadata.v1.MetaData meta_data = 1;
+message GetUserMetadataResponse {
+    zitadel.metadata.v1.Metadata metadata = 1;
 }
 
-message SetUserMetaDataRequest {
+message SetUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string value = 3 [(validate.rules).string = {min_len: 1}];
 }
 
-message SetUserMetaDataResponse {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+message SetUserMetadataResponse {
+    string id = 1;
     zitadel.v1.ObjectDetails details = 2;
 }
 
-message BulkSetUserMetaDataRequest {
+message BulkSetUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    message MetaData {
+    message Metadata {
         string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
         string value = 2 [(validate.rules).string = {min_len: 1}];
     }
-    repeated MetaData meta_data = 2;
+    repeated Metadata metadata = 2;
 }
 
-message BulkSetUserMetaDataResponse {
+message BulkSetUserMetadataResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveUserMetaDataRequest {
+message RemoveUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveUserMetaDataResponse {
+message RemoveUserMetadataResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message BulkRemoveUserMetaDataRequest {
+message BulkRemoveUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string keys = 2;
+    repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
 }
 
-message BulkRemoveUserMetaDataResponse {
+message BulkRemoveUserMetadataResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

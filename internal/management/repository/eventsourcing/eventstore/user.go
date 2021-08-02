@@ -129,15 +129,15 @@ func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) 
 	return repo.View.IsUserUnique(userName, email)
 }
 
-func (repo *UserRepo) GetMetaDataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.MetaData, error) {
-	data, err := repo.View.MetaDataByKeyAndResourceOwner(userID, resourceOwner, key)
+func (repo *UserRepo) GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error) {
+	data, err := repo.View.MetadataByKeyAndResourceOwner(userID, resourceOwner, key)
 	if err != nil {
 		return nil, err
 	}
-	return iam_model.MetaDataViewToDomain(data), nil
+	return iam_model.MetadataViewToDomain(data), nil
 }
 
-func (repo *UserRepo) SearchMetaData(ctx context.Context, userID, resourceOwner string, req *domain.MetaDataSearchRequest) (*domain.MetaDataSearchResponse, error) {
+func (repo *UserRepo) SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error) {
 	err := req.EnsureLimit(repo.SearchLimit)
 	if err != nil {
 		return nil, err
@@ -146,15 +146,15 @@ func (repo *UserRepo) SearchMetaData(ctx context.Context, userID, resourceOwner 
 	logging.Log("EVENT-m0ds3").OnError(sequenceErr).Warn("could not read latest user sequence")
 	req.AppendAggregateIDQuery(userID)
 	req.AppendResourceOwnerQuery(resourceOwner)
-	metaData, count, err := repo.View.SearchMetaData(req)
+	metaData, count, err := repo.View.SearchMetadata(req)
 	if err != nil {
 		return nil, err
 	}
-	result := &domain.MetaDataSearchResponse{
+	result := &domain.MetadataSearchResponse{
 		Offset:      req.Offset,
 		Limit:       req.Limit,
 		TotalResult: count,
-		Result:      iam_model.MetaDataViewsToDomain(metaData),
+		Result:      iam_model.MetadataViewsToDomain(metaData),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence

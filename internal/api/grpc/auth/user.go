@@ -40,13 +40,13 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 	}, nil
 }
 
-func (s *Server) ListMyMetaData(ctx context.Context, req *auth_pb.ListMyMetaDataRequest) (*auth_pb.ListMyMetaDataResponse, error) {
-	res, err := s.repo.SearchMyMetaData(ctx, ListUserMetaDataToDomain(req))
+func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadataRequest) (*auth_pb.ListMyMetadataResponse, error) {
+	res, err := s.repo.SearchMyMetadata(ctx, ListUserMetadataToDomain(req))
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.ListMyMetaDataResponse{
-		Result: metadata.MetaDataListToPb(res.Result),
+	return &auth_pb.ListMyMetadataResponse{
+		Result: metadata.MetadataListToPb(res.Result),
 		Details: obj_grpc.ToListDetails(
 			res.TotalResult,
 			res.Sequence,
@@ -55,23 +55,23 @@ func (s *Server) ListMyMetaData(ctx context.Context, req *auth_pb.ListMyMetaData
 	}, nil
 }
 
-func (s *Server) GetMyMetaData(ctx context.Context, req *auth_pb.GetMyMetaDataRequest) (*auth_pb.GetMyMetaDataResponse, error) {
-	data, err := s.repo.GetMyMetaDataByKey(ctx, req.Key)
+func (s *Server) GetMyMetadata(ctx context.Context, req *auth_pb.GetMyMetadataRequest) (*auth_pb.GetMyMetadataResponse, error) {
+	data, err := s.repo.GetMyMetadataByKey(ctx, req.Key)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyMetaDataResponse{
-		MetaData: metadata.DomainMetaDataToPb(data),
+	return &auth_pb.GetMyMetadataResponse{
+		Metadata: metadata.DomainMetadataToPb(data),
 	}, nil
 }
 
-func (s *Server) SetMyMetaData(ctx context.Context, req *auth_pb.SetMyMetaDataRequest) (*auth_pb.SetMyMetaDataResponse, error) {
+func (s *Server) SetMyMetadata(ctx context.Context, req *auth_pb.SetMyMetadataRequest) (*auth_pb.SetMyMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.SetUserMetaData(ctx, &domain.MetaData{Key: req.Key, Value: req.Value}, ctxData.UserID, ctxData.ResourceOwner)
+	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.SetMyMetaDataResponse{
+	return &auth_pb.SetMyMetadataResponse{
 		Details: obj_grpc.AddToDetailsPb(
 			result.Sequence,
 			result.ChangeDate,
@@ -80,35 +80,35 @@ func (s *Server) SetMyMetaData(ctx context.Context, req *auth_pb.SetMyMetaDataRe
 	}, nil
 }
 
-func (s *Server) BulkSetMyMetaData(ctx context.Context, req *auth_pb.BulkSetMyMetaDataRequest) (*auth_pb.BulkSetMyMetaDataResponse, error) {
+func (s *Server) BulkSetMyMetadata(ctx context.Context, req *auth_pb.BulkSetMyMetadataRequest) (*auth_pb.BulkSetMyMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetaData(ctx, ctxData.UserID, ctxData.ResourceOwner, BulkSetMetaDataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, ctxData.UserID, ctxData.ResourceOwner, BulkSetMetadataToDomain(req)...)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.BulkSetMyMetaDataResponse{
+	return &auth_pb.BulkSetMyMetadataResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(result),
 	}, nil
 }
 
-func (s *Server) RemoveMyMetaData(ctx context.Context, req *auth_pb.RemoveMyMetaDataRequest) (*auth_pb.RemoveMyMetaDataResponse, error) {
+func (s *Server) RemoveMyMetadata(ctx context.Context, req *auth_pb.RemoveMyMetadataRequest) (*auth_pb.RemoveMyMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.RemoveUserMetaData(ctx, req.Key, ctxData.UserID, ctxData.ResourceOwner)
+	result, err := s.command.RemoveUserMetadata(ctx, req.Key, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.RemoveMyMetaDataResponse{
+	return &auth_pb.RemoveMyMetadataResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(result),
 	}, nil
 }
 
-func (s *Server) BulkRemoveMyMetaData(ctx context.Context, req *auth_pb.BulkRemoveMyMetaDataRequest) (*auth_pb.BulkRemoveMyMetaDataResponse, error) {
+func (s *Server) BulkRemoveMyMetadata(ctx context.Context, req *auth_pb.BulkRemoveMyMetadataRequest) (*auth_pb.BulkRemoveMyMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkRemoveUserMetaData(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Keys...)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.BulkRemoveMyMetaDataResponse{
+	return &auth_pb.BulkRemoveMyMetadataResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(result),
 	}, nil
 }

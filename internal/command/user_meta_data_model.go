@@ -5,13 +5,13 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-type UserMetaDataWriteModel struct {
-	MetaDataWriteModel
+type UserMetadataWriteModel struct {
+	MetadataWriteModel
 }
 
-func NewUserMetaDataWriteModel(userID, resourceOwner, key string) *UserMetaDataWriteModel {
-	return &UserMetaDataWriteModel{
-		MetaDataWriteModel{
+func NewUserMetadataWriteModel(userID, resourceOwner, key string) *UserMetadataWriteModel {
+	return &UserMetadataWriteModel{
+		MetadataWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   userID,
 				ResourceOwner: resourceOwner,
@@ -21,40 +21,40 @@ func NewUserMetaDataWriteModel(userID, resourceOwner, key string) *UserMetaDataW
 	}
 }
 
-func (wm *UserMetaDataWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserMetadataWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *user.MetaDataSetEvent:
-			wm.MetaDataWriteModel.AppendEvents(&e.SetEvent)
-		case *user.MetaDataRemovedEvent:
-			wm.MetaDataWriteModel.AppendEvents(&e.RemovedEvent)
+		case *user.MetadataSetEvent:
+			wm.MetadataWriteModel.AppendEvents(&e.SetEvent)
+		case *user.MetadataRemovedEvent:
+			wm.MetadataWriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
 }
 
-func (wm *UserMetaDataWriteModel) Reduce() error {
-	return wm.MetaDataWriteModel.Reduce()
+func (wm *UserMetadataWriteModel) Reduce() error {
+	return wm.MetadataWriteModel.Reduce()
 }
 
-func (wm *UserMetaDataWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *UserMetadataWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateIDs(wm.MetaDataWriteModel.AggregateID).
+		AggregateIDs(wm.MetadataWriteModel.AggregateID).
 		AggregateTypes(user.AggregateType).
 		EventTypes(
-			user.MetaDataSetType,
-			user.MetaDataRemovedType).
+			user.MetadataSetType,
+			user.MetadataRemovedType).
 		Builder()
 }
 
-type UserMetaDataListWriteModel struct {
-	MetaDataListWriteModel
+type UserMetadataListWriteModel struct {
+	MetadataListWriteModel
 }
 
-func NewUserMetaDataListWriteModel(userID, resourceOwner string) *UserMetaDataListWriteModel {
-	return &UserMetaDataListWriteModel{
-		MetaDataListWriteModel{
+func NewUserMetadataListWriteModel(userID, resourceOwner string) *UserMetadataListWriteModel {
+	return &UserMetadataListWriteModel{
+		MetadataListWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   userID,
 				ResourceOwner: resourceOwner,
@@ -64,29 +64,29 @@ func NewUserMetaDataListWriteModel(userID, resourceOwner string) *UserMetaDataLi
 	}
 }
 
-func (wm *UserMetaDataListWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserMetadataListWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *user.MetaDataSetEvent:
-			wm.MetaDataListWriteModel.AppendEvents(&e.SetEvent)
-		case *user.MetaDataRemovedEvent:
-			wm.MetaDataListWriteModel.AppendEvents(&e.RemovedEvent)
+		case *user.MetadataSetEvent:
+			wm.MetadataListWriteModel.AppendEvents(&e.SetEvent)
+		case *user.MetadataRemovedEvent:
+			wm.MetadataListWriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
 }
 
-func (wm *UserMetaDataListWriteModel) Reduce() error {
-	return wm.MetaDataListWriteModel.Reduce()
+func (wm *UserMetadataListWriteModel) Reduce() error {
+	return wm.MetadataListWriteModel.Reduce()
 }
 
-func (wm *UserMetaDataListWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *UserMetadataListWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateIDs(wm.MetaDataListWriteModel.AggregateID).
+		AggregateIDs(wm.MetadataListWriteModel.AggregateID).
 		AggregateTypes(user.AggregateType).
 		EventTypes(
-			user.MetaDataSetType,
-			user.MetaDataRemovedType).
+			user.MetadataSetType,
+			user.MetadataRemovedType).
 		Builder()
 }

@@ -67,10 +67,10 @@ Returns the user sessions of the authorized user of the current useragent
     POST: /users/me/sessions/_search
 
 
-### SetMyMetaData
+### SetMyMetadata
 
-> **rpc** SetMyMetaData([SetMyMetaDataRequest](#setmymetadatarequest))
-[SetMyMetaDataResponse](#setmymetadataresponse)
+> **rpc** SetMyMetadata([SetMyMetadataRequest](#setmymetadatarequest))
+[SetMyMetadataResponse](#setmymetadataresponse)
 
 Sets a user meta data by key to the authorized user
 
@@ -79,10 +79,10 @@ Sets a user meta data by key to the authorized user
     POST: /users/me/metadata/{key}
 
 
-### BulkSetMyMetaData
+### BulkSetMyMetadata
 
-> **rpc** BulkSetMyMetaData([BulkSetMyMetaDataRequest](#bulksetmymetadatarequest))
-[BulkSetMyMetaDataResponse](#bulksetmymetadataresponse)
+> **rpc** BulkSetMyMetadata([BulkSetMyMetadataRequest](#bulksetmymetadatarequest))
+[BulkSetMyMetadataResponse](#bulksetmymetadataresponse)
 
 Set a list of user meta data to the authorized user
 
@@ -91,10 +91,10 @@ Set a list of user meta data to the authorized user
     POST: /users/me/metadata/_bulk
 
 
-### ListMyMetaData
+### ListMyMetadata
 
-> **rpc** ListMyMetaData([ListMyMetaDataRequest](#listmymetadatarequest))
-[ListMyMetaDataResponse](#listmymetadataresponse)
+> **rpc** ListMyMetadata([ListMyMetadataRequest](#listmymetadatarequest))
+[ListMyMetadataResponse](#listmymetadataresponse)
 
 Returns the user meta data of the authorized user
 
@@ -103,10 +103,10 @@ Returns the user meta data of the authorized user
     POST: /users/me/metadata/_search
 
 
-### GetMyMetaData
+### GetMyMetadata
 
-> **rpc** GetMyMetaData([GetMyMetaDataRequest](#getmymetadatarequest))
-[GetMyMetaDataResponse](#getmymetadataresponse)
+> **rpc** GetMyMetadata([GetMyMetadataRequest](#getmymetadatarequest))
+[GetMyMetadataResponse](#getmymetadataresponse)
 
 Returns the user meta data by key of the authorized user
 
@@ -115,10 +115,10 @@ Returns the user meta data by key of the authorized user
     GET: /users/me/metadata/{key}
 
 
-### RemoveMyMetaData
+### RemoveMyMetadata
 
-> **rpc** RemoveMyMetaData([RemoveMyMetaDataRequest](#removemymetadatarequest))
-[RemoveMyMetaDataResponse](#removemymetadataresponse)
+> **rpc** RemoveMyMetadata([RemoveMyMetadataRequest](#removemymetadatarequest))
+[RemoveMyMetadataResponse](#removemymetadataresponse)
 
 Removes a user meta data by key to the authorized user
 
@@ -127,10 +127,10 @@ Removes a user meta data by key to the authorized user
     DELETE: /users/me/metadata/{key}
 
 
-### BulkRemoveMyMetaData
+### BulkRemoveMyMetadata
 
-> **rpc** BulkRemoveMyMetaData([BulkRemoveMyMetaDataRequest](#bulkremovemymetadatarequest))
-[BulkRemoveMyMetaDataResponse](#bulkremovemymetadataresponse)
+> **rpc** BulkRemoveMyMetadata([BulkRemoveMyMetadataRequest](#bulkremovemymetadatarequest))
+[BulkRemoveMyMetadataResponse](#bulkremovemymetadataresponse)
 
 Set a list of user meta data to the authorized user
 
@@ -640,18 +640,18 @@ This is an empty request
 
 
 
-### BulkRemoveMyMetaDataRequest
+### BulkRemoveMyMetadataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| keys | repeated string | - |  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
 
 
 
 
-### BulkRemoveMyMetaDataResponse
+### BulkRemoveMyMetadataResponse
 
 
 
@@ -662,18 +662,18 @@ This is an empty request
 
 
 
-### BulkSetMyMetaDataRequest
+### BulkSetMyMetadataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| meta_data | repeated BulkSetMyMetaDataRequest.MetaData | - |  |
+| metadata | repeated BulkSetMyMetadataRequest.Metadata | - |  |
 
 
 
 
-### BulkSetMyMetaDataRequest.MetaData
+### BulkSetMyMetadataRequest.Metadata
 
 
 
@@ -685,7 +685,7 @@ This is an empty request
 
 
 
-### BulkSetMyMetaDataResponse
+### BulkSetMyMetadataResponse
 
 
 
@@ -714,24 +714,24 @@ This is an empty request
 
 
 
-### GetMyMetaDataRequest
+### GetMyMetadataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| key |  string | - | string.min_len: 1<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 
-### GetMyMetaDataResponse
+### GetMyMetadataResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| meta_data |  zitadel.metadata.v1.MetaData | - |  |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -877,26 +877,26 @@ This is an empty request
 
 
 
-### ListMyMetaDataRequest
+### ListMyMetadataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | query |  zitadel.v1.ListQuery | - |  |
-| queries | repeated zitadel.metadata.v1.MetaDataQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
 
 
 
 
-### ListMyMetaDataResponse
+### ListMyMetadataResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.metadata.v1.MetaData | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -1153,7 +1153,7 @@ This is an empty request
 
 
 
-### RemoveMyMetaDataRequest
+### RemoveMyMetadataRequest
 
 
 
@@ -1164,7 +1164,7 @@ This is an empty request
 
 
 
-### RemoveMyMetaDataResponse
+### RemoveMyMetadataResponse
 
 
 
@@ -1304,7 +1304,7 @@ This is an empty response
 
 
 
-### SetMyMetaDataRequest
+### SetMyMetadataRequest
 
 
 
@@ -1316,7 +1316,7 @@ This is an empty response
 
 
 
-### SetMyMetaDataResponse
+### SetMyMetadataResponse
 
 
 

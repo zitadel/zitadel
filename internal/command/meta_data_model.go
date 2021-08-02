@@ -6,15 +6,15 @@ import (
 	"github.com/caos/zitadel/internal/repository/metadata"
 )
 
-type MetaDataWriteModel struct {
+type MetadataWriteModel struct {
 	eventstore.WriteModel
 
 	Key   string
 	Value string
-	State domain.MetaDataState
+	State domain.MetadataState
 }
 
-func (wm *MetaDataWriteModel) Reduce() error {
+func (wm *MetadataWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *metadata.SetEvent:
@@ -22,21 +22,21 @@ func (wm *MetaDataWriteModel) Reduce() error {
 				continue
 			}
 			wm.Value = e.Value
-			wm.State = domain.MetaDataStateActive
+			wm.State = domain.MetadataStateActive
 		case *metadata.RemovedEvent:
-			wm.State = domain.MetaDataStateRemoved
+			wm.State = domain.MetadataStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
-type MetaDataListWriteModel struct {
+type MetadataListWriteModel struct {
 	eventstore.WriteModel
 
 	metaDataList map[string]string
 }
 
-func (wm *MetaDataListWriteModel) Reduce() error {
+func (wm *MetadataListWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *metadata.SetEvent:

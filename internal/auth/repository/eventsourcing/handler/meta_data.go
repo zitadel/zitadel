@@ -12,13 +12,13 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-type MetaData struct {
+type Metadata struct {
 	handler
 	subscription *v1.Subscription
 }
 
-func newMetaData(handler handler) *MetaData {
-	h := &MetaData{
+func newMetadata(handler handler) *Metadata {
+	h := &Metadata{
 		handler: handler,
 	}
 
@@ -27,7 +27,7 @@ func newMetaData(handler handler) *MetaData {
 	return h
 }
 
-func (m *MetaData) subscribe() {
+func (m *Metadata) subscribe() {
 	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
 	go func() {
 		for event := range m.subscription.Events {
@@ -37,31 +37,31 @@ func (m *MetaData) subscribe() {
 }
 
 const (
-	metaDataTable = "auth.meta_data"
+	metadataTable = "auth.meta_data"
 )
 
-func (m *MetaData) ViewModel() string {
-	return metaDataTable
+func (m *Metadata) ViewModel() string {
+	return metadataTable
 }
 
-func (m *MetaData) Subscription() *v1.Subscription {
+func (m *Metadata) Subscription() *v1.Subscription {
 	return m.subscription
 }
 
-func (_ *MetaData) AggregateTypes() []es_models.AggregateType {
+func (_ *Metadata) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{usr_model.UserAggregate}
 }
 
-func (p *MetaData) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestMetaDataSequence()
+func (p *Metadata) CurrentSequence() (uint64, error) {
+	sequence, err := p.view.GetLatestMetadataSequence()
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (m *MetaData) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestMetaDataSequence()
+func (m *Metadata) EventQuery() (*es_models.SearchQuery, error) {
+	sequence, err := m.view.GetLatestMetadataSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -70,55 +70,55 @@ func (m *MetaData) EventQuery() (*es_models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (m *MetaData) Reduce(event *es_models.Event) (err error) {
+func (m *Metadata) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
 	case usr_model.UserAggregate:
-		err = m.processMetaData(event)
+		err = m.processMetadata(event)
 	}
 	return err
 }
 
-func (m *MetaData) processMetaData(event *es_models.Event) (err error) {
-	metaData := new(iam_model.MetaDataView)
+func (m *Metadata) processMetadata(event *es_models.Event) (err error) {
+	metaData := new(iam_model.MetadataView)
 	switch event.Type {
-	case usr_model.UserMetaDataSet:
+	case usr_model.UserMetadataSet:
 		err = metaData.SetData(event)
 		if err != nil {
 			return err
 		}
-		metaData, err = m.view.MetaDataByKey(event.AggregateID, metaData.Key)
+		metaData, err = m.view.MetadataByKey(event.AggregateID, metaData.Key)
 		if err != nil && !caos_errs.IsNotFound(err) {
 			return err
 		}
 		if caos_errs.IsNotFound(err) {
 			err = nil
-			metaData = new(iam_model.MetaDataView)
+			metaData = new(iam_model.MetadataView)
 			metaData.CreationDate = event.CreationDate
 		}
 		err = metaData.AppendEvent(event)
-	case usr_model.UserMetaDataRemoved:
-		data := new(iam_model.MetaDataView)
+	case usr_model.UserMetadataRemoved:
+		data := new(iam_model.MetadataView)
 		err = data.SetData(event)
 		if err != nil {
 			return err
 		}
-		return m.view.DeleteMetaData(event.AggregateID, data.Key, event)
+		return m.view.DeleteMetadata(event.AggregateID, data.Key, event)
 	case usr_model.UserRemoved:
-		return m.view.DeleteMetaDataByAggregateID(event.AggregateID, event)
+		return m.view.DeleteMetadataByAggregateID(event.AggregateID, event)
 	default:
-		return m.view.ProcessedMetaDataSequence(event)
+		return m.view.ProcessedMetadataSequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return m.view.PutMetaData(metaData, event)
+	return m.view.PutMetadata(metaData, event)
 }
 
-func (m *MetaData) OnError(event *es_models.Event, err error) error {
+func (m *Metadata) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-miJJs", "id", event.AggregateID).WithError(err).Warn("something went wrong in custom text handler")
-	return spooler.HandleError(event, err, m.view.GetLatestMetaDataFailedEvent, m.view.ProcessedMetaDataFailedEvent, m.view.ProcessedMetaDataSequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestMetadataFailedEvent, m.view.ProcessedMetadataFailedEvent, m.view.ProcessedMetadataSequence, m.errorCountUntilSkip)
 }
 
-func (o *MetaData) OnSuccess() error {
-	return spooler.HandleSuccess(o.view.UpdateMetaDataSpoolerRunTimestamp)
+func (o *Metadata) OnSuccess() error {
+	return spooler.HandleSuccess(o.view.UpdateMetadataSpoolerRunTimestamp)
 }

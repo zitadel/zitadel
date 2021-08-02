@@ -39,10 +39,10 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 	}
 }
 
-func BulkSetMetaDataToDomain(req *mgmt_pb.BulkSetUserMetaDataRequest) []*domain.MetaData {
-	metaData := make([]*domain.MetaData, len(req.MetaData))
-	for i, data := range req.MetaData {
-		metaData[i] = &domain.MetaData{
+func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
+	metaData := make([]*domain.Metadata, len(req.Metadata))
+	for i, data := range req.Metadata {
+		metaData[i] = &domain.Metadata{
 			Key:   data.Key,
 			Value: data.Value,
 		}
@@ -50,13 +50,13 @@ func BulkSetMetaDataToDomain(req *mgmt_pb.BulkSetUserMetaDataRequest) []*domain.
 	return metaData
 }
 
-func ListUserMetaDataToDomain(req *mgmt_pb.ListUserMetaDataRequest) *domain.MetaDataSearchRequest {
+func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) *domain.MetadataSearchRequest {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &domain.MetaDataSearchRequest{
+	return &domain.MetadataSearchRequest{
 		Offset:  offset,
 		Limit:   limit,
 		Asc:     asc,
-		Queries: metadata.MetaDataQueriesToModel(req.Queries),
+		Queries: metadata.MetadataQueriesToModel(req.Queries),
 	}
 }
 

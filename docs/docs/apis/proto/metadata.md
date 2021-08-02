@@ -9,7 +9,7 @@ title: zitadel/metadata.proto
 ## Messages
 
 
-### MetaData
+### Metadata
 
 
 
@@ -22,7 +22,7 @@ title: zitadel/metadata.proto
 
 
 
-### MetaDataKeyQuery
+### MetadataKeyQuery
 
 
 
@@ -34,19 +34,19 @@ title: zitadel/metadata.proto
 
 
 
-### MetaDataQuery
+### MetadataQuery
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.key_query |  MetaDataKeyQuery | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.value_query |  MetaDataValueQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.key_query |  MetadataKeyQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.value_query |  MetadataValueQuery | - |  |
 
 
 
 
-### MetaDataValueQuery
+### MetadataValueQuery
 
 
 

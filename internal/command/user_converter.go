@@ -144,8 +144,8 @@ func authRequestDomainToAuthRequestInfo(authRequest *domain.AuthRequest) *user.A
 	return info
 }
 
-func writeModelToUserMetaData(wm *UserMetaDataWriteModel) *domain.MetaData {
-	return &domain.MetaData{
+func writeModelToUserMetadata(wm *UserMetadataWriteModel) *domain.Metadata {
+	return &domain.Metadata{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
 		Key:        wm.Key,
 		Value:      wm.Value,

@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_SetMetaData(t *testing.T) {
+func TestCommandSide_SetMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -24,11 +24,11 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 			ctx      context.Context
 			orgID    string
 			userID   string
-			metaData *domain.MetaData
+			metaData *domain.Metadata
 		}
 	)
 	type res struct {
-		want *domain.MetaData
+		want *domain.Metadata
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -49,7 +49,7 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaData: &domain.MetaData{
+				metaData: &domain.Metadata{
 					Key:   "key",
 					Value: "value",
 				},
@@ -85,7 +85,7 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaData: &domain.MetaData{
+				metaData: &domain.Metadata{
 					Key: "key",
 				},
 			},
@@ -117,7 +117,7 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewMetaDataSetEvent(context.Background(),
+								user.NewMetadataSetEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"key",
 									"value",
@@ -131,20 +131,20 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaData: &domain.MetaData{
+				metaData: &domain.Metadata{
 					Key:   "key",
 					Value: "value",
 				},
 			},
 			res: res{
-				want: &domain.MetaData{
+				want: &domain.Metadata{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
 					},
 					Key:   "key",
 					Value: "value",
-					State: domain.MetaDataStateActive,
+					State: domain.MetadataStateActive,
 				},
 			},
 		},
@@ -154,7 +154,7 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.SetUserMetaData(tt.args.ctx, tt.args.metaData, tt.args.userID, tt.args.orgID)
+			got, err := r.SetUserMetadata(tt.args.ctx, tt.args.metaData, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -168,7 +168,7 @@ func TestCommandSide_SetMetaData(t *testing.T) {
 	}
 }
 
-func TestCommandSide_BulkSetMetaData(t *testing.T) {
+func TestCommandSide_BulkSetMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -177,7 +177,7 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 			ctx          context.Context
 			orgID        string
 			userID       string
-			metaDataList []*domain.MetaData
+			metaDataList []*domain.Metadata
 		}
 	)
 	type res struct {
@@ -218,7 +218,7 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaDataList: []*domain.MetaData{
+				metaDataList: []*domain.Metadata{
 					{Key: "key", Value: "value"},
 					{Key: "key1", Value: "value1"},
 				},
@@ -254,7 +254,7 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaDataList: []*domain.MetaData{
+				metaDataList: []*domain.Metadata{
 					{Key: "key"},
 					{Key: "key1"},
 				},
@@ -287,14 +287,14 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewMetaDataSetEvent(context.Background(),
+								user.NewMetadataSetEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"key",
 									"value",
 								),
 							),
 							eventFromEventPusher(
-								user.NewMetaDataSetEvent(context.Background(),
+								user.NewMetadataSetEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"key1",
 									"value1",
@@ -308,7 +308,7 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaDataList: []*domain.MetaData{
+				metaDataList: []*domain.Metadata{
 					{Key: "key", Value: "value"},
 					{Key: "key1", Value: "value1"},
 				},
@@ -325,7 +325,7 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.BulkSetUserMetaData(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metaDataList...)
+			got, err := r.BulkSetUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metaDataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -339,7 +339,7 @@ func TestCommandSide_BulkSetMetaData(t *testing.T) {
 	}
 }
 
-func TestCommandSide_UserRemoveMetaData(t *testing.T) {
+func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -453,7 +453,7 @@ func TestCommandSide_UserRemoveMetaData(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMetaDataSetEvent(context.Background(),
+							user.NewMetadataSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"key",
 								"value",
@@ -463,7 +463,7 @@ func TestCommandSide_UserRemoveMetaData(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewMetaDataRemovedEvent(context.Background(),
+								user.NewMetadataRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"key",
 								),
@@ -490,7 +490,7 @@ func TestCommandSide_UserRemoveMetaData(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveUserMetaData(tt.args.ctx, tt.args.metaDataKey, tt.args.userID, tt.args.orgID)
+			got, err := r.RemoveUserMetadata(tt.args.ctx, tt.args.metaDataKey, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -504,7 +504,7 @@ func TestCommandSide_UserRemoveMetaData(t *testing.T) {
 	}
 }
 
-func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
+func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -526,40 +526,40 @@ func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "empty meta data list, pre condition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		orgID:  "org1",
-		//		userID: "user1",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "user not existing, pre condition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		orgID:  "org1",
-		//		userID: "user1",
-		//		metaDataList: []string{"key", "key1"},
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
+		{
+			name: "empty meta data list, pre condition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "user not existing, pre condition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:          context.Background(),
+				orgID:        "org1",
+				userID:       "user1",
+				metaDataList: []string{"key", "key1"},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
 		{
 			name: "remove metadata keys not existing, precondition error",
 			fields: fields{
@@ -583,7 +583,7 @@ func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMetaDataSetEvent(context.Background(),
+							user.NewMetadataSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"key",
 								"value",
@@ -625,14 +625,14 @@ func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMetaDataSetEvent(context.Background(),
+							user.NewMetadataSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"key",
 								"value",
 							),
 						),
 						eventFromEventPusher(
-							user.NewMetaDataSetEvent(context.Background(),
+							user.NewMetadataSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"key1",
 								"value1",
@@ -674,14 +674,14 @@ func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMetaDataSetEvent(context.Background(),
+							user.NewMetadataSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"key",
 								"value",
 							),
 						),
 						eventFromEventPusher(
-							user.NewMetaDataSetEvent(context.Background(),
+							user.NewMetadataSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"key1",
 								"value1",
@@ -691,13 +691,13 @@ func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewMetaDataRemovedEvent(context.Background(),
+								user.NewMetadataRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"key",
 								),
 							),
 							eventFromEventPusher(
-								user.NewMetaDataRemovedEvent(context.Background(),
+								user.NewMetadataRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"key1",
 								),
@@ -724,7 +724,7 @@ func TestCommandSide_BulkRemoveMetaData(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.BulkRemoveUserMetaData(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metaDataList...)
+			got, err := r.BulkRemoveUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metaDataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -7,10 +7,10 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func BulkSetMetaDataToDomain(req *auth.BulkSetMyMetaDataRequest) []*domain.MetaData {
-	metaData := make([]*domain.MetaData, len(req.MetaData))
-	for i, data := range req.MetaData {
-		metaData[i] = &domain.MetaData{
+func BulkSetMetadataToDomain(req *auth.BulkSetMyMetadataRequest) []*domain.Metadata {
+	metaData := make([]*domain.Metadata, len(req.Metadata))
+	for i, data := range req.Metadata {
+		metaData[i] = &domain.Metadata{
 			Key:   data.Key,
 			Value: data.Value,
 		}
@@ -18,12 +18,12 @@ func BulkSetMetaDataToDomain(req *auth.BulkSetMyMetaDataRequest) []*domain.MetaD
 	return metaData
 }
 
-func ListUserMetaDataToDomain(req *auth.ListMyMetaDataRequest) *domain.MetaDataSearchRequest {
+func ListUserMetadataToDomain(req *auth.ListMyMetadataRequest) *domain.MetadataSearchRequest {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &domain.MetaDataSearchRequest{
+	return &domain.MetadataSearchRequest{
 		Offset:  offset,
 		Limit:   limit,
 		Asc:     asc,
-		Queries: metadata.MetaDataQueriesToModel(req.Queries),
+		Queries: metadata.MetadataQueriesToModel(req.Queries),
 	}
 }
