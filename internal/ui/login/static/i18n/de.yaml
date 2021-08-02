@@ -136,7 +136,7 @@ Passwordless:
 
 PasswordlessPrompt:
   Title: Passwortloser Login hinzufügen
-  Description: Möchtest du einen Passwortloser Login hinzufügen?
+  Description: Möchtest du einen passwortlosen Login hinzufügen?
   DescriptionInit: Du musst zuerst den Passwortlosen Login hinzufügen. Nutze dazu den Link, den du erhalten hast um dein Gerät zu registrieren.
   PasswordlessButtonText: Werde Passwortlos
   NextButtonText: weiter
