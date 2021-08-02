@@ -38,5 +38,5 @@ PasswordlessRegistration:
   PreHeader: Passwortlosen Login hinzufügen
   Subject: Passwortlosen Login hinzufügen
   Greeting: Hallo {{.FirstName}} {{.LastName}},
-  Text: Wir haben eine Anfrage für das Hinzufügen eines Token für den passwortlosen Login erhalten. Du kansst den untenstehenden Button verwenden, um dein Token oder Gerät hinzuzufügen.
+  Text: Wir haben eine Anfrage für das Hinzufügen eines Token für den passwortlosen Login erhalten. Du kannst den untenstehenden Button verwenden, um dein Token oder Gerät hinzuzufügen.
   ButtonText: Passwortlosen Login hinzufügen
