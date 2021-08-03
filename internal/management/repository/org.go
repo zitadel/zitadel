@@ -42,8 +42,8 @@ type OrgRepository interface {
 	GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
 	GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
 
-	GetPasswordLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
-	GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
+	GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
+	GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
 
 	GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
 	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)

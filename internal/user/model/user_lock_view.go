@@ -27,7 +27,7 @@ type UserLockSearchKey int32
 
 const (
 	UserLockSearchKeyUnspecified UserLockSearchKey = iota
-	UserLockSearchKeyID
+	UserLockSearchKeyUserID
 )
 
 type UserLockSearchQuery struct {

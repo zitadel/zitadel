@@ -282,7 +282,7 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	return iam_es_model.PasswordAgeViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
+func (repo *IAMRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
 	policy, viewErr := repo.View.LockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr

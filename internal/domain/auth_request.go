@@ -48,7 +48,7 @@ type AuthRequest struct {
 	AllowedExternalIDPs    []*IDPProvider
 	LabelPolicy            *LabelPolicy
 	PrivacyPolicy          *PrivacyPolicy
-	LockoutPolicy          *PasswordLockoutPolicy
+	LockoutPolicy          *LockoutPolicy
 	DefaultTranslations    []*CustomText
 	OrgTranslations        []*CustomText
 }

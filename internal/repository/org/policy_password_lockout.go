@@ -9,95 +9,95 @@ import (
 )
 
 var (
-	PasswordLockoutPolicyAddedEventType   = orgEventTypePrefix + policy.PasswordLockoutPolicyAddedEventType
-	PasswordLockoutPolicyChangedEventType = orgEventTypePrefix + policy.PasswordLockoutPolicyChangedEventType
-	PasswordLockoutPolicyRemovedEventType = orgEventTypePrefix + policy.PasswordLockoutPolicyRemovedEventType
+	LockoutPolicyAddedEventType   = orgEventTypePrefix + policy.LockoutPolicyAddedEventType
+	LockoutPolicyChangedEventType = orgEventTypePrefix + policy.LockoutPolicyChangedEventType
+	LockoutPolicyRemovedEventType = orgEventTypePrefix + policy.LockoutPolicyRemovedEventType
 )
 
-type PasswordLockoutPolicyAddedEvent struct {
-	policy.PasswordLockoutPolicyAddedEvent
+type LockoutPolicyAddedEvent struct {
+	policy.LockoutPolicyAddedEvent
 }
 
-func NewPasswordLockoutPolicyAddedEvent(
+func NewLockoutPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	maxAttempts uint64,
 	showLockoutFailure bool,
-) *PasswordLockoutPolicyAddedEvent {
-	return &PasswordLockoutPolicyAddedEvent{
-		PasswordLockoutPolicyAddedEvent: *policy.NewPasswordLockoutPolicyAddedEvent(
+) *LockoutPolicyAddedEvent {
+	return &LockoutPolicyAddedEvent{
+		LockoutPolicyAddedEvent: *policy.NewLockoutPolicyAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				PasswordLockoutPolicyAddedEventType),
+				LockoutPolicyAddedEventType),
 			maxAttempts,
 			showLockoutFailure),
 	}
 }
 
-func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := policy.PasswordLockoutPolicyAddedEventMapper(event)
+func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LockoutPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordLockoutPolicyAddedEvent{PasswordLockoutPolicyAddedEvent: *e.(*policy.PasswordLockoutPolicyAddedEvent)}, nil
+	return &LockoutPolicyAddedEvent{LockoutPolicyAddedEvent: *e.(*policy.LockoutPolicyAddedEvent)}, nil
 }
 
-type PasswordLockoutPolicyChangedEvent struct {
-	policy.PasswordLockoutPolicyChangedEvent
+type LockoutPolicyChangedEvent struct {
+	policy.LockoutPolicyChangedEvent
 }
 
-func NewPasswordLockoutPolicyChangedEvent(
+func NewLockoutPolicyChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	changes []policy.PasswordLockoutPolicyChanges,
-) (*PasswordLockoutPolicyChangedEvent, error) {
-	changedEvent, err := policy.NewPasswordLockoutPolicyChangedEvent(
+	changes []policy.LockoutPolicyChanges,
+) (*LockoutPolicyChangedEvent, error) {
+	changedEvent, err := policy.NewLockoutPolicyChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasswordLockoutPolicyChangedEventType),
+			LockoutPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &PasswordLockoutPolicyChangedEvent{PasswordLockoutPolicyChangedEvent: *changedEvent}, nil
+	return &LockoutPolicyChangedEvent{LockoutPolicyChangedEvent: *changedEvent}, nil
 }
 
-func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := policy.PasswordLockoutPolicyChangedEventMapper(event)
+func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LockoutPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordLockoutPolicyChangedEvent{PasswordLockoutPolicyChangedEvent: *e.(*policy.PasswordLockoutPolicyChangedEvent)}, nil
+	return &LockoutPolicyChangedEvent{LockoutPolicyChangedEvent: *e.(*policy.LockoutPolicyChangedEvent)}, nil
 }
 
-type PasswordLockoutPolicyRemovedEvent struct {
-	policy.PasswordLockoutPolicyRemovedEvent
+type LockoutPolicyRemovedEvent struct {
+	policy.LockoutPolicyRemovedEvent
 }
 
-func NewPasswordLockoutPolicyRemovedEvent(
+func NewLockoutPolicyRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *PasswordLockoutPolicyRemovedEvent {
-	return &PasswordLockoutPolicyRemovedEvent{
-		PasswordLockoutPolicyRemovedEvent: *policy.NewPasswordLockoutPolicyRemovedEvent(
+) *LockoutPolicyRemovedEvent {
+	return &LockoutPolicyRemovedEvent{
+		LockoutPolicyRemovedEvent: *policy.NewLockoutPolicyRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				PasswordLockoutPolicyRemovedEventType),
+				LockoutPolicyRemovedEventType),
 		),
 	}
 }
 
-func PasswordLockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e, err := policy.PasswordLockoutPolicyRemovedEventMapper(event)
+func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := policy.LockoutPolicyRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PasswordLockoutPolicyRemovedEvent{PasswordLockoutPolicyRemovedEvent: *e.(*policy.PasswordLockoutPolicyRemovedEvent)}, nil
+	return &LockoutPolicyRemovedEvent{LockoutPolicyRemovedEvent: *e.(*policy.LockoutPolicyRemovedEvent)}, nil
 }

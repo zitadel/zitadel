@@ -15,12 +15,12 @@ type PasswordLockoutPolicyReadModel struct {
 func (rm *PasswordLockoutPolicyReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *policy.PasswordLockoutPolicyAddedEvent:
-			rm.MaxAttempts = e.MaxAttempts
+		case *policy.LockoutPolicyAddedEvent:
+			rm.MaxAttempts = e.MaxPasswordAttempts
 			rm.ShowLockOutFailures = e.ShowLockOutFailures
-		case *policy.PasswordLockoutPolicyChangedEvent:
-			if e.MaxAttempts != nil {
-				rm.MaxAttempts = *e.MaxAttempts
+		case *policy.LockoutPolicyChangedEvent:
+			if e.MaxPasswordAttempts != nil {
+				rm.MaxAttempts = *e.MaxPasswordAttempts
 			}
 			if e.ShowLockOutFailures != nil {
 				rm.ShowLockOutFailures = *e.ShowLockOutFailures

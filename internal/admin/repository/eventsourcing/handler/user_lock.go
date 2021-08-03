@@ -136,7 +136,7 @@ func (u *UserLocker) ProcessUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		if policy.MaxAttempts == 0 || userLock.PasswordCheckFailedCount < policy.MaxAttempts {
+		if policy.MaxPasswordAttempts == 0 || userLock.PasswordCheckFailedCount < policy.MaxPasswordAttempts {
 			return nil
 		}
 		_, err = u.command.LockUser(context.Background(), userLock.UserID, userLock.ResourceOwner)

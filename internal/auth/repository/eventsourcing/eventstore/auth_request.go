@@ -794,7 +794,7 @@ func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string)
 	return policy.ToDomain(), err
 }
 
-func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*domain.PasswordLockoutPolicy, error) {
+func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*domain.LockoutPolicy, error) {
 	policy, err := repo.View.LockoutPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.LockoutPolicyByAggregateID(repo.IAMID)

@@ -24,7 +24,7 @@ type LockoutPolicyView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 	State        int32     `json:"-" gorm:"column:lockout_policy_state"`
 
-	MaxAttempts         uint64 `json:"maxAttempts" gorm:"column:max_attempts"`
+	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts" gorm:"column:max_password_attempts"`
 	ShowLockOutFailures bool   `json:"showLockOutFailures" gorm:"column:show_lockout_failures"`
 	Default             bool   `json:"-" gorm:"-"`
 
@@ -37,21 +37,21 @@ func LockoutViewToModel(policy *LockoutPolicyView) *model.LockoutPolicyView {
 		Sequence:            policy.Sequence,
 		CreationDate:        policy.CreationDate,
 		ChangeDate:          policy.ChangeDate,
-		MaxAttempts:         policy.MaxAttempts,
+		MaxPasswordAttempts: policy.MaxPasswordAttempts,
 		ShowLockOutFailures: policy.ShowLockOutFailures,
 		Default:             policy.Default,
 	}
 }
 
-func (p *LockoutPolicyView) ToDomain() *domain.PasswordLockoutPolicy {
-	return &domain.PasswordLockoutPolicy{
+func (p *LockoutPolicyView) ToDomain() *domain.LockoutPolicy {
+	return &domain.LockoutPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:  p.AggregateID,
 			CreationDate: p.CreationDate,
 			ChangeDate:   p.ChangeDate,
 			Sequence:     p.Sequence,
 		},
-		MaxAttempts:         p.MaxAttempts,
+		MaxPasswordAttempts: p.MaxPasswordAttempts,
 		ShowLockOutFailures: p.ShowLockOutFailures,
 		Default:             p.Default,
 	}
@@ -61,11 +61,11 @@ func (i *LockoutPolicyView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch event.Type {
-	case es_model.PasswordLockoutPolicyAdded, org_es_model.PasswordLockoutPolicyAdded:
+	case es_model.LockoutPolicyAdded, org_es_model.LockoutPolicyAdded:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
-	case es_model.PasswordLockoutPolicyChanged, org_es_model.PasswordLockoutPolicyChanged:
+	case es_model.LockoutPolicyChanged, org_es_model.LockoutPolicyChanged:
 		err = i.SetData(event)
 	}
 	return err

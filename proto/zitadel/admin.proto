@@ -1425,10 +1425,10 @@ service AdminService {
         };
     }
 
-    //Returns the password lockout policy defined by the administrators of ZITADEL
-    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
+    //Returns the lockout policy defined by the administrators of ZITADEL
+    rpc GetLockoutPolicy(GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/password/lockout";
+            get: "/policies/lockout";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1437,20 +1437,19 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "policy";
-            tags: "password policy";
-            tags: "password lockout policy";
+            tags: "lockout policy";
             responses: {
                 key: "200";
                 value: {
-                    description: "default password lockout policy";
+                    description: "default lockout policy";
                 };
             };
         };
     }
     
-    //Updates the default password lockout policy of ZITADEL
+    //Updates the default lockout policy of ZITADEL
     // it impacts all organisations without a customised policy
-    rpc UpdatePasswordLockoutPolicy(UpdatePasswordLockoutPolicyRequest) returns (UpdatePasswordLockoutPolicyResponse) {
+    rpc UpdateLockoutPolicy(UpdateLockoutPolicyRequest) returns (UpdateLockoutPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/lockout";
             body: "*";
@@ -3086,17 +3085,17 @@ message UpdatePasswordAgePolicyResponse {
 }
 
 //This is an empty request
-message GetPasswordLockoutPolicyRequest {}
+message GetLockoutPolicyRequest {}
 
-message GetPasswordLockoutPolicyResponse {
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+message GetLockoutPolicyResponse {
+    zitadel.policy.v1.LockoutPolicy policy = 1;
 }
 
-message UpdatePasswordLockoutPolicyRequest {
+message UpdateLockoutPolicyRequest {
     // failed attempts until a user gets locked
-    uint32 max_attempts = 1 [
+    uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
             example: "\"10\""
         }
     ];
@@ -3104,7 +3103,7 @@ message UpdatePasswordLockoutPolicyRequest {
     bool show_lockout_failure = 2;
 }
 
-message UpdatePasswordLockoutPolicyResponse {
+message UpdateLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

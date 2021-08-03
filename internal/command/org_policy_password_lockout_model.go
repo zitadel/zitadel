@@ -9,13 +9,13 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type OrgPasswordLockoutPolicyWriteModel struct {
-	PasswordLockoutPolicyWriteModel
+type OrgLockoutPolicyWriteModel struct {
+	LockoutPolicyWriteModel
 }
 
-func NewOrgPasswordLockoutPolicyWriteModel(orgID string) *OrgPasswordLockoutPolicyWriteModel {
-	return &OrgPasswordLockoutPolicyWriteModel{
-		PasswordLockoutPolicyWriteModel{
+func NewOrgLockoutPolicyWriteModel(orgID string) *OrgLockoutPolicyWriteModel {
+	return &OrgLockoutPolicyWriteModel{
+		LockoutPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
@@ -24,42 +24,42 @@ func NewOrgPasswordLockoutPolicyWriteModel(orgID string) *OrgPasswordLockoutPoli
 	}
 }
 
-func (wm *OrgPasswordLockoutPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLockoutPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *org.PasswordLockoutPolicyAddedEvent:
-			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
-		case *org.PasswordLockoutPolicyChangedEvent:
-			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
-		case *org.PasswordLockoutPolicyRemovedEvent:
-			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyRemovedEvent)
+		case *org.LockoutPolicyAddedEvent:
+			wm.LockoutPolicyWriteModel.AppendEvents(&e.LockoutPolicyAddedEvent)
+		case *org.LockoutPolicyChangedEvent:
+			wm.LockoutPolicyWriteModel.AppendEvents(&e.LockoutPolicyChangedEvent)
+		case *org.LockoutPolicyRemovedEvent:
+			wm.LockoutPolicyWriteModel.AppendEvents(&e.LockoutPolicyRemovedEvent)
 		}
 	}
 }
 
-func (wm *OrgPasswordLockoutPolicyWriteModel) Reduce() error {
-	return wm.PasswordLockoutPolicyWriteModel.Reduce()
+func (wm *OrgLockoutPolicyWriteModel) Reduce() error {
+	return wm.LockoutPolicyWriteModel.Reduce()
 }
 
-func (wm *OrgPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *OrgLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(org.AggregateType).
-		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
-		EventTypes(org.PasswordLockoutPolicyAddedEventType,
-			org.PasswordLockoutPolicyChangedEventType,
-			org.PasswordLockoutPolicyRemovedEventType).
+		AggregateIDs(wm.LockoutPolicyWriteModel.AggregateID).
+		EventTypes(org.LockoutPolicyAddedEventType,
+			org.LockoutPolicyChangedEventType,
+			org.LockoutPolicyRemovedEventType).
 		Builder()
 }
 
-func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(
+func (wm *OrgLockoutPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	maxAttempts uint64,
-	showLockoutFailure bool) (*org.PasswordLockoutPolicyChangedEvent, bool) {
-	changes := make([]policy.PasswordLockoutPolicyChanges, 0)
-	if wm.MaxAttempts != maxAttempts {
+	showLockoutFailure bool) (*org.LockoutPolicyChangedEvent, bool) {
+	changes := make([]policy.LockoutPolicyChanges, 0)
+	if wm.MaxPasswordAttempts != maxAttempts {
 		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
@@ -68,7 +68,7 @@ func (wm *OrgPasswordLockoutPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewPasswordLockoutPolicyChangedEvent(ctx, aggregate, changes)
+	changedEvent, err := org.NewLockoutPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -13,11 +13,11 @@ type OrgPasswordLockoutPolicyReadModel struct {
 func (rm *OrgPasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *org.PasswordLockoutPolicyAddedEvent:
-			rm.PasswordLockoutPolicyReadModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
-		case *org.PasswordLockoutPolicyChangedEvent:
-			rm.PasswordLockoutPolicyReadModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
-		case *policy.PasswordLockoutPolicyAddedEvent, *policy.PasswordLockoutPolicyChangedEvent:
+		case *org.LockoutPolicyAddedEvent:
+			rm.PasswordLockoutPolicyReadModel.AppendEvents(&e.LockoutPolicyAddedEvent)
+		case *org.LockoutPolicyChangedEvent:
+			rm.PasswordLockoutPolicyReadModel.AppendEvents(&e.LockoutPolicyChangedEvent)
+		case *policy.LockoutPolicyAddedEvent, *policy.LockoutPolicyChangedEvent:
 			rm.PasswordLockoutPolicyReadModel.AppendEvents(e)
 		}
 	}

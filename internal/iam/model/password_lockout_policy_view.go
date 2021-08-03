@@ -7,7 +7,7 @@ import (
 
 type LockoutPolicyView struct {
 	AggregateID         string
-	MaxAttempts         uint64
+	MaxPasswordAttempts uint64
 	ShowLockOutFailures bool
 	Default             bool
 

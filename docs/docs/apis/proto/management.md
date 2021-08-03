@@ -1854,64 +1854,64 @@ The password age policy is not used at the moment
     DELETE: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
 
 
-    GET: /policies/password/lockout
 
 
-### GetDefaultPasswordLockoutPolicy
-
-> **rpc** GetDefaultPasswordLockoutPolicy([GetDefaultPasswordLockoutPolicyRequest](#getdefaultpasswordlockoutpolicyrequest))
-[GetDefaultPasswordLockoutPolicyResponse](#getdefaultpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/lockout
 
 
+### GetDefaultLockoutPolicy
 
-    GET: /policies/default/password/lockout
-
-
-### AddCustomPasswordLockoutPolicy
-
-> **rpc** AddCustomPasswordLockoutPolicy([AddCustomPasswordLockoutPolicyRequest](#addcustompasswordlockoutpolicyrequest))
-[AddCustomPasswordLockoutPolicyResponse](#addcustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetDefaultLockoutPolicy([GetDefaultLockoutPolicyRequest](#getdefaultlockoutpolicyrequest))
+[GetDefaultLockoutPolicyResponse](#getdefaultlockoutpolicyresponse)
 
 
 
-    POST: /policies/password/lockout
 
 
-### UpdateCustomPasswordLockoutPolicy
-
-> **rpc** UpdateCustomPasswordLockoutPolicy([UpdateCustomPasswordLockoutPolicyRequest](#updatecustompasswordlockoutpolicyrequest))
-[UpdateCustomPasswordLockoutPolicyResponse](#updatecustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/default/lockout
 
 
+### AddCustomLockoutPolicy
 
-    PUT: /policies/password/lockout
-
-
-### ResetPasswordLockoutPolicyToDefault
-
-> **rpc** ResetPasswordLockoutPolicyToDefault([ResetPasswordLockoutPolicyToDefaultRequest](#resetpasswordlockoutpolicytodefaultrequest))
-[ResetPasswordLockoutPolicyToDefaultResponse](#resetpasswordlockoutpolicytodefaultresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** AddCustomLockoutPolicy([AddCustomLockoutPolicyRequest](#addcustomlockoutpolicyrequest))
+[AddCustomLockoutPolicyResponse](#addcustomlockoutpolicyresponse)
 
 
 
-    DELETE: /policies/password/lockout
+
+
+    POST: /policies/lockout
+
+
+### UpdateCustomLockoutPolicy
+
+> **rpc** UpdateCustomLockoutPolicy([UpdateCustomLockoutPolicyRequest](#updatecustomlockoutpolicyrequest))
+[UpdateCustomLockoutPolicyResponse](#updatecustomlockoutpolicyresponse)
+
+
+
+
+
+    PUT: /policies/lockout
+
+
+### ResetLockoutPolicyToDefault
+
+> **rpc** ResetLockoutPolicyToDefault([ResetLockoutPolicyToDefaultRequest](#resetlockoutpolicytodefaultrequest))
+[ResetLockoutPolicyToDefaultResponse](#resetlockoutpolicytodefaultresponse)
+
+
+
+
+
+    DELETE: /policies/lockout
 
 
 ### GetPrivacyPolicy
@@ -2697,6 +2697,29 @@ This is an empty request
 
 
 
+### AddCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+| show_lockout_failure |  bool | - |  |
+
+
+
+
+### AddCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomLoginPolicyRequest
 
 
@@ -2763,29 +2786,6 @@ This is an empty request
 
 
 ### AddCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyResponse
 
 
 
@@ -3785,6 +3785,23 @@ This is an empty request
 
 
 
+### GetDefaultLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
 ### GetDefaultLoginPolicyRequest
 
 
@@ -3854,23 +3871,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-
-
-
-
-### GetDefaultPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetDefaultPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
@@ -4125,6 +4125,24 @@ This is an empty request
 
 
 
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 
 
@@ -4293,24 +4311,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-| is_default |  bool | - |  |
-
-
-
-
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 | is_default |  bool | - |  |
 
 
@@ -6246,7 +6246,7 @@ This is an empty request
 
 
 ### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -6328,6 +6328,23 @@ This is an empty request
 
 
 
+### ResetLockoutPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetLockoutPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetLoginPolicyToDefaultRequest
 
 
@@ -6369,23 +6386,6 @@ This is an empty request
 
 
 ### ResetPasswordComplexityPolicyToDefaultResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultRequest
-This is an empty request
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultResponse
 
 
 
@@ -6857,6 +6857,29 @@ This is an empty request
 
 
 
+### UpdateCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+| show_lockout_failure |  bool | - |  |
+
+
+
+
+### UpdateCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateCustomLoginPolicyRequest
 
 
@@ -6923,29 +6946,6 @@ This is an empty request
 
 
 ### UpdateCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyResponse
 
 
 

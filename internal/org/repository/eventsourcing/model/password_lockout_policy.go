@@ -6,7 +6,7 @@ import (
 )
 
 func (o *Org) appendAddPasswordLockoutPolicyEvent(event *es_models.Event) error {
-	o.PasswordLockoutPolicy = new(iam_es_model.PasswordLockoutPolicy)
+	o.PasswordLockoutPolicy = new(iam_es_model.LockoutPolicy)
 	err := o.PasswordLockoutPolicy.SetData(event)
 	if err != nil {
 		return err

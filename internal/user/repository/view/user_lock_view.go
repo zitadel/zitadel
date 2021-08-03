@@ -12,7 +12,7 @@ import (
 
 func UserLockByID(db *gorm.DB, table, userID string) (*model.UserLockView, error) {
 	user := new(model.UserLockView)
-	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserLockSearchKeyID), userID)
+	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserLockSearchKeyUserID), userID)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
@@ -26,6 +26,6 @@ func PutUserLock(db *gorm.DB, table string, userLock *model.UserLockView) error 
 }
 
 func DeleteUserLock(db *gorm.DB, table, userID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserLockSearchKeyID), userID)
+	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserLockSearchKeyUserID), userID)
 	return delete(db)
 }

@@ -36,6 +36,20 @@ title: zitadel/policy.proto
 
 
 
+### LockoutPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| max_password_attempts |  uint64 | - |  |
+| show_lockout_failure |  bool | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### LoginPolicy
 
 
@@ -93,20 +107,6 @@ title: zitadel/policy.proto
 | has_lowercase |  bool | - |  |
 | has_number |  bool | - |  |
 | has_symbol |  bool | - |  |
-| is_default |  bool | - |  |
-
-
-
-
-### PasswordLockoutPolicy
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| max_attempts |  uint64 | - |  |
-| show_lockout_failure |  bool | - |  |
 | is_default |  bool | - |  |
 
 

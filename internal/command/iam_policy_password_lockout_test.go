@@ -19,10 +19,10 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		policy *domain.PasswordLockoutPolicy
+		policy *domain.LockoutPolicy
 	}
 	type res struct {
-		want *domain.PasswordLockoutPolicy
+		want *domain.LockoutPolicy
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -38,7 +38,7 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewPasswordLockoutPolicyAddedEvent(context.Background(),
+							iam.NewLockoutPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								10,
 								true,
@@ -49,8 +49,8 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.PasswordLockoutPolicy{
-					MaxAttempts:         10,
+				policy: &domain.LockoutPolicy{
+					MaxPasswordAttempts: 10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -67,7 +67,7 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewPasswordLockoutPolicyAddedEvent(context.Background(),
+								iam.NewLockoutPolicyAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
 									10,
 									true,
@@ -79,18 +79,18 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.PasswordLockoutPolicy{
-					MaxAttempts:         10,
+				policy: &domain.LockoutPolicy{
+					MaxPasswordAttempts: 10,
 					ShowLockOutFailures: true,
 				},
 			},
 			res: res{
-				want: &domain.PasswordLockoutPolicy{
+				want: &domain.LockoutPolicy{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "IAM",
 						ResourceOwner: "IAM",
 					},
-					MaxAttempts:         10,
+					MaxPasswordAttempts: 10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -101,7 +101,7 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultLockoutPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -121,10 +121,10 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		policy *domain.PasswordLockoutPolicy
+		policy *domain.LockoutPolicy
 	}
 	type res struct {
-		want *domain.PasswordLockoutPolicy
+		want *domain.LockoutPolicy
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -143,8 +143,8 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.PasswordLockoutPolicy{
-					MaxAttempts:         10,
+				policy: &domain.LockoutPolicy{
+					MaxPasswordAttempts: 10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -159,7 +159,7 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewPasswordLockoutPolicyAddedEvent(context.Background(),
+							iam.NewLockoutPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								10,
 								true,
@@ -170,8 +170,8 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.PasswordLockoutPolicy{
-					MaxAttempts:         10,
+				policy: &domain.LockoutPolicy{
+					MaxPasswordAttempts: 10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -186,7 +186,7 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewPasswordLockoutPolicyAddedEvent(context.Background(),
+							iam.NewLockoutPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								10,
 								true,
@@ -204,18 +204,18 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.PasswordLockoutPolicy{
-					MaxAttempts:         20,
+				policy: &domain.LockoutPolicy{
+					MaxPasswordAttempts: 20,
 					ShowLockOutFailures: false,
 				},
 			},
 			res: res{
-				want: &domain.PasswordLockoutPolicy{
+				want: &domain.LockoutPolicy{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "IAM",
 						ResourceOwner: "IAM",
 					},
-					MaxAttempts:         20,
+					MaxPasswordAttempts: 20,
 					ShowLockOutFailures: false,
 				},
 			},
@@ -226,7 +226,7 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultPasswordLockoutPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.ChangeDefaultLockoutPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -240,10 +240,10 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultPasswordLockoutPolicyChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *iam.PasswordLockoutPolicyChangedEvent {
-	event, _ := iam.NewPasswordLockoutPolicyChangedEvent(ctx,
+func newDefaultPasswordLockoutPolicyChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *iam.LockoutPolicyChangedEvent {
+	event, _ := iam.NewLockoutPolicyChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
-		[]policy.PasswordLockoutPolicyChanges{
+		[]policy.LockoutPolicyChanges{
 			policy.ChangeMaxAttempts(maxAttempts),
 			policy.ChangeShowLockOutFailures(showLockoutFailure),
 		},

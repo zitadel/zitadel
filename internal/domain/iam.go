@@ -22,5 +22,5 @@ type IAM struct {
 	DefaultOrgIAMPolicy             *OrgIAMPolicy
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy
 	DefaultPasswordAgePolicy        *PasswordAgePolicy
-	DefaultPasswordLockoutPolicy    *PasswordLockoutPolicy
+	DefaultPasswordLockoutPolicy    *LockoutPolicy
 }

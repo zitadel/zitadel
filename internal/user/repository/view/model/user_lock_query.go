@@ -51,7 +51,7 @@ func (req UserLockSearchQuery) GetValue() interface{} {
 
 func (key UserLockSearchKey) ToColumnName() string {
 	switch usr_model.UserLockSearchKey(key) {
-	case usr_model.UserLockSearchKeyUserLockID:
+	case usr_model.UserLockSearchKeyUserID:
 		return UserLockedKeyUserID
 	default:
 		return ""

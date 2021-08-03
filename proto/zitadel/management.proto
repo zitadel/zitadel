@@ -1894,9 +1894,9 @@ service ManagementService {
         };
     }
 
-    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
+    rpc GetLockoutPolicy(GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/password/lockout"
+            get: "/policies/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1904,9 +1904,9 @@ service ManagementService {
         };
     }
 
-    rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
+    rpc GetDefaultLockoutPolicy(GetDefaultLockoutPolicyRequest) returns (GetDefaultLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/default/password/lockout"
+            get: "/policies/default/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1914,9 +1914,9 @@ service ManagementService {
         };
     }
 
-    rpc AddCustomPasswordLockoutPolicy(AddCustomPasswordLockoutPolicyRequest) returns (AddCustomPasswordLockoutPolicyResponse) {
+    rpc AddCustomLockoutPolicy(AddCustomLockoutPolicyRequest) returns (AddCustomLockoutPolicyResponse) {
         option (google.api.http) = {
-            post: "/policies/password/lockout"
+            post: "/policies/lockout"
             body: "*"
         };
 
@@ -1925,9 +1925,9 @@ service ManagementService {
         };
     }
 
-    rpc UpdateCustomPasswordLockoutPolicy(UpdateCustomPasswordLockoutPolicyRequest) returns (UpdateCustomPasswordLockoutPolicyResponse) {
+    rpc UpdateCustomLockoutPolicy(UpdateCustomLockoutPolicyRequest) returns (UpdateCustomLockoutPolicyResponse) {
         option (google.api.http) = {
-            put: "/policies/password/lockout"
+            put: "/policies/lockout"
             body: "*"
         };
 
@@ -1936,9 +1936,9 @@ service ManagementService {
         };
     }
 
-    rpc ResetPasswordLockoutPolicyToDefault(ResetPasswordLockoutPolicyToDefaultRequest) returns (ResetPasswordLockoutPolicyToDefaultResponse) {
+    rpc ResetLockoutPolicyToDefault(ResetLockoutPolicyToDefaultRequest) returns (ResetLockoutPolicyToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/policies/password/lockout"
+            delete: "/policies/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -4131,42 +4131,42 @@ message ResetPasswordAgePolicyToDefaultResponse {
 }
 
 //This is an empty request
-message GetPasswordLockoutPolicyRequest {}
+message GetLockoutPolicyRequest {}
 
-message GetPasswordLockoutPolicyResponse {
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+message GetLockoutPolicyResponse {
+    zitadel.policy.v1.LockoutPolicy policy = 1;
     bool is_default = 2;
 }
 
 //This is an empty request
-message GetDefaultPasswordLockoutPolicyRequest {}
+message GetDefaultLockoutPolicyRequest {}
 
-message GetDefaultPasswordLockoutPolicyResponse {
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+message GetDefaultLockoutPolicyResponse {
+    zitadel.policy.v1.LockoutPolicy policy = 1;
 }
 
-message AddCustomPasswordLockoutPolicyRequest {
-    uint32 max_attempts = 1;
+message AddCustomLockoutPolicyRequest {
+    uint32 max_password_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
-message AddCustomPasswordLockoutPolicyResponse {
+message AddCustomLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message UpdateCustomPasswordLockoutPolicyRequest {
-    uint32 max_attempts = 1;
+message UpdateCustomLockoutPolicyRequest {
+    uint32 max_password_attempts = 1;
     bool show_lockout_failure = 2;
 }
 
-message UpdateCustomPasswordLockoutPolicyResponse {
+message UpdateCustomLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request
-message ResetPasswordLockoutPolicyToDefaultRequest {}
+message ResetLockoutPolicyToDefaultRequest {}
 
-message ResetPasswordLockoutPolicyToDefaultResponse {
+message ResetLockoutPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

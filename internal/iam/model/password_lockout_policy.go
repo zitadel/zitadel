@@ -8,6 +8,6 @@ type LockoutPolicy struct {
 	models.ObjectRoot
 
 	State               PolicyState
-	MaxAttempts         uint64
+	MaxPasswordAttempts uint64
 	ShowLockOutFailures bool
 }
