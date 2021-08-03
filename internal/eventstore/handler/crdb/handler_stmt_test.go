@@ -1392,7 +1392,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectUpdateTwoCurrentSequence("my_table", "my_projection", 5, 6, "agg", "agg2"),
+					expectUpdateTwoCurrentSequence("my_table", "my_projection", currentSequences{
+						"agg":  5,
+						"agg2": 6},
+					),
 				},
 			},
 		},

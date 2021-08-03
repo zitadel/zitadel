@@ -3,11 +3,12 @@ package crdb
 import (
 	"database/sql"
 	"database/sql/driver"
-	"reflect"
+	"log"
 	"strings"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/caos/zitadel/internal/eventstore"
 )
 
 type mockExpectation func(sqlmock.Sqlmock)
@@ -193,18 +194,17 @@ func expectUpdateCurrentSequence(tableName, projection string, seq uint64, aggre
 	}
 }
 
-func expectUpdateTwoCurrentSequence(tableName, projection string, seq1, seq2 uint64, aggregateType1, aggregateType2 string) func(sqlmock.Sqlmock) {
+func expectUpdateTwoCurrentSequence(tableName, projection string, sequences currentSequences) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		aggMatcher := &unorderedMachter{expected: []driver.Value{aggregateType1, aggregateType2}}
-		seqMatcher := &unorderedMachter{expected: []driver.Value{int64(seq1), int64(seq2)}}
+		matcher := &currentSequenceMatcher{seq: sequences}
 		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, aggregate_type, current_sequence, timestamp\) VALUES \(\$1, \$2, \$3, NOW\(\)\), \(\$4, \$5, \$6, NOW\(\)\)`).
 			WithArgs(
 				projection,
-				aggMatcher,
-				seqMatcher,
+				matcher,
+				matcher,
 				projection,
-				aggMatcher,
-				seqMatcher,
+				matcher,
+				matcher,
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -212,18 +212,30 @@ func expectUpdateTwoCurrentSequence(tableName, projection string, seq1, seq2 uin
 	}
 }
 
-type unorderedMachter struct {
-	expected []driver.Value
+type currentSequenceMatcher struct {
+	seq              currentSequences
+	currentAggregate eventstore.AggregateType
 }
 
-func (m *unorderedMachter) Match(value driver.Value) bool {
-	for i := len(m.expected) - 1; i >= 0; i-- {
-		if reflect.DeepEqual(value, m.expected[i]) {
-			m.expected = append(m.expected[:i], m.expected[i+1:]...)
-			return true
+func (m *currentSequenceMatcher) Match(value driver.Value) bool {
+	switch value.(type) {
+	case string:
+		if m.currentAggregate != "" {
+			log.Printf("expected sequence of %s but got next aggregate type %s", m.currentAggregate, value)
+			return false
 		}
+		_, ok := m.seq[eventstore.AggregateType(value.(string))]
+		if !ok {
+			return false
+		}
+		m.currentAggregate = eventstore.AggregateType(value.(string))
+		return true
+	default:
+		seq := m.seq[m.currentAggregate]
+		m.currentAggregate = ""
+		delete(m.seq, m.currentAggregate)
+		return int64(seq) == value.(int64)
 	}
-	return false
 }
 
 func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, err error, aggregateType string) func(sqlmock.Sqlmock) {
