@@ -245,7 +245,7 @@ footer .watermark .lgn-logo-watermark {
 }
 .lgn-header .lgn-logo {
   display: block;
-  height: 100px;
+  height: 100%;
   margin: 0 auto;
   max-width: 250px;
   max-height: 150px;
@@ -1134,7 +1134,7 @@ footer .watermark .lgn-logo-watermark {
 }
 .lgn-header .lgn-logo {
   display: block;
-  height: 100px;
+  height: 100%;
   margin: 0 auto;
   max-width: 250px;
   max-height: 150px;
@@ -2365,7 +2365,7 @@ i {
 }
 .lgn-header .lgn-logo {
   display: block;
-  height: 100px;
+  height: 100%;
   margin: 0 auto;
   max-width: 250px;
   max-height: 150px;

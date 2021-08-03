@@ -1,10 +1,13 @@
-
 .card {
   margin: 1rem 0;
   padding: 1.5rem;
   border-radius: .5rem;
   padding-top: 1rem;
   min-width: 300px;
+
+  &.nomargin {
+    margin: 0;
+  }
 
   .header {
     margin-top: 0;

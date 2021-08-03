@@ -1,6 +1,8 @@
 package orb
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
@@ -8,12 +10,12 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/orbos/pkg/treelabels"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/caos/zitadel/operator/database/kinds/databases"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -45,14 +47,16 @@ func AdaptFunc(
 		err error,
 	) {
 		defer func() {
-			err = errors.Wrapf(err, "building %s failed", orbDesiredTree.Common.Kind)
+			if err != nil {
+				err = fmt.Errorf("building %s failed: %w", orbDesiredTree.Common.Kind, err)
+			}
 		}()
 
 		orbMonitor := monitor.WithField("kind", "orb")
 
 		desiredKind, err := ParseDesiredV0(orbDesiredTree)
 		if err != nil {
-			return nil, nil, nil, nil, nil, migrate, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, migrate, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		orbDesiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
@@ -91,31 +95,34 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, migrate, err
 		}
 
+		rec, _ := Reconcile(monitor, desiredKind.Spec, gitops)
+
 		destroyers := make([]operator.DestroyFunc, 0)
 		queriers := make([]operator.QueryFunc, 0)
+		dbOrBackup := false
 		for _, feature := range features {
 			switch feature {
 			case "database", backup.Instant, backup.Normal, restore.Instant, clean.Instant:
-				queriers = append(queriers,
-					operator.ResourceQueryToZitadelQuery(queryNS),
-					queryDB,
-				)
-				destroyers = append(destroyers,
-					destroyDB,
-				)
+				if !dbOrBackup {
+					dbOrBackup = true
+					queriers = append(queriers,
+						operator.ResourceQueryToZitadelQuery(queryNS),
+						queryDB,
+					)
+					destroyers = append(destroyers,
+						destroyDB,
+					)
+				}
 			case "operator":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
-					operator.EnsureFuncToQueryFunc(Reconcile(monitor, desiredKind.Spec, gitops)),
+					operator.EnsureFuncToQueryFunc(rec),
 				)
 			}
 		}
 
 		currentTree.Parsed = &DesiredV0{
-			Common: &tree.Common{
-				Kind:    "databases.caos.ch/Orb",
-				Version: "v0",
-			},
+			Common:   tree.NewCommon("databases.caos.ch/Orb", "v0", false),
 			Database: databaseCurrent,
 		}
 

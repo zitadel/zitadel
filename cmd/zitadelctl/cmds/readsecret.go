@@ -18,11 +18,14 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 		Long:    "Print a secrets decrypted value to stdout.\nIf no path is provided, a secret can interactively be chosen from a list of all possible secrets",
 		Args:    cobra.MaximumNArgs(1),
 		Example: `zitadelctl readsecret database.bucket.serviceaccountjson.encrypted > ~/googlecloudstoragesa.json`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			rv, err := getRv()
-			if err != nil {
-				return err
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+
+			path := ""
+			if len(args) > 0 {
+				path = args[0]
 			}
+
+			rv := getRv("readsecret", map[string]interface{}{"path": path}, "")
 			defer func() {
 				err = rv.ErrFunc(err)
 			}()
@@ -30,11 +33,6 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 			monitor := rv.Monitor
 			orbConfig := rv.OrbConfig
 			gitClient := rv.GitClient
-
-			path := ""
-			if len(args) > 0 {
-				path = args[0]
-			}
 
 			k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
 			if err != nil && !rv.Gitops {
@@ -47,13 +45,11 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 				secrets.GetAllSecretsFunc(monitor, path == "", rv.Gitops, gitClient, k8sClient, orbConfig),
 			)
 			if err != nil {
-				monitor.Error(err)
-				return nil
+				return err
 			}
 
 			if _, err := os.Stdout.Write([]byte(value)); err != nil {
-				monitor.Error(err)
-				return nil
+				return err
 			}
 			return nil
 		},

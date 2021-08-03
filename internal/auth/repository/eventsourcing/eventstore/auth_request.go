@@ -296,6 +296,32 @@ func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceO
 	return repo.Command.HumanFinishU2FLogin(ctx, userID, resourceOwner, credentialData, request, true)
 }
 
+func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string) (login *domain.WebAuthNToken, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, true)
+}
+
+func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName string, credentialData []byte) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	_, err = repo.Command.HumanHumanPasswordlessSetup(ctx, userID, resourceOwner, tokenName, userAgentID, credentialData)
+	return err
+}
+
+func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string) (login *domain.WebAuthNToken, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode)
+}
+
+func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode, credentialData)
+	return err
+}
+
 func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -610,7 +636,6 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 
 	if request.LinkingUsers != nil && len(request.LinkingUsers) != 0 {
 		return append(steps, &domain.LinkUsersStep{}), nil
-
 	}
 	//PLANNED: consent step
 
@@ -657,10 +682,16 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
-		step = &domain.PasswordlessStep{}
+		step = &domain.PasswordlessStep{
+			PasswordSet: user.PasswordSet,
+		}
 	}
 
-	if !user.PasswordSet {
+	if user.PasswordlessInitRequired {
+		return &domain.PasswordlessRegistrationPromptStep{}
+	}
+
+	if user.PasswordInitRequired {
 		return &domain.InitPasswordStep{}
 	}
 

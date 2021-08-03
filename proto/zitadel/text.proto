@@ -79,6 +79,9 @@ message LoginCustomText {
     SuccessLoginScreenText success_login_text = 29;
     LogoutDoneScreenText logout_text = 30;
     FooterText footer_text = 31;
+    PasswordlessPromptScreenText passwordless_prompt_text = 32;
+    PasswordlessRegistrationScreenText passwordless_registration_text = 33;
+    PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
 }
 
 message SelectAccountScreenText {
@@ -280,6 +283,8 @@ message RegistrationOptionScreenText {
 }
 
 message RegistrationUserScreenText {
+    reserved 14, 16, 17, 19;
+    reserved "tos_link", "privacy_confirm", "privacy_link", "external_login_description";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string description_org_register = 3 [(validate.rules).string = {max_len: 500}];
@@ -293,17 +298,16 @@ message RegistrationUserScreenText {
     string password_confirm_label = 11 [(validate.rules).string = {max_len: 200}];
     string tos_and_privacy_label = 12 [(validate.rules).string = {max_len: 200}];
     string tos_confirm = 13 [(validate.rules).string = {max_len: 200}];
-    string tos_link = 14 [(validate.rules).string = {max_len: 200}];
     string tos_link_text = 15 [(validate.rules).string = {max_len: 200}];
-    string privacy_confirm = 16 [(validate.rules).string = {max_len: 200}];
-    string privacy_link = 17 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 18 [(validate.rules).string = {max_len: 200}];
-    string external_login_description = 19 [(validate.rules).string = {max_len: 500}];
     string next_button_text = 20 [(validate.rules).string = {max_len: 200}];
     string back_button_text = 21 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm_and = 22 [(validate.rules).string = {max_len: 200}];
 }
 
 message RegistrationOrgScreenText {
+    reserved 13, 15, 16, 18;
+    reserved "tos_link", "privacy_confirm", "privacy_link", "external_login_description";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string orgname_label = 3 [(validate.rules).string = {max_len: 200}];
@@ -315,13 +319,10 @@ message RegistrationOrgScreenText {
     string password_confirm_label = 10 [(validate.rules).string = {max_len: 200}];
     string tos_and_privacy_label = 11 [(validate.rules).string = {max_len: 200}];
     string tos_confirm = 12 [(validate.rules).string = {max_len: 200}];
-    string tos_link = 13 [(validate.rules).string = {max_len: 200}];
     string tos_link_text = 14 [(validate.rules).string = {max_len: 200}];
-    string privacy_confirm = 15 [(validate.rules).string = {max_len: 200}];
-    string privacy_link = 16 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 17 [(validate.rules).string = {max_len: 200}];
-    string external_login_description = 18 [(validate.rules).string = {max_len: 500}];
     string save_button_text = 19 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm_and = 20 [(validate.rules).string = {max_len: 200}];
 }
 
 message LinkingUserDoneScreenText {
@@ -354,10 +355,34 @@ message LogoutDoneScreenText {
 }
 
 message FooterText {
+    reserved 2, 4;
+    reserved "tos_link", "privacy_policy_link";
     string tos = 1 [(validate.rules).string = {max_len: 200}];
-    string tos_link = 2 [(validate.rules).string = {max_len: 500}];
     string privacy_policy = 3 [(validate.rules).string = {max_len: 200}];
-    string privacy_policy_link = 4 [(validate.rules).string = {max_len: 500}];
     string help = 5 [(validate.rules).string = {max_len: 200}];
     string help_link = 6 [(validate.rules).string = {max_len: 500}];
+}
+
+message PasswordlessPromptScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string description_init = 3 [(validate.rules).string = {max_len: 500}];
+    string passwordless_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string next_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string skip_button_text = 6 [(validate.rules).string = {max_len: 100}];
+}
+
+message PasswordlessRegistrationScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string token_name_label = 3 [(validate.rules).string = {max_len: 200}];
+    string not_supported = 4 [(validate.rules).string = {max_len: 500}];
+    string register_token_button_text = 5 [(validate.rules).string = {max_len: 100}];
+    string error_retry = 6 [(validate.rules).string = {max_len: 500}];
+}
+
+message PasswordlessRegistrationDoneScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string next_button_text = 3 [(validate.rules).string = {max_len: 100}];
 }

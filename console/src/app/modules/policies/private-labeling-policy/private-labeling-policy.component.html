@@ -66,7 +66,7 @@
               <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <div class="img-wrapper" *ngIf="images['previewDarkLogo']" >
+                  <div class="img-wrapper mat-elevation-z3" *ngIf="images['previewDarkLogo']" >
                     <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
                     <img matTooltip="Preview" class="prev" [src]="images['previewDarkLogo']" alt="dark logo preview"/>
                   </div>
@@ -90,11 +90,10 @@
               (dropped)="onDropLogo(theme, $event)"
               [class.hovering]="isHoveringOverDarkLogo">
                 <label class="file-label">
-                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $event.target.files)">
-                  <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" mat-raised-button type="button" (click)="selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
-
-                  <i class="icon las la-cloud-upload-alt"></i>
+                  <i class="icon las la-image"></i>
                   <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
+                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $event.target.files)">
+                  <a class="btn"  *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
             </div>
             </div>
@@ -130,11 +129,10 @@
               (dropped)="onDropIcon(theme, $event)"
               [class.hovering]="isHoveringOverDarkIcon">
               <label class="file-label">
-                <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
-                <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" mat-raised-button type="button" (click)="selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
-
-                <i class="icon las la-cloud-upload-alt"></i>
+                <i class="icon las la-image"></i>
                 <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
+                <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
+                <a class="btn" *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
               </label>
               </div>
             </div>
@@ -219,11 +217,10 @@
               (dropped)="onDropFont($event)"
               [class.hovering]="isHoveringOverFont">
                 <label class="file-label">
-                  <input #selectedFontFile style="display: none;"  class="file-input" type="file" (change)="onDropFont($event.target.files)">
-                  <button mat-stroked-button class="btn" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false"  mat-raised-button type="button" (click)="selectedFontFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</button>
-
-                  <i class="icon las la-cloud-upload-alt"></i>
+                  <i class="icon las la-file"></i>
                   <span >{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate): ('POLICY.PRIVATELABELING.DROPFONT' | translate)}}</span>
+                  <input #selectedFontFile style="display: none;"  class="file-input" type="file" (change)="onDropFont($event.target.files)">
+                  <a class="btn" *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="selectedFontFile.click()">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
             </div>
         </div>
@@ -259,7 +256,7 @@
           </cnsl-info-section>
         </ng-container>
         <mat-slide-toggle class="toggle" color="primary" ngDefaultControl [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) == false"
-            [(ngModel)]="previewData.disableWatermark" (change)="saveWatermark()">
+            [(ngModel)]="previewData.disableWatermark" (change)="savePolicy()">
             {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
         </mat-slide-toggle>
       </div>
@@ -279,5 +276,5 @@
       </div>
     </div>
 
-    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
+    <app-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></app-policy-grid>
 </div>

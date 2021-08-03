@@ -3,6 +3,18 @@
   margin-top: 0;
 }
 
+.icon-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  margin: 1rem;
+  align-items: center;
+
+  .icon {
+    font-size: 3rem;
+  }
+}
+
 .desc {
   color: var(--grey);
   font-size: .9rem;

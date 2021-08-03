@@ -1,30 +1,28 @@
 package managed
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/caos/zitadel/operator/common"
-
-	"github.com/caos/zitadel/operator"
-
-	"github.com/caos/orbos/pkg/labels"
-
-	"github.com/caos/orbos/pkg/secret"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
-
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/pdb"
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
+
+	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -35,7 +33,6 @@ const (
 	privateServiceName = SfsName
 	cockroachPort      = int32(26257)
 	cockroachHTTPPort  = int32(8080)
-	image              = "cockroachdb/cockroach:v20.2.3"
 )
 
 func Adapter(
@@ -54,27 +51,37 @@ func Adapter(
 		desired *tree.Tree,
 		current *tree.Tree,
 	) (
-		operator.QueryFunc,
-		operator.DestroyFunc,
-		operator.ConfigureFunc,
-		map[string]*secret.Secret,
-		map[string]*secret.Existing,
-		bool,
-		error,
+		_ operator.QueryFunc,
+		_ operator.DestroyFunc,
+		_ operator.ConfigureFunc,
+		_ map[string]*secret.Secret,
+		_ map[string]*secret.Existing,
+		migrate bool,
+		err error,
 	) {
+
+		defer func() {
+			if err != nil {
+				err = fmt.Errorf("adapting managed database failed: %w", err)
+			}
+		}()
 
 		var (
 			internalMonitor = monitor.WithField("kind", "cockroachdb")
 			allSecrets      = make(map[string]*secret.Secret)
 			allExisting     = make(map[string]*secret.Existing)
-			migrate         bool
 		)
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
+
+		storageCapacity, err := resource.ParseQuantity(desiredKind.Spec.StorageCapacity)
+		if err != nil {
+			return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("parsing storage capacity format failed: %w", err))
+		}
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
@@ -120,7 +127,7 @@ func Adapter(
 			common.CockroachImage.Reference(customImageRegistry),
 			serviceAccountName,
 			desiredKind.Spec.ReplicaCount,
-			desiredKind.Spec.StorageCapacity,
+			storageCapacity,
 			cockroachPort,
 			cockroachHTTPPort,
 			desiredKind.Spec.StorageClass,
@@ -142,27 +149,13 @@ func Adapter(
 			cockroachHTTPPort,
 		)
 
-		//externalName := "cockroachdb-public." + namespaceStr + ".svc.cluster.local"
-		//queryES, destroyES, err := service.AdaptFunc("cockroachdb-public", "default", labels, []service.Port{}, "ExternalName", map[string]string{}, false, "", externalName)
-		//if err != nil {
-		//	return nil, nil, err
-		//}
-
 		queryPDB, err := pdb.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, pdbName), cockroachSelector, "1")
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		destroyPDB, err := pdb.AdaptFuncToDestroy(namespace, pdbName)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
 		currentDB := &Current{
-			Common: &tree.Common{
-				Kind:    "databases.caos.ch/CockroachDB",
-				Version: "v0",
-			},
+			Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 			Current: &CurrentDB{
 				CA: &certificate.Current{},
 			},
@@ -188,7 +181,6 @@ func Adapter(
 
 		if isFeatureDatabase {
 			destroyers = append(destroyers,
-				operator.ResourceDestroyToZitadelDestroy(destroyPDB),
 				destroyS,
 				operator.ResourceDestroyToZitadelDestroy(destroySFS),
 				destroyRBAC,

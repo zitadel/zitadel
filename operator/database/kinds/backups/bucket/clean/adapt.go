@@ -30,6 +30,7 @@ func AdaptFunc(
 	namespace string,
 	componentLabels *labels.Component,
 	databases []string,
+	users []string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	checkDBReady operator.EnsureFunc,
@@ -42,7 +43,7 @@ func AdaptFunc(
 	err error,
 ) {
 
-	command := getCommand(databases)
+	command := getCommand(databases, users)
 
 	jobDef := getJob(
 		namespace,

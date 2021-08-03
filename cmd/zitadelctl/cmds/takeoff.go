@@ -23,11 +23,8 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		}
 	)
 
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv()
-		if err != nil {
-			return err
-		}
+	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
+		rv := getRv("takeoff", nil, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -49,7 +46,6 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		}
 
 		if err := kubernetes.EnsureCaosSystemNamespace(monitor, k8sClient); err != nil {
-			monitor.Info("failed to apply common resources into k8s-cluster")
 			return err
 		}
 
@@ -61,7 +57,6 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			}
 
 			if err := kubernetes.EnsureOrbconfigSecret(monitor, k8sClient, orbConfigBytes); err != nil {
-				monitor.Info("failed to apply configuration resources into k8s-cluster")
 				return err
 			}
 		}
@@ -73,95 +68,83 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 			rv.Version,
 			rv.Gitops,
 		); err != nil {
-			monitor.Error(err)
+			return err
 		}
 
-		if err := deployDatabase(
+		return deployDatabase(
 			monitor,
 			gitClient,
 			k8sClient,
 			rv.Version,
 			rv.Gitops,
-		); err != nil {
-			monitor.Error(err)
-		}
-		return nil
+		)
 	}
 	return cmd
 }
 
 func deployOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
-	if gitops {
-		if gitClient.Exists(git.ZitadelFile) {
+	if !gitops {
 
-			desiredTree, err := gitClient.ReadTree(git.ZitadelFile)
-			if err != nil {
-				return err
-			}
-			desired, err := orbzit.ParseDesiredV0(desiredTree)
-			if err != nil {
-				return err
-			}
-			spec := desired.Spec
-
-			// at takeoff the artifacts have to be applied
-			spec.SelfReconciling = true
-			if err := orbzit.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
-				return err
-			}
-		}
-	} else {
 		// at takeoff the artifacts have to be applied
 		spec := &orbzit.Spec{
 			Version:         version,
 			SelfReconciling: true,
 		}
 
-		if err := orbzit.Reconcile(monitor, spec, gitops)(k8sClient); err != nil {
-			return err
-		}
+		rec, _ := orbzit.Reconcile(monitor, spec, gitops)
+		return rec(k8sClient)
 	}
 
-	return nil
+	if !gitClient.Exists(git.ZitadelFile) {
+		monitor.WithField("file", git.ZitadelFile).Info("File not found in git, skipping deployment")
+		return nil
+	}
+
+	desiredTree, err := gitClient.ReadTree(git.ZitadelFile)
+	if err != nil {
+		return err
+	}
+	desired, err := orbzit.ParseDesiredV0(desiredTree)
+	if err != nil {
+		return err
+	}
+	spec := desired.Spec
+
+	// at takeoff the artifacts have to be applied
+	spec.SelfReconciling = true
+	rec, _ := orbzit.Reconcile(monitor, spec, gitops)
+	return rec(k8sClient)
 }
 
 func deployDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kubernetes.ClientInt, version string, gitops bool) error {
-	if gitops {
-		if gitClient.Exists(git.DatabaseFile) {
-			desiredTree, err := gitClient.ReadTree(git.DatabaseFile)
-			if err != nil {
-				return err
-			}
-			desired, err := orbdb.ParseDesiredV0(desiredTree)
-			if err != nil {
-				return err
-			}
-			spec := desired.Spec
+	if !gitops {
 
-			// at takeoff the artifacts have to be applied
-			spec.SelfReconciling = true
-			if err := orbdb.Reconcile(
-				monitor,
-				spec,
-				gitops,
-			)(k8sClient); err != nil {
-				return err
-			}
-		}
-	} else {
 		// at takeoff the artifacts have to be applied
 		spec := &orbdb.Spec{
 			Version:         version,
 			SelfReconciling: true,
 		}
 
-		if err := orbdb.Reconcile(
-			monitor,
-			spec,
-			gitops,
-		)(k8sClient); err != nil {
-			return err
-		}
+		rec, _ := orbdb.Reconcile(monitor, spec, gitops)
+		return rec(k8sClient)
 	}
-	return nil
+
+	if !gitClient.Exists(git.DatabaseFile) {
+		monitor.WithField("file", git.DatabaseFile).Info("File not found in git, skipping deployment")
+		return nil
+	}
+	desiredTree, err := gitClient.ReadTree(git.DatabaseFile)
+	if err != nil {
+		return err
+	}
+	desired, err := orbdb.ParseDesiredV0(desiredTree)
+	if err != nil {
+		return err
+	}
+	spec := desired.Spec
+
+	// at takeoff the artifacts have to be applied
+	spec.SelfReconciling = true
+	rec, _ := orbdb.Reconcile(monitor, spec, gitops)
+	return rec(k8sClient)
 }

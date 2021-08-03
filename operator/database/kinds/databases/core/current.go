@@ -3,6 +3,7 @@ package core
 import (
 	"crypto/rsa"
 	"errors"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
@@ -45,16 +46,17 @@ func SetQueriedForDatabase(queried map[string]interface{}, databaseCurrent *tree
 	queried[queriedName] = databaseCurrent
 }
 
-func SetQueriedForDatabaseDBList(queried map[string]interface{}, databases []string) {
+func SetQueriedForDatabaseDBList(queried map[string]interface{}, databases, users []string) {
 	currentDBList := &CurrentDBList{
 		Common: &tree.Common{
-			Kind:    "DBList",
-			Version: "V0",
+			Kind: "DBList",
 		},
 		Current: &DatabaseCurrentDBList{
 			Databases: databases,
+			Users:     users,
 		},
 	}
+	currentDBList.Common.OverwriteVersion("V0")
 
 	currentDB := &tree.Tree{
 		Parsed: currentDBList,

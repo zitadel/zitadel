@@ -7,7 +7,7 @@ It demonstrates how to add a user login to your application and fetch some data 
 
 At the end of the guide you should have an application able to login a user and read the user profile.
 
-> This documentation refers to our [Template](https://github.com/caos/zitadel-angular-template) in Github. Note that our **ZITADEL Console** is also written in Angular and can therefore be used as a reference.
+> This documentation refers to our [Template](https://github.com/caos/zitadel-examples/tree/main/angular) in Github. Note that our **ZITADEL Console** is also written in Angular and can therefore be used as a reference.
 
 ## Setup Application and get Keys
 
@@ -22,7 +22,7 @@ We recommend that you use [Authorization Code](../apis/openidoauth/grant-types#a
 
 A redirect URL is a URL in your application where ZITADEL redirects the user after they have authenticated. Set your url to the domain the web app will be deployed to or use `localhost:4200` for development as Angular will be running on port 4200.
 
-> If you are following along with the [sample](https://github.com/caos/zitadel-angular-template) project you downloaded from our templates, you should set the Allowed Callback URL to <http://localhost:4200/auth/callback>. You will also have to set dev mode to `true` as this will enable unsecure http for the moment.
+> If you are following along with the [sample](https://github.com/caos/zitadel-examples/tree/main/angular) project you downloaded from our templates, you should set the Allowed Callback URL to <http://localhost:4200/auth/callback>. You will also have to set dev mode to `true` as this will enable unsecure http for the moment.
 
 If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the post redirectURI field.
 
@@ -295,7 +295,7 @@ and in your html
 
 You have successfully integrated ZITADEL in your Angular Application!
 
-If you get stuck consider checking out our [template](https://github.com/caos/zitadel-angular-template) application which includes all the mentioned functionality of this quickstart. You can simply start by cloning the repo and replacing the AuthConfig in the app.module with your own configuration. If your run into issues don't hesitate to contact us or raise an issue on [Github](https://github.com/caos/zitadel).
+If you get stuck consider checking out our [template](https://github.com/caos/zitadel-examples/tree/main/angular) application which includes all the mentioned functionality of this quickstart. You can simply start by cloning the repo and replacing the AuthConfig in the app.module with your own configuration. If your run into issues don't hesitate to contact us or raise an issue on [Github](https://github.com/caos/zitadel).
 
 ![App in console](/img/angular/app-screen.png)
 

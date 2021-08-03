@@ -7,26 +7,28 @@ import (
 )
 
 const (
-	InitCodeMessageType      = "InitCode"
-	PasswordResetMessageType = "PasswordReset"
-	VerifyEmailMessageType   = "VerifyEmail"
-	VerifyPhoneMessageType   = "VerifyPhone"
-	DomainClaimedMessageType = "DomainClaimed"
-	MessageTitle             = "Title"
-	MessagePreHeader         = "PreHeader"
-	MessageSubject           = "Subject"
-	MessageGreeting          = "Greeting"
-	MessageText              = "Text"
-	MessageButtonText        = "ButtonText"
-	MessageFooterText        = "Footer"
+	InitCodeMessageType                 = "InitCode"
+	PasswordResetMessageType            = "PasswordReset"
+	VerifyEmailMessageType              = "VerifyEmail"
+	VerifyPhoneMessageType              = "VerifyPhone"
+	DomainClaimedMessageType            = "DomainClaimed"
+	PasswordlessRegistrationMessageType = "PasswordlessRegistration"
+	MessageTitle                        = "Title"
+	MessagePreHeader                    = "PreHeader"
+	MessageSubject                      = "Subject"
+	MessageGreeting                     = "Greeting"
+	MessageText                         = "Text"
+	MessageButtonText                   = "ButtonText"
+	MessageFooterText                   = "Footer"
 )
 
 type MessageTexts struct {
-	InitCode      CustomMessageText
-	PasswordReset CustomMessageText
-	VerifyEmail   CustomMessageText
-	VerifyPhone   CustomMessageText
-	DomainClaimed CustomMessageText
+	InitCode                 CustomMessageText
+	PasswordReset            CustomMessageText
+	VerifyEmail              CustomMessageText
+	VerifyPhone              CustomMessageText
+	DomainClaimed            CustomMessageText
+	PasswordlessRegistration CustomMessageText
 }
 
 type CustomMessageText struct {
@@ -61,6 +63,8 @@ func (m *MessageTexts) GetMessageTextByType(msgType string) *CustomMessageText {
 		return &m.VerifyPhone
 	case DomainClaimedMessageType:
 		return &m.DomainClaimed
+	case PasswordlessRegistrationMessageType:
+		return &m.PasswordlessRegistration
 	}
 	return nil
 }

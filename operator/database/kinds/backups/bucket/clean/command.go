@@ -4,6 +4,7 @@ import "strings"
 
 func getCommand(
 	databases []string,
+	users []string,
 ) string {
 	backupCommands := make([]string, 0)
 	for _, database := range databases {
@@ -14,12 +15,12 @@ func getCommand(
 				database,
 			}, " "))
 	}
-	for _, database := range databases {
+	for _, user := range users {
 		backupCommands = append(backupCommands,
 			strings.Join([]string{
 				"/scripts/clean-user.sh",
 				certPath,
-				database,
+				user,
 			}, " "))
 	}
 	backupCommands = append(backupCommands,

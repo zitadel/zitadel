@@ -317,7 +317,7 @@ UI:
         Config:
           MaxCacheSizeInByte: 52428800 #50MB
   Console:
-    EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
+    ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
     ShortCache:
       MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
       SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE

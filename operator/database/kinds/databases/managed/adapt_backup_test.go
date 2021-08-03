@@ -21,10 +21,7 @@ import (
 func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backupName string) *tree.Tree {
 
 	bucketDesired := getDesiredTree(t, masterkey, &bucket.DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &bucket.Spec{
 			Verbose: true,
 			Cron:    "testCron",
@@ -39,10 +36,7 @@ func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backu
 	bucketDesired.Parsed = bucketDesiredKind
 
 	return getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,
@@ -88,7 +82,7 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
-	queried := bucket.SetQueriedForDatabases(databases)
+	queried := bucket.SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
@@ -128,7 +122,7 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
-	queried := bucket.SetQueriedForDatabases(databases)
+	queried := bucket.SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
@@ -169,7 +163,8 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
-	queried := bucket.SetQueriedForDatabases(databases)
+	users := []string{"test1", "test2"}
+	queried := bucket.SetQueriedForDatabases(databases, users)
 	ensure, err := query(k8sClient, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)

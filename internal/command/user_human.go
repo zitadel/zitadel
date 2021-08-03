@@ -50,33 +50,40 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
+func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
 	}
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.OrgIAMPolicy.NotFound")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexity.NotFound")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexity.NotFound")
 	}
-	events, addedHuman, err := c.importHuman(ctx, orgID, human, orgIAMPolicy, pwPolicy)
+	events, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, orgIAMPolicy, pwPolicy)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = AppendAndReduce(addedHuman, pushedEvents...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	if addedCode != nil {
+		err = AppendAndReduce(addedCode, pushedEvents...)
+		if err != nil {
+			return nil, nil, err
+		}
+		passwordlessCode = writeModelToPasswordlessInitCode(addedCode, code)
 	}
 
-	return writeModelToHuman(addedHuman), nil
+	return writeModelToHuman(addedHuman), passwordlessCode, nil
 }
 
 func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
@@ -86,14 +93,26 @@ func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Hum
 	if human.Password != nil && human.SecretString != "" {
 		human.ChangeRequired = true
 	}
-	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, nil, false, false, orgIAMPolicy, pwPolicy)
 }
 
-func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) (events []eventstore.EventPusher, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
 	if orgID == "" || !human.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
+		return nil, nil, nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
 	}
-	return c.createHuman(ctx, orgID, human, nil, false, orgIAMPolicy, pwPolicy)
+	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, nil, false, passwordless, orgIAMPolicy, pwPolicy)
+	if err != nil {
+		return nil, nil, nil, "", err
+	}
+	if passwordless {
+		var codeEvent eventstore.EventPusher
+		codeEvent, passwordlessCodeWriteModel, code, err = c.humanAddPasswordlessInitCode(ctx, human.AggregateID, orgID, true)
+		if err != nil {
+			return nil, nil, nil, "", err
+		}
+		events = append(events, codeEvent)
+	}
+	return events, humanWriteModel, passwordlessCodeWriteModel, code, nil
 }
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
@@ -149,10 +168,10 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if human.Password != nil && human.SecretString != "" {
 		human.ChangeRequired = false
 	}
-	return c.createHuman(ctx, orgID, human, externalIDP, true, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, externalIDP, true, false, orgIAMPolicy, pwPolicy)
 }
 
-func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
@@ -187,7 +206,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		events = append(events, event)
 	}
 
-	if human.IsInitialState() {
+	if human.IsInitialState(passwordless) {
 		initCode, err := domain.NewInitUserCode(c.initializeUserCode)
 		if err != nil {
 			return nil, nil, err

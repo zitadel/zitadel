@@ -14,6 +14,8 @@ const (
 	EndpointExternalLogin            = "/login/externalidp"
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
 	EndpointPasswordlessLogin        = "/login/passwordless"
+	EndpointPasswordlessRegistration = "/login/passwordless/init"
+	EndpointPasswordlessPrompt       = "/login/passwordless/prompt"
 	EndpointLoginName                = "/loginname"
 	EndpointUserSelection            = "/userselection"
 	EndpointChangeUsername           = "/username/change"
@@ -52,6 +54,9 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointExternalLogin, login.handleExternalLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointPasswordlessLogin, login.handlePasswordlessVerification).Methods(http.MethodPost)
+	router.HandleFunc(EndpointPasswordlessRegistration, login.handlePasswordlessRegistration).Methods(http.MethodGet)
+	router.HandleFunc(EndpointPasswordlessRegistration, login.handlePasswordlessRegistrationCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointPasswordlessPrompt, login.handlePasswordlessPrompt).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginName, login.handleLoginName).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLoginName, login.handleLoginNameCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointUserSelection, login.handleSelectUser).Methods(http.MethodPost)

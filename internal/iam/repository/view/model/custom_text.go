@@ -16,7 +16,6 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
 )
 
 const (
@@ -37,19 +36,6 @@ type CustomTextView struct {
 	Text     string `json:"Text" gorm:"column:text"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
-}
-
-func CustomTextViewFromModel(template *model.CustomTextView) *CustomTextView {
-	return &CustomTextView{
-		AggregateID:  template.AggregateID,
-		Sequence:     template.Sequence,
-		CreationDate: template.CreationDate,
-		ChangeDate:   template.ChangeDate,
-		Language:     template.Language.String(),
-		Template:     template.Template,
-		Key:          template.Key,
-		Text:         template.Text,
-	}
 }
 
 func CustomTextViewsToDomain(texts []*CustomTextView) []*domain.CustomText {
@@ -107,7 +93,8 @@ func (r *CustomTextView) IsMessageTemplate() bool {
 		r.Template == domain.PasswordResetMessageType ||
 		r.Template == domain.VerifyEmailMessageType ||
 		r.Template == domain.VerifyPhoneMessageType ||
-		r.Template == domain.DomainClaimedMessageType
+		r.Template == domain.DomainClaimedMessageType ||
+		r.Template == domain.PasswordlessRegistrationMessageType
 }
 
 func CustomTextViewsToMessageDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomMessageText {
@@ -222,6 +209,15 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordless) {
 			passwordlessKeyToDomain(text, result)
 		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessPrompt) {
+			passwordlessPromptKeyToDomain(text, result)
+		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessRegistration) {
+			passwordlessRegistrationKeyToDomain(text, result)
+		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+			passwordlessRegistrationDoneKeyToDomain(text, result)
+		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyPasswordChange) {
 			passwordChangeKeyToDomain(text, result)
 		}
@@ -323,7 +319,7 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 }
 
 func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyPasswordlessValidateTokenButtonText {
+	if text.Key == domain.LoginKeyPasswordTitle {
 		result.Password.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyPasswordDescription {
@@ -491,7 +487,7 @@ func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 }
 
 func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
-	if text.Key == domain.LoginKeyInitUserDone {
+	if text.Key == domain.LoginKeyInitUserDoneTitle {
 		result.InitUserDone.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyInitUserDoneDescription {
@@ -652,6 +648,60 @@ func passwordlessKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
+func passwordlessPromptKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyPasswordlessPromptTitle {
+		result.PasswordlessPrompt.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptDescription {
+		result.PasswordlessPrompt.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptDescriptionInit {
+		result.PasswordlessPrompt.DescriptionInit = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptPasswordlessButtonText {
+		result.PasswordlessPrompt.PasswordlessButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptNextButtonText {
+		result.PasswordlessPrompt.NextButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessPromptSkipButtonText {
+		result.PasswordlessPrompt.SkipButtonText = text.Text
+	}
+}
+
+func passwordlessRegistrationKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		result.PasswordlessRegistration.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		result.PasswordlessRegistration.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		result.PasswordlessRegistration.RegisterTokenButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		result.PasswordlessRegistration.TokenNameLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		result.PasswordlessRegistration.NotSupported = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		result.PasswordlessRegistration.ErrorRetry = text.Text
+	}
+}
+
+func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		result.PasswordlessRegistrationDone.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		result.PasswordlessRegistrationDone.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		result.PasswordlessRegistrationDone.NextButtonText = text.Text
+	}
+}
+
 func passwordChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordChangeTitle {
 		result.PasswordChange.Title = text.Text
@@ -755,23 +805,14 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyRegistrationUserTOSConfirm {
 		result.RegistrationUser.TOSConfirm = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserTOSLink {
-		result.RegistrationUser.TOSLink = text.Text
-	}
 	if text.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		result.RegistrationUser.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserPrivacyConfirm {
-		result.RegistrationUser.PrivacyConfirm = text.Text
-	}
-	if text.Key == domain.LoginKeyRegistrationUserPrivacyLink {
-		result.RegistrationUser.PrivacyLink = text.Text
+	if text.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
+		result.RegistrationUser.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
 		result.RegistrationUser.PrivacyLinkText = text.Text
-	}
-	if text.Key == domain.LoginKeyRegistrationUserExternalLoginDescription {
-		result.RegistrationUser.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserNextButtonText {
 		result.RegistrationUser.NextButtonText = text.Text
@@ -815,23 +856,14 @@ func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLogin
 	if text.Key == domain.LoginKeyRegisterOrgTOSConfirm {
 		result.RegistrationOrg.TOSConfirm = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgTOSLink {
-		result.RegistrationOrg.TOSLink = text.Text
-	}
 	if text.Key == domain.LoginKeyRegisterOrgTOSLinkText {
 		result.RegistrationOrg.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgPrivacyConfirm {
-		result.RegistrationOrg.PrivacyConfirm = text.Text
-	}
-	if text.Key == domain.LoginKeyRegisterOrgPrivacyLink {
-		result.RegistrationOrg.PrivacyLink = text.Text
+	if text.Key == domain.LoginKeyRegisterOrgTosConfirmAnd {
+		result.RegistrationOrg.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
 		result.RegistrationOrg.PrivacyLinkText = text.Text
-	}
-	if text.Key == domain.LoginKeyRegisterOrgExternalLoginDescription {
-		result.RegistrationOrg.ExternalLoginDescription = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgSaveButtonText {
 		result.RegistrationOrg.SaveButtonText = text.Text
@@ -899,14 +931,8 @@ func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterTOS {
 		result.Footer.TOS = text.Text
 	}
-	if text.Key == domain.LoginKeyFooterTOSLink {
-		result.Footer.TOSLink = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterPrivacy {
+	if text.Key == domain.LoginKeyFooterPrivacyPolicy {
 		result.Footer.PrivacyPolicy = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterPrivacyLink {
-		result.Footer.PrivacyPolicyLink = text.Text
 	}
 	if text.Key == domain.LoginKeyFooterHelp {
 		result.Footer.Help = text.Text

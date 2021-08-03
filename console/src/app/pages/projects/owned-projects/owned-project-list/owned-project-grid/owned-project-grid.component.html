@@ -4,8 +4,8 @@
     </button>
 </div>
 
-<div class="container">
-    <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
+<div class="owned-project-grid-container">
+    <mat-progress-bar *ngIf="loading" class="spinner" color="primary" mode="indeterminate"></mat-progress-bar>
 
     <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
 
@@ -31,7 +31,7 @@
     </div>
 
 </div>
-<div class="container">
+<div class="owned-project-grid-container">
     <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
     <div class="item card" *ngFor="let item of notPinned; index as i" (click)="navigateToProject(item.id, $event)"

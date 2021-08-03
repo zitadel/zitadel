@@ -3,18 +3,7 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
-import {
-  RemoveLabelPolicyFontRequest,
-  RemoveLabelPolicyFontResponse,
-  RemoveLabelPolicyIconDarkRequest,
-  RemoveLabelPolicyIconDarkResponse,
-  RemoveLabelPolicyIconRequest,
-  RemoveLabelPolicyIconResponse,
-  RemoveLabelPolicyLogoDarkRequest,
-  RemoveLabelPolicyLogoDarkResponse,
-  RemoveLabelPolicyLogoRequest,
-  RemoveLabelPolicyLogoResponse,
-} from '../proto/generated/zitadel/admin_pb';
+import { GetDefaultDomainClaimedMessageTextRequest } from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -36,6 +25,8 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPasswordLockoutPolicyRequest,
   AddCustomPasswordLockoutPolicyResponse,
+  AddCustomPrivacyPolicyRequest,
+  AddCustomPrivacyPolicyResponse,
   AddHumanUserRequest,
   AddHumanUserResponse,
   AddIDPToLoginPolicyRequest,
@@ -90,10 +81,33 @@ import {
   GenerateOrgDomainValidationResponse,
   GetAppByIDRequest,
   GetAppByIDResponse,
+  GetCustomDomainClaimedMessageTextRequest,
+  GetCustomDomainClaimedMessageTextResponse,
+  GetCustomInitMessageTextRequest,
+  GetCustomInitMessageTextResponse,
+  GetCustomLoginTextsRequest,
+  GetCustomLoginTextsResponse,
+  GetCustomPasswordResetMessageTextRequest,
+  GetCustomPasswordResetMessageTextResponse,
+  GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyEmailMessageTextResponse,
+  GetCustomVerifyPhoneMessageTextRequest,
+  GetCustomVerifyPhoneMessageTextResponse,
+  GetDefaultDomainClaimedMessageTextResponse,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultInitMessageTextResponse,
   GetDefaultLabelPolicyRequest,
   GetDefaultLabelPolicyResponse,
+  GetDefaultLoginTextsRequest,
+  GetDefaultLoginTextsResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
+  GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultPasswordResetMessageTextResponse,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextResponse,
+  GetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextResponse,
   GetFeaturesRequest,
   GetFeaturesResponse,
   GetGrantedProjectByIDRequest,
@@ -128,10 +142,14 @@ import {
   GetPasswordLockoutPolicyResponse,
   GetPreviewLabelPolicyRequest,
   GetPreviewLabelPolicyResponse,
+  GetPrivacyPolicyRequest,
+  GetPrivacyPolicyResponse,
   GetProjectByIDRequest,
   GetProjectByIDResponse,
   GetProjectGrantByIDRequest,
   GetProjectGrantByIDResponse,
+  GetSupportedLanguagesRequest,
+  GetSupportedLanguagesResponse,
   GetUserByIDRequest,
   GetUserByIDResponse,
   GetUserByLoginNameGlobalRequest,
@@ -214,6 +232,16 @@ import {
   RemoveAppKeyResponse,
   RemoveAppRequest,
   RemoveAppResponse,
+  RemoveCustomLabelPolicyFontRequest,
+  RemoveCustomLabelPolicyFontResponse,
+  RemoveCustomLabelPolicyIconDarkRequest,
+  RemoveCustomLabelPolicyIconDarkResponse,
+  RemoveCustomLabelPolicyIconRequest,
+  RemoveCustomLabelPolicyIconResponse,
+  RemoveCustomLabelPolicyLogoDarkRequest,
+  RemoveCustomLabelPolicyLogoDarkResponse,
+  RemoveCustomLabelPolicyLogoRequest,
+  RemoveCustomLabelPolicyLogoResponse,
   RemoveHumanAuthFactorOTPRequest,
   RemoveHumanAuthFactorOTPResponse,
   RemoveHumanAuthFactorU2FRequest,
@@ -256,6 +284,18 @@ import {
   ResendHumanInitializationRequest,
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequest,
+  ResetCustomDomainClaimedMessageTextToDefaultRequest,
+  ResetCustomDomainClaimedMessageTextToDefaultResponse,
+  ResetCustomInitMessageTextToDefaultRequest,
+  ResetCustomInitMessageTextToDefaultResponse,
+  ResetCustomLoginTextsToDefaultRequest,
+  ResetCustomLoginTextsToDefaultResponse,
+  ResetCustomPasswordResetMessageTextToDefaultRequest,
+  ResetCustomPasswordResetMessageTextToDefaultResponse,
+  ResetCustomVerifyEmailMessageTextToDefaultRequest,
+  ResetCustomVerifyEmailMessageTextToDefaultResponse,
+  ResetCustomVerifyPhoneMessageTextToDefaultRequest,
+  ResetCustomVerifyPhoneMessageTextToDefaultResponse,
   ResetLabelPolicyToDefaultRequest,
   ResetLabelPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
@@ -266,7 +306,21 @@ import {
   ResetPasswordComplexityPolicyToDefaultResponse,
   ResetPasswordLockoutPolicyToDefaultRequest,
   ResetPasswordLockoutPolicyToDefaultResponse,
+  ResetPrivacyPolicyToDefaultRequest,
+  ResetPrivacyPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
+  SetCustomDomainClaimedMessageTextRequest,
+  SetCustomDomainClaimedMessageTextResponse,
+  SetCustomInitMessageTextRequest,
+  SetCustomInitMessageTextResponse,
+  SetCustomLoginTextsRequest,
+  SetCustomLoginTextsResponse,
+  SetCustomPasswordResetMessageTextRequest,
+  SetCustomPasswordResetMessageTextResponse,
+  SetCustomVerifyEmailMessageTextRequest,
+  SetCustomVerifyEmailMessageTextResponse,
+  SetCustomVerifyPhoneMessageTextRequest,
+  SetCustomVerifyPhoneMessageTextResponse,
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
@@ -284,6 +338,8 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPasswordLockoutPolicyRequest,
   UpdateCustomPasswordLockoutPolicyResponse,
+  UpdateCustomPrivacyPolicyRequest,
+  UpdateCustomPrivacyPolicyResponse,
   UpdateHumanEmailRequest,
   UpdateHumanEmailResponse,
   UpdateHumanPhoneRequest,
@@ -340,6 +396,146 @@ export class ManagementService {
 
   constructor(private readonly grpcService: GrpcService) { }
 
+  public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
+    const req = new GetSupportedLanguagesRequest();
+    return this.grpcService.mgmt.getSupportedLanguages(req, null).then(resp => resp.toObject());
+  }
+
+  public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultLoginTexts(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomLoginTexts(req: GetCustomLoginTextsRequest): Promise<GetCustomLoginTextsResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomLoginTexts(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomLoginText(req: SetCustomLoginTextsRequest): Promise<SetCustomLoginTextsResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomLoginText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomLoginTextToDefault(lang: string): Promise<ResetCustomLoginTextsToDefaultResponse.AsObject> {
+    const req = new ResetCustomLoginTextsToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomLoginTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+  // message texts
+
+  public getDefaultInitMessageText(req: GetDefaultInitMessageTextRequest):
+    Promise<GetDefaultInitMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomInitMessageText(req: GetCustomInitMessageTextRequest):
+    Promise<GetCustomInitMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomInitMessageText(req: SetCustomInitMessageTextRequest):
+    Promise<SetCustomInitMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomInitMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomInitMessageTextToDefault(lang: string):
+    Promise<ResetCustomInitMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomInitMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomInitMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
+
+  public getDefaultVerifyEmailMessageText(req: GetDefaultVerifyEmailMessageTextRequest):
+    Promise<GetDefaultVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomVerifyEmailMessageText(req: GetCustomVerifyEmailMessageTextRequest):
+    Promise<GetCustomVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomVerifyEmailMessageText(req: SetCustomVerifyEmailMessageTextRequest):
+    Promise<SetCustomVerifyEmailMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomVerifyEmailMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomVerifyEmailMessageTextToDefault(lang: string):
+    Promise<ResetCustomVerifyEmailMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyEmailMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomVerifyEmailMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultVerifyPhoneMessageText(req: GetDefaultVerifyPhoneMessageTextRequest):
+    Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomVerifyPhoneMessageText(req: GetCustomVerifyPhoneMessageTextRequest):
+    Promise<GetCustomVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomVerifyPhoneMessageText(req: SetCustomVerifyPhoneMessageTextRequest):
+    Promise<SetCustomVerifyPhoneMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomVerifyPhoneMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomVerifyPhoneMessageTextToDefault(lang: string):
+    Promise<ResetCustomVerifyPhoneMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyPhoneMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomVerifyPhoneMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultPasswordResetMessageText(req: GetDefaultPasswordResetMessageTextRequest):
+    Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomPasswordResetMessageText(req: GetCustomPasswordResetMessageTextRequest):
+    Promise<GetCustomPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomPasswordResetMessageText(req: SetCustomPasswordResetMessageTextRequest):
+    Promise<SetCustomPasswordResetMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomPasswordResetMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomPasswordResetMessageTextToDefault(lang: string):
+    Promise<ResetCustomPasswordResetMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordResetMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomPasswordResetMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultDomainClaimedMessageText(req: GetDefaultDomainClaimedMessageTextRequest):
+    Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomDomainClaimedMessageText(req: GetCustomDomainClaimedMessageTextRequest):
+    Promise<GetCustomDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomDomainClaimedMessageCustomText(req: SetCustomDomainClaimedMessageTextRequest):
+    Promise<SetCustomDomainClaimedMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomDomainClaimedMessageCustomText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomDomainClaimedMessageTextToDefault(lang: string):
+    Promise<ResetCustomDomainClaimedMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomDomainClaimedMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomDomainClaimedMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
   public listOrgIDPs(
     limit?: number,
     offset?: number,
@@ -358,6 +554,28 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.mgmt.listOrgIDPs(req, null).then(resp => resp.toObject());
+  }
+
+  public getPrivacyPolicy():
+    Promise<GetPrivacyPolicyResponse.AsObject> {
+    const req = new GetPrivacyPolicyRequest();
+    return this.grpcService.mgmt.getPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public addCustomPrivacyPolicy(req: AddCustomPrivacyPolicyRequest):
+    Promise<AddCustomPrivacyPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.addCustomPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public updateCustomPrivacyPolicy(req: UpdateCustomPrivacyPolicyRequest):
+    Promise<UpdateCustomPrivacyPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.updateCustomPrivacyPolicy(req, null).then(resp => resp.toObject());
+  }
+
+  public resetPrivacyPolicyToDefault():
+    Promise<ResetPrivacyPolicyToDefaultResponse.AsObject> {
+    const req = new ResetPrivacyPolicyToDefaultRequest();
+    return this.grpcService.mgmt.resetPrivacyPolicyToDefault(req, null).then(resp => resp.toObject());
   }
 
   public listHumanPasswordless(userId: string): Promise<ListHumanPasswordlessResponse.AsObject> {
@@ -781,35 +999,34 @@ export class ManagementService {
   }
 
   public removeLabelPolicyFont():
-    Promise<RemoveLabelPolicyFontResponse.AsObject> {
-    const req = new RemoveLabelPolicyFontRequest();
+    Promise<RemoveCustomLabelPolicyFontResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyFontRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyFont(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyIcon():
-    Promise<RemoveLabelPolicyIconResponse.AsObject> {
-    const req = new RemoveLabelPolicyIconRequest();
+    Promise<RemoveCustomLabelPolicyIconResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyIconRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyIcon(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyIconDark():
-    Promise<RemoveLabelPolicyIconDarkResponse.AsObject> {
-    const req = new RemoveLabelPolicyIconDarkRequest();
+    Promise<RemoveCustomLabelPolicyIconDarkResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyIconDarkRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyIconDark(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyLogo():
-    Promise<RemoveLabelPolicyLogoResponse.AsObject> {
-    const req = new RemoveLabelPolicyLogoRequest();
+    Promise<RemoveCustomLabelPolicyLogoResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyLogoRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyLogo(req, null).then(resp => resp.toObject());
   }
 
   public removeLabelPolicyLogoDark():
-    Promise<RemoveLabelPolicyLogoDarkResponse.AsObject> {
-    const req = new RemoveLabelPolicyLogoDarkRequest();
+    Promise<RemoveCustomLabelPolicyLogoDarkResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyLogoDarkRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyLogoDark(req, null).then(resp => resp.toObject());
   }
-
   public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
     const req = new GetOrgIAMPolicyRequest();
     return this.grpcService.mgmt.getOrgIAMPolicy(req, null).then(resp => resp.toObject());

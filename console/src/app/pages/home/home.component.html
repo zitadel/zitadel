@@ -1,27 +1,10 @@
 <div class="wrapper max-width-container">
-    <div class="header" *ngIf="(authService.user | async) || {} as user">
-        <app-avatar [routerLink]="['/users/me']"
-            *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-            class="avatar"
-            [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-            [forColor]="user?.preferredLoginName"
-            [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
-            [size]="100">
-        </app-avatar>
-        <h3
-            *ngIf="user && (user.human?.profile?.displayName || user.human?.profile?.firstName || user.human?.profile?.lastName); else loader">
-            {{'HOME.WELCOME' | translate}},
-            {{user?.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + '
-            '+ user.human?.profile?.lastName)}}</h3>
-        <p>{{user?.human?.profile?.userName}}</p>
-
+    <div class="header">
+        <h1 class="title">{{'HOME.WELCOME' | translate}}</h1>
         <p class="wlc_stnce">{{'HOME.WELCOMESENTENCE' | translate}}</p>
-        <ng-template #loader>
-            <mat-spinner diameter="50"></mat-spinner>
-        </ng-template>
     </div>
 
-    <div class="container">
+    <div class="gridcontainer">
         <ng-template appHasRole [appHasRole]="['iam.write']">
             <a matRipple *ngIf="!firstStepsDismissed" class="onboard" [routerLink]="['/firststeps']">
                 <p class="first-steps">{{'ONBOARDING.HEADER' | translate}}</p>
@@ -34,7 +17,7 @@
             </a>
         </ng-template>
 
-        <a matRipple *ngIf="!firstStepsDismissed" class="quickstart" target="_blank"
+        <a matRipple *ngIf="!quickstartsDismissed" class="quickstart" target="_blank"
             href="https://docs.zitadel.ch/docs/quickstarts/introduction">
             <p class="first-steps">{{'HOME.QUICKSTARTS.LABEL' | translate}}</p>
             <h2>{{'HOME.QUICKSTARTS.TITLE' | translate}}</h2>
@@ -52,7 +35,7 @@
         </a>
 
         <ng-template appHasRole [appHasRole]="['iam.write']">
-            <app-card class="item">
+            <app-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="icon las la-gem"></i>
@@ -83,7 +66,7 @@
             </app-card>
         </ng-template>
 
-        <app-card class="item">
+        <app-card class="griditem" [nomargin]="true">
             <div class="top">
                 <h2> <i class="icon las la-user-circle"></i>
                     {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
@@ -100,7 +83,7 @@
         </app-card>
 
         <ng-template appHasRole [appHasRole]="['project.read']">
-            <app-card class="item">
+            <app-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="icon las la-layer-group"></i>
@@ -121,7 +104,7 @@
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['org.read']">
-            <app-card class="item">
+            <app-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2> <i class="icon las la-archway"></i>
                         {{'HOME.PROTECTION'| translate}}</h2>
@@ -149,7 +132,7 @@
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.read']">
-            <app-card class="item">
+            <app-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="las la-users"></i>

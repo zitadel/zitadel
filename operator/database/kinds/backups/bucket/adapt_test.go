@@ -39,10 +39,7 @@ func TestBucket_Secrets(t *testing.T) {
 	version := "testVersion2"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/" + kind,
-			Version: kindVersion,
-		},
+		Common: tree.NewCommon("databases.caos.ch/"+kind, kindVersion, false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -114,10 +111,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 	version := "testVersion2"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -153,7 +147,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	queried := SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(client, queried)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
@@ -189,10 +183,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 	saJson := "testSA"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -228,7 +219,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	queried := SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(client, queried)
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)
@@ -265,10 +256,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 	saJson := "testSA"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -304,7 +292,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	queried := SetQueriedForDatabases(databases, []string{})
 	ensure, err := query(client, queried)
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)
@@ -341,10 +329,7 @@ func TestBucket_AdaptClean(t *testing.T) {
 	saJson := "testSA"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -380,7 +365,8 @@ func TestBucket_AdaptClean(t *testing.T) {
 
 	assert.NoError(t, err)
 	databases := []string{"test1", "test2"}
-	queried := SetQueriedForDatabases(databases)
+	users := []string{"test1", "test2"}
+	queried := SetQueriedForDatabases(databases, users)
 	ensure, err := query(client, queried)
 	assert.NotNil(t, ensure)
 	assert.NoError(t, err)

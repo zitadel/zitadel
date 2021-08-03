@@ -11,15 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_COMPLEXITY_LINK,
-  IAM_LOGIN_POLICY_LINK,
-  IAM_PRIVATELABEL_LINK,
-  ORG_COMPLEXITY_LINK,
-  ORG_LOGIN_POLICY_LINK,
-  ORG_PRIVATELABEL_LINK,
-} from '../../policy-grid/policy-links';
+import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -37,7 +29,8 @@ export class OrgIamPolicyComponent implements OnDestroy {
   private org!: Org.AsObject;
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public nextLinks: Array<CnslLinks> = [];
+  public currentPolicy: GridPolicy = IAM_POLICY;
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
@@ -53,17 +46,6 @@ export class OrgIamPolicyComponent implements OnDestroy {
       this.serviceType = data.serviceType;
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
-        this.nextLinks = [
-          ORG_COMPLEXITY_LINK,
-          ORG_LOGIN_POLICY_LINK,
-          ORG_PRIVATELABEL_LINK,
-        ];
-      } else {
-        this.nextLinks = [
-          IAM_COMPLEXITY_LINK,
-          IAM_LOGIN_POLICY_LINK,
-          IAM_PRIVATELABEL_LINK,
-        ];
       }
       return this.route.params;
     })).subscribe(_ => {
