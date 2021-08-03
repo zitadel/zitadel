@@ -6,7 +6,7 @@ import (
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 
-func ModelPasswordLockoutPolicyToPb(policy *model.PasswordLockoutPolicyView) *policy_pb.PasswordLockoutPolicy {
+func ModelPasswordLockoutPolicyToPb(policy *model.LockoutPolicyView) *policy_pb.PasswordLockoutPolicy {
 	return &policy_pb.PasswordLockoutPolicy{
 		IsDefault:          policy.Default,
 		MaxAttempts:        policy.MaxAttempts,

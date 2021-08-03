@@ -35,14 +35,15 @@ type AuthRequestRepo struct {
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 
-	UserSessionViewProvider userSessionViewProvider
-	UserViewProvider        userViewProvider
-	UserCommandProvider     userCommandProvider
-	UserEventProvider       userEventProvider
-	OrgViewProvider         orgViewProvider
-	LoginPolicyViewProvider loginPolicyViewProvider
-	IDPProviderViewProvider idpProviderViewProvider
-	UserGrantProvider       userGrantProvider
+	UserSessionViewProvider   userSessionViewProvider
+	UserViewProvider          userViewProvider
+	UserCommandProvider       userCommandProvider
+	UserEventProvider         userEventProvider
+	OrgViewProvider           orgViewProvider
+	LoginPolicyViewProvider   loginPolicyViewProvider
+	LockoutPolicyViewProvider lockoutPolicyViewProvider
+	IDPProviderViewProvider   idpProviderViewProvider
+	UserGrantProvider         userGrantProvider
 
 	IdGenerator id.Generator
 
@@ -67,6 +68,10 @@ type userViewProvider interface {
 
 type loginPolicyViewProvider interface {
 	LoginPolicyByAggregateID(string) (*iam_view_model.LoginPolicyView, error)
+}
+
+type lockoutPolicyViewProvider interface {
+	LockoutPolicyByAggregateID(string) (*iam_view_model.LockoutPolicyView, error)
 }
 
 type idpProviderViewProvider interface {
@@ -240,7 +245,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return err
 	}
@@ -414,6 +419,10 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	if err != nil {
+		return nil, err
+	}
 	return request, nil
 }
 
@@ -466,6 +475,11 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
+	lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.LockoutPolicy = lockoutPolicy
 	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
 	if err != nil {
 		return err
@@ -587,7 +601,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 		return steps, nil
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -780,6 +794,21 @@ func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string)
 	return policy.ToDomain(), err
 }
 
+func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*domain.PasswordLockoutPolicy, error) {
+	policy, err := repo.View.LockoutPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LockoutPolicyByAggregateID(repo.IAMID)
+		if err != nil {
+			return nil, err
+		}
+		policy.Default = true
+	}
+	if err != nil {
+		return nil, err
+	}
+	return policy.ToDomain(), err
+}
+
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
 	policy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
@@ -906,7 +935,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, userID string) (*user_model.UserView, error) {
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
 	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
 		return nil, err
@@ -915,9 +944,16 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
 	}
-
+	lockoutPolicy, err := lockoutPolicyProvider.LockoutPolicyByAggregateID(user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
+		errMsg := "Errors.User.Locked"
+		if !lockoutPolicy.ShowLockOutFailures {
+			errMsg = "Errors.User.SomethingWentWrong"
+		}
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", errMsg)
 	}
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")

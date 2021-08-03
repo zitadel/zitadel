@@ -229,6 +229,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		orgViewProvider            orgViewProvider
 		userGrantProvider          userGrantProvider
 		loginPolicyProvider        loginPolicyViewProvider
+		lockoutPolicyProvider      lockoutPolicyViewProvider
 		PasswordCheckLifeTime      time.Duration
 		ExternalLoginCheckLifeTime time.Duration
 		MFAInitSkippedLifeTime     time.Duration
@@ -1024,6 +1025,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				OrgViewProvider:            tt.fields.orgViewProvider,
 				UserGrantProvider:          tt.fields.userGrantProvider,
 				LoginPolicyViewProvider:    tt.fields.loginPolicyProvider,
+				LockoutPolicyViewProvider:  tt.fields.lockoutPolicyProvider,
 				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
 				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
 				MFAInitSkippedLifeTime:     tt.fields.MFAInitSkippedLifeTime,

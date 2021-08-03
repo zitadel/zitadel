@@ -282,30 +282,30 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	return iam_es_model.PasswordAgeViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
-	policy, viewErr := repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
+func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
+	policy, viewErr := repo.View.LockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordLockoutPolicyView)
+		policy = new(iam_es_model.LockoutPolicyView)
 	}
 
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.LockoutPolicy.NotFound")
 	}
 	if esErr != nil {
 		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordLockoutViewToModel(policy), nil
+		return iam_es_model.LockoutViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordLockoutViewToModel(policy), nil
+			return iam_es_model.LockoutViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.PasswordLockoutViewToModel(policy), nil
+	return iam_es_model.LockoutViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {

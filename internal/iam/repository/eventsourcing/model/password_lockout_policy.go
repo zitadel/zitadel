@@ -16,7 +16,7 @@ type PasswordLockoutPolicy struct {
 	ShowLockOutFailures bool   `json:"showLockOutFailures"`
 }
 
-func PasswordLockoutPolicyFromModel(policy *iam_model.PasswordLockoutPolicy) *PasswordLockoutPolicy {
+func PasswordLockoutPolicyFromModel(policy *iam_model.LockoutPolicy) *PasswordLockoutPolicy {
 	return &PasswordLockoutPolicy{
 		ObjectRoot:          policy.ObjectRoot,
 		State:               int32(policy.State),
@@ -25,8 +25,8 @@ func PasswordLockoutPolicyFromModel(policy *iam_model.PasswordLockoutPolicy) *Pa
 	}
 }
 
-func PasswordLockoutPolicyToModel(policy *PasswordLockoutPolicy) *iam_model.PasswordLockoutPolicy {
-	return &iam_model.PasswordLockoutPolicy{
+func PasswordLockoutPolicyToModel(policy *PasswordLockoutPolicy) *iam_model.LockoutPolicy {
+	return &iam_model.LockoutPolicy{
 		ObjectRoot:          policy.ObjectRoot,
 		State:               iam_model.PolicyState(policy.State),
 		MaxAttempts:         policy.MaxAttempts,

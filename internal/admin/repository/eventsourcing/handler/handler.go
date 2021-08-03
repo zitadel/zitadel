@@ -3,6 +3,7 @@ package handler
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/static"
 
@@ -31,7 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage, localDevMode bool) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, command *command.Commands, static static.Storage, localDevMode bool) []query.Handler {
 	handlers := []query.Handler{
 		newOrg(
 			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
@@ -70,6 +71,9 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
 		newCustomText(
 			handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
+		newUserLocker(
+			handler{view, bulkLimit, configs.cycleDuration("UserLocker"), errorCount, es},
+			command),
 	}
 	if static != nil {
 		handlers = append(handlers, newStyling(

@@ -311,6 +311,7 @@ Errors:
         InvalidCode: Invalid code
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
     Locked: User is locked
+    SomethingWentWrong: Something went wrong
     NotActive: User is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented

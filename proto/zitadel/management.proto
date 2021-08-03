@@ -1894,7 +1894,6 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
     rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/lockout"
@@ -1905,7 +1904,6 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
     rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/lockout"
@@ -1916,7 +1914,6 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
     rpc AddCustomPasswordLockoutPolicy(AddCustomPasswordLockoutPolicyRequest) returns (AddCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/lockout"
@@ -1928,7 +1925,6 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
     rpc UpdateCustomPasswordLockoutPolicy(UpdateCustomPasswordLockoutPolicyRequest) returns (UpdateCustomPasswordLockoutPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/lockout"
@@ -1940,7 +1936,6 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
     rpc ResetPasswordLockoutPolicyToDefault(ResetPasswordLockoutPolicyToDefaultRequest) returns (ResetPasswordLockoutPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/lockout"

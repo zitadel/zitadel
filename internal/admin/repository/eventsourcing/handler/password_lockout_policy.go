@@ -53,7 +53,7 @@ func (p *PasswordLockoutPolicy) AggregateTypes() []es_models.AggregateType {
 }
 
 func (p *PasswordLockoutPolicy) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	sequence, err := p.view.GetLatestLockoutPolicySequence()
 	if err != nil {
 		return 0, err
 	}
@@ -61,7 +61,7 @@ func (p *PasswordLockoutPolicy) CurrentSequence() (uint64, error) {
 }
 
 func (p *PasswordLockoutPolicy) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestPasswordLockoutPolicySequence()
+	sequence, err := p.view.GetLatestLockoutPolicySequence()
 	if err != nil {
 		return nil, err
 	}
@@ -79,32 +79,32 @@ func (p *PasswordLockoutPolicy) Reduce(event *es_models.Event) (err error) {
 }
 
 func (p *PasswordLockoutPolicy) processPasswordLockoutPolicy(event *es_models.Event) (err error) {
-	policy := new(iam_model.PasswordLockoutPolicyView)
+	policy := new(iam_model.LockoutPolicyView)
 	switch event.Type {
 	case iam_es_model.PasswordLockoutPolicyAdded, model.PasswordLockoutPolicyAdded:
 		err = policy.AppendEvent(event)
 	case iam_es_model.PasswordLockoutPolicyChanged, model.PasswordLockoutPolicyChanged:
-		policy, err = p.view.PasswordLockoutPolicyByAggregateID(event.AggregateID)
+		policy, err = p.view.LockoutPolicyByAggregateID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 	case model.PasswordLockoutPolicyRemoved:
-		return p.view.DeletePasswordLockoutPolicy(event.AggregateID, event)
+		return p.view.DeleteLockoutPolicy(event.AggregateID, event)
 	default:
-		return p.view.ProcessedPasswordLockoutPolicySequence(event)
+		return p.view.ProcessedLockoutPolicySequence(event)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.PutPasswordLockoutPolicy(policy, event)
+	return p.view.PutLockoutPolicy(policy, event)
 }
 
 func (p *PasswordLockoutPolicy) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-nD8sie", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordLockout policy handler")
-	return spooler.HandleError(event, err, p.view.GetLatestPasswordLockoutPolicyFailedEvent, p.view.ProcessedPasswordLockoutPolicyFailedEvent, p.view.ProcessedPasswordLockoutPolicySequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestLockoutPolicyFailedEvent, p.view.ProcessedLockoutPolicyFailedEvent, p.view.ProcessedLockoutPolicySequence, p.errorCountUntilSkip)
 }
 
 func (p *PasswordLockoutPolicy) OnSuccess() error {
-	return spooler.HandleSuccess(p.view.UpdatePasswordLockoutPolicySpoolerRunTimestamp)
+	return spooler.HandleSuccess(p.view.UpdateLockoutPolicySpoolerRunTimestamp)
 }

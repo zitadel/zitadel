@@ -7,6 +7,7 @@ import (
 type PasswordLockoutPolicy struct {
 	models.ObjectRoot
 
+	Default             bool
 	MaxAttempts         uint64
 	ShowLockOutFailures bool
 }

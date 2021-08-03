@@ -121,8 +121,8 @@ func readModelToPasswordComplexityPolicy(readModel *IAMPasswordComplexityPolicyR
 		MinLength:    readModel.MinLength,
 	}
 }
-func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadModel) *model.PasswordLockoutPolicy {
-	return &model.PasswordLockoutPolicy{
+func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadModel) *model.LockoutPolicy {
+	return &model.LockoutPolicy{
 		ObjectRoot:          readModelToObjectRoot(readModel.PasswordLockoutPolicyReadModel.ReadModel),
 		MaxAttempts:         readModel.MaxAttempts,
 		ShowLockOutFailures: readModel.ShowLockOutFailures,

@@ -43,7 +43,7 @@ type IAMRepository interface {
 
 	GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
 
-	GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error)
+	GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
 
 	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
 
