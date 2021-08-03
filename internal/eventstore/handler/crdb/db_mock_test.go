@@ -3,6 +3,7 @@ package crdb
 import (
 	"database/sql"
 	"database/sql/driver"
+	"reflect"
 	"strings"
 	"time"
 
@@ -194,19 +195,35 @@ func expectUpdateCurrentSequence(tableName, projection string, seq uint64, aggre
 
 func expectUpdateTwoCurrentSequence(tableName, projection string, seq1, seq2 uint64, aggregateType1, aggregateType2 string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
+		aggMatcher := &unorderedMachter{expected: []driver.Value{aggregateType1, aggregateType2}}
+		seqMatcher := &unorderedMachter{expected: []driver.Value{int64(seq1), int64(seq2)}}
 		m.ExpectExec("UPSERT INTO "+tableName+` \(view_name, aggregate_type, current_sequence, timestamp\) VALUES \(\$1, \$2, \$3, NOW\(\)\), \(\$4, \$5, \$6, NOW\(\)\)`).
 			WithArgs(
 				projection,
-				aggregateType1,
-				seq1,
+				aggMatcher,
+				seqMatcher,
 				projection,
-				aggregateType2,
-				seq2,
+				aggMatcher,
+				seqMatcher,
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
 			)
 	}
+}
+
+type unorderedMachter struct {
+	expected []driver.Value
+}
+
+func (m *unorderedMachter) Match(value driver.Value) bool {
+	for i := len(m.expected) - 1; i >= 0; i-- {
+		if reflect.DeepEqual(value, m.expected[i]) {
+			m.expected = append(m.expected[:i], m.expected[i+1:]...)
+			return true
+		}
+	}
+	return false
 }
 
 func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, err error, aggregateType string) func(sqlmock.Sqlmock) {
