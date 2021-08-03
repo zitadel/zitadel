@@ -23,6 +23,7 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 	var (
 		newMasterKey string
 		newRepoURL   string
+		newRepoKey   string
 		cmd          = &cobra.Command{
 			Use:     "configure",
 			Short:   "Configures and reconfigures an orb",
@@ -34,10 +35,15 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 	flags := cmd.Flags()
 	flags.StringVar(&newMasterKey, "masterkey", "", "Reencrypts all secrets")
 	flags.StringVar(&newRepoURL, "repourl", "", "Configures the repository URL")
+	flags.StringVar(&newRepoKey, "repokey", "", "Configures the used key to communicate with the repository")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 
-		rv := getRv("configure", map[string]interface{}{"masterkey": newMasterKey != "", "newRepoURL": newRepoURL}, "")
+		rv := getRv("configure", map[string]interface{}{
+			"masterkey":  newMasterKey != "",
+			"newRepoURL": newRepoURL,
+			"newRepoKey": newRepoKey,
+		}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -46,7 +52,17 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 			return mntr.ToUserError(errors.New("configure command is only supported with the --gitops flag"))
 		}
 
-		if err := orb.Reconfigure(rv.Ctx, rv.Monitor, rv.OrbConfig, newRepoURL, newMasterKey, rv.GitClient, ghClientID, ghClientSecret); err != nil {
+		if err := orb.Reconfigure(
+			rv.Ctx,
+			rv.Monitor,
+			rv.OrbConfig,
+			newRepoURL,
+			newMasterKey,
+			newRepoKey,
+			rv.GitClient,
+			ghClientID,
+			ghClientSecret,
+		); err != nil {
 			return err
 		}
 

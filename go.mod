@@ -17,7 +17,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.15.7
-	github.com/caos/orbos v1.5.14-0.20210727080455-c90c315021f5
+	github.com/caos/orbos v1.5.14-0.20210803150636-814cdcfa141a
 	github.com/cockroachdb/cockroach-go/v2 v2.1.0
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/duo-labs/webauthn v0.0.0-20200714211715-1daaee874e43
@@ -27,7 +27,6 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
-	github.com/golang/snappy v0.0.2 // indirect
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -35,6 +34,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
+	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
@@ -82,6 +82,7 @@ require (
 	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/square/go-jose.v2 v2.6.0
+	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.19.2
