@@ -688,7 +688,7 @@
     },
     "PWD_LOCKOUT": {
       "TITLE": "Password Lockout",
-      "DESCRIPTION": "Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
+      "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
     },
     "IAM_POLICY": {
       "TITLE": "IAM Access Preferences",
