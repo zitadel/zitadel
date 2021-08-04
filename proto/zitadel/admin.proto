@@ -3099,8 +3099,6 @@ message UpdateLockoutPolicyRequest {
             example: "\"10\""
         }
     ];
-    // If an error should be displayed during a lockout or not
-    bool show_lockout_failure = 2;
 }
 
 message UpdateLockoutPolicyResponse {

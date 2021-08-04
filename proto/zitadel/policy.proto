@@ -210,11 +210,6 @@ message LockoutPolicy {
             example: "\"10\""
         }
     ];
-    bool show_lockout_failure = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enables if the failure should be shown to de user, sometimes for security issues the user should not get to much information"
-        }
-    ];
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the organisation's admin changed the policy"

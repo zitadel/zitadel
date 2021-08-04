@@ -940,6 +940,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 }
 
 func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
+	// PLANNED: Check LockoutPolicy
 	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
 		return nil, err
@@ -948,18 +949,11 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
 	}
-	lockoutPolicy, err := lockoutPolicyProvider.LockoutPolicyByAggregateID(user.ResourceOwner)
-	if errors.IsNotFound(err) {
-		lockoutPolicy, err = lockoutPolicyProvider.LockoutPolicyByAggregateID(domain.IAMID)
-	}
 	if err != nil {
 		return nil, err
 	}
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
 		errMsg := "Errors.User.Locked"
-		if !lockoutPolicy.ShowLockOutFailures {
-			errMsg = "Errors.User.SomethingWentWrong"
-		}
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", errMsg)
 	}
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {

@@ -4147,7 +4147,6 @@ message GetDefaultLockoutPolicyResponse {
 
 message AddCustomLockoutPolicyRequest {
     uint32 max_password_attempts = 1;
-    bool show_lockout_failure = 2;
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -4156,7 +4155,6 @@ message AddCustomLockoutPolicyResponse {
 
 message UpdateCustomLockoutPolicyRequest {
     uint32 max_password_attempts = 1;
-    bool show_lockout_failure = 2;
 }
 
 message UpdateCustomLockoutPolicyResponse {

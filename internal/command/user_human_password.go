@@ -231,9 +231,6 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
 		if existingPassword.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
 			events = append(events, user.NewUserLockedEvent(ctx, userAgg))
-			if lockoutPolicy.ShowLockOutFailures {
-				errMsg = "Errors.User.Password.InvalidAndLocked"
-			}
 		}
 
 	}
