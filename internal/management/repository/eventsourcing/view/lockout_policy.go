@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	lockoutPolicyTable = "management.password_lockout_policies"
+	lockoutPolicyTable = "management.lockout_policies"
 )
 
 func (v *View) LockoutPolicyByAggregateID(aggregateID string) (*model.LockoutPolicyView, error) {

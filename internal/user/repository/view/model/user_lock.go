@@ -15,9 +15,9 @@ const (
 type UserLockView struct {
 	UserID                   string    `json:"-" gorm:"column:user_id;primary_key"`
 	ChangeDate               time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner            string    `json:"-" gorm:"column:resource_owner"`
+	ResourceOwner            string    `json:"-" gorm:"column:resourceowner"`
 	Sequence                 uint64    `json:"-" gorm:"column:sequence"`
-	State                    int32     `json:"-" gorm:"column:user_state"`
+	State                    int32     `json:"-" gorm:"column:state"`
 	PasswordCheckFailedCount uint64    `json:"-" gorm:"column:password_check_failed_count"`
 }
 
@@ -33,9 +33,14 @@ func (u *UserLockView) AppendEvent(event *models.Event) (err error) {
 		u.UserID = event.AggregateID
 		u.ResourceOwner = event.ResourceOwner
 		u.State = int32(model.UserStateActive)
-	case es_model.UserPasswordCheckFailed:
+	case es_model.UserPasswordCheckFailed,
+		es_model.HumanPasswordCheckFailed:
 		u.PasswordCheckFailedCount += 1
-	case es_model.UserPasswordCheckSucceeded:
+	case es_model.UserPasswordCheckSucceeded,
+		es_model.HumanPasswordCheckSucceeded:
+		u.PasswordCheckFailedCount = 0
+	case es_model.UserPasswordChanged,
+		es_model.HumanPasswordChanged:
 		u.PasswordCheckFailedCount = 0
 	case es_model.UserLocked:
 		u.State = int32(model.UserStateLocked)

@@ -107,13 +107,14 @@ func (u *UserLocker) ProcessUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-	case es_model.UserPasswordCheckFailed:
-		userLock, err = u.view.UserLockByID(event.AggregateID)
-		if err != nil {
-			return err
-		}
-		err = userLock.AppendEvent(event)
-	case es_model.UserPasswordCheckSucceeded:
+	case es_model.UserPasswordCheckFailed,
+		es_model.HumanPasswordCheckFailed,
+		es_model.UserPasswordCheckSucceeded,
+		es_model.HumanPasswordCheckSucceeded,
+		es_model.UserPasswordChanged,
+		es_model.HumanPasswordChanged,
+		es_model.UserLocked,
+		es_model.UserUnlocked:
 		userLock, err = u.view.UserLockByID(event.AggregateID)
 		if err != nil {
 			return err
@@ -131,18 +132,19 @@ func (u *UserLocker) ProcessUser(event *es_models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	if userLock.State != int32(view_model.UserStateLocked) && userLock.PasswordCheckFailedCount > 0 {
-		policy, err := u.getLockoutPolicy(context.Background(), userLock.ResourceOwner)
-		if err != nil {
-			return err
-		}
-		if policy.MaxPasswordAttempts == 0 || userLock.PasswordCheckFailedCount < policy.MaxPasswordAttempts {
-			return nil
-		}
-		_, err = u.command.LockUser(context.Background(), userLock.UserID, userLock.ResourceOwner)
-		if err != nil {
-			return err
-		}
+	if userLock.State == int32(view_model.UserStateLocked) || userLock.PasswordCheckFailedCount == 0 {
+		return nil
+	}
+	policy, err := u.getLockoutPolicy(context.Background(), userLock.ResourceOwner)
+	if err != nil {
+		return err
+	}
+	if policy.MaxPasswordAttempts == 0 || userLock.PasswordCheckFailedCount < policy.MaxPasswordAttempts {
+		return nil
+	}
+	_, err = u.command.LockUser(context.Background(), userLock.UserID, userLock.ResourceOwner)
+	if err != nil {
+		return err
 	}
 	return nil
 }

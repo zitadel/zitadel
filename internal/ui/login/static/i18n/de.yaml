@@ -319,5 +319,8 @@ Errors:
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
     InvalidConfig: Identitäts Provider Konfiguration ist ungültig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy existiert nicht
 
 optional: (optional)

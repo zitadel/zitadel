@@ -319,5 +319,8 @@ Errors:
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy not existing
 
 optional: (optional)

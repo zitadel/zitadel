@@ -245,7 +245,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID)
 	if err != nil {
 		return err
 	}
@@ -945,6 +945,9 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
 	}
 	lockoutPolicy, err := lockoutPolicyProvider.LockoutPolicyByAggregateID(user.ResourceOwner)
+	if errors.IsNotFound(err) {
+		lockoutPolicy, err = lockoutPolicyProvider.LockoutPolicyByAggregateID(domain.IAMID)
+	}
 	if err != nil {
 		return nil, err
 	}
