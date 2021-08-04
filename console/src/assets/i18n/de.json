@@ -688,7 +688,7 @@
     },
     "PWD_LOCKOUT": {
       "TITLE": "Passwortsperre",
-      "DESCRIPTION": "Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+      "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
     "IAM_POLICY": {
       "TITLE": "Zugangseinstellungen IAM",

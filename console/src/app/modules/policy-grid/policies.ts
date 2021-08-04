@@ -25,6 +25,18 @@ export const COMPLEXITY_POLICY: GridPolicy = {
   color: 'yellow',
 };
 
+export const LOCKOUT_POLICY: GridPolicy = {
+  i18nTitle: 'POLICY.PWD_LOCKOUT.TITLE',
+  i18nDesc: 'POLICY.PWD_LOCKOUT.DESCRIPTION',
+  iamRouterLink: ['/iam', 'policy', PolicyComponentType.LOCKOUT],
+  orgRouterLink: ['/org', 'policy', PolicyComponentType.LOCKOUT],
+  iamWithRole: ['iam.policy.read'],
+  orgWithRole: ['policy.read'],
+  tags: ['login', 'security'],
+  icon: 'las la-lock',
+  color: 'yellow',
+};
+
 export const IAM_POLICY = {
   i18nTitle: 'POLICY.IAM_POLICY.TITLE',
   i18nDesc: 'POLICY.IAM_POLICY.DESCRIPTION',
@@ -99,6 +111,7 @@ export const LOGIN_TEXTS_POLICY = {
 
 export const POLICIES: GridPolicy[] = [
   COMPLEXITY_POLICY,
+  LOCKOUT_POLICY,
   IAM_POLICY,
   LOGIN_POLICY,
   PRIVATELABEL_POLICY,
