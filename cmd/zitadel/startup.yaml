@@ -54,8 +54,8 @@ Queries:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_EVENTSTORE_CERT
-      Key: $CR_EVENTSTORE_KEY
+      Cert: $CR_QUERIES_CERT
+      Key: $CR_QUERIES_KEY
 
 Projections:  
   RequeueEvery: 10s
@@ -72,12 +72,11 @@ Projections:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_EVENTSTORE_CERT
-      Key: $CR_EVENTSTORE_KEY
+      Cert: $CR_QUERIES_CERT
+      Key: $CR_QUERIES_KEY
   Customizations:
     projects:
       BulkLimit: 2000
-
 
 AuthZ:
   Repository:
@@ -93,8 +92,8 @@ AuthZ:
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_EVENTSTORE_CERT
-            Key: $CR_EVENTSTORE_KEY
+            Cert: $CR_AUTHZ_CERT
+            Key: $CR_AUTHZ_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -108,8 +107,8 @@ AuthZ:
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_EVENTSTORE_CERT
-        Key: $CR_EVENTSTORE_KEY
+        Cert: $CR_AUTHZ_CERT
+        Key: $CR_AUTHZ_KEY
     Spooler:
       ConcurrentWorkers: 1
       BulkLimit: 10000
@@ -131,8 +130,8 @@ Auth:
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_EVENTSTORE_CERT
-          Key: $CR_EVENTSTORE_KEY
+          Cert: $CR_AUTH_CERT
+          Key: $CR_AUTH_KEY
     Cache:
       Type: 'fastcache'
       Config:
@@ -147,8 +146,8 @@ Auth:
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_EVENTSTORE_CERT
-        Key: $CR_EVENTSTORE_KEY
+        Cert: $CR_AUTH_CERT
+        Key: $CR_AUTH_KEY
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
@@ -158,8 +157,8 @@ Auth:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_EVENTSTORE_CERT
-      Key: $CR_EVENTSTORE_KEY
+      Cert: $CR_AUTH_CERT
+      Key: $CR_AUTH_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -181,8 +180,8 @@ Admin:
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_EVENTSTORE_CERT
-          Key: $CR_EVENTSTORE_KEY
+          Cert: $CR_ADMINAPI_CERT
+          Key: $CR_ADMINAPI_KEY
     Cache:
       Type: 'fastcache'
       Config:
@@ -196,8 +195,8 @@ Admin:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_EVENTSTORE_CERT
-      Key: $CR_EVENTSTORE_KEY
+      Cert: $CR_ADMINAPI_CERT
+      Key: $CR_ADMINAPI_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -219,8 +218,8 @@ Mgmt:
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_EVENTSTORE_CERT
-          Key: $CR_EVENTSTORE_KEY
+          Cert: $CR_MANAGEMENT_CERT
+          Key: $CR_MANAGEMENT_KEY
     Cache:
       Type: 'fastcache'
       Config:
@@ -234,8 +233,8 @@ Mgmt:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_EVENTSTORE_CERT
-      Key: $CR_EVENTSTORE_KEY
+      Cert: $CR_MANAGEMENT_CERT
+      Key: $CR_MANAGEMENT_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
