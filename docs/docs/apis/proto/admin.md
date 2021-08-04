@@ -2931,7 +2931,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | max_password_attempts |  uint32 | failed attempts until a user gets locked |  |
-| show_lockout_failure |  bool | If an error should be displayed during a lockout or not |  |
 
 
 

@@ -2704,7 +2704,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | max_password_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
 
 
 
@@ -6864,7 +6863,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | max_password_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
 
 
 

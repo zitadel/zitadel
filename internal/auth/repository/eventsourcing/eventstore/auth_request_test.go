@@ -255,153 +255,153 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		want    []domain.NextStep
 		wantErr func(error) bool
 	}{
-		//{
-		//	"request nil, error",
-		//	fields{},
-		//	args{nil, false},
-		//	nil,
-		//	errors.IsErrorInvalidArgument,
-		//},
-		//{
-		//	"prompt none and checkLoggedIn false, callback step",
-		//	fields{},
-		//	args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptNone}}, false},
-		//	[]domain.NextStep{&domain.RedirectToCallbackStep{}},
-		//	nil,
-		//},
-		//{
-		//	"user not set no active session, login step",
-		//	fields{
-		//		userSessionViewProvider: &mockViewNoUserSession{},
-		//	},
-		//	args{&domain.AuthRequest{}, false},
-		//	[]domain.NextStep{&domain.LoginStep{}},
-		//	nil,
-		//},
-		//{
-		//	"user not set no active session, linking users, external user not found option",
-		//	fields{
-		//		userSessionViewProvider: &mockViewNoUserSession{},
-		//	},
-		//	args{&domain.AuthRequest{LinkingUsers: []*domain.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
-		//	[]domain.NextStep{&domain.ExternalNotFoundOptionStep{}},
-		//	nil,
-		//},
-		//{
-		//	"user not set, prompt select account and internal error, internal error",
-		//	fields{
-		//		userSessionViewProvider: &mockViewErrUserSession{},
-		//	},
-		//	args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
-		//	nil,
-		//	errors.IsInternal,
-		//},
-		//{
-		//	"user not set, prompt select account, login and select account steps",
-		//	fields{
-		//		userSessionViewProvider: &mockViewUserSession{
-		//			Users: []mockUser{
-		//				{
-		//					"id1",
-		//					"loginname1",
-		//					"orgID1",
-		//				},
-		//				{
-		//					"id2",
-		//					"loginname2",
-		//					"orgID2",
-		//				},
-		//			},
-		//		},
-		//		userEventProvider: &mockEventUser{},
-		//	},
-		//	args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
-		//	[]domain.NextStep{
-		//		&domain.LoginStep{},
-		//		&domain.SelectUserStep{
-		//			Users: []domain.UserSelection{
-		//				{
-		//					UserID:            "id1",
-		//					LoginName:         "loginname1",
-		//					SelectionPossible: true,
-		//					ResourceOwner:     "orgID1",
-		//				},
-		//				{
-		//					UserID:            "id2",
-		//					LoginName:         "loginname2",
-		//					SelectionPossible: true,
-		//					ResourceOwner:     "orgID2",
-		//				},
-		//			},
-		//		}},
-		//	nil,
-		//},
-		//{
-		//	"user not set, primary domain set, prompt select account, login and select account steps",
-		//	fields{
-		//		userSessionViewProvider: &mockViewUserSession{
-		//			Users: []mockUser{
-		//				{
-		//					"id1",
-		//					"loginname1",
-		//					"orgID1",
-		//				},
-		//				{
-		//					"id2",
-		//					"loginname2",
-		//					"orgID2",
-		//				},
-		//			},
-		//		},
-		//		userEventProvider: &mockEventUser{},
-		//	},
-		//	args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}, RequestedOrgID: "orgID1"}, false},
-		//	[]domain.NextStep{
-		//		&domain.LoginStep{},
-		//		&domain.SelectUserStep{
-		//			Users: []domain.UserSelection{
-		//				{
-		//					UserID:            "id1",
-		//					LoginName:         "loginname1",
-		//					SelectionPossible: true,
-		//					ResourceOwner:     "orgID1",
-		//				},
-		//				{
-		//					UserID:            "id2",
-		//					LoginName:         "loginname2",
-		//					SelectionPossible: false,
-		//					ResourceOwner:     "orgID2",
-		//				},
-		//			},
-		//		}},
-		//	nil,
-		//},
-		//{
-		//	"user not set, prompt select account, no active session, login and select account steps",
-		//	fields{
-		//		userSessionViewProvider: &mockViewUserSession{
-		//			Users: nil,
-		//		},
-		//		userEventProvider: &mockEventUser{},
-		//	},
-		//	args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
-		//	[]domain.NextStep{
-		//		&domain.LoginStep{},
-		//		&domain.SelectUserStep{
-		//			Users: []domain.UserSelection{},
-		//		}},
-		//	nil,
-		//},
-		//{
-		//	"user not found, not found error",
-		//	fields{
-		//		userViewProvider:  &mockViewNoUser{},
-		//		userEventProvider: &mockEventUser{},
-		//	},
-		//	args{&domain.AuthRequest{UserID: "UserID"}, false},
-		//	nil,
-		//	errors.IsNotFound,
-		//},
+		{
+			"request nil, error",
+			fields{},
+			args{nil, false},
+			nil,
+			errors.IsErrorInvalidArgument,
+		},
+		{
+			"prompt none and checkLoggedIn false, callback step",
+			fields{},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptNone}}, false},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"user not set no active session, login step",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&domain.AuthRequest{}, false},
+			[]domain.NextStep{&domain.LoginStep{}},
+			nil,
+		},
+		{
+			"user not set no active session, linking users, external user not found option",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&domain.AuthRequest{LinkingUsers: []*domain.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "ExternalUserID"}}}, false},
+			[]domain.NextStep{&domain.ExternalNotFoundOptionStep{}},
+			nil,
+		},
+		{
+			"user not set, prompt select account and internal error, internal error",
+			fields{
+				userSessionViewProvider: &mockViewErrUserSession{},
+			},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
+			nil,
+			errors.IsInternal,
+		},
+		{
+			"user not set, prompt select account, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: []mockUser{
+						{
+							"id1",
+							"loginname1",
+							"orgID1",
+						},
+						{
+							"id2",
+							"loginname2",
+							"orgID2",
+						},
+					},
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
+			[]domain.NextStep{
+				&domain.LoginStep{},
+				&domain.SelectUserStep{
+					Users: []domain.UserSelection{
+						{
+							UserID:            "id1",
+							LoginName:         "loginname1",
+							SelectionPossible: true,
+							ResourceOwner:     "orgID1",
+						},
+						{
+							UserID:            "id2",
+							LoginName:         "loginname2",
+							SelectionPossible: true,
+							ResourceOwner:     "orgID2",
+						},
+					},
+				}},
+			nil,
+		},
+		{
+			"user not set, primary domain set, prompt select account, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: []mockUser{
+						{
+							"id1",
+							"loginname1",
+							"orgID1",
+						},
+						{
+							"id2",
+							"loginname2",
+							"orgID2",
+						},
+					},
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}, RequestedOrgID: "orgID1"}, false},
+			[]domain.NextStep{
+				&domain.LoginStep{},
+				&domain.SelectUserStep{
+					Users: []domain.UserSelection{
+						{
+							UserID:            "id1",
+							LoginName:         "loginname1",
+							SelectionPossible: true,
+							ResourceOwner:     "orgID1",
+						},
+						{
+							UserID:            "id2",
+							LoginName:         "loginname2",
+							SelectionPossible: false,
+							ResourceOwner:     "orgID2",
+						},
+					},
+				}},
+			nil,
+		},
+		{
+			"user not set, prompt select account, no active session, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: nil,
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
+			[]domain.NextStep{
+				&domain.LoginStep{},
+				&domain.SelectUserStep{
+					Users: []domain.UserSelection{},
+				}},
+			nil,
+		},
+		{
+			"user not found, not found error",
+			fields{
+				userViewProvider:  &mockViewNoUser{},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&domain.AuthRequest{UserID: "UserID"}, false},
+			nil,
+			errors.IsNotFound,
+		},
 		{
 			"user not active, precondition failed error",
 			fields{

@@ -44,7 +44,6 @@ title: zitadel/policy.proto
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | max_password_attempts |  uint64 | - |  |
-| show_lockout_failure |  bool | - |  |
 | is_default |  bool | - |  |
 
 
