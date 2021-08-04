@@ -40,18 +40,6 @@ CREATE TABLE auth.lockout_policies (
        PRIMARY KEY (aggregate_id)
 );
 
-CREATE TABLE adminapi.user_lock (
-   user_id TEXT,
-
-   change_date TIMESTAMPTZ,
-   sequence BIGINT,
-   resourceowner TEXT,
-   state SMALLINT,
-   password_check_failed_count BIGINT,
-
-   PRIMARY KEY (user_id)
-);
-
 DROP TABLE management.password_lockout_policies;
 DROP TABLE adminapi.password_lockout_policies;
 DROP TABLE auth.password_lockout_policies;

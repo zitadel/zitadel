@@ -287,6 +287,7 @@ Errors:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
       Invalid: Password is invalid
+      InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short

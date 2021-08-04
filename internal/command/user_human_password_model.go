@@ -16,9 +16,10 @@ type HumanPasswordWriteModel struct {
 	Secret               *crypto.CryptoValue
 	SecretChangeRequired bool
 
-	Code             *crypto.CryptoValue
-	CodeCreationDate time.Time
-	CodeExpiry       time.Duration
+	Code                     *crypto.CryptoValue
+	CodeCreationDate         time.Time
+	CodeExpiry               time.Duration
+	PasswordCheckFailedCount uint64
 
 	UserState domain.UserState
 }
@@ -51,6 +52,7 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.Secret = e.Secret
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.Code = nil
+			wm.PasswordCheckFailedCount = 0
 		case *user.HumanPasswordCodeAddedEvent:
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
@@ -59,6 +61,12 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			if wm.UserState == domain.UserStateInitial {
 				wm.UserState = domain.UserStateActive
 			}
+		case *user.HumanPasswordCheckFailedEvent:
+			wm.PasswordCheckFailedCount += 1
+		case *user.HumanPasswordCheckSucceededEvent:
+			wm.PasswordCheckFailedCount = 0
+		case *user.UserUnlockedEvent:
+			wm.PasswordCheckFailedCount = 0
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}
@@ -78,14 +86,19 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPasswordChangedType,
 			user.HumanPasswordCodeAddedType,
 			user.HumanEmailVerifiedType,
+			user.HumanPasswordCheckFailedType,
+			user.HumanPasswordCheckSucceededType,
 			user.UserRemovedType,
+			user.UserUnlockedType,
 			user.UserV1AddedType,
 			user.UserV1RegisteredType,
 			user.UserV1InitialCodeAddedType,
 			user.UserV1InitializedCheckSucceededType,
 			user.UserV1PasswordChangedType,
 			user.UserV1PasswordCodeAddedType,
-			user.UserV1EmailVerifiedType).
+			user.UserV1EmailVerifiedType,
+			user.UserV1PasswordCheckFailedType,
+			user.UserV1PasswordCheckSucceededType).
 		Builder()
 
 	if wm.ResourceOwner != "" {

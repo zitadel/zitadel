@@ -267,7 +267,11 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, res
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info))
+	policy, err := repo.getLockoutPolicy(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), policy)
 }
 
 func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) (err error) {
