@@ -42,10 +42,8 @@ We also provide services to setup our ZITADEL with the operators also provided b
             <li>Volume provisioner for Kubernetes to fill Persistent Volume Claims</li>
             <li>S3-storage for assets in ZITADEL</li>
             <li>S3-storage or Google Cloud Bucket for backups of the database</li>
-            <li>CDN or internal DNS to create DNS records for 4 subdomains pointing at ZITADEL</li>
-            <li>Account to connect to email relay for sending emails from ZITADEL</li>
-            <li>Account for Twilio to send SMS from ZITADEL</li>
             <li>Inbound and outbound gRPC-Web traffic possible(for example not natively supported by nginx)</li>
+            <li><a href="/docs/guides/installation/managed-dedicated-instance">Prerequisites listed for a managed instance, limited to functionality for ZITADEL</a></li>
         </ul>
         <p>Deliverable</p>
         <ul>
@@ -62,7 +60,7 @@ We also provide services to setup our ZITADEL with the operators also provided b
         <p>In Scope</p>
         <ul>
             <li>Check prerequisites and architecture</li>
-            <li>Setup of VMs, Loadbalancing and Kubernetes with [ORBOS](https://github.com/caos/orbos)</li>
+            <li>Setup of VMs, Loadbalancing and Kubernetes with <a href="https://github.com/caos/orbos">ORBOS</a></li>
             <li>Setup of in-cluster toolset with ORBOS, which includes monitoring and an API gateway (Ambassador)</li>
             <li>Installation and configuration of ZITADEL with the ZITADEL-operator</li>
             <li>Installation and configuration of CockroachDB with the Database-operator</li>
@@ -82,12 +80,9 @@ We also provide services to setup our ZITADEL with the operators also provided b
         </ul>
         <p>Prerequisites</p>
         <ul>
-            <li>Possibility to run ORBOS with one of the [implemented providers](https://github.com/caos/orbos/blob/master/docs/orbiter/providers.md)</li>
             <li>S3-storage for assets in ZITADEL</li>
             <li>S3-storage or Google Cloud Bucket for backups of the database</li>
-            <li>CDN or internal DNS to create DNS records for 4 subdomains pointing at ZITADEL</li>
-            <li>Account to connect to email relay for sending emails from ZITADEL</li>
-            <li>Account for Twilio to send SMS from ZITADEL</li>
+            <li><a href="/docs/guides/installation/managed-dedicated-instance">Prerequisites listed for a managed instance</a></li>
         </ul>
         <p>Deliverable</p>
         <ul>
