@@ -145,6 +145,7 @@ module.exports = {
     'concepts/architecture',
     'concepts/principles',
     'concepts/eventstore',
+    'concepts/setup',
   ],
   legal: [
     'legal/introduction',

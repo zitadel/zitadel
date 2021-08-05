@@ -2,8 +2,13 @@
 title: Setup
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+We also provide services to setup our ZITADEL with the operators also provided by us.
+
 <Tabs 
-    defaultValue="gce"
+    defaultValue="zitadel"
     values={[
         {label: 'ZITADEL Setup with Kubernetes', value: 'zitadel'}, 
         {label: 'ZITADEL Setup with ORBOS', value: 'orbos'}, 
@@ -43,7 +48,7 @@ title: Setup
         <ul>
             <li>Running CockroachDB</li>
             <li>Running ZITADEL</li>
-            <li>Running backups for ZITADEL
+            <li>Running backups for ZITADEL</li>
         </ul>
         <p>Time Estimate</p>
         <ul>
