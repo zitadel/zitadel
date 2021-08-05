@@ -35,7 +35,7 @@ type IAM struct {
 	DefaultOrgIAMPolicy             *OrgIAMPolicy
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy
 	DefaultPasswordAgePolicy        *PasswordAgePolicy
-	DefaultPasswordLockoutPolicy    *LockoutPolicy
+	DefaultLockoutPolicy            *LockoutPolicy
 	DefaultMailTemplate             *MailTemplate
 	DefaultMailTexts                []*MailText
 }

@@ -8,13 +8,11 @@ import (
 func AddLockoutPolicyToDomain(p *mgmt.AddCustomLockoutPolicyRequest) *domain.LockoutPolicy {
 	return &domain.LockoutPolicy{
 		MaxPasswordAttempts: uint64(p.MaxPasswordAttempts),
-		ShowLockOutFailures: p.ShowLockoutFailure,
 	}
 }
 
 func UpdateLockoutPolicyToDomain(p *mgmt.UpdateCustomLockoutPolicyRequest) *domain.LockoutPolicy {
 	return &domain.LockoutPolicy{
 		MaxPasswordAttempts: uint64(p.MaxPasswordAttempts),
-		ShowLockOutFailures: p.ShowLockoutFailure,
 	}
 }

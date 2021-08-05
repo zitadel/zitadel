@@ -24,7 +24,7 @@ type Org struct {
 	MailTexts                []*iam_model.MailText
 	PasswordComplexityPolicy *iam_model.PasswordComplexityPolicy
 	PasswordAgePolicy        *iam_model.PasswordAgePolicy
-	PasswordLockoutPolicy    *iam_model.LockoutPolicy
+	LockoutPolicy            *iam_model.LockoutPolicy
 
 	IDPs []*iam_model.IDPConfig
 }

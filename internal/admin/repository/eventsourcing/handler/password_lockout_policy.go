@@ -101,7 +101,7 @@ func (p *LockoutPolicy) processLockoutPolicy(event *es_models.Event) (err error)
 }
 
 func (p *LockoutPolicy) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-nD8sie", "id", event.AggregateID).WithError(err).Warn("something went wrong in passwordLockout policy handler")
+	logging.LogWithFields("SPOOL-nD8sie", "id", event.AggregateID).WithError(err).Warn("something went wrong in Lockout policy handler")
 	return spooler.HandleError(event, err, p.view.GetLatestLockoutPolicyFailedEvent, p.view.ProcessedLockoutPolicyFailedEvent, p.view.ProcessedLockoutPolicySequence, p.errorCountUntilSkip)
 }
 

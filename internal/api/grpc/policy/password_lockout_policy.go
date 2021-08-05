@@ -10,7 +10,6 @@ func ModelLockoutPolicyToPb(policy *model.LockoutPolicyView) *policy_pb.LockoutP
 	return &policy_pb.LockoutPolicy{
 		IsDefault:           policy.Default,
 		MaxPasswordAttempts: policy.MaxPasswordAttempts,
-		ShowLockoutFailure:  policy.ShowLockOutFailures,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

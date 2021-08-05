@@ -25,7 +25,7 @@ type ReadModel struct {
 	DefaultOrgIAMPolicy             IAMOrgIAMPolicyReadModel
 	DefaultPasswordComplexityPolicy IAMPasswordComplexityPolicyReadModel
 	DefaultPasswordAgePolicy        IAMPasswordAgePolicyReadModel
-	DefaultPasswordLockoutPolicy    IAMPasswordLockoutPolicyReadModel
+	DefaultPasswordLockoutPolicy    IAMLockoutPolicyReadModel
 }
 
 func NewReadModel(id string) *ReadModel {

@@ -20,7 +20,7 @@ func readModelToIAM(readModel *ReadModel) *model.IAM {
 		DefaultOrgIAMPolicy:             readModelToOrgIAMPolicy(&readModel.DefaultOrgIAMPolicy),
 		DefaultPasswordAgePolicy:        readModelToPasswordAgePolicy(&readModel.DefaultPasswordAgePolicy),
 		DefaultPasswordComplexityPolicy: readModelToPasswordComplexityPolicy(&readModel.DefaultPasswordComplexityPolicy),
-		DefaultPasswordLockoutPolicy:    readModelToPasswordLockoutPolicy(&readModel.DefaultPasswordLockoutPolicy),
+		DefaultLockoutPolicy:            readModelToPasswordLockoutPolicy(&readModel.DefaultPasswordLockoutPolicy),
 		IDPs:                            readModelToIDPConfigs(&readModel.IDPs),
 	}
 }
@@ -121,9 +121,9 @@ func readModelToPasswordComplexityPolicy(readModel *IAMPasswordComplexityPolicyR
 		MinLength:    readModel.MinLength,
 	}
 }
-func readModelToPasswordLockoutPolicy(readModel *IAMPasswordLockoutPolicyReadModel) *model.LockoutPolicy {
+func readModelToPasswordLockoutPolicy(readModel *IAMLockoutPolicyReadModel) *model.LockoutPolicy {
 	return &model.LockoutPolicy{
-		ObjectRoot:          readModelToObjectRoot(readModel.PasswordLockoutPolicyReadModel.ReadModel),
+		ObjectRoot:          readModelToObjectRoot(readModel.LockoutPolicyReadModel.ReadModel),
 		MaxPasswordAttempts: readModel.MaxAttempts,
 		ShowLockOutFailures: readModel.ShowLockOutFailures,
 	}

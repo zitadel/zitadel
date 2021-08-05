@@ -67,7 +67,7 @@ func IAMToModel(iam *IAM) *model.IAM {
 		converted.DefaultPasswordAgePolicy = PasswordAgePolicyToModel(iam.DefaultPasswordAgePolicy)
 	}
 	if iam.DefaultLockoutPolicy != nil {
-		converted.DefaultPasswordLockoutPolicy = LockoutPolicyToModel(iam.DefaultLockoutPolicy)
+		converted.DefaultLockoutPolicy = LockoutPolicyToModel(iam.DefaultLockoutPolicy)
 	}
 	if iam.DefaultOrgIAMPolicy != nil {
 		converted.DefaultOrgIAMPolicy = OrgIAMPolicyToModel(iam.DefaultOrgIAMPolicy)

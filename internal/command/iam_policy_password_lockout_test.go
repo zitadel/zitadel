@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
+func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -32,7 +32,7 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "password lockout policy already existing, already exists error",
+			name: "lockout policy already existing, already exists error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -115,7 +115,7 @@ func TestCommandSide_AddDefaultPasswordLockoutPolicy(t *testing.T) {
 	}
 }
 
-func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
+func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -134,7 +134,7 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "password lockout policy not existing, not found error",
+			name: "lockout policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -196,7 +196,7 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultPasswordLockoutPolicyChangedEvent(context.Background(), 20, false),
+								newDefaultLockoutPolicyChangedEvent(context.Background(), 20, false),
 							),
 						},
 					),
@@ -240,7 +240,7 @@ func TestCommandSide_ChangeDefaultPasswordLockoutPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultPasswordLockoutPolicyChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *iam.LockoutPolicyChangedEvent {
+func newDefaultLockoutPolicyChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *iam.LockoutPolicyChangedEvent {
 	event, _ := iam.NewLockoutPolicyChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		[]policy.LockoutPolicyChanges{
