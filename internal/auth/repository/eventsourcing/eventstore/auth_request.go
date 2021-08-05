@@ -4,25 +4,24 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
-	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -34,6 +33,7 @@ type AuthRequestRepo struct {
 	Command      *command.Commands
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
+	Eventstore   v1.Eventstore
 
 	UserSessionViewProvider userSessionViewProvider
 	UserViewProvider        userViewProvider
@@ -664,7 +664,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 			LoginName:         session.LoginName,
 			ResourceOwner:     session.ResourceOwner,
 			AvatarKey:         session.AvatarKey,
-			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
+			UserSessionState:  model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 		}
 	}
@@ -709,7 +709,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
-	promptRequired := (auth_req_model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
+	promptRequired := (model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
@@ -733,14 +733,14 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		fallthrough
 	case domain.MFALevelSecondFactor:
 		if checkVerificationTimeMaxAge(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime, request) {
-			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.SecondFactorVerificationType))
+			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.SecondFactorVerificationType))
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
 	case domain.MFALevelMultiFactor:
 		if checkVerificationTimeMaxAge(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime, request) {
-			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.MultiFactorVerificationType))
+			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.MultiFactorVerificationType))
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
 		}
@@ -762,17 +762,32 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LoginPolicyViewToModel(policy), err
+	return iam_view_model.LoginPolicyViewToModel(policy), err
 }
 
 func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
 	policy, err := repo.View.PrivacyPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.PrivacyPolicyByAggregateID(repo.IAMID)
-		if err != nil {
+		if err != nil && !errors.IsNotFound(err) {
 			return nil, err
 		}
+		if err == nil {
+			return policy.ToDomain(), nil
+		}
+		policy = &iam_view_model.PrivacyPolicyView{}
+		events, err := repo.Eventstore.FilterEvents(ctx, es_models.NewSearchQuery().
+			AggregateIDFilter(repo.IAMID).
+			AggregateTypeFilter(iam.AggregateType).
+			EventTypesFilter(es_models.EventType(iam.PrivacyPolicyAddedEventType), es_models.EventType(iam.PrivacyPolicyChangedEventType)))
+		if err != nil {
+			return nil, errors.ThrowNotFound(err, "EVENT-GSRqg", "IAM.PrivacyPolicy.NotExisting")
+		}
 		policy.Default = true
+		for _, event := range events {
+			policy.AppendEvent(event)
+		}
+		return policy.ToDomain(), nil
 	}
 	if err != nil {
 		return nil, err
@@ -825,13 +840,13 @@ func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID s
 		if err != nil {
 			return nil, err
 		}
-		return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
+		return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 	}
 	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iam_model.IDPConfigStateActive)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
+	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 }
 
 func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {
