@@ -780,7 +780,7 @@ func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string)
 			AggregateIDFilter(repo.IAMID).
 			AggregateTypeFilter(iam.AggregateType).
 			EventTypesFilter(es_models.EventType(iam.PrivacyPolicyAddedEventType), es_models.EventType(iam.PrivacyPolicyChangedEventType)))
-		if err != nil {
+		if err != nil || len(events) == 0 {
 			return nil, errors.ThrowNotFound(err, "EVENT-GSRqg", "IAM.PrivacyPolicy.NotExisting")
 		}
 		policy.Default = true
