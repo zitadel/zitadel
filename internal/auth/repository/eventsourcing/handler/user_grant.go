@@ -4,31 +4,28 @@ import (
 	"context"
 	"strings"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	proj_view "github.com/caos/zitadel/internal/project/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/view"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
@@ -375,7 +372,7 @@ func (u *UserGrant) setIamProjectID() error {
 	}
 
 	if iam.SetUpDone < domain.StepCount-1 {
-		return caos_errs.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
+		return errors.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
 	}
 	u.iamProjectID = iam.IAMProjectID
 	return nil
@@ -442,7 +439,7 @@ func (u *UserGrant) OnSuccess() error {
 
 func (u *UserGrant) getUserByID(userID string) (*model.UserView, error) {
 	user, usrErr := u.view.UserByID(userID)
-	if usrErr != nil && !caos_errs.IsNotFound(usrErr) {
+	if usrErr != nil && !errors.IsNotFound(usrErr) {
 		return nil, usrErr
 	}
 	if user == nil {
@@ -459,7 +456,7 @@ func (u *UserGrant) getUserByID(userID string) (*model.UserView, error) {
 		}
 	}
 	if userCopy.State == int32(usr_model.UserStateDeleted) {
-		return nil, caos_errs.ThrowNotFound(nil, "HANDLER-m9dos", "Errors.User.NotFound")
+		return nil, errors.ThrowNotFound(nil, "HANDLER-m9dos", "Errors.User.NotFound")
 	}
 	return &userCopy, nil
 }

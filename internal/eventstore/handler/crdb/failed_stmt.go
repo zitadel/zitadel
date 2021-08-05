@@ -26,7 +26,8 @@ func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt handler.Statement, 
 		logging.LogWithFields("CRDB-WJaFk", "projection", h.ProjectionName, "seq", stmt.Sequence).WithError(err).Warn("unable to get failure count")
 		return false
 	}
-	err = h.setFailureCount(tx, stmt.Sequence, failureCount+1, execErr)
+	failureCount += 1
+	err = h.setFailureCount(tx, stmt.Sequence, failureCount, execErr)
 	logging.LogWithFields("CRDB-cI0dB", "projection", h.ProjectionName, "seq", stmt.Sequence).OnError(err).Warn("unable to update failure count")
 
 	return failureCount >= h.maxFailureCount
