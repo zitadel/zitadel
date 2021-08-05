@@ -1,5 +1,5 @@
 ---
-title: Setup
+title: Setup by CAOS
 ---
 
 import Tabs from '@theme/Tabs';

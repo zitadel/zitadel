@@ -73,6 +73,14 @@ module.exports = {
         },
         {
           type: 'category',
+          label: 'Setup by CAOS',
+          collapsed: true,
+          items: [
+            'guides/installation/setup'
+          ],
+        },
+        {
+          type: 'category',
           label: 'Self Managed',
           collapsed: true,
           items: [
@@ -145,7 +153,6 @@ module.exports = {
     'concepts/architecture',
     'concepts/principles',
     'concepts/eventstore',
-    'concepts/setup',
   ],
   legal: [
     'legal/introduction',
