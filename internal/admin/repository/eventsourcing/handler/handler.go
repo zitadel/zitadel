@@ -33,45 +33,45 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, static static.Storage, localDevMode bool) []query.Handler {
 	handlers := []query.Handler{
-		// newOrg(
-		// 	handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
-		// newIAMMember(
-		// 	handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es}),
-		// newIDPConfig(
-		// 	handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		// newLabelPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
-		// newLoginPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
-		// newIDPProvider(
-		// 	handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-		// 	defaults),
-		// newUser(
-		// 	handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-		// 	defaults),
-		// newPasswordComplexityPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
-		// newPasswordAgePolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount, es}),
-		// newPasswordLockoutPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount, es}),
-		// newOrgIAMPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
-		// newExternalIDP(
-		// 	handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-		// 	defaults),
-		// newMailTemplate(
-		// 	handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
-		// newMessageText(
-		// 	handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
-		// newFeatures(
-		// 	handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
+		newOrg(
+			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
+		newIAMMember(
+			handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es}),
+		newIDPConfig(
+			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
+		newLabelPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
+		newLoginPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
+		newIDPProvider(
+			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
+			defaults),
+		newUser(
+			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+			defaults),
+		newPasswordComplexityPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
+		newPasswordAgePolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount, es}),
+		newPasswordLockoutPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordLockoutPolicy"), errorCount, es}),
+		newOrgIAMPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
+		newExternalIDP(
+			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
+			defaults),
+		newMailTemplate(
+			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
+		newMessageText(
+			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
+		newFeatures(
+			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}
 	if static != nil {
-		// handlers = append(handlers, newStyling(
-		// 	handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
-		// 	static,
-		// 	localDevMode))
+		handlers = append(handlers, newStyling(
+			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
+			static,
+			localDevMode))
 	}
 	return handlers
 }

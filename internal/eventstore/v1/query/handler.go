@@ -4,12 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
-
-	"github.com/caos/logging"
-
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 

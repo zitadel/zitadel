@@ -33,44 +33,45 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, keyChan chan<- *key_model.KeyView) []query.Handler {
 	return []query.Handler{
-		// newUser(
-		// 	handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-		// 	systemDefaults.IamID),
-		// newUserSession(
-		// 	handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
-		// newUserMembership(
-		// 	handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
-		// newToken(
-		// 	handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
-		// newKey(
-		// 	handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
-		// 	keyChan),
-		// newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
-		// newOrg(
-		// 	handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
-		// newUserGrant(
-		// 	handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-		// 	systemDefaults.IamID),
-		// newAuthNKeys(
-		// 	handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
-		// newLoginPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
-		// newIDPConfig(
-		// 	handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		// newIDPProvider(
-		// 	handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-		// 	systemDefaults),
-		// newExternalIDP(
-		// 	handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-		// 	systemDefaults),
-		// newPasswordComplexityPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
-		// newOrgIAMPolicy(
-		// 	handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
-		// newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
-		// newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
-		// newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
-		// newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
+		newUser(
+			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+			systemDefaults.IamID),
+		newUserSession(
+			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
+		newUserMembership(
+			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
+		newToken(
+			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
+		newKey(
+			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
+			keyChan),
+		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
+		newOrg(
+			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
+		newUserGrant(
+			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
+			systemDefaults.IamID),
+		newAuthNKeys(
+			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
+		newLoginPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
+		newIDPConfig(
+			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
+		newIDPProvider(
+			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
+			systemDefaults),
+		newExternalIDP(
+			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
+			systemDefaults),
+		newPasswordComplexityPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
+		newOrgIAMPolicy(
+			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
+		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
+		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
+		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
+		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
+		newPrivacyPolicy(handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
 	}
 }
 
