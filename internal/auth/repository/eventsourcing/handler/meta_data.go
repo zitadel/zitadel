@@ -79,23 +79,23 @@ func (m *Metadata) Reduce(event *es_models.Event) (err error) {
 }
 
 func (m *Metadata) processMetadata(event *es_models.Event) (err error) {
-	metaData := new(iam_model.MetadataView)
+	metadata := new(iam_model.MetadataView)
 	switch event.Type {
 	case usr_model.UserMetadataSet:
-		err = metaData.SetData(event)
+		err = metadata.SetData(event)
 		if err != nil {
 			return err
 		}
-		metaData, err = m.view.MetadataByKey(event.AggregateID, metaData.Key)
+		metadata, err = m.view.MetadataByKey(event.AggregateID, metadata.Key)
 		if err != nil && !caos_errs.IsNotFound(err) {
 			return err
 		}
 		if caos_errs.IsNotFound(err) {
 			err = nil
-			metaData = new(iam_model.MetadataView)
-			metaData.CreationDate = event.CreationDate
+			metadata = new(iam_model.MetadataView)
+			metadata.CreationDate = event.CreationDate
 		}
-		err = metaData.AppendEvent(event)
+		err = metadata.AppendEvent(event)
 	case usr_model.UserMetadataRemoved:
 		data := new(iam_model.MetadataView)
 		err = data.SetData(event)
@@ -111,7 +111,7 @@ func (m *Metadata) processMetadata(event *es_models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return m.view.PutMetadata(metaData, event)
+	return m.view.PutMetadata(metadata, event)
 }
 
 func (m *Metadata) OnError(event *es_models.Event, err error) error {

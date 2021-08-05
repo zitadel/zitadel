@@ -8,14 +8,14 @@ import (
 )
 
 func BulkSetMetadataToDomain(req *auth.BulkSetMyMetadataRequest) []*domain.Metadata {
-	metaData := make([]*domain.Metadata, len(req.Metadata))
+	metadata := make([]*domain.Metadata, len(req.Metadata))
 	for i, data := range req.Metadata {
-		metaData[i] = &domain.Metadata{
+		metadata[i] = &domain.Metadata{
 			Key:   data.Key,
 			Value: data.Value,
 		}
 	}
-	return metaData
+	return metadata
 }
 
 func ListUserMetadataToDomain(req *auth.ListMyMetadataRequest) *domain.MetadataSearchRequest {

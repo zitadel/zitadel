@@ -52,13 +52,13 @@ func MetadataByKeyAndResourceOwner(db *gorm.DB, table, aggregateID, resourceOwne
 }
 
 func SearchMetadata(db *gorm.DB, table string, req *domain.MetadataSearchRequest) ([]*model.MetadataView, uint64, error) {
-	metaData := make([]*model.MetadataView, 0)
+	metadata := make([]*model.MetadataView, 0)
 	query := repository.PrepareSearchQuery(table, model.MetadataSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
-	count, err := query(db, &metaData)
+	count, err := query(db, &metadata)
 	if err != nil {
 		return nil, 0, err
 	}
-	return metaData, count, nil
+	return metadata, count, nil
 }
 
 func PutMetadata(db *gorm.DB, table string, customText *model.MetadataView) error {

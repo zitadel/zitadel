@@ -59,7 +59,7 @@ func NewUserMetadataListWriteModel(userID, resourceOwner string) *UserMetadataLi
 				AggregateID:   userID,
 				ResourceOwner: resourceOwner,
 			},
-			metaDataList: make(map[string][]byte),
+			metadataList: make(map[string][]byte),
 		},
 	}
 }

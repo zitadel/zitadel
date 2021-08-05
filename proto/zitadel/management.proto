@@ -295,6 +295,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+            feature: "metadata.user"
         };
     }
 
@@ -307,6 +308,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+            feature: "metadata.user"
         };
     }
 
@@ -319,6 +321,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
+            feature: "metadata.user"
         };
     }
 
@@ -330,6 +333,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
+            feature: "metadata.user"
         };
     }
 
@@ -341,6 +345,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+            feature: "metadata.user"
         };
     }
 
@@ -353,6 +358,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+            feature: "metadata.user"
         };
     }
 

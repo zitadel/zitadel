@@ -317,7 +317,7 @@ func (repo *UserRepo) SearchMyMetadata(ctx context.Context, req *domain.Metadata
 	logging.Log("EVENT-N9fsd").OnError(sequenceErr).Warn("could not read latest user sequence")
 	req.AppendAggregateIDQuery(ctxData.UserID)
 	req.AppendResourceOwnerQuery(ctxData.ResourceOwner)
-	metaData, count, err := repo.View.SearchMetadata(req)
+	metadata, count, err := repo.View.SearchMetadata(req)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +325,7 @@ func (repo *UserRepo) SearchMyMetadata(ctx context.Context, req *domain.Metadata
 		Offset:      req.Offset,
 		Limit:       req.Limit,
 		TotalResult: count,
-		Result:      iam_model.MetadataViewsToDomain(metaData),
+		Result:      iam_model.MetadataViewsToDomain(metadata),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence

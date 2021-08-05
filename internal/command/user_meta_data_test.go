@@ -24,7 +24,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 			ctx      context.Context
 			orgID    string
 			userID   string
-			metaData *domain.Metadata
+			metadata *domain.Metadata
 		}
 	)
 	type res struct {
@@ -49,7 +49,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaData: &domain.Metadata{
+				metadata: &domain.Metadata{
 					Key:   "key",
 					Value: []byte("value"),
 				},
@@ -85,7 +85,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaData: &domain.Metadata{
+				metadata: &domain.Metadata{
 					Key: "key",
 				},
 			},
@@ -131,7 +131,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaData: &domain.Metadata{
+				metadata: &domain.Metadata{
 					Key:   "key",
 					Value: []byte("value"),
 				},
@@ -154,7 +154,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.SetUserMetadata(tt.args.ctx, tt.args.metaData, tt.args.userID, tt.args.orgID)
+			got, err := r.SetUserMetadata(tt.args.ctx, tt.args.metadata, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -177,7 +177,7 @@ func TestCommandSide_BulkSetMetadata(t *testing.T) {
 			ctx          context.Context
 			orgID        string
 			userID       string
-			metaDataList []*domain.Metadata
+			metadataList []*domain.Metadata
 		}
 	)
 	type res struct {
@@ -218,7 +218,7 @@ func TestCommandSide_BulkSetMetadata(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaDataList: []*domain.Metadata{
+				metadataList: []*domain.Metadata{
 					{Key: "key", Value: []byte("value")},
 					{Key: "key1", Value: []byte("value1")},
 				},
@@ -254,7 +254,7 @@ func TestCommandSide_BulkSetMetadata(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaDataList: []*domain.Metadata{
+				metadataList: []*domain.Metadata{
 					{Key: "key"},
 					{Key: "key1"},
 				},
@@ -308,7 +308,7 @@ func TestCommandSide_BulkSetMetadata(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				metaDataList: []*domain.Metadata{
+				metadataList: []*domain.Metadata{
 					{Key: "key", Value: []byte("value")},
 					{Key: "key1", Value: []byte("value1")},
 				},
@@ -325,7 +325,7 @@ func TestCommandSide_BulkSetMetadata(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.BulkSetUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metaDataList...)
+			got, err := r.BulkSetUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metadataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -348,7 +348,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 			ctx         context.Context
 			orgID       string
 			userID      string
-			metaDataKey string
+			metadataKey string
 		}
 	)
 	type res struct {
@@ -373,7 +373,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				ctx:         context.Background(),
 				orgID:       "org1",
 				userID:      "user1",
-				metaDataKey: "key",
+				metadataKey: "key",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -390,7 +390,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				ctx:         context.Background(),
 				orgID:       "org1",
 				userID:      "user1",
-				metaDataKey: "",
+				metadataKey: "",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -424,7 +424,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				ctx:         context.Background(),
 				orgID:       "org1",
 				userID:      "user1",
-				metaDataKey: "key",
+				metadataKey: "key",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -476,7 +476,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				ctx:         context.Background(),
 				orgID:       "org1",
 				userID:      "user1",
-				metaDataKey: "key",
+				metadataKey: "key",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -490,7 +490,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveUserMetadata(tt.args.ctx, tt.args.metaDataKey, tt.args.userID, tt.args.orgID)
+			got, err := r.RemoveUserMetadata(tt.args.ctx, tt.args.metadataKey, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -513,7 +513,7 @@ func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 			ctx          context.Context
 			orgID        string
 			userID       string
-			metaDataList []string
+			metadataList []string
 		}
 	)
 	type res struct {
@@ -554,7 +554,7 @@ func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 				ctx:          context.Background(),
 				orgID:        "org1",
 				userID:       "user1",
-				metaDataList: []string{"key", "key1"},
+				metadataList: []string{"key", "key1"},
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -596,7 +596,7 @@ func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 				ctx:          context.Background(),
 				orgID:        "org1",
 				userID:       "user1",
-				metaDataList: []string{"key", "key1"},
+				metadataList: []string{"key", "key1"},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -645,7 +645,7 @@ func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 				ctx:          context.Background(),
 				orgID:        "org1",
 				userID:       "user1",
-				metaDataList: []string{""},
+				metadataList: []string{""},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -710,7 +710,7 @@ func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 				ctx:          context.Background(),
 				orgID:        "org1",
 				userID:       "user1",
-				metaDataList: []string{"key", "key1"},
+				metadataList: []string{"key", "key1"},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -724,7 +724,7 @@ func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.BulkRemoveUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metaDataList...)
+			got, err := r.BulkRemoveUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metadataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

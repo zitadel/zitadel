@@ -33,16 +33,16 @@ func (wm *MetadataWriteModel) Reduce() error {
 type MetadataListWriteModel struct {
 	eventstore.WriteModel
 
-	metaDataList map[string][]byte
+	metadataList map[string][]byte
 }
 
 func (wm *MetadataListWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *metadata.SetEvent:
-			wm.metaDataList[e.Key] = e.Value
+			wm.metadataList[e.Key] = e.Value
 		case *metadata.RemovedEvent:
-			delete(wm.metaDataList, e.Key)
+			delete(wm.metadataList, e.Key)
 		}
 	}
 	return wm.WriteModel.Reduce()

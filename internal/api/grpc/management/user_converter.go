@@ -40,14 +40,14 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 }
 
 func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
-	metaData := make([]*domain.Metadata, len(req.Metadata))
+	metadata := make([]*domain.Metadata, len(req.Metadata))
 	for i, data := range req.Metadata {
-		metaData[i] = &domain.Metadata{
+		metadata[i] = &domain.Metadata{
 			Key:   data.Key,
 			Value: data.Value,
 		}
 	}
-	return metaData
+	return metadata
 }
 
 func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) *domain.MetadataSearchRequest {
