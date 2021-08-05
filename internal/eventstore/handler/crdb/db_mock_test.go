@@ -218,17 +218,17 @@ type currentSequenceMatcher struct {
 }
 
 func (m *currentSequenceMatcher) Match(value driver.Value) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case string:
 		if m.currentAggregate != "" {
 			log.Printf("expected sequence of %s but got next aggregate type %s", m.currentAggregate, value)
 			return false
 		}
-		_, ok := m.seq[eventstore.AggregateType(value.(string))]
+		_, ok := m.seq[eventstore.AggregateType(v)]
 		if !ok {
 			return false
 		}
-		m.currentAggregate = eventstore.AggregateType(value.(string))
+		m.currentAggregate = eventstore.AggregateType(v)
 		return true
 	default:
 		seq := m.seq[m.currentAggregate]
