@@ -39,9 +39,9 @@ We also provide services to setup our ZITADEL with the operators also provided b
         <ul>
             <li>Running Kubernetes with possibility to deploy to namespaces caos-system and caos-zitadel</li>
             <li>S3-storage for assets in ZITADEL</li>
-            <li>S3-storage for backups of the database</li>
+            <li>S3-storage or Google Cloud Bucket for backups of the database</li>
             <li>CDN or internal DNS to create DNS records for 4 subdomains pointing at ZITADEL</li>
-            <li>Email relay to send emails from ZITADEL</li>
+            <li>Account to connect to email relay for sending emails from ZITADEL</li>
             <li>Account for Twilio to send SMS from ZITADEL</li>
         </ul>
         <p>Deliverable</p>
@@ -81,14 +81,14 @@ We also provide services to setup our ZITADEL with the operators also provided b
         <ul>
             <li>Possibility to run ORBOS with one of the implemented Providers</li>
             <li>S3-storage for assets in ZITADEL</li>
-            <li>S3-storage for backups of the database</li>
+            <li>S3-storage or Google Cloud Bucket for backups of the database</li>
             <li>CDN or internal DNS to create DNS records for 4 subdomains pointing at ZITADEL</li>
-            <li>Email relay to send emails from ZITADEL</li>
+            <li>Account to connect to email relay for sending emails from ZITADEL</li>
             <li>Account for Twilio to send SMS from ZITADEL</li>
         </ul>
         <p>Deliverable</p>
         <ul>
-            <li>Running Vanilla Kubernetes</li>
+            <li>Running Kubernetes</li>
             <li>Running toolset for monitoring and alerting</li>
             <li>Running CockroachDB</li>
             <li>Running ZITADEL</li>
