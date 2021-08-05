@@ -2,29 +2,29 @@ package api
 
 import (
 	"context"
-	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
-	view_model "github.com/caos/zitadel/internal/view/model"
-	sentryhttp "github.com/getsentry/sentry-go/http"
-	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
 
 	"github.com/caos/logging"
+	sentryhttp "github.com/getsentry/sentry-go/http"
+	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/grpc"
 
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/oidc"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	view_model "github.com/caos/zitadel/internal/view/model"
 )
 
 type Config struct {

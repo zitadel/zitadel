@@ -2,13 +2,15 @@ package otel
 
 import (
 	"context"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"go.opentelemetry.io/otel/api/metric"
-	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/label"
 	"net/http"
 	"sync"
+
+	label "go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/metric"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 )
 
 type Metrics struct {
