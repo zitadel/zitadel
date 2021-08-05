@@ -60,9 +60,7 @@ title: zitadel/text.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | tos |  string | - | string.max_len: 200<br />  |
-| tos_link |  string | - | string.max_len: 500<br />  |
 | privacy_policy |  string | - | string.max_len: 200<br />  |
-| privacy_policy_link |  string | - | string.max_len: 500<br />  |
 | help |  string | - | string.max_len: 200<br />  |
 | help_link |  string | - | string.max_len: 500<br />  |
 
@@ -245,6 +243,9 @@ title: zitadel/text.proto
 | success_login_text |  SuccessLoginScreenText | - |  |
 | logout_text |  LogoutDoneScreenText | - |  |
 | footer_text |  FooterText | - |  |
+| passwordless_prompt_text |  PasswordlessPromptScreenText | - |  |
+| passwordless_registration_text |  PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  PasswordlessRegistrationDoneScreenText | - |  |
 
 
 
@@ -379,6 +380,51 @@ title: zitadel/text.proto
 
 
 
+### PasswordlessPromptScreenText
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| title |  string | - | string.max_len: 200<br />  |
+| description |  string | - | string.max_len: 500<br />  |
+| description_init |  string | - | string.max_len: 500<br />  |
+| passwordless_button_text |  string | - | string.max_len: 100<br />  |
+| next_button_text |  string | - | string.max_len: 100<br />  |
+| skip_button_text |  string | - | string.max_len: 100<br />  |
+
+
+
+
+### PasswordlessRegistrationDoneScreenText
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| title |  string | - | string.max_len: 200<br />  |
+| description |  string | - | string.max_len: 500<br />  |
+| next_button_text |  string | - | string.max_len: 100<br />  |
+
+
+
+
+### PasswordlessRegistrationScreenText
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| title |  string | - | string.max_len: 200<br />  |
+| description |  string | - | string.max_len: 500<br />  |
+| token_name_label |  string | - | string.max_len: 200<br />  |
+| not_supported |  string | - | string.max_len: 500<br />  |
+| register_token_button_text |  string | - | string.max_len: 100<br />  |
+| error_retry |  string | - | string.max_len: 500<br />  |
+
+
+
+
 ### PasswordlessScreenText
 
 
@@ -426,13 +472,10 @@ title: zitadel/text.proto
 | password_confirm_label |  string | - | string.max_len: 200<br />  |
 | tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
 | tos_confirm |  string | - | string.max_len: 200<br />  |
-| tos_link |  string | - | string.max_len: 200<br />  |
 | tos_link_text |  string | - | string.max_len: 200<br />  |
-| privacy_confirm |  string | - | string.max_len: 200<br />  |
-| privacy_link |  string | - | string.max_len: 200<br />  |
 | privacy_link_text |  string | - | string.max_len: 200<br />  |
-| external_login_description |  string | - | string.max_len: 500<br />  |
 | save_button_text |  string | - | string.max_len: 200<br />  |
+| tos_confirm_and |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -456,14 +499,11 @@ title: zitadel/text.proto
 | password_confirm_label |  string | - | string.max_len: 200<br />  |
 | tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
 | tos_confirm |  string | - | string.max_len: 200<br />  |
-| tos_link |  string | - | string.max_len: 200<br />  |
 | tos_link_text |  string | - | string.max_len: 200<br />  |
-| privacy_confirm |  string | - | string.max_len: 200<br />  |
-| privacy_link |  string | - | string.max_len: 200<br />  |
 | privacy_link_text |  string | - | string.max_len: 200<br />  |
-| external_login_description |  string | - | string.max_len: 500<br />  |
 | next_button_text |  string | - | string.max_len: 200<br />  |
 | back_button_text |  string | - | string.max_len: 200<br />  |
+| tos_confirm_and |  string | - | string.max_len: 200<br />  |
 
 
 

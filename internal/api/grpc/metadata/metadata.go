@@ -39,8 +39,6 @@ func MetadataQueryToModel(query *meta_pb.MetadataQuery) *domain.MetadataSearchQu
 	switch q := query.Query.(type) {
 	case *meta_pb.MetadataQuery_KeyQuery:
 		return MetadataKeyQueryToModel(q.KeyQuery)
-	case *meta_pb.MetadataQuery_ValueQuery:
-		return MetadataValueQueryToModel(q.ValueQuery)
 	default:
 		return nil
 	}
@@ -51,13 +49,5 @@ func MetadataKeyQueryToModel(q *meta_pb.MetadataKeyQuery) *domain.MetadataSearch
 		Key:    domain.MetadataSearchKeyKey,
 		Method: object.TextMethodToModel(q.Method),
 		Value:  q.Key,
-	}
-}
-
-func MetadataValueQueryToModel(q *meta_pb.MetadataValueQuery) *domain.MetadataSearchQuery {
-	return &domain.MetadataSearchQuery{
-		Key:    domain.MetadataSearchKeyValue,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.Value,
 	}
 }

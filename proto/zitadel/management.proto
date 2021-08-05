@@ -2921,7 +2921,7 @@ message GetUserMetadataResponse {
 message SetUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string value = 3 [(validate.rules).string = {min_len: 1}];
+    bytes value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 
 message SetUserMetadataResponse {
@@ -2933,7 +2933,7 @@ message BulkSetUserMetadataRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     message Metadata {
         string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-        string value = 2 [(validate.rules).string = {min_len: 1}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
     }
     repeated Metadata metadata = 2;
 }

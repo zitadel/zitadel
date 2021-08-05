@@ -17,7 +17,7 @@ type SetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Key   string `json:"key"`
-	Value string `json:"value"`
+	Value []byte `json:"value"`
 }
 
 func (e *SetEvent) Data() interface{} {
@@ -30,8 +30,8 @@ func (e *SetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 func NewSetEvent(
 	base *eventstore.BaseEvent,
-	key,
-	value string,
+	key string,
+	value []byte,
 ) *SetEvent {
 	return &SetEvent{
 		BaseEvent: *base,

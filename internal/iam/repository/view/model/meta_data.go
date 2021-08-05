@@ -27,7 +27,7 @@ type MetadataView struct {
 	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
 
 	Key   string `json:"key" gorm:"column:key;primary_key"`
-	Value string `json:"value" gorm:"column:value"`
+	Value []byte `json:"value" gorm:"column:value"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }

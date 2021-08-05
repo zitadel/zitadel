@@ -2,7 +2,7 @@ CREATE TABLE auth.meta_data (
    aggregate_id TEXT,
 
    key TEXT,
-   value TEXT,
+   value BYTES,
 
    resource_owner TEXT,
    creation_date TIMESTAMPTZ,
@@ -16,7 +16,7 @@ CREATE TABLE management.meta_data (
     aggregate_id TEXT,
 
     key TEXT,
-    value TEXT,
+    value BYTES,
 
     resource_owner TEXT,
     creation_date TIMESTAMPTZ,

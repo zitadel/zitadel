@@ -10,7 +10,7 @@ type MetadataWriteModel struct {
 	eventstore.WriteModel
 
 	Key   string
-	Value string
+	Value []byte
 	State domain.MetadataState
 }
 
@@ -33,7 +33,7 @@ func (wm *MetadataWriteModel) Reduce() error {
 type MetadataListWriteModel struct {
 	eventstore.WriteModel
 
-	metaDataList map[string]string
+	metaDataList map[string][]byte
 }
 
 func (wm *MetadataListWriteModel) Reduce() error {

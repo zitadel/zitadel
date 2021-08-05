@@ -727,7 +727,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| value |  string | - | string.min_len: 1<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
 
 
 
@@ -1375,7 +1375,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| value |  string | - | string.min_len: 1<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
 
 
 

@@ -17,7 +17,7 @@ title: zitadel/metadata.proto
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | key |  string | - |  |
-| value |  string | - |  |
+| value |  bytes | - |  |
 
 
 
@@ -41,19 +41,6 @@ title: zitadel/metadata.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.key_query |  MetadataKeyQuery | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.value_query |  MetadataValueQuery | - |  |
-
-
-
-
-### MetadataValueQuery
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| value |  string | - | string.max_len: 200<br />  |
-| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
 
 
 

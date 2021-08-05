@@ -12,7 +12,7 @@ type Metadata struct {
 
 	State MetadataState
 	Key   string
-	Value string
+	Value []byte
 }
 
 type MetadataState int32
@@ -24,7 +24,7 @@ const (
 )
 
 func (u *Metadata) IsValid() bool {
-	return u.Key != "" && u.Value != ""
+	return u.Key != "" && len(u.Value) > 0
 }
 
 func (s MetadataState) Exists() bool {

@@ -674,7 +674,7 @@ message GetMyMetadataResponse {
 
 message SetMyMetadataRequest {
     string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string value = 2 [(validate.rules).string = {min_len: 1}];
+    bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 
 message SetMyMetadataResponse {
@@ -684,7 +684,7 @@ message SetMyMetadataResponse {
 message BulkSetMyMetadataRequest {
     message Metadata {
         string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-        string value = 2 [(validate.rules).string = {min_len: 1}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
     }
     repeated Metadata metadata = 1;
 }

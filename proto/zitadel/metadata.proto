@@ -15,7 +15,7 @@ message Metadata {
             description: "meta data key"
         }
     ];
-    string value = 3 [
+    bytes value = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "meta data value"
         }
@@ -26,7 +26,6 @@ message MetadataQuery {
     oneof query {
         option (validate.required) = true;
         MetadataKeyQuery key_query = 1;
-        MetadataValueQuery value_query = 2;
     }
 }
 
@@ -44,19 +43,3 @@ message MetadataKeyQuery {
         }
     ];
 }
-
-message MetadataValueQuery {
-    string value = 1 [
-        (validate.rules).string = {max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"value\""
-        }
-    ];
-    zitadel.v1.TextQueryMethod method = 2 [
-        (validate.rules).enum.defined_only = true,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines which text equality method is used";
-        }
-    ];
-}
-

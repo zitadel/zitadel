@@ -17,7 +17,7 @@ type MetadataSetEvent struct {
 	metadata.SetEvent
 }
 
-func NewMetadataSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, key, value string) *MetadataSetEvent {
+func NewMetadataSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, key string, value []byte) *MetadataSetEvent {
 	return &MetadataSetEvent{
 		SetEvent: *metadata.NewSetEvent(
 			eventstore.NewBaseEventForPush(
