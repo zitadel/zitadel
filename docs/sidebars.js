@@ -76,7 +76,9 @@ module.exports = {
           label: 'Setup by CAOS',
           collapsed: true,
           items: [
-            'guides/installation/setup'
+            'guides/installation/setup',
+            'guides/installation/setup-orbos',
+            'guides/installation/checkup'
           ],
         },
         {

@@ -1,23 +1,22 @@
 ---
-title: ZITADEL setup by CAOS
+title: ORBOS and ZITADEL setup by CAOS
 ---
 
-We provide services to setup our ZITADEL with the operators also provided by us.
+We provide services to setup our ORBOS and ZITADEL with the operators also provided by us.
 
 ### In Scope
 
 - Check prerequisites and architecture
+- Setup of VMs, Loadbalancing and Kubernetes with [ORBOS](https://github.com/caos/orbos)
+- Setup of in-cluster toolset with ORBOS, which includes monitoring and an API gateway (Ambassador)
 - Installation and configuration of ZITADEL with the ZITADEL-operator
 - Installation and configuration of CockroachDB with the Database-operator
 - Functional testing of the ZITADEL instance
   
 ### Out of Scope
-  
-- Running multiple ZITADEL instances on the same cluster
+- Integration of external S3-storage or other types of storage
 - Integration into internal monitoring and alerting
 - Multi-cluster architecture deployments
-- DNS, Network and Firewall configuration
-- Kubernetes configuration
 - Changes for specific environments
 - Performance testing
 - Production deployment
@@ -27,19 +26,18 @@ We provide services to setup our ZITADEL with the operators also provided by us.
 
 ### Prerequisites
 
-- Running Kubernetes with possibility to deploy to namespaces caos-system and caos-zitadel
-- Volume provisioner for Kubernetes to fill Persistent Volume Claims
 - S3-storage for assets in ZITADEL
 - S3-storage or Google Cloud Bucket for backups of the database
-- Inbound and outbound gRPC-Web traffic possible(for example not natively supported by nginx)
-- [Prerequisites listed for a managed instance, limited to functionality for ZITADEL](/docs/guides/installation/managed-dedicated-instance)
+- [Prerequisites listed for a managed instance](/docs/guides/installation/managed-dedicated-instance)
 
 ### Deliverable
-  
+
+- Running Kubernetes
+- Running toolset for monitoring and alerting
 - Running CockroachDB
 - Running ZITADEL
 - Running backups for ZITADEL
-
-### Time Estimate
   
-8 hours
+### Time Estimate
+
+12 hours
