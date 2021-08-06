@@ -97,6 +97,9 @@ func TestMigration_AdaptFunc(t *testing.T) {
 					},
 				},
 				Spec: corev1.PodSpec{
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: helpers.PointerBool(true),
+					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,
 					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, ""),
