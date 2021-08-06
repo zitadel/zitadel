@@ -119,6 +119,6 @@ func (m *Metadata) OnError(event *es_models.Event, err error) error {
 	return spooler.HandleError(event, err, m.view.GetLatestMetadataFailedEvent, m.view.ProcessedMetadataFailedEvent, m.view.ProcessedMetadataSequence, m.errorCountUntilSkip)
 }
 
-func (o *Metadata) OnSuccess() error {
-	return spooler.HandleSuccess(o.view.UpdateMetadataSpoolerRunTimestamp)
+func (m *Metadata) OnSuccess() error {
+	return spooler.HandleSuccess(m.view.UpdateMetadataSpoolerRunTimestamp)
 }
