@@ -37,7 +37,7 @@ func (m *Metadata) subscribe() {
 }
 
 const (
-	metadataTable = "management.meta_data"
+	metadataTable = "auth.metadata"
 )
 
 func (m *Metadata) ViewModel() string {
@@ -115,7 +115,7 @@ func (m *Metadata) processMetadata(event *es_models.Event) (err error) {
 }
 
 func (m *Metadata) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-3m912", "id", event.AggregateID).WithError(err).Warn("something went wrong in custom text handler")
+	logging.LogWithFields("SPOOL-miJJs", "id", event.AggregateID).WithError(err).Warn("something went wrong in custom text handler")
 	return spooler.HandleError(event, err, m.view.GetLatestMetadataFailedEvent, m.view.ProcessedMetadataFailedEvent, m.view.ProcessedMetadataSequence, m.errorCountUntilSkip)
 }
 

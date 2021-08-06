@@ -10,19 +10,19 @@ import (
 )
 
 const (
-	metadataTable = "management.meta_data"
+	metadataTable = "auth.metadata"
 )
 
 func (v *View) MetadataByKey(aggregateID, key string) (*model.MetadataView, error) {
 	return view.MetadataByKey(v.Db, metadataTable, aggregateID, key)
 }
 
-func (v *View) MetadataByKeyAndResourceOwner(aggregateID, resourceOwner, key string) (*model.MetadataView, error) {
-	return view.MetadataByKeyAndResourceOwner(v.Db, metadataTable, aggregateID, resourceOwner, key)
-}
-
 func (v *View) MetadataListByAggregateID(aggregateID string) ([]*model.MetadataView, error) {
 	return view.GetMetadataList(v.Db, metadataTable, aggregateID)
+}
+
+func (v *View) MetadataByKeyAndResourceOwner(aggregateID, resourceOwner, key string) (*model.MetadataView, error) {
+	return view.MetadataByKeyAndResourceOwner(v.Db, metadataTable, aggregateID, resourceOwner, key)
 }
 
 func (v *View) SearchMetadata(request *domain.MetadataSearchRequest) ([]*model.MetadataView, uint64, error) {

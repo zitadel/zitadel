@@ -1,4 +1,4 @@
-CREATE TABLE auth.meta_data (
+CREATE TABLE auth.metadata (
    aggregate_id TEXT,
 
    key TEXT,
@@ -12,7 +12,7 @@ CREATE TABLE auth.meta_data (
    PRIMARY KEY (aggregate_id, key)
 );
 
-CREATE TABLE management.meta_data (
+CREATE TABLE management.metadata (
     aggregate_id TEXT,
 
     key TEXT,
