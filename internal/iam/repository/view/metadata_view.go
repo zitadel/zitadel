@@ -27,28 +27,28 @@ func GetMetadataList(db *gorm.DB, table string, aggregateID string) ([]*model.Me
 }
 
 func MetadataByKey(db *gorm.DB, table, aggregateID, key string) (*model.MetadataView, error) {
-	customText := new(model.MetadataView)
+	metadata := new(model.MetadataView)
 	aggregateIDQuery := &model.MetadataSearchQuery{Key: domain.MetadataSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	keyQuery := &model.MetadataSearchQuery{Key: domain.MetadataSearchKeyKey, Value: key, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, keyQuery)
-	err := query(db, customText)
+	err := query(db, metadata)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-29kkd", "Errors.Metadata.NotExisting")
 	}
-	return customText, err
+	return metadata, err
 }
 
 func MetadataByKeyAndResourceOwner(db *gorm.DB, table, aggregateID, resourceOwner, key string) (*model.MetadataView, error) {
-	customText := new(model.MetadataView)
+	metadata := new(model.MetadataView)
 	aggregateIDQuery := &model.MetadataSearchQuery{Key: domain.MetadataSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	resourceOwnerQuery := &model.MetadataSearchQuery{Key: domain.MetadataSearchKeyResourceOwner, Value: resourceOwner, Method: domain.SearchMethodEquals}
 	keyQuery := &model.MetadataSearchQuery{Key: domain.MetadataSearchKeyKey, Value: key, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, resourceOwnerQuery, keyQuery)
-	err := query(db, customText)
+	err := query(db, metadata)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-29kkd", "Errors.Metadata.NotExisting")
 	}
-	return customText, err
+	return metadata, err
 }
 
 func SearchMetadata(db *gorm.DB, table string, req *domain.MetadataSearchRequest) ([]*model.MetadataView, uint64, error) {
