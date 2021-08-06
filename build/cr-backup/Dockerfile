@@ -1,6 +1,6 @@
 FROM cockroachdb/cockroach:v20.2.3
 
-RUN microdnf install curl wget tar gzip
+RUN microdnf install curl wget tar gzip shadow-utils
 
 RUN wget https://storage.googleapis.com/oauth2l/latest/linux_amd64.tgz
 RUN tar zxvf linux_amd64.tgz
@@ -19,4 +19,9 @@ RUN chmod +x /scripts/clean-migration.sh
 COPY build/cr-backup/scripts/clean-user-cockroach.sh /scripts/clean-user.sh
 RUN chmod +x /scripts/clean-user.sh
 
-ENTRYPOINT [ "/cockroach" ]
+RUN groupadd cockroach
+RUN useradd -g cockroach cockroach
+
+USER cockroach
+
+ENTRYPOINT ["/cockroach/cockroach.sh"]

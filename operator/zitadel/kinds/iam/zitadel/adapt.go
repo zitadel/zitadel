@@ -154,6 +154,7 @@ func AdaptFunc(
 			nodeselector,
 			tolerations,
 			customImageRegistry,
+			*version,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err

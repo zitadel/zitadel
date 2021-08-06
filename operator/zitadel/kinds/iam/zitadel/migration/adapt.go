@@ -51,6 +51,7 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	customImageRegistry string,
+	version string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -108,7 +109,7 @@ func AdaptFunc(
 							},
 							NodeSelector:   nodeselector,
 							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry),
+							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry, version),
 							Containers: []corev1.Container{
 								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry),
 							},

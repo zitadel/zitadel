@@ -14,12 +14,13 @@ func getPostContainers(
 	migrationUser string,
 	secretPasswordName string,
 	customImageRegistry string,
+	version string,
 ) []corev1.Container {
 
 	return []corev1.Container{
 		{
 			Name:    "delete-flyway-user",
-			Image:   common.CockroachImage.Reference(customImageRegistry),
+			Image:   common.BackupImage.Reference(customImageRegistry, version),
 			Command: []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{

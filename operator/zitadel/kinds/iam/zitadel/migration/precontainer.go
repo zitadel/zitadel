@@ -14,6 +14,7 @@ func getPreContainer(
 	migrationUser string,
 	secretPasswordName string,
 	customImageRegistry string,
+	version string,
 ) []corev1.Container {
 
 	return []corev1.Container{
@@ -31,7 +32,7 @@ func getPreContainer(
 		},
 		{
 			Name:  "create-flyway-user",
-			Image: common.CockroachImage.Reference(customImageRegistry),
+			Image: common.BackupImage.Reference(customImageRegistry, version),
 			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
 			VolumeMounts: []corev1.VolumeMount{{
 				Name:      rootUserInternal,

@@ -73,6 +73,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 	tolerations := []corev1.Toleration{}
 	dbHost := "test"
 	dbPort := "test"
+	version := "test"
 
 	allScripts := getMigrationFiles(mntr.Monitor{}, "/cockroach/")
 
@@ -102,7 +103,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,
-					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, ""),
+					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, "", version),
 					Containers: []corev1.Container{
 						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, ""),
 					},
@@ -167,6 +168,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 		nodeselector,
 		tolerations,
 		"",
+		version,
 	)
 
 	queried := map[string]interface{}{}
