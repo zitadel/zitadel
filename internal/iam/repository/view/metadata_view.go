@@ -10,7 +10,7 @@ import (
 )
 
 func GetMetadataList(db *gorm.DB, table string, aggregateID string) ([]*model.MetadataView, error) {
-	texts := make([]*model.MetadataView, 0)
+	metadatas := make([]*model.MetadataView, 0)
 	queries := []*domain.MetadataSearchQuery{
 		{
 			Key:    domain.MetadataSearchKeyAggregateID,
@@ -19,11 +19,11 @@ func GetMetadataList(db *gorm.DB, table string, aggregateID string) ([]*model.Me
 		},
 	}
 	query := repository.PrepareSearchQuery(table, model.MetadataSearchRequest{Queries: queries})
-	_, err := query(db, &texts)
+	_, err := query(db, &metadatas)
 	if err != nil {
 		return nil, err
 	}
-	return texts, nil
+	return metadatas, nil
 }
 
 func MetadataByKey(db *gorm.DB, table, aggregateID, key string) (*model.MetadataView, error) {
