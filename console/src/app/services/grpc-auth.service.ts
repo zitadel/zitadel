@@ -24,6 +24,8 @@ import {
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
   ListMyLinkedIDPsResponse,
+  ListMyMembershipsRequest,
+  ListMyMembershipsResponse,
   ListMyPasswordlessRequest,
   ListMyPasswordlessResponse,
   ListMyProjectOrgsRequest,
@@ -74,7 +76,7 @@ import {
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { Gender, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
+import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
 
@@ -344,6 +346,24 @@ export class GrpcAuthService {
     }
     req.setQuery(query);
     return this.grpcService.auth.listMyUserGrants(req, null).then(resp => resp.toObject());
+  }
+
+  public listMyMemberships(limit: number, offset: number,
+    queryList?: MembershipQuery[],
+  ): Promise<ListMyMembershipsResponse.AsObject> {
+    const req = new ListMyMembershipsRequest();
+    const metadata = new ListQuery();
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.auth.listMyMemberships(req, null).then(resp => resp.toObject());
   }
 
   public getMyEmail(): Promise<GetMyEmailResponse.AsObject> {
