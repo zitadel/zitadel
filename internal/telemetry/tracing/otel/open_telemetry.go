@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"go.opentelemetry.io/otel/api/global"
-	api_trace "go.opentelemetry.io/otel/api/trace"
-	"go.opentelemetry.io/otel/propagators"
-	"go.opentelemetry.io/otel/sdk/export/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	api_trace "go.opentelemetry.io/otel/trace"
+
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type Tracer struct {
@@ -17,15 +17,15 @@ type Tracer struct {
 	sampler  sdk_trace.Sampler
 }
 
-func NewTracer(name string, sampler sdk_trace.Sampler, exporter trace.SpanExporter) *Tracer {
+func NewTracer(name string, sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) *Tracer {
 	tp := sdk_trace.NewTracerProvider(
-		sdk_trace.WithConfig(sdk_trace.Config{DefaultSampler: sampler}),
+		sdk_trace.WithSampler(sampler),
 		sdk_trace.WithSyncer(exporter),
 	)
 
-	global.SetTracerProvider(tp)
-	tc := propagators.TraceContext{}
-	global.SetTextMapPropagator(tc)
+	otel.SetTracerProvider(tp)
+	tc := propagation.TraceContext{}
+	otel.SetTextMapPropagator(tc)
 
 	return &Tracer{Exporter: tp.Tracer(name), sampler: sampler}
 }
@@ -54,11 +54,11 @@ func (t *Tracer) NewSpan(ctx context.Context, caller string) (context.Context, *
 	return t.newSpan(ctx, caller)
 }
 
-func (t *Tracer) newSpan(ctx context.Context, caller string, options ...api_trace.SpanOption) (context.Context, *tracing.Span) {
+func (t *Tracer) newSpan(ctx context.Context, caller string, options ...api_trace.SpanStartOption) (context.Context, *tracing.Span) {
 	return t.newSpanFromName(ctx, caller, options...)
 }
 
-func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...api_trace.SpanOption) (context.Context, *tracing.Span) {
+func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...api_trace.SpanStartOption) (context.Context, *tracing.Span) {
 	ctx, span := t.Exporter.Start(ctx, name, options...)
 	return ctx, tracing.CreateSpan(span)
 }

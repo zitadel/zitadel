@@ -8,6 +8,10 @@ import (
 	label "go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/metric"
+	export "go.opentelemetry.io/otel/sdk/export/metric"
+	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
+	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
+	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
@@ -22,8 +26,15 @@ type Metrics struct {
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
-	exporter, err := prometheus.NewExportPipeline(
+	exporter, err := prometheus.New(
 		prometheus.Config{},
+		controller.New(
+			processor.New(
+				selector.NewWithHistogramDistribution(),
+				export.CumulativeExportKindSelector(),
+				processor.WithMemory(true),
+			),
+		),
 	)
 	if err != nil {
 		return &Metrics{}, err
