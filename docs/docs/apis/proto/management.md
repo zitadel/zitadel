@@ -241,7 +241,7 @@ Changes the username
 > **rpc** SetUserMetadata([SetUserMetadataRequest](#setusermetadatarequest))
 [SetUserMetadataResponse](#setusermetadataresponse)
 
-Sets a user meta data by key
+Sets a user metadata by key
 
 
 
@@ -253,7 +253,7 @@ Sets a user meta data by key
 > **rpc** BulkSetUserMetadata([BulkSetUserMetadataRequest](#bulksetusermetadatarequest))
 [BulkSetUserMetadataResponse](#bulksetusermetadataresponse)
 
-Set a list of user meta data
+Set a list of user metadata
 
 
 
@@ -265,7 +265,7 @@ Set a list of user meta data
 > **rpc** ListUserMetadata([ListUserMetadataRequest](#listusermetadatarequest))
 [ListUserMetadataResponse](#listusermetadataresponse)
 
-Returns the user meta data
+Returns the user metadata
 
 
 
@@ -277,7 +277,7 @@ Returns the user meta data
 > **rpc** GetUserMetadata([GetUserMetadataRequest](#getusermetadatarequest))
 [GetUserMetadataResponse](#getusermetadataresponse)
 
-Returns the user meta data by key
+Returns the user metadata by key
 
 
 
@@ -289,7 +289,7 @@ Returns the user meta data by key
 > **rpc** RemoveUserMetadata([RemoveUserMetadataRequest](#removeusermetadatarequest))
 [RemoveUserMetadataResponse](#removeusermetadataresponse)
 
-Removes a user meta data by key
+Removes a user metadata by key
 
 
 
@@ -301,7 +301,7 @@ Removes a user meta data by key
 > **rpc** BulkRemoveUserMetadata([BulkRemoveUserMetadataRequest](#bulkremoveusermetadatarequest))
 [BulkRemoveUserMetadataResponse](#bulkremoveusermetadataresponse)
 
-Set a list of user meta data
+Set a list of user metadata
 
 
 

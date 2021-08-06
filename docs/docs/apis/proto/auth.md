@@ -72,7 +72,7 @@ Returns the user sessions of the authorized user of the current useragent
 > **rpc** SetMyMetadata([SetMyMetadataRequest](#setmymetadatarequest))
 [SetMyMetadataResponse](#setmymetadataresponse)
 
-Sets a user meta data by key to the authorized user
+Sets a user metadata by key to the authorized user
 
 
 
@@ -84,7 +84,7 @@ Sets a user meta data by key to the authorized user
 > **rpc** BulkSetMyMetadata([BulkSetMyMetadataRequest](#bulksetmymetadatarequest))
 [BulkSetMyMetadataResponse](#bulksetmymetadataresponse)
 
-Set a list of user meta data to the authorized user
+Set a list of user metadata to the authorized user
 
 
 
@@ -96,7 +96,7 @@ Set a list of user meta data to the authorized user
 > **rpc** ListMyMetadata([ListMyMetadataRequest](#listmymetadatarequest))
 [ListMyMetadataResponse](#listmymetadataresponse)
 
-Returns the user meta data of the authorized user
+Returns the user metadata of the authorized user
 
 
 
@@ -108,7 +108,7 @@ Returns the user meta data of the authorized user
 > **rpc** GetMyMetadata([GetMyMetadataRequest](#getmymetadatarequest))
 [GetMyMetadataResponse](#getmymetadataresponse)
 
-Returns the user meta data by key of the authorized user
+Returns the user metadata by key of the authorized user
 
 
 
@@ -120,7 +120,7 @@ Returns the user meta data by key of the authorized user
 > **rpc** RemoveMyMetadata([RemoveMyMetadataRequest](#removemymetadatarequest))
 [RemoveMyMetadataResponse](#removemymetadataresponse)
 
-Removes a user meta data by key to the authorized user
+Removes a user metadata by key to the authorized user
 
 
 
@@ -132,7 +132,7 @@ Removes a user meta data by key to the authorized user
 > **rpc** BulkRemoveMyMetadata([BulkRemoveMyMetadataRequest](#bulkremovemymetadatarequest))
 [BulkRemoveMyMetadataResponse](#bulkremovemymetadataresponse)
 
-Set a list of user meta data to the authorized user
+Set a list of user metadata to the authorized user
 
 
 

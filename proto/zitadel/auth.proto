@@ -97,7 +97,7 @@ service AuthService {
         };
     }
 
-    // Sets a user meta data by key to the authorized user
+    // Sets a user metadata by key to the authorized user
     rpc SetMyMetadata(SetMyMetadataRequest) returns (SetMyMetadataResponse) {
         option (google.api.http) = {
             post: "/users/me/metadata/{key}"
@@ -109,7 +109,7 @@ service AuthService {
         };
     }
 
-    // Set a list of user meta data to the authorized user
+    // Set a list of user metadata to the authorized user
     rpc BulkSetMyMetadata(BulkSetMyMetadataRequest) returns (BulkSetMyMetadataResponse) {
         option (google.api.http) = {
             post: "/users/me/metadata/_bulk"
@@ -121,7 +121,7 @@ service AuthService {
         };
     }
 
-    // Returns the user meta data of the authorized user
+    // Returns the user metadata of the authorized user
     rpc ListMyMetadata(ListMyMetadataRequest) returns (ListMyMetadataResponse) {
         option (google.api.http) = {
             post: "/users/me/metadata/_search"
@@ -133,7 +133,7 @@ service AuthService {
         };
     }
 
-    // Returns the user meta data by key of the authorized user
+    // Returns the user metadata by key of the authorized user
     rpc GetMyMetadata(GetMyMetadataRequest) returns (GetMyMetadataResponse) {
         option (google.api.http) = {
             get: "/users/me/metadata/{key}"
@@ -144,7 +144,7 @@ service AuthService {
         };
     }
 
-    // Removes a user meta data by key to the authorized user
+    // Removes a user metadata by key to the authorized user
     rpc RemoveMyMetadata(RemoveMyMetadataRequest) returns (RemoveMyMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/me/metadata/{key}"
@@ -155,7 +155,7 @@ service AuthService {
         };
     }
 
-    // Set a list of user meta data to the authorized user
+    // Set a list of user metadata to the authorized user
     rpc BulkRemoveMyMetadata(BulkRemoveMyMetadataRequest) returns (BulkRemoveMyMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/me/metadata/_bulk"

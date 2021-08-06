@@ -286,7 +286,7 @@ service ManagementService {
         };
     }
 
-    // Sets a user meta data by key
+    // Sets a user metadata by key
     rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/{key}"
@@ -299,7 +299,7 @@ service ManagementService {
         };
     }
 
-    // Set a list of user meta data
+    // Set a list of user metadata
     rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_bulk"
@@ -312,7 +312,7 @@ service ManagementService {
         };
     }
 
-    // Returns the user meta data
+    // Returns the user metadata
     rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_search"
@@ -325,7 +325,7 @@ service ManagementService {
         };
     }
 
-    // Returns the user meta data by key
+    // Returns the user metadata by key
     rpc GetUserMetadata(GetUserMetadataRequest) returns (GetUserMetadataResponse) {
         option (google.api.http) = {
             get: "/users/{id}/metadata/{key}"
@@ -337,7 +337,7 @@ service ManagementService {
         };
     }
 
-    // Removes a user meta data by key
+    // Removes a user metadata by key
     rpc RemoveUserMetadata(RemoveUserMetadataRequest) returns (RemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/{key}"
@@ -349,7 +349,7 @@ service ManagementService {
         };
     }
 
-    // Set a list of user meta data
+    // Set a list of user metadata
     rpc BulkRemoveUserMetadata(BulkRemoveUserMetadataRequest) returns (BulkRemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/_bulk"
