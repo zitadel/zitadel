@@ -533,6 +533,19 @@ Returns a list of roles for the authorized user and project
     POST: /permissions/me/_search
 
 
+### ListMyMemberships
+
+> **rpc** ListMyMemberships([ListMyMembershipsRequest](#listmymembershipsrequest))
+[ListMyMembershipsResponse](#listmymembershipsresponse)
+
+Show all the permissions my user has in ZITADEL (ZITADEL Manager)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /memberships/me/_search
+
+
 
 
 
@@ -770,6 +783,30 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.idp.v1.IDPUserLink | - |  |
+
+
+
+
+### ListMyMembershipsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | the field the result is sorted |  |
+| queries | repeated zitadel.user.v1.MembershipQuery | criterias the client is looking for |  |
+
+
+
+
+### ListMyMembershipsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.Membership | - |  |
 
 
 
