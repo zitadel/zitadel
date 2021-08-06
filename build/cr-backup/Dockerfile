@@ -19,8 +19,8 @@ RUN chmod +x /scripts/clean-migration.sh
 COPY build/cr-backup/scripts/clean-user-cockroach.sh /scripts/clean-user.sh
 RUN chmod +x /scripts/clean-user.sh
 
-RUN groupadd cockroach
-RUN useradd -g cockroach cockroach
+RUN groupadd -g 1000 cockroach
+RUN useradd -u 1000 -g cockroach cockroach
 
 USER cockroach
 

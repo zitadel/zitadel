@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"github.com/caos/zitadel/operator/helpers"
 	"strings"
 
 	"github.com/caos/zitadel/operator/common"
@@ -33,6 +34,10 @@ func getMigrationContainer(
 			Name:      rootUserInternal,
 			MountPath: rootUserPath,
 		}},
+
+		SecurityContext: &corev1.SecurityContext{
+			RunAsNonRoot: helpers.PointerBool(true),
+		},
 		TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 		TerminationMessagePolicy: "File",
 		ImagePullPolicy:          "IfNotPresent",

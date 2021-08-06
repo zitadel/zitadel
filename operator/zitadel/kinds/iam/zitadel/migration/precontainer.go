@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"github.com/caos/zitadel/operator/helpers"
 	"strings"
 
 	"github.com/caos/zitadel/operator/common"
@@ -26,6 +27,11 @@ func getPreContainer(
 				"-c",
 				"until pg_isready -h " + dbHost + " -p " + dbPort + "; do echo waiting for database; sleep 2; done;",
 			},
+			SecurityContext: &corev1.SecurityContext{
+				RunAsUser:    helpers.PointerInt64(70),
+				RunAsGroup:   helpers.PointerInt64(70),
+				RunAsNonRoot: helpers.PointerBool(true),
+			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
 			ImagePullPolicy:          "IfNotPresent",
@@ -46,6 +52,11 @@ func getPreContainer(
 					"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
 				},
 					";"),
+			},
+			SecurityContext: &corev1.SecurityContext{
+				RunAsUser:    helpers.PointerInt64(1000),
+				RunAsGroup:   helpers.PointerInt64(1000),
+				RunAsNonRoot: helpers.PointerBool(true),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
