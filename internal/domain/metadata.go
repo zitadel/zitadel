@@ -23,8 +23,8 @@ const (
 	MetadataStateRemoved
 )
 
-func (u *Metadata) IsValid() bool {
-	return u.Key != "" && len(u.Value) > 0
+func (m *Metadata) IsValid() bool {
+	return m.Key != "" && len(m.Value) > 0
 }
 
 func (s MetadataState) Exists() bool {
