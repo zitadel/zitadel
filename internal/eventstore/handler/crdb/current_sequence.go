@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	currentSequenceStmtFormat        = `SELECT current_sequence, aggregate_type FROM %s WHERE view_name = $1 FOR UPDATE`
-	updateCurrentSequencesStmtFormat = `UPSERT INTO %s (view_name, aggregate_type, current_sequence, timestamp) VALUES `
+	currentSequenceStmtFormat        = `SELECT current_sequence, aggregate_type FROM %s WHERE projection_name = $1 FOR UPDATE`
+	updateCurrentSequencesStmtFormat = `UPSERT INTO %s (projection_name, aggregate_type, current_sequence, timestamp) VALUES `
 )
 
 type currentSequences map[eventstore.AggregateType]uint64

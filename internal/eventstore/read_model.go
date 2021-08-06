@@ -2,7 +2,7 @@ package eventstore
 
 import "time"
 
-//ReadModel is the minimum representation of a View model.
+//ReadModel is the minimum representation of a read model.
 // It implements a basic reducer
 // it might be saved in a database or in memory
 type ReadModel struct {

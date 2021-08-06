@@ -2,7 +2,7 @@ package eventstore
 
 import "time"
 
-//MemberWriteModel is the minimum representation of a command side view model.
+//WriteModel is the minimum representation of a command side write model.
 // It implements a basic reducer
 // it's purpose is to reduce events to create new ones
 type WriteModel struct {

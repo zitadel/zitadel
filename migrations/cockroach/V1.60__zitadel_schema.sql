@@ -7,13 +7,13 @@ CREATE SCHEMA projections AUTHORIZATION queries;
 CREATE TABLE projections.locks (
     locker_id TEXT,
     locked_until TIMESTAMPTZ(3),
-    view_name TEXT,
+    projection_name TEXT,
 
     PRIMARY KEY (view_name)
 );
 
 CREATE TABLE projections.current_sequences (
-    view_name TEXT,
+    projection_name TEXT,
     aggregate_type TEXT,
     current_sequence BIGINT,
     timestamp TIMESTAMPTZ,

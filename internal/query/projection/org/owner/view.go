@@ -166,7 +166,7 @@ func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReade
 	}
 
 	return []handler.Statement{
-		crdb.NewViewUpdateStatement(
+		crdb.NewProjectionUpdateStatement(
 			userTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
@@ -207,7 +207,7 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	}
 
 	return []handler.Statement{
-		crdb.NewViewUpdateStatement(
+		crdb.NewProjectionUpdateStatement(
 			userTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
@@ -227,7 +227,7 @@ func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) ([]han
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pk6TS", "reduce.wrong.event.type")
 	}
 	return []handler.Statement{
-		crdb.NewViewCreateStatement(
+		crdb.NewProjectionCreateStatement(
 			orgTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
@@ -258,7 +258,7 @@ func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 	}
 
 	return []handler.Statement{
-		crdb.NewViewUpdateStatement(
+		crdb.NewProjectionUpdateStatement(
 			orgTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
@@ -280,7 +280,7 @@ func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 
 	return []handler.Statement{
 		//delete org in org table
-		crdb.NewViewDeleteStatement(
+		crdb.NewProjectionDeleteStatement(
 			orgTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
@@ -290,7 +290,7 @@ func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 			},
 		),
 		// delete users of the org
-		crdb.NewViewDeleteStatement(
+		crdb.NewProjectionDeleteStatement(
 			userTableSuffix,
 			e.Aggregate().Typ,
 			e.Sequence(),
@@ -312,7 +312,7 @@ func isOrgOwner(roles []string) bool {
 }
 
 func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) handler.Statement {
-	return crdb.NewViewDeleteStatement(
+	return crdb.NewProjectionDeleteStatement(
 		userTableSuffix,
 		event.Aggregate().Typ,
 		event.Sequence(),
@@ -371,7 +371,7 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 		values = append(values, handler.NewCol(userLanguageCol, owner.OwnerLanguage.String()))
 	}
 
-	return crdb.NewViewUpsertStatement(
+	return crdb.NewProjectionUpsertStatement(
 		userTableSuffix,
 		event.Aggregate().Typ,
 		event.Sequence(),

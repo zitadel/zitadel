@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"

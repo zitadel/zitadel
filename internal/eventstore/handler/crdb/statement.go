@@ -40,7 +40,7 @@ func NewCreateStatement(aggregateType eventstore.AggregateType, sequence, previo
 	}
 }
 
-func NewViewCreateStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
+func NewProjectionCreateStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -102,7 +102,7 @@ func NewUpsertStatement(aggregateType eventstore.AggregateType, sequence, previo
 	}
 }
 
-func NewViewUpsertStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
+func NewProjectionUpsertStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -171,7 +171,7 @@ func NewUpdateStatement(aggregateType eventstore.AggregateType, sequence, previo
 	}
 }
 
-func NewViewUpdateStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values, conditions []handler.Column) handler.Statement {
+func NewProjectionUpdateStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values, conditions []handler.Column) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -241,7 +241,7 @@ func NewDeleteStatement(aggregateType eventstore.AggregateType, sequence, previo
 	}
 }
 
-func NewViewDeleteStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, conditions []handler.Column) handler.Statement {
+func NewProjectionDeleteStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, conditions []handler.Column) handler.Statement {
 	wheres, args := columnsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")

@@ -9,10 +9,10 @@ import (
 
 const (
 	lockStmtFormat = "INSERT INTO %[1]s" +
-		" (locker_id, locked_until, view_name) VALUES ($1, now()+$2::INTERVAL, $3)" +
-		" ON CONFLICT (view_name)" +
+		" (locker_id, locked_until, projection_name) VALUES ($1, now()+$2::INTERVAL, $3)" +
+		" ON CONFLICT (projection_name)" +
 		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL" +
-		" WHERE %[1]s.view_name = $3 AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
+		" WHERE %[1]s.projection_name = $3 AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
 	millisecondsAsSeconds = int64(time.Second / time.Millisecond)
 )
 
