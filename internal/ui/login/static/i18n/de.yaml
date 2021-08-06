@@ -154,6 +154,7 @@ PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
   Description: Token für passwortlosen Login erfolgreich hinzugefügt.
   NextButtonText: weiter
+  CancelButtonText: abbrechen
 
 PasswordChange:
   Title: Passwort ändern

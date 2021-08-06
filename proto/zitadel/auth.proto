@@ -609,6 +609,19 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    // Show all the permissions my user has in ZITADEL (ZITADEL Manager)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse) {
+        option (google.api.http) = {
+            post: "/memberships/me/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //This is an empty request
@@ -1025,4 +1038,16 @@ message ListMyProjectPermissionsRequest {}
 
 message ListMyProjectPermissionsResponse {
     repeated string result = 1;
+}
+
+message ListMyMembershipsRequest {
+    //the field the result is sorted
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.user.v1.MembershipQuery queries = 2;
+}
+
+message ListMyMembershipsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.Membership result = 2;
 }
