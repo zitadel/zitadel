@@ -68,13 +68,12 @@ func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggr
 	if !metadata.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid")
 	}
-	pusher = user.NewMetadataSetEvent(
+	return user.NewMetadataSetEvent(
 		ctx,
 		userAgg,
 		metadata.Key,
 		metadata.Value,
-	)
-	return pusher, nil
+	), nil
 }
 
 func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
