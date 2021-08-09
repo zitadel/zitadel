@@ -21,6 +21,7 @@ func NewTracer(name string, sampler sdk_trace.Sampler, exporter sdk_trace.SpanEx
 	tp := sdk_trace.NewTracerProvider(
 		sdk_trace.WithSampler(sampler),
 		sdk_trace.WithSyncer(exporter),
+		sdk_trace.WithBatcher(exporter),
 	)
 
 	otel.SetTracerProvider(tp)

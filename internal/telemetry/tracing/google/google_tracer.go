@@ -5,10 +5,11 @@ import (
 	"strings"
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
-	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Config struct {
