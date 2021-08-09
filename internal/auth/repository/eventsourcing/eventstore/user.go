@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -295,4 +296,40 @@ func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence ui
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *UserRepo) GetMyMetadataByKey(ctx context.Context, key string) (*domain.Metadata, error) {
+	ctxData := authz.GetCtxData(ctx)
+	data, err := repo.View.MetadataByKeyAndResourceOwner(ctxData.UserID, ctxData.ResourceOwner, key)
+	if err != nil {
+		return nil, err
+	}
+	return iam_model.MetadataViewToDomain(data), nil
+}
+
+func (repo *UserRepo) SearchMyMetadata(ctx context.Context, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	err := req.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-N9fsd").OnError(sequenceErr).Warn("could not read latest user sequence")
+	req.AppendAggregateIDQuery(ctxData.UserID)
+	req.AppendResourceOwnerQuery(ctxData.ResourceOwner)
+	metadata, count, err := repo.View.SearchMetadata(req)
+	if err != nil {
+		return nil, err
+	}
+	result := &domain.MetadataSearchResponse{
+		Offset:      req.Offset,
+		Limit:       req.Limit,
+		TotalResult: count,
+		Result:      iam_model.MetadataViewsToDomain(metadata),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
 }
