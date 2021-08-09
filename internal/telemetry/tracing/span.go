@@ -8,11 +8,11 @@ import (
 
 type Span struct {
 	span trace.Span
-	opts []trace.SpanEndOption
+	opts []trace.SpanOption
 }
 
 func CreateSpan(span trace.Span) *Span {
-	return &Span{span: span, opts: []trace.SpanEndOption{}}
+	return &Span{span: span, opts: []trace.SpanOption{}}
 }
 
 func (s *Span) End() {

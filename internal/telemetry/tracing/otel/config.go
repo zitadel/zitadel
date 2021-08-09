@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	otlpgrpc "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp"
+	otlpgrpc "go.opentelemetry.io/otel/exporters/otlp/otlpgrpc"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -16,7 +17,7 @@ type Config struct {
 
 func (c *Config) NewTracer() error {
 	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
-	exporter, err := otlpgrpc.New(context.Background(), otlpgrpc.WithEndpoint(c.Endpoint), otlpgrpc.WithInsecure())
+	exporter, err := otlp.NewExporter(context.Background(), otlpgrpc.NewDriver(otlpgrpc.WithEndpoint(c.Endpoint), otlpgrpc.WithInsecure()))
 	if err != nil {
 		return err
 	}

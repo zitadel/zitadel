@@ -57,11 +57,11 @@ func (t *Tracer) NewSpan(ctx context.Context, caller string) (context.Context, *
 	return t.newSpan(ctx, caller)
 }
 
-func (t *Tracer) newSpan(ctx context.Context, caller string, options ...api_trace.SpanStartOption) (context.Context, *tracing.Span) {
+func (t *Tracer) newSpan(ctx context.Context, caller string, options ...api_trace.SpanOption) (context.Context, *tracing.Span) {
 	return t.newSpanFromName(ctx, caller, options...)
 }
 
-func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...api_trace.SpanStartOption) (context.Context, *tracing.Span) {
+func (t *Tracer) newSpanFromName(ctx context.Context, name string, options ...api_trace.SpanOption) (context.Context, *tracing.Span) {
 	ctx, span := t.Exporter.Start(ctx, name, options...)
 	return ctx, tracing.CreateSpan(span)
 }

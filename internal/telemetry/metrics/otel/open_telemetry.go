@@ -26,7 +26,7 @@ type Metrics struct {
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
-	exporter, err := prometheus.New(
+	exporter, err := prometheus.NewExporter(
 		prometheus.Config{},
 		controller.New(
 			processor.New(

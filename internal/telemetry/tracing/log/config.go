@@ -3,7 +3,7 @@ package log
 import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
-	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	stdout "go.opentelemetry.io/otel/exporters/stdout"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -18,7 +18,7 @@ type Tracer struct {
 
 func (c *Config) NewTracer() error {
 	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
-	exporter, err := stdout.New(stdout.WithPrettyPrint())
+	exporter, err := stdout.NewExporter(stdout.WithPrettyPrint())
 	if err != nil {
 		return err
 	}
