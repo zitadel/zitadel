@@ -100,6 +100,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 				Spec: corev1.PodSpec{
 					SecurityContext: &corev1.PodSecurityContext{
 						RunAsNonRoot: helpers.PointerBool(true),
+						FSGroup:      helpers.PointerInt64(1000),
 					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,

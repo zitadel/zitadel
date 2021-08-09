@@ -26,9 +26,10 @@ func getPreContainer(
 		deployment.GetInitContainer(
 			rootUserInternal,
 			dbCerts,
-			[]string{},
+			[]string{"root"},
 			1000,
 			customImageRegistry,
+			version,
 		),
 		/*
 			{

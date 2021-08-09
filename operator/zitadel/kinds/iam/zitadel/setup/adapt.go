@@ -140,6 +140,7 @@ func jobDef(
 			users,
 			deployment.RunAsUser,
 			customImageRegistry,
+			*version,
 		)}
 
 	containers := []corev1.Container{

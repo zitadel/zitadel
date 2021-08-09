@@ -1,6 +1,8 @@
 package deployment
 
 import (
+	"github.com/caos/zitadel/operator/common"
+	"github.com/caos/zitadel/operator/helpers"
 	"strings"
 	"testing"
 
@@ -10,12 +12,13 @@ import (
 
 func TestDeployment_GetInitContainer(t *testing.T) {
 	users := []string{"test"}
+	version := "test"
 
 	initCommands := []string{
 		"cp /dbsecrets/client_root/ca.crt /tmp/dbsecrets/ca.crt",
 		"cp /dbsecrets/client_test/client.test.crt /tmp/dbsecrets/client.test.crt",
 		"cp /dbsecrets/client_test/client.test.key /tmp/dbsecrets/client.test.key",
-		"chown -R 1000:1000 /tmp/dbsecrets",
+		//"chown -R 1000:1000 /tmp/dbsecrets",
 		"chmod 0600 /tmp/dbsecrets/*",
 	}
 
@@ -26,8 +29,12 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 	}
 
 	equals := corev1.Container{
+		SecurityContext: &corev1.SecurityContext{
+			RunAsUser:  helpers.PointerInt64(1000),
+			RunAsGroup: helpers.PointerInt64(1000),
+		},
 		Name:                     "fix-permissions",
-		Image:                    "alpine:3.11",
+		Image:                    common.BackupImage.Reference("", version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -36,19 +43,20 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 
-	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "")
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "", version)
 
 	assert.Equal(t, equals, init)
 }
 
 func TestDeployment_GetInitContainer1(t *testing.T) {
 	users := []string{"test1"}
+	version := "test1"
 
 	initCommands := []string{
 		"cp /dbsecrets/client_root/ca.crt /tmp/dbsecrets/ca.crt",
 		"cp /dbsecrets/client_test1/client.test1.crt /tmp/dbsecrets/client.test1.crt",
 		"cp /dbsecrets/client_test1/client.test1.key /tmp/dbsecrets/client.test1.key",
-		"chown -R 1000:1000 /tmp/dbsecrets",
+		//"chown -R 1000:1000 /tmp/dbsecrets",
 		"chmod 0600 /tmp/dbsecrets/*",
 	}
 
@@ -59,8 +67,12 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 	}
 
 	equals := corev1.Container{
+		SecurityContext: &corev1.SecurityContext{
+			RunAsUser:  helpers.PointerInt64(1000),
+			RunAsGroup: helpers.PointerInt64(1000),
+		},
 		Name:                     "fix-permissions",
-		Image:                    "alpine:3.11",
+		Image:                    common.BackupImage.Reference("", version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -69,13 +81,14 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 		ImagePullPolicy:          corev1.PullIfNotPresent,
 	}
 
-	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "")
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "", version)
 
 	assert.Equal(t, equals, init)
 }
 
 func TestDeployment_GetInitContainer2(t *testing.T) {
 	users := []string{"test1", "test2"}
+	version := "test2"
 
 	initCommands := []string{
 		"cp /dbsecrets/client_root/ca.crt /tmp/dbsecrets/ca.crt",
@@ -83,7 +96,7 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 		"cp /dbsecrets/client_test1/client.test1.key /tmp/dbsecrets/client.test1.key",
 		"cp /dbsecrets/client_test2/client.test2.crt /tmp/dbsecrets/client.test2.crt",
 		"cp /dbsecrets/client_test2/client.test2.key /tmp/dbsecrets/client.test2.key",
-		"chown -R 1000:1000 /tmp/dbsecrets",
+		//"chown -R 1000:1000 /tmp/dbsecrets",
 		"chmod 0600 /tmp/dbsecrets/*",
 	}
 
@@ -95,8 +108,12 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 	}
 
 	equals := corev1.Container{
+		SecurityContext: &corev1.SecurityContext{
+			RunAsUser:  helpers.PointerInt64(1000),
+			RunAsGroup: helpers.PointerInt64(1000),
+		},
 		Name:                     "fix-permissions",
-		Image:                    "alpine:3.11",
+		Image:                    common.BackupImage.Reference("", version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -105,7 +122,7 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 
-	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "")
+	init := GetInitContainer(rootSecret, dbSecrets, users, RunAsUser, "", version)
 
 	assert.Equal(t, equals, init)
 }

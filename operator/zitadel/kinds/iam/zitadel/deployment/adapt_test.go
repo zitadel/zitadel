@@ -89,6 +89,7 @@ func TestDeployment_Adapt(t *testing.T) {
 							users,
 							RunAsUser,
 							customImageRegistry,
+							imageVersion,
 						),
 					},
 					Containers: []corev1.Container{

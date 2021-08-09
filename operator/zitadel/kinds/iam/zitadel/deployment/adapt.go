@@ -182,6 +182,7 @@ func deploymentDef(
 							users,
 							RunAsUser,
 							customImageRegistry,
+							*version,
 						),
 					},
 					Containers: []corev1.Container{

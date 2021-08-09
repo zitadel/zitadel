@@ -32,8 +32,8 @@ func getMigrationContainer(
 				Name:      migrationConfigmap,
 				MountPath: migrationsPath,
 			}, {
-				Name:      certTempMountPath,
-				MountPath: dbCerts,
+				Name:      dbCerts,
+				MountPath: certTempMountPath,
 			},
 		},
 
