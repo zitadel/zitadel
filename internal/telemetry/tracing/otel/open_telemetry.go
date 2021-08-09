@@ -18,10 +18,12 @@ type Tracer struct {
 }
 
 func NewTracer(name string, sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) *Tracer {
+	spanProcessor := sdk_trace.NewBatchSpanProcessor(exporter)
 	tp := sdk_trace.NewTracerProvider(
 		sdk_trace.WithSampler(sampler),
 		sdk_trace.WithSyncer(exporter),
 		sdk_trace.WithBatcher(exporter),
+		sdk_trace.WithSpanProcessor(spanProcessor),
 	)
 
 	otel.SetTracerProvider(tp)
