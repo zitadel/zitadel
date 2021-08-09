@@ -28,7 +28,7 @@ func (c *Config) NewTracer() error {
 	}
 
 	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
-	exporter, err := texporter.NewExporter(texporter.WithProjectID(c.ProjectID))
+	exporter, err := texporter.New(texporter.WithProjectID(c.ProjectID))
 	if err != nil {
 		return err
 	}
