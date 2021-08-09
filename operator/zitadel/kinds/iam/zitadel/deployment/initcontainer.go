@@ -71,8 +71,8 @@ func GetInitContainer(
 		TerminationMessagePath:   "/dev/termination-log",
 		ImagePullPolicy:          corev1.PullIfNotPresent,
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:  helpers.PointerInt64(1000),
-			RunAsGroup: helpers.PointerInt64(1000),
+			RunAsUser:  helpers.PointerInt64(runAsUser),
+			RunAsGroup: helpers.PointerInt64(runAsUser),
 		},
 	}
 }

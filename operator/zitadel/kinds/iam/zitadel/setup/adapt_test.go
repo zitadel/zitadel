@@ -60,7 +60,7 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		},
 	}
 
-	initContainers := []corev1.Container{deployment.GetInitContainer(rootSecret, dbSecrets, users, deployment.RunAsUser, "")}
+	initContainers := []corev1.Container{deployment.GetInitContainer(rootSecret, dbSecrets, users, deployment.RunAsUser, "", version)}
 	containers := []corev1.Container{deployment.GetContainer(
 		containerName,
 		version,
