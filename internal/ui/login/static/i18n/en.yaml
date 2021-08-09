@@ -260,6 +260,11 @@ ExternalNotFoundOption:
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
   AutoRegisterButtonText: Auto register
+  TosAndPrivacyLabel: Terms and conditions
+  TosConfirm: I accept the
+  TosLinkText: TOS
+  TosConfirmAnd: and the
+  PrivacyLinkText: privacy policy
 
 Footer:
   PoweredBy: Powered By

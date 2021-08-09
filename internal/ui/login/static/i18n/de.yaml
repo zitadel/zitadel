@@ -260,6 +260,11 @@ ExternalNotFoundOption:
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
   AutoRegisterButtonText: Automatisches registrieren
+  TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
+  TosConfirm: Ich akzeptiere die
+  TosLinkText: AGBs
+  TosConfirmAnd: und die
+  PrivacyLinkText: Datenschutzerklärung
 
 Footer:
   PoweredBy: Powered By

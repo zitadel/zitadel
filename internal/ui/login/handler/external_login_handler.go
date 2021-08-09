@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
 	"golang.org/x/oauth2"
@@ -11,9 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"net/http"
-	"strings"
-	"time"
 )
 
 const (
@@ -34,6 +35,7 @@ type externalNotFoundOptionFormData struct {
 	Link         bool `schema:"link"`
 	AutoRegister bool `schema:"autoregister"`
 	ResetLinking bool `schema:"resetlinking"`
+	TermsConfirm bool `schema:"terms-confirm"`
 }
 
 type externalNotFoundOptionData struct {
