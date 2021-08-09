@@ -47,7 +47,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.EventPusher) []*repository.E
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
-			AggregateType: repository.AggregateType(event.Aggregate().Typ),
+			AggregateType: repository.AggregateType(event.Aggregate().Type),
 			ResourceOwner: event.Aggregate().ResourceOwner,
 			EditorService: event.EditorService(),
 			EditorUser:    event.EditorUser(),
@@ -149,7 +149,7 @@ func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 		EditorUser:                    event.EditorUser(),
 		Version:                       repository.Version(event.Aggregate().Version),
 		AggregateID:                   event.Aggregate().ID,
-		AggregateType:                 repository.AggregateType(event.Aggregate().Typ),
+		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
 		ResourceOwner:                 event.Aggregate().ResourceOwner,
 	}
 }

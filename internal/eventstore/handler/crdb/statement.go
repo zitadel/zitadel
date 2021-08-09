@@ -283,7 +283,7 @@ func NewNoOpStatement(aggregateType eventstore.AggregateType, sequence, previous
 
 func NoOpStatementFromEvent(event eventstore.EventReader) handler.Statement {
 	return handler.Statement{
-		AggregateType:    event.Aggregate().Typ,
+		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
 	}

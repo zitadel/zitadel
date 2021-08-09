@@ -19,7 +19,7 @@ func NewAggregate(
 ) *Aggregate {
 	a := &Aggregate{
 		ID:            id,
-		Typ:           typ,
+		Type:          typ,
 		ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		Version:       version,
 	}
@@ -47,7 +47,7 @@ func AggregateFromWriteModel(
 ) *Aggregate {
 	return &Aggregate{
 		ID:            wm.AggregateID,
-		Typ:           typ,
+		Type:          typ,
 		ResourceOwner: wm.ResourceOwner,
 		Version:       version,
 	}
@@ -57,8 +57,8 @@ func AggregateFromWriteModel(
 type Aggregate struct {
 	//ID is the unique identitfier of this aggregate
 	ID string `json:"-"`
-	//Typ is the name of the aggregate.
-	Typ AggregateType `json:"-"`
+	//Type is the name of the aggregate.
+	Type AggregateType `json:"-"`
 	//ResourceOwner is the org this aggregates belongs to
 	ResourceOwner string `json:"-"`
 	//Version is the semver this aggregate represents

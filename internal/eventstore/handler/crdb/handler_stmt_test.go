@@ -1451,7 +1451,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 func testReduce(stmts ...handler.Statement) handler.Reduce {
 	return func(event eventstore.EventReader) ([]handler.Statement, error) {
 		return []handler.Statement{
-			NewNoOpStatement(event.Aggregate().Typ, event.Sequence(), event.PreviousAggregateSequence()),
+			NewNoOpStatement(event.Aggregate().Type, event.Sequence(), event.PreviousAggregateSequence()),
 		}, nil
 	}
 }

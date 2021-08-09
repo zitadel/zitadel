@@ -16,7 +16,7 @@ type Aggregate struct {
 func NewAggregate(id, resourceOwner string) *Aggregate {
 	return &Aggregate{
 		Aggregate: eventstore.Aggregate{
-			Typ:           AggregateType,
+			Type:          AggregateType,
 			Version:       AggregateVersion,
 			ID:            id,
 			ResourceOwner: resourceOwner,

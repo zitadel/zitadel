@@ -71,7 +71,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) ([]
 
 	return []handler.Statement{
 		crdb.NewCreateStatement(
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -91,12 +91,12 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 	e := event.(*project.ProjectChangeEvent)
 
 	if e.Name == nil {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Type, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -115,7 +115,7 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReade
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -134,7 +134,7 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReade
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -153,7 +153,7 @@ func (p *ProjectProjection) reduceProjectRemoved(event eventstore.EventReader) (
 
 	return []handler.Statement{
 		crdb.NewDeleteStatement(
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{

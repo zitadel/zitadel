@@ -62,12 +62,12 @@ func notify(events []EventReader) {
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 	for _, event := range events {
-		subs, ok := subscriptions[event.Aggregate().Typ]
+		subs, ok := subscriptions[event.Aggregate().Type]
 		if !ok {
 			continue
 		}
 		for _, sub := range subs {
-			eventTypes := sub.types[event.Aggregate().Typ]
+			eventTypes := sub.types[event.Aggregate().Type]
 			//subscription for all events
 			if len(eventTypes) == 0 {
 				sub.Events <- event
@@ -119,7 +119,7 @@ func mapEventToV1Event(event EventReader) *models.Event {
 		Sequence:      event.Sequence(),
 		CreationDate:  event.CreationDate(),
 		Type:          models.EventType(event.Type()),
-		AggregateType: models.AggregateType(event.Aggregate().Typ),
+		AggregateType: models.AggregateType(event.Aggregate().Type),
 		AggregateID:   event.Aggregate().ID,
 		ResourceOwner: event.Aggregate().ResourceOwner,
 		EditorService: event.EditorService(),

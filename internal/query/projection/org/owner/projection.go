@@ -118,7 +118,7 @@ func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) ([]
 	}
 
 	if !isOrgOwner(e.Roles) {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Type, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	stmt, err := p.addOwner(e, e.Aggregate().ResourceOwner, e.UserID)
@@ -168,7 +168,7 @@ func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReade
 	return []handler.Statement{
 		crdb.NewProjectionUpdateStatement(
 			userTableSuffix,
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -203,13 +203,13 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Type, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewProjectionUpdateStatement(
 			userTableSuffix,
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			values,
@@ -229,7 +229,7 @@ func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) ([]han
 	return []handler.Statement{
 		crdb.NewProjectionCreateStatement(
 			orgTableSuffix,
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -254,13 +254,13 @@ func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Typ, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Type, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewProjectionUpdateStatement(
 			orgTableSuffix,
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			values,
@@ -282,7 +282,7 @@ func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 		//delete org in org table
 		crdb.NewProjectionDeleteStatement(
 			orgTableSuffix,
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -292,7 +292,7 @@ func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 		// delete users of the org
 		crdb.NewProjectionDeleteStatement(
 			userTableSuffix,
-			e.Aggregate().Typ,
+			e.Aggregate().Type,
 			e.Sequence(),
 			e.PreviousAggregateTypeSequence(),
 			[]handler.Column{
@@ -314,7 +314,7 @@ func isOrgOwner(roles []string) bool {
 func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) handler.Statement {
 	return crdb.NewProjectionDeleteStatement(
 		userTableSuffix,
-		event.Aggregate().Typ,
+		event.Aggregate().Type,
 		event.Sequence(),
 		event.PreviousAggregateTypeSequence(),
 		[]handler.Column{
@@ -373,7 +373,7 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 
 	return crdb.NewProjectionUpsertStatement(
 		userTableSuffix,
-		event.Aggregate().Typ,
+		event.Aggregate().Type,
 		event.Sequence(),
 		event.PreviousAggregateTypeSequence(),
 		values), nil
