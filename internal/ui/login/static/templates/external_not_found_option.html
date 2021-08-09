@@ -45,10 +45,10 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
         
-        <button class="lgn-raised-button lgn-primary" name="link" value="true"
+        <button class="lgn-raised-button lgn-primary" id="link-button" name="link" value="true"
             formnovalidate>{{t "ExternalNotFoundOption.LinkButtonText"}}</button>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" name="autoregister" value="true"
+        <button class="lgn-raised-button lgn-primary" id="auto-register-button" name="autoregister" value="true"
             formnovalidate>{{t "ExternalNotFoundOption.AutoRegisterButtonText"}}</button>
     </div>
 
@@ -57,6 +57,6 @@
 
 
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl "scripts/external_not_found_check.js" }}"></script>
 
 {{template "main-bottom" .}}
