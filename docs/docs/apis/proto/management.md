@@ -236,6 +236,78 @@ Changes the username
     GET: /users/{user_id}/username
 
 
+### SetUserMetadata
+
+> **rpc** SetUserMetadata([SetUserMetadataRequest](#setusermetadatarequest))
+[SetUserMetadataResponse](#setusermetadataresponse)
+
+Sets a user metadata by key
+
+
+
+    POST: /users/{id}/metadata/{key}
+
+
+### BulkSetUserMetadata
+
+> **rpc** BulkSetUserMetadata([BulkSetUserMetadataRequest](#bulksetusermetadatarequest))
+[BulkSetUserMetadataResponse](#bulksetusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    POST: /users/{id}/metadata/_bulk
+
+
+### ListUserMetadata
+
+> **rpc** ListUserMetadata([ListUserMetadataRequest](#listusermetadatarequest))
+[ListUserMetadataResponse](#listusermetadataresponse)
+
+Returns the user metadata
+
+
+
+    POST: /users/{id}/metadata/_search
+
+
+### GetUserMetadata
+
+> **rpc** GetUserMetadata([GetUserMetadataRequest](#getusermetadatarequest))
+[GetUserMetadataResponse](#getusermetadataresponse)
+
+Returns the user metadata by key
+
+
+
+    GET: /users/{id}/metadata/{key}
+
+
+### RemoveUserMetadata
+
+> **rpc** RemoveUserMetadata([RemoveUserMetadataRequest](#removeusermetadatarequest))
+[RemoveUserMetadataResponse](#removeusermetadataresponse)
+
+Removes a user metadata by key
+
+
+
+    DELETE: /users/{id}/metadata/{key}
+
+
+### BulkRemoveUserMetadata
+
+> **rpc** BulkRemoveUserMetadata([BulkRemoveUserMetadataRequest](#bulkremoveusermetadatarequest))
+[BulkRemoveUserMetadataResponse](#bulkremoveusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    DELETE: /users/{id}/metadata/_bulk
+
+
 ### GetHumanProfile
 
 > **rpc** GetHumanProfile([GetHumanProfileRequest](#gethumanprofilerequest))
@@ -3346,6 +3418,64 @@ This is an empty request
 
 
 
+### BulkRemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| metadata | repeated BulkSetUserMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### DeactivateAppRequest
 
 
@@ -4479,6 +4609,29 @@ This is an empty request
 
 
 
+### GetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### HealthzRequest
 This is an empty request
 
@@ -5259,6 +5412,31 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.user.v1.Membership | - |  |
+
+
+
+
+### ListUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -6067,6 +6245,29 @@ This is an empty response
 
 
 
+### RemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveUserRequest
 
 
@@ -6750,6 +6951,31 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 

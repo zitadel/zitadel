@@ -154,6 +154,7 @@ PasswordlessRegistrationDone:
   Title: Passwordless set up
   Description: Token for passwordless successfully added.
   NextButtonText: next
+  CancelButtonText: cancel
 
 PasswordChange:
   Title: Change Password
