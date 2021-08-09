@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	key_model "github.com/caos/zitadel/internal/key/model"
 )

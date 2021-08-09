@@ -17,7 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	es2 "github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
 	key_model "github.com/caos/zitadel/internal/key/model"
@@ -101,6 +101,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			Command:                    command,
 			AuthRequests:               authReq,
 			View:                       view,
+			Eventstore:                 es,
 			UserSessionViewProvider:    view,
 			UserViewProvider:           view,
 			UserCommandProvider:        command,
@@ -156,6 +157,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			SearchLimit:    conf.SearchLimit,
 			View:           view,
 			SystemDefaults: systemDefaults,
+			Eventstore:     es,
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
