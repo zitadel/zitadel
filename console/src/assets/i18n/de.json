@@ -676,6 +676,9 @@
       "RELEASE":"Jetzt loslassen",
       "DROPFONT":"Fontdatei hier ablegen",
       "RELEASEFONT":"Jetzt loslassen",
+      "MAXSIZE":"Die maximale Grösse von Uploads ist mit 524kB begrenzt",
+      "MAXSIZEEXCEEDED":"Maximale Grösse von 524kB überschritten",
+      "FONTINLOGINONLY":"Die Schriftart wird momentan nur im Login interface angezeigt.",
       "PREVIEW": {
         "TITLE":"Anmeldung",
         "SECOND":"mit ZITADEL-Konto anmelden.",

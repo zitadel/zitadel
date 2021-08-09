@@ -676,6 +676,9 @@
       "RELEASE":"Release",
       "DROPFONT":"Drop fontfile here",
       "RELEASEFONT":"Release",
+      "MAXSIZE":"The maximum size is limited to 524kB",
+      "MAXSIZEEXCEEDED":"Maximum size of 524kB exceeded.",
+      "FONTINLOGINONLY":"The font is currently only displayed in the login interface.",
       "PREVIEW": {
         "TITLE":"Login",
         "SECOND":"login with your ZITADEL-Account.",
@@ -817,7 +820,7 @@
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
       "ERRORMSGPOPUP":"Show Error in Dialog",
-      "DISABLEWATERMARK":"Disable Watermark"
+      "DISABLEWATERMARK":"Hide Watermark"
     },
     "RESET": "Reset Policy",
     "CREATECUSTOM": "Create Custom Policy",

@@ -1,6 +1,6 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.IAM_POLICY.TITLE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
     <ng-template appHasRole [appHasRole]="['iam.policy.delete']">
         <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"

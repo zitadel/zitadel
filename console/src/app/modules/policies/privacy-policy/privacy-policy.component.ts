@@ -144,4 +144,12 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
+
+  public get isDefault(): boolean {
+    if (this.privacyPolicy && this.serviceType === PolicyComponentServiceType.MGMT) {
+      return (this.privacyPolicy as PrivacyPolicy.AsObject).isDefault;
+    } else {
+      return false;
+    }
+  }
 }

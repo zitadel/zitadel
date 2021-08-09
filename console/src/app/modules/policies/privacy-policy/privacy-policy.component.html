@@ -2,6 +2,8 @@
   [title]="'POLICY.PRIVACY_POLICY.TITLE' | translate"
   [description]="'POLICY.PRIVACY_POLICY.DESCRIPTION' | translate">
 
+  <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
+
   <cnsl-info-section class="warn"
     *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) == false"
     type="WARN">
