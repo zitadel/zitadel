@@ -3,7 +3,6 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
-import { GetDefaultDomainClaimedMessageTextRequest } from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -87,12 +86,15 @@ import {
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
   GetCustomLoginTextsResponse,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyEmailMessageTextResponse,
   GetCustomVerifyPhoneMessageTextRequest,
   GetCustomVerifyPhoneMessageTextResponse,
+  GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultDomainClaimedMessageTextResponse,
   GetDefaultInitMessageTextRequest,
   GetDefaultInitMessageTextResponse,
@@ -102,6 +104,8 @@ import {
   GetDefaultLoginTextsResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -290,6 +294,8 @@ import {
   ResetCustomInitMessageTextToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
+  ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
   ResetCustomPasswordResetMessageTextToDefaultResponse,
   ResetCustomVerifyEmailMessageTextToDefaultRequest,
@@ -315,6 +321,8 @@ import {
   SetCustomInitMessageTextResponse,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
+  SetCustomPasswordlessRegistrationMessageTextRequest,
+  SetCustomPasswordlessRegistrationMessageTextResponse,
   SetCustomPasswordResetMessageTextRequest,
   SetCustomPasswordResetMessageTextResponse,
   SetCustomVerifyEmailMessageTextRequest,
@@ -534,6 +542,29 @@ export class ManagementService {
     const req = new ResetCustomDomainClaimedMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomDomainClaimedMessageTextToDefault(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultPasswordlessRegistrationMessageText(req: GetDefaultPasswordlessRegistrationMessageTextRequest):
+    Promise<GetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomPasswordlessRegistrationMessageText(req: GetCustomPasswordlessRegistrationMessageTextRequest):
+    Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomPasswordlessRegistrationMessageCustomText(req: SetCustomPasswordlessRegistrationMessageTextRequest):
+    Promise<SetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomPasswordlessRegistrationMessageCustomText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomPasswordlessRegistrationMessageTextToDefault(lang: string):
+    Promise<ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomPasswordlessRegistrationMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
   public listOrgIDPs(

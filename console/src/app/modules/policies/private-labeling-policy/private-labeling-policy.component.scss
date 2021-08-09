@@ -1,6 +1,6 @@
-@import './preview/preview.component.scss';
-
 @use '~@angular/material' as mat;
+
+@import './preview/preview.component.scss';
 
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);

@@ -779,13 +779,25 @@
         "VE":"Emailverifikation",
         "VP":"Telefonnummerverifikation",
         "PR":"Password Wiederherstellung",
-        "DC":"Domainbeanspruchung"
+        "DC":"Domainbeanspruchung",
+        "PL":"Passwordless"
       },
       "CHIPS": {
         "firstname":"Vorname",
         "lastname":"Nachname",
         "code":"Code",
-        "preferredLoginName":"Bevorzugter Anmeldename"
+        "preferredLoginName":"Bevorzugter Anmeldename",
+        "displayName":"Anzeigename",
+        "nickName":"Spitzname",
+        "loginnames":"Loginnamen",
+        "domain":"Domain",
+        "lastEmail":"Letzte email",
+        "lastPhone":"Letzte Telefonnummer",
+        "verifiedEmail":"Verifizierte email",
+        "verifiedPhone":"Verifizierte Telefonnummer",
+        "changedate":"Änderungsdatum",
+        "username":"Username",
+        "tempUsername":"Temp. Username"
       },
       "TOAST": {
         "UPDATED":"Benutzerdefinierte Texte gespeichert."

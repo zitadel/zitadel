@@ -1,4 +1,4 @@
-<div class="max-width-container">
+<div [ngClass]="{'max-width-container': maxWidth, 'enlarged-container': !maxWidth}">
     <div class="detail-container">
         <div class="detail-left">
             <a *ngIf="backRouterLink" [routerLink]="backRouterLink" mat-icon-button>

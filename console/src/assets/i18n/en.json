@@ -781,13 +781,25 @@
         "VE":"Verify Email",
         "VP":"Verify Phone",
         "PR":"Password Reset",
-        "DC":"Domain Claim"
+        "DC":"Domain Claim",
+        "PL":"Passwordless"
       },
       "CHIPS": {
         "firstname":"Firstname",
         "lastname":"Lastname",
         "code":"Code",
-        "preferredLoginName":"Preferred Login Name"
+        "preferredLoginName":"Preferred Login Name",
+        "displayName":"Displayname",
+        "nickName":"Nickname",
+        "loginnames":"Login names",
+        "domain":"Domain",
+        "lastEmail":"Last email",
+        "lastPhone":"Last phone",
+        "verifiedEmail":"Verified email",
+        "verifiedPhone":"Verified phone",
+        "changedate":"Change date",
+        "username":"Username",
+        "tempUsername":"Temp username"
       },
       "TOAST": {
         "UPDATED":"Custom Texts saved."

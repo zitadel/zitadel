@@ -27,6 +27,8 @@ import {
   GetCustomLoginTextsResponse,
   GetCustomOrgIAMPolicyRequest,
   GetCustomOrgIAMPolicyResponse,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
@@ -41,6 +43,8 @@ import {
   GetDefaultInitMessageTextResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -124,6 +128,8 @@ import {
   SetDefaultFeaturesResponse,
   SetDefaultInitMessageTextRequest,
   SetDefaultInitMessageTextResponse,
+  SetDefaultPasswordlessRegistrationMessageTextRequest,
+  SetDefaultPasswordlessRegistrationMessageTextResponse,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultPasswordResetMessageTextResponse,
   SetDefaultVerifyEmailMessageTextRequest,
@@ -273,6 +279,22 @@ export class AdminService {
   public setDefaultDomainClaimedMessageText(req: SetDefaultDomainClaimedMessageTextRequest):
     Promise<SetDefaultDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultPasswordlessRegistrationMessageText(req: GetDefaultPasswordlessRegistrationMessageTextRequest):
+    Promise<GetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomPasswordlessRegistrationMessageText(req: GetCustomPasswordlessRegistrationMessageTextRequest):
+    Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultPasswordlessRegistrationMessageText(req: SetDefaultPasswordlessRegistrationMessageTextRequest):
+    Promise<SetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
   }
 
   public SetUpOrg(
