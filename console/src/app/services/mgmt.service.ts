@@ -564,7 +564,8 @@ export class ManagementService {
     Promise<ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse.AsObject> {
     const req = new ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest();
     req.setLanguage(lang);
-    return this.grpcService.mgmt.resetCustomPasswordlessRegistrationMessageTextToDefault(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.resetCustomPasswordlessRegistrationMessageTextToDefault(req, null)
+      .then(resp => resp.toObject());
   }
 
   public listOrgIDPs(

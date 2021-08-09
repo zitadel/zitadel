@@ -513,7 +513,8 @@ export class MessageTextsComponent implements OnDestroy {
         case MESSAGETYPES.DOMAINCLAIMED:
           return handler((this.service as ManagementService).setCustomDomainClaimedMessageCustomText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
-          return handler((this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(this.updateRequest));
+          return handler((this.service as ManagementService)
+            .getCustomPasswordlessRegistrationMessageText(this.updateRequest));
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       switch (this.currentType) {
@@ -528,7 +529,8 @@ export class MessageTextsComponent implements OnDestroy {
         case MESSAGETYPES.DOMAINCLAIMED:
           return handler((this.service as AdminService).setDefaultDomainClaimedMessageText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
-          return handler((this.service as AdminService).setDefaultPasswordlessRegistrationMessageText(this.updateRequest));
+          return handler((this.service as AdminService)
+            .setDefaultPasswordlessRegistrationMessageText(this.updateRequest));
       }
     }
   }
@@ -570,7 +572,8 @@ export class MessageTextsComponent implements OnDestroy {
             case MESSAGETYPES.DOMAINCLAIMED:
               return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(this.locale));
             case MESSAGETYPES.DOMAINCLAIMED:
-              return handler((this.service as ManagementService).resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale));
+              return handler((this.service as ManagementService)
+                .resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale));
 
           }
 
