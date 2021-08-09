@@ -761,7 +761,6 @@
         "passwordChangeText":"Password change",
         "passwordResetDoneText":"Password reset done",
         "passwordText":"Password",
-        "passwordlessText":"Passwordless",
         "registrationOptionText":"Registration Options",
         "registrationOrgText":"Register Org",
         "registrationUserText":"Register User",
@@ -770,7 +769,11 @@
         "usernameChangeDoneText":"Username change done",
         "usernameChangeText":"Username change",
         "verifyMfaOtpText":"Verify OTP",
-        "verifyMfaU2fText":"Verify Universal Second Factor"
+        "verifyMfaU2fText":"Verify Universal Second Factor",
+        "passwordlessPromptText":"Passwordless Prompt",
+        "passwordlessRegistrationDoneText":"Passwordless Registration Done",
+        "passwordlessRegistrationText":"Passwordless Registration",
+        "passwordlessText":"Passwordless"
       }
     },
     "MESSAGE_TEXTS": {

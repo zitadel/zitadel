@@ -759,7 +759,6 @@
         "passwordChangeText":"Passwortwechsel",
         "passwordResetDoneText":"Passwort zurücksetzen erfolgreich",
         "passwordText":"Passwort",
-        "passwordlessText":"Passwortlose Authentifizierung",
         "registrationOptionText":"Registrierungsoptionen",
         "registrationOrgText":"Organisation registrieren",
         "registrationUserText":"Benutzer registrieren",
@@ -768,7 +767,11 @@
         "usernameChangeDoneText":"Benutzernamenwechsel erfolgreich",
         "usernameChangeText":"Benutzernamenwechsel",
         "verifyMfaOtpText":"OTP Verifikation",
-        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation"
+        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation",
+        "passwordlessPromptText":"Passwordless Aufforderung",
+        "passwordlessRegistrationDoneText":"Passwordless setzen erfolgreich",
+        "passwordlessRegistrationText":"Passwordless Registrierung",
+        "passwordlessText":"Passwordless"
       }
     },
     "MESSAGE_TEXTS": {
