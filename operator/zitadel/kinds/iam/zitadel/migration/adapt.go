@@ -31,13 +31,14 @@ const (
 	migrationConfigmap = "migrate-db"
 	migrationsPath     = "/migrate"
 	rootUserInternal   = "root"
-	rootUserPath       = "/certificates"
 	envMigrationUser   = "FLYWAY_USER"
 	envMigrationPW     = "FLYWAY_PASSWORD"
 	jobNamePrefix      = "cockroachdb-cluster-migration-"
 	createFile         = "create.sql"
 	grantFile          = "grant.sql"
 	deleteFile         = "delete.sql"
+	rootSecretName     = "cockroachdb.client.root"
+	dbCerts            = "dbcerts"
 )
 
 func AdaptFunc(
@@ -109,7 +110,7 @@ func AdaptFunc(
 							},
 							NodeSelector:   nodeselector,
 							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry, version),
+							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry, version, dbCerts),
 							Containers: []corev1.Container{
 								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry),
 							},
@@ -128,7 +129,7 @@ func AdaptFunc(
 								Name: rootUserInternal,
 								VolumeSource: corev1.VolumeSource{
 									Secret: &corev1.SecretVolumeSource{
-										SecretName:  "cockroachdb.client.root",
+										SecretName:  rootSecretName,
 										DefaultMode: helpers.PointerInt32(0400),
 									},
 								},
@@ -138,6 +139,11 @@ func AdaptFunc(
 									Secret: &corev1.SecretVolumeSource{
 										SecretName: secretPasswordName,
 									},
+								},
+							}, {
+								Name: dbCerts,
+								VolumeSource: corev1.VolumeSource{
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							}},
 						},

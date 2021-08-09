@@ -103,7 +103,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,
-					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, "", version),
+					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, "", version, dbCerts),
 					Containers: []corev1.Container{
 						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, ""),
 					},
@@ -122,7 +122,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 						Name: rootUserInternal,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName:  "cockroachdb.client.root",
+								SecretName:  rootSecretName,
 								DefaultMode: helpers.PointerInt32(0400),
 							},
 						},
@@ -132,6 +132,11 @@ func TestMigration_AdaptFunc(t *testing.T) {
 							Secret: &corev1.SecretVolumeSource{
 								SecretName: secretPasswordName,
 							},
+						},
+					}, {
+						Name: dbCerts,
+						VolumeSource: corev1.VolumeSource{
+							EmptyDir: &corev1.EmptyDirVolumeSource{},
 						},
 					}},
 				},

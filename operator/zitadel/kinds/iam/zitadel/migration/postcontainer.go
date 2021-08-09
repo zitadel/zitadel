@@ -16,6 +16,7 @@ func getPostContainers(
 	secretPasswordName string,
 	customImageRegistry string,
 	version string,
+	dbCerts string,
 ) []corev1.Container {
 
 	return []corev1.Container{
@@ -26,14 +27,16 @@ func getPostContainers(
 			Args: []string{
 				strings.Join([]string{
 					deleteUserCommand(envMigrationUser, deleteFile),
-					"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + deleteFile + ")\";",
+					"cockroach.sh sql --certs-dir=" + certTempMountPath + " --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + deleteFile + ")\";",
 				}, ";"),
 			},
 			Env: baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
-			VolumeMounts: []corev1.VolumeMount{{
-				Name:      rootUserInternal,
-				MountPath: rootUserPath,
-			}},
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      dbCerts,
+					MountPath: dbCerts,
+				},
+			},
 			SecurityContext: &corev1.SecurityContext{
 				RunAsUser:    helpers.PointerInt64(1000),
 				RunAsGroup:   helpers.PointerInt64(1000),

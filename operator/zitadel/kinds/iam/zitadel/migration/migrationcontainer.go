@@ -22,18 +22,20 @@ func getMigrationContainer(
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
 		Args: []string{
-			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
+			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + certTempMountPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
 			"-locations=filesystem:" + migrationsPath,
 			"migrate",
 		},
 		Env: migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName, users),
-		VolumeMounts: []corev1.VolumeMount{{
-			Name:      migrationConfigmap,
-			MountPath: migrationsPath,
-		}, {
-			Name:      rootUserInternal,
-			MountPath: rootUserPath,
-		}},
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      migrationConfigmap,
+				MountPath: migrationsPath,
+			}, {
+				Name:      certTempMountPath,
+				MountPath: dbCerts,
+			},
+		},
 
 		SecurityContext: &corev1.SecurityContext{
 			RunAsNonRoot: helpers.PointerBool(true),
