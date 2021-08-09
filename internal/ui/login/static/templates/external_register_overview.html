@@ -1,0 +1,114 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "ExternalRegistrationUserOverview.Title"}}</h1>
+    <p>{{t "ExternalRegistrationUserOverview.Description"}}</p>
+</div>
+
+
+<form action="{{ externalRegistrationUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="externalIDPConfigID" value="{{ .ExternalIDPID }}" />
+    <input type="hidden" name="externalIDPExtUserID" value="{{ .ExternalIDPUserID }}" />
+    <input type="hidden" name="externalIDPExtDisplayName" value="{{ .ExternalIDPUserDisplayName }}" />
+    <input type="hidden" name="externalEmail" value="{{ .ExternalEmail }}" />
+    <input type="hidden" name="externalEmailVerified" value="{{ .ExternalEmailVerified }}" />
+    <input type="hidden" name="externalPhone" value="{{ .ExternalPhone }}" />
+    <input type="hidden" name="externalPhone" value="{{ .ExternalPhoneVerified }}" />
+
+    <div class="lgn-register">
+
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="firstname">{{t "ExternalRegistrationUserOverview.FirstnameLabel"}}</label>
+                <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
+                       value="{{ .Firstname }}" autofocus required>
+            </div>
+            <div class="lgn-field">
+                <label class="lgn-label" for="lastname">{{t "ExternalRegistrationUserOverview.LastnameLabel"}}</label>
+                <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
+                       value="{{ .Lastname }}" required>
+            </div>
+        </div>
+
+        <div class="lgn-field double">
+            <label class="lgn-label" for="email">{{t "ExternalRegistrationUserOverview.EmailLabel"}}</label>
+            <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
+        </div>
+
+        <div class="lgn-field double">
+            <label class="lgn-label" for="phone">{{t "ExternalRegistrationUserOverview.PhoneLabel"}}</label>
+            <input class="lgn-input" type="text" id="phone" name="phone" autocomplete="tel" value="{{ .Phone }}">
+        </div>
+
+        {{if .ShowUsername}}
+        <div class="lgn-field double">
+            <label class="lgn-label" for="username">{{t "ExternalRegistrationUserOverview.UsernameLabel"}}</label>
+            <div class="lgn-suffix-wrapper">
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
+                {{if .DisplayLoginNameSuffix}}
+                <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="languages">{{t "ExternalRegistrationUserOverview.LanguageLabel"}}</label>
+                <select id="languages" name="language">
+                    <option value=""></option>
+                    <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "ExternalRegistrationUserOverview.German"}}
+                    </option>
+                    <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "ExternalRegistrationUserOverview.English"}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        {{ if or .TOSLink .PrivacyLink }}
+        <div class="lgn-field">
+            <label class="lgn-label">{{t "ExternalRegistrationUserOverview.TosAndPrivacyLabel"}}</label>
+            <div class="lgn-checkbox">
+                <input type="checkbox" id="register-term-confirmation"
+                       name="register-term-confirmation" required>
+                <label for="register-term-confirmation">
+                    {{t "ExternalRegistrationUserOverview.TosConfirm"}}
+                    {{ if .TOSLink }}
+                    <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
+                        {{t "ExternalRegistrationUserOverview.TosLinkText"}}
+                    </a>
+                    {{end}}
+                    {{ if and .TOSLink .PrivacyLink }}
+                    {{t "ExternalRegistrationUserOverview.TosConfirmAnd"}}
+                    {{ end }}
+                    {{ if .PrivacyLink }}
+                    <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
+                        {{t "ExternalRegistrationUserOverview.PrivacyLinkText"}}
+                    </a>
+                    {{end}}
+                </label>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+
+    {{template "error-message" .}}
+
+    <div class="lgn-actions">
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "ExternalRegistrationUserOverview.BackButtonText"}}
+        </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "ExternalRegistrationUserOverview.NextButtonText"}}</button>
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+
+{{template "main-bottom" .}}

@@ -1,11 +1,13 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "ExternalNotFoundOption.Title"}}</h1>
-    <p>{{t "ExternalNotFoundOption.Description"}}</p>
+    <h1>{{t "ExternalRegistrationUser.Title"}}</h1>
+    <p>{{t "ExternalRegistrationUser.Description"}}</p>
+
 </div>
 
-<form action="{{ externalNotFoundOptionUrl }}" method="POST">
+
+<form action="{{ registrationUrl }}" method="POST">
 
     {{ .CSRF }}
 
@@ -13,25 +15,102 @@
 
     <div class="lgn-register">
 
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="firstname">{{t "RegistrationUser.FirstnameLabel"}}</label>
+                <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
+                       value="{{ .Firstname }}" autofocus required>
+            </div>
+            <div class="lgn-field">
+                <label class="lgn-label" for="lastname">{{t "RegistrationUser.LastnameLabel"}}</label>
+                <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
+                       value="{{ .Lastname }}" required>
+            </div>
+        </div>
+
+        <div class="lgn-field double">
+            <label class="lgn-label" for="email">{{t "RegistrationUser.EmailLabel"}}</label>
+            <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
+        </div>
+
+        {{if .ShowUsername}}
+        <div class="lgn-field double">
+            <label class="lgn-label" for="email">{{t "RegistrationUser.UsernameLabel"}}</label>
+            <div class="lgn-suffix-wrapper">
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
+                {{if .DisplayLoginNameSuffix}}
+                <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="languages">{{t "RegistrationUser.LanguageLabel"}}</label>
+                <select id="languages" name="language">
+                    <option value=""></option>
+                    <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "RegistrationUser.German"}}
+                    </option>
+                    <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "RegistrationUser.English"}}
+                    </option>
+                </select>
+            </div>
+            <div class="lgn-field" >
+                <label class="lgn-label" for="genders">
+                    {{t "RegistrationUser.GenderLabel"}}
+                    <span class="optional">{{t "optional"}}</span>
+                </label>
+                <select id="genders" name="gender">
+                    <option value=""></option>
+                    <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "RegistrationUser.Female"}}
+                    </option>
+                    <option value="2" id="male" {{if (selectedGender 2)}} selected {{end}}>{{t "RegistrationUser.Male"}}
+                    </option>
+                    <option value="3" id="diverse" {{if (selectedGender 3)}} selected {{end}}>{{t "RegistrationUser.Diverse"}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="register-password">{{t "RegistrationUser.PasswordLabel"}}</label>
+                <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
+                       data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
+                       data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="register-password"
+                       name="register-password" autocomplete="new-password" required>
+            </div>
+            <div class="lgn-field">
+                <label class="lgn-label" for="register-password-confirmation">{{t "RegistrationUser.PasswordConfirmLabel"}}</label>
+                <input class="lgn-input" type="password" id="register-password-confirmation"
+                       name="register-password-confirmation" autocomplete="new-password" required>
+            </div>
+        </div>
+
+        <div class="lgn-field">
+            {{ .PasswordPolicyDescription }}
+        </div>
+
         {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
-            <label class="lgn-label">{{t "ExternalNotFoundOption.TosAndPrivacyLabel"}}</label>
+            <label class="lgn-label">{{t "RegistrationUser.TosAndPrivacyLabel"}}</label>
             <div class="lgn-checkbox">
                 <input type="checkbox" id="register-term-confirmation"
                        name="register-term-confirmation" required>
                 <label for="register-term-confirmation">
-                    {{t "ExternalNotFoundOption.TosConfirm"}}
+                    {{t "RegistrationUser.TosConfirm"}}
                     {{ if .TOSLink }}
                     <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
-                        {{t "ExternalNotFoundOption.TosLinkText"}}
+                        {{t "RegistrationUser.TosLinkText"}}
                     </a>
                     {{end}}
                     {{ if and .TOSLink .PrivacyLink }}
-                    {{t "ExternalNotFoundOption.TosConfirmAnd"}}
+                    {{t "RegistrationUser.TosConfirmAnd"}}
                     {{ end }}
                     {{ if .PrivacyLink }}
                     <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
-                        {{t "ExternalNotFoundOption.PrivacyLinkText"}}
+                        {{t "RegistrationUser.PrivacyLinkText"}}
                     </a>
                     {{end}}
                 </label>
@@ -39,24 +118,21 @@
         </div>
         {{ end }}
     </div>
-    <div class="lgn-actions">
-        <button class="lgn-icon-button lgn-left-action" name="resetlinking" value="true"
-            formnovalidate>
-            <i class="lgn-icon-arrow-left-solid"></i>
-        </button>
-        
-        <button class="lgn-raised-button lgn-primary" id="link-button" name="link" value="true"
-            formnovalidate>{{t "ExternalNotFoundOption.LinkButtonText"}}</button>
-        <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="auto-register-button" name="autoregister" value="true"
-            formnovalidate>{{t "ExternalNotFoundOption.AutoRegisterButtonText"}}</button>
-    </div>
 
     {{template "error-message" .}}
+
+    <div class="lgn-actions">
+        <a class="lgn-stroked-button lgn-primary" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "RegistrationUser.BackButtonText"}}
+        </a>
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "RegistrationUser.NextButtonText"}}</button>
+    </div>
 </form>
 
-
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl "scripts/external_not_found_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
 
 {{template "main-bottom" .}}

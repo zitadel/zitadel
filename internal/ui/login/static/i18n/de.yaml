@@ -221,6 +221,26 @@ RegistrationUser:
   BackButtonText: zurück
   NextButtonText: weiter
 
+ExternalRegistrationUserOverview:
+  Title: Externer Benutzer Registration
+  Description: Deine Benutzerangaben werden vom ausgewählten Provider übernommen. Du kannst sie hier ändern und ergänzen, bevor dein Benutzer angelegt wird.
+  EmailLabel: E-Mail
+  UsernameLabel: Benutzername
+  FirstnameLabel: Vorname
+  LastnameLabel: Nachname
+  NicknameLabel: Nachname
+  PhoneLabel: Telefonnummer
+  LanguageLabel: Sprache
+  German: Deutsch
+  English: English
+  TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
+  TosConfirm: Ich akzeptiere die
+  TosLinkText: AGBs
+  TosConfirmAnd: und die
+  PrivacyLinkText: Datenschutzerklärung
+  BackButtonText: zurück
+  NextButtonText: speichern
+
 RegistrationOrg:
   Title: Organisations Registration
   Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
@@ -309,6 +329,8 @@ Errors:
       GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
     EmailVerify:
       UserIDEmpty: UserID ist leer
+    ExternalData:
+      CouldNotRead: Externe Daten konnten nicht korrekt gelesen werden
     MFA:
       NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
       OTP:
@@ -321,6 +343,9 @@ Errors:
     ExternalIDP:
       IDPTypeNotImplemented: IDP Typ ist nicht implementiert
       NotAllowed: Externer Login Provider ist nicht erlaubt
+      IDPConfigIDEmpty: Identity Provider ID ist leer
+      ExternalUserIDEmpty: Externe User ID  ist leer
+      UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
     InvalidConfig: Identitäts Provider Konfiguration ist ungültig

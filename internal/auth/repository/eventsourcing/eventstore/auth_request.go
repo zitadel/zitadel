@@ -228,6 +228,21 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+
+	err = repo.setLinkingUser(ctx, request, externalUser)
+	if err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	request.LinkingUsers = append(request.LinkingUsers, externalUser)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
