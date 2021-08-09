@@ -106,7 +106,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 					Tolerations:    tolerations,
 					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, "", version, dbCerts),
 					Containers: []corev1.Container{
-						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, ""),
+						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, "", version),
 					},
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",

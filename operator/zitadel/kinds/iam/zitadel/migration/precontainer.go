@@ -69,9 +69,8 @@ func getPreContainer(
 					";"),
 			},
 			SecurityContext: &corev1.SecurityContext{
-				RunAsUser:    helpers.PointerInt64(1000),
-				RunAsGroup:   helpers.PointerInt64(1000),
-				RunAsNonRoot: helpers.PointerBool(true),
+				RunAsUser:  helpers.PointerInt64(1000),
+				RunAsGroup: helpers.PointerInt64(1000),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",

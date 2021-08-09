@@ -16,28 +16,29 @@ RUN mkdir /flyway \
   && tar -xzf flyway-commandline-${FLYWAY_VERSION}.tar.gz \
   && mv flyway-${FLYWAY_VERSION}/* /flyway \
   && rm flyway-commandline-${FLYWAY_VERSION}.tar.gz \
-  && chown -R 1000:1000 /flyway
+  && chown -R 1000:1000 /flyway \
+  && chmod -R u+x /flyway
 
 ENV PATH="/flyway:${PATH}"
 
 COPY build/cr-backup/scripts/backup-cockroach.sh /scripts/backup.sh
 RUN chown 1000:1000 /scripts/backup.sh
-RUN chmod +x /scripts/backup.sh
+RUN chmod u+x /scripts/backup.sh
 
 COPY build/cr-backup/scripts/restore-cockroach.sh /scripts/restore.sh
 RUN chown 1000:1000 /scripts/restore.sh
-RUN chmod +x /scripts/restore.sh
+RUN chmod u+x /scripts/restore.sh
 
 COPY build/cr-backup/scripts/clean-db-cockroach.sh /scripts/clean-db.sh
 RUN chown 1000:1000 /scripts/clean-db.sh
-RUN chmod +x /scripts/clean-db.sh
+RUN chmod u+x /scripts/clean-db.sh
 COPY build/cr-backup/scripts/clean-migration-cockroach.sh /scripts/clean-migration.sh
 RUN chown 1000:1000 /scripts/clean-migration.sh
-RUN chmod +x /scripts/clean-migration.sh
+RUN chmod u+x /scripts/clean-migration.sh
 COPY build/cr-backup/scripts/clean-user-cockroach.sh /scripts/clean-user.sh
 RUN chown 1000:1000 /scripts/clean-user.sh
-RUN chmod +x /scripts/clean-user.sh
+RUN chmod u+x /scripts/clean-user.sh
 
-USER cockroach
+USER 1000
 
 ENTRYPOINT ["/cockroach/cockroach.sh"]

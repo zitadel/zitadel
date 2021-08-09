@@ -16,11 +16,13 @@ func getMigrationContainer(
 	secretPasswordName string,
 	users []string,
 	customImageRegistry string,
+	version string,
 ) corev1.Container {
 
 	return corev1.Container{
-		Name:  "db-migration",
-		Image: common.FlywayImage.Reference(customImageRegistry),
+		Name:    "db-migration",
+		Image:   common.BackupImage.Reference(customImageRegistry, version),
+		Command: []string{"flyway"},
 		Args: []string{
 			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + certTempMountPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
 			"-locations=filesystem:" + migrationsPath,
@@ -38,7 +40,8 @@ func getMigrationContainer(
 		},
 
 		SecurityContext: &corev1.SecurityContext{
-			RunAsNonRoot: helpers.PointerBool(true),
+			RunAsUser:  helpers.PointerInt64(1000),
+			RunAsGroup: helpers.PointerInt64(1000),
 		},
 		TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 		TerminationMessagePolicy: "File",

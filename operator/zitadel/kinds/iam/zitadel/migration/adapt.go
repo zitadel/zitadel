@@ -113,7 +113,7 @@ func AdaptFunc(
 							Tolerations:    tolerations,
 							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry, version, dbCerts),
 							Containers: []corev1.Container{
-								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry),
+								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry, version),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
