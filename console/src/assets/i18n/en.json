@@ -465,6 +465,8 @@
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
       "DESCRIPTION": "These are all member grants of the user. You can modify them also on organisation, project, or IAM detail pages.",
+      "ORGCONTEXT":"You see all organizations and projects that are related to the currently selected organization.",
+      "USERCONTEXT":"You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
       "CHANGEDATE": "Last Modified",
       "DISPLAYNAME": "Display Name",
