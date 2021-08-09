@@ -81,7 +81,7 @@ export class MembershipDetailComponent implements AfterViewInit {
                 console.error(err);
               });
             }
-          })
+          }),
         );
       })).subscribe();
   }
