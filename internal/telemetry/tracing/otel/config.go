@@ -16,7 +16,7 @@ type Config struct {
 
 func (c *Config) NewTracer() error {
 	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
-	exporter, err := otlpgrpc.New(context.Background(), otlpgrpc.NewDriver(otlpgrpc.WithEndpoint(c.Endpoint), otlpgrpc.WithInsecure()))
+	exporter, err := otlpgrpc.New(context.Background(), otlpgrpc.WithEndpoint(c.Endpoint), otlpgrpc.WithInsecure())
 	if err != nil {
 		return err
 	}
