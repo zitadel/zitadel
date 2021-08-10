@@ -46,7 +46,6 @@ const KeyNamesArray = [
   'passwordChangeText',
   'passwordResetDoneText',
   'passwordText',
-  'passwordlessText',
   'registrationOptionText',
   'registrationOrgText',
   'registrationUserText',
