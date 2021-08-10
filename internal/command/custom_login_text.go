@@ -664,6 +664,10 @@ func (c *Commands) createPasswordlessRegistrationDoneEvents(ctx context.Context,
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, existingText.PasswordlessRegistrationDoneCancelButtonText, text.PasswordlessRegistrationDone.CancelButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	return events
 }
 
@@ -933,6 +937,26 @@ func (c *Commands) createExternalUserNotFoundEvents(ctx context.Context, agg *ev
 		events = append(events, event)
 	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, existingText.ExternalUserNotFoundAutoRegisterButtonText, text.ExternalNotFoundOption.AutoRegisterButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, existingText.ExternalUserNotFoundTOSAndPrivacyLabel, text.ExternalNotFoundOption.TOSAndPrivacyLabel, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundTOSConfirm, existingText.ExternalUserNotFoundTOSConfirm, text.ExternalNotFoundOption.TOSConfirm, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundTOSLinkText, existingText.ExternalUserNotFoundTOSLinkText, text.ExternalNotFoundOption.TOSLinkText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundTOSConfirmAnd, existingText.ExternalUserNotFoundTOSConfirmAnd, text.ExternalNotFoundOption.TOSConfirmAnd, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundPrivacyLinkText, existingText.ExternalUserNotFoundPrivacyLinkText, text.ExternalNotFoundOption.PrivacyLinkText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

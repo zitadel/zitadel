@@ -175,10 +175,11 @@ const (
 	LoginKeyPasswordlessRegistrationNotSupported            = LoginKeyPasswordlessRegistration + "NotSupported"
 	LoginKeyPasswordlessRegistrationErrorRetry              = LoginKeyPasswordlessRegistration + "ErrorRetry"
 
-	LoginKeyPasswordlessRegistrationDone               = "PasswordlessRegistrationDone."
-	LoginKeyPasswordlessRegistrationDoneTitle          = LoginKeyPasswordlessRegistrationDone + "Title"
-	LoginKeyPasswordlessRegistrationDoneDescription    = LoginKeyPasswordlessRegistrationDone + "Description"
-	LoginKeyPasswordlessRegistrationDoneNextButtonText = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
+	LoginKeyPasswordlessRegistrationDone                 = "PasswordlessRegistrationDone."
+	LoginKeyPasswordlessRegistrationDoneTitle            = LoginKeyPasswordlessRegistrationDone + "Title"
+	LoginKeyPasswordlessRegistrationDoneDescription      = LoginKeyPasswordlessRegistrationDone + "Description"
+	LoginKeyPasswordlessRegistrationDoneNextButtonText   = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
+	LoginKeyPasswordlessRegistrationDoneCancelButtonText = LoginKeyPasswordlessRegistrationDone + "CancelButtonText"
 
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
@@ -253,6 +254,11 @@ const (
 	LoginKeyExternalNotFoundDescription            = LoginKeyExternalNotFound + "Description"
 	LoginKeyExternalNotFoundLinkButtonText         = LoginKeyExternalNotFound + "LinkButtonText"
 	LoginKeyExternalNotFoundAutoRegisterButtonText = LoginKeyExternalNotFound + "AutoRegisterButtonText"
+	LoginKeyExternalNotFoundTOSAndPrivacyLabel     = LoginKeyExternalNotFound + "TosAndPrivacyLabel"
+	LoginKeyExternalNotFoundTOSConfirm             = LoginKeyExternalNotFound + "TosConfirm"
+	LoginKeyExternalNotFoundTOSLinkText            = LoginKeyExternalNotFound + "TosLinkText"
+	LoginKeyExternalNotFoundTOSConfirmAnd          = LoginKeyExternalNotFound + "TosConfirmAnd"
+	LoginKeyExternalNotFoundPrivacyLinkText        = LoginKeyExternalNotFound + "PrivacyLinkText"
 
 	LoginKeySuccessLogin                        = "LoginSuccess."
 	LoginKeySuccessLoginTitle                   = LoginKeySuccessLogin + "Title"
@@ -567,6 +573,11 @@ type ExternalUserNotFoundScreenText struct {
 	Description            string
 	LinkButtonText         string
 	AutoRegisterButtonText string
+	TOSAndPrivacyLabel     string
+	TOSConfirm             string
+	TOSLinkText            string
+	TOSConfirmAnd          string
+	PrivacyLinkText        string
 }
 
 type SuccessLoginScreenText struct {
@@ -608,7 +619,8 @@ type PasswordlessRegistrationScreenText struct {
 }
 
 type PasswordlessRegistrationDoneScreenText struct {
-	Title          string
-	Description    string
-	NextButtonText string
+	Title            string
+	Description      string
+	NextButtonText   string
+	CancelButtonText string
 }

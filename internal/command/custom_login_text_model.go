@@ -161,9 +161,10 @@ type CustomLoginTextReadModel struct {
 	PasswordlessRegistrationNotSupported            string
 	PasswordlessRegistrationErrorRetry              string
 
-	PasswordlessRegistrationDoneTitle          string
-	PasswordlessRegistrationDoneDescription    string
-	PasswordlessRegistrationDoneNextButtonText string
+	PasswordlessRegistrationDoneTitle            string
+	PasswordlessRegistrationDoneDescription      string
+	PasswordlessRegistrationDoneNextButtonText   string
+	PasswordlessRegistrationDoneCancelButtonText string
 
 	PasswordChangeTitle                   string
 	PasswordChangeDescription             string
@@ -232,6 +233,11 @@ type CustomLoginTextReadModel struct {
 	ExternalUserNotFoundDescription            string
 	ExternalUserNotFoundLinkButtonText         string
 	ExternalUserNotFoundAutoRegisterButtonText string
+	ExternalUserNotFoundTOSAndPrivacyLabel     string
+	ExternalUserNotFoundTOSConfirm             string
+	ExternalUserNotFoundTOSLinkText            string
+	ExternalUserNotFoundTOSConfirmAnd          string
+	ExternalUserNotFoundPrivacyLinkText        string
 
 	SuccessLoginTitle                   string
 	SuccessLoginAutoRedirectDescription string
@@ -1652,6 +1658,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenSetE
 		wm.PasswordlessRegistrationDoneNextButtonText = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText {
+		wm.PasswordlessRegistrationDoneCancelButtonText = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -1665,6 +1675,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemo
 	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
 		wm.PasswordlessRegistrationDoneNextButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText {
+		wm.PasswordlessRegistrationDoneCancelButtonText = ""
 		return
 	}
 }
@@ -2160,6 +2174,26 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenSetEvent(e *
 		wm.ExternalUserNotFoundAutoRegisterButtonText = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
+		wm.ExternalUserNotFoundTOSAndPrivacyLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
+		wm.ExternalUserNotFoundTOSConfirm = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
+		wm.ExternalUserNotFoundTOSLinkText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
+		wm.ExternalUserNotFoundTOSConfirmAnd = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
+		wm.ExternalUserNotFoundPrivacyLinkText = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -2177,6 +2211,22 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenRemoveEvent(
 	}
 	if e.Key == domain.LoginKeyExternalNotFoundAutoRegisterButtonText {
 		wm.ExternalUserNotFoundAutoRegisterButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
+		wm.ExternalUserNotFoundTOSAndPrivacyLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
+		wm.ExternalUserNotFoundTOSConfirm = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
+		wm.ExternalUserNotFoundTOSConfirmAnd = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
+		wm.ExternalUserNotFoundPrivacyLinkText = ""
 		return
 	}
 }
