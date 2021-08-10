@@ -2217,6 +2217,10 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenRemoveEvent(
 		wm.ExternalUserNotFoundTOSAndPrivacyLabel = ""
 		return
 	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
+		wm.ExternalUserNotFoundTOSLinkText = ""
+		return
+	}
 	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
 		wm.ExternalUserNotFoundTOSConfirm = ""
 		return

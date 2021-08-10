@@ -114,12 +114,6 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
-	//memberRoles := []string{domain.RoleOrgProjectCreator}
-	//
-	//if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
-	//	memberRoles = nil
-	//	resourceOwner = authReq.RequestedOrgID
-	//}
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
@@ -127,12 +121,6 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
 	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
-	//_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles)
-	//if err != nil {
-	//	l.renderRegisterOption(w, r, authReq, err)
-	//	return
-	//}
-	//l.renderNextStep(w, r, authReq)
 }
 
 func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *iam_model.OrgIAMPolicyView, human *domain.Human, idp *domain.ExternalIDP, err error) {
