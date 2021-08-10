@@ -174,7 +174,9 @@
       "REACTIVATE": "Reactivate",
       "DEACTIVATE": "Deactivate",
       "FILTER": "Filter",
-      "DELETE": "Delete User"
+      "DELETE": "Delete User",
+      "UNLOCK": "Unlock User",
+      "LOCKEDDESCRIPTION":"This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
@@ -421,7 +423,8 @@
     "STATE": {
       "0": "Unknown",
       "1": "Active",
-      "2": "Expired"
+      "2": "Expired",
+      "4": "Locked"
     },
     "SEARCH": {
       "FOUND": "Found"
@@ -460,7 +463,8 @@
       "SELECTEDKEYSDELETED": "Selected keys deleted.",
       "KEYADDED": "Key added!",
       "MACHINEADDED": "Service User created!",
-      "DELETED": "User deleted successfully!"
+      "DELETED": "User deleted successfully!",
+      "UNLOCKED":"User unlocked successfully!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",

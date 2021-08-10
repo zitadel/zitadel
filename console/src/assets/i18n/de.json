@@ -174,7 +174,9 @@
       "REACTIVATE": "Reaktivieren",
       "DEACTIVATE": "Deaktivieren",
       "FILTER": "Filter",
-      "DELETE": "Benutzer löschen"
+      "DELETE": "Benutzer löschen",
+      "UNLOCK": "Benutzer entsperren",
+      "LOCKEDDESCRIPTION":"Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
@@ -421,7 +423,8 @@
     "STATE": {
       "0": "Unbekannt",
       "1": "Aktiv",
-      "2": "Abgelaufen"
+      "2": "Abgelaufen",
+      "4": "Gesperrt"
     },
     "SEARCH": {
       "FOUND": "Gefunden"
@@ -460,7 +463,8 @@
       "SELECTEDKEYSDELETED": "Selektierte Schlüssel gelöscht.",
       "KEYADDED": "Schlüssel hinzugefügt!",
       "MACHINEADDED": "Service User erstellt!",
-      "DELETED": "Benutzer erfolgreich gelöscht!"
+      "DELETED": "Benutzer erfolgreich gelöscht!",
+      "UNLOCKED":"Benutzer erfolgreich freigeschaltet!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
