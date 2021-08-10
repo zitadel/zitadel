@@ -117,8 +117,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 		//Args:      []string{"tail -f /dev/null;"},
 		Args: []string{"start"},
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:    helpers.PointerInt64(RunAsUser),
-			RunAsNonRoot: helpers.PointerBool(true),
+			RunAsUser: helpers.PointerInt64(RunAsUser),
 		},
 		Name:            containerName,
 		Image:           fmt.Sprintf("ghcr.io/%s:%s", common.ZITADELImage, version),

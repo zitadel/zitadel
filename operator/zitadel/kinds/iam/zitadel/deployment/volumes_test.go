@@ -18,7 +18,7 @@ func TestDeployment_Volumes(t *testing.T) {
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  secretName,
-				DefaultMode: helpers.PointerInt32(420),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -26,7 +26,7 @@ func TestDeployment_Volumes(t *testing.T) {
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  "cockroachdb.client.root",
-				DefaultMode: helpers.PointerInt32(384),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -34,7 +34,7 @@ func TestDeployment_Volumes(t *testing.T) {
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  secretPasswordsName,
-				DefaultMode: helpers.PointerInt32(384),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -42,7 +42,7 @@ func TestDeployment_Volumes(t *testing.T) {
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{Name: consoleCMName},
-				DefaultMode:          helpers.PointerInt32(420),
+				DefaultMode:          helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -54,7 +54,7 @@ func TestDeployment_Volumes(t *testing.T) {
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  "cockroachdb.client.test",
-				DefaultMode: helpers.PointerInt32(384),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}}
@@ -70,7 +70,7 @@ func TestDeployment_UserVolumes(t *testing.T) {
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName:  "cockroachdb.client.test",
-					DefaultMode: helpers.PointerInt32(384),
+					DefaultMode: helpers.PointerInt32(0444),
 				},
 			},
 		}}
@@ -83,7 +83,7 @@ func TestDeployment_UserVolumes(t *testing.T) {
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName:  "cockroachdb.client.te-st",
-					DefaultMode: helpers.PointerInt32(384),
+					DefaultMode: helpers.PointerInt32(0444),
 				},
 			},
 		}}
@@ -96,14 +96,14 @@ func TestDeployment_UserVolumes(t *testing.T) {
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName:  "cockroachdb.client.test",
-					DefaultMode: helpers.PointerInt32(384),
+					DefaultMode: helpers.PointerInt32(0444),
 				},
 			},
 		}, {Name: "client-te-st",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName:  "cockroachdb.client.te-st",
-					DefaultMode: helpers.PointerInt32(384),
+					DefaultMode: helpers.PointerInt32(0444),
 				},
 			},
 		}}

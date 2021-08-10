@@ -19,43 +19,39 @@ func getPreContainer(
 	secretPasswordName string,
 	customImageRegistry string,
 	version string,
-	dbCerts string,
+	dbCertsCockroach string,
+	runAsUserCockroach int64,
+	dbCertsFlyway string,
+	runAsUserFlyway int64,
 ) []corev1.Container {
-
+	certsCockroach := deployment.GetInitContainer(
+		"cockroach",
+		rootUserInternal,
+		dbCertsCockroach,
+		[]string{"root"},
+		runAsUserCockroach,
+		customImageRegistry,
+		version,
+	)
+	certsFlyway := deployment.GetInitContainer(
+		"flyway",
+		rootUserInternal,
+		dbCertsFlyway,
+		[]string{"root"},
+		runAsUserFlyway,
+		customImageRegistry,
+		version,
+	)
 	return []corev1.Container{
-		deployment.GetInitContainer(
-			rootUserInternal,
-			dbCerts,
-			[]string{"root"},
-			1000,
-			customImageRegistry,
-			version,
-		),
-		/*
-			{
-				Name:  "check-db-ready",
-				Image: common.PostgresImage.Reference(customImageRegistry),
-				Command: []string{
-					"sh",
-					"-c",
-					"until pg_isready -h " + dbHost + " -p " + dbPort + "; do echo waiting for database; sleep 2; done;",
-				},
-				SecurityContext: &corev1.SecurityContext{
-					RunAsUser:    helpers.PointerInt64(70),
-					RunAsGroup:   helpers.PointerInt64(70),
-					RunAsNonRoot: helpers.PointerBool(true),
-				},
-				TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-				TerminationMessagePolicy: "File",
-				ImagePullPolicy:          "IfNotPresent",
-			},*/
+		certsCockroach,
+		certsFlyway,
 		{
 			Name:  "create-flyway-user",
-			Image: common.BackupImage.Reference(customImageRegistry, version),
+			Image: common.ZITADELCockroachImage.Reference(customImageRegistry, version),
 			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      dbCerts,
+					Name:      dbCertsCockroach,
 					MountPath: certTempMountPath,
 				},
 			},
@@ -69,12 +65,12 @@ func getPreContainer(
 					";"),
 			},
 			SecurityContext: &corev1.SecurityContext{
-				RunAsUser:  helpers.PointerInt64(1000),
-				RunAsGroup: helpers.PointerInt64(1000),
+				RunAsUser:  helpers.PointerInt64(runAsUserCockroach),
+				RunAsGroup: helpers.PointerInt64(runAsUserCockroach),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-			TerminationMessagePolicy: "File",
-			ImagePullPolicy:          "IfNotPresent",
+			TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+			ImagePullPolicy:          corev1.PullIfNotPresent,
 		},
 	}
 }
@@ -101,6 +97,11 @@ func createUserCommand(user, pw, file string) string {
 		}, ";")
 	}
 
+	createUser = strings.Join([]string{
+		createUser,
+		"chmod +xr " + file,
+	}, ";")
+
 	return createUser
 }
 
@@ -109,5 +110,6 @@ func grantUserCommand(user, file string) string {
 		"echo -n 'GRANT admin TO ' > " + file,
 		"echo -n ${" + user + "} >> " + file,
 		"echo -n ' WITH ADMIN OPTION;'  >> " + file,
+		"chmod +xr " + file,
 	}, ";")
 }

@@ -60,7 +60,17 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		},
 	}
 
-	initContainers := []corev1.Container{deployment.GetInitContainer(rootSecret, dbSecrets, users, deployment.RunAsUser, "", version)}
+	initContainers := []corev1.Container{
+		deployment.GetInitContainer(
+			"zitadel",
+			rootSecret,
+			dbSecrets,
+			users,
+			deployment.RunAsUser,
+			"",
+			version,
+		),
+	}
 	containers := []corev1.Container{deployment.GetContainer(
 		containerName,
 		version,
@@ -96,6 +106,10 @@ func TestSetup_AdaptFunc(t *testing.T) {
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: helpers.PointerBool(true),
+						FSGroup:      helpers.PointerInt64(deployment.RunAsUser),
+					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,
 					InitContainers: initContainers,

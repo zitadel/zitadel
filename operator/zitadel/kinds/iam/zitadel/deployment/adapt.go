@@ -20,6 +20,7 @@ const (
 	dbSecrets     = "db-secrets"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
+	InitRunAsUser = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
 	timeout = 60 * time.Second
 )
@@ -177,6 +178,7 @@ func deploymentDef(
 					Affinity:     affinity.K8s(),
 					InitContainers: []corev1.Container{
 						GetInitContainer(
+							"zitadel",
 							rootSecret,
 							dbSecrets,
 							users,

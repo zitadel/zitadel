@@ -16,6 +16,7 @@ const (
 )
 
 func GetInitContainer(
+	reason string,
 	rootSecret string,
 	dbSecrets string,
 	users []string,
@@ -61,18 +62,23 @@ func GetInitContainer(
 		"chmod 0600 "+certTempMountPath+"/*",
 	)
 
+	name := "fix-permissions"
+	if reason != "" {
+		name = name + "-" + reason
+	}
+
 	return corev1.Container{
-		Name:                     "fix-permissions",
-		Image:                    common.BackupImage.Reference(customImageRegistry, version),
+		Name:                     name,
+		Image:                    common.ZITADELCockroachImage.Reference(customImageRegistry, version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
-		TerminationMessagePolicy: "File",
-		TerminationMessagePath:   "/dev/termination-log",
+		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 		ImagePullPolicy:          corev1.PullIfNotPresent,
+		TerminationMessagePath:   "/dev/termination-log",
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:  helpers.PointerInt64(runAsUser),
-			RunAsGroup: helpers.PointerInt64(runAsUser),
+			RunAsGroup: helpers.PointerInt64(InitRunAsUser),
 		},
 	}
 }

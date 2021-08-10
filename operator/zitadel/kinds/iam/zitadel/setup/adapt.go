@@ -135,6 +135,7 @@ func jobDef(
 ) *batchv1.Job {
 	initContainers := []corev1.Container{
 		deployment.GetInitContainer(
+			"zitadel",
 			rootSecret,
 			dbSecrets,
 			users,
@@ -179,6 +180,10 @@ func jobDef(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
+					SecurityContext: &corev1.PodSecurityContext{
+						RunAsNonRoot: helpers.PointerBool(true),
+						FSGroup:      helpers.PointerInt64(deployment.RunAsUser),
+					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,
 					InitContainers: initContainers,

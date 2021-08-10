@@ -10,7 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
-  CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
+  CRDB_IMAGE_NAME: ${{ github.repository }}-cockroach
   ARTIFACTS_FOLDER: './artifacts'
 
 jobs:
@@ -310,7 +310,7 @@ jobs:
         name: buildandpush
         with:
           context: .
-          file: ./build/cr-backup/Dockerfile
+          file: ./build/cockroach/Dockerfile
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true

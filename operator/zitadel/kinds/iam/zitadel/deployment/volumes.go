@@ -18,7 +18,7 @@ func GetVolumes(
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  secretName,
-				DefaultMode: helpers.PointerInt32(420),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -26,7 +26,7 @@ func GetVolumes(
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  "cockroachdb.client.root",
-				DefaultMode: helpers.PointerInt32(384),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -34,7 +34,7 @@ func GetVolumes(
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  secretPasswordsName,
-				DefaultMode: helpers.PointerInt32(384),
+				DefaultMode: helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -42,7 +42,7 @@ func GetVolumes(
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{Name: consoleCMName},
-				DefaultMode:          helpers.PointerInt32(420),
+				DefaultMode:          helpers.PointerInt32(0444),
 			},
 		},
 	}, {
@@ -69,7 +69,7 @@ func userVolumes(
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName:  "cockroachdb.client." + userReplaced,
-					DefaultMode: helpers.PointerInt32(384),
+					DefaultMode: helpers.PointerInt32(0444),
 				},
 			},
 		})

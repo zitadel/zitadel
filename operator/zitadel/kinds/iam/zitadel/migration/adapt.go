@@ -34,11 +34,14 @@ const (
 	envMigrationUser   = "FLYWAY_USER"
 	envMigrationPW     = "FLYWAY_PASSWORD"
 	jobNamePrefix      = "cockroachdb-cluster-migration-"
-	createFile         = "create.sql"
-	grantFile          = "grant.sql"
-	deleteFile         = "delete.sql"
+	createFile         = "~/create.sql"
+	grantFile          = "~/grant.sql"
+	deleteFile         = "~/delete.sql"
 	rootSecretName     = "cockroachdb.client.root"
-	dbCerts            = "dbcerts"
+	dbCertsCockroach   = "dbcertscockroach"
+	dbCertsFlyway      = "dbcertsflyway"
+	runAsUserFlyway    = int64(101)
+	runAsUserCockroach = int64(1000)
 )
 
 func AdaptFunc(
@@ -107,13 +110,32 @@ func AdaptFunc(
 						Spec: corev1.PodSpec{
 							SecurityContext: &corev1.PodSecurityContext{
 								RunAsNonRoot: helpers.PointerBool(true),
-								FSGroup:      helpers.PointerInt64(1000),
 							},
-							NodeSelector:   nodeselector,
-							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry, version, dbCerts),
+							NodeSelector: nodeselector,
+							Tolerations:  tolerations,
+							InitContainers: getPreContainer(
+								dbHost,
+								dbPort,
+								migrationUser,
+								secretPasswordName,
+								customImageRegistry,
+								version,
+								dbCertsCockroach,
+								runAsUserCockroach,
+								dbCertsFlyway,
+								runAsUserFlyway,
+							),
 							Containers: []corev1.Container{
-								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry, version),
+								getMigrationContainer(
+									dbHost,
+									dbPort,
+									migrationUser,
+									secretPasswordName,
+									users,
+									customImageRegistry,
+									dbCertsFlyway,
+									runAsUserFlyway,
+								),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
@@ -124,6 +146,7 @@ func AdaptFunc(
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
+										DefaultMode:          helpers.PointerInt32(0444),
 									},
 								},
 							}, {
@@ -131,18 +154,24 @@ func AdaptFunc(
 								VolumeSource: corev1.VolumeSource{
 									Secret: &corev1.SecretVolumeSource{
 										SecretName:  rootSecretName,
-										DefaultMode: helpers.PointerInt32(0400),
+										DefaultMode: helpers.PointerInt32(0444),
 									},
 								},
 							}, {
 								Name: secretPasswordName,
 								VolumeSource: corev1.VolumeSource{
 									Secret: &corev1.SecretVolumeSource{
-										SecretName: secretPasswordName,
+										SecretName:  secretPasswordName,
+										DefaultMode: helpers.PointerInt32(0444),
 									},
 								},
 							}, {
-								Name: dbCerts,
+								Name: dbCertsCockroach,
+								VolumeSource: corev1.VolumeSource{
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
+								},
+							}, {
+								Name: dbCertsFlyway,
 								VolumeSource: corev1.VolumeSource{
 									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},

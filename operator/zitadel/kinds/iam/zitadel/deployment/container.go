@@ -113,8 +113,7 @@ func GetContainer(
 		//Args:      []string{"tail -f /dev/null;"},
 		Args: []string{command},
 		SecurityContext: &corev1.SecurityContext{
-			RunAsUser:    &runAsUser,
-			RunAsNonRoot: &runAsNonRoot,
+			RunAsUser: &runAsUser,
 		},
 		Name:            containerName,
 		Image:           common.ZITADELImage.Reference(customImageRegistry, version),
@@ -153,7 +152,7 @@ func GetContainer(
 			PeriodSeconds:    5,
 			FailureThreshold: 2,
 		},
-		TerminationMessagePolicy: "File",
+		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 }

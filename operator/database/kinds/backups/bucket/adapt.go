@@ -71,7 +71,7 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		image := common.BackupImage.Reference(customImageRegistry, version)
+		image := common.ZITADELCockroachImage.Reference(customImageRegistry, version)
 
 		_, destroyB, err := backup.AdaptFunc(
 			internalMonitor,

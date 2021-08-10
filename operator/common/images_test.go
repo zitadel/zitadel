@@ -50,7 +50,7 @@ func TestDockerHubReference(t *testing.T) {
 
 func TestZITADELReference(t *testing.T) {
 
-	imgs := []zitadelImage{ZITADELImage, BackupImage}
+	imgs := []zitadelImage{ZITADELImage, ZITADELCockroachImage}
 	dummyVersion := "v99.99.99"
 
 	type args struct {

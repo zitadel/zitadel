@@ -51,7 +51,6 @@ func TestMigration_GetMigrationFiles(t *testing.T) {
 			Filename: "V1.1__test.sql",
 			Data:     "test",
 		},
-
 		{
 			Filename: "V1.2__test2.sql",
 			Data:     "test2",
@@ -100,13 +99,32 @@ func TestMigration_AdaptFunc(t *testing.T) {
 				Spec: corev1.PodSpec{
 					SecurityContext: &corev1.PodSecurityContext{
 						RunAsNonRoot: helpers.PointerBool(true),
-						FSGroup:      helpers.PointerInt64(1000),
 					},
-					NodeSelector:   nodeselector,
-					Tolerations:    tolerations,
-					InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, "", version, dbCerts),
+					NodeSelector: nodeselector,
+					Tolerations:  tolerations,
+					InitContainers: getPreContainer(
+						dbHost,
+						dbPort,
+						migrationUser,
+						secretPasswordName,
+						"",
+						version,
+						dbCertsCockroach,
+						runAsUserCockroach,
+						dbCertsFlyway,
+						runAsUserFlyway,
+					),
 					Containers: []corev1.Container{
-						getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, "", version),
+						getMigrationContainer(
+							dbHost,
+							dbPort,
+							migrationUser,
+							secretPasswordName,
+							users,
+							"",
+							dbCertsFlyway,
+							runAsUserFlyway,
+						),
 					},
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
@@ -117,6 +135,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 						VolumeSource: corev1.VolumeSource{
 							ConfigMap: &corev1.ConfigMapVolumeSource{
 								LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
+								DefaultMode:          helpers.PointerInt32(0444),
 							},
 						},
 					}, {
@@ -124,22 +143,29 @@ func TestMigration_AdaptFunc(t *testing.T) {
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
 								SecretName:  rootSecretName,
-								DefaultMode: helpers.PointerInt32(0400),
+								DefaultMode: helpers.PointerInt32(0444),
 							},
 						},
 					}, {
 						Name: secretPasswordName,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName: secretPasswordName,
+								SecretName:  secretPasswordName,
+								DefaultMode: helpers.PointerInt32(0444),
 							},
 						},
 					}, {
-						Name: dbCerts,
+						Name: dbCertsCockroach,
 						VolumeSource: corev1.VolumeSource{
 							EmptyDir: &corev1.EmptyDirVolumeSource{},
 						},
-					}},
+					}, {
+						Name: dbCertsFlyway,
+						VolumeSource: corev1.VolumeSource{
+							EmptyDir: &corev1.EmptyDirVolumeSource{},
+						},
+					},
+					},
 				},
 			},
 		},

@@ -17,12 +17,13 @@ func getPostContainers(
 	customImageRegistry string,
 	version string,
 	dbCerts string,
+	runAsUser int64,
 ) []corev1.Container {
 
 	return []corev1.Container{
 		{
 			Name:    "delete-flyway-user",
-			Image:   common.BackupImage.Reference(customImageRegistry, version),
+			Image:   common.ZITADELCockroachImage.Reference(customImageRegistry, version),
 			Command: []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{
@@ -38,13 +39,12 @@ func getPostContainers(
 				},
 			},
 			SecurityContext: &corev1.SecurityContext{
-				RunAsUser:    helpers.PointerInt64(1000),
-				RunAsGroup:   helpers.PointerInt64(1000),
-				RunAsNonRoot: helpers.PointerBool(true),
+				RunAsUser:  helpers.PointerInt64(runAsUser),
+				RunAsGroup: helpers.PointerInt64(runAsUser),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
-			TerminationMessagePolicy: "File",
-			ImagePullPolicy:          "IfNotPresent",
+			TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+			ImagePullPolicy:          corev1.PullIfNotPresent,
 		},
 	}
 }

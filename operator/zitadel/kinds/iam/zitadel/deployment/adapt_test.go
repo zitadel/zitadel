@@ -84,6 +84,7 @@ func TestDeployment_Adapt(t *testing.T) {
 					Affinity:     nil,
 					InitContainers: []corev1.Container{
 						GetInitContainer(
+							"zitadel",
 							rootSecret,
 							dbSecrets,
 							users,
