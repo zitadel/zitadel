@@ -74,7 +74,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
     }
   }
 
-  public removePolicy(): void {
+  public resetPolicy(): void {
     if (this.service instanceof ManagementService) {
       this.service.resetLockoutPolicyToDefault().then(() => {
         this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
