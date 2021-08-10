@@ -3396,6 +3396,7 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessPromptScreenText passwordless_prompt_text = 32;
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
+    zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
 }
 
 message SetCustomLoginTextsResponse {
