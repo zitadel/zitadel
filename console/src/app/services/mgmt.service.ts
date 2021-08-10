@@ -324,6 +324,8 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  UnlockUserRequest,
+  UnlockUserResponse,
   UpdateAPIAppConfigRequest,
   UpdateAPIAppConfigResponse,
   UpdateAppRequest,
@@ -554,6 +556,11 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.mgmt.listOrgIDPs(req, null).then(resp => resp.toObject());
+  }
+
+  public unlockUser(req: UnlockUserRequest):
+    Promise<UnlockUserResponse.AsObject> {
+    return this.grpcService.mgmt.unlockUser(req, null).then(resp => resp.toObject());
   }
 
   public getPrivacyPolicy():
