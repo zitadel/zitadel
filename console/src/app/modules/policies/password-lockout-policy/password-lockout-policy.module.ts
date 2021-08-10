@@ -28,7 +28,7 @@ import { PasswordLockoutPolicyComponent } from './password-lockout-policy.compon
     MatTooltipModule,
     TranslateModule,
     DetailLayoutModule,
-    InfoSectionModule
+    InfoSectionModule,
   ],
 })
 export class PasswordLockoutPolicyModule { }
