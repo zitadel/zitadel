@@ -3,7 +3,9 @@
 <div class="lgn-head">
     <h1>{{t "ExternalNotFoundOption.Title"}}</h1>
     <p>{{t "ExternalNotFoundOption.Description"}}</p>
+
 </div>
+
 
 <form action="{{ externalNotFoundOptionUrl }}" method="POST">
 
@@ -11,24 +13,55 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
+    <div class="lgn-register">
+        {{ if or .TOSLink .PrivacyLink }}
+        <div class="lgn-field">
+            <label class="lgn-label">{{t "ExternalNotFoundOption.TosAndPrivacyLabel"}}</label>
+            <div class="lgn-checkbox">
+                <input type="checkbox" id="register-term-confirmation"
+                       name="register-term-confirmation" required>
+                <label for="register-term-confirmation">
+                    {{t "ExternalNotFoundOption.TosConfirm"}}
+                    {{ if .TOSLink }}
+                    <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
+                        {{t "ExternalNotFoundOption.TosLinkText"}}
+                    </a>
+                    {{end}}
+                    {{ if and .TOSLink .PrivacyLink }}
+                    {{t "ExternalNotFoundOption.TosConfirmAnd"}}
+                    {{ end }}
+                    {{ if .PrivacyLink }}
+                    <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
+                        {{t "ExternalNotFoundOption.PrivacyLinkText"}}
+                    </a>
+                    {{end}}
+                </label>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+
+    {{template "error-message" .}}
+
     <div class="lgn-actions">
         <button class="lgn-icon-button lgn-left-action" name="resetlinking" value="true"
-            formnovalidate>
+                formnovalidate>
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
-        
-        <button class="lgn-raised-button lgn-primary" name="link" value="true"
-            formnovalidate>{{t "ExternalNotFoundOption.LinkButtonText"}}</button>
-        <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" name="autoregister" value="true"
-            formnovalidate>{{t "ExternalNotFoundOption.AutoRegisterButtonText"}}</button>
+
+        <button class="lgn-raised-button lgn-primary" name="link" value="true">
+            {{t "ExternalNotFoundOption.LinkButtonText"}}
+        </button>
+            <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary" name="autoregister" value="true">
+            {{t "ExternalNotFoundOption.AutoRegisterButtonText"}}
+        </button>
     </div>
 
     {{template "error-message" .}}
 </form>
 
-
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl "scripts/external_not_found_check.js" }}"></script>
 
 {{template "main-bottom" .}}
