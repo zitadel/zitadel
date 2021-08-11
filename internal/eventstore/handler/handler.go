@@ -20,10 +20,10 @@ func NewHandler(config HandlerConfig) Handler {
 	}
 }
 
-func (h Handler) Subscribe(aggregates ...eventstore.AggregateType) {
+func (h *Handler) Subscribe(aggregates ...eventstore.AggregateType) {
 	h.Sub = eventstore.SubscribeAggregates(h.EventQueue, aggregates...)
 }
 
-func (h Handler) SubscribeEvents(types map[eventstore.AggregateType][]eventstore.EventType) {
+func (h *Handler) SubscribeEvents(types map[eventstore.AggregateType][]eventstore.EventType) {
 	h.Sub = eventstore.SubscribeEventTypes(h.EventQueue, types)
 }
