@@ -691,7 +691,7 @@
       "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
     },
     "PWD_LOCKOUT": {
-      "TITLE": "Password Lockout",
+      "TITLE": "Lockout Policy",
       "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
     },
     "IAM_POLICY": {
@@ -803,7 +803,7 @@
       "HASLOWERCASE": "has lowercase",
       "HASUPPERCASE": "has uppercase",
       "SHOWLOCKOUTFAILURES": "show lockout failures",
-      "MAXATTEMPTS": "Max Attempts",
+      "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",
