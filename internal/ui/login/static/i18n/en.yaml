@@ -288,6 +288,7 @@ Errors:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
       Invalid: Password is invalid
+      InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short
@@ -312,6 +313,7 @@ Errors:
         InvalidCode: Invalid code
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
     Locked: User is locked
+    SomethingWentWrong: Something went wrong
     NotActive: User is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
@@ -319,5 +321,8 @@ Errors:
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy not existing
 
 optional: (optional)

@@ -7,21 +7,21 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-8fJif", "Errors.ResourceOwnerMissing")
 	}
-	addedPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
+	addedPolicy := NewOrgLockoutPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-0olDf", "Errors.ORG.PasswordLockoutPolicy.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-0olDf", "Errors.ORG.LockoutPolicy.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewPasswordLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxAttempts, policy.ShowLockOutFailures))
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures))
 	if err != nil {
 		return nil, err
 	}
@@ -29,26 +29,26 @@ func (c *Commands) AddPasswordLockoutPolicy(ctx context.Context, resourceOwner s
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToPasswordLockoutPolicy(&addedPolicy.PasswordLockoutPolicyWriteModel), nil
+	return writeModelToLockoutPolicy(&addedPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
+func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3J9fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(resourceOwner)
+	existingPolicy := NewOrgLockoutPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-ADfs1", "Errors.Org.PasswordLockoutPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-ADfs1", "Errors.Org.LockoutPolicy.NotFound")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordLockoutPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MaxAttempts, policy.ShowLockOutFailures)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LockoutPolicyWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.Org.PasswordLockoutPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.Org.LockoutPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
@@ -59,23 +59,23 @@ func (c *Commands) ChangePasswordLockoutPolicy(ctx context.Context, resourceOwne
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToPasswordLockoutPolicy(&existingPolicy.PasswordLockoutPolicyWriteModel), nil
+	return writeModelToLockoutPolicy(&existingPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) RemovePasswordLockoutPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) error {
 	if orgID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "Org-4J9fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy := NewOrgPasswordLockoutPolicyWriteModel(orgID)
+	existingPolicy := NewOrgLockoutPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-D4zuz", "Errors.Org.PasswordLockoutPolicy.NotFound")
+		return caos_errs.ThrowNotFound(nil, "ORG-D4zuz", "Errors.Org.LockoutPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = c.eventstore.PushEvents(ctx, org.NewPasswordLockoutPolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.PushEvents(ctx, org.NewLockoutPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }

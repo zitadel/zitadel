@@ -231,6 +231,10 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+	if err != nil {
+		l.renderInternalError(w, r, authReq, err)
+		return
+	}
 	if authReq == nil || len(authReq.PossibleSteps) == 0 {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
@@ -292,7 +296,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
-		msg = err.Error()
+		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)

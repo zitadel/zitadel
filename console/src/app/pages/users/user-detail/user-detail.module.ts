@@ -17,6 +17,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
@@ -104,6 +105,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     LocalizedDatePipeModule,
     InputModule,
     MachineKeysModule,
+    InfoSectionModule,
   ],
 })
 export class UserDetailModule { }

@@ -288,6 +288,7 @@ Errors:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
+      InvalidAndLocked: Password ist undgültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -312,6 +313,7 @@ Errors:
         InvalidCode: Code ist ungültig
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
     Locked: Benutzer ist gesperrt
+    SomethingWentWrong: Irgendetwas ist schief gelaufen
     NotActive: Benutzer ist nicht aktiv
     ExternalIDP:
       IDPTypeNotImplemented: IDP Typ ist nicht implementiert
@@ -319,5 +321,8 @@ Errors:
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
     InvalidConfig: Identitäts Provider Konfiguration ist ungültig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy existiert nicht
 
 optional: (optional)

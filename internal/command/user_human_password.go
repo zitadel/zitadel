@@ -194,7 +194,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 	return err
 }
 
-func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest) (err error) {
+func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -225,7 +225,15 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	events := make([]eventstore.EventPusher, 0)
+	events = append(events, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
+		if existingPassword.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
+			events = append(events, user.NewUserLockedEvent(ctx, userAgg))
+		}
+
+	}
+	_, err = c.eventstore.PushEvents(ctx, events...)
 	logging.Log("COMMAND-9fj7s").OnError(err).Error("error create password check failed event")
 	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", "Errors.User.Password.Invalid")
 }

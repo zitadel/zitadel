@@ -47,7 +47,6 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 			wm.IsEmailVerified = false
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
-			wm.Code = nil
 			if wm.UserState == domain.UserStateInitial {
 				wm.UserState = domain.UserStateActive
 			}

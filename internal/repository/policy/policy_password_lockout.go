@@ -9,41 +9,41 @@ import (
 )
 
 const (
-	PasswordLockoutPolicyAddedEventType   = "policy.password.lockout.added"
-	PasswordLockoutPolicyChangedEventType = "policy.password.lockout.changed"
-	PasswordLockoutPolicyRemovedEventType = "policy.password.lockout.removed"
+	LockoutPolicyAddedEventType   = "policy.lockout.added"
+	LockoutPolicyChangedEventType = "policy.lockout.changed"
+	LockoutPolicyRemovedEventType = "policy.lockout.removed"
 )
 
-type PasswordLockoutPolicyAddedEvent struct {
+type LockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         uint64 `json:"maxAttempts,omitempty"`
+	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
-func (e *PasswordLockoutPolicyAddedEvent) Data() interface{} {
+func (e *LockoutPolicyAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordLockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewPasswordLockoutPolicyAddedEvent(
+func NewLockoutPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	maxAttempts uint64,
 	showLockOutFailures bool,
-) *PasswordLockoutPolicyAddedEvent {
+) *LockoutPolicyAddedEvent {
 
-	return &PasswordLockoutPolicyAddedEvent{
+	return &LockoutPolicyAddedEvent{
 		BaseEvent:           *base,
-		MaxAttempts:         maxAttempts,
+		MaxPasswordAttempts: maxAttempts,
 		ShowLockOutFailures: showLockOutFailures,
 	}
 }
 
-func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &PasswordLockoutPolicyAddedEvent{
+func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &LockoutPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -55,29 +55,29 @@ func PasswordLockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.
 	return e, nil
 }
 
-type PasswordLockoutPolicyChangedEvent struct {
+type LockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxAttempts         *uint64 `json:"maxAttempts,omitempty"`
+	MaxPasswordAttempts *uint64 `json:"maxPasswordAttempts,omitempty"`
 	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
 }
 
-func (e *PasswordLockoutPolicyChangedEvent) Data() interface{} {
+func (e *LockoutPolicyChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasswordLockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewPasswordLockoutPolicyChangedEvent(
+func NewLockoutPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-	changes []PasswordLockoutPolicyChanges,
-) (*PasswordLockoutPolicyChangedEvent, error) {
+	changes []LockoutPolicyChanges,
+) (*LockoutPolicyChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-sdgh6", "Errors.NoChangesFound")
 	}
-	changeEvent := &PasswordLockoutPolicyChangedEvent{
+	changeEvent := &LockoutPolicyChangedEvent{
 		BaseEvent: *base,
 	}
 	for _, change := range changes {
@@ -86,22 +86,22 @@ func NewPasswordLockoutPolicyChangedEvent(
 	return changeEvent, nil
 }
 
-type PasswordLockoutPolicyChanges func(*PasswordLockoutPolicyChangedEvent)
+type LockoutPolicyChanges func(*LockoutPolicyChangedEvent)
 
-func ChangeMaxAttempts(maxAttempts uint64) func(*PasswordLockoutPolicyChangedEvent) {
-	return func(e *PasswordLockoutPolicyChangedEvent) {
-		e.MaxAttempts = &maxAttempts
+func ChangeMaxAttempts(maxAttempts uint64) func(*LockoutPolicyChangedEvent) {
+	return func(e *LockoutPolicyChangedEvent) {
+		e.MaxPasswordAttempts = &maxAttempts
 	}
 }
 
-func ChangeShowLockOutFailures(showLockOutFailures bool) func(*PasswordLockoutPolicyChangedEvent) {
-	return func(e *PasswordLockoutPolicyChangedEvent) {
+func ChangeShowLockOutFailures(showLockOutFailures bool) func(*LockoutPolicyChangedEvent) {
+	return func(e *LockoutPolicyChangedEvent) {
 		e.ShowLockOutFailures = &showLockOutFailures
 	}
 }
 
-func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &PasswordLockoutPolicyChangedEvent{
+func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &LockoutPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -113,26 +113,26 @@ func PasswordLockoutPolicyChangedEventMapper(event *repository.Event) (eventstor
 	return e, nil
 }
 
-type PasswordLockoutPolicyRemovedEvent struct {
+type LockoutPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PasswordLockoutPolicyRemovedEvent) Data() interface{} {
+func (e *LockoutPolicyRemovedEvent) Data() interface{} {
 	return nil
 }
 
-func (e *PasswordLockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewPasswordLockoutPolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordLockoutPolicyRemovedEvent {
-	return &PasswordLockoutPolicyRemovedEvent{
+func NewLockoutPolicyRemovedEvent(base *eventstore.BaseEvent) *LockoutPolicyRemovedEvent {
+	return &LockoutPolicyRemovedEvent{
 		BaseEvent: *base,
 	}
 }
 
-func PasswordLockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &PasswordLockoutPolicyRemovedEvent{
+func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &LockoutPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

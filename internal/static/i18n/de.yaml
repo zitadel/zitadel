@@ -483,6 +483,14 @@ EventTypes:
             failed: Verifikation für Passwortlos Login fehlgeschlagen
           signcount:
             changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
+        initialization:
+          code:
+            added: Passwortlos Initialisierungcode wurde hinzugefügt
+            sent: Passwortlos Initialisierungcode wurde versendet
+            requested: Passwortlos Initialisierungcode wurde angefordert
+            check:
+              succeeded: Passwortlos Initialisierungcode wurde erfolgreich geprüft
+              failed: Passwortlos Initialisierungcode Überprüfung ist fehlgeschlagen
       signed:
         out: Benutzer erfolgreich abgemeldet
       refresh:
