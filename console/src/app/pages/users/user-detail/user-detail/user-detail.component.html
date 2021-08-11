@@ -14,6 +14,11 @@
             <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
+              <button class="unlock-button" mat-stroked-button color="warn"
+                  *ngIf="user?.state === UserState.USER_STATE_LOCKED"
+                  (click)="unlockUser()">{{'USER.PAGES.UNLOCK' |
+                  translate}}</button>
+         
                 <button class="state-button" mat-stroked-button color="warn"
                     *ngIf="user?.state !== UserState.USER_STATE_INACTIVE"
                     (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
@@ -26,6 +31,7 @@
 
         <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
+        <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" type="WARN">{{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
         <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
