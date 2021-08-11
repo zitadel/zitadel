@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -15,7 +16,6 @@ import (
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/static"
@@ -59,11 +59,11 @@ type Downloader interface {
 	BucketName(ctx context.Context, id string) string
 }
 
-type ErrorHandler func(http.ResponseWriter, *http.Request, error)
+type ErrorHandler func(http.ResponseWriter, *http.Request, error, int)
 
-func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code int) {
 	logging.Log("ASSET-g5ef1").WithError(err).WithField("uri", r.RequestURI).Error("error occurred on asset api")
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+	http.Error(w, err.Error(), code)
 }
 
 func NewHandler(
@@ -115,7 +115,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		err := r.ParseMultipartForm(maxMemory)
 		file, handler, err := r.FormFile(paramFile)
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		defer func() {
@@ -125,28 +125,28 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		contentType := handler.Header.Get("content-type")
 		size := handler.Size
 		if !uploader.ContentTypeAllowed(contentType) {
-			s.ErrorHandler()(w, r, caos_errs.ThrowInvalidArgumentf(nil, "UPLOAD-Dbvfs", "invalid content-type: %s", contentType))
+			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", contentType), http.StatusBadRequest)
 			return
 		}
 		if size > uploader.MaxFileSize() {
-			s.ErrorHandler()(w, r, caos_errs.ThrowInvalidArgumentf(nil, "UPLOAD-Bfb32", "file to big, max file size is %v", uploader.MaxFileSize()))
+			s.ErrorHandler()(w, r, fmt.Errorf("file to big, max file size is %vKB", uploader.MaxFileSize()/1024), http.StatusBadRequest)
 			return
 		}
 
 		bucketName := uploader.BucketName(ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, contentType, file, size)
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 		err = uploader.Callback(ctx, info, ctxData.OrgID, s.Commands())
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -166,26 +166,26 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 		if objectName == "" {
-			s.ErrorHandler()(w, r, caos_errs.ThrowNotFound(nil, "UPLOAD-adf4f", "file not found"))
+			s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", objectName), http.StatusNotFound)
 			return
 		}
 		reader, getInfo, err := s.Storage().GetObject(ctx, bucketName, objectName)
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 		data, err := ioutil.ReadAll(reader)
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 		info, err := getInfo()
 		if err != nil {
-			s.ErrorHandler()(w, r, err)
+			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("content-length", strconv.FormatInt(info.Size, 10))
