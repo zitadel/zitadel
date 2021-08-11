@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"github.com/caos/zitadel/operator/common"
+	"github.com/caos/zitadel/operator/helpers"
 
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -267,7 +268,7 @@ status:
 			Labels:    k8sNameLabels,
 		},
 		Spec: apps.DeploymentSpec{
-			Replicas: int32Ptr(1),
+			Replicas: helpers.PointerInt32(1),
 			Selector: &mach.LabelSelector{
 				MatchLabels: k8sPodSelector,
 			},
@@ -299,11 +300,17 @@ status:
 								"memory": resource.MustParse("250Mi"),
 							},
 						},
+						SecurityContext: &core.SecurityContext{
+							RunAsUser: helpers.PointerInt64(1000),
+						},
 					}},
+					SecurityContext: &core.PodSecurityContext{
+						RunAsNonRoot: helpers.PointerBool(true),
+					},
 					NodeSelector:                  nodeselector,
 					Tolerations:                   tolerations,
 					Volumes:                       volumes,
-					TerminationGracePeriodSeconds: int64Ptr(10),
+					TerminationGracePeriodSeconds: helpers.PointerInt64(10),
 				},
 			},
 		},
@@ -369,9 +376,6 @@ func ScaleDatabaseOperator(
 	monitor.Debug("Scaling database-operator")
 	return client.ScaleDeployment(namespace, "database-operator", replicaCount)
 }
-
-func int32Ptr(i int32) *int32 { return &i }
-func int64Ptr(i int64) *int64 { return &i }
 
 func toNameLabels(apiLabels *labels.API, operatorName string) *labels.Name {
 	return labels.MustForName(labels.MustForComponent(apiLabels, "operator"), operatorName)
@@ -616,7 +620,7 @@ status:
 			Labels:    k8sNameLabels,
 		},
 		Spec: apps.DeploymentSpec{
-			Replicas: int32Ptr(1),
+			Replicas: helpers.PointerInt32(1),
 			Selector: &mach.LabelSelector{
 				MatchLabels: labels.MustK8sMap(labels.DeriveNameSelector(nameLabels, false)),
 			},
@@ -648,11 +652,17 @@ status:
 								"memory": resource.MustParse("250Mi"),
 							},
 						},
+						SecurityContext: &core.SecurityContext{
+							RunAsUser: helpers.PointerInt64(1000),
+						},
 					}},
+					SecurityContext: &core.PodSecurityContext{
+						RunAsNonRoot: helpers.PointerBool(true),
+					},
 					NodeSelector:                  nodeselector,
 					Tolerations:                   tolerations,
 					Volumes:                       volumes,
-					TerminationGracePeriodSeconds: int64Ptr(10),
+					TerminationGracePeriodSeconds: helpers.PointerInt64(10),
 				},
 			},
 		},

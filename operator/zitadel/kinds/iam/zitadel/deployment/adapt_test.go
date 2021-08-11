@@ -98,7 +98,6 @@ func TestDeployment_Adapt(t *testing.T) {
 							containerName,
 							imageVersion,
 							RunAsUser,
-							true,
 							resources,
 							cmName,
 							certPath,

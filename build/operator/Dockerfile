@@ -45,7 +45,7 @@ RUN go get github.com/go-delve/delve/cmd/dlv
 ## Final Production Image
 #######################
 FROM alpine:latest as artifact
-RUN adduser -D zitadel
+RUN adduser -D -u 1000 zitadel
 
 ARG ARCH=amd64
 ARG OS=linux
@@ -60,6 +60,6 @@ FROM scratch as final
 COPY --from=artifact /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /app /
-USER zitadel
+USER 1000
 HEALTHCHECK NONE
 ENTRYPOINT ["/zitadelctl"]

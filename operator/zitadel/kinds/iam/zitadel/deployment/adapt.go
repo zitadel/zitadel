@@ -192,7 +192,6 @@ func deploymentDef(
 							containerName,
 							*version,
 							RunAsUser,
-							true,
 							GetResourcesFromDefault(resources),
 							cmName,
 							certPath,

@@ -15,7 +15,6 @@ func GetContainer(
 	containerName string,
 	version string,
 	runAsUser int64,
-	runAsNonRoot bool,
 	resources *k8s.Resources,
 	cmName string,
 	certPath string,

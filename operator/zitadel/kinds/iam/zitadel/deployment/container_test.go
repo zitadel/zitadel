@@ -164,7 +164,6 @@ func TestDeployment_GetContainer(t *testing.T) {
 		containerName,
 		version,
 		RunAsUser,
-		true,
 		resources,
 		cmName,
 		certPath,

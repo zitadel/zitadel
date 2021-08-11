@@ -149,7 +149,6 @@ func jobDef(
 			containerName,
 			*version,
 			deployment.RunAsUser,
-			true,
 			deployment.GetResourcesFromDefault(resources),
 			cmName,
 			certPath,

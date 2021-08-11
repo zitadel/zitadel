@@ -75,7 +75,6 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		containerName,
 		version,
 		deployment.RunAsUser,
-		true,
 		resources,
 		cmName,
 		certPath,
