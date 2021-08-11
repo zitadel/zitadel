@@ -226,7 +226,6 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		return err
 	}
 	events := make([]eventstore.EventPusher, 0)
-	errMsg := "Errors.User.Password.Invalid"
 	events = append(events, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
 		if existingPassword.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
@@ -236,7 +235,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	}
 	_, err = c.eventstore.PushEvents(ctx, events...)
 	logging.Log("COMMAND-9fj7s").OnError(err).Error("error create password check failed event")
-	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", errMsg)
+	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", "Errors.User.Password.Invalid")
 }
 
 func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {

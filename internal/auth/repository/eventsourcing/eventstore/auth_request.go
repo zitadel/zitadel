@@ -949,9 +949,6 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
 	}
-	if err != nil {
-		return nil, err
-	}
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
 	}
