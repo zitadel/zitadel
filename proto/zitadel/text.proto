@@ -357,6 +357,11 @@ message ExternalUserNotFoundScreenText {
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string link_button_text = 3 [(validate.rules).string = {max_len: 100}];
     string auto_register_button_text = 4 [(validate.rules).string = {max_len: 100}];
+    string tos_and_privacy_label = 5 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm = 6 [(validate.rules).string = {max_len: 200}];
+    string tos_link_text = 7 [(validate.rules).string = {max_len: 200}];
+    string privacy_link_text = 8 [(validate.rules).string = {max_len: 200}];
+    string tos_confirm_and = 9 [(validate.rules).string = {max_len: 200}];
 }
 
 message SuccessLoginScreenText {

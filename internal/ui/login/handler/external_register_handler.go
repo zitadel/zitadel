@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/caos/oidc/pkg/client/rp"
@@ -16,25 +15,25 @@ import (
 )
 
 const (
-	tmplExternalRegisterOverview   = "externalregisteroverview"
-	queryExternalIDPConfigID       = "externalIDPConfigID"
-	queryExternalIDPExtUserID      = "externalIDPExtUserID"
-	queryExternalIDPExtDisplayName = "externalIDPExtDisplayName"
-	queryExternalEmail             = "externalEmail"
-	queryExternalEmailVerified     = "externalEmailVerified"
-	queryExternalPhone             = "externalPhone"
-	queryExternalPhoneVerified     = "externalPhoneVerified"
+	tmplExternalRegisterOverview = "externalregisteroverview"
 )
 
 type externalRegisterFormData struct {
-	Email        string `schema:"email"`
-	Username     string `schema:"username"`
-	Firstname    string `schema:"firstname"`
-	Lastname     string `schema:"lastname"`
-	Nickname     string `schema:"nickname"`
-	Phone        string `schema:"phone"`
-	Language     string `schema:"language"`
-	TermsConfirm bool   `schema:"terms-confirm"`
+	ExternalIDPConfigID    string `schema:"external-idp-config-id"`
+	ExternalIDPExtUserID   string `schema:"external-idp-ext-user-id"`
+	ExternalIDPDisplayName string `schema:"external-idp-display-name"`
+	ExternalEmail          string `schema:"external-email"`
+	ExternalEmailVerified  bool   `schema:"external-email-verified"`
+	Email                  string `schema:"email"`
+	Username               string `schema:"username"`
+	Firstname              string `schema:"firstname"`
+	Lastname               string `schema:"lastname"`
+	Nickname               string `schema:"nickname"`
+	ExternalPhone          string `schema:"external-phone"`
+	ExternalPhoneVerified  bool   `schema:"external-phone-verified"`
+	Phone                  string `schema:"phone"`
+	Language               string `schema:"language"`
+	TermsConfirm           bool   `schema:"terms-confirm"`
 }
 
 type externalRegisterData struct {
@@ -175,7 +174,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
-	externalIDP, err := l.getExternalIDP(r)
+	externalIDP, err := l.getExternalIDP(data)
 	if externalIDP == nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -262,52 +261,29 @@ func (l *Login) mapExternalRegisterDataToUser(r *http.Request, data *externalReg
 			EmailAddress: data.Email,
 		},
 	}
-
-	externalEmail := r.FormValue(queryExternalEmail)
-	if externalEmail == "" {
-		return nil, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-m0sfw", "Errors.User.ExternalData.CouldNotRead")
-	}
-	externalEmailVerified := r.FormValue(queryExternalEmailVerified)
-	if externalEmailVerified == "" {
-		return nil, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-m9fs", "Errors.User.ExternalData.CouldNotRead")
-	}
-	if externalEmail != data.Email {
+	if data.ExternalEmail != data.Email {
 		human.IsEmailVerified = false
 	} else {
-		human.IsEmailVerified, _ = strconv.ParseBool(externalEmailVerified)
+		human.IsEmailVerified = data.ExternalEmailVerified
 	}
-	externalPhone := r.FormValue(queryExternalPhone)
-	if externalPhone == "" {
-		return human, nil
-	}
-	externalPhoneVerified := r.FormValue(queryExternalPhoneVerified)
-	if externalPhoneVerified == "" {
+	if data.ExternalPhone == "" {
 		return human, nil
 	}
 	human.Phone = &domain.Phone{
-		PhoneNumber: externalPhone,
+		PhoneNumber: data.Phone,
 	}
-	if externalPhone != data.Phone {
+	if data.ExternalPhone != data.Phone {
 		human.IsPhoneVerified = false
 	} else {
-		human.IsPhoneVerified, _ = strconv.ParseBool(externalPhoneVerified)
+		human.IsPhoneVerified = data.ExternalPhoneVerified
 	}
 	return human, nil
 }
 
-func (l *Login) getExternalIDP(r *http.Request) (*domain.ExternalIDP, error) {
-	idpConfigID := r.FormValue(queryExternalIDPConfigID)
-	if idpConfigID == "" {
-		return nil, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-33jdG", "Errors.User.ExternalIDP.ConfigIDEmpty")
-	}
-	userID := r.FormValue(queryExternalIDPExtUserID)
-	if userID == "" {
-		return nil, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-33jdG", "Errors.User.ExternalIDP.ExternalUserIDEmpty")
-	}
-	displayName := r.FormValue(queryExternalIDPExtDisplayName)
+func (l *Login) getExternalIDP(data *externalRegisterFormData) (*domain.ExternalIDP, error) {
 	return &domain.ExternalIDP{
-		IDPConfigID:    idpConfigID,
-		ExternalUserID: userID,
-		DisplayName:    displayName,
+		IDPConfigID:    data.ExternalIDPConfigID,
+		ExternalUserID: data.ExternalIDPExtUserID,
+		DisplayName:    data.ExternalIDPDisplayName,
 	}, nil
 }
