@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/metadata"
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
@@ -84,6 +85,61 @@ func (wm *UserMetadataListWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateIDs(wm.MetadataListWriteModel.AggregateID).
+		AggregateTypes(user.AggregateType).
+		EventTypes(
+			user.MetadataSetType,
+			user.MetadataRemovedType).
+		Builder()
+}
+
+type UserMetadataByOrgListWriteModel struct {
+	eventstore.WriteModel
+	resourceOwner string
+	UserMetadata  map[string]map[string][]byte
+}
+
+func NewUserMetadataByOrgListWriteModel(resourceOwner string) *UserMetadataByOrgListWriteModel {
+	return &UserMetadataByOrgListWriteModel{
+		resourceOwner: resourceOwner,
+		UserMetadata:  make(map[string]map[string][]byte),
+	}
+}
+
+func (wm *UserMetadataByOrgListWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.MetadataSetEvent:
+			wm.AppendEvents(&e.SetEvent)
+		case *user.MetadataRemovedEvent:
+			wm.AppendEvents(&e.RemovedEvent)
+		}
+	}
+}
+
+func (wm *UserMetadataByOrgListWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *metadata.SetEvent:
+			if val, ok := wm.UserMetadata[e.Aggregate().ID]; ok {
+				val[e.Key] = e.Value
+			} else {
+				wm.UserMetadata[e.Aggregate().ID] = map[string][]byte{
+					e.Key: e.Value,
+				}
+			}
+		case *metadata.RemovedEvent:
+			if val, ok := wm.UserMetadata[e.Aggregate().ID]; ok {
+				delete(val, e.Key)
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *UserMetadataByOrgListWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
 		AggregateTypes(user.AggregateType).
 		EventTypes(
 			user.MetadataSetType,

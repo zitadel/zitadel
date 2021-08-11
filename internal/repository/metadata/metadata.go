@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	SetEventType     = "metadata.set"
-	RemovedEventType = "metadata.removed"
+	SetEventType        = "metadata.set"
+	RemovedEventType    = "metadata.removed"
+	RemovedAllEventType = "metadata.removed.all"
 )
 
 type SetEvent struct {
@@ -89,4 +90,31 @@ func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error)
 	}
 
 	return e, nil
+}
+
+type RemovedAllEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *RemovedAllEvent) Data() interface{} {
+	return nil
+}
+
+func (e *RemovedAllEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewRemovedAllEvent(
+	base *eventstore.BaseEvent,
+) *RemovedAllEvent {
+
+	return &RemovedAllEvent{
+		BaseEvent: *base,
+	}
+}
+
+func RemovedAllEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	return &RemovedAllEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

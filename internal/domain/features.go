@@ -21,6 +21,8 @@ const (
 	FeatureCustomText               = "custom_text"
 	FeatureCustomDomain             = "custom_domain"
 	FeaturePrivacyPolicy            = "privacy_policy"
+	FeatureMetadata                 = "metadata"
+	FeatureMetadataUser             = FeatureMetadata + ".user"
 )
 
 type Features struct {
@@ -45,6 +47,7 @@ type Features struct {
 	CustomDomain             bool
 	CustomText               bool
 	PrivacyPolicy            bool
+	MetadataUser             bool
 }
 
 type FeaturesState int32

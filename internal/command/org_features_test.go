@@ -278,6 +278,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					CustomDomain:             false,
 					CustomText:               false,
 					PrivacyPolicy:            false,
+					MetadataUser:             false,
 				},
 			},
 			res: res{
