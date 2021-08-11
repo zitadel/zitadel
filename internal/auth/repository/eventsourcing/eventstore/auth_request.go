@@ -953,8 +953,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 		return nil, err
 	}
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
-		errMsg := "Errors.User.Locked"
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", errMsg)
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
 	}
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
