@@ -75,7 +75,8 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	labelPolicyWatermark,
 	customDomain,
 	customText,
-	privacyPolicy bool,
+	privacyPolicy,
+	metadataUser bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -130,6 +131,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.PrivacyPolicy != privacyPolicy {
 		changes = append(changes, features.ChangePrivacyPolicy(privacyPolicy))
+	}
+	if wm.MetadataUser != metadataUser {
+		changes = append(changes, features.ChangeMetadataUser(metadataUser))
 	}
 
 	if len(changes) == 0 {
