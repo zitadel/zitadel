@@ -264,7 +264,7 @@ func expectLock(lockTable, workerName string, d time.Duration) func(sqlmock.Sqlm
 			` WHERE `+lockTable+`\.projection_name = \$3 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				d,
+				float64(d),
 				projectionName,
 			).
 			WillReturnResult(
@@ -282,7 +282,7 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration) func(sqlmoc
 			` WHERE `+lockTable+`\.projection_name = \$3 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				d,
+				float64(d),
 				projectionName,
 			).
 			WillReturnResult(driver.ResultNoRows)
@@ -298,7 +298,7 @@ func expectLockErr(lockTable, workerName string, d time.Duration, err error) fun
 			` WHERE `+lockTable+`\.projection_name = \$3 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				d,
+				float64(d),
 				projectionName,
 			).
 			WillReturnError(err)
