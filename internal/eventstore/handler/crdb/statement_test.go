@@ -45,11 +45,9 @@ func (ex *wantExecuter) Exec(query string, args ...interface{}) (sql.Result, err
 
 func TestNewCreateStatement(t *testing.T) {
 	type args struct {
-		table            string
-		aggregateType    eventstore.AggregateType
-		sequence         uint64
-		previousSequence uint64
-		values           []handler.Column
+		table  string
+		event  *testEvent
+		values []handler.Column
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -67,10 +65,12 @@ func TestNewCreateStatement(t *testing.T) {
 		{
 			name: "no table",
 			args: args{
-				table:            "",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -87,99 +87,20 @@ func TestNewCreateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoTable)
-				},
-			},
-		},
-		{
-			name: "no aggregate type",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoAggregateType)
-				},
-			},
-		},
-		{
-			name: "sequence equal prev seq",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
-				},
-			},
-		},
-		{
-			name: "sequence less prev seq",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrNoProjection)
 				},
 			},
 		},
 		{
 			name: "no values",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
-				values:           []handler.Column{},
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				values: []handler.Column{},
 			},
 			want: want{
 				table:            "my_table",
@@ -197,10 +118,12 @@ func TestNewCreateStatement(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -227,7 +150,7 @@ func TestNewCreateStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewCreateStatement(tt.args.aggregateType, tt.args.sequence, tt.args.previousSequence, tt.args.values)
+			stmt := NewCreateStatement(tt.args.event, tt.args.values)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
@@ -240,11 +163,9 @@ func TestNewCreateStatement(t *testing.T) {
 
 func TestNewUpsertStatement(t *testing.T) {
 	type args struct {
-		table            string
-		aggregateType    eventstore.AggregateType
-		sequence         uint64
-		previousSequence uint64
-		values           []handler.Column
+		table  string
+		event  *testEvent
+		values []handler.Column
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -262,10 +183,12 @@ func TestNewUpsertStatement(t *testing.T) {
 		{
 			name: "no table",
 			args: args{
-				table:            "",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -282,99 +205,20 @@ func TestNewUpsertStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoTable)
-				},
-			},
-		},
-		{
-			name: "no aggregate type",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoAggregateType)
-				},
-			},
-		},
-		{
-			name: "sequence equal prev seq",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
-				},
-			},
-		},
-		{
-			name: "sequence less prev seq",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrNoProjection)
 				},
 			},
 		},
 		{
 			name: "no values",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
-				values:           []handler.Column{},
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				values: []handler.Column{},
 			},
 			want: want{
 				table:            "my_table",
@@ -392,10 +236,12 @@ func TestNewUpsertStatement(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -422,7 +268,7 @@ func TestNewUpsertStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewUpsertStatement(tt.args.aggregateType, tt.args.sequence, tt.args.previousSequence, tt.args.values)
+			stmt := NewUpsertStatement(tt.args.event, tt.args.values)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
@@ -435,12 +281,10 @@ func TestNewUpsertStatement(t *testing.T) {
 
 func TestNewUpdateStatement(t *testing.T) {
 	type args struct {
-		table            string
-		aggregateType    eventstore.AggregateType
-		sequence         uint64
-		previousSequence uint64
-		conditions       []handler.Column
-		values           []handler.Column
+		table      string
+		event      *testEvent
+		conditions []handler.Column
+		values     []handler.Column
 	}
 	type want struct {
 		table            string
@@ -458,10 +302,12 @@ func TestNewUpdateStatement(t *testing.T) {
 		{
 			name: "no table",
 			args: args{
-				table:            "",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -484,123 +330,26 @@ func TestNewUpdateStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoTable)
-				},
-			},
-		},
-		{
-			name: "no aggregate type",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-				conditions: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoAggregateType)
-				},
-			},
-		},
-		{
-			name: "sequence equal prev seq",
-			args: args{
-				table:         "my_table",
-				aggregateType: "agg",
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-				conditions: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
-				sequence:         1,
-				previousSequence: 1,
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
-				},
-			},
-		},
-		{
-			name: "sequence less prev seq",
-			args: args{
-				table:         "my_table",
-				aggregateType: "agg",
-				values: []handler.Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-				},
-				conditions: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
-				sequence:         1,
-				previousSequence: 2,
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrNoProjection)
 				},
 			},
 		},
 		{
 			name: "no values",
 			args: args{
-				table:         "my_table",
-				aggregateType: "agg",
-				values:        []handler.Column{},
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				values: []handler.Column{},
 				conditions: []handler.Column{
 					{
 						Name:  "col2",
 						Value: 1,
 					},
 				},
-				sequence:         1,
-				previousSequence: 0,
 			},
 			want: want{
 				table:            "my_table",
@@ -618,10 +367,12 @@ func TestNewUpdateStatement(t *testing.T) {
 		{
 			name: "no conditions",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -646,10 +397,12 @@ func TestNewUpdateStatement(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -682,7 +435,7 @@ func TestNewUpdateStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewUpdateStatement(tt.args.aggregateType, tt.args.sequence, tt.args.previousSequence, tt.args.values, tt.args.conditions)
+			stmt := NewUpdateStatement(tt.args.event, tt.args.values, tt.args.conditions)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
@@ -695,11 +448,9 @@ func TestNewUpdateStatement(t *testing.T) {
 
 func TestNewDeleteStatement(t *testing.T) {
 	type args struct {
-		table            string
-		aggregateType    eventstore.AggregateType
-		sequence         uint64
-		previousSequence uint64
-		conditions       []handler.Column
+		table      string
+		event      *testEvent
+		conditions []handler.Column
 	}
 
 	type want struct {
@@ -718,10 +469,12 @@ func TestNewDeleteStatement(t *testing.T) {
 		{
 			name: "no table",
 			args: args{
-				table:            "",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 0,
+				table: "",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
 				conditions: []handler.Column{
 					{
 						Name:  "col2",
@@ -738,99 +491,20 @@ func TestNewDeleteStatement(t *testing.T) {
 					shouldExecute: false,
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoTable)
-				},
-			},
-		},
-		{
-			name: "no aggregate type",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				conditions: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "",
-				sequence:         1,
-				previousSequence: 0,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrNoAggregateType)
-				},
-			},
-		},
-		{
-			name: "sequence equal prev seq",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				conditions: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
-				},
-			},
-		},
-		{
-			name: "sequence less prev seq",
-			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				conditions: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 2,
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, handler.ErrPrevSeqGtSeq)
+					return errors.Is(err, handler.ErrNoProjection)
 				},
 			},
 		},
 		{
 			name: "no conditions",
 			args: args{
-				table:            "my_table",
-				aggregateType:    "agg",
-				conditions:       []handler.Column{},
-				sequence:         1,
-				previousSequence: 0,
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conditions: []handler.Column{},
 			},
 			want: want{
 				table:            "my_table",
@@ -848,10 +522,12 @@ func TestNewDeleteStatement(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				table:            "my_table",
-				sequence:         1,
-				previousSequence: 0,
-				aggregateType:    "agg",
+				table: "my_table",
+				event: &testEvent{
+					sequence:         1,
+					previousSequence: 0,
+					aggregateType:    "agg",
+				},
 				conditions: []handler.Column{
 					{
 						Name:  "col1",
@@ -878,7 +554,7 @@ func TestNewDeleteStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewDeleteStatement(tt.args.aggregateType, tt.args.sequence, tt.args.previousSequence, tt.args.conditions)
+			stmt := NewDeleteStatement(tt.args.event, tt.args.conditions)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
@@ -891,9 +567,7 @@ func TestNewDeleteStatement(t *testing.T) {
 
 func TestNewNoOpStatement(t *testing.T) {
 	type args struct {
-		aggregateType    eventstore.AggregateType
-		sequence         uint64
-		previousSequence uint64
+		event *testEvent
 	}
 	tests := []struct {
 		name string
@@ -903,9 +577,11 @@ func TestNewNoOpStatement(t *testing.T) {
 		{
 			name: "generate correctly",
 			args: args{
-				aggregateType:    "agg",
-				sequence:         5,
-				previousSequence: 3,
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         5,
+					previousSequence: 3,
+				},
 			},
 			want: handler.Statement{
 				AggregateType:    "agg",
@@ -917,7 +593,7 @@ func TestNewNoOpStatement(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewNoOpStatement(tt.args.aggregateType, tt.args.sequence, tt.args.previousSequence); !reflect.DeepEqual(got, tt.want) {
+			if got := NewNoOpStatement(tt.args.event); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewNoOpStatement() = %v, want %v", got, tt.want)
 			}
 		})

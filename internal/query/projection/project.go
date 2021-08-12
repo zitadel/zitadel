@@ -71,9 +71,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) ([]
 
 	return []handler.Statement{
 		crdb.NewCreateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(projectIDCol, e.Aggregate().ID),
 				handler.NewCol(projectNameCol, e.Name),
@@ -91,14 +89,12 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 	e := event.(*project.ProjectChangeEvent)
 
 	if e.Name == nil {
-		return []handler.Statement{crdb.NewNoOpStatement(e.Aggregate().Type, e.Sequence(), e.PreviousAggregateTypeSequence())}, nil
+		return []handler.Statement{crdb.NewNoOpStatement(e)}, nil
 	}
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(projectNameCol, e.Name),
 				handler.NewCol(projectChangeDateCol, e.CreationDate()),
@@ -115,9 +111,7 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReade
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(projectStateCol, projectInactive),
 				handler.NewCol(projectChangeDateCol, e.CreationDate()),
@@ -134,9 +128,7 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReade
 
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(projectStateCol, projectActive),
 				handler.NewCol(projectChangeDateCol, e.CreationDate()),
@@ -153,9 +145,7 @@ func (p *ProjectProjection) reduceProjectRemoved(event eventstore.EventReader) (
 
 	return []handler.Statement{
 		crdb.NewDeleteStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(projectIDCol, e.Aggregate().ID),
 			},

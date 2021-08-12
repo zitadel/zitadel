@@ -21,6 +21,29 @@ var (
 	errReduce = errors.New("reduce err")
 )
 
+var _ eventstore.EventReader = &testEvent{}
+
+type testEvent struct {
+	eventstore.BaseEvent
+	sequence         uint64
+	previousSequence uint64
+	aggregateType    eventstore.AggregateType
+}
+
+func (e *testEvent) Sequence() uint64 {
+	return e.sequence
+}
+
+func (e *testEvent) Aggregate() eventstore.Aggregate {
+	return eventstore.Aggregate{
+		Type: e.aggregateType,
+	}
+}
+
+func (e *testEvent) PreviousAggregateTypeSequence() uint64 {
+	return e.previousSequence
+}
+
 func TestProjectionHandler_SearchQuery(t *testing.T) {
 	type want struct {
 		SearchQueryBuilder *eventstore.SearchQueryBuilder
@@ -190,7 +213,11 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement("agg", 6, 0),
+					NewNoOpStatement(&testEvent{
+						aggregateType:    "agg",
+						sequence:         6,
+						previousSequence: 0,
+					}),
 				},
 			},
 			want: want{
@@ -217,9 +244,11 @@ func TestStatementHandler_Update(t *testing.T) {
 				ctx: context.Background(),
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"testAgg",
-						7,
-						6,
+						&testEvent{
+							aggregateType:    "testAgg",
+							sequence:         7,
+							previousSequence: 6,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -252,9 +281,11 @@ func TestStatementHandler_Update(t *testing.T) {
 				ctx: context.Background(),
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						7,
-						5,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         7,
+							previousSequence: 5,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -291,9 +322,11 @@ func TestStatementHandler_Update(t *testing.T) {
 				ctx: context.Background(),
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						7,
-						5,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         7,
+							previousSequence: 5,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -329,7 +362,11 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement("testAgg", 7, 5),
+					NewNoOpStatement(&testEvent{
+						aggregateType:    "testAgg",
+						sequence:         7,
+						previousSequence: 5,
+					}),
 				},
 			},
 			want: want{
@@ -356,7 +393,11 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement("testAgg", 7, 0),
+					NewNoOpStatement(&testEvent{
+						aggregateType:    "testAgg",
+						sequence:         7,
+						previousSequence: 0,
+					}),
 				},
 			},
 			want: want{
@@ -388,7 +429,11 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement("testAgg", 7, 0),
+					NewNoOpStatement(&testEvent{
+						aggregateType:    "testAgg",
+						sequence:         7,
+						previousSequence: 0,
+					}),
 				},
 				reduce: testReduce(),
 			},
@@ -660,9 +705,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			args: args{
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						5,
-						2,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         5,
+							previousSequence: 2,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -687,9 +734,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			args: args{
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						5,
-						0,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         5,
+							previousSequence: 0,
+						},
 						[]handler.Column{
 							{
 								Name:  "col1",
@@ -697,9 +746,12 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						8,
-						7,
+
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         8,
+							previousSequence: 7,
+						},
 						[]handler.Column{
 							{
 								Name:  "col2",
@@ -730,9 +782,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			args: args{
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						5,
-						0,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         5,
+							previousSequence: 0,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -740,9 +794,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						6,
-						5,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         6,
+							previousSequence: 5,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -750,9 +806,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						7,
-						6,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         7,
+							previousSequence: 6,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -772,7 +830,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreateErr("my_projection", []string{"col"}, []string{"$1"}, sql.ErrConnDone),
 					expectSavePointRollback(),
-					expectFailureCount("failed_events", "my_projection", 6, 4),
+					expectFailureCount("failed_events", "my_projection", 6, 3),
+					expectUpdateFailureCount("failed_events", "my_projection", 6, 4),
 				},
 				idx: 0,
 			},
@@ -787,9 +846,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			args: args{
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						5,
-						0,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         5,
+							previousSequence: 0,
+						},
 						[]handler.Column{
 							{
 								Name:  "col1",
@@ -797,9 +858,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						6,
-						5,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         6,
+							previousSequence: 5,
+						},
 						[]handler.Column{
 							{
 								Name:  "col2",
@@ -807,9 +870,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						7,
-						6,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         7,
+							previousSequence: 6,
+						},
 						[]handler.Column{
 							{
 								Name:  "col3",
@@ -829,7 +894,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreateErr("my_projection", []string{"col2"}, []string{"$1"}, sql.ErrConnDone),
 					expectSavePointRollback(),
-					expectFailureCount("failed_events", "my_projection", 6, 5),
+					expectFailureCount("failed_events", "my_projection", 6, 4),
+					expectUpdateFailureCount("failed_events", "my_projection", 6, 5),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col3"}, []string{"$1"}),
 					expectSavePointRelease(),
@@ -845,9 +911,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			args: args{
 				stmts: []handler.Statement{
 					NewCreateStatement(
-						"agg",
-						5,
-						0,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         5,
+							previousSequence: 0,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -855,9 +923,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						6,
-						5,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         6,
+							previousSequence: 5,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -865,9 +935,11 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 					NewCreateStatement(
-						"agg",
-						7,
-						6,
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         7,
+							previousSequence: 6,
+						},
 						[]handler.Column{
 							{
 								Name:  "col",
@@ -972,9 +1044,11 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 			},
 			args: args{
 				stmt: NewCreateStatement(
-					"agg",
-					1,
-					0,
+					&testEvent{
+						aggregateType:    "agg",
+						sequence:         1,
+						previousSequence: 0,
+					},
 					[]handler.Column{
 						{
 							Name:  "col",
@@ -998,9 +1072,11 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 			},
 			args: args{
 				stmt: NewCreateStatement(
-					"agg",
-					1,
-					0,
+					&testEvent{
+						aggregateType:    "agg",
+						sequence:         1,
+						previousSequence: 0,
+					},
 					[]handler.Column{
 						{
 							Name:  "col",
@@ -1026,9 +1102,11 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 			},
 			args: args{
 				stmt: NewCreateStatement(
-					"agg",
-					1,
-					0,
+					&testEvent{
+						aggregateType:    "agg",
+						sequence:         1,
+						previousSequence: 0,
+					},
 					[]handler.Column{
 						{
 							Name:  "col",
@@ -1053,7 +1131,11 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewNoOpStatement("agg", 1, 0),
+				stmt: NewNoOpStatement(&testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				}),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -1069,9 +1151,11 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 			},
 			args: args{
 				stmt: NewCreateStatement(
-					"agg",
-					1,
-					0,
+					&testEvent{
+						aggregateType:    "agg",
+						sequence:         1,
+						previousSequence: 0,
+					},
 					[]handler.Column{
 						{
 							Name:  "col",
@@ -1451,7 +1535,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 func testReduce(stmts ...handler.Statement) handler.Reduce {
 	return func(event eventstore.EventReader) ([]handler.Statement, error) {
 		return []handler.Statement{
-			NewNoOpStatement(event.Aggregate().Type, event.Sequence(), event.PreviousAggregateSequence()),
+			NewNoOpStatement(event),
 		}, nil
 	}
 }

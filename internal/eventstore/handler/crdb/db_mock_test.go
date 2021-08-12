@@ -15,13 +15,19 @@ type mockExpectation func(sqlmock.Sqlmock)
 
 func expectFailureCount(tableName string, projectionName string, failedSeq, failureCount uint64) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-
-		m.ExpectQuery(`SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2`).
+		m.ExpectQuery(`WITH failures AS \(SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2\) SELECT IF\(EXISTS\(SELECT failure_count FROM failures\), \(SELECT failure_count FROM failures\), 0\) AS failure_count`).
 			WithArgs(projectionName, failedSeq).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"failure_count"}).
 					AddRow(failureCount),
 			)
+	}
+}
+
+func expectUpdateFailureCount(tableName string, projectionName string, seq, failureCount uint64) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectExec(`UPSERT INTO `+tableName+` \(projection_name, failed_sequence, failure_count, error\) VALUES \(\$1, \$2, \$3, \$4\)`).
+			WithArgs(projectionName, seq, failureCount, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
 	}
 }
 

@@ -9,131 +9,71 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
 
-func NewCreateStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
+type execOption func(*execConfig)
+type execConfig struct {
+	tableName string
+
+	args []interface{}
+	err  error
+}
+
+func WithTableSuffix(name string) func(*execConfig) {
+	return func(o *execConfig) {
+		o.tableName += "_" + name
+	}
+}
+
+func NewCreateStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
 
+	config := execConfig{
+		args: args,
+	}
+
+	if len(values) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
+	q := func(config execConfig) string {
+		return "INSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
+	}
+
 	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(values) == 0 {
-				return handler.ErrNoValues
-			}
-			query := "INSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-pKtsr", "create failed")
-			}
-			return nil
-		},
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          exec(config, q, opts),
 	}
 }
 
-func NewProjectionCreateStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
+func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
 
+	config := execConfig{
+		args: args,
+	}
+
+	if len(values) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
+	q := func(config execConfig) string {
+		return "UPSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
+	}
+
 	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(values) == 0 {
-				return handler.ErrNoValues
-			}
-			query := "INSERT INTO " + projectionName + "_" + tableSuffix + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-pKtsr", "create failed")
-			}
-			return nil
-		},
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          exec(config, q, opts),
 	}
 }
 
-func NewUpsertStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
-	cols, params, args := columnsToQuery(values)
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
-
-	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(values) == 0 {
-				return handler.ErrNoValues
-			}
-			query := "UPSERT INTO " + projectionName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-KCSi6", "upsert failed")
-			}
-			return nil
-		},
-	}
-}
-
-func NewProjectionUpsertStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values []handler.Column) handler.Statement {
-	cols, params, args := columnsToQuery(values)
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
-
-	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(values) == 0 {
-				return handler.ErrNoValues
-			}
-			query := "UPSERT INTO " + projectionName + "_" + tableSuffix + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-KCSi6", "upsert failed")
-			}
-			return nil
-		},
-	}
-}
-
-func NewUpdateStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values, conditions []handler.Column) handler.Statement {
+func NewUpdateStatement(event eventstore.EventReader, values, conditions []handler.Column, opts ...execOption) handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := columnsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -142,146 +82,56 @@ func NewUpdateStatement(aggregateType eventstore.AggregateType, sequence, previo
 	valuesPlaceholder := strings.Join(params, ", ")
 	wheresPlaceholders := strings.Join(wheres, " AND ")
 
+	config := execConfig{
+		args: args,
+	}
+
+	if len(values) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
+	if len(conditions) == 0 {
+		config.err = handler.ErrNoCondition
+	}
+
+	q := func(config execConfig) string {
+		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
+	}
+
 	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(values) == 0 {
-				return handler.ErrNoValues
-			}
-			if len(conditions) == 0 {
-				return handler.ErrNoCondition
-			}
-			query := "UPDATE " + projectionName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-hpHFZ", "update failed")
-			}
-			return nil
-		},
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          exec(config, q, opts),
 	}
 }
 
-func NewProjectionUpdateStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, values, conditions []handler.Column) handler.Statement {
-	cols, params, args := columnsToQuery(values)
-	wheres, whereArgs := columnsToWhere(conditions, len(params))
-	args = append(args, whereArgs...)
-
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
-	wheresPlaceholders := strings.Join(wheres, " AND ")
-
-	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(values) == 0 {
-				return handler.ErrNoValues
-			}
-			if len(conditions) == 0 {
-				return handler.ErrNoCondition
-			}
-			query := "UPDATE " + projectionName + "_" + tableSuffix + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-hpHFZ", "update failed")
-			}
-			return nil
-		},
-	}
-}
-
-func NewDeleteStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64, conditions []handler.Column) handler.Statement {
+func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Column, opts ...execOption) handler.Statement {
 	wheres, args := columnsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
 
-	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(conditions) == 0 {
-				return handler.ErrNoCondition
-			}
-			query := "DELETE FROM " + projectionName + " WHERE " + wheresPlaceholders
+	config := execConfig{
+		args: args,
+	}
 
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-I478U", "delete failed")
-			}
-			return nil
-		},
+	if len(conditions) == 0 {
+		config.err = handler.ErrNoCondition
+	}
+
+	q := func(config execConfig) string {
+		return "DELETE FROM " + config.tableName + " WHERE " + wheresPlaceholders
+	}
+
+	return handler.Statement{
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          exec(config, q, opts),
 	}
 }
 
-func NewProjectionDeleteStatement(tableSuffix string, aggregateType eventstore.AggregateType, sequence, previousSequence uint64, conditions []handler.Column) handler.Statement {
-	wheres, args := columnsToWhere(conditions, 0)
-
-	wheresPlaceholders := strings.Join(wheres, " AND ")
-
-	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-		Execute: func(ex handler.Executer, projectionName string) error {
-			if aggregateType == "" {
-				return handler.ErrNoAggregateType
-			}
-			if projectionName == "" {
-				return handler.ErrNoTable
-			}
-			if previousSequence >= sequence {
-				return handler.ErrPrevSeqGtSeq
-			}
-			if len(conditions) == 0 {
-				return handler.ErrNoCondition
-			}
-			query := "DELETE FROM " + projectionName + "_" + tableSuffix + " WHERE " + wheresPlaceholders
-
-			if _, err := ex.Exec(query, args...); err != nil {
-				return errors.ThrowInternal(err, "CRDB-I478U", "delete failed")
-			}
-			return nil
-		},
-	}
-}
-
-func NewNoOpStatement(aggregateType eventstore.AggregateType, sequence, previousSequence uint64) handler.Statement {
-	return handler.Statement{
-		AggregateType:    aggregateType,
-		Sequence:         sequence,
-		PreviousSequence: previousSequence,
-	}
-}
-
-func NoOpStatementFromEvent(event eventstore.EventReader) handler.Statement {
+func NewNoOpStatement(event eventstore.EventReader) handler.Statement {
 	return handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
@@ -312,4 +162,29 @@ func columnsToWhere(cols []handler.Column, paramOffset int) (wheres []string, va
 	}
 
 	return wheres, values
+}
+
+type query func(config execConfig) string
+
+func exec(config execConfig, q query, opts []execOption) func(ex handler.Executer, projectionName string) error {
+	return func(ex handler.Executer, projectionName string) error {
+		if projectionName == "" {
+			return handler.ErrNoProjection
+		}
+
+		if config.err != nil {
+			return config.err
+		}
+
+		config.tableName = projectionName
+		for _, opt := range opts {
+			opt(&config)
+		}
+
+		if _, err := ex.Exec(q(config), config.args...); err != nil {
+			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
+		}
+
+		return nil
+	}
 }

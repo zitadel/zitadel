@@ -12,12 +12,12 @@ const (
 	setFailureCountStmtFormat = "UPSERT INTO %s" +
 		" (projection_name, failed_sequence, failure_count, error)" +
 		" VALUES ($1, $2, $3, $4)"
-	failureCountStmtFormat = `WITH failures AS (SELECT failure_count FROM %s WHERE projection_name = $1 AND failed_sequence = $2)
-	SELECT IF(
-		EXISTS(SELECT failure_count FROM failures),
-		(SELECT failure_count FROM failures),
-		0
-	) AS failure_count`
+	failureCountStmtFormat = "WITH failures AS (SELECT failure_count FROM %s WHERE projection_name = $1 AND failed_sequence = $2)" +
+		" SELECT IF(" +
+		"EXISTS(SELECT failure_count FROM failures)," +
+		" (SELECT failure_count FROM failures)," +
+		" 0" +
+		") AS failure_count`"
 )
 
 func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt handler.Statement, execErr error) (shouldContinue bool) {

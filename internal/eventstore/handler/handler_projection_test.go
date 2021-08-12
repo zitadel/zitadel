@@ -702,12 +702,12 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 			name:   "fetch fails",
 			fields: fields{},
 			args: args{
-				query: testQuery(nil, 10, ErrNoTable),
+				query: testQuery(nil, 10, ErrNoProjection),
 				ctx:   context.Background(),
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, ErrNoTable)
+					return errors.Is(err, ErrNoProjection)
 				},
 			},
 		},

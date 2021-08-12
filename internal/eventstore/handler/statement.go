@@ -10,9 +10,7 @@ import (
 )
 
 var (
-	ErrNoAggregateType = errors.New("no aggregate")
-	ErrNoTable         = errors.New("no table")
-	ErrPrevSeqGtSeq    = errors.New("prev seq >= seq")
+	ErrNoProjection    = errors.New("no projection")
 	ErrNoValues        = errors.New("no values")
 	ErrNoCondition     = errors.New("no condition")
 	ErrSomeStmtsFailed = errors.New("some statements failed")

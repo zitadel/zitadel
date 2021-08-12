@@ -73,9 +73,7 @@ func (p *OrgProjection) reduceOrgAdded(event eventstore.EventReader) ([]handler.
 	}
 	return []handler.Statement{
 		crdb.NewCreateStatement(
-			e.Aggregate().Type,
-			event.Sequence(),
-			event.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(orgIDCol, e.Aggregate().ID),
 				handler.NewCol(orgCreationDateCol, e.CreationDate()),
@@ -104,9 +102,7 @@ func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) ([]handle
 	}
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(orgIDCol, e.Aggregate().ID),
 			},
@@ -123,9 +119,7 @@ func (p *OrgProjection) reduceOrgDeactivated(event eventstore.EventReader) ([]ha
 	}
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(orgChangeDateCol, e.CreationDate()),
 				handler.NewCol(orgSequenceCol, e.Sequence()),
@@ -146,9 +140,7 @@ func (p *OrgProjection) reduceOrgReactivated(event eventstore.EventReader) ([]ha
 	}
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(orgChangeDateCol, e.CreationDate()),
 				handler.NewCol(orgSequenceCol, e.Sequence()),
@@ -169,9 +161,7 @@ func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.EventReader) ([]
 	}
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
-			e.Aggregate().Type,
-			e.Sequence(),
-			e.PreviousAggregateTypeSequence(),
+			e,
 			[]handler.Column{
 				handler.NewCol(orgChangeDateCol, e.CreationDate()),
 				handler.NewCol(orgSequenceCol, e.Sequence()),
