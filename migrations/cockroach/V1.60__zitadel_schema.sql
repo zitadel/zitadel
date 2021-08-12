@@ -9,7 +9,7 @@ CREATE TABLE projections.locks (
     locked_until TIMESTAMPTZ(3),
     projection_name TEXT,
 
-    PRIMARY KEY (view_name)
+    PRIMARY KEY (projection_name)
 );
 
 CREATE TABLE projections.current_sequences (
@@ -18,7 +18,7 @@ CREATE TABLE projections.current_sequences (
     current_sequence BIGINT,
     timestamp TIMESTAMPTZ,
 
-    PRIMARY KEY (view_name, aggregate_type)
+    PRIMARY KEY (projection_name, aggregate_type)
 );
 
 CREATE TABLE projections.failed_events (
