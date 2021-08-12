@@ -1462,6 +1462,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
