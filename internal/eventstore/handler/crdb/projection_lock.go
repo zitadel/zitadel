@@ -54,7 +54,7 @@ func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Dura
 }
 
 func (h *StatementHandler) Unlock() error {
-	_, err := h.client.Exec(h.lockStmt, h.workerName, 0, h.ProjectionName)
+	_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.ProjectionName)
 	if err != nil {
 		return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
 	}
