@@ -13,7 +13,6 @@ const (
 		" ON CONFLICT (projection_name)" +
 		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL" +
 		" WHERE %[1]s.projection_name = $3 AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
-	millisecondsAsSeconds = int64(time.Second / time.Millisecond)
 )
 
 func (h *StatementHandler) Lock(ctx context.Context, lockDuration time.Duration) <-chan error {
@@ -28,7 +27,8 @@ func (h *StatementHandler) handleLock(ctx context.Context, errs chan error, lock
 		select {
 		case <-renewLock.C:
 			errs <- h.renewLock(ctx, lockDuration)
-			renewLock.Reset(lockDuration / 2)
+			//refresh the lock 500ms before it times out. 500ms should be enough for one transaction
+			renewLock.Reset(lockDuration - (500 * time.Millisecond))
 		case <-ctx.Done():
 			close(errs)
 			renewLock.Stop()
@@ -38,7 +38,10 @@ func (h *StatementHandler) handleLock(ctx context.Context, errs chan error, lock
 }
 
 func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Duration) error {
-	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Milliseconds()/millisecondsAsSeconds, h.ProjectionName)
+	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
+	//the var is float for not losing ms of the lock
+	interval := float64(lockDuration) / float64(time.Second)
+	res, err := h.client.Exec(h.lockStmt, h.workerName, interval, h.ProjectionName)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}
