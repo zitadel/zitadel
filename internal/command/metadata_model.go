@@ -25,6 +25,8 @@ func (wm *MetadataWriteModel) Reduce() error {
 			wm.State = domain.MetadataStateActive
 		case *metadata.RemovedEvent:
 			wm.State = domain.MetadataStateRemoved
+		case *metadata.RemovedAllEvent:
+			wm.State = domain.MetadataStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -43,6 +45,8 @@ func (wm *MetadataListWriteModel) Reduce() error {
 			wm.metadataList[e.Key] = e.Value
 		case *metadata.RemovedEvent:
 			delete(wm.metadataList, e.Key)
+		case *metadata.RemovedAllEvent:
+			wm.metadataList = make(map[string][]byte)
 		}
 	}
 	return wm.WriteModel.Reduce()
