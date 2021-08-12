@@ -98,6 +98,10 @@ SystemDefaults:
         SID: $TWILIO_SERVICE_SID
         Token: $TWILIO_TOKEN
         From: $TWILIO_SENDER_NAME
+        Proxy:
+          HTTP: $TWILIO_PROXY_HTTP
+          HTTPS: $TWILIO_PROXY_HTTPS
+          CertPath: $TWILIO_PROXY_CERT_PATH
     TemplateData:
       InitCode:
         Title: 'InitCode.Title'
