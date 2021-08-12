@@ -1,10 +1,11 @@
 package domain
 
 const (
-	OrgDomainPrimaryScope = "urn:zitadel:iam:org:domain:primary:"
-	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
-	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
-	AudSuffix             = ":aud"
+	OrgDomainPrimaryScope   = "urn:zitadel:iam:org:domain:primary:"
+	OrgDomainPrimaryClaim   = "urn:zitadel:iam:org:domain:primary"
+	OrgPrivateLabelingScope = "urn:zitadel:iam:org:private:labeling:id:"
+	ProjectIDScope          = "urn:zitadel:iam:org:project:id:"
+	AudSuffix               = ":aud"
 )
 
 //TODO: Change AuthRequest to interface and let oidcauthreqesut implement it

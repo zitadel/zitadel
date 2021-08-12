@@ -121,6 +121,9 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
+	if err := setPrivateLabeling(repo.OrgViewProvider, request); err != nil {
+		return nil, err
+	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
@@ -482,8 +485,15 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	if orgID == "" {
 		orgID = request.UserOrgID
 	}
+	privateLabelingOrgID := orgID
+	if privateLabelingOrgID == "" {
+		privateLabelingOrgID = request.RequestedPrivateLabelingOrgID
+	}
 	if orgID == "" {
 		orgID = repo.IAMID
+	}
+	if privateLabelingOrgID == "" {
+		privateLabelingOrgID = repo.IAMID
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -504,7 +514,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
+	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
 		return err
 	}
@@ -879,6 +889,15 @@ func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) erro
 	request.RequestedOrgID = org.ID
 	request.RequestedOrgName = org.Name
 	request.RequestedPrimaryDomain = primaryDomain
+	return nil
+}
+
+func setPrivateLabeling(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
+	privateLabelingOrgID := request.GetScopeOrgPrivateLabeling()
+	if privateLabelingOrgID == "" {
+		return nil
+	}
+	request.RequestedPrivateLabelingOrgID = privateLabelingOrgID
 	return nil
 }
 

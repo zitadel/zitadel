@@ -25,32 +25,33 @@ type AuthRequest struct {
 	MaxAuthAge    *time.Duration
 	Request       Request
 
-	levelOfAssurance       LevelOfAssurance
-	UserID                 string
-	UserName               string
-	LoginName              string
-	DisplayName            string
-	AvatarKey              string
-	PresignedAvatar        string
-	UserOrgID              string
-	RequestedOrgID         string
-	RequestedOrgName       string
-	RequestedPrimaryDomain string
-	SelectedIDPConfigID    string
-	LinkingUsers           []*ExternalUser
-	PossibleSteps          []NextStep
-	PasswordVerified       bool
-	MFAsVerified           []MFAType
-	Audience               []string
-	AuthTime               time.Time
-	Code                   string
-	LoginPolicy            *LoginPolicy
-	AllowedExternalIDPs    []*IDPProvider
-	LabelPolicy            *LabelPolicy
-	PrivacyPolicy          *PrivacyPolicy
-	LockoutPolicy          *LockoutPolicy
-	DefaultTranslations    []*CustomText
-	OrgTranslations        []*CustomText
+	levelOfAssurance              LevelOfAssurance
+	UserID                        string
+	UserName                      string
+	LoginName                     string
+	DisplayName                   string
+	AvatarKey                     string
+	PresignedAvatar               string
+	UserOrgID                     string
+	RequestedOrgID                string
+	RequestedOrgName              string
+	RequestedPrimaryDomain        string
+	RequestedPrivateLabelingOrgID string
+	SelectedIDPConfigID           string
+	LinkingUsers                  []*ExternalUser
+	PossibleSteps                 []NextStep
+	PasswordVerified              bool
+	MFAsVerified                  []MFAType
+	Audience                      []string
+	AuthTime                      time.Time
+	Code                          string
+	LoginPolicy                   *LoginPolicy
+	AllowedExternalIDPs           []*IDPProvider
+	LabelPolicy                   *LabelPolicy
+	PrivacyPolicy                 *PrivacyPolicy
+	LockoutPolicy                 *LockoutPolicy
+	DefaultTranslations           []*CustomText
+	OrgTranslations               []*CustomText
 }
 
 type ExternalUser struct {
@@ -166,6 +167,18 @@ func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 		for _, scope := range request.Scopes {
 			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
 				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
+			}
+		}
+	}
+	return ""
+}
+
+func (a *AuthRequest) GetScopeOrgPrivateLabeling() string {
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, OrgPrivateLabelingScope) {
+				return strings.TrimPrefix(scope, OrgPrivateLabelingScope)
 			}
 		}
 	}

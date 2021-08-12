@@ -328,6 +328,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(authReq),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -422,6 +423,19 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
+func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
+	if authReq.RequestedOrgID != "" {
+
+	}
+	if authReq.UserOrgID != "" {
+		return authReq.UserOrgID
+	}
+	return authReq.RequestedPrivateLabelingOrgID
+}
+
 func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
 	if authReq == nil {
 		return ""
@@ -484,6 +498,7 @@ type baseData struct {
 	Theme                  string
 	ThemeMode              string
 	DarkMode               bool
+	PrivateLabelingOrgID   string
 	OrgID                  string
 	OrgName                string
 	PrimaryDomain          string
