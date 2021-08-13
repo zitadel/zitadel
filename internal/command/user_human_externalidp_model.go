@@ -27,6 +27,30 @@ func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resource
 	}
 }
 
+func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanExternalIDPAddedEvent:
+			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.HumanExternalIDPRemovedEvent:
+			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.HumanExternalIDPCascadeRemovedEvent:
+			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
 func (wm *HumanExternalIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
