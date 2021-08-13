@@ -10,6 +10,7 @@ func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {
 		Name:                 writeModel.Name,
 		ProjectRoleAssertion: writeModel.ProjectRoleAssertion,
 		ProjectRoleCheck:     writeModel.ProjectRoleCheck,
+		OrgGrantCheck:        writeModel.OrgGrantCheck,
 	}
 }
 

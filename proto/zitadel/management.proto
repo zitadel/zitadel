@@ -3452,6 +3452,7 @@ message AddProjectRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 2;
     bool project_role_check = 3;
+    bool org_grant_check = 4;
 }
 
 message AddProjectResponse {
@@ -3464,6 +3465,7 @@ message UpdateProjectRequest {
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 3;
     bool project_role_check = 4;
+    bool org_grant_check = 5;
 }
 
 message UpdateProjectResponse {

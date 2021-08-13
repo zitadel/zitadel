@@ -65,6 +65,7 @@ title: zitadel/project.proto
 | state |  ProjectState | - |  |
 | project_role_assertion |  bool | describes if roles of user should be added in token |  |
 | project_role_check |  bool | ZITADEL checks if the user has at least one on this project |  |
+| org_grant_check |  bool | ZITADEL checks if the org of the user has permission to this project |  |
 
 
 

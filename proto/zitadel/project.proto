@@ -29,6 +29,8 @@ message Project {
     bool project_role_assertion = 5;
     // ZITADEL checks if the user has at least one on this project
     bool project_role_check = 6;
+    // ZITADEL checks if the org of the user has permission to this project
+    bool org_grant_check = 7;
 }
 
 message GrantedProject {

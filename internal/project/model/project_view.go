@@ -16,6 +16,7 @@ type ProjectView struct {
 	ResourceOwner        string
 	ProjectRoleAssertion bool
 	ProjectRoleCheck     bool
+	OrgGrantCheck        bool
 	Sequence             uint64
 }
 
