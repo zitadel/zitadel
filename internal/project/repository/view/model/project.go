@@ -27,7 +27,7 @@ type ProjectView struct {
 	ResourceOwner        string    `json:"-" gorm:"column:resource_owner"`
 	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
 	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
-	HasProjectCheck      bool      `json:"hasProjectCheck" gorm:"column:org_grant_check"`
+	HasProjectCheck      bool      `json:"hasProjectCheck" gorm:"column:has_project_check"`
 	Sequence             uint64    `json:"-" gorm:"column:sequence"`
 }
 

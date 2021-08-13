@@ -8,5 +8,5 @@ CREATE TABLE auth.org_project_mapping (
      org_id TEXT,
      project_id TEXT,
 
-     PRIMARY KEY (aggregate_id, project_id)
+     PRIMARY KEY (org_id, project_id)
 );
