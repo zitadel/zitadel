@@ -3,8 +3,6 @@ package handler
 import (
 	"time"
 
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
