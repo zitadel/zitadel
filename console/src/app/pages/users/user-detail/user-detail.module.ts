@@ -75,7 +75,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DialogU2FComponent,
     DialogPasswordlessComponent,
     AuthFactorDialogComponent,
-    MetadataDialogComponent
+    MetadataDialogComponent,
   ],
   imports: [
     UserDetailRoutingModule,

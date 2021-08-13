@@ -1196,7 +1196,7 @@ export class ManagementService {
     return this.grpcService.mgmt.getUserMetadata(req, null).then(resp => resp.toObject());
   }
 
-  public setMyMetadata(key: string, value: string): Promise<SetUserMetadataResponse.AsObject> {
+  public setUserMetadata(key: string, value: string): Promise<SetUserMetadataResponse.AsObject> {
     const req = new SetUserMetadataRequest();
     req.setKey(key);
     req.setValue(value);

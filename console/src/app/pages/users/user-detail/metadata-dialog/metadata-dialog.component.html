@@ -1,20 +1,34 @@
 <h1 mat-dialog-title>
-    <span class="title">{{'USER.CODEDIALOG.TITLE' | translate}} {{data?.number}}</span>
+    <span class="title">{{'USER.METADATADIALOG.TITLE' | translate}} {{data?.number}}</span>
 </h1>
-<p class="desc">{{'USER.CODEDIALOG.DESCRIPTION' | translate}}</p>
+<p class="desc">{{'USER.METADATADIALOG.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
-    <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.CODEDIALOG.CODE' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="code" />
-    </cnsl-form-field>
+  <form @list (ngSubmit)="addMetadata()">
+    <div @animate class="content">
+        <ng-container [formGroup]="formGroup">
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'USER.METADATA.KEY' | translate }}</cnsl-label>
+                <input cnslInput formControlName="key" />
+            </cnsl-form-field>
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'USER.METADATA.VALUE' | translate }}</cnsl-label>
+                <input cnslInput formControlName="value" />
+            </cnsl-form-field>
+           
+            <button *ngIf="i !== 0" mat-icon-button (click)="removeEntry(i)" type="button" color="warn"
+                matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
+                <i class="las la-trash"></i>
+            </button>
+        </ng-container>
+    </div>
+
+    <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">
+        {{ 'ACTIONS.SAVE' | translate }}
+    </button>
+</form>
 </div>
 <div mat-dialog-actions class="action">
     <button cdkFocusInitial color="primary" mat-button class="ok-button" (click)="closeDialog()">
         {{'ACTIONS.CLOSE' | translate}}
-    </button>
-
-    <button [disabled]="!code" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialog(code)">
-        {{'ACTIONS.OK' | translate}}
     </button>
 </div>
