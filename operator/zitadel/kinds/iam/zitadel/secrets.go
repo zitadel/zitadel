@@ -89,6 +89,26 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secrets[twilOAuthKey] = conf.Notifications.Twilio.AuthToken
 	existing[twilOAuthKey] = conf.Notifications.Twilio.ExistingAuthToken
 
+	if conf.Notifications.Twilio.ProxyHTTP == nil {
+		conf.Notifications.Twilio.ProxyHTTP = &secret.Secret{}
+	}
+	if conf.Notifications.Twilio.ExistingProxyHTTP == nil {
+		conf.Notifications.Twilio.ExistingProxyHTTP = &secret.Existing{}
+	}
+	twilioHTTPProxyKey := "twilioroxyhttp"
+	secrets[twilioHTTPProxyKey] = conf.Notifications.Twilio.ProxyHTTP
+	existing[twilioHTTPProxyKey] = conf.Notifications.Twilio.ExistingProxyHTTP
+
+	if conf.Notifications.Twilio.ProxyHTTPS == nil {
+		conf.Notifications.Twilio.ProxyHTTPS = &secret.Secret{}
+	}
+	if conf.Notifications.Twilio.ExistingProxyHTTPS == nil {
+		conf.Notifications.Twilio.ExistingProxyHTTPS = &secret.Existing{}
+	}
+	twilioHTTPSProxyKey := "twilioproxyhttps"
+	secrets[twilioHTTPSProxyKey] = conf.Notifications.Twilio.ProxyHTTPS
+	existing[twilioHTTPSProxyKey] = conf.Notifications.Twilio.ExistingProxyHTTPS
+
 	if conf.Notifications.Email == nil {
 		conf.Notifications.Email = &configuration.Email{}
 	}

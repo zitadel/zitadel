@@ -42,9 +42,12 @@ var (
 				AppKey:        &secret.Secret{Value: ""},
 			},
 			Twilio: &Twilio{
-				SenderName: "",
-				AuthToken:  &secret.Secret{Value: ""},
-				SID:        &secret.Secret{Value: ""},
+				SenderName:    "",
+				AuthToken:     &secret.Secret{Value: ""},
+				SID:           &secret.Secret{Value: ""},
+				ProxyCertPath: "",
+				ProxyHTTP:     &secret.Secret{Value: ""},
+				ProxyHTTPS:    &secret.Secret{Value: ""},
 			},
 		},
 		Passwords: &Passwords{
@@ -111,9 +114,12 @@ var (
 				AppKey:        &secret.Secret{Value: "appkey"},
 			},
 			Twilio: &Twilio{
-				SenderName: "sendername",
-				AuthToken:  &secret.Secret{Value: "authtoken"},
-				SID:        &secret.Secret{Value: "sid"},
+				SenderName:    "sendername",
+				AuthToken:     &secret.Secret{Value: "authtoken"},
+				SID:           &secret.Secret{Value: "sid"},
+				ProxyCertPath: "",
+				ProxyHTTP:     &secret.Secret{Value: ""},
+				ProxyHTTPS:    &secret.Secret{Value: ""},
 			},
 		},
 		Passwords: &Passwords{

@@ -119,11 +119,16 @@ type Tracing struct {
 }
 
 type Twilio struct {
-	SenderName        string           `yaml:"senderName,omitempty"`
-	AuthToken         *secret.Secret   `yaml:"authToken,omitempty"`
-	SID               *secret.Secret   `yaml:"sid,omitempty"`
-	ExistingAuthToken *secret.Existing `yaml:"existingAuthToken,omitempty"`
-	ExistingSID       *secret.Existing `yaml:"ExistingSid,omitempty"`
+	SenderName         string           `yaml:"senderName,omitempty"`
+	AuthToken          *secret.Secret   `yaml:"authToken,omitempty"`
+	SID                *secret.Secret   `yaml:"sid,omitempty"`
+	ProxyCertPath      string           `yaml:"proxyCertPath,omitempty"`
+	ProxyHTTP          *secret.Secret   `yaml:"proxyHTTP,omitempty"`
+	ProxyHTTPS         *secret.Secret   `yaml:"proxyHTTPS,omitempty"`
+	ExistingAuthToken  *secret.Existing `yaml:"existingAuthToken,omitempty"`
+	ExistingSID        *secret.Existing `yaml:"existingSid,omitempty"`
+	ExistingProxyHTTP  *secret.Existing `yaml:"existingProxyHTTP,omitempty"`
+	ExistingProxyHTTPS *secret.Existing `yaml:"existingProxyHTTPS,omitempty"`
 }
 
 type Email struct {

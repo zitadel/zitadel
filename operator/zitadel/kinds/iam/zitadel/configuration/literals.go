@@ -67,6 +67,7 @@ func literalsConfigMap(
 		}
 		if desired.Notifications != nil {
 			literalsConfigMap["TWILIO_SENDER_NAME"] = desired.Notifications.Twilio.SenderName
+			literalsConfigMap["TWILIO_PROXY_CERT_PATH"] = desired.Notifications.Twilio.ProxyCertPath
 			literalsConfigMap["SMTP_HOST"] = desired.Notifications.Email.SMTPHost
 			literalsConfigMap["SMTP_USER"] = desired.Notifications.Email.SMTPUser
 			literalsConfigMap["EMAIL_SENDER_ADDRESS"] = desired.Notifications.Email.SenderAddress
@@ -178,6 +179,20 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 					return nil, err
 				}
 				literalsSecretVars["ZITADEL_TWILIO_SID"] = value
+			}
+			if desired.Notifications.Twilio.ProxyHTTP != nil || desired.Notifications.Twilio.ExistingProxyHTTP != nil {
+				value, err := read.GetSecretValue(k8sClient, desired.Notifications.Twilio.ProxyHTTP, desired.Notifications.Twilio.ExistingProxyHTTP)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_TWILIO_PROXY_HTTP"] = value
+			}
+			if desired.Notifications.Twilio.ProxyHTTPS != nil || desired.Notifications.Twilio.ExistingProxyHTTPS != nil {
+				value, err := read.GetSecretValue(k8sClient, desired.Notifications.Twilio.ProxyHTTPS, desired.Notifications.Twilio.ExistingProxyHTTPS)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["ZITADEL_TWILIO_PROXY_HTTPS"] = value
 			}
 		}
 		if desired.AssetStorage != nil {
