@@ -7,7 +7,7 @@
 </div>
 
 
-<form action="{{ externalNotFoundOptionUrl }}" method="POST">
+<form action="{{ externalNotFoundOptionUrl "none" }}" method="POST">
 
     {{ .CSRF }}
 
@@ -49,11 +49,11 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
 
-        <button class="lgn-raised-button lgn-primary" id="link-button" name="link" value="true">
+        <button type="submit" formaction="{{ externalNotFoundOptionUrl "linkbutton"}}" class="lgn-raised-button lgn-primary" name="linkbutton" value="true">
             {{t "ExternalNotFoundOption.LinkButtonText"}}
         </button>
             <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="auto-register-button" name="autoregister" value="true">
+        <button type="submit" formaction="{{ externalNotFoundOptionUrl "autoregisterbutton"}}" class="lgn-raised-button lgn-primary" name="autoregisterbutton" value="true">
             {{t "ExternalNotFoundOption.AutoRegisterButtonText"}}
         </button>
     </div>
