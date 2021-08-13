@@ -8,6 +8,7 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -22,6 +23,7 @@ import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dia
 })
 export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
+  public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
   public languages: string[] = ['de', 'en'];
 
@@ -52,6 +54,14 @@ export class UserDetailComponent implements OnInit {
       this.mgmtUserService.getUserByID(id).then(resp => {
         if (resp.user) {
           this.user = resp.user;
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+
+      this.mgmtUserService.listUserMetadata(id, 0, 100, []).then(resp => {
+        if (resp.resultList) {
+          this.metadata = resp.resultList;
         }
       }).catch(err => {
         console.error(err);
@@ -90,6 +100,10 @@ export class UserDetailComponent implements OnInit {
         this.toast.showError(error);
       });
     }
+  }
+
+  public editMetadata(): void {
+
   }
 
   public saveProfile(profileData: Profile.AsObject): void {

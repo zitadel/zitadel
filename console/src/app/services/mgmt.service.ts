@@ -156,6 +156,8 @@ import {
   GetUserByLoginNameGlobalResponse,
   GetUserGrantByIDRequest,
   GetUserGrantByIDResponse,
+  GetUserMetadataRequest,
+  GetUserMetadataResponse,
   IDPQuery,
   ListAppChangesRequest,
   ListAppChangesResponse,
@@ -210,6 +212,8 @@ import {
   ListUserGrantResponse,
   ListUserMembershipsRequest,
   ListUserMembershipsResponse,
+  ListUserMetadataRequest,
+  ListUserMetadataResponse,
   ListUsersRequest,
   ListUsersResponse,
   ReactivateAppRequest,
@@ -326,6 +330,8 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  SetUserMetadataRequest,
+  SetUserMetadataResponse,
   UnlockUserRequest,
   UnlockUserResponse,
   UpdateAPIAppConfigRequest,
@@ -376,6 +382,7 @@ import {
   ValidateOrgDomainResponse,
 } from '../proto/generated/zitadel/management_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
+import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
@@ -1163,6 +1170,37 @@ export class ManagementService {
     const req = new GetUserByIDRequest();
     req.setId(id);
     return this.grpcService.mgmt.getUserByID(req, null).then(resp => resp.toObject());
+  }
+
+  public listUserMetadata(userId: string, offset: number, limit: number, queryList: MetadataQuery[]): Promise<ListUserMetadataResponse.AsObject> {
+    const req = new ListUserMetadataRequest();
+
+    req.setId(userId);
+    const metadata = new ListQuery();
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.mgmt.listUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public getUserMetadata(userId: string, key: string): Promise<GetUserMetadataResponse.AsObject> {
+    const req = new GetUserMetadataRequest();
+    req.setId(userId);
+    req.setKey(key);
+    return this.grpcService.mgmt.getUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public setMyMetadata(key: string, value: string): Promise<SetUserMetadataResponse.AsObject> {
+    const req = new SetUserMetadataRequest();
+    req.setKey(key);
+    req.setValue(value);
+    return this.grpcService.mgmt.setUserMetadata(req, null).then(resp => resp.toObject());
   }
 
   public removeUser(id: string): Promise<RemoveUserResponse.AsObject> {

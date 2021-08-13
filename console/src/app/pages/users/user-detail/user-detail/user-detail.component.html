@@ -106,28 +106,47 @@
     </div>
 
     <div *ngIf="user" class="side" metainfo>
-        <div class="meta-details">
-            <div class="meta-row">
-                <span class="first">{{'RESOURCEID' | translate}}:</span>
-                <span *ngIf="user?.id" class="second">{{ user.id }}</span>
-            </div>
-            <div class="meta-row" *ngIf="user?.preferredLoginName">
-                <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
-                <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
-            </div>
-            <div class="meta-row">
-                <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
-                <span *ngIf="user && user.state !== undefined" class="state"
-                    [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">{{'USER.DATA.STATE'+user.state
-                    | translate}}</span>
-            </div>
+      <div class="meta-details">
+        <div class="meta-row">
+            <span class="first">{{'RESOURCEID' | translate}}:</span>
+            <span *ngIf="user?.id" class="second">{{ user.id }}</span>
         </div>
+        <div class="meta-row" *ngIf="user?.preferredLoginName">
+            <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
+            <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
+        </div>
+        <div class="meta-row">
+            <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
+            <span *ngIf="user && user.state !== undefined" class="state"
+                [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">{{'USER.DATA.STATE'+user.state
+                | translate}}</span>
+        </div>
+      </div>
 
-        <ng-template appHasRole [appHasRole]="['user.membership.read']">
+      <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+        <mat-tab label="Details">
+          <div class="side-padding">
+          <ng-template appHasRole [appHasRole]="['user.membership.read']">
             <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
-        </ng-template>
+          </ng-template>
 
+          <div class="meta-details">
+            <div class="title-row">
+            <span class="title">Metadata</span>
+            <a class="edit" (click)="editMetadata()">edit</a>
+          </div>
+
+          <div class="meta-row" *ngFor="let md of metadata">
+              <span class="first">{{md.key}}:</span>
+              <span class="second">{{ md.value }}</span>
+          </div>
+        </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
         <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
         </app-changes>
+      </mat-tab>
+      </mat-tab-group>
     </div>
 </app-meta-layout>

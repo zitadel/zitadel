@@ -287,8 +287,8 @@
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
       "DIALOG": {
-        "REMOVE_TITLE": "Remove IDP",
-        "REMOVE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        "DELETE_TITLE": "Remove IDP",
+        "DELETE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
       }
     },
     "CREATE": {

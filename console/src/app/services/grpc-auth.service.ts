@@ -14,6 +14,8 @@ import {
   AddMyPasswordlessResponse,
   GetMyEmailRequest,
   GetMyEmailResponse,
+  GetMyMetadataRequest,
+  GetMyMetadataResponse,
   GetMyPasswordComplexityPolicyRequest,
   GetMyPasswordComplexityPolicyResponse,
   GetMyPhoneRequest,
@@ -26,6 +28,8 @@ import {
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
   ListMyLinkedIDPsResponse,
+  ListMyMetadataRequest,
+  ListMyMetadataResponse,
   ListMyPasswordlessRequest,
   ListMyPasswordlessResponse,
   ListMyProjectOrgsRequest,
@@ -60,6 +64,8 @@ import {
   SendMyPasswordlessLinkResponse,
   SetMyEmailRequest,
   SetMyEmailResponse,
+  SetMyMetadataRequest,
+  SetMyMetadataResponse,
   SetMyPhoneRequest,
   SetMyPhoneResponse,
   UpdateMyPasswordRequest,
@@ -76,6 +82,7 @@ import {
   VerifyMyPhoneResponse,
 } from '../proto/generated/zitadel/auth_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
+import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { Gender, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
@@ -269,6 +276,36 @@ export class GrpcAuthService {
     return this.grpcService.auth.getMyUser(
       new GetMyUserRequest(), null,
     ).then(resp => resp.toObject());
+  }
+
+  public listMyMetadata(offset: number, limit: number, queryList: MetadataQuery[]): Promise<ListMyMetadataResponse.AsObject> {
+    const req = new ListMyMetadataRequest();
+    const metadata = new ListQuery();
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.auth.listMyMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public getMyMetadata(key?: string): Promise<GetMyMetadataResponse.AsObject> {
+    const req = new GetMyMetadataRequest();
+    if (key) {
+      req.setKey(key);
+    }
+    return this.grpcService.auth.getMyMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public setMyMetadata(key: string, value: string): Promise<SetMyMetadataResponse.AsObject> {
+    const req = new SetMyMetadataRequest();
+    req.setKey(key);
+    req.setValue(value);
+    return this.grpcService.auth.setMyMetadata(req, null).then(resp => resp.toObject());
   }
 
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse.AsObject> {

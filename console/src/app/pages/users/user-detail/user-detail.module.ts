@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { QRCodeModule } from 'angularx-qrcode';
@@ -48,6 +49,7 @@ import { DetailFormMachineModule } from './detail-form-machine/detail-form-machi
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
 import { MembershipsComponent } from './memberships/memberships.component';
+import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
@@ -73,11 +75,13 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DialogU2FComponent,
     DialogPasswordlessComponent,
     AuthFactorDialogComponent,
+    MetadataDialogComponent
   ],
   imports: [
     UserDetailRoutingModule,
     ChangesModule,
     CommonModule,
+    MatTabsModule,
     FormsModule,
     ReactiveFormsModule,
     DetailFormModule,
