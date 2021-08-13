@@ -1,3 +1,17 @@
+CREATE TABLE projections.orgs (
+     id TEXT,
+     creation_date TIMESTAMPTZ,
+     change_date TIMESTAMPTZ,
+     resource_owner TEXT,
+     org_state SMALLINT,
+     sequence BIGINT,
+
+     domain TEXT,
+     name TEXT,
+
+     PRIMARY KEY (id)
+);
+
 CREATE TABLE zitadel.projections.org_owners_orgs (
     id TEXT,
     name TEXT,
@@ -5,7 +19,6 @@ CREATE TABLE zitadel.projections.org_owners_orgs (
 
     PRIMARY KEY (id)
 );
-
 
 CREATE TABLE zitadel.projections.org_owners_users (
     org_id TEXT,
