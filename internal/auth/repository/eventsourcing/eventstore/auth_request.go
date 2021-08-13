@@ -44,6 +44,7 @@ type AuthRequestRepo struct {
 	LockoutPolicyViewProvider lockoutPolicyViewProvider
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
+	ProjectProvider           projectProvider
 
 	IdGenerator id.Generator
 
@@ -94,6 +95,10 @@ type orgViewProvider interface {
 type userGrantProvider interface {
 	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
 	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
+}
+
+type projectProvider interface {
+	OrgProjectMappingByIDs(orgID, projectID string) (project_view_model.OrgProjectMapping, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -672,7 +677,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	//PLANNED: consent step
 
-	missing, err := userGrantRequired(ctx, request, user, repo.UserGrantProvider)
+	missing, err := projectRequired(ctx, request, repo.UserGrantProvider, repo.ProjectProvider)
+	if err != nil {
+		return nil, err
+	}
+	if missing {
+		return append(steps, &domain.ProjectRequiredStep{}), nil
+	}
+
+	missing, err = userGrantRequired(ctx, request, user, repo.UserGrantProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -1058,6 +1071,7 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 	}
 	return true
 }
+
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var app *project_view_model.ApplicationView
 	switch request.Request.Type() {
@@ -1077,4 +1091,28 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 		return false, err
 	}
 	return len(grants) == 0, nil
+}
+
+func projectRequired(ctx context.Context, request *domain.AuthRequest, userGrantProvider userGrantProvider, projectProvider projectProvider) (_ bool, err error) {
+	var app *project_view_model.ApplicationView
+	switch request.Request.Type() {
+	case domain.AuthRequestTypeOIDC:
+		app, err = userGrantProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+	default:
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+	}
+	if !app.HasProjectCheck {
+		return false, nil
+	}
+	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, app.ProjectID)
+	if errors.IsNotFound(err) {
+		return true, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return false, nil
 }

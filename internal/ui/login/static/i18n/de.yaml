@@ -349,6 +349,7 @@ Errors:
       ExternalUserIDEmpty: Externe User ID  ist leer
       UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
+    ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
     InvalidConfig: Identitäts Provider Konfiguration ist ungültig
   IAM:

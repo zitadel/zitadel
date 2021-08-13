@@ -14,7 +14,7 @@ type ProjectWriteModel struct {
 	Name                 string
 	ProjectRoleAssertion bool
 	ProjectRoleCheck     bool
-	OrgGrantCheck        bool
+	HasProjectCheck      bool
 	State                domain.ProjectState
 }
 
@@ -34,7 +34,7 @@ func (wm *ProjectWriteModel) Reduce() error {
 			wm.Name = e.Name
 			wm.ProjectRoleAssertion = e.ProjectRoleAssertion
 			wm.ProjectRoleCheck = e.ProjectRoleCheck
-			wm.OrgGrantCheck = e.OrgGrantCheck
+			wm.HasProjectCheck = e.HasProjectCheck
 			wm.State = domain.ProjectStateActive
 		case *project.ProjectChangeEvent:
 			if e.Name != nil {
@@ -46,8 +46,8 @@ func (wm *ProjectWriteModel) Reduce() error {
 			if e.ProjectRoleCheck != nil {
 				wm.ProjectRoleCheck = *e.ProjectRoleCheck
 			}
-			if e.OrgGrantCheck != nil {
-				wm.OrgGrantCheck = *e.OrgGrantCheck
+			if e.HasProjectCheck != nil {
+				wm.HasProjectCheck = *e.HasProjectCheck
 			}
 		case *project.ProjectDeactivatedEvent:
 			if wm.State == domain.ProjectStateRemoved {
@@ -86,7 +86,7 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	name string,
 	projectRoleAssertion,
 	projectRoleCheck,
-	orgGrantCheck bool,
+	hasProjectCheck bool,
 ) (*project.ProjectChangeEvent, bool, error) {
 	changes := make([]project.ProjectChanges, 0)
 	var err error
@@ -102,8 +102,8 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	if wm.ProjectRoleCheck != projectRoleCheck {
 		changes = append(changes, project.ChangeProjectRoleCheck(projectRoleCheck))
 	}
-	if wm.OrgGrantCheck != orgGrantCheck {
-		changes = append(changes, project.ChangeOrgGrantCheck(orgGrantCheck))
+	if wm.HasProjectCheck != hasProjectCheck {
+		changes = append(changes, project.ChangeHasProjectCheck(hasProjectCheck))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

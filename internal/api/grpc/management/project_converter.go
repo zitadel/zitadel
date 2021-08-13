@@ -15,7 +15,7 @@ func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
 		Name:                 req.Name,
 		ProjectRoleAssertion: req.ProjectRoleAssertion,
 		ProjectRoleCheck:     req.ProjectRoleCheck,
-		OrgGrantCheck:        req.OrgGrantCheck,
+		HasProjectCheck:      req.HasProjectCheck,
 	}
 }
 
@@ -27,7 +27,7 @@ func ProjectUpdateToDomain(req *mgmt_pb.UpdateProjectRequest) *domain.Project {
 		Name:                 req.Name,
 		ProjectRoleAssertion: req.ProjectRoleAssertion,
 		ProjectRoleCheck:     req.ProjectRoleCheck,
-		OrgGrantCheck:        req.OrgGrantCheck,
+		HasProjectCheck:      req.HasProjectCheck,
 	}
 }
 

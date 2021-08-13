@@ -18,52 +18,12 @@ type Project struct {
 	Name                 string           `json:"name,omitempty"`
 	ProjectRoleAssertion bool             `json:"projectRoleAssertion,omitempty"`
 	ProjectRoleCheck     bool             `json:"projectRoleCheck,omitempty"`
+	HasProjectCheck      bool             `json:"hasProjectCheck,omitempty"`
 	State                int32            `json:"-"`
 	Members              []*ProjectMember `json:"-"`
 	Roles                []*ProjectRole   `json:"-"`
 	Applications         []*Application   `json:"-"`
 	Grants               []*ProjectGrant  `json:"-"`
-}
-
-func GetProject(projects []*Project, id string) (int, *Project) {
-	for i, p := range projects {
-		if p.AggregateID == id {
-			return i, p
-		}
-	}
-	return -1, nil
-}
-
-func (p *Project) Changes(changed *Project) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-	if changed.Name != "" && p.Name != changed.Name {
-		changes["name"] = changed.Name
-	}
-	if p.ProjectRoleAssertion != changed.ProjectRoleAssertion {
-		changes["projectRoleAssertion"] = changed.ProjectRoleAssertion
-	}
-	if p.ProjectRoleCheck != changed.ProjectRoleCheck {
-		changes["projectRoleCheck"] = changed.ProjectRoleCheck
-	}
-	return changes
-}
-
-func ProjectFromModel(project *model.Project) *Project {
-	members := ProjectMembersFromModel(project.Members)
-	roles := ProjectRolesFromModel(project.Roles)
-	apps := AppsFromModel(project.Applications)
-	grants := GrantsFromModel(project.Grants)
-	return &Project{
-		ObjectRoot:           project.ObjectRoot,
-		Name:                 project.Name,
-		ProjectRoleAssertion: project.ProjectRoleAssertion,
-		ProjectRoleCheck:     project.ProjectRoleCheck,
-		State:                int32(project.State),
-		Members:              members,
-		Roles:                roles,
-		Applications:         apps,
-		Grants:               grants,
-	}
 }
 
 func ProjectToModel(project *Project) *model.Project {

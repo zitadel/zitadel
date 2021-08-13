@@ -211,12 +211,13 @@ func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, er
 }
 
 type mockUserGrants struct {
-	roleCheck  bool
-	userGrants int
+	roleCheck    bool
+	projectCheck bool
+	userGrants   int
 }
 
 func (m *mockUserGrants) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
-	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck}, nil
+	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck, HasProjectCheck: m.projectCheck}, nil
 }
 
 func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*grant_view_model.UserGrantView, error) {

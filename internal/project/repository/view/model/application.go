@@ -31,6 +31,7 @@ type ApplicationView struct {
 	State                int32     `json:"-" gorm:"column:app_state"`
 	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
 	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
+	HasProjectCheck      bool      `json:"hasProjectCheck" gorm:"column:has_project_check"`
 
 	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
 	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
@@ -234,6 +235,7 @@ func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	changes := struct {
 		ProjectRoleAssertion *bool `json:"projectRoleAssertion,omitempty"`
 		ProjectRoleCheck     *bool `json:"projectRoleCheck,omitempty"`
+		HasProjectCheck      *bool `json:"hasProjectCheck,omitempty"`
 	}{}
 	if err := json.Unmarshal(event.Data, &changes); err != nil {
 		logging.Log("EVEN-DFbfg").WithError(err).Error("could not unmarshal event data")
@@ -244,6 +246,9 @@ func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	}
 	if changes.ProjectRoleCheck != nil {
 		a.ProjectRoleCheck = *changes.ProjectRoleCheck
+	}
+	if changes.HasProjectCheck != nil {
+		a.HasProjectCheck = *changes.HasProjectCheck
 	}
 	return nil
 }

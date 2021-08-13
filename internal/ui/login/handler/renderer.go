@@ -292,6 +292,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
+	case *domain.ProjectRequiredStep:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

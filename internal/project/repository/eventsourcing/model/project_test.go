@@ -8,50 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/project/model"
 )
 
-func TestProjectChanges(t *testing.T) {
-	type args struct {
-		existingProject *Project
-		newProject      *Project
-	}
-	type res struct {
-		changesLen int
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "project name changes",
-			args: args{
-				existingProject: &Project{Name: "Name"},
-				newProject:      &Project{Name: "NameChanged"},
-			},
-			res: res{
-				changesLen: 1,
-			},
-		},
-		{
-			name: "no changes",
-			args: args{
-				existingProject: &Project{Name: "Name"},
-				newProject:      &Project{Name: "Name"},
-			},
-			res: res{
-				changesLen: 0,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existingProject.Changes(tt.args.newProject)
-			if len(changes) != tt.res.changesLen {
-				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
-			}
-		})
-	}
-}
-
 func TestProjectFromEvents(t *testing.T) {
 	type args struct {
 		event   []*es_models.Event

@@ -3276,7 +3276,7 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
-| org_grant_check |  bool | - |  |
+| has_project_check |  bool | - |  |
 
 
 
@@ -7521,7 +7521,7 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
-| org_grant_check |  bool | - |  |
+| has_project_check |  bool | - |  |
 
 
 

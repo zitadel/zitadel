@@ -15,7 +15,7 @@ func ProjectToPb(project *proj_model.ProjectView) *proj_pb.Project {
 		State:                projectStateToPb(project.State),
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
 		ProjectRoleCheck:     project.ProjectRoleCheck,
-		OrgGrantCheck:        project.OrgGrantCheck,
+		HasProjectCheck:      project.HasProjectCheck,
 	}
 }
 

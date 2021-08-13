@@ -152,7 +152,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 					Name:                 "project",
 					ProjectRoleAssertion: true,
 					ProjectRoleCheck:     true,
-					OrgGrantCheck:        true,
+					HasProjectCheck:      true,
 				},
 			},
 		},
@@ -208,7 +208,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 					Name:                 "project",
 					ProjectRoleAssertion: true,
 					ProjectRoleCheck:     true,
-					OrgGrantCheck:        true,
+					HasProjectCheck:      true,
 				},
 			},
 		},
@@ -368,7 +368,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					Name:                 "project",
 					ProjectRoleAssertion: true,
 					ProjectRoleCheck:     true,
-					OrgGrantCheck:        true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 			},
@@ -415,7 +415,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					Name:                 "project-new",
 					ProjectRoleAssertion: true,
 					ProjectRoleCheck:     true,
-					OrgGrantCheck:        true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 			},
@@ -468,7 +468,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					Name:                 "project",
 					ProjectRoleAssertion: true,
 					ProjectRoleCheck:     true,
-					OrgGrantCheck:        true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 			},
@@ -1007,11 +1007,11 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 	}
 }
 
-func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck, orgGrantCheck bool) *project.ProjectChangeEvent {
+func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck, hasProjectCheck bool) *project.ProjectChangeEvent {
 	changes := []project.ProjectChanges{
 		project.ChangeProjectRoleAssertion(roleAssertion),
 		project.ChangeProjectRoleCheck(roleCheck),
-		project.ChangeOrgGrantCheck(orgGrantCheck),
+		project.ChangeHasProjectCheck(hasProjectCheck),
 	}
 	if newName != "" {
 		changes = append(changes, project.ChangeName(newName))

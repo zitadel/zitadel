@@ -350,6 +350,7 @@ Errors:
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
+    ProjectRequired: Login not possible. The organisation of the user should be granted to the project. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid
   IAM:

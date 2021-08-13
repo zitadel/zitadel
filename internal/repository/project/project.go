@@ -38,7 +38,7 @@ type ProjectAddedEvent struct {
 	Name                 string `json:"name,omitempty"`
 	ProjectRoleAssertion bool   `json:"projectRoleAssertion,omitempty"`
 	ProjectRoleCheck     bool   `json:"projectRoleCheck,omitempty"`
-	OrgGrantCheck        bool   `json:"orgGrantCheck,omitempty"`
+	HasProjectCheck      bool   `json:"hasProjectCheck,omitempty"`
 }
 
 func (e *ProjectAddedEvent) Data() interface{} {
@@ -55,7 +55,7 @@ func NewProjectAddedEvent(
 	name string,
 	projectRoleAssertion,
 	projectRoleCheck,
-	orgGrantCheck bool,
+	hasProjectCheck bool,
 ) *ProjectAddedEvent {
 	return &ProjectAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -66,7 +66,7 @@ func NewProjectAddedEvent(
 		Name:                 name,
 		ProjectRoleAssertion: projectRoleAssertion,
 		ProjectRoleCheck:     projectRoleCheck,
-		OrgGrantCheck:        orgGrantCheck,
+		HasProjectCheck:      hasProjectCheck,
 	}
 }
 
@@ -89,7 +89,7 @@ type ProjectChangeEvent struct {
 	Name                 *string `json:"name,omitempty"`
 	ProjectRoleAssertion *bool   `json:"projectRoleAssertion,omitempty"`
 	ProjectRoleCheck     *bool   `json:"projectRoleCheck,omitempty"`
-	OrgGrantCheck        *bool   `json:"orgGrantCheck,omitempty"`
+	HasProjectCheck      *bool   `json:"hasProjectCheck,omitempty"`
 	oldName              string
 }
 
@@ -150,9 +150,9 @@ func ChangeProjectRoleCheck(projectRoleCheck bool) func(event *ProjectChangeEven
 	}
 }
 
-func ChangeOrgGrantCheck(ChangeOrgGrantCheck bool) func(event *ProjectChangeEvent) {
+func ChangeHasProjectCheck(ChangeHasProjectCheck bool) func(event *ProjectChangeEvent) {
 	return func(e *ProjectChangeEvent) {
-		e.OrgGrantCheck = &ChangeOrgGrantCheck
+		e.HasProjectCheck = &ChangeHasProjectCheck
 	}
 }
 

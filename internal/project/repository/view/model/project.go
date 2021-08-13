@@ -27,23 +27,8 @@ type ProjectView struct {
 	ResourceOwner        string    `json:"-" gorm:"column:resource_owner"`
 	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
 	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
-	OrgGrantCheck        bool      `json:"orgGrantCheck" gorm:"column:org_grant_check"`
+	HasProjectCheck      bool      `json:"hasProjectCheck" gorm:"column:org_grant_check"`
 	Sequence             uint64    `json:"-" gorm:"column:sequence"`
-}
-
-func ProjectFromModel(project *model.ProjectView) *ProjectView {
-	return &ProjectView{
-		ProjectID:            project.ProjectID,
-		Name:                 project.Name,
-		ChangeDate:           project.ChangeDate,
-		CreationDate:         project.CreationDate,
-		State:                int32(project.State),
-		ResourceOwner:        project.ResourceOwner,
-		ProjectRoleAssertion: project.ProjectRoleAssertion,
-		ProjectRoleCheck:     project.ProjectRoleCheck,
-		OrgGrantCheck:        project.OrgGrantCheck,
-		Sequence:             project.Sequence,
-	}
 }
 
 func ProjectToModel(project *ProjectView) *model.ProjectView {
@@ -56,7 +41,7 @@ func ProjectToModel(project *ProjectView) *model.ProjectView {
 		ResourceOwner:        project.ResourceOwner,
 		ProjectRoleAssertion: project.ProjectRoleAssertion,
 		ProjectRoleCheck:     project.ProjectRoleCheck,
-		OrgGrantCheck:        project.OrgGrantCheck,
+		HasProjectCheck:      project.HasProjectCheck,
 		Sequence:             project.Sequence,
 	}
 }

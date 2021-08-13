@@ -11,7 +11,7 @@ type Project struct {
 	Name                 string
 	ProjectRoleAssertion bool
 	ProjectRoleCheck     bool
-	OrgGrantCheck        bool
+	HasProjectCheck      bool
 }
 
 type ProjectState int32
