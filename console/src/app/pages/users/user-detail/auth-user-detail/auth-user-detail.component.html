@@ -33,11 +33,6 @@
             </app-detail-form>
         </app-card>
 
-        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
-            description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
-            <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
-        </app-card>
-
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
             <button card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
@@ -48,6 +43,11 @@
                 (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
             </app-contact>
+        </app-card>
+
+        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
+        description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+          <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
         </app-card>
 
         <app-auth-passwordless *ngIf="user" #mfaComponent></app-auth-passwordless>

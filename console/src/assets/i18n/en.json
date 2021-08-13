@@ -203,6 +203,7 @@
       "EMPTY": "No entries"
     },
     "PASSWORDLESS": {
+      "SEND":"Send registration link",
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
       "NAME": "Name",
@@ -229,7 +230,17 @@
       },
       "DIALOG": {
         "DELETE_TITLE": "Remove Passwordless Authentication Method",
-        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?"
+        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?",
+        "ADD_TITLE":"Passwordless Authentication",
+        "ADD_DESCRIPTION":"Select one of the available options for creating a passwordless authentication method.",
+        "SEND_DESCRIPTION":"Send yourself a registration link to your email address.",
+        "SEND":"Send registration link",
+        "SENT":"The email was successfully delivered. Check your mailbox to continue with the setup.",
+        "QRCODE_DESCRIPTION":"Generate QR code for scanning with another device.",
+        "QRCODE":"Generate QR code",
+        "QRCODE_SCAN":"Scan this QR code to continue with the setup on your device.",
+        "NEW_DESCRIPTION":"Use this device to set up Passwordless.",
+        "NEW":"Add New"
       }
     },
     "MFA": {
@@ -464,7 +475,8 @@
       "KEYADDED": "Key added!",
       "MACHINEADDED": "Service User created!",
       "DELETED": "User deleted successfully!",
-      "UNLOCKED":"User unlocked successfully!"
+      "UNLOCKED":"User unlocked successfully!",
+      "PASSWORDLESSREGISTRATIONSENT":"Registration Link sent successfully."
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
