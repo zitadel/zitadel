@@ -592,7 +592,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, user.UserName, user.PreferredLoginName, "", "", externalIDP.ResourceOwner)
+	request.SetUserInfo(user.ID, user.UserName, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
 	return nil
 }
 
