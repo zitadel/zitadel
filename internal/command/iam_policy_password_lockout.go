@@ -9,10 +9,10 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	addedPolicy := NewIAMPasswordLockoutPolicyWriteModel()
+func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
+	addedPolicy := NewIAMLockoutPolicyWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&addedPolicy.WriteModel)
-	event, err := c.addDefaultPasswordLockoutPolicy(ctx, iamAgg, addedPolicy, policy)
+	event, err := c.addDefaultLockoutPolicy(ctx, iamAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -25,34 +25,34 @@ func (c *Commands) AddDefaultPasswordLockoutPolicy(ctx context.Context, policy *
 		return nil, err
 	}
 
-	return writeModelToPasswordLockoutPolicy(&addedPolicy.PasswordLockoutPolicyWriteModel), nil
+	return writeModelToLockoutPolicy(&addedPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) addDefaultPasswordLockoutPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPasswordLockoutPolicyWriteModel, policy *domain.PasswordLockoutPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultLockoutPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLockoutPolicyWriteModel, policy *domain.LockoutPolicy) (eventstore.EventPusher, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.PasswordLockoutPolicy.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-0olDf", "Errors.IAM.LockoutPolicy.AlreadyExists")
 	}
 
-	return iam_repo.NewPasswordLockoutPolicyAddedEvent(ctx, iamAgg, policy.MaxAttempts, policy.ShowLockOutFailures), nil
+	return iam_repo.NewLockoutPolicyAddedEvent(ctx, iamAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures), nil
 }
 
-func (c *Commands) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, policy *domain.PasswordLockoutPolicy) (*domain.PasswordLockoutPolicy, error) {
-	existingPolicy, err := c.defaultPasswordLockoutPolicyWriteModelByID(ctx)
+func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
+	existingPolicy, err := c.defaultLockoutPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-0oPew", "Errors.IAM.PasswordLockoutPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-0oPew", "Errors.IAM.LockoutPolicy.NotFound")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PasswordLockoutPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.MaxAttempts, policy.ShowLockOutFailures)
+	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LockoutPolicyWriteModel.WriteModel)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.PasswordLockoutPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LockoutPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
@@ -63,14 +63,14 @@ func (c *Commands) ChangeDefaultPasswordLockoutPolicy(ctx context.Context, polic
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToPasswordLockoutPolicy(&existingPolicy.PasswordLockoutPolicyWriteModel), nil
+	return writeModelToLockoutPolicy(&existingPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) defaultPasswordLockoutPolicyWriteModelByID(ctx context.Context) (policy *IAMPasswordLockoutPolicyWriteModel, err error) {
+func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (policy *IAMLockoutPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewIAMPasswordLockoutPolicyWriteModel()
+	writeModel := NewIAMLockoutPolicyWriteModel()
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

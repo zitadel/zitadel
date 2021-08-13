@@ -44,6 +44,7 @@ type FeaturesView struct {
 	CustomDomain             bool          `json:"customDomain" gorm:"column:custom_domain"`
 	CustomText               bool          `json:"customText" gorm:"column:custom_text"`
 	PrivacyPolicy            bool          `json:"privacyPolicy" gorm:"column:privacy_policy"`
+	MetadataUser             bool          `json:"metadataUser" gorm:"column:metadata_user"`
 }
 
 func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
@@ -70,6 +71,7 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		CustomDomain:             features.CustomDomain,
 		CustomText:               features.CustomText,
 		PrivacyPolicy:            features.PrivacyPolicy,
+		MetadataUser:             features.MetadataUser,
 	}
 }
 

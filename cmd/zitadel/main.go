@@ -205,7 +205,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
-	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, static, roles, *localDevMode)
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, roles, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)

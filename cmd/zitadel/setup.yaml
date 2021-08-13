@@ -74,7 +74,7 @@ SetUp:
       ExpireWarnDays: 0
   Step4:
     DefaultPasswordLockoutPolicy:
-      MaxAttempts: 5
+      MaxPasswordAttempts: 5
       ShowLockOutFailures: false
   Step5:
     DefaultOrgIAMPolicy:
@@ -193,3 +193,7 @@ SetUp:
     PrivacyPolicy:
       TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
       PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
+  Step18:
+    LockoutPolicy:
+      MaxPasswordAttempts: 0
+      ShowLockOutFailures: true

@@ -163,6 +163,12 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
+		if requiredFeature == domain.FeatureMetadataUser {
+			if !features.MetadataUser {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
 		return MissingFeatureErr(requiredFeature)
 	}
 	return nil

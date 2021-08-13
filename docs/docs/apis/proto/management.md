@@ -236,6 +236,78 @@ Changes the username
     GET: /users/{user_id}/username
 
 
+### SetUserMetadata
+
+> **rpc** SetUserMetadata([SetUserMetadataRequest](#setusermetadatarequest))
+[SetUserMetadataResponse](#setusermetadataresponse)
+
+Sets a user metadata by key
+
+
+
+    POST: /users/{id}/metadata/{key}
+
+
+### BulkSetUserMetadata
+
+> **rpc** BulkSetUserMetadata([BulkSetUserMetadataRequest](#bulksetusermetadatarequest))
+[BulkSetUserMetadataResponse](#bulksetusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    POST: /users/{id}/metadata/_bulk
+
+
+### ListUserMetadata
+
+> **rpc** ListUserMetadata([ListUserMetadataRequest](#listusermetadatarequest))
+[ListUserMetadataResponse](#listusermetadataresponse)
+
+Returns the user metadata
+
+
+
+    POST: /users/{id}/metadata/_search
+
+
+### GetUserMetadata
+
+> **rpc** GetUserMetadata([GetUserMetadataRequest](#getusermetadatarequest))
+[GetUserMetadataResponse](#getusermetadataresponse)
+
+Returns the user metadata by key
+
+
+
+    GET: /users/{id}/metadata/{key}
+
+
+### RemoveUserMetadata
+
+> **rpc** RemoveUserMetadata([RemoveUserMetadataRequest](#removeusermetadatarequest))
+[RemoveUserMetadataResponse](#removeusermetadataresponse)
+
+Removes a user metadata by key
+
+
+
+    DELETE: /users/{id}/metadata/{key}
+
+
+### BulkRemoveUserMetadata
+
+> **rpc** BulkRemoveUserMetadata([BulkRemoveUserMetadataRequest](#bulkremoveusermetadatarequest))
+[BulkRemoveUserMetadataResponse](#bulkremoveusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    DELETE: /users/{id}/metadata/_bulk
+
+
 ### GetHumanProfile
 
 > **rpc** GetHumanProfile([GetHumanProfileRequest](#gethumanprofilerequest))
@@ -1854,64 +1926,64 @@ The password age policy is not used at the moment
     DELETE: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
 
 
-    GET: /policies/password/lockout
 
 
-### GetDefaultPasswordLockoutPolicy
-
-> **rpc** GetDefaultPasswordLockoutPolicy([GetDefaultPasswordLockoutPolicyRequest](#getdefaultpasswordlockoutpolicyrequest))
-[GetDefaultPasswordLockoutPolicyResponse](#getdefaultpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/lockout
 
 
+### GetDefaultLockoutPolicy
 
-    GET: /policies/default/password/lockout
-
-
-### AddCustomPasswordLockoutPolicy
-
-> **rpc** AddCustomPasswordLockoutPolicy([AddCustomPasswordLockoutPolicyRequest](#addcustompasswordlockoutpolicyrequest))
-[AddCustomPasswordLockoutPolicyResponse](#addcustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetDefaultLockoutPolicy([GetDefaultLockoutPolicyRequest](#getdefaultlockoutpolicyrequest))
+[GetDefaultLockoutPolicyResponse](#getdefaultlockoutpolicyresponse)
 
 
 
-    POST: /policies/password/lockout
 
 
-### UpdateCustomPasswordLockoutPolicy
-
-> **rpc** UpdateCustomPasswordLockoutPolicy([UpdateCustomPasswordLockoutPolicyRequest](#updatecustompasswordlockoutpolicyrequest))
-[UpdateCustomPasswordLockoutPolicyResponse](#updatecustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/default/lockout
 
 
+### AddCustomLockoutPolicy
 
-    PUT: /policies/password/lockout
-
-
-### ResetPasswordLockoutPolicyToDefault
-
-> **rpc** ResetPasswordLockoutPolicyToDefault([ResetPasswordLockoutPolicyToDefaultRequest](#resetpasswordlockoutpolicytodefaultrequest))
-[ResetPasswordLockoutPolicyToDefaultResponse](#resetpasswordlockoutpolicytodefaultresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** AddCustomLockoutPolicy([AddCustomLockoutPolicyRequest](#addcustomlockoutpolicyrequest))
+[AddCustomLockoutPolicyResponse](#addcustomlockoutpolicyresponse)
 
 
 
-    DELETE: /policies/password/lockout
+
+
+    POST: /policies/lockout
+
+
+### UpdateCustomLockoutPolicy
+
+> **rpc** UpdateCustomLockoutPolicy([UpdateCustomLockoutPolicyRequest](#updatecustomlockoutpolicyrequest))
+[UpdateCustomLockoutPolicyResponse](#updatecustomlockoutpolicyresponse)
+
+
+
+
+
+    PUT: /policies/lockout
+
+
+### ResetLockoutPolicyToDefault
+
+> **rpc** ResetLockoutPolicyToDefault([ResetLockoutPolicyToDefaultRequest](#resetlockoutpolicytodefaultrequest))
+[ResetLockoutPolicyToDefaultResponse](#resetlockoutpolicytodefaultresponse)
+
+
+
+
+
+    DELETE: /policies/lockout
 
 
 ### GetPrivacyPolicy
@@ -2697,6 +2769,28 @@ This is an empty request
 
 
 
+### AddCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+
+
+
+
+### AddCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomLoginPolicyRequest
 
 
@@ -2763,29 +2857,6 @@ This is an empty request
 
 
 ### AddCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyResponse
 
 
 
@@ -3347,6 +3418,64 @@ This is an empty request
 
 
 
+### BulkRemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| metadata | repeated BulkSetUserMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### DeactivateAppRequest
 
 
@@ -3785,6 +3914,23 @@ This is an empty request
 
 
 
+### GetDefaultLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
 ### GetDefaultLoginPolicyRequest
 
 
@@ -3854,23 +4000,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-
-
-
-
-### GetDefaultPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetDefaultPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
@@ -4125,6 +4254,24 @@ This is an empty request
 
 
 
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 
 
@@ -4298,24 +4445,6 @@ This is an empty request
 
 
 
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
-| is_default |  bool | - |  |
-
-
-
-
 ### GetPreviewLabelPolicyRequest
 This is an empty request
 
@@ -4476,6 +4605,29 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_grant |  zitadel.user.v1.UserGrant | - |  |
+
+
+
+
+### GetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -5260,6 +5412,31 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.user.v1.Membership | - |  |
+
+
+
+
+### ListUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -6068,6 +6245,29 @@ This is an empty response
 
 
 
+### RemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveUserRequest
 
 
@@ -6246,7 +6446,7 @@ This is an empty request
 
 
 ### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -6328,6 +6528,23 @@ This is an empty request
 
 
 
+### ResetLockoutPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetLockoutPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetLoginPolicyToDefaultRequest
 
 
@@ -6369,23 +6586,6 @@ This is an empty request
 
 
 ### ResetPasswordComplexityPolicyToDefaultResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultRequest
-This is an empty request
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultResponse
 
 
 
@@ -6556,6 +6756,7 @@ This is an empty request
 | passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
 | passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -6756,6 +6957,31 @@ This is an empty request
 
 
 
+### SetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UnlockUserRequest
 
 
@@ -6857,6 +7083,28 @@ This is an empty request
 
 
 
+### UpdateCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+
+
+
+
+### UpdateCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateCustomLoginPolicyRequest
 
 
@@ -6923,29 +7171,6 @@ This is an empty request
 
 
 ### UpdateCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyResponse
 
 
 

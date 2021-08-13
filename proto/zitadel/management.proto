@@ -14,6 +14,7 @@ import "zitadel/message.proto";
 import "zitadel/change.proto";
 import "zitadel/auth_n_key.proto";
 import "zitadel/features.proto";
+import "zitadel/metadata.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -282,6 +283,82 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+    }
+
+    // Sets a user metadata by key
+    rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/{id}/metadata/{key}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+            feature: "metadata.user"
+        };
+    }
+
+    // Set a list of user metadata
+    rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/{id}/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+            feature: "metadata.user"
+        };
+    }
+
+    // Returns the user metadata
+    rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/{id}/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+            feature: "metadata.user"
+        };
+    }
+
+    // Returns the user metadata by key
+    rpc GetUserMetadata(GetUserMetadataRequest) returns (GetUserMetadataResponse) {
+        option (google.api.http) = {
+            get: "/users/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+            feature: "metadata.user"
+        };
+    }
+
+    // Removes a user metadata by key
+    rpc RemoveUserMetadata(RemoveUserMetadataRequest) returns (RemoveUserMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/users/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+            feature: "metadata.user"
+        };
+    }
+
+    // Set a list of user metadata
+    rpc BulkRemoveUserMetadata(BulkRemoveUserMetadataRequest) returns (BulkRemoveUserMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/users/{id}/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+            feature: "metadata.user"
         };
     }
 
@@ -1894,10 +1971,9 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
-    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
+    rpc GetLockoutPolicy(GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/password/lockout"
+            get: "/policies/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1905,10 +1981,9 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
-    rpc GetDefaultPasswordLockoutPolicy(GetDefaultPasswordLockoutPolicyRequest) returns (GetDefaultPasswordLockoutPolicyResponse) {
+    rpc GetDefaultLockoutPolicy(GetDefaultLockoutPolicyRequest) returns (GetDefaultLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/default/password/lockout"
+            get: "/policies/default/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1916,10 +1991,9 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
-    rpc AddCustomPasswordLockoutPolicy(AddCustomPasswordLockoutPolicyRequest) returns (AddCustomPasswordLockoutPolicyResponse) {
+    rpc AddCustomLockoutPolicy(AddCustomLockoutPolicyRequest) returns (AddCustomLockoutPolicyResponse) {
         option (google.api.http) = {
-            post: "/policies/password/lockout"
+            post: "/policies/lockout"
             body: "*"
         };
 
@@ -1928,10 +2002,9 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
-    rpc UpdateCustomPasswordLockoutPolicy(UpdateCustomPasswordLockoutPolicyRequest) returns (UpdateCustomPasswordLockoutPolicyResponse) {
+    rpc UpdateCustomLockoutPolicy(UpdateCustomLockoutPolicyRequest) returns (UpdateCustomLockoutPolicyResponse) {
         option (google.api.http) = {
-            put: "/policies/password/lockout"
+            put: "/policies/lockout"
             body: "*"
         };
 
@@ -1940,10 +2013,9 @@ service ManagementService {
         };
     }
 
-    // The password lockout policy is not used at the moment
-    rpc ResetPasswordLockoutPolicyToDefault(ResetPasswordLockoutPolicyToDefaultRequest) returns (ResetPasswordLockoutPolicyToDefaultResponse) {
+    rpc ResetLockoutPolicyToDefault(ResetLockoutPolicyToDefaultRequest) returns (ResetLockoutPolicyToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/policies/password/lockout"
+            delete: "/policies/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2824,6 +2896,68 @@ message UpdateUserNameRequest {
 }
 
 message UpdateUserNameResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListUserMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.v1.ListQuery query = 2;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 3;
+}
+
+message ListUserMetadataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.Metadata result = 2;
+}
+
+message GetUserMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetUserMetadataResponse {
+    zitadel.metadata.v1.Metadata metadata = 1;
+}
+
+message SetUserMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bytes value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetUserMetadataResponse {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message BulkSetUserMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    message Metadata {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    }
+    repeated Metadata metadata = 2;
+}
+
+message BulkSetUserMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveUserMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveUserMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveUserMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message BulkRemoveUserMetadataResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -4136,42 +4270,40 @@ message ResetPasswordAgePolicyToDefaultResponse {
 }
 
 //This is an empty request
-message GetPasswordLockoutPolicyRequest {}
+message GetLockoutPolicyRequest {}
 
-message GetPasswordLockoutPolicyResponse {
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+message GetLockoutPolicyResponse {
+    zitadel.policy.v1.LockoutPolicy policy = 1;
     bool is_default = 2;
 }
 
 //This is an empty request
-message GetDefaultPasswordLockoutPolicyRequest {}
+message GetDefaultLockoutPolicyRequest {}
 
-message GetDefaultPasswordLockoutPolicyResponse {
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+message GetDefaultLockoutPolicyResponse {
+    zitadel.policy.v1.LockoutPolicy policy = 1;
 }
 
-message AddCustomPasswordLockoutPolicyRequest {
-    uint32 max_attempts = 1;
-    bool show_lockout_failure = 2;
+message AddCustomLockoutPolicyRequest {
+    uint32 max_password_attempts = 1;
 }
 
-message AddCustomPasswordLockoutPolicyResponse {
+message AddCustomLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message UpdateCustomPasswordLockoutPolicyRequest {
-    uint32 max_attempts = 1;
-    bool show_lockout_failure = 2;
+message UpdateCustomLockoutPolicyRequest {
+    uint32 max_password_attempts = 1;
 }
 
-message UpdateCustomPasswordLockoutPolicyResponse {
+message UpdateCustomLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request
-message ResetPasswordLockoutPolicyToDefaultRequest {}
+message ResetLockoutPolicyToDefaultRequest {}
 
-message ResetPasswordLockoutPolicyToDefaultResponse {
+message ResetLockoutPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -4429,6 +4561,7 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessPromptScreenText passwordless_prompt_text = 32;
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
+    zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
 }
 
 message SetCustomLoginTextsResponse {

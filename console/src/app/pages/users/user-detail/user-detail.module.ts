@@ -17,6 +17,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
@@ -32,6 +33,9 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
+import {
+  DialogPasswordlessComponent,
+} from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
@@ -67,6 +71,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ContactComponent,
     ResendEmailDialogComponent,
     DialogU2FComponent,
+    DialogPasswordlessComponent,
     AuthFactorDialogComponent,
   ],
   imports: [
@@ -104,6 +109,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     LocalizedDatePipeModule,
     InputModule,
     MachineKeysModule,
+    InfoSectionModule,
   ],
 })
 export class UserDetailModule { }

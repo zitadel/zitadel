@@ -152,6 +152,14 @@ func (m *mockLoginPolicy) LoginPolicyByAggregateID(id string) (*iam_view_model.L
 	return m.policy, nil
 }
 
+type mockLockoutPolicy struct {
+	policy *iam_view_model.LockoutPolicyView
+}
+
+func (m *mockLockoutPolicy) LockoutPolicyByAggregateID(id string) (*iam_view_model.LockoutPolicyView, error) {
+	return m.policy, nil
+}
+
 func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
 		State:    int32(user_model.UserStateActive),
@@ -229,6 +237,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		orgViewProvider            orgViewProvider
 		userGrantProvider          userGrantProvider
 		loginPolicyProvider        loginPolicyViewProvider
+		lockoutPolicyProvider      lockoutPolicyViewProvider
 		PasswordCheckLifeTime      time.Duration
 		ExternalLoginCheckLifeTime time.Duration
 		MFAInitSkippedLifeTime     time.Duration
@@ -404,6 +413,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
@@ -420,6 +434,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
@@ -431,6 +450,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:  &mockViewUser{},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewErrOrg{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
@@ -442,6 +466,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:  &mockViewUser{},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateInactive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
@@ -456,6 +485,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.PasswordStep{}},
@@ -468,6 +502,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:        &mockViewUser{},
 				userEventProvider:       &mockEventUser{},
 				orgViewProvider:         &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			nil,
@@ -483,6 +522,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID"}, false},
 			[]domain.NextStep{&domain.InitUserStep{
@@ -500,6 +544,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:        &mockEventUser{},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
 			[]domain.NextStep{&domain.PasswordlessRegistrationPromptStep{}},
@@ -512,8 +561,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
 				},
-				userEventProvider:        &mockEventUser{},
-				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
@@ -528,8 +582,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:        true,
 					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
 				},
-				userEventProvider:        &mockEventUser{},
-				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
@@ -550,7 +609,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified:        false,
 					MFAMaxSetUp:            int32(model.MFALevelMultiFactor),
 				},
-				userEventProvider:        &mockEventUser{},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				orgViewProvider:          &mockViewOrg{State: org_model.OrgStateActive},
 				MultiFactorCheckLifeTime: 10 * time.Hour,
 			},
@@ -572,7 +636,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordInitRequired: true,
 				},
 				userEventProvider: &mockEventUser{},
-				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.InitPasswordStep{}},
@@ -588,7 +657,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -613,6 +687,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &iam_view_model.LoginPolicyView{},
 				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime:  18 * time.Hour,
 			},
@@ -634,8 +713,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
 				},
-				userEventProvider:     &mockEventUser{},
-				orgViewProvider:       &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime: 10 * 24 * time.Hour,
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
@@ -654,9 +738,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:          &mockEventUser{},
-				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
-				userGrantProvider:          &mockUserGrants{},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				SecondFactorCheckLifeTime:  18 * time.Hour,
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 			},
@@ -682,8 +771,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					OTPState:           int32(user_model.MFAStateReady),
 					MFAMaxSetUp:        int32(model.MFALevelMultiFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -710,8 +804,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					OTPState:    int32(user_model.MFAStateReady),
 					MFAMaxSetUp: int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -739,8 +838,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					OTPState:    int32(user_model.MFAStateReady),
 					MFAMaxSetUp: int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:          &mockEventUser{},
-				orgViewProvider:            &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:      10 * 24 * time.Hour,
 				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime:  18 * time.Hour,
@@ -771,8 +875,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified:        true,
 					MFAMaxSetUp:            int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -797,8 +906,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet: true,
 					MFAMaxSetUp: int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -823,8 +937,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordChangeRequired: true,
 					MFAMaxSetUp:            int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -849,9 +968,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
-				userGrantProvider:         &mockUserGrants{},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -877,9 +1001,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
-				userGrantProvider:         &mockUserGrants{},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -911,6 +1040,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userGrantProvider: &mockUserGrants{
 					roleCheck:  true,
 					userGrants: 0,
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
 				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
@@ -944,6 +1078,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					roleCheck:  true,
 					userGrants: 2,
 				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
@@ -968,6 +1107,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:     true,
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
 				},
 				userEventProvider:         &mockEventUser{},
 				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
@@ -995,8 +1139,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: org_model.OrgStateActive},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
 				SecondFactorCheckLifeTime: 18 * time.Hour,
 				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 			},
@@ -1024,6 +1173,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				OrgViewProvider:            tt.fields.orgViewProvider,
 				UserGrantProvider:          tt.fields.userGrantProvider,
 				LoginPolicyViewProvider:    tt.fields.loginPolicyProvider,
+				LockoutPolicyViewProvider:  tt.fields.lockoutPolicyProvider,
 				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
 				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
 				MFAInitSkippedLifeTime:     tt.fields.MFAInitSkippedLifeTime,

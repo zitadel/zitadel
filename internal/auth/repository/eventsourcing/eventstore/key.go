@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"os"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/key/model"
@@ -50,9 +50,9 @@ func (k *KeyRepository) GetSigningKey(ctx context.Context, keyCh chan<- jose.Sig
 				renewTimer = time.After(k.getRenewTimer(refreshed))
 			case <-renewTimer:
 				key, err := k.latestSigningKey()
-				logging.Log("KEY-DAfh4").OnError(err).Error("could not check for latest signing key")
+				logging.Log("KEY-DAfh4-1").OnError(err).Error("could not check for latest signing key")
 				refreshed, err := k.refreshSigningKey(ctx, key, keyCh, algorithm)
-				logging.Log("KEY-DAfh4").OnError(err).Error("could not refresh signing key when ensuring key")
+				logging.Log("KEY-DAfh4-2").OnError(err).Error("could not refresh signing key when ensuring key")
 				renewTimer = time.After(k.getRenewTimer(refreshed))
 			}
 		}

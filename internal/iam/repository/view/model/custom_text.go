@@ -30,10 +30,10 @@ type CustomTextView struct {
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 
-	Template string `json:"Template" gorm:"column:template;primary_key"`
-	Language string `json:"Language" gorm:"column:language;primary_key"`
-	Key      string `json:"Key" gorm:"column:key;primary_key"`
-	Text     string `json:"Text" gorm:"column:text"`
+	Template string `json:"template" gorm:"column:template;primary_key"`
+	Language string `json:"language" gorm:"column:language;primary_key"`
+	Key      string `json:"key" gorm:"column:key;primary_key"`
+	Text     string `json:"text" gorm:"column:text"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
@@ -700,6 +700,9 @@ func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domai
 	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
 		result.PasswordlessRegistrationDone.NextButtonText = text.Text
 	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText {
+		result.PasswordlessRegistrationDone.CancelButtonText = text.Text
+	}
 }
 
 func passwordChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
@@ -897,6 +900,21 @@ func externalUserNotFoundKeyToDomain(text *CustomTextView, result *domain.Custom
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundAutoRegisterButtonText {
 		result.ExternalNotFoundOption.AutoRegisterButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
+		result.ExternalNotFoundOption.TOSAndPrivacyLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
+		result.ExternalNotFoundOption.TOSConfirm = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
+		result.ExternalNotFoundOption.TOSLinkText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
+		result.ExternalNotFoundOption.TOSConfirmAnd = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
+		result.ExternalNotFoundOption.PrivacyLinkText = text.Text
 	}
 }
 
