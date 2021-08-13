@@ -92,6 +92,7 @@ Errors:
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
+      NotFound: External IDP not found
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
