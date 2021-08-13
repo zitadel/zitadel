@@ -230,7 +230,7 @@ func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) ([]han
 				handler.NewCol(orgNameCol, e.Name),
 				handler.NewCol(orgCreationDateCol, e.CreationDate()),
 			},
-			crdb.WithTableSuffix(userTableSuffix),
+			crdb.WithTableSuffix(orgTableSuffix),
 		),
 	}, nil
 }
@@ -258,7 +258,7 @@ func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 			[]handler.Column{
 				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
 			},
-			crdb.WithTableSuffix(userTableSuffix),
+			crdb.WithTableSuffix(orgTableSuffix),
 		),
 	}, nil
 }
@@ -277,7 +277,7 @@ func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 			[]handler.Column{
 				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
 			},
-			crdb.WithTableSuffix(userTableSuffix),
+			crdb.WithTableSuffix(orgTableSuffix),
 		),
 		// delete users of the org
 		crdb.NewDeleteStatement(
