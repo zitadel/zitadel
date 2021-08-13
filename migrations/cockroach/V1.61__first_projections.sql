@@ -1,6 +1,4 @@
-use zitadel;
-
-CREATE TABLE projections.org_owners_orgs (
+CREATE TABLE zitadel.projections.org_owners_orgs (
     id TEXT,
     name TEXT,
     creation_date TIMESTAMPTZ,
@@ -9,7 +7,7 @@ CREATE TABLE projections.org_owners_orgs (
 );
 
 
-CREATE TABLE projections.org_owners_users (
+CREATE TABLE zitadel.projections.org_owners_users (
     org_id TEXT,
     owner_id TEXT,
     language VARCHAR(10),
@@ -22,7 +20,7 @@ CREATE TABLE projections.org_owners_users (
     CONSTRAINT fk_org FOREIGN KEY (org_id) REFERENCES projections.org_owners_orgs (id) ON DELETE CASCADE
 );
 
-CREATE VIEW projections.org_owners AS (
+CREATE VIEW zitadel.projections.org_owners AS (
     SELECT o.id AS org_id, 
         o.name AS org_name, 
         o.creation_date,
@@ -34,4 +32,16 @@ CREATE VIEW projections.org_owners AS (
         u.gender
     FROM projections.org_owners_orgs o
     JOIN projections.org_owners_users u ON o.id = u.org_id
+);
+
+CREATE TABLE zitadel.projections.projects (
+    id TEXT,
+    name TEXT,
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    owner_id TEXT,
+    creator_id TEXT,
+    state INT2,
+
+    PRIMARY KEY (id)
 );
