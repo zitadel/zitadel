@@ -117,9 +117,9 @@ var (
 				SenderName:    "sendername",
 				AuthToken:     &secret.Secret{Value: "authtoken"},
 				SID:           &secret.Secret{Value: "sid"},
-				ProxyCertPath: "",
-				ProxyHTTP:     &secret.Secret{Value: ""},
-				ProxyHTTPS:    &secret.Secret{Value: ""},
+				ProxyCertPath: "proxyCertPath",
+				ProxyHTTP:     &secret.Secret{Value: "proxyHTTP"},
+				ProxyHTTPS:    &secret.Secret{Value: "proxyHTTPS"},
 			},
 		},
 		Passwords: &Passwords{
@@ -183,9 +183,12 @@ var (
 				ExistingAppKey: &secret.Existing{"appkey", "appkey", "appkey"},
 			},
 			Twilio: &Twilio{
-				SenderName:        "sendername",
-				ExistingAuthToken: &secret.Existing{"migration", "migration", "migration"},
-				ExistingSID:       &secret.Existing{"sid", "sid", "sid"},
+				SenderName:         "sendername",
+				ExistingAuthToken:  &secret.Existing{"migration", "migration", "migration"},
+				ExistingSID:        &secret.Existing{"sid", "sid", "sid"},
+				ProxyCertPath:      "proxyCertPath",
+				ExistingProxyHTTP:  &secret.Existing{"proxyHTTP", "proxyHTTP", "proxyHTTP"},
+				ExistingProxyHTTPS: &secret.Existing{"proxyHTTPS", "proxyHTTPS", "proxyHTTPS"},
 			},
 		},
 		Passwords: &Passwords{
@@ -277,6 +280,7 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"CR_EVENTSTORE_KEY":                   "test/client.eventstore.key",
 		"ZITADEL_CSRF_KEY":                    "",
 		"TWILIO_SENDER_NAME":                  "",
+		"TWILIO_PROXY_CERT_PATH":              "",
 		"EMAIL_SENDER_ADDRESS":                "",
 		"ZITADEL_ISSUER":                      "https://.",
 		"ZITADEL_CONSOLE":                     "https://.",
@@ -358,6 +362,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"SMTP_TLS":                            "TRUE",
 		"SMTP_USER":                           "smtpuser",
 		"TWILIO_SENDER_NAME":                  "sendername",
+		"TWILIO_PROXY_CERT_PATH":              "proxyCertPath",
 		"ZITADEL_ACCOUNTS":                    "https://accounts.domain",
 		"ZITADEL_ACCOUNTS_DOMAIN":             "accounts.domain",
 		"ZITADEL_AUTHORIZE":                   "https://accounts.domain/oauth/v2",
@@ -467,6 +472,8 @@ func TestConfiguration_LiteralsSecretVars(t *testing.T) {
 		"ZITADEL_GOOGLE_CHAT_URL":                 "",
 		"ZITADEL_TWILIO_AUTH_TOKEN":               "",
 		"ZITADEL_TWILIO_SID":                      "",
+		"ZITADEL_TWILIO_PROXY_HTTP":               "",
+		"ZITADEL_TWILIO_PROXY_HTTPS":              "",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "",
 		"SENTRY_DSN":                              "",
@@ -484,6 +491,8 @@ func TestConfiguration_LiteralsSecretVarsFull(t *testing.T) {
 		"ZITADEL_GOOGLE_CHAT_URL":                 "chat",
 		"ZITADEL_TWILIO_AUTH_TOKEN":               "authtoken",
 		"ZITADEL_TWILIO_SID":                      "sid",
+		"ZITADEL_TWILIO_PROXY_HTTP":               "proxyHTTP",
+		"ZITADEL_TWILIO_PROXY_HTTPS":              "proxyHTTPS",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "accesskeyid",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "secretaccesskey",
 		"SENTRY_DSN":                              "",
@@ -501,6 +510,8 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 	chat := "chat"
 	authtoken := "authtoken"
 	sid := "sid"
+	proxyHTTP := "proxyHTTP"
+	proxyHTTPS := "proxyHTTPS"
 	akid := "accesskeyid"
 	sak := "secretaccesskey"
 	/* TODO: incomment!!!
@@ -542,6 +553,8 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 		"ZITADEL_GOOGLE_CHAT_URL":                 chat,
 		"ZITADEL_TWILIO_AUTH_TOKEN":               authtoken,
 		"ZITADEL_TWILIO_SID":                      sid,
+		"ZITADEL_TWILIO_PROXY_HTTP":               proxyHTTP,
+		"ZITADEL_TWILIO_PROXY_HTTPS":              proxyHTTPS,
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     akid,
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": sak,
 		"SENTRY_DSN":                              "",
