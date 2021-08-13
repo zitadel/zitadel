@@ -17,7 +17,7 @@ const (
 		"EXISTS(SELECT failure_count FROM failures)," +
 		" (SELECT failure_count FROM failures)," +
 		" 0" +
-		") AS failure_count`"
+		") AS failure_count"
 )
 
 func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt handler.Statement, execErr error) (shouldContinue bool) {
