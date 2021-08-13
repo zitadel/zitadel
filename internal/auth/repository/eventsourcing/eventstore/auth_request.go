@@ -98,7 +98,7 @@ type userGrantProvider interface {
 }
 
 type projectProvider interface {
-	OrgProjectMappingByIDs(orgID, projectID string) (project_view_model.OrgProjectMapping, error)
+	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {

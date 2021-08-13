@@ -228,6 +228,17 @@ func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*g
 	return grants, nil
 }
 
+type mockProject struct {
+	hasProject bool
+}
+
+func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID string) (*proj_view_model.OrgProjectMapping, error) {
+	if m.hasProject {
+		return &proj_view_model.OrgProjectMapping{OrgID: orgID, ProjectID: projectID}, nil
+	}
+	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
+}
+
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
 		AuthRequests               *cache.AuthRequestCache

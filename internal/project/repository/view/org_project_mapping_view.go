@@ -36,11 +36,16 @@ func DeleteOrgProjectMapping(db *gorm.DB, table, orgID, projectID string) error 
 }
 
 func DeleteOrgProjectMappingsByProjectID(db *gorm.DB, table, projectID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.GrantedProjectSearchKeyProjectID), projectID)
+	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyProjectID), projectID)
+	return delete(db)
+}
+
+func DeleteOrgProjectMappingsByProjectGrantID(db *gorm.DB, table, projectGrantID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyProjectGrantID), projectGrantID)
 	return delete(db)
 }
 
 func DeleteOrgProjectMappingsByOrgID(db *gorm.DB, table, orgID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.GrantedProjectSearchKeyOrgID), orgID)
+	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOrgID), orgID)
 	return delete(db)
 }

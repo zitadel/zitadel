@@ -36,6 +36,10 @@ func (v *View) DeleteOrgProjectMappingsByProjectID(projectID string) error {
 	return view.DeleteOrgProjectMappingsByProjectID(v.Db, orgPrgojectMappingTable, projectID)
 }
 
+func (v *View) DeleteOrgProjectMappingsByProjectGrantID(projectGrantID string) error {
+	return view.DeleteOrgProjectMappingsByProjectGrantID(v.Db, orgPrgojectMappingTable, projectGrantID)
+}
+
 func (v *View) GetLatestOrgProjectMappingSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgPrgojectMappingTable)
 }
