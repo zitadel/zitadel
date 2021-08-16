@@ -656,7 +656,8 @@
       "LABELPOLICYWATERMARK": "Label Policy - watermark",
       "CUSTOMDOMAIN": "Domain Verification - available",
       "CUSTOMTEXT": "Custom texts",
-      "PRIVACYPOLICY":"Privacy Policy and TOS - custom"
+      "PRIVACYPOLICY":"Privacy Policy and TOS - custom",
+      "METADATAUSER":"User Metadata"
     },
     "TIERSTATES": {
       "0": "Active",

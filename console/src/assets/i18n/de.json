@@ -656,7 +656,8 @@
       "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
       "CUSTOMTEXT": "Benutzerdefinierte Texte",
-      "PRIVACYPOLICY":"Datenschutzrichtlinie und AGB - benutzerdefiniert"
+      "PRIVACYPOLICY":"Datenschutzrichtlinie und AGB - benutzerdefiniert",
+      "METADATAUSER":"User Metadata"
     },
     "TIERSTATES": {
       "0": "Aktiv",

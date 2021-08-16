@@ -185,9 +185,9 @@
 
         <div class="row">
           <i class="icon las la-gem"></i>
-          <span class="left-desc">{{'FEATURES.DATA.CUSTOMDOMAIN' | translate}}</span>
+          <span class="left-desc">{{'FEATURES.DATA.METADATAUSER' | translate}}</span>
           <span class="fill-space"></span>
-          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features"
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.metadataUser"
               [disabled]="(['iam.features.write'] | hasRole | async) == false">
           </mat-slide-toggle>
         </div>
