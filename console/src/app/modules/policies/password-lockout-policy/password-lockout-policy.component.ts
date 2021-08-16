@@ -104,6 +104,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
         this.lockoutData.maxPasswordAttempts,
       ).then(() => {
         this.toast.showInfo('POLICY.TOAST.SET', true);
+        this.fetchData();
       }).catch(error => {
         this.toast.showError(error);
       });
@@ -113,6 +114,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
           this.lockoutData.maxPasswordAttempts,
         ).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
+          this.fetchData();
         }).catch(error => {
           this.toast.showError(error);
         });
@@ -121,6 +123,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
           this.lockoutData.maxPasswordAttempts,
         ).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
+          this.fetchData();
         }).catch(error => {
           this.toast.showError(error);
         });

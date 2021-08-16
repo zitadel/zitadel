@@ -206,7 +206,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		events = append(events, event)
 	}
 
-	if human.IsInitialState(passwordless) {
+	if human.IsInitialState(passwordless, externalIDP != nil) {
 		initCode, err := domain.NewInitUserCode(c.initializeUserCode)
 		if err != nil {
 			return nil, nil, err

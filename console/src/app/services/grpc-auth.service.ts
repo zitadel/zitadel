@@ -8,6 +8,8 @@ import {
   AddMyAuthFactorOTPResponse,
   AddMyAuthFactorU2FRequest,
   AddMyAuthFactorU2FResponse,
+  AddMyPasswordlessLinkRequest,
+  AddMyPasswordlessLinkResponse,
   AddMyPasswordlessRequest,
   AddMyPasswordlessResponse,
   GetMyEmailRequest,
@@ -56,6 +58,8 @@ import {
   ResendMyEmailVerificationResponse,
   ResendMyPhoneVerificationRequest,
   ResendMyPhoneVerificationResponse,
+  SendMyPasswordlessLinkRequest,
+  SendMyPasswordlessLinkResponse,
   SetMyEmailRequest,
   SetMyEmailResponse,
   SetMyPhoneRequest,
@@ -511,6 +515,16 @@ export class GrpcAuthService {
     return this.grpcService.auth.verifyMyPasswordless(
       req, null,
     ).then(resp => resp.toObject());
+  }
+
+  public sendMyPasswordlessLink(): Promise<SendMyPasswordlessLinkResponse.AsObject> {
+    const req = new SendMyPasswordlessLinkRequest();
+    return this.grpcService.auth.sendMyPasswordlessLink(req, null).then(resp => resp.toObject());
+  }
+
+  public addMyPasswordlessLink(): Promise<AddMyPasswordlessLinkResponse.AsObject> {
+    const req = new AddMyPasswordlessLinkRequest();
+    return this.grpcService.auth.addMyPasswordlessLink(req, null).then(resp => resp.toObject());
   }
 
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {

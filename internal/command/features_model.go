@@ -28,6 +28,7 @@ type FeaturesWriteModel struct {
 	CustomDomain             bool
 	CustomText               bool
 	PrivacyPolicy            bool
+	MetadataUser             bool
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {
@@ -85,6 +86,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.CustomText != nil {
 				wm.CustomText = *e.CustomText
+			}
+			if e.MetadataUser != nil {
+				wm.MetadataUser = *e.MetadataUser
 			}
 		case *features.FeaturesRemovedEvent:
 			wm.State = domain.FeaturesStateRemoved

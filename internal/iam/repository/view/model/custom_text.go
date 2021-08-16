@@ -700,6 +700,9 @@ func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domai
 	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
 		result.PasswordlessRegistrationDone.NextButtonText = text.Text
 	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText {
+		result.PasswordlessRegistrationDone.CancelButtonText = text.Text
+	}
 }
 
 func passwordChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
@@ -897,6 +900,21 @@ func externalUserNotFoundKeyToDomain(text *CustomTextView, result *domain.Custom
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundAutoRegisterButtonText {
 		result.ExternalNotFoundOption.AutoRegisterButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
+		result.ExternalNotFoundOption.TOSAndPrivacyLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
+		result.ExternalNotFoundOption.TOSConfirm = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
+		result.ExternalNotFoundOption.TOSLinkText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
+		result.ExternalNotFoundOption.TOSConfirmAnd = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
+		result.ExternalNotFoundOption.PrivacyLinkText = text.Text
 	}
 }
 

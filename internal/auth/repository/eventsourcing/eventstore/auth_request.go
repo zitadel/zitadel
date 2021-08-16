@@ -215,7 +215,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	if err != nil {
 		return err
 	}
-	err = repo.checkExternalUserLogin(request, externalUser.IDPConfigID, externalUser.ExternalUserID)
+	err = repo.checkExternalUserLogin(ctx, request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
@@ -227,6 +227,21 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 
 	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
+	if err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+
+	err = repo.setLinkingUser(ctx, request, externalUser)
 	if err != nil {
 		return err
 	}
@@ -327,7 +342,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context,
 func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode, credentialData)
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData)
 	return err
 }
 
@@ -563,7 +578,7 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 	return errors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
 }
 
-func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
+func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
 	externalIDP := new(user_view_model.ExternalIDPView)
 	if request.RequestedOrgID != "" {
 		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID)
@@ -573,7 +588,15 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest,
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(externalIDP.UserID, "", "", "", "", externalIDP.ResourceOwner)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID)
+	if err != nil {
+		return err
+	}
+	username := user.UserName
+	if request.RequestedOrgID == "" {
+		username = user.PreferredLoginName
+	}
+	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
 	return nil
 }
 

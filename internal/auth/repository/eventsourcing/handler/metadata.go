@@ -103,6 +103,8 @@ func (m *Metadata) processMetadata(event *es_models.Event) (err error) {
 			return err
 		}
 		return m.view.DeleteMetadata(event.AggregateID, data.Key, event)
+	case usr_model.UserMetadataRemovedAll:
+		return m.view.DeleteMetadataByAggregateID(event.AggregateID, event)
 	case usr_model.UserRemoved:
 		return m.view.DeleteMetadataByAggregateID(event.AggregateID, event)
 	default:

@@ -221,6 +221,27 @@ RegistrationUser:
   BackButtonText: back
   NextButtonText: next
 
+ExternalRegistrationUserOverview:
+  Title: External User Registration
+  Description: We have taken your user details from the selected provider. You can now change or complete them.
+  EmailLabel: E-Mail
+  UsernameLabel: Username
+  FirstnameLabel: Firstname
+  LastnameLabel: Lastname
+  NicknameLabel: Nickname
+  PhoneLabel: Phonenumber
+  LanguageLabel: Language
+  German: Deutsch
+  English: English
+  TosAndPrivacyLabel: Terms and conditions
+  TosConfirm: I accept the
+  TosLinkText: TOS
+  TosConfirmAnd: and the
+  PrivacyLinkText: privacy policy
+  ExternalLogin: or register with an external user
+  BackButtonText: back
+  NextButtonText: save
+
 RegistrationOrg:
   Title: Organisation Registration
   Description: Enter your organisationname and userdata.
@@ -260,6 +281,11 @@ ExternalNotFoundOption:
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
   AutoRegisterButtonText: Auto register
+  TosAndPrivacyLabel: Terms and conditions
+  TosConfirm: I accept the
+  TosLinkText: TOS
+  TosConfirmAnd: and the
+  PrivacyLinkText: privacy policy
 
 Footer:
   PoweredBy: Powered By
@@ -305,6 +331,8 @@ Errors:
       GeneratorAlgNotSupported: Unsupported generator algorithm
     EmailVerify:
       UserIDEmpty: UserID is empty
+    ExternalData:
+      CouldNotRead: External data could not be read correctly
     MFA:
       NoProviders: No available multifactor providers
       OTP:
@@ -318,6 +346,9 @@ Errors:
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
       NotAllowed: External Login Provider not allowed
+      IDPConfigIDEmpty: Identity Provider ID is empty
+      ExternalUserIDEmpty: External User ID is empty
+      UserDisplayNameEmpty: User Display Name is empty
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid

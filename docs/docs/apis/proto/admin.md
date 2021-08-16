@@ -2437,6 +2437,7 @@ This is an empty request
 | passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
 | passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -2503,6 +2504,7 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
 
 
 
@@ -2688,6 +2690,7 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
 
 
 

@@ -315,6 +315,8 @@ import {
   ResetPrivacyPolicyToDefaultRequest,
   ResetPrivacyPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
+  SendPasswordlessRegistrationRequest,
+  SendPasswordlessRegistrationResponse,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomDomainClaimedMessageTextResponse,
   SetCustomInitMessageTextRequest,
@@ -628,6 +630,12 @@ export class ManagementService {
     req.setTokenId(tokenId);
     req.setUserId(userId);
     return this.grpcService.mgmt.removeHumanPasswordless(req, null).then(resp => resp.toObject());
+  }
+
+  public sendPasswordlessRegistration(userId: string): Promise<SendPasswordlessRegistrationResponse.AsObject> {
+    const req = new SendPasswordlessRegistrationRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.sendPasswordlessRegistration(req, null).then(resp => resp.toObject());
   }
 
   public listLoginPolicyMultiFactors(): Promise<ListLoginPolicyMultiFactorsResponse.AsObject> {
