@@ -130,17 +130,7 @@
             <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
           </ng-template>
 
-          <div class="meta-details">
-            <div class="title-row">
-            <span class="title">Metadata</span>
-            <button mat-icon-button class="edit" (click)="editMetadata()"><i class="las la-edit"></i></button>
-          </div>
-
-          <div class="meta-row" *ngFor="let md of metadata">
-              <span class="first">{{md.key}}:</span>
-              <span class="second">{{ md.value }}</span>
-          </div>
-        </div>
+          <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
         </div>
       </mat-tab>
       <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">

@@ -15,7 +15,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
-import { MetadataDialogComponent } from '../metadata-dialog/metadata-dialog.component';
 
 @Component({
   selector: 'app-user-detail',
@@ -101,22 +100,6 @@ export class UserDetailComponent implements OnInit {
         this.toast.showError(error);
       });
     }
-  }
-
-  public editMetadata(): void {
-    const dialogRef = this.dialog.open(MetadataDialogComponent, {
-      data: {
-        serviceType: 'MGMT',
-        userId: this.user.id,
-      },
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe(resp => {
-      if (resp) {
-
-      }
-    });
   }
 
   public saveProfile(profileData: Profile.AsObject): void {

@@ -1,0 +1,16 @@
+<div class="meta-details">
+  <div class="title-row">
+  <span class="title">Metadata</span>
+  <button mat-icon-button class="edit" (click)="editMetadata()"><i class="las la-edit"></i></button>
+</div>
+
+<ng-container *ngIf="metadata?.length; else emptyList">
+  <div class="metadata-set" *ngFor="let md of metadata">
+      <span class="first">{{md.key}}:</span>
+      <span class="second">{{ md.value }}</span>
+  </div>
+</ng-container>
+
+<ng-template #emptyList>
+  <p class="empty-desc">{{'USER.METADATA.EMPTY' | translate}}</p>
+</ng-template>

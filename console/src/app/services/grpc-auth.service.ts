@@ -52,6 +52,8 @@ import {
   RemoveMyAvatarResponse,
   RemoveMyLinkedIDPRequest,
   RemoveMyLinkedIDPResponse,
+  RemoveMyMetadataRequest,
+  RemoveMyMetadataResponse,
   RemoveMyPasswordlessRequest,
   RemoveMyPasswordlessResponse,
   RemoveMyPhoneRequest,
@@ -307,6 +309,12 @@ export class GrpcAuthService {
     req.setKey(key);
     req.setValue(value);
     return this.grpcService.auth.setMyMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public removeMyMetadata(key: string): Promise<RemoveMyMetadataResponse.AsObject> {
+    const req = new RemoveMyMetadataRequest();
+    req.setKey(key);
+    return this.grpcService.auth.removeMyMetadata(req, null).then(resp => resp.toObject());
   }
 
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse.AsObject> {

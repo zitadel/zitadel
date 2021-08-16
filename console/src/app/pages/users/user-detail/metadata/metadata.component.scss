@@ -1,0 +1,14 @@
+.metadata-set {
+  display: flex;
+  flex-direction: column;
+
+  .first {
+    font-size: 14px;
+    color: var(--grey);
+  }
+}
+
+.empty-desc {
+  font-size: 14px;
+  color: var(--grey);
+}

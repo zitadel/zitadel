@@ -282,6 +282,8 @@ import {
   RemoveSecondFactorFromLoginPolicyResponse,
   RemoveUserGrantRequest,
   RemoveUserGrantResponse,
+  RemoveUserMetadataRequest,
+  RemoveUserMetadataResponse,
   RemoveUserRequest,
   RemoveUserResponse,
   ResendHumanEmailVerificationRequest,
@@ -1197,11 +1199,19 @@ export class ManagementService {
     return this.grpcService.mgmt.getUserMetadata(req, null).then(resp => resp.toObject());
   }
 
-  public setUserMetadata(key: string, value: string): Promise<SetUserMetadataResponse.AsObject> {
+  public setUserMetadata(key: string, value: string, userId: string): Promise<SetUserMetadataResponse.AsObject> {
     const req = new SetUserMetadataRequest();
     req.setKey(key);
     req.setValue(value);
+    req.setId(userId);
     return this.grpcService.mgmt.setUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public removeUserMetadata(key: string, userId: string): Promise<RemoveUserMetadataResponse.AsObject> {
+    const req = new RemoveUserMetadataRequest();
+    req.setKey(key);
+    req.setId(userId);
+    return this.grpcService.mgmt.removeUserMetadata(req, null).then(resp => resp.toObject());
   }
 
   public removeUser(id: string): Promise<RemoveUserResponse.AsObject> {

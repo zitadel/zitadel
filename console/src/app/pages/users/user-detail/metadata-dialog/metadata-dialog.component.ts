@@ -1,5 +1,5 @@
 import { Component, Inject, Injector, Type } from '@angular/core';
-import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -69,13 +69,26 @@ export class MetadataDialogComponent {
   }
 
   public removeEntry(index: number): void {
-    this.formArray.removeAt(index);
+    const key = this.formArray.controls[index].get('key')?.value;
+    if (key) {
+
+    } else {
+      this.formArray.removeAt(index);
+    }
   }
 
-  public addMetadata(): void {
-    if (this.key?.value && this.value?.value) {
+  public saveElement(index: number): void {
+    const formControl = this.formArray.controls[index];
+
+    if (formControl.valid) {
+      this.setMetadata(formControl.get('key')?.value, formControl.get('value')?.value);
+    }
+  }
+
+  public setMetadata(key: string, value: string): void {
+    if (key && value) {
       switch (this.injData.serviceType) {
-        case 'MGMT': (this.service as ManagementService).setUserMetadata(this.key.value, this.value.value)
+        case 'MGMT': (this.service as ManagementService).setUserMetadata(key, value, this.injData.userId)
           .then(() => {
             this.toast.showInfo('');
             this.formGroup.reset();
@@ -83,7 +96,30 @@ export class MetadataDialogComponent {
             this.toast.showError(error);
           });
           break;
-        case 'AUTH': (this.service as GrpcAuthService).setMyMetadata(this.key.value, this.value.value)
+        case 'AUTH': (this.service as GrpcAuthService).setMyMetadata(key, value)
+          .then(() => {
+            this.toast.showInfo('');
+            this.formGroup.reset();
+          }).catch(error => {
+            this.toast.showError(error);
+          });
+          break;
+      }
+    }
+  }
+
+  public removeMetadata(key: string): void {
+    if (key) {
+      switch (this.injData.serviceType) {
+        case 'MGMT': (this.service as ManagementService).removeUserMetadata(key, this.injData.userId)
+          .then(() => {
+            this.toast.showInfo('');
+            this.formGroup.reset();
+          }).catch(error => {
+            this.toast.showError(error);
+          });
+          break;
+        case 'AUTH': (this.service as GrpcAuthService).removeMyMetadata(key)
           .then(() => {
             this.toast.showInfo('');
             this.formGroup.reset();
@@ -97,13 +133,5 @@ export class MetadataDialogComponent {
 
   closeDialog(): void {
     this.dialogRef.close();
-  }
-
-  public get key(): AbstractControl | null {
-    return this.formGroup.get('key');
-  }
-
-  public get value(): AbstractControl | null {
-    return this.formGroup.get('value');
   }
 }

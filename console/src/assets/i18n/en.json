@@ -248,7 +248,9 @@
       "DESCRIPTION":"",
       "KEY":"Key",
       "VALUE":"Value",
-      "ADD":"New Entry"
+      "ADD":"New Entry",
+      "SAVE":"Save",
+      "EMPTY":"Keine Metadaten"
     },
     "MFA": {
       "TABLETYPE": "Type",
