@@ -1,35 +1,32 @@
 <h1 mat-dialog-title>
-    <span class="title">{{'USER.METADATA.TITLE' | translate}} {{data?.number}}</span>
+    <span class="title">{{'USER.METADATA.TITLE' | translate}}</span>
 </h1>
 <p class="desc">{{'USER.METADATA.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
-  <form @list>
-    <div @animate *ngFor="let formGroup of formArray.controls; index as i" class="content">
+  <mat-spinner *ngIf="loading" diameter="30"></mat-spinner>
+  <form *ngFor="let md of metadata; index as i" (ngSubmit)="saveElement(i)" >
+    <div class="content">
+      <cnsl-form-field appearance="outline" class="formfield">
+          <cnsl-label>{{ 'USER.METADATA.KEY' | translate }}</cnsl-label>
+          <input cnslInput [(ngModel)]="md.key" />
+      </cnsl-form-field>
+      <cnsl-form-field appearance="outline" class="formfield">
+          <cnsl-label>{{ 'USER.METADATA.VALUE' | translate }}</cnsl-label>
+          <input cnslInput [(ngModel)]="md.value" />
+      </cnsl-form-field>
 
-      <div @animate class="content">
-          <ng-container [formGroup]="formGroup">
-            <cnsl-form-field appearance="outline" class="formfield">
-                <cnsl-label>{{ 'USER.METADATA.KEY' | translate }}</cnsl-label>
-                <input cnslInput formControlName="key" />
-            </cnsl-form-field>
-            <cnsl-form-field appearance="outline" class="formfield">
-                <cnsl-label>{{ 'USER.METADATA.VALUE' | translate }}</cnsl-label>
-                <input cnslInput formControlName="value" />
-            </cnsl-form-field>
-
-            <button mat-icon-button (click)="saveElement(i)" [disabled]="formGroup.invalid" class="set-button" type="button" color="primary"
-                matTooltip="{{ 'ACTIONS.SAVE' | translate }}">
-                <i class="las la-save"></i>
-            </button>
-            <button mat-icon-button (click)="removeEntry(i)" [disabled]="formArray.length < 2 && i === 0" class="rm-button" type="button" color="warn"
-                matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
-                <i class="las la-trash"></i>
-            </button>
-          </ng-container>
-      </div>
+      <button mat-icon-button [disabled]="!(md.key && md.value)" class="set-button" type="submit" color="primary"
+          matTooltip="{{ 'ACTIONS.SAVE' | translate }}">
+          <i class="las la-save"></i>
+      </button>
+      <button mat-icon-button (click)="removeEntry(i)" [disabled]="metadata.length < 2 && i === 0 && !md.key" class="rm-button" type="button" color="warn"
+          matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
+          <i class="las la-trash"></i>
+      </button>
     </div>
   </form>
   <button color="primary" (click)="addEntry()" mat-stroked-button color="primary" class="continue-button" type="button">
+    <mat-icon>add</mat-icon>
     {{ 'ACTIONS.ADD' | translate }}
   </button>
 </div>

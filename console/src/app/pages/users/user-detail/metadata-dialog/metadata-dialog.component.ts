@@ -1,5 +1,4 @@
 import { Component, Inject, Injector, Type } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -13,24 +12,15 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./metadata-dialog.component.scss'],
 })
 export class MetadataDialogComponent {
-  public metadata: Metadata.AsObject[] = [];
-
-  public formGroup!: FormGroup;
-  public formArray!: FormArray;
-
+  public metadata: Partial<Metadata.AsObject>[] = [];
   public injData: any = {};
   private service!: GrpcAuthService | ManagementService;
-
+  public loading: boolean = true;
   constructor(
     private injector: Injector,
     private toast: ToastService,
     public dialogRef: MatDialogRef<MetadataDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.formGroup = new FormGroup({
-      key: new FormControl('', [Validators.required]),
-      value: new FormControl('', [Validators.required]),
-    });
-    this.formArray = new FormArray([this.formGroup]);
 
     this.injData = data;
     switch (this.data.serviceType) {
@@ -42,64 +32,77 @@ export class MetadataDialogComponent {
         break;
     }
 
-    this.loadMetadata(data.userId);
+    this.loadMetadata(data.userId).then(() => {
+      this.loading = false;
+      if (this.metadata.length === 0) {
+        this.addEntry();
+      }
+    }).catch(error => {
+      this.loading = false;
+      this.toast.showError(error);
+      if (this.metadata.length === 0) {
+        this.addEntry();
+      }
+    });
   }
 
-  public loadMetadata(userId?: string): void {
+  public loadMetadata(userId?: string): Promise<any> {
     if (this.data.serviceType === 'MGMT' && userId) {
-      (this.service as ManagementService).listUserMetadata(userId).then(resp => {
+      return (this.service as ManagementService).listUserMetadata(userId).then(resp => {
         this.metadata = resp.resultList;
-        this.formArray.patchValue(this.metadata);
       });
-    } else if (this.data.serviceType === 'AUTH') {
-      (this.service as GrpcAuthService).listMyMetadata().then(resp => {
+    } else {
+      return (this.service as GrpcAuthService).listMyMetadata().then(resp => {
         this.metadata = resp.resultList;
-        this.formArray.patchValue(this.metadata);
       });
     }
   }
 
   public addEntry(): void {
-    const newGroup = new FormGroup({
-      key: new FormControl('', [Validators.required]),
-      value: new FormControl('', [Validators.required]),
-    });
+    const newGroup = {
+      key: '',
+      value: '',
+    };
 
-    this.formArray.push(newGroup);
+    this.metadata.push(newGroup);
   }
 
   public removeEntry(index: number): void {
-    const key = this.formArray.controls[index].get('key')?.value;
+    const key = this.metadata[index].key;
     if (key) {
-
+      this.removeMetadata(key).then(() => {
+        this.metadata.splice(index, 1);
+        if (this.metadata.length === 0) {
+          this.addEntry();
+        }
+      });
     } else {
-      this.formArray.removeAt(index);
+      this.metadata.splice(index, 1);
     }
   }
 
   public saveElement(index: number): void {
-    const formControl = this.formArray.controls[index];
+    const metadataElement = this.metadata[index];
 
-    if (formControl.valid) {
-      this.setMetadata(formControl.get('key')?.value, formControl.get('value')?.value);
+    if (metadataElement.key && metadataElement.value) {
+      this.setMetadata(metadataElement.key, metadataElement.value as string);
     }
   }
 
   public setMetadata(key: string, value: string): void {
+    console.log(key, value, this.injData.userId);
     if (key && value) {
       switch (this.injData.serviceType) {
         case 'MGMT': (this.service as ManagementService).setUserMetadata(key, value, this.injData.userId)
           .then(() => {
-            this.toast.showInfo('');
-            this.formGroup.reset();
+            this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
           }).catch(error => {
             this.toast.showError(error);
           });
           break;
         case 'AUTH': (this.service as GrpcAuthService).setMyMetadata(key, value)
           .then(() => {
-            this.toast.showInfo('');
-            this.formGroup.reset();
+            this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
           }).catch(error => {
             this.toast.showError(error);
           });
@@ -108,26 +111,22 @@ export class MetadataDialogComponent {
     }
   }
 
-  public removeMetadata(key: string): void {
-    if (key) {
-      switch (this.injData.serviceType) {
-        case 'MGMT': (this.service as ManagementService).removeUserMetadata(key, this.injData.userId)
-          .then(() => {
-            this.toast.showInfo('');
-            this.formGroup.reset();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-          break;
-        case 'AUTH': (this.service as GrpcAuthService).removeMyMetadata(key)
-          .then(() => {
-            this.toast.showInfo('');
-            this.formGroup.reset();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-          break;
-      }
+  public removeMetadata(key: string): Promise<any> {
+    switch (this.injData.serviceType) {
+      case 'MGMT': return (this.service as ManagementService).removeUserMetadata(key, this.injData.userId)
+        .then(() => {
+          this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
+        }).catch(error => {
+          this.toast.showError(error);
+        });
+      case 'AUTH': return (this.service as GrpcAuthService).removeMyMetadata(key)
+        .then(() => {
+          this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
+        }).catch(error => {
+          this.toast.showError(error);
+        });
+      default:
+        return Promise.reject();
     }
   }
 

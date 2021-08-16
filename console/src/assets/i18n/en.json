@@ -250,7 +250,9 @@
       "VALUE":"Value",
       "ADD":"New Entry",
       "SAVE":"Save",
-      "EMPTY":"Keine Metadaten"
+      "EMPTY":"Keine Metadaten",
+      "SETSUCCESS":"Element saved successfully",
+      "REMOVESUCCESS":"Element deleted successfully"
     },
     "MFA": {
       "TABLETYPE": "Type",

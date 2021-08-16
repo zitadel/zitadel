@@ -13,6 +13,7 @@ import { MetadataDialogComponent } from '../metadata-dialog/metadata-dialog.comp
 })
 export class MetadataComponent implements OnInit {
   @Input() userId: string = '';
+  @Input() serviceType: string = '';
   private service!: GrpcAuthService | ManagementService;
   public metadata: Metadata.AsObject[] = [];
 
@@ -26,12 +27,14 @@ export class MetadataComponent implements OnInit {
     } else {
       this.service = this.injector.get(GrpcAuthService as Type<GrpcAuthService>);
     }
+
+    this.loadMetadata();
   }
 
   public editMetadata(): void {
     const dialogRef = this.dialog.open(MetadataDialogComponent, {
       data: {
-        serviceType: 'MGMT',
+        serviceType: this.userId ? 'MGMT' : 'AUTH',
         userId: this.userId,
       },
     });
@@ -44,13 +47,14 @@ export class MetadataComponent implements OnInit {
   }
 
   public loadMetadata(userId?: string): void {
-    if (userId) {
+    if (userId && this.serviceType === 'MGMT') {
       (this.service as ManagementService).listUserMetadata(userId).then(resp => {
         this.metadata = resp.resultList;
       });
-    } else {
+    } else if (this.serviceType === 'AUTH') {
       (this.service as GrpcAuthService).listMyMetadata().then(resp => {
         this.metadata = resp.resultList;
+        console.log(this.metadata);
       });
     }
   }

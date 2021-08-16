@@ -130,7 +130,7 @@
             <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
           </ng-template>
 
-          <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
+          <cnsl-metadata *ngIf="user?.id" [userId]="user.id" serviceType="MGMT"></cnsl-metadata>
         </div>
       </mat-tab>
       <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">

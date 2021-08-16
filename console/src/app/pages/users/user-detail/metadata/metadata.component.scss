@@ -1,11 +1,21 @@
 .metadata-set {
   display: flex;
   flex-direction: column;
+  margin-bottom: .5rem;
 
   .first {
     font-size: 14px;
     color: var(--grey);
   }
+}
+
+.border-t {
+  border-top: 1px solid #81868a40;
+}
+
+.edit {
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .empty-desc {
