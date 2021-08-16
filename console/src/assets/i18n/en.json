@@ -1004,6 +1004,8 @@
       "CHECK": "Check roles on Authentication",
       "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
+    "HAS_PROJECT": "Check for Project on Authentication",
+    "HAS_PROJECT_DESCRIPTION": "It is checked whether the user's organisation has this project. If not, the user cannot be authenticated.",
     "TABLE": {
       "TOTAL": "Entries total:",
       "SELECTION": "Selected Elements",

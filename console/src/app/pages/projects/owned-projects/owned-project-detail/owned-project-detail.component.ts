@@ -185,6 +185,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     req.setName(this.project.name);
     req.setProjectRoleAssertion(this.project.projectRoleAssertion);
     req.setProjectRoleCheck(this.project.projectRoleCheck);
+    req.setHasProjectCheck(this.project.hasProjectCheck);
 
     this.mgmtService.updateProject(req).then(() => {
       this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
