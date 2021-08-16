@@ -243,6 +243,12 @@
         "NEW":"Hinzufügen"
       }
     },
+    "METADATA": {
+      "TITLE":"Metadata",
+      "DESCRIPTION":"",
+      "KEY":"Schlüssel",
+      "VALUE":"Wert"
+    },
     "MFA": {
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",

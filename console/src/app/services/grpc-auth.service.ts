@@ -278,7 +278,7 @@ export class GrpcAuthService {
     ).then(resp => resp.toObject());
   }
 
-  public listMyMetadata(offset: number, limit: number, queryList: MetadataQuery[]): Promise<ListMyMetadataResponse.AsObject> {
+  public listMyMetadata(offset?: number, limit?: number, queryList?: MetadataQuery[]): Promise<ListMyMetadataResponse.AsObject> {
     const req = new ListMyMetadataRequest();
     const metadata = new ListQuery();
     if (offset) {

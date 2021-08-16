@@ -180,6 +180,17 @@
                             [disabled]="(['iam.features.write'] | hasRole | async) == false">
           </mat-slide-toggle>
         </div>
+
+        <br/>
+
+        <div class="row">
+          <i class="icon las la-gem"></i>
+          <span class="left-desc">{{'FEATURES.DATA.CUSTOMDOMAIN' | translate}}</span>
+          <span class="fill-space"></span>
+          <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features"
+              [disabled]="(['iam.features.write'] | hasRole | async) == false">
+          </mat-slide-toggle>
+        </div>
     </div>
 
     <div class="btn-container" *ngIf="(['iam.features.write'] | hasRole | async) == true">

@@ -1,6 +1,7 @@
 import { Component, Inject, Injector, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -12,8 +13,11 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./metadata-dialog.component.scss'],
 })
 export class MetadataDialogComponent {
-  // public formArray!: FormArray;
+  public metadata: Metadata.AsObject[] = [];
+
   public formGroup!: FormGroup;
+  public formArray!: FormArray;
+
   public injData: any = {};
   private service!: GrpcAuthService | ManagementService;
 
@@ -26,6 +30,7 @@ export class MetadataDialogComponent {
       key: new FormControl('', [Validators.required]),
       value: new FormControl('', [Validators.required]),
     });
+    this.formArray = new FormArray([this.formGroup]);
 
     this.injData = data;
     switch (this.data.serviceType) {
@@ -37,6 +42,35 @@ export class MetadataDialogComponent {
         break;
     }
 
+    this.loadMetadata(data.userId);
+  }
+
+  public loadMetadata(userId?: string) {
+    if (this.data.serviceType === 'MGMT' && userId) {
+      (this.service as ManagementService).listUserMetadata(userId).then(resp => {
+        this.metadata = resp.resultList;
+        this.formArray.patchValue(this.metadata);
+      });
+    } else if (this.data.serviceType === 'AUTH') {
+      (this.service as GrpcAuthService).listMyMetadata().then(resp => {
+        this.metadata = resp.resultList;
+        this.formArray.patchValue(this.metadata);
+      });
+    }
+  }
+
+  public addEntry(): void {
+    const newGroup = new FormGroup({
+      key: new FormControl('', [Validators.required]),
+      displayName: new FormControl(''),
+      group: new FormControl(''),
+    });
+
+    this.formArray.push(newGroup);
+  }
+
+  public removeEntry(index: number): void {
+    this.formArray.removeAt(index);
   }
 
   public addMetadata(): void {
