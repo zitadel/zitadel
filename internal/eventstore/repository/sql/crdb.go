@@ -29,7 +29,7 @@ const (
 		" SELECT MAX(event_sequence) seq, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2" +
-		") AS agg_type" +
+		") AS agg_type " +
 		// combined with
 		"LEFT JOIN " +
 		"(" +
