@@ -840,7 +840,7 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 	policy, err := repo.View.LockoutPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.LockoutPolicyByAggregateID(repo.IAMID)
-		if err != nil {
+		if err != nil && !errors.IsNotFound(err) {
 			return nil, err
 		}
 		if err == nil {
@@ -850,9 +850,9 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 		events, err := repo.Eventstore.FilterEvents(ctx, es_models.NewSearchQuery().
 			AggregateIDFilter(repo.IAMID).
 			AggregateTypeFilter(iam.AggregateType).
-			EventTypesFilter(es_models.EventType(iam.PrivacyPolicyAddedEventType), es_models.EventType(iam.PrivacyPolicyChangedEventType)))
+			EventTypesFilter(es_models.EventType(iam.LockoutPolicyAddedEventType), es_models.EventType(iam.LockoutPolicyChangedEventType)))
 		if err != nil || len(events) == 0 {
-			return nil, errors.ThrowNotFound(err, "EVENT-GSRqg", "IAM.PrivacyPolicy.NotExisting")
+			return nil, errors.ThrowNotFound(err, "EVENT-Gfgr2", "IAM.LockoutPolicy.NotExisting")
 		}
 		policy.Default = true
 		for _, event := range events {
