@@ -55,7 +55,7 @@ export class MembershipsComponent implements OnInit {
 
   public async loadManager(userId: string): Promise<void> {
     if (this.auth) {
-      this.authService.listMyUserGrants(100, 0, []).then(resp => {
+      this.authService.listMyMemberships(100, 0, []).then(resp => {
         this.memberships = resp.resultList;
         this.totalResult = resp.details?.totalResult || 0;
         this.loading = false;

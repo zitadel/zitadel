@@ -9,7 +9,7 @@
       </div>
     </div>
     <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
@@ -59,6 +59,8 @@
 
           <p class="description">Your Logo will be used in the Login itself, while the icon is used for smaller UI elements like in the organisation switcher in console</p>
           
+          <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.MAXSIZE' | translate}}</cnsl-info-section>
+
           <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           <div class="logo-setup-wrapper">
             <div class="part">
@@ -93,7 +95,7 @@
                   <i class="icon las la-image"></i>
                   <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                   <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $event.target.files)">
-                  <a class="btn"  *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
+                  <a class="btn" *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="$event.preventDefault(); selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
             </div>
             </div>
@@ -132,7 +134,7 @@
                 <i class="icon las la-image"></i>
                 <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                 <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
-                <a class="btn" *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
+                <a class="btn" *ngIf="serviceType == PolicyComponentServiceType.ADMIN || (serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="$event.preventDefault(); selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
               </label>
               </div>
             </div>
@@ -205,6 +207,7 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div class="fonts">
+            <cnsl-info-section class="info-section">{{'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate}}</cnsl-info-section>
             <div class="font-preview mat-elevation-z3" *ngIf="preview == Preview.PREVIEW && previewData.fontUrl || preview == Preview.CURRENT && data.fontUrl">
               <mat-icon class="icon">text_fields</mat-icon>
               <span>ABC • abc • 123</span>

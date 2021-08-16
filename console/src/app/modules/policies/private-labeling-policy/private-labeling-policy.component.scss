@@ -28,16 +28,16 @@
       }
     }
 
-    .default {
-      color: var(--color-main);
-      margin-top: 0;
-    }
-
     .desc {
       font-size: 14px;
       color: var(--grey);
       max-width: 800px;
       margin-bottom: 2rem;
+    }
+
+    .max-size-desc {
+      display: block;
+      margin-bottom: 1rem;
     }
 
     .spinner-wr {
@@ -323,6 +323,11 @@
         }
 
         .fonts {
+          .info-section {
+            display: block;
+            margin-bottom: 1rem;
+          }
+
           .title {
             display: block;
             font-size: 14px;

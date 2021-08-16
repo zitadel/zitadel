@@ -28,7 +28,6 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     PrivacyPolicyRoutingModule,
     MatSelectModule,
     CommonModule,
-    InfoSectionModule,
     ReactiveFormsModule,
     FormsModule,
     InputModule,
@@ -47,6 +46,7 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     MatDialogModule,
     WarnDialogModule,
     PolicyGridModule,
+    InfoSectionModule,
   ],
 })
 export class PrivacyPolicyModule { }

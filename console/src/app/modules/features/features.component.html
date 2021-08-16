@@ -49,7 +49,7 @@
 
     <div class="divider"></div>
 
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
     <div class="content" *ngIf="features">
         <div class="row">
           <span class="left-desc">{{'FEATURES.DATA.AUDITLOGRETENTION' | translate}}</span>

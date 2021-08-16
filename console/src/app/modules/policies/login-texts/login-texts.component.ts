@@ -46,7 +46,6 @@ const KeyNamesArray = [
   'passwordChangeText',
   'passwordResetDoneText',
   'passwordText',
-  'passwordlessText',
   'registrationOptionText',
   'registrationOrgText',
   'registrationUserText',
@@ -56,6 +55,10 @@ const KeyNamesArray = [
   'usernameChangeText',
   'verifyMfaOtpText',
   'verifyMfaU2fText',
+  'passwordlessPromptText',
+  'passwordlessRegistrationDoneText',
+  'passwordlessRegistrationText',
+  'passwordlessText',
 ];
 // tslint:enable
 

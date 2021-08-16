@@ -481,6 +481,8 @@
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
       "DESCRIPTION": "These are all member grants of the user. You can modify them also on organisation, project, or IAM detail pages.",
+      "ORGCONTEXT":"You see all organizations and projects that are related to the currently selected organization.",
+      "USERCONTEXT":"You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
       "CHANGEDATE": "Last Modified",
       "DISPLAYNAME": "Display Name",
@@ -690,6 +692,9 @@
       "RELEASE":"Release",
       "DROPFONT":"Drop fontfile here",
       "RELEASEFONT":"Release",
+      "MAXSIZE":"The maximum size is limited to 524kB",
+      "MAXSIZEEXCEEDED":"Maximum size of 524kB exceeded.",
+      "FONTINLOGINONLY":"The font is currently only displayed in the login interface.",
       "PREVIEW": {
         "TITLE":"Login",
         "SECOND":"login with your ZITADEL-Account.",
@@ -772,7 +777,6 @@
         "passwordChangeText":"Password change",
         "passwordResetDoneText":"Password reset done",
         "passwordText":"Password",
-        "passwordlessText":"Passwordless",
         "registrationOptionText":"Registration Options",
         "registrationOrgText":"Register Org",
         "registrationUserText":"Register User",
@@ -781,7 +785,11 @@
         "usernameChangeDoneText":"Username change done",
         "usernameChangeText":"Username change",
         "verifyMfaOtpText":"Verify OTP",
-        "verifyMfaU2fText":"Verify Universal Second Factor"
+        "verifyMfaU2fText":"Verify Universal Second Factor",
+        "passwordlessPromptText":"Passwordless Prompt",
+        "passwordlessRegistrationDoneText":"Passwordless Registration Done",
+        "passwordlessRegistrationText":"Passwordless Registration",
+        "passwordlessText":"Passwordless"
       }
     },
     "MESSAGE_TEXTS": {
@@ -792,13 +800,25 @@
         "VE":"Verify Email",
         "VP":"Verify Phone",
         "PR":"Password Reset",
-        "DC":"Domain Claim"
+        "DC":"Domain Claim",
+        "PL":"Passwordless"
       },
       "CHIPS": {
         "firstname":"Firstname",
         "lastname":"Lastname",
         "code":"Code",
-        "preferredLoginName":"Preferred Login Name"
+        "preferredLoginName":"Preferred Login Name",
+        "displayName":"Displayname",
+        "nickName":"Nickname",
+        "loginnames":"Login names",
+        "domain":"Domain",
+        "lastEmail":"Last email",
+        "lastPhone":"Last phone",
+        "verifiedEmail":"Verified email",
+        "verifiedPhone":"Verified phone",
+        "changedate":"Change date",
+        "username":"Username",
+        "tempUsername":"Temp username"
       },
       "TOAST": {
         "UPDATED":"Custom Texts saved."
@@ -831,7 +851,7 @@
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX":"Hide Loginname suffix",
       "ERRORMSGPOPUP":"Show Error in Dialog",
-      "DISABLEWATERMARK":"Disable Watermark"
+      "DISABLEWATERMARK":"Hide Watermark"
     },
     "RESET": "Reset Policy",
     "CREATECUSTOM": "Create Custom Policy",

@@ -481,6 +481,8 @@
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
       "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
+      "ORGCONTEXT":"Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
+      "USERCONTEXT":"Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DISPLAYNAME": "Anzeigename",
@@ -690,6 +692,9 @@
       "RELEASE":"Jetzt loslassen",
       "DROPFONT":"Fontdatei hier ablegen",
       "RELEASEFONT":"Jetzt loslassen",
+      "MAXSIZE":"Die maximale Grösse von Uploads ist mit 524kB begrenzt",
+      "MAXSIZEEXCEEDED":"Maximale Grösse von 524kB überschritten",
+      "FONTINLOGINONLY":"Die Schriftart wird momentan nur im Login interface angezeigt.",
       "PREVIEW": {
         "TITLE":"Anmeldung",
         "SECOND":"mit ZITADEL-Konto anmelden.",
@@ -770,7 +775,6 @@
         "passwordChangeText":"Passwortwechsel",
         "passwordResetDoneText":"Passwort zurücksetzen erfolgreich",
         "passwordText":"Passwort",
-        "passwordlessText":"Passwortlose Authentifizierung",
         "registrationOptionText":"Registrierungsoptionen",
         "registrationOrgText":"Organisation registrieren",
         "registrationUserText":"Benutzer registrieren",
@@ -779,7 +783,11 @@
         "usernameChangeDoneText":"Benutzernamenwechsel erfolgreich",
         "usernameChangeText":"Benutzernamenwechsel",
         "verifyMfaOtpText":"OTP Verifikation",
-        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation"
+        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation",
+        "passwordlessPromptText":"Passwordless Aufforderung",
+        "passwordlessRegistrationDoneText":"Passwordless setzen erfolgreich",
+        "passwordlessRegistrationText":"Passwordless Registrierung",
+        "passwordlessText":"Passwordless"
       }
     },
     "MESSAGE_TEXTS": {
@@ -790,13 +798,25 @@
         "VE":"Emailverifikation",
         "VP":"Telefonnummerverifikation",
         "PR":"Password Wiederherstellung",
-        "DC":"Domainbeanspruchung"
+        "DC":"Domainbeanspruchung",
+        "PL":"Passwordless"
       },
       "CHIPS": {
         "firstname":"Vorname",
         "lastname":"Nachname",
         "code":"Code",
-        "preferredLoginName":"Bevorzugter Anmeldename"
+        "preferredLoginName":"Bevorzugter Anmeldename",
+        "displayName":"Anzeigename",
+        "nickName":"Spitzname",
+        "loginnames":"Loginnamen",
+        "domain":"Domain",
+        "lastEmail":"Letzte email",
+        "lastPhone":"Letzte Telefonnummer",
+        "verifiedEmail":"Verifizierte email",
+        "verifiedPhone":"Verifizierte Telefonnummer",
+        "changedate":"Änderungsdatum",
+        "username":"Username",
+        "tempUsername":"Temp. Username"
       },
       "TOAST": {
         "UPDATED":"Benutzerdefinierte Texte gespeichert."

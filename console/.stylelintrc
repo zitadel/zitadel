@@ -7,6 +7,7 @@
     "value-keyword-case": null,
     "at-rule-no-unknown": null,
     "no-descending-specificity": null,
+    "no-invalid-position-at-import-rule": null,
     "at-rule-empty-line-before": [
       "always",
       {
