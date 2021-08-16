@@ -23,47 +23,53 @@ const (
 	//previous_data selects the needed data of the latest event of the aggregate
 	// and buffers it (crdb inmemory)
 	crdbInsert = "WITH previous_data (aggregate_type_sequence, aggregate_sequence, resource_owner) AS (" +
-		"    WITH aggregate_events AS (" +
-		"        SELECT event_sequence, aggregate_id, resource_owner FROM eventstore.events WHERE aggregate_type = $2 ORDER BY event_sequence DESC" +
-		"    )" +
-		"    SELECT * FROM" +
-		"        (SELECT event_sequence AS aggregate_type_sequence FROM aggregate_events ORDER BY event_sequence DESC LIMIT 1)" +
-		//natural left join because it could be the first event of the aggregate but aggregate root exists
-		"        NATURAL LEFT JOIN (SELECT event_sequence AS aggregate_sequence, resource_owner FROM aggregate_events WHERE aggregate_id = $3 ORDER BY event_sequence DESC LIMIT 1)" +
-		"        UNION ALL" +
-		//if first event of the aggregate
-		"        SELECT NULL::INT8, NULL::INT8, NULL::TEXT" +
-		"        LIMIT 1" +
-		")" +
-		"INSERT INTO eventstore.events " +
-		"( " +
-		"    event_type, " +
-		"    aggregate_type," +
-		"    aggregate_id, " +
-		"    aggregate_version, " +
-		"    creation_date, " +
-		"    event_data, " +
-		"    editor_user, " +
-		"    editor_service, " +
-		"    resource_owner, " +
-		"    previous_aggregate_sequence, " +
-		"    previous_aggregate_type_sequence " +
+		"SELECT agg_type.seq, agg.seq, agg.ro FROM " +
+		"(" +
+		//max sequence of requested aggregate type
+		" SELECT MAX(event_sequence) seq, 1 join_me" +
+		" FROM eventstore.events" +
+		" WHERE aggregate_type = $2" +
+		") AS agg_type" +
+		// combined with
+		"LEFT JOIN " +
+		"(" +
+		// max sequence and resource owner of aggregate root
+		" SELECT event_sequence seq, resource_owner ro, 1 join_me" +
+		" FROM eventstore.events" +
+		" WHERE aggregate_type = $2 AND aggregate_id = $3" +
+		" ORDER BY event_sequence DESC" +
+		" LIMIT 1" +
+		") AS agg USING(join_me)" +
+		") " +
+		"INSERT INTO eventstore.events (" +
+		" event_type," +
+		" aggregate_type," +
+		" aggregate_id," +
+		" aggregate_version," +
+		" creation_date," +
+		" event_data," +
+		" editor_user," +
+		" editor_service," +
+		" resource_owner," +
+		" previous_aggregate_sequence," +
+		" previous_aggregate_type_sequence" +
 		") " +
 		// defines the data to be inserted
-		"SELECT " +
-		"    $1::VARCHAR AS event_type, " +
-		"    $2::VARCHAR AS aggregate_type, " +
-		"    $3::VARCHAR AS aggregate_id, " +
-		"    $4::VARCHAR AS aggregate_version, " +
-		"    NOW() AS creation_date, " +
-		"    $5::JSONB AS event_data, " +
-		"    $6::VARCHAR AS editor_user, " +
-		"    $7::VARCHAR AS editor_service, " +
-		"    IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner, " +
-		"    aggregate_sequence AS previous_aggregate_sequence, " +
-		"    aggregate_type_sequence AS previous_aggregate_type_sequence " +
-		"FROM previous_data " +
+		"SELECT" +
+		" $1::VARCHAR AS event_type," +
+		" $2::VARCHAR AS aggregate_type," +
+		" $3::VARCHAR AS aggregate_id," +
+		" $4::VARCHAR AS aggregate_version," +
+		" NOW() AS creation_date," +
+		" $5::JSONB AS event_data," +
+		" $6::VARCHAR AS editor_user," +
+		" $7::VARCHAR AS editor_service," +
+		" IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner," +
+		" aggregate_sequence AS previous_aggregate_sequence," +
+		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
+		"FROM previous_data" +
 		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner"
+
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
 						unique_type,
@@ -73,6 +79,7 @@ const (
 						$1,
 						$2
 					)`
+
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
 					WHERE unique_type = $1 and unique_field = $2`
 )
