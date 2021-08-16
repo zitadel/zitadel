@@ -67,7 +67,7 @@ const (
 		" IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
-		"FROM previous_data" +
+		"FROM previous_data " +
 		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner"
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
