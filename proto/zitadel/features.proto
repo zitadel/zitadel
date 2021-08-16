@@ -27,6 +27,8 @@ message Features {
   bool custom_text = 16;
   bool privacy_policy = 17;
   bool metadata_user = 18;
+  bool custom_text_message = 19;
+  bool custom_text_login = 20;
 }
 
 message FeatureTier {

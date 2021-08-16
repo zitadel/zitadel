@@ -67,6 +67,21 @@ func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string
 	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
+func (c *Commands) removeOrgLoginTextsIfExists(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+	msgTemplates := NewOrgCustomLoginTextsReadModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, msgTemplates)
+	if err != nil {
+		return nil, err
+	}
+
+	orgAgg := OrgAggregateFromWriteModel(&msgTemplates.WriteModel)
+	events := make([]eventstore.EventPusher, 0, len(msgTemplates.CustomLoginTexts))
+	for _, tmpl := range msgTemplates.CustomLoginTexts {
+		events = append(events, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, tmpl.Template, tmpl.Language))
+	}
+	return events, nil
+}
+
 func (c *Commands) orgCustomLoginTextWriteModelByID(ctx context.Context, orgID string, lang language.Tag) (*OrgCustomLoginTextReadModel, error) {
 	writeModel := NewOrgCustomLoginTextReadModel(orgID, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)

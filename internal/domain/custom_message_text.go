@@ -68,3 +68,12 @@ func (m *MessageTexts) GetMessageTextByType(msgType string) *CustomMessageText {
 	}
 	return nil
 }
+
+func IsMessageTextType(textType string) bool {
+	return textType == InitCodeMessageType ||
+		textType == PasswordResetMessageType ||
+		textType == VerifyEmailMessageType ||
+		textType == VerifyPhoneMessageType ||
+		textType == DomainClaimedMessageType ||
+		textType == PasswordResetMessageType
+}

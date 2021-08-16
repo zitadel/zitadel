@@ -2271,7 +2271,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2319,7 +2319,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2368,7 +2368,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2417,7 +2417,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2466,7 +2466,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2515,7 +2515,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2563,7 +2563,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.login"
         };
     }
 

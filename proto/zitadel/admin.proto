@@ -2613,6 +2613,8 @@ message SetDefaultFeaturesRequest {
     bool custom_text = 17;
     bool privacy_policy = 18;
     bool metadata_user = 19;
+    bool custom_text_message = 20;
+    bool custom_text_login = 21;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2649,6 +2651,8 @@ message SetOrgFeaturesRequest {
     bool custom_text = 18;
     bool privacy_policy = 19;
     bool metadata_user = 20;
+    bool custom_text_message = 21;
+    bool custom_text_login = 22;
 }
 
 message SetOrgFeaturesResponse {

@@ -2505,6 +2505,8 @@ This is an empty request
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
 | metadata_user |  bool | - |  |
+| custom_text_message |  bool | - |  |
+| custom_text_login |  bool | - |  |
 
 
 
@@ -2691,6 +2693,8 @@ This is an empty request
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
 | metadata_user |  bool | - |  |
+| custom_text_message |  bool | - |  |
+| custom_text_login |  bool | - |  |
 
 
 

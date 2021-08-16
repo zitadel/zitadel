@@ -3,6 +3,7 @@ package command
 import (
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
 )
@@ -74,10 +75,19 @@ func (wm *OrgCustomMessageTemplatesReadModel) AppendEvents(events ...eventstore.
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:
+			if !domain.IsMessageTextType(e.Template) {
+				continue
+			}
 			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextSetEvent)
 		case *org.CustomTextRemovedEvent:
+			if !domain.IsMessageTextType(e.Template) {
+				continue
+			}
 			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextRemovedEvent)
 		case *org.CustomTextTemplateRemovedEvent:
+			if !domain.IsMessageTextType(e.Template) {
+				continue
+			}
 			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextTemplateRemovedEvent)
 		}
 	}
