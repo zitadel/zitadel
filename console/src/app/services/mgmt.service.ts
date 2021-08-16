@@ -1172,7 +1172,8 @@ export class ManagementService {
     return this.grpcService.mgmt.getUserByID(req, null).then(resp => resp.toObject());
   }
 
-  public listUserMetadata(userId: string, offset?: number, limit?: number, queryList?: MetadataQuery[]): Promise<ListUserMetadataResponse.AsObject> {
+  public listUserMetadata(userId: string, offset?: number, limit?: number, queryList?: MetadataQuery[]):
+    Promise<ListUserMetadataResponse.AsObject> {
     const req = new ListUserMetadataRequest();
 
     req.setId(userId);

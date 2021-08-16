@@ -1,17 +1,19 @@
 .content {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
   display: flex;
-  margin: 0 -.5rem;
-  flex-wrap: wrap;
-  border-bottom: 1px solid #ffffff20;
+  align-items: center;
+  margin: 0 -.25rem;
 
   .formfield {
+    flex: 1;
     margin: 0 .5rem;
 
     @media only screen and (max-width: 450px) {
       flex-basis: 100%;
     }
+  }
+
+  .rm-button {
+    margin-top: 14px;
   }
 }
 

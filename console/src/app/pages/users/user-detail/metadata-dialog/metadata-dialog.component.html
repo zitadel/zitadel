@@ -17,21 +17,24 @@
                   <input cnslInput formControlName="value" />
               </cnsl-form-field>
             
-              <button *ngIf="i !== 0" mat-icon-button (click)="removeEntry(i)" type="button" color="warn"
+              <button mat-icon-button (click)="removeEntry(i)" class="rm-button" type="button" color="warn"
                   matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
                   <i class="las la-trash"></i>
               </button>
           </ng-container>
       </div>
     </div>
-
-    <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">
-        {{ 'ACTIONS.SAVE' | translate }}
-    </button>
-</form>
+  </form>
+  <button color="primary" (click)="addEntry()" mat-stroked-button color="primary" class="continue-button" type="button">
+    {{ 'ACTIONS.ADD' | translate }}
+  </button>
 </div>
 <div mat-dialog-actions class="action">
     <button cdkFocusInitial color="primary" mat-button class="ok-button" (click)="closeDialog()">
         {{'ACTIONS.CLOSE' | translate}}
     </button>
+
+    <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">
+      {{ 'ACTIONS.SAVE' | translate }}
+  </button>
 </div>

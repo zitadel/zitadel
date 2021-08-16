@@ -247,7 +247,8 @@
       "TITLE":"Metadata",
       "DESCRIPTION":"",
       "KEY":"Key",
-      "VALUE":"Value"
+      "VALUE":"Value",
+      "ADD":"New Entry"
     },
     "MFA": {
       "TABLETYPE": "Type",

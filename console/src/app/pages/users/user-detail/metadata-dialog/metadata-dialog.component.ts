@@ -45,7 +45,7 @@ export class MetadataDialogComponent {
     this.loadMetadata(data.userId);
   }
 
-  public loadMetadata(userId?: string) {
+  public loadMetadata(userId?: string): void {
     if (this.data.serviceType === 'MGMT' && userId) {
       (this.service as ManagementService).listUserMetadata(userId).then(resp => {
         this.metadata = resp.resultList;
@@ -62,8 +62,7 @@ export class MetadataDialogComponent {
   public addEntry(): void {
     const newGroup = new FormGroup({
       key: new FormControl('', [Validators.required]),
-      displayName: new FormControl(''),
-      group: new FormControl(''),
+      value: new FormControl('', [Validators.required]),
     });
 
     this.formArray.push(newGroup);
@@ -83,6 +82,7 @@ export class MetadataDialogComponent {
           }).catch(error => {
             this.toast.showError(error);
           });
+          break;
         case 'AUTH': (this.service as GrpcAuthService).setMyMetadata(this.key.value, this.value.value)
           .then(() => {
             this.toast.showInfo('');
@@ -90,6 +90,7 @@ export class MetadataDialogComponent {
           }).catch(error => {
             this.toast.showError(error);
           });
+          break;
       }
     }
   }
