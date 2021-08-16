@@ -7,7 +7,7 @@
 </div>
 
 
-<form action="{{ externalNotFoundOptionUrl }}" method="POST">
+<form action="{{ externalNotFoundOptionUrl "none" }}" method="POST">
 
     {{ .CSRF }}
 
@@ -18,9 +18,9 @@
         <div class="lgn-field">
             <label class="lgn-label">{{t "ExternalNotFoundOption.TosAndPrivacyLabel"}}</label>
             <div class="lgn-checkbox">
-                <input type="checkbox" id="register-term-confirmation"
-                       name="register-term-confirmation" required>
-                <label for="register-term-confirmation">
+                <input type="checkbox" id="terms-confirm"
+                       name="terms-confirm" required>
+                <label for="terms-confirm">
                     {{t "ExternalNotFoundOption.TosConfirm"}}
                     {{ if .TOSLink }}
                     <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
@@ -49,16 +49,14 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
 
-        <button class="lgn-raised-button lgn-primary" name="link" value="true">
+        <button type="submit" formaction="{{ externalNotFoundOptionUrl "linkbutton"}}" class="lgn-raised-button lgn-primary" name="linkbutton" value="true">
             {{t "ExternalNotFoundOption.LinkButtonText"}}
         </button>
             <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" name="autoregister" value="true">
+        <button type="submit" formaction="{{ externalNotFoundOptionUrl "autoregisterbutton"}}" class="lgn-raised-button lgn-primary" name="autoregisterbutton" value="true">
             {{t "ExternalNotFoundOption.AutoRegisterButtonText"}}
         </button>
     </div>
-
-    {{template "error-message" .}}
 </form>
 
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>

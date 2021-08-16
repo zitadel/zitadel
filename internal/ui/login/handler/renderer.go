@@ -188,8 +188,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
-		"externalNotFoundOptionUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption)
+		"externalNotFoundOptionUrl": func(action string) string {
+			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption+"?"+action+"=true")
 		},
 		"selectedLanguage": func(l string) bool {
 			return false
