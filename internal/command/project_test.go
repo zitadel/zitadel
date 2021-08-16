@@ -2,6 +2,10 @@ package command
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,8 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddProject(t *testing.T) {
@@ -91,7 +93,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 				ownerID:       "user1",
@@ -138,7 +143,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "globalorg",
 				ownerID:       "user1",
@@ -194,7 +202,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 				ownerID:       "user1",
@@ -396,9 +407,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 									"org1",
 									"project",
 									"project-new",
-									true,
-									true,
-									true),
+									false,
+									false,
+									false),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
@@ -413,9 +424,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						AggregateID: "project1",
 					},
 					Name:                 "project-new",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 				resourceOwner: "org1",
 			},
@@ -426,8 +437,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					Name:                 "project-new",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 			},
 		},
@@ -451,9 +463,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 									"org1",
 									"project",
 									"",
-									true,
-									true,
-									true),
+									false,
+									false,
+									false),
 							),
 						},
 					),
@@ -466,9 +478,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						AggregateID: "project1",
 					},
 					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 				resourceOwner: "org1",
 			},
@@ -479,8 +491,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 			},
 		},
