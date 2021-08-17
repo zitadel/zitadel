@@ -3,6 +3,7 @@ package types
 import (
 	"database/sql"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -89,7 +90,7 @@ func (s *SQL) Start() (*sql.DB, error) {
 	// as we open many sql clients we set the max
 	// open cons deep. now 3(maxconn) * 8(clients) = max 24 conns per pod
 	client.SetMaxOpenConns(3)
-	client.SetMaxIdleConns(3)
+	client.SetConnMaxLifetime(5 * time.Minute)
 	return client, nil
 }
 
