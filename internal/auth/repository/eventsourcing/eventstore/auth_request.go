@@ -98,6 +98,7 @@ type userGrantProvider interface {
 }
 
 type projectProvider interface {
+	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
 }
 
