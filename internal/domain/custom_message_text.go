@@ -75,5 +75,5 @@ func IsMessageTextType(textType string) bool {
 		textType == VerifyEmailMessageType ||
 		textType == VerifyPhoneMessageType ||
 		textType == DomainClaimedMessageType ||
-		textType == PasswordResetMessageType
+		textType == PasswordlessRegistrationMessageType
 }
