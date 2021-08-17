@@ -678,7 +678,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	//PLANNED: consent step
 
-	missing, err := projectRequired(ctx, request, repo.UserGrantProvider, repo.ProjectProvider)
+	missing, err := projectRequired(ctx, request, repo.ProjectProvider)
 	if err != nil {
 		return nil, err
 	}
