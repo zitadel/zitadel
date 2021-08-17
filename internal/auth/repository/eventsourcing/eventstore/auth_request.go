@@ -1098,7 +1098,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	var app *project_view_model.ApplicationView
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		app, err = userGrantProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		app, err = projectProvider.ApplicationByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
