@@ -1094,7 +1094,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	return len(grants) == 0, nil
 }
 
-func projectRequired(ctx context.Context, request *domain.AuthRequest, userGrantProvider userGrantProvider, projectProvider projectProvider) (_ bool, err error) {
+func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
 	var app *project_view_model.ApplicationView
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
