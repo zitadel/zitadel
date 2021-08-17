@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -211,8 +212,8 @@ func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, er
 }
 
 type mockUserGrants struct {
-	roleCheck    bool
-	userGrants   int
+	roleCheck  bool
+	userGrants int
 }
 
 func (m *mockUserGrants) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
@@ -232,8 +233,8 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m * mockProject) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
-	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck, HasProjectCheck: m.projectCheck}, nil
+func (m *mockProject) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
+	return &proj_view_model.ApplicationView{HasProjectCheck: m.projectCheck}, nil
 }
 
 func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID string) (*proj_view_model.OrgProjectMapping, error) {
@@ -252,6 +253,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		userEventProvider          userEventProvider
 		orgViewProvider            orgViewProvider
 		userGrantProvider          userGrantProvider
+		projectProvider            projectProvider
 		loginPolicyProvider        loginPolicyViewProvider
 		lockoutPolicyProvider      lockoutPolicyViewProvider
 		PasswordCheckLifeTime      time.Duration
@@ -700,6 +702,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 				userGrantProvider: &mockUserGrants{},
+				projectProvider:   &mockProject{},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &iam_view_model.LoginPolicyView{},
 				},
@@ -757,6 +760,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 				userGrantProvider: &mockUserGrants{},
+				projectProvider:   &mockProject{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &iam_view_model.LockoutPolicyView{
 						ShowLockOutFailures: true,
@@ -987,6 +991,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 				userGrantProvider: &mockUserGrants{},
+				projectProvider:   &mockProject{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &iam_view_model.LockoutPolicyView{
 						ShowLockOutFailures: true,
@@ -1020,6 +1025,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
 				userGrantProvider: &mockUserGrants{},
+				projectProvider:   &mockProject{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &iam_view_model.LockoutPolicyView{
 						ShowLockOutFailures: true,
@@ -1057,6 +1063,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					roleCheck:  true,
 					userGrants: 0,
 				},
+				projectProvider: &mockProject{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &iam_view_model.LockoutPolicyView{
 						ShowLockOutFailures: true,
@@ -1093,6 +1100,83 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userGrantProvider: &mockUserGrants{
 					roleCheck:  true,
 					userGrants: 2,
+				},
+				projectProvider: &mockProject{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
+				PasswordCheckLifeTime:     10 * 24 * time.Hour,
+				SecondFactorCheckLifeTime: 18 * time.Hour,
+			},
+			args{&domain.AuthRequest{
+				UserID:  "UserID",
+				Prompt:  []domain.Prompt{domain.PromptNone},
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				},
+			}, true},
+			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required project missing, project required step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
+					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{},
+				projectProvider: &mockProject{
+					projectCheck: true,
+					hasProject:   false,
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &iam_view_model.LockoutPolicyView{
+						ShowLockOutFailures: true,
+					},
+				},
+				PasswordCheckLifeTime:     10 * 24 * time.Hour,
+				SecondFactorCheckLifeTime: 18 * time.Hour,
+			},
+			args{&domain.AuthRequest{
+				UserID:  "UserID",
+				Prompt:  []domain.Prompt{domain.PromptNone},
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				},
+			}, true},
+			[]domain.NextStep{&domain.ProjectRequiredStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and required project exist, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
+					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: org_model.OrgStateActive},
+				userGrantProvider: &mockUserGrants{},
+				projectProvider: &mockProject{
+					projectCheck: true,
+					hasProject:   true,
 				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &iam_view_model.LockoutPolicyView{
@@ -1188,6 +1272,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				UserEventProvider:          tt.fields.userEventProvider,
 				OrgViewProvider:            tt.fields.orgViewProvider,
 				UserGrantProvider:          tt.fields.userGrantProvider,
+				ProjectProvider:            tt.fields.projectProvider,
 				LoginPolicyViewProvider:    tt.fields.loginPolicyProvider,
 				LockoutPolicyViewProvider:  tt.fields.lockoutPolicyProvider,
 				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,

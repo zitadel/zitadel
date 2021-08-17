@@ -1003,7 +1003,7 @@
       "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einem entsprechenden Rolle authentifiziert werden."
     },
     "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
-    "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der BEnutzer nicht authentifiziert werden.",
+    "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der Benutzer nicht authentifiziert werden.",
     "TABLE": {
       "TOTAL": "Einträge gesamt:",
       "SELECTION": "ausgewählt",
