@@ -212,7 +212,6 @@ func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*org_view_model.OrgView, er
 
 type mockUserGrants struct {
 	roleCheck    bool
-	projectCheck bool
 	userGrants   int
 }
 
