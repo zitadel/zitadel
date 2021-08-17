@@ -3,7 +3,6 @@ package types
 import (
 	"database/sql"
 	"strings"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -15,13 +14,16 @@ const (
 )
 
 type SQL struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Database string
-	Schema   string
-	SSL      *ssl
+	Host            string
+	Port            string
+	User            string
+	Password        string
+	Database        string
+	Schema          string
+	SSL             *ssl
+	MaxOpenConns    uint32
+	MaxConnLifetime Duration
+	MaxConnIdleTime Duration
 }
 
 type SQLBase struct {
@@ -89,8 +91,10 @@ func (s *SQL) Start() (*sql.DB, error) {
 	}
 	// as we open many sql clients we set the max
 	// open cons deep. now 3(maxconn) * 8(clients) = max 24 conns per pod
-	client.SetMaxOpenConns(3)
-	client.SetConnMaxLifetime(5 * time.Minute)
+	client.SetMaxOpenConns(int(s.MaxOpenConns))
+	client.SetConnMaxLifetime(s.MaxConnLifetime.Duration)
+	client.SetConnMaxIdleTime(s.MaxConnIdleTime.Duration)
+
 	return client, nil
 }
 
