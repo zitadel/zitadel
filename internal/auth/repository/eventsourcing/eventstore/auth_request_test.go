@@ -228,7 +228,12 @@ func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*g
 }
 
 type mockProject struct {
-	hasProject bool
+	hasProject   bool
+	projectCheck bool
+}
+
+func (m * mockProject) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
+	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck, HasProjectCheck: m.projectCheck}, nil
 }
 
 func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID string) (*proj_view_model.OrgProjectMapping, error) {
