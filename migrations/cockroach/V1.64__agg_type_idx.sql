@@ -1,0 +1,1 @@
+CREATE INDEX agg_type ON eventstore.events (aggregate_type);
