@@ -32,8 +32,8 @@ EventstoreBase:
   Port: $ZITADEL_EVENTSTORE_PORT
   Database: 'eventstore'
   MaxOpenConns: 3
-	MaxConnLifetime: 5m
-	MaxConnIdleTime: 5m
+  MaxConnLifetime: 5m
+  MaxConnIdleTime: 5m
   SSL:
     Mode: $CR_SSL_MODE
     RootCert: $CR_ROOT_CERT
