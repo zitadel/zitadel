@@ -12,6 +12,7 @@ type Project struct {
 	ProjectRoleAssertion bool
 	ProjectRoleCheck     bool
 	HasProjectCheck      bool
+	PrivateLabeling      PrivateLabelingSetting
 }
 
 type ProjectState int32
@@ -21,6 +22,14 @@ const (
 	ProjectStateActive
 	ProjectStateInactive
 	ProjectStateRemoved
+)
+
+type PrivateLabelingSetting int32
+
+const (
+	PrivateLabelingSettingUnspecified PrivateLabelingSetting = iota
+	PrivateLabelingSettingProjectResourceOwnerSetting
+	PrivateLabelingSettingLoginUserResourceOwnerSetting
 )
 
 func (o *Project) IsValid() bool {
