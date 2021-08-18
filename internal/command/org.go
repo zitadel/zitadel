@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -167,7 +168,7 @@ func (c *Commands) setUpOrg(ctx context.Context, organisation *domain.Org, admin
 		return nil, nil, nil, nil, nil, err
 	}
 
-	userEvents, human, err := c.addHuman(ctx, orgAgg.ID, admin, loginPolicy, pwPolicy)
+	userEvents, human, err := c.registerHuman(ctx, orgAgg.ID, admin, nil, loginPolicy, pwPolicy)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
