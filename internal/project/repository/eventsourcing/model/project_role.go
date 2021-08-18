@@ -57,43 +57,6 @@ func ProjectRoleToModel(role *ProjectRole) *model.ProjectRole {
 	}
 }
 
-func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
-	role := new(ProjectRole)
-	err := role.setData(event)
-	if err != nil {
-		return err
-	}
-	role.ObjectRoot.CreationDate = event.CreationDate
-	p.Roles = append(p.Roles, role)
-	return nil
-}
-
-func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
-	role := new(ProjectRole)
-	err := role.setData(event)
-	if err != nil {
-		return err
-	}
-	if i, r := GetProjectRole(p.Roles, role.Key); r != nil {
-		p.Roles[i] = role
-	}
-	return nil
-}
-
-func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
-	role := new(ProjectRole)
-	err := role.setData(event)
-	if err != nil {
-		return err
-	}
-	if i, r := GetProjectRole(p.Roles, role.Key); r != nil {
-		p.Roles[i] = p.Roles[len(p.Roles)-1]
-		p.Roles[len(p.Roles)-1] = nil
-		p.Roles = p.Roles[:len(p.Roles)-1]
-	}
-	return nil
-}
-
 func (r *ProjectRole) setData(event *es_models.Event) error {
 	r.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, r); err != nil {

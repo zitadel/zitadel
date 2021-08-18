@@ -7,12 +7,12 @@ import (
 type Project struct {
 	models.ObjectRoot
 
-	State                ProjectState
-	Name                 string
-	ProjectRoleAssertion bool
-	ProjectRoleCheck     bool
-	HasProjectCheck      bool
-	PrivateLabeling      PrivateLabelingSetting
+	State                  ProjectState
+	Name                   string
+	ProjectRoleAssertion   bool
+	ProjectRoleCheck       bool
+	HasProjectCheck        bool
+	PrivateLabelingSetting PrivateLabelingSetting
 }
 
 type ProjectState int32
@@ -28,8 +28,8 @@ type PrivateLabelingSetting int32
 
 const (
 	PrivateLabelingSettingUnspecified PrivateLabelingSetting = iota
-	PrivateLabelingSettingProjectResourceOwnerSetting
-	PrivateLabelingSettingLoginUserResourceOwnerSetting
+	PrivateLabelingSettingProjectResourceOwnerPolicy
+	PrivateLabelingSettingLoginUserResourceOwnerPolicy
 )
 
 func (o *Project) IsValid() bool {
