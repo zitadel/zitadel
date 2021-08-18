@@ -32,8 +32,8 @@ type externalIDPCallbackData struct {
 }
 
 type externalNotFoundOptionFormData struct {
-	Link         bool `schema:"link"`
-	AutoRegister bool `schema:"autoregister"`
+	Link         bool `schema:"linkbutton"`
+	AutoRegister bool `schema:"autoregisterbutton"`
 	ResetLinking bool `schema:"resetlinking"`
 	TermsConfirm bool `schema:"terms-confirm"`
 }

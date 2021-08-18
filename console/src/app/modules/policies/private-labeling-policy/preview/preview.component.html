@@ -25,7 +25,7 @@
       </div>
 
       <div class="btn-wrapper">
-        <button mat-stroked-button [style.color]="theme == Theme.DARK ? policy.fontColorDark : policy.fontColor">{{'POLICY.PRIVATELABELING.PREVIEW.SECONDARYBUTTON' | translate}}</button>
+        <button mat-stroked-button [style.color]="theme == Theme.DARK ? policy.primaryColorDark : policy.primaryColor">{{'POLICY.PRIVATELABELING.PREVIEW.SECONDARYBUTTON' | translate}}</button>
         <button *ngIf="theme == Theme.DARK" mat-raised-button [style.background]="policy.primaryColorDark" [style.color]="policy.primaryColorDark == '#ffffff' ? '#000000' : '#ffffff'">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON' | translate}}</button>
         <button *ngIf="theme == Theme.LIGHT" mat-raised-button [style.background]="policy.primaryColor" [style.color]="policy.primaryColor == '#ffffff' ? '#000000' : '#ffffff'">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON' | translate}}</button>
       </div>

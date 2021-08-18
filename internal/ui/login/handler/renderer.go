@@ -13,7 +13,6 @@ import (
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
@@ -149,7 +148,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"mfaPromptUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
-		"mfaPromptChangeUrl": func(id string, provider model.MFAType) string {
+		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, queryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
@@ -188,8 +187,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
-		"externalNotFoundOptionUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption)
+		"externalNotFoundOptionUrl": func(action string) string {
+			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption+"?"+action+"=true")
 		},
 		"selectedLanguage": func(l string) bool {
 			return false
@@ -292,6 +291,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
+	case *domain.ProjectRequiredStep:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

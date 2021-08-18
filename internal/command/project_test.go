@@ -2,6 +2,10 @@ package command
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,8 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddProject(t *testing.T) {
@@ -71,7 +73,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 							eventFromEventPusher(project.NewProjectAddedEvent(
 								context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project",
+								"project", true, true, true,
 							),
 							),
 							eventFromEventPusher(project.NewProjectMemberAddedEvent(
@@ -91,7 +93,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 				ownerID:       "user1",
@@ -118,7 +123,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 							eventFromEventPusher(project.NewProjectAddedEvent(
 								context.Background(),
 								&project.NewAggregate("project1", "globalorg").Aggregate,
-								"project",
+								"project", true, true, true,
 							),
 							),
 							eventFromEventPusher(project.NewProjectMemberAddedEvent(
@@ -138,7 +143,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "globalorg",
 				ownerID:       "user1",
@@ -149,7 +157,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 						ResourceOwner: "globalorg",
 						AggregateID:   "project1",
 					},
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 			},
 		},
@@ -171,7 +182,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 							eventFromEventPusher(project.NewProjectAddedEvent(
 								context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project",
+								"project", true, true, true,
 							),
 							),
 							eventFromEventPusher(project.NewProjectMemberAddedEvent(
@@ -191,7 +202,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 				ownerID:       "user1",
@@ -202,7 +216,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 						ResourceOwner: "org1",
 						AggregateID:   "project1",
 					},
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 			},
 		},
@@ -315,7 +332,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -348,7 +365,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 				),
@@ -359,7 +376,10 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name: "project",
+					Name:                 "project",
+					ProjectRoleAssertion: true,
+					ProjectRoleCheck:     true,
+					HasProjectCheck:      true,
 				},
 				resourceOwner: "org1",
 			},
@@ -376,7 +396,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 					expectPush(
@@ -387,8 +407,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 									"org1",
 									"project",
 									"project-new",
-									true,
-									true),
+									false,
+									false,
+									false),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
@@ -403,8 +424,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						AggregateID: "project1",
 					},
 					Name:                 "project-new",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 				resourceOwner: "org1",
 			},
@@ -415,8 +437,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					Name:                 "project-new",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 			},
 		},
@@ -429,7 +452,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 					expectPush(
@@ -440,8 +463,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 									"org1",
 									"project",
 									"",
-									true,
-									true),
+									false,
+									false,
+									false),
 							),
 						},
 					),
@@ -454,8 +478,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						AggregateID: "project1",
 					},
 					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 				resourceOwner: "org1",
 			},
@@ -466,8 +491,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
+					ProjectRoleAssertion: false,
+					ProjectRoleCheck:     false,
+					HasProjectCheck:      false,
 				},
 			},
 		},
@@ -568,7 +594,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -596,7 +622,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 						eventFromEventPusher(
 							project.NewProjectDeactivatedEvent(context.Background(),
@@ -623,7 +649,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 					expectPush(
@@ -744,7 +770,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -772,7 +798,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 				),
@@ -795,7 +821,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 						eventFromEventPusher(
 							project.NewProjectDeactivatedEvent(context.Background(),
@@ -920,7 +946,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -948,7 +974,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 					expectPush(
@@ -994,10 +1020,11 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 	}
 }
 
-func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck bool) *project.ProjectChangeEvent {
+func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck, hasProjectCheck bool) *project.ProjectChangeEvent {
 	changes := []project.ProjectChanges{
 		project.ChangeProjectRoleAssertion(roleAssertion),
 		project.ChangeProjectRoleCheck(roleCheck),
+		project.ChangeHasProjectCheck(hasProjectCheck),
 	}
 	if newName != "" {
 		changes = append(changes, project.ChangeName(newName))
