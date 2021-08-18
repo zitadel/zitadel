@@ -244,6 +244,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
@@ -411,6 +423,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
 								language.English,
 							),
@@ -596,6 +620,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
 								language.English,
 							),
@@ -791,6 +827,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
 								language.English,
 							),
@@ -1048,6 +1096,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							org.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
@@ -1079,6 +1139,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.InitCodeMessageType, language.English),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, language.English),
 							),
 							eventFromEventPusher(
 								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
@@ -1215,6 +1278,18 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
 								language.English,
 							),
@@ -1449,6 +1524,18 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
 								language.English,
 							),
