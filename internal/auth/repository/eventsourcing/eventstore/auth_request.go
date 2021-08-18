@@ -124,10 +124,9 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	request.Audience = appIDs
 	request.AppendAudIfNotExisting(app.ProjectID)
+	request.ApplicationResourceOwner = app.ResourceOwner
+	request.PrivateLabelingSetting = app.PrivateLabelingSetting
 	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
-		return nil, err
-	}
-	if err := setPrivateLabeling(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
 	if request.LoginHint != "" {
@@ -491,15 +490,8 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	if orgID == "" {
 		orgID = request.UserOrgID
 	}
-	privateLabelingOrgID := orgID
-	if privateLabelingOrgID == "" {
-		privateLabelingOrgID = request.RequestedPrivateLabelingOrgID
-	}
 	if orgID == "" {
 		orgID = repo.IAMID
-	}
-	if privateLabelingOrgID == "" {
-		privateLabelingOrgID = repo.IAMID
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -520,6 +512,15 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
+	privateLabelingOrgID := ""
+	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
+		privateLabelingOrgID = request.ApplicationResourceOwner
+	}
+	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy {
+		if request.UserOrgID != "" {
+			privateLabelingOrgID = request.UserOrgID
+		}
+	}
 	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
 		return err
@@ -926,15 +927,6 @@ func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) erro
 	request.RequestedOrgID = org.ID
 	request.RequestedOrgName = org.Name
 	request.RequestedPrimaryDomain = primaryDomain
-	return nil
-}
-
-func setPrivateLabeling(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
-	privateLabelingOrgID := request.GetScopeOrgPrivateLabeling()
-	if privateLabelingOrgID == "" {
-		return nil
-	}
-	request.RequestedPrivateLabelingOrgID = privateLabelingOrgID
 	return nil
 }
 

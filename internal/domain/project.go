@@ -28,8 +28,8 @@ type PrivateLabelingSetting int32
 
 const (
 	PrivateLabelingSettingUnspecified PrivateLabelingSetting = iota
-	PrivateLabelingSettingProjectResourceOwnerPolicy
-	PrivateLabelingSettingLoginUserResourceOwnerPolicy
+	PrivateLabelingSettingEnforceProjectResourceOwnerPolicy
+	PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy
 )
 
 func (o *Project) IsValid() bool {

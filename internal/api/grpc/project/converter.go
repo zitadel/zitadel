@@ -65,9 +65,9 @@ func projectStateToPb(state proj_model.ProjectState) proj_pb.ProjectState {
 
 func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) proj_pb.PrivateLabelingSetting {
 	switch setting {
-	case domain.PrivateLabelingSettingLoginUserResourceOwnerPolicy:
+	case domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy:
 		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_LOGIN_USER_RESOURCE_OWNER_POLICY
-	case domain.PrivateLabelingSettingProjectResourceOwnerPolicy:
+	case domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy:
 		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_PROJECT_RESOURCE_OWNER_POLICY
 	default:
 		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
