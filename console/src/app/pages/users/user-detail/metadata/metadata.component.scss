@@ -22,3 +22,18 @@
   font-size: 14px;
   color: var(--grey);
 }
+
+.ts {
+  font-size: 14px;
+  color: var(--grey);
+  margin-top: 0;
+}
+
+.refresh-btn {
+  float: left;
+  margin: .5rem 0 .5rem 1rem;
+
+  .icon {
+    font-size: 1.2rem;
+  }
+}

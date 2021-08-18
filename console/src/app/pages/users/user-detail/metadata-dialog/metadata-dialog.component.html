@@ -4,6 +4,11 @@
 <p class="desc">{{'USER.METADATA.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
   <mat-spinner *ngIf="loading" diameter="30"></mat-spinner>
+
+  <div class="controlrow">
+    <p *ngIf="ts" class="ts">{{ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
+    <button mat-icon-button (click)="load()"><mat-icon>refresh</mat-icon></button>
+  </div>
   <form *ngFor="let md of metadata; index as i" (ngSubmit)="saveElement(i)" >
     <div class="content">
       <cnsl-form-field appearance="outline" class="formfield">

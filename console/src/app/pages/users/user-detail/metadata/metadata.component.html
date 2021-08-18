@@ -1,10 +1,18 @@
 <div class="meta-details border-t">
   <div class="title-row">
   <span class="title">Metadata</span>
+  <span class="fill-space"></span>
+  <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
   <a class="edit" (click)="editMetadata()">{{'ACTIONS.EDIT' | translate}}</a>
+  <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-btn" (click)="loadMetadata()"
+      mat-icon-button aria-label="refresh contributors">
+      <mat-icon class="icon">refresh</mat-icon>
+  </button>
 </div>
 
 <ng-container *ngIf="metadata?.length; else emptyList">
+  <p *ngIf="ts" class="ts">{{ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
+
   <div class="metadata-set" *ngFor="let md of metadata">
       <span class="first">{{md.key}}</span>
       <span class="second">{{ md.value }}</span>
@@ -13,4 +21,5 @@
 
 <ng-template #emptyList>
   <p class="empty-desc">{{'USER.METADATA.EMPTY' | translate}}</p>
+  <p *ngIf="ts" class="ts">{{ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
 </ng-template>

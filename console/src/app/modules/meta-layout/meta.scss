@@ -8,8 +8,7 @@
     .title-row {
       display: flex;
       align-items: center;
-      margin: 1rem 0;
-      justify-content: space-between;
+      margin: .5rem 0;
 
       .title {
         font-size: 14px;
@@ -20,6 +19,10 @@
 
       .edit {
         font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
       }
     }
 

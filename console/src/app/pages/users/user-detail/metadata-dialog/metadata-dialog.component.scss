@@ -18,6 +18,18 @@
   }
 }
 
+.controlrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 400px;
+
+  .ts {
+    font-size: 14px;
+    color: var(--grey);
+  }
+}
+
 .action {
   display: flex;
   justify-content: flex-end;

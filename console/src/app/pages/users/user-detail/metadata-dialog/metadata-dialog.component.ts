@@ -1,5 +1,6 @@
 import { Component, Inject, Injector, Type } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -16,6 +17,8 @@ export class MetadataDialogComponent {
   public injData: any = {};
   private service!: GrpcAuthService | ManagementService;
   public loading: boolean = true;
+  public ts!: Timestamp.AsObject | undefined;
+
   constructor(
     private injector: Injector,
     private toast: ToastService,
@@ -32,7 +35,11 @@ export class MetadataDialogComponent {
         break;
     }
 
-    this.loadMetadata(data.userId).then(() => {
+    this.load();
+  }
+
+  public load(): void {
+    this.loadMetadata().then(() => {
       this.loading = false;
       if (this.metadata.length === 0) {
         this.addEntry();
@@ -46,14 +53,17 @@ export class MetadataDialogComponent {
     });
   }
 
-  public loadMetadata(userId?: string): Promise<any> {
-    if (this.data.serviceType === 'MGMT' && userId) {
-      return (this.service as ManagementService).listUserMetadata(userId).then(resp => {
+  public loadMetadata(): Promise<any> {
+    this.loading = true;
+    if (this.data.serviceType === 'MGMT' && this.injData.userId) {
+      return (this.service as ManagementService).listUserMetadata(this.injData.userId).then(resp => {
         this.metadata = resp.resultList;
+        this.ts = resp.details?.viewTimestamp;
       });
     } else {
       return (this.service as GrpcAuthService).listMyMetadata().then(resp => {
         this.metadata = resp.resultList;
+        this.ts = resp.details?.viewTimestamp;
       });
     }
   }
