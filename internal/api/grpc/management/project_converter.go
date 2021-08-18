@@ -36,9 +36,9 @@ func ProjectUpdateToDomain(req *mgmt_pb.UpdateProjectRequest) *domain.Project {
 
 func privateLabelingSettingToDomain(setting proj_pb.PrivateLabelingSetting) domain.PrivateLabelingSetting {
 	switch setting {
-	case proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_LOGIN_USER_RESOURCE_OWNER_POLICY:
+	case proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY:
 		return domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy
-	case proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_PROJECT_RESOURCE_OWNER_POLICY:
+	case proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY:
 		return domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy
 	default:
 		return domain.PrivateLabelingSettingUnspecified

@@ -240,9 +240,10 @@ func (a *ApplicationView) setCompliance() {
 
 func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	changes := struct {
-		ProjectRoleAssertion *bool `json:"projectRoleAssertion,omitempty"`
-		ProjectRoleCheck     *bool `json:"projectRoleCheck,omitempty"`
-		HasProjectCheck      *bool `json:"hasProjectCheck,omitempty"`
+		ProjectRoleAssertion   *bool                          `json:"projectRoleAssertion,omitempty"`
+		ProjectRoleCheck       *bool                          `json:"projectRoleCheck,omitempty"`
+		HasProjectCheck        *bool                          `json:"hasProjectCheck,omitempty"`
+		PrivateLabelingSetting *domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
 	}{}
 	if err := json.Unmarshal(event.Data, &changes); err != nil {
 		logging.Log("EVEN-DFbfg").WithError(err).Error("could not unmarshal event data")
@@ -256,6 +257,9 @@ func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	}
 	if changes.HasProjectCheck != nil {
 		a.HasProjectCheck = *changes.HasProjectCheck
+	}
+	if changes.PrivateLabelingSetting != nil {
+		a.PrivateLabelingSetting = *changes.PrivateLabelingSetting
 	}
 	return nil
 }

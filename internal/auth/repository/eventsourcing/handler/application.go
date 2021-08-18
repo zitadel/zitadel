@@ -84,6 +84,7 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 		app.ProjectRoleCheck = project.ProjectRoleCheck
 		app.HasProjectCheck = project.HasProjectCheck
 		app.ProjectRoleAssertion = project.ProjectRoleAssertion
+		app.PrivateLabelingSetting = project.PrivateLabelingSetting
 
 		err = app.AppendEvent(event)
 	case es_model.ApplicationChanged,
