@@ -76,7 +76,7 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		CustomDomain:             req.CustomDomain,
 		PrivacyPolicy:            req.PrivacyPolicy,
 		MetadataUser:             req.MetadataUser,
-		CustomTextLogin:          req.CustomTextLogin,
+		CustomTextLogin:          req.CustomTextLogin || req.CustomText,
 		CustomTextMessage:        req.CustomTextMessage,
 	}
 }
