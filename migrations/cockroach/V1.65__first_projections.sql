@@ -1,4 +1,4 @@
-CREATE TABLE projections.orgs (
+CREATE TABLE zitadel.projections.orgs (
      id TEXT,
      creation_date TIMESTAMPTZ,
      change_date TIMESTAMPTZ,
