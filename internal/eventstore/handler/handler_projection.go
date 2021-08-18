@@ -70,6 +70,8 @@ func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 		}
 		logging.LogWithFields("HANDL-mC9Xx", "projection", h.ProjectionName).Info("starting handler without requeue")
 		return h
+	} else if config.RequeueEvery < 500*time.Millisecond {
+		logging.LogWithFields("HANDL-IEFsG", "projection", h.ProjectionName).Fatal("requeue every must be greater 500ms or <= 0")
 	}
 	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Info("starting handler")
 	return h
