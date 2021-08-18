@@ -133,10 +133,8 @@ Required request Parameters
 curl --request POST \
   --url https://api.zitadel.ch/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data grant_type=authorization_code \
-  --data code=DKLvnksjndjsflkdjlkfgjslow... \
-  --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
-  --data client_assertion=eyJhbGciOiJSUzI1Ni...
+  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
+  --data assertion=eyJhbGciOiJSUzI1Ni...
 ```
 
 ### Refresh Token Grant
