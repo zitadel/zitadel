@@ -76,6 +76,7 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		CustomDomain:             req.CustomDomain,
 		CustomText:               req.CustomText,
 		PrivacyPolicy:            req.PrivacyPolicy,
+		MetadataUser:             req.MetadataUser,
 	}
 }
 
@@ -98,5 +99,6 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		CustomDomain:             req.CustomDomain,
 		CustomText:               req.CustomText,
 		PrivacyPolicy:            req.PrivacyPolicy,
+		MetadataUser:             req.MetadataUser,
 	}
 }

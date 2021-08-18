@@ -615,24 +615,24 @@ it impacts all organisations without a customised policy
     PUT: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
-Returns the password lockout policy defined by the administrators of ZITADEL
-
-
-
-    GET: /policies/password/lockout
+Returns the lockout policy defined by the administrators of ZITADEL
 
 
-### UpdatePasswordLockoutPolicy
 
-> **rpc** UpdatePasswordLockoutPolicy([UpdatePasswordLockoutPolicyRequest](#updatepasswordlockoutpolicyrequest))
-[UpdatePasswordLockoutPolicyResponse](#updatepasswordlockoutpolicyresponse)
+    GET: /policies/lockout
 
-Updates the default password lockout policy of ZITADEL
+
+### UpdateLockoutPolicy
+
+> **rpc** UpdateLockoutPolicy([UpdateLockoutPolicyRequest](#updatelockoutpolicyrequest))
+[UpdateLockoutPolicyResponse](#updatelockoutpolicyresponse)
+
+Updates the default lockout policy of ZITADEL
 it impacts all organisations without a customised policy
 
 
@@ -1681,6 +1681,23 @@ This is an empty request
 
 
 
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 This is an empty request
 
@@ -1789,23 +1806,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-
-
-
-
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
@@ -2437,6 +2437,7 @@ This is an empty request
 | passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
 | passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -2503,6 +2504,7 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
 
 
 
@@ -2688,6 +2690,7 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
 
 
 
@@ -2924,6 +2927,28 @@ This is an empty request
 
 
 
+### UpdateLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | failed attempts until a user gets locked |  |
+
+
+
+
+### UpdateLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateLoginPolicyRequest
 
 
@@ -3012,29 +3037,6 @@ This is an empty request
 
 
 ### UpdatePasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdatePasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | failed attempts until a user gets locked |  |
-| show_lockout_failure |  bool | If an error should be displayed during a lockout or not |  |
-
-
-
-
-### UpdatePasswordLockoutPolicyResponse
 
 
 

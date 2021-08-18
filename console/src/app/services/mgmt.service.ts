@@ -17,14 +17,14 @@ import {
   AddAppKeyResponse,
   AddCustomLabelPolicyRequest,
   AddCustomLabelPolicyResponse,
+  AddCustomLockoutPolicyRequest,
+  AddCustomLockoutPolicyResponse,
   AddCustomLoginPolicyRequest,
   AddCustomLoginPolicyResponse,
   AddCustomPasswordAgePolicyRequest,
   AddCustomPasswordAgePolicyResponse,
   AddCustomPasswordComplexityPolicyRequest,
   AddCustomPasswordComplexityPolicyResponse,
-  AddCustomPasswordLockoutPolicyRequest,
-  AddCustomPasswordLockoutPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
   AddHumanUserRequest,
@@ -122,6 +122,8 @@ import {
   GetIAMResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
+  GetLockoutPolicyRequest,
+  GetLockoutPolicyResponse,
   GetLoginPolicyRequest,
   GetLoginPolicyResponse,
   GetMyOrgRequest,
@@ -138,8 +140,6 @@ import {
   GetPasswordAgePolicyResponse,
   GetPasswordComplexityPolicyRequest,
   GetPasswordComplexityPolicyResponse,
-  GetPasswordLockoutPolicyRequest,
-  GetPasswordLockoutPolicyResponse,
   GetPreviewLabelPolicyRequest,
   GetPreviewLabelPolicyResponse,
   GetPrivacyPolicyRequest,
@@ -298,17 +298,19 @@ import {
   ResetCustomVerifyPhoneMessageTextToDefaultResponse,
   ResetLabelPolicyToDefaultRequest,
   ResetLabelPolicyToDefaultResponse,
+  ResetLockoutPolicyToDefaultRequest,
+  ResetLockoutPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
   ResetLoginPolicyToDefaultResponse,
   ResetPasswordAgePolicyToDefaultRequest,
   ResetPasswordAgePolicyToDefaultResponse,
   ResetPasswordComplexityPolicyToDefaultRequest,
   ResetPasswordComplexityPolicyToDefaultResponse,
-  ResetPasswordLockoutPolicyToDefaultRequest,
-  ResetPasswordLockoutPolicyToDefaultResponse,
   ResetPrivacyPolicyToDefaultRequest,
   ResetPrivacyPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
+  SendPasswordlessRegistrationRequest,
+  SendPasswordlessRegistrationResponse,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomDomainClaimedMessageTextResponse,
   SetCustomInitMessageTextRequest,
@@ -324,20 +326,22 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  UnlockUserRequest,
+  UnlockUserResponse,
   UpdateAPIAppConfigRequest,
   UpdateAPIAppConfigResponse,
   UpdateAppRequest,
   UpdateAppResponse,
   UpdateCustomLabelPolicyRequest,
   UpdateCustomLabelPolicyResponse,
+  UpdateCustomLockoutPolicyRequest,
+  UpdateCustomLockoutPolicyResponse,
   UpdateCustomLoginPolicyRequest,
   UpdateCustomLoginPolicyResponse,
   UpdateCustomPasswordAgePolicyRequest,
   UpdateCustomPasswordAgePolicyResponse,
   UpdateCustomPasswordComplexityPolicyRequest,
   UpdateCustomPasswordComplexityPolicyResponse,
-  UpdateCustomPasswordLockoutPolicyRequest,
-  UpdateCustomPasswordLockoutPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
   UpdateHumanEmailRequest,
@@ -556,6 +560,11 @@ export class ManagementService {
     return this.grpcService.mgmt.listOrgIDPs(req, null).then(resp => resp.toObject());
   }
 
+  public unlockUser(req: UnlockUserRequest):
+    Promise<UnlockUserResponse.AsObject> {
+    return this.grpcService.mgmt.unlockUser(req, null).then(resp => resp.toObject());
+  }
+
   public getPrivacyPolicy():
     Promise<GetPrivacyPolicyResponse.AsObject> {
     const req = new GetPrivacyPolicyRequest();
@@ -589,6 +598,12 @@ export class ManagementService {
     req.setTokenId(tokenId);
     req.setUserId(userId);
     return this.grpcService.mgmt.removeHumanPasswordless(req, null).then(resp => resp.toObject());
+  }
+
+  public sendPasswordlessRegistration(userId: string): Promise<SendPasswordlessRegistrationResponse.AsObject> {
+    const req = new SendPasswordlessRegistrationRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.sendPasswordlessRegistration(req, null).then(resp => resp.toObject());
   }
 
   public listLoginPolicyMultiFactors(): Promise<ListLoginPolicyMultiFactorsResponse.AsObject> {
@@ -1105,36 +1120,31 @@ export class ManagementService {
     return this.grpcService.mgmt.updateCustomPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse.AsObject> {
-    const req = new GetPasswordLockoutPolicyRequest();
-
-    return this.grpcService.mgmt.getPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+  public getLockoutPolicy(): Promise<GetLockoutPolicyResponse.AsObject> {
+    const req = new GetLockoutPolicyRequest();
+    return this.grpcService.mgmt.getLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public addCustomPasswordLockoutPolicy(
+  public addCustomLockoutPolicy(
     maxAttempts: number,
-    showLockoutFailures: boolean,
-  ): Promise<AddCustomPasswordLockoutPolicyResponse.AsObject> {
-    const req = new AddCustomPasswordLockoutPolicyRequest();
-    req.setMaxAttempts(maxAttempts);
-    req.setShowLockoutFailure(showLockoutFailures);
+  ): Promise<AddCustomLockoutPolicyResponse.AsObject> {
+    const req = new AddCustomLockoutPolicyRequest();
+    req.setMaxPasswordAttempts(maxAttempts);
 
-    return this.grpcService.mgmt.addCustomPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.addCustomLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public resetPasswordLockoutPolicyToDefault(): Promise<ResetPasswordLockoutPolicyToDefaultResponse.AsObject> {
-    const req = new ResetPasswordLockoutPolicyToDefaultRequest();
-    return this.grpcService.mgmt.resetPasswordLockoutPolicyToDefault(req, null).then(resp => resp.toObject());
+  public resetLockoutPolicyToDefault(): Promise<ResetLockoutPolicyToDefaultResponse.AsObject> {
+    const req = new ResetLockoutPolicyToDefaultRequest();
+    return this.grpcService.mgmt.resetLockoutPolicyToDefault(req, null).then(resp => resp.toObject());
   }
 
-  public updateCustomPasswordLockoutPolicy(
+  public updateCustomLockoutPolicy(
     maxAttempts: number,
-    showLockoutFailures: boolean,
-  ): Promise<UpdateCustomPasswordLockoutPolicyResponse.AsObject> {
-    const req = new UpdateCustomPasswordLockoutPolicyRequest();
-    req.setMaxAttempts(maxAttempts);
-    req.setShowLockoutFailure(showLockoutFailures);
-    return this.grpcService.mgmt.updateCustomPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+  ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
+    const req = new UpdateCustomLockoutPolicyRequest();
+    req.setMaxPasswordAttempts(maxAttempts);
+    return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
   public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {

@@ -45,6 +45,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UserDomainClaimedType, DomainClaimedEventMapper).
 		RegisterFilterEventMapper(UserDomainClaimedSentType, DomainClaimedSentEventMapper).
 		RegisterFilterEventMapper(UserUserNameChangedType, UsernameChangedEventMapper).
+		RegisterFilterEventMapper(MetadataSetType, MetadataSetEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedType, MetadataRemovedEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper).
 		RegisterFilterEventMapper(HumanAddedType, HumanAddedEventMapper).
 		RegisterFilterEventMapper(HumanRegisteredType, HumanRegisteredEventMapper).
 		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedEventMapper).

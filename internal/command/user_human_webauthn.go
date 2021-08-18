@@ -497,7 +497,7 @@ func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, res
 }
 
 func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
-	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
+	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, false)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, codeEvent)
 	if err != nil {
 		return nil, err

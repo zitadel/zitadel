@@ -37,6 +37,7 @@ type FeaturesSetEvent struct {
 	CustomDomain             *bool                 `json:"customDomain,omitempty"`
 	CustomText               *bool                 `json:"customText,omitempty"`
 	PrivacyPolicy            *bool                 `json:"privacyPolicy,omitempty"`
+	MetadataUser             *bool                 `json:"metadataUser,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -167,6 +168,11 @@ func ChangePrivacyPolicy(privacyPolicy bool) func(event *FeaturesSetEvent) {
 	}
 }
 
+func ChangeMetadataUser(metadataUser bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.MetadataUser = &metadataUser
+	}
+}
 func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

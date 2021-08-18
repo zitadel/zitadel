@@ -174,7 +174,9 @@
       "REACTIVATE": "Reaktivieren",
       "DEACTIVATE": "Deaktivieren",
       "FILTER": "Filter",
-      "DELETE": "Benutzer löschen"
+      "DELETE": "Benutzer löschen",
+      "UNLOCK": "Benutzer entsperren",
+      "LOCKEDDESCRIPTION":"Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
@@ -201,6 +203,7 @@
       "EMPTY": "Keine Einträge"
     },
     "PASSWORDLESS": {
+      "SEND":"Registrierungslink senden",
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
@@ -227,7 +230,17 @@
       },
       "DIALOG": {
         "DELETE_TITLE": "Passwordless entfernen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?"
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
+        "ADD_TITLE":"Passwortlose Authentifizierung",
+        "ADD_DESCRIPTION":"Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwordlosen Authentifizierungsmethode.",
+        "SEND_DESCRIPTION":"Senden Sie sich einen Registrierungslink an Ihre email adresse.",
+        "SEND":"Registrierungslink senden",
+        "SENT":"Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup forzufahren.",
+        "QRCODE_DESCRIPTION":"QR-Code zum scannen mit einem anderen Gerät generieren.",
+        "QRCODE":"QR-Code generieren",
+        "QRCODE_SCAN":"Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät forzufahren.",
+        "NEW_DESCRIPTION":"Verwenden Sie dieses Gerät um Passwordless aufzusetzen.",
+        "NEW":"Hinzufügen"
       }
     },
     "MFA": {
@@ -421,7 +434,8 @@
     "STATE": {
       "0": "Unbekannt",
       "1": "Aktiv",
-      "2": "Abgelaufen"
+      "2": "Abgelaufen",
+      "4": "Gesperrt"
     },
     "SEARCH": {
       "FOUND": "Gefunden"
@@ -460,7 +474,9 @@
       "SELECTEDKEYSDELETED": "Selektierte Schlüssel gelöscht.",
       "KEYADDED": "Schlüssel hinzugefügt!",
       "MACHINEADDED": "Service User erstellt!",
-      "DELETED": "Benutzer erfolgreich gelöscht!"
+      "DELETED": "Benutzer erfolgreich gelöscht!",
+      "UNLOCKED":"Benutzer erfolgreich freigeschaltet!",
+      "PASSWORDLESSREGISTRATIONSENT":"Link via email versendet."
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
@@ -688,7 +704,7 @@
     },
     "PWD_LOCKOUT": {
       "TITLE": "Passwortsperre",
-      "DESCRIPTION": "Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+      "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
     "IAM_POLICY": {
       "TITLE": "Zugangseinstellungen IAM",

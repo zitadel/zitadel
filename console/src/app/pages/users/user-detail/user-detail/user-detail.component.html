@@ -14,6 +14,11 @@
             <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
+              <button class="unlock-button" mat-stroked-button color="warn"
+                  *ngIf="user?.state === UserState.USER_STATE_LOCKED"
+                  (click)="unlockUser()">{{'USER.PAGES.UNLOCK' |
+                  translate}}</button>
+         
                 <button class="state-button" mat-stroked-button color="warn"
                     *ngIf="user?.state !== UserState.USER_STATE_INACTIVE"
                     (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
@@ -26,6 +31,7 @@
 
         <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
+        <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" type="WARN">{{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
         <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
@@ -49,6 +55,25 @@
                 </app-detail-form>
             </app-card>
 
+            <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+            description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
+              <button card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+                  <mat-icon>refresh</mat-icon>
+              </button>
+              <app-contact disablePhoneCode="true"
+                  [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
+                  [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
+                  (resendEmailVerification)="resendEmailVerification()"
+                  (resendPhoneVerification)="resendPhoneVerification()">
+                  <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+                      mat-stroked-button color="primary" *ngIf="user.state === UserState.USER_STATE_INITIAL">{{
+                      'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                  <button emailAction class="resendemail" *ngIf="user.state == UserState.USER_STATE_INITIAL"
+                      mat-stroked-button color="primary" (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' |
+                      translate}}</button>
+              </app-contact>
+            </app-card>
+
             <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
                 description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
                 <app-external-idps [userId]="user.id" [service]="mgmtUserService"></app-external-idps>
@@ -65,25 +90,6 @@
                 <app-machine-keys [userId]="user.id"></app-machine-keys>
             </app-card>
         </ng-template>
-
-        <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
-            description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-            <button card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
-                <mat-icon>refresh</mat-icon>
-            </button>
-            <app-contact disablePhoneCode="true"
-                [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
-                [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
-                (resendEmailVerification)="resendEmailVerification()"
-                (resendPhoneVerification)="resendPhoneVerification()">
-                <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
-                    mat-stroked-button color="primary" *ngIf="user.state === UserState.USER_STATE_INITIAL">{{
-                    'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-                <button emailAction class="resendemail" *ngIf="user.state == UserState.USER_STATE_INITIAL"
-                    mat-stroked-button color="primary" (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' |
-                    translate}}</button>
-            </app-contact>
-        </app-card>
 
         <app-passwordless *ngIf="user && user.human" [user]="user"></app-passwordless>
 

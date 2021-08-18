@@ -154,6 +154,7 @@ PasswordlessRegistrationDone:
   Title: Passwordless set up
   Description: Token for passwordless successfully added.
   NextButtonText: next
+  CancelButtonText: cancel
 
 PasswordChange:
   Title: Change Password
@@ -220,6 +221,27 @@ RegistrationUser:
   BackButtonText: back
   NextButtonText: next
 
+ExternalRegistrationUserOverview:
+  Title: External User Registration
+  Description: We have taken your user details from the selected provider. You can now change or complete them.
+  EmailLabel: E-Mail
+  UsernameLabel: Username
+  FirstnameLabel: Firstname
+  LastnameLabel: Lastname
+  NicknameLabel: Nickname
+  PhoneLabel: Phonenumber
+  LanguageLabel: Language
+  German: Deutsch
+  English: English
+  TosAndPrivacyLabel: Terms and conditions
+  TosConfirm: I accept the
+  TosLinkText: TOS
+  TosConfirmAnd: and the
+  PrivacyLinkText: privacy policy
+  ExternalLogin: or register with an external user
+  BackButtonText: back
+  NextButtonText: save
+
 RegistrationOrg:
   Title: Organisation Registration
   Description: Enter your organisationname and userdata.
@@ -259,6 +281,11 @@ ExternalNotFoundOption:
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
   AutoRegisterButtonText: Auto register
+  TosAndPrivacyLabel: Terms and conditions
+  TosConfirm: I accept the
+  TosLinkText: TOS
+  TosConfirmAnd: and the
+  PrivacyLinkText: privacy policy
 
 Footer:
   PoweredBy: Powered By
@@ -287,6 +314,7 @@ Errors:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
       Invalid: Password is invalid
+      InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short
@@ -303,6 +331,8 @@ Errors:
       GeneratorAlgNotSupported: Unsupported generator algorithm
     EmailVerify:
       UserIDEmpty: UserID is empty
+    ExternalData:
+      CouldNotRead: External data could not be read correctly
     MFA:
       NoProviders: No available multifactor providers
       OTP:
@@ -311,12 +341,19 @@ Errors:
         InvalidCode: Invalid code
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
     Locked: User is locked
+    SomethingWentWrong: Something went wrong
     NotActive: User is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
       NotAllowed: External Login Provider not allowed
+      IDPConfigIDEmpty: Identity Provider ID is empty
+      ExternalUserIDEmpty: External User ID is empty
+      UserDisplayNameEmpty: User Display Name is empty
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy not existing
 
 optional: (optional)

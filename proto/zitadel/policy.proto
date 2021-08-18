@@ -202,17 +202,12 @@ message PasswordAgePolicy {
     ];
 }
 
-message PasswordLockoutPolicy {
+message LockoutPolicy {
     zitadel.v1.ObjectDetails details = 1;
-    uint64 max_attempts = 2 [
+    uint64 max_password_attempts = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
             example: "\"10\""
-        }
-    ];
-    bool show_lockout_failure = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enables if the failure should be shown to de user, sometimes for security issues the user should not get to much information"
         }
     ];
     bool is_default = 4 [

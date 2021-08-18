@@ -174,7 +174,9 @@
       "REACTIVATE": "Reactivate",
       "DEACTIVATE": "Deactivate",
       "FILTER": "Filter",
-      "DELETE": "Delete User"
+      "DELETE": "Delete User",
+      "UNLOCK": "Unlock User",
+      "LOCKEDDESCRIPTION":"This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
@@ -201,6 +203,7 @@
       "EMPTY": "No entries"
     },
     "PASSWORDLESS": {
+      "SEND":"Send registration link",
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
       "NAME": "Name",
@@ -227,7 +230,17 @@
       },
       "DIALOG": {
         "DELETE_TITLE": "Remove Passwordless Authentication Method",
-        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?"
+        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?",
+        "ADD_TITLE":"Passwordless Authentication",
+        "ADD_DESCRIPTION":"Select one of the available options for creating a passwordless authentication method.",
+        "SEND_DESCRIPTION":"Send yourself a registration link to your email address.",
+        "SEND":"Send registration link",
+        "SENT":"The email was successfully delivered. Check your mailbox to continue with the setup.",
+        "QRCODE_DESCRIPTION":"Generate QR code for scanning with another device.",
+        "QRCODE":"Generate QR code",
+        "QRCODE_SCAN":"Scan this QR code to continue with the setup on your device.",
+        "NEW_DESCRIPTION":"Use this device to set up Passwordless.",
+        "NEW":"Add New"
       }
     },
     "MFA": {
@@ -421,7 +434,8 @@
     "STATE": {
       "0": "Unknown",
       "1": "Active",
-      "2": "Expired"
+      "2": "Expired",
+      "4": "Locked"
     },
     "SEARCH": {
       "FOUND": "Found"
@@ -460,7 +474,9 @@
       "SELECTEDKEYSDELETED": "Selected keys deleted.",
       "KEYADDED": "Key added!",
       "MACHINEADDED": "Service User created!",
-      "DELETED": "User deleted successfully!"
+      "DELETED": "User deleted successfully!",
+      "UNLOCKED":"User unlocked successfully!",
+      "PASSWORDLESSREGISTRATIONSENT":"Registration Link sent successfully."
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
@@ -687,8 +703,8 @@
       "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
     },
     "PWD_LOCKOUT": {
-      "TITLE": "Password Lockout",
-      "DESCRIPTION": "Password retries are infinite in default mode. You have to apply this policy if you want to show the number of retries, or set a maximum number of retries after which the account will be blocked."
+      "TITLE": "Lockout Policy",
+      "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
     },
     "IAM_POLICY": {
       "TITLE": "IAM Access Preferences",
@@ -799,7 +815,7 @@
       "HASLOWERCASE": "has lowercase",
       "HASUPPERCASE": "has uppercase",
       "SHOWLOCKOUTFAILURES": "show lockout failures",
-      "MAXATTEMPTS": "Max Attempts",
+      "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",

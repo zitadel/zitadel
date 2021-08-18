@@ -153,3 +153,12 @@ func writeModelToPasswordlessInitCode(initCodeModel *HumanPasswordlessInitCodeWr
 		State:      initCodeModel.State,
 	}
 }
+
+func writeModelToUserMetadata(wm *UserMetadataWriteModel) *domain.Metadata {
+	return &domain.Metadata{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Key:        wm.Key,
+		Value:      wm.Value,
+		State:      wm.State,
+	}
+}

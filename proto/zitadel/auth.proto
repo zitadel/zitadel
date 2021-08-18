@@ -7,6 +7,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/policy.proto";
 import "zitadel/idp.proto";
+import "zitadel/metadata.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
@@ -76,6 +77,7 @@ service AuthService {
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/me/changes/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -87,6 +89,77 @@ service AuthService {
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
             post: "/users/me/sessions/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Sets a user metadata by key to the authorized user
+    rpc SetMyMetadata(SetMyMetadataRequest) returns (SetMyMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/{key}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Set a list of user metadata to the authorized user
+    rpc BulkSetMyMetadata(BulkSetMyMetadataRequest) returns (BulkSetMyMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user metadata of the authorized user
+    rpc ListMyMetadata(ListMyMetadataRequest) returns (ListMyMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user metadata by key of the authorized user
+    rpc GetMyMetadata(GetMyMetadataRequest) returns (GetMyMetadataResponse) {
+        option (google.api.http) = {
+            get: "/users/me/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Removes a user metadata by key to the authorized user
+    rpc RemoveMyMetadata(RemoveMyMetadataRequest) returns (RemoveMyMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Set a list of user metadata to the authorized user
+    rpc BulkRemoveMyMetadata(BulkRemoveMyMetadataRequest) returns (BulkRemoveMyMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/metadata/_bulk"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -98,6 +171,7 @@ service AuthService {
     rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -120,6 +194,7 @@ service AuthService {
     rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_revoke_all"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -534,6 +609,19 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    // Show all the permissions my user has in ZITADEL (ZITADEL Manager)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse) {
+        option (google.api.http) = {
+            post: "/memberships/me/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //This is an empty request
@@ -577,6 +665,61 @@ message ListMyUserSessionsRequest {}
 
 message ListMyUserSessionsResponse {
     repeated zitadel.user.v1.Session result = 1;
+}
+
+message ListMyMetadataRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 2;
+}
+
+message ListMyMetadataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.Metadata result = 2;
+}
+
+message GetMyMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetMyMetadataResponse {
+    zitadel.metadata.v1.Metadata metadata = 1;
+}
+
+message SetMyMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkSetMyMetadataRequest {
+    message Metadata {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    }
+    repeated Metadata metadata = 1;
+}
+
+message BulkSetMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveMyMetadataRequest {
+    repeated string keys = 1 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message BulkRemoveMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request
@@ -895,4 +1038,16 @@ message ListMyProjectPermissionsRequest {}
 
 message ListMyProjectPermissionsResponse {
     repeated string result = 1;
+}
+
+message ListMyMembershipsRequest {
+    //the field the result is sorted
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.user.v1.MembershipQuery queries = 2;
+}
+
+message ListMyMembershipsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.Membership result = 2;
 }

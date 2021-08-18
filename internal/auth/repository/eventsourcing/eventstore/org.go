@@ -6,16 +6,18 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	eventstore "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-
-	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -25,6 +27,7 @@ const (
 type OrgRepository struct {
 	SearchLimit uint64
 
+	Eventstore     eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 }
@@ -129,9 +132,32 @@ func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*d
 }
 
 func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
-	policy, err := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+	policy, viewErr := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
 	}
-	return iam_view_model.PrivacyViewToModel(policy), nil
+	if errors.IsNotFound(viewErr) {
+		policy = new(iam_view_model.PrivacyPolicyView)
+	}
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-LPJMp", "Errors.IAM.PrivacyPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-1l7bf").WithError(esErr).Debug("error retrieving new events")
+		return iam_view_model.PrivacyViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_view_model.PrivacyViewToModel(policy), nil
+		}
+	}
+	result := iam_view_model.PrivacyViewToModel(policy)
+	result.Default = true
+	return result, nil
+}
+
+func (p *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
+	return p.Eventstore.FilterEvents(ctx, models.NewSearchQuery().AggregateIDFilter(p.SystemDefaults.IamID).AggregateTypeFilter(iam.AggregateType))
 }

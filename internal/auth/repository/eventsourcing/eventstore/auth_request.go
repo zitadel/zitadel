@@ -4,25 +4,24 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
-	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -34,15 +33,17 @@ type AuthRequestRepo struct {
 	Command      *command.Commands
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
+	Eventstore   v1.Eventstore
 
-	UserSessionViewProvider userSessionViewProvider
-	UserViewProvider        userViewProvider
-	UserCommandProvider     userCommandProvider
-	UserEventProvider       userEventProvider
-	OrgViewProvider         orgViewProvider
-	LoginPolicyViewProvider loginPolicyViewProvider
-	IDPProviderViewProvider idpProviderViewProvider
-	UserGrantProvider       userGrantProvider
+	UserSessionViewProvider   userSessionViewProvider
+	UserViewProvider          userViewProvider
+	UserCommandProvider       userCommandProvider
+	UserEventProvider         userEventProvider
+	OrgViewProvider           orgViewProvider
+	LoginPolicyViewProvider   loginPolicyViewProvider
+	LockoutPolicyViewProvider lockoutPolicyViewProvider
+	IDPProviderViewProvider   idpProviderViewProvider
+	UserGrantProvider         userGrantProvider
 
 	IdGenerator id.Generator
 
@@ -67,6 +68,10 @@ type userViewProvider interface {
 
 type loginPolicyViewProvider interface {
 	LoginPolicyByAggregateID(string) (*iam_view_model.LoginPolicyView, error)
+}
+
+type lockoutPolicyViewProvider interface {
+	LockoutPolicyByAggregateID(string) (*iam_view_model.LockoutPolicyView, error)
 }
 
 type idpProviderViewProvider interface {
@@ -228,6 +233,21 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+
+	err = repo.setLinkingUser(ctx, request, externalUser)
+	if err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	request.LinkingUsers = append(request.LinkingUsers, externalUser)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
@@ -240,7 +260,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID)
 	if err != nil {
 		return err
 	}
@@ -262,7 +282,11 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, res
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info))
+	policy, err := repo.getLockoutPolicy(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), policy)
 }
 
 func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -318,7 +342,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context,
 func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode, credentialData)
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData)
 	return err
 }
 
@@ -414,6 +438,10 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	if err != nil {
+		return nil, err
+	}
 	return request, nil
 }
 
@@ -466,6 +494,11 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
+	lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	request.LockoutPolicy = lockoutPolicy
 	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
 	if err != nil {
 		return err
@@ -587,7 +620,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 		return steps, nil
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -664,7 +697,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 			LoginName:         session.LoginName,
 			ResourceOwner:     session.ResourceOwner,
 			AvatarKey:         session.AvatarKey,
-			UserSessionState:  auth_req_model.UserSessionStateToDomain(session.State),
+			UserSessionState:  model.UserSessionStateToDomain(session.State),
 			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 		}
 	}
@@ -709,7 +742,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
-	promptRequired := (auth_req_model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
+	promptRequired := (model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
@@ -733,14 +766,14 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		fallthrough
 	case domain.MFALevelSecondFactor:
 		if checkVerificationTimeMaxAge(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime, request) {
-			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.SecondFactorVerificationType))
+			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.SecondFactorVerificationType))
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
 	case domain.MFALevelMultiFactor:
 		if checkVerificationTimeMaxAge(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime, request) {
-			request.MFAsVerified = append(request.MFAsVerified, auth_req_model.MFATypeToDomain(userSession.MultiFactorVerificationType))
+			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.MultiFactorVerificationType))
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
 		}
@@ -762,13 +795,43 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LoginPolicyViewToModel(policy), err
+	return iam_view_model.LoginPolicyViewToModel(policy), err
 }
 
 func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
 	policy, err := repo.View.PrivacyPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.PrivacyPolicyByAggregateID(repo.IAMID)
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
+		if err == nil {
+			return policy.ToDomain(), nil
+		}
+		policy = &iam_view_model.PrivacyPolicyView{}
+		events, err := repo.Eventstore.FilterEvents(ctx, es_models.NewSearchQuery().
+			AggregateIDFilter(repo.IAMID).
+			AggregateTypeFilter(iam.AggregateType).
+			EventTypesFilter(es_models.EventType(iam.PrivacyPolicyAddedEventType), es_models.EventType(iam.PrivacyPolicyChangedEventType)))
+		if err != nil || len(events) == 0 {
+			return nil, errors.ThrowNotFound(err, "EVENT-GSRqg", "IAM.PrivacyPolicy.NotExisting")
+		}
+		policy.Default = true
+		for _, event := range events {
+			policy.AppendEvent(event)
+		}
+		return policy.ToDomain(), nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return policy.ToDomain(), err
+}
+
+func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*domain.LockoutPolicy, error) {
+	policy, err := repo.View.LockoutPolicyByAggregateID(orgID)
+	if errors.IsNotFound(err) {
+		policy, err = repo.View.LockoutPolicyByAggregateID(repo.IAMID)
 		if err != nil {
 			return nil, err
 		}
@@ -825,13 +888,13 @@ func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID s
 		if err != nil {
 			return nil, err
 		}
-		return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
+		return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 	}
 	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iam_model.IDPConfigStateActive)
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.IDPProviderViewsToModel(idpProviders), nil
+	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 }
 
 func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {
@@ -906,7 +969,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, userID string) (*user_model.UserView, error) {
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
+	// PLANNED: Check LockoutPolicy
 	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
 		return nil, err
@@ -915,7 +979,6 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if user.HumanView == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
 	}
-
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
 	}
