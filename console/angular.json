@@ -35,6 +35,8 @@
             ],
             "allowedCommonJsDependencies": [
                 "@angular/common/locales/de",
+                "src/app/proto/generated/zitadel/admin_pb",
+                "src/app/proto/generated/zitadel/management_pb",
                 "src/app/proto/generated/**",
                 "file-saver",
                 "qrcode"

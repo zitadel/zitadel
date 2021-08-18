@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+<app-detail-layout [maxWidth]="false" [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
     [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
@@ -27,7 +27,7 @@
 </cnsl-info-section>
 
     <div class="content" >
-      <cnsl-edit-text [chips]="chips" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+      <cnsl-edit-text [chips]="chips[currentType]" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text'] | hasFeature | async) == false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
         $event)"></cnsl-edit-text>
     </div>
 

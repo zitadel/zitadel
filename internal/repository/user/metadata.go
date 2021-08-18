@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	MetadataSetType     = userEventTypePrefix + metadata.SetEventType
-	MetadataRemovedType = userEventTypePrefix + metadata.RemovedEventType
+	MetadataSetType        = userEventTypePrefix + metadata.SetEventType
+	MetadataRemovedType    = userEventTypePrefix + metadata.RemovedEventType
+	MetadataRemovedAllType = userEventTypePrefix + metadata.RemovedAllEventType
 )
 
 type MetadataSetEvent struct {
@@ -60,4 +61,28 @@ func MetadataRemovedEventMapper(event *repository.Event) (eventstore.EventReader
 	}
 
 	return &MetadataRemovedEvent{RemovedEvent: *e.(*metadata.RemovedEvent)}, nil
+}
+
+type MetadataRemovedAllEvent struct {
+	metadata.RemovedAllEvent
+}
+
+func NewMetadataRemovedAllEvent(ctx context.Context, aggregate *eventstore.Aggregate) *MetadataRemovedAllEvent {
+	return &MetadataRemovedAllEvent{
+		RemovedAllEvent: *metadata.NewRemovedAllEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				MetadataRemovedAllType),
+		),
+	}
+}
+
+func MetadataRemovedAllEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := metadata.RemovedAllEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetadataRemovedAllEvent{RemovedAllEvent: *e.(*metadata.RemovedAllEvent)}, nil
 }

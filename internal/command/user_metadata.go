@@ -149,6 +149,24 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
+func (c *Commands) removeUserMetadataFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.EventPusher, error) {
+	existingUserMetadata, err := c.getUserMetadataByOrgListModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if len(existingUserMetadata.UserMetadata) == 0 {
+		return nil, nil
+	}
+	events := make([]eventstore.EventPusher, 0)
+	for key, value := range existingUserMetadata.UserMetadata {
+		if len(value) == 0 {
+			continue
+		}
+		events = append(events, user.NewMetadataRemovedAllEvent(ctx, &user.NewAggregate(key, resourceOwner).Aggregate))
+	}
+	return events, nil
+}
+
 func (c *Commands) removeUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadataKey string) (pusher eventstore.EventPusher, err error) {
 	pusher = user.NewMetadataRemovedEvent(
 		ctx,
@@ -169,6 +187,15 @@ func (c *Commands) getUserMetadataModelByID(ctx context.Context, userID, resourc
 
 func (c *Commands) getUserMetadataListModelByID(ctx context.Context, userID, resourceOwner string) (*UserMetadataListWriteModel, error) {
 	userMetadataWriteModel := NewUserMetadataListWriteModel(userID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return userMetadataWriteModel, nil
+}
+
+func (c *Commands) getUserMetadataByOrgListModelByID(ctx context.Context, resourceOwner string) (*UserMetadataByOrgListWriteModel, error) {
+	userMetadataWriteModel := NewUserMetadataByOrgListWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err

@@ -2504,6 +2504,7 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
 
 
 
@@ -2689,6 +2690,7 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
 
 
 

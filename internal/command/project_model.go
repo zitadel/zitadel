@@ -14,6 +14,7 @@ type ProjectWriteModel struct {
 	Name                 string
 	ProjectRoleAssertion bool
 	ProjectRoleCheck     bool
+	HasProjectCheck      bool
 	State                domain.ProjectState
 }
 
@@ -33,6 +34,7 @@ func (wm *ProjectWriteModel) Reduce() error {
 			wm.Name = e.Name
 			wm.ProjectRoleAssertion = e.ProjectRoleAssertion
 			wm.ProjectRoleCheck = e.ProjectRoleCheck
+			wm.HasProjectCheck = e.HasProjectCheck
 			wm.State = domain.ProjectStateActive
 		case *project.ProjectChangeEvent:
 			if e.Name != nil {
@@ -43,6 +45,9 @@ func (wm *ProjectWriteModel) Reduce() error {
 			}
 			if e.ProjectRoleCheck != nil {
 				wm.ProjectRoleCheck = *e.ProjectRoleCheck
+			}
+			if e.HasProjectCheck != nil {
+				wm.HasProjectCheck = *e.HasProjectCheck
 			}
 		case *project.ProjectDeactivatedEvent:
 			if wm.State == domain.ProjectStateRemoved {
@@ -80,7 +85,8 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	name string,
 	projectRoleAssertion,
-	projectRoleCheck bool,
+	projectRoleCheck,
+	hasProjectCheck bool,
 ) (*project.ProjectChangeEvent, bool, error) {
 	changes := make([]project.ProjectChanges, 0)
 	var err error
@@ -95,6 +101,9 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	}
 	if wm.ProjectRoleCheck != projectRoleCheck {
 		changes = append(changes, project.ChangeProjectRoleCheck(projectRoleCheck))
+	}
+	if wm.HasProjectCheck != hasProjectCheck {
+		changes = append(changes, project.ChangeHasProjectCheck(hasProjectCheck))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

@@ -11,6 +11,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
+import { InfoSectionModule } from '../../info-section/info-section.module';
 import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { PasswordComplexityPolicyRoutingModule } from './password-complexity-policy-routing.module';
 import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
@@ -31,6 +32,7 @@ import { PasswordComplexityPolicyComponent } from './password-complexity-policy.
     DetailLayoutModule,
     MatProgressSpinnerModule,
     PolicyGridModule,
+    InfoSectionModule,
   ],
 })
 export class PasswordComplexityPolicyModule { }

@@ -30,6 +30,7 @@ type FeaturesView struct {
 	CustomDomain             bool
 	CustomText               bool
 	PrivacyPolicy            bool
+	MetadataUser             bool
 }
 
 func (f *FeaturesView) FeatureList() []string {
@@ -69,6 +70,9 @@ func (f *FeaturesView) FeatureList() []string {
 	}
 	if f.PrivacyPolicy {
 		list = append(list, domain.FeaturePrivacyPolicy)
+	}
+	if f.MetadataUser {
+		list = append(list, domain.FeatureMetadataUser)
 	}
 	return list
 }
