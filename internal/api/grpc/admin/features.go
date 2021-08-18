@@ -100,7 +100,7 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		CustomDomain:             req.CustomDomain,
 		PrivacyPolicy:            req.PrivacyPolicy,
 		MetadataUser:             req.MetadataUser,
-		CustomTextLogin:          req.CustomTextLogin,
+		CustomTextLogin:          req.CustomTextLogin || req.CustomText,
 		CustomTextMessage:        req.CustomTextMessage,
 	}
 }
