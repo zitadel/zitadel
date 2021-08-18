@@ -13,7 +13,6 @@ import (
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
@@ -149,7 +148,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"mfaPromptUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
-		"mfaPromptChangeUrl": func(id string, provider model.MFAType) string {
+		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, queryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {

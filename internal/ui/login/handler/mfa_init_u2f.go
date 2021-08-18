@@ -2,11 +2,10 @@ package handler
 
 import (
 	"encoding/base64"
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 )
 
 const (
@@ -15,7 +14,7 @@ const (
 
 type u2fInitData struct {
 	webAuthNData
-	MFAType model.MFAType
+	MFAType domain.MFAType
 }
 
 func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
@@ -35,7 +34,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 			userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
-		MFAType: model.MFATypeU2F,
+		MFAType: domain.MFATypeU2F,
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplMFAU2FInit], data, nil)
 }
