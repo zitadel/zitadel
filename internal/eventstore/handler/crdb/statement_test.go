@@ -283,8 +283,8 @@ func TestNewUpdateStatement(t *testing.T) {
 	type args struct {
 		table      string
 		event      *testEvent
-		conditions []handler.Column
 		values     []handler.Column
+		conditions []handler.Condition
 	}
 	type want struct {
 		table            string
@@ -314,7 +314,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -344,7 +344,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					previousSequence: 0,
 				},
 				values: []handler.Column{},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -379,7 +379,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Column{},
+				conditions: []handler.Condition{},
 			},
 			want: want{
 				table:            "my_table",
@@ -409,7 +409,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -450,7 +450,7 @@ func TestNewDeleteStatement(t *testing.T) {
 	type args struct {
 		table      string
 		event      *testEvent
-		conditions []handler.Column
+		conditions []handler.Condition
 	}
 
 	type want struct {
@@ -475,7 +475,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -504,7 +504,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conditions: []handler.Column{},
+				conditions: []handler.Condition{},
 			},
 			want: want{
 				table:            "my_table",
@@ -528,7 +528,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					previousSequence: 0,
 					aggregateType:    "agg",
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: 1,
@@ -735,7 +735,7 @@ func Test_columnsToQuery(t *testing.T) {
 
 func Test_columnsToWhere(t *testing.T) {
 	type args struct {
-		cols        []handler.Column
+		conds       []handler.Condition
 		paramOffset int
 	}
 	type want struct {
@@ -758,7 +758,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "no offset",
 			args: args{
-				cols: []handler.Column{
+				conds: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -774,7 +774,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "multiple cols",
 			args: args{
-				cols: []handler.Column{
+				conds: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -794,7 +794,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "2 offset",
 			args: args{
-				cols: []handler.Column{
+				conds: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -810,7 +810,7 @@ func Test_columnsToWhere(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotWheres, gotValues := columnsToWhere(tt.args.cols, tt.args.paramOffset)
+			gotWheres, gotValues := conditionsToWhere(tt.args.conds, tt.args.paramOffset)
 			if !reflect.DeepEqual(gotWheres, tt.want.wheres) {
 				t.Errorf("columnsToWhere() gotWheres = %v, want %v", gotWheres, tt.want.wheres)
 			}

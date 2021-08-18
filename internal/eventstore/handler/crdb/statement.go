@@ -73,9 +73,9 @@ func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpdateStatement(event eventstore.EventReader, values, conditions []handler.Column, opts ...execOption) handler.Statement {
+func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, conditions []handler.Condition, opts ...execOption) handler.Statement {
 	cols, params, args := columnsToQuery(values)
-	wheres, whereArgs := columnsToWhere(conditions, len(params))
+	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
 
 	columnNames := strings.Join(cols, ", ")
@@ -106,8 +106,8 @@ func NewUpdateStatement(event eventstore.EventReader, values, conditions []handl
 	}
 }
 
-func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Column, opts ...execOption) handler.Statement {
-	wheres, args := columnsToWhere(conditions, 0)
+func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condition, opts ...execOption) handler.Statement {
+	wheres, args := conditionsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
 
@@ -152,7 +152,7 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	return names, parameters, values
 }
 
-func columnsToWhere(cols []handler.Column, paramOffset int) (wheres []string, values []interface{}) {
+func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {
 	wheres = make([]string, len(cols))
 	values = make([]interface{}, len(cols))
 

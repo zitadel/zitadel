@@ -171,8 +171,8 @@ func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReade
 			[]handler.Column{
 				handler.NewCol(userEmailCol, e.EmailAddress),
 			},
-			[]handler.Column{
-				handler.NewCol(userIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(userIDCol, e.Aggregate().ID),
 			},
 			crdb.WithTableSuffix(userTableSuffix),
 		),
@@ -208,8 +208,8 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 		crdb.NewUpdateStatement(
 			e,
 			values,
-			[]handler.Column{
-				handler.NewCol(userIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(userIDCol, e.Aggregate().ID),
 			},
 			crdb.WithTableSuffix(userTableSuffix),
 		),
@@ -255,8 +255,8 @@ func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 		crdb.NewUpdateStatement(
 			e,
 			values,
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
+			[]handler.Condition{
+				handler.NewCond(orgIDCol, e.Aggregate().ResourceOwner),
 			},
 			crdb.WithTableSuffix(orgTableSuffix),
 		),
@@ -274,16 +274,16 @@ func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]h
 		//delete org in org table
 		crdb.NewDeleteStatement(
 			e,
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
+			[]handler.Condition{
+				handler.NewCond(orgIDCol, e.Aggregate().ResourceOwner),
 			},
 			crdb.WithTableSuffix(orgTableSuffix),
 		),
 		// delete users of the org
 		crdb.NewDeleteStatement(
 			e,
-			[]handler.Column{
-				handler.NewCol(userOrgIDCol, e.Aggregate().ResourceOwner),
+			[]handler.Condition{
+				handler.NewCond(userOrgIDCol, e.Aggregate().ResourceOwner),
 			},
 			crdb.WithTableSuffix(userTableSuffix),
 		),
@@ -302,9 +302,9 @@ func isOrgOwner(roles []string) bool {
 func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) handler.Statement {
 	return crdb.NewDeleteStatement(
 		event,
-		[]handler.Column{
-			handler.NewCol(userOrgIDCol, orgID),
-			handler.NewCol(userIDCol, ownerID),
+		[]handler.Condition{
+			handler.NewCond(userOrgIDCol, orgID),
+			handler.NewCond(userIDCol, ownerID),
 		},
 		crdb.WithTableSuffix(userTableSuffix),
 	)

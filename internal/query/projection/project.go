@@ -99,8 +99,8 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 				handler.NewCol(projectNameCol, e.Name),
 				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			},
-			[]handler.Column{
-				handler.NewCol(projectIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(projectIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
@@ -116,8 +116,8 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReade
 				handler.NewCol(projectStateCol, projectInactive),
 				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			},
-			[]handler.Column{
-				handler.NewCol(projectIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(projectIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
@@ -133,8 +133,8 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReade
 				handler.NewCol(projectStateCol, projectActive),
 				handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			},
-			[]handler.Column{
-				handler.NewCol(projectIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(projectIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
@@ -146,8 +146,8 @@ func (p *ProjectProjection) reduceProjectRemoved(event eventstore.EventReader) (
 	return []handler.Statement{
 		crdb.NewDeleteStatement(
 			e,
-			[]handler.Column{
-				handler.NewCol(projectIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(projectIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil

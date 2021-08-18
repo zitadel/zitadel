@@ -103,10 +103,10 @@ func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) ([]handle
 	return []handler.Statement{
 		crdb.NewUpdateStatement(
 			e,
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ID),
-			},
 			values,
+			[]handler.Condition{
+				handler.NewCond(orgIDCol, e.Aggregate().ID),
+			},
 		),
 	}, nil
 }
@@ -125,8 +125,8 @@ func (p *OrgProjection) reduceOrgDeactivated(event eventstore.EventReader) ([]ha
 				handler.NewCol(orgSequenceCol, e.Sequence()),
 				handler.NewCol(orgStateCol, domain.OrgStateInactive),
 			},
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(orgIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
@@ -146,8 +146,8 @@ func (p *OrgProjection) reduceOrgReactivated(event eventstore.EventReader) ([]ha
 				handler.NewCol(orgSequenceCol, e.Sequence()),
 				handler.NewCol(orgStateCol, domain.OrgStateActive),
 			},
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(orgIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
@@ -167,8 +167,8 @@ func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.EventReader) ([]
 				handler.NewCol(orgSequenceCol, e.Sequence()),
 				handler.NewCol(orgDomainCol, e.Domain),
 			},
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ID),
+			[]handler.Condition{
+				handler.NewCond(orgIDCol, e.Aggregate().ID),
 			},
 		),
 	}, nil
