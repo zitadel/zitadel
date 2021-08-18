@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	key_model "github.com/caos/zitadel/internal/key/model"
 )
@@ -70,6 +70,11 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
 		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
+		newPrivacyPolicy(handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
+		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
+		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
+		newLockoutPolicy(handler{view, bulkLimit, configs.cycleDuration("LockoutPolicy"), errorCount, es}),
+		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
 }
 

@@ -58,6 +58,10 @@ func (u *UserGrant) ViewModel() string {
 	return userGrantTable
 }
 
+func (u *UserGrant) Subscription() *v1.Subscription {
+	return u.subscription
+}
+
 func (_ *UserGrant) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate, org_es_model.OrgAggregate}
 }

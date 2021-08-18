@@ -58,6 +58,10 @@ func (m *OrgMember) ViewModel() string {
 	return orgMemberTable
 }
 
+func (m *OrgMember) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *OrgMember) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, usr_es_model.UserAggregate}
 }

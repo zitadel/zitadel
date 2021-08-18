@@ -43,6 +43,10 @@ func (m *OrgIAMPolicy) ViewModel() string {
 	return orgIAMPolicyTable
 }
 
+func (m *OrgIAMPolicy) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *OrgIAMPolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

@@ -51,6 +51,10 @@ func (p *Features) ViewModel() string {
 	return featuresTable
 }
 
+func (p *Features) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (p *Features) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
 }

@@ -1,13 +1,18 @@
 package deployment
 
 import (
+	"fmt"
+	"testing"
+
+	"github.com/caos/zitadel/operator/common"
+
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
-	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"testing"
+
+	"github.com/caos/zitadel/operator/helpers"
 )
 
 func TestDeployment_GetContainer(t *testing.T) {
@@ -81,6 +86,14 @@ func TestDeployment_GetContainer(t *testing.T) {
 					Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
 				},
 			}},
+		{Name: "SENTRY_DSN",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "SENTRY_DSN",
+				},
+			},
+		},
 		{
 			Name: "CR_TEST_PASSWORD",
 			ValueFrom: &corev1.EnvVarSource{
@@ -108,7 +121,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 			RunAsNonRoot: helpers.PointerBool(true),
 		},
 		Name:            containerName,
-		Image:           zitadelImage + ":" + version,
+		Image:           fmt.Sprintf("ghcr.io/%s:%s", common.ZITADELImage, version),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},
@@ -164,6 +177,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 		users,
 		dbSecrets,
 		"start",
+		"",
 	)
 
 	assert.Equal(t, equals, container)

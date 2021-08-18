@@ -67,8 +67,10 @@ protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
   --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
+  --openapiv2_opt allow_delete_body=true \
   --authoption_out=${GRPC_PATH}/auth \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto
@@ -116,6 +118,10 @@ protoc \
   ${PROTO_PATH}/message.proto
 protoc \
   -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,metadata.md \
+  ${PROTO_PATH}/metadata.proto
+protoc \
+  -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,object.md \
   ${PROTO_PATH}/object.proto
 protoc \
@@ -134,9 +140,14 @@ protoc \
   -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,project.md \
   ${PROTO_PATH}/project.proto
+  protoc \
+  -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,text.md \
+  ${PROTO_PATH}/text.proto
 protoc \
   -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,user.md \
   ${PROTO_PATH}/user.proto
+
 
 echo "done generating grpc"

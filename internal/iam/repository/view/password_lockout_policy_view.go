@@ -9,24 +9,24 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func GetPasswordLockoutPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.PasswordLockoutPolicyView, error) {
-	policy := new(model.PasswordLockoutPolicyView)
-	aggregateIDQuery := &model.PasswordLockoutPolicySearchQuery{Key: iam_model.PasswordLockoutPolicySearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
+func GetLockoutPolicyByAggregateID(db *gorm.DB, table, aggregateID string) (*model.LockoutPolicyView, error) {
+	policy := new(model.LockoutPolicyView)
+	aggregateIDQuery := &model.LockoutPolicySearchQuery{Key: iam_model.LockoutPolicySearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-M9fsf", "Errors.IAM.PasswordLockoutPolicy.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-M9fsf", "Errors.IAM.LockoutPolicy.NotExisting")
 	}
 	return policy, err
 }
 
-func PutPasswordLockoutPolicy(db *gorm.DB, table string, policy *model.PasswordLockoutPolicyView) error {
+func PutLockoutPolicy(db *gorm.DB, table string, policy *model.LockoutPolicyView) error {
 	save := repository.PrepareSave(table)
 	return save(db, policy)
 }
 
-func DeletePasswordLockoutPolicy(db *gorm.DB, table, aggregateID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.PasswordLockoutPolicySearchKey(iam_model.PasswordLockoutPolicySearchKeyAggregateID), aggregateID)
+func DeleteLockoutPolicy(db *gorm.DB, table, aggregateID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.LockoutPolicySearchKey(iam_model.LockoutPolicySearchKeyAggregateID), aggregateID)
 
 	return delete(db)
 }

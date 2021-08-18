@@ -42,13 +42,14 @@ func (rm *ExistingLabelPoliciesReadModel) Reduce() error {
 }
 
 func (rm *ExistingLabelPoliciesReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(
-		eventstore.ColumnsEvent,
-		iam.AggregateType,
-		org.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		EventTypes(iam.LabelPolicyAddedEventType).
+		Or().
+		AggregateTypes(org.AggregateType).
 		EventTypes(
-			iam.LabelPolicyAddedEventType,
 			org.LabelPolicyAddedEventType,
-			org.LabelPolicyRemovedEventType,
-		)
+			org.LabelPolicyRemovedEventType).
+		Builder()
 }

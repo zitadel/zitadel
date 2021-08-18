@@ -1,6 +1,6 @@
 <app-detail-layout [backRouterLink]="[ '/users/list/machines']" title="{{ 'USER.CREATE.TITLE' | translate }}"
     description="{{ 'USER.CREATE.DESCRIPTION' | translate }}">
-    <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
     <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
         <div class="content">

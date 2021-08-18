@@ -19,36 +19,36 @@ import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { LinksModule } from '../../links/links.module';
+import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { AddIdpDialogModule } from './add-idp-dialog/add-idp-dialog.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
 
 @NgModule({
-    declarations: [LoginPolicyComponent],
-    imports: [
-        LoginPolicyRoutingModule,
-        CommonModule,
-        InfoSectionModule,
-        FormsModule,
-        CardModule,
-        InputModule,
-        MatButtonModule,
-        HasFeaturePipeModule,
-        MatSlideToggleModule,
-        MatIconModule,
-        HasRoleModule,
-        HasRolePipeModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-        AddIdpDialogModule,
-        IdpTableModule,
-        MfaTableModule,
-        MatProgressSpinnerModule,
-        MatSelectModule,
-        MatRippleModule,
-        LinksModule,
-    ],
+  declarations: [LoginPolicyComponent],
+  imports: [
+    LoginPolicyRoutingModule,
+    CommonModule,
+    InfoSectionModule,
+    FormsModule,
+    CardModule,
+    InputModule,
+    MatButtonModule,
+    HasFeaturePipeModule,
+    MatSlideToggleModule,
+    MatIconModule,
+    HasRoleModule,
+    HasRolePipeModule,
+    MatTooltipModule,
+    TranslateModule,
+    DetailLayoutModule,
+    AddIdpDialogModule,
+    IdpTableModule,
+    MfaTableModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatRippleModule,
+    PolicyGridModule,
+  ],
 })
 export class LoginPolicyModule { }

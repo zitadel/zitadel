@@ -14,8 +14,6 @@ type AssetAction int32
 const (
 	AssetAdd AssetAction = iota
 	AssetRemove
-
-	assetActionCount
 )
 
 func NewAddAsset(

@@ -22,17 +22,10 @@ import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.s
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CnslLinks } from '../../links/links.component';
-import {
-  IAM_COMPLEXITY_LINK,
-  IAM_LOGIN_POLICY_LINK,
-  IAM_POLICY_LINK,
-  ORG_COMPLEXITY_LINK,
-  ORG_IAM_POLICY_LINK,
-  ORG_LOGIN_POLICY_LINK,
-} from '../../policy-grid/policy-links';
+import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -56,6 +49,7 @@ export enum ColorType {
 }
 
 const ORG_STORAGE_KEY = 'organization';
+const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 
 @Component({
   selector: 'app-private-labeling-policy',
@@ -85,11 +79,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
-  public nextLinks: CnslLinks[] = [
-    IAM_COMPLEXITY_LINK,
-    IAM_POLICY_LINK,
-    IAM_LOGIN_POLICY_LINK,
-  ];
 
   public Theme: any = Theme;
   public Preview: any = Preview;
@@ -99,7 +88,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
   private org!: Org.AsObject;
-
+  public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -108,6 +97,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
     private storageService: StorageService,
+    private themeService: ThemeService,
   ) {
     const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
 
@@ -121,19 +111,9 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.nextLinks = [
-            ORG_IAM_POLICY_LINK,
-            ORG_LOGIN_POLICY_LINK,
-            ORG_COMPLEXITY_LINK,
-          ];
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.nextLinks = [
-            IAM_POLICY_LINK,
-            IAM_LOGIN_POLICY_LINK,
-            IAM_COMPLEXITY_LINK,
-          ];
           break;
       }
 
@@ -160,25 +140,28 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const file = filelist.item(0);
     if (file) {
 
-      const formData = new FormData();
-      formData.append('file', file);
-      if (theme === Theme.DARK) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
-          case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData, this.org.id));
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (theme === Theme.DARK) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
+            case PolicyComponentServiceType.ADMIN:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData, this.org.id));
+          }
+        }
+        if (theme === Theme.LIGHT) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
+            case PolicyComponentServiceType.ADMIN:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData, this.org.id));
+          }
         }
       }
-      if (theme === Theme.LIGHT) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
-          case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData, this.org.id));
-        }
-      }
-
     }
   }
 
@@ -283,26 +266,30 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const file = filelist.item(0);
     if (file) {
 
-      const formData = new FormData();
-      formData.append('file', file);
-      if (theme === Theme.DARK) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
-            break;
-          case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData, this.org.id));
-            break;
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (theme === Theme.DARK) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData, this.org.id));
+              break;
+          }
         }
-      }
-      if (theme === Theme.LIGHT) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
-            break;
-          case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData, this.org.id));
-            break;
+        if (theme === Theme.LIGHT) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData, this.org.id));
+              break;
+          }
         }
       }
     }
@@ -354,8 +341,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
     this.authService.canUseFeature(['label_policy.private_label']).pipe(take(1)).subscribe((canUse) => {
       this.getPreviewData().then(data => {
-        console.log('preview', data);
-
         if (data.policy) {
           this.previewData = data.policy;
           this.loading = false;
@@ -371,15 +356,12 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
       });
 
       this.getData().then(data => {
-        console.log('data', data);
-
         if (data.policy) {
           this.data = data.policy;
           this.loading = false;
 
           if ((canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
             this.serviceType === PolicyComponentServiceType.ADMIN) {
-            // this.loadingImages = true;
             this.loadImages();
           }
         }
@@ -423,6 +405,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     if (promises.length) {
       Promise.all(promises).then(() => {
         this.loadingImages = false;
+        this.refreshPreview.emit();
       }).catch(error => {
         this.loadingImages = false;
       });
@@ -465,6 +448,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     if (promises.length) {
       Promise.all(promises).then(() => {
         this.loadingImages = false;
+        this.refreshPreview.emit();
       }).catch(error => {
         this.loadingImages = false;
       });
@@ -505,7 +489,6 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   private loadAsset(imagekey: string, url: string): Promise<any> {
     return this.assetService.load(`${url}`, this.org.id).then(data => {
-      console.log(data);
       const objectURL = URL.createObjectURL(data);
       this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
       this.refreshPreview.emit();
@@ -528,6 +511,18 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   public savePolicy(): Promise<any> {
+    const reloadPolicy = () => {
+      setTimeout(() => {
+        this.loadingImages = true;
+        this.getData().then(data => {
+
+          if (data.policy) {
+            this.data = data.policy;
+            this.loadImages();
+          }
+        });
+      }, 500);
+    };
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.previewData as LabelPolicy.AsObject).isDefault) {
@@ -536,6 +531,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
           return (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
+
+            reloadPolicy();
           }).catch((error: HttpErrorResponse) => {
             this.toast.showError(error);
           });
@@ -545,6 +542,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
           return (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
+
+            reloadPolicy();
           }).catch(error => {
             this.toast.showError(error);
           });
@@ -553,46 +552,11 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         const req = new UpdateLabelPolicyRequest();
         this.overwriteValues(req);
         return (this.service as AdminService).updateLabelPolicy(req).then(() => {
+          reloadPolicy();
           this.toast.showInfo('POLICY.TOAST.SET', true);
         }).catch(error => {
           this.toast.showError(error);
         });
-    }
-  }
-
-  public saveWatermark(): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        if ((this.previewData as LabelPolicy.AsObject).isDefault) {
-          const req0 = new AddCustomLabelPolicyRequest();
-          req0.setDisableWatermark(this.previewData.disableWatermark);
-
-          (this.service as ManagementService).addCustomLabelPolicy(req0).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch((error: HttpErrorResponse) => {
-            this.toast.showError(error);
-          });
-        } else {
-          const req1 = new UpdateCustomLabelPolicyRequest();
-          req1.setDisableWatermark(this.previewData.disableWatermark);
-
-          (this.service as ManagementService).updateCustomLabelPolicy(req1).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-        }
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        const req = new UpdateLabelPolicyRequest();
-        req.setDisableWatermark(this.data.disableWatermark);
-
-        (this.service as AdminService).updateLabelPolicy(req).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-        break;
     }
   }
 
@@ -633,6 +597,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
               if (data.policy) {
                 this.data = data.policy;
+                this.applyToConsole(data.policy);
                 this.loadImages();
               }
             });
@@ -649,6 +614,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
               if (data.policy) {
                 this.data = data.policy;
+                this.applyToConsole(data.policy);
                 this.loadImages();
               }
             });
@@ -657,6 +623,26 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
           this.toast.showError(error);
         });
     }
+  }
+
+  private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
+    const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
+    const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
+
+    const darkWarn = labelpolicy?.warnColorDark || '#F44336';
+    const lightWarn = labelpolicy?.warnColor || '#F44336';
+
+    const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
+    const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
+
+    this.themeService.savePrimaryColor(darkPrimary, true);
+    this.themeService.savePrimaryColor(lightPrimary, false);
+
+    this.themeService.saveWarnColor(darkWarn, true);
+    this.themeService.saveWarnColor(lightWarn, false);
+
+    this.themeService.saveBackgroundColor(darkBackground, true);
+    this.themeService.saveBackgroundColor(lightBackground, false);
   }
 
   public resetPolicy(): Promise<any> {

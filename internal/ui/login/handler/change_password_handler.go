@@ -43,7 +43,7 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		baseData:    l.getBaseData(r, authReq, "Change Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
-	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)
+	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq, authReq.UserOrgID)
 	if policy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
@@ -60,11 +60,12 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 			data.HasNumber = NumberRegex
 		}
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePassword], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangePassword], data, nil)
 }
 
 func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
 	data := l.getUserData(r, authReq, "Password Change Done", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePasswordDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

@@ -1,11 +1,13 @@
 package setup
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
+
 	"github.com/caos/zitadel/operator"
-	"github.com/pkg/errors"
-	"time"
 )
 
 const (
@@ -20,8 +22,7 @@ func GetDoneFunc(
 	return func(k8sClient kubernetes.ClientInt) error {
 		monitor.Info("waiting for setup to be completed")
 		if err := k8sClient.WaitUntilJobCompleted(namespace, getJobName(reason), timeout); err != nil {
-			monitor.Error(errors.Wrap(err, "error while waiting for setup to be completed"))
-			return err
+			return fmt.Errorf("error while waiting for setup to be completed: %w", err)
 		}
 		monitor.Info("migration is completed")
 		return nil

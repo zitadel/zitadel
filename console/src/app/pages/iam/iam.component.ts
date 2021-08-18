@@ -5,7 +5,6 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
-import { PolicyGridType } from 'src/app/modules/policy-grid/policy-grid.component';
 import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -25,7 +24,6 @@ export class IamComponent {
   public membersSubject: BehaviorSubject<Member.AsObject[]>
     = new BehaviorSubject<Member.AsObject[]>([]);
 
-  public PolicyGridType: any = PolicyGridType;
   public features!: Features.AsObject;
 
   constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,

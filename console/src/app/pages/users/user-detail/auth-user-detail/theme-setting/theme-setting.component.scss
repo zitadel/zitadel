@@ -1,6 +1,3 @@
-$dark-background: #212224;
-$light-background: rgb(220, 220, 220);
-
 :root {
   transition: none;
 }
@@ -31,7 +28,6 @@ $light-background: rgb(220, 220, 220);
   right: 0;
   width: 40px;
   height: 40px;
-  background: $light-background;
   transform: scale(0);
   transform-origin: top right;
   transition: transform .2s cubic-bezier(.645, .045, .355, 1);
@@ -57,7 +53,6 @@ label {
 
 .toggle {
   position: absolute;
-  background-color: $light-background;
   box-shadow: 0 2px 15px rgba(0, 0, 0, .15);
 }
 
@@ -82,7 +77,6 @@ label {
 [type="checkbox"]:checked {
   .toggle {
     transform: translateX(100%);
-    background-color: $dark-background;
   }
 
   .light {
@@ -101,7 +95,6 @@ label {
 
 [type="checkbox"]:checked + .theme-app .crescent {
   transform: scale(1);
-  background: $dark-background;
 }
 
 [type="checkbox"]:checked + .theme-app .circle {
@@ -110,9 +103,4 @@ label {
 
 [type="checkbox"]:checked + .theme-app .main-circle {
   background: linear-gradient(40deg, #8983f7, #a3dafb 70%);
-}
-
-[type="checkbox"]:checked + .app .toggle {
-  transform: translateX(100%);
-  background-color: #34323d;
 }

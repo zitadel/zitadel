@@ -175,11 +175,13 @@ InternalAuthZ:
     - Role: 'ORG_PROJECT_CREATOR'
       Permissions:
         - "user.global.read"
+        - "policy.read"
         - "project.read:self"
         - "project.create"
     - Role: 'PROJECT_OWNER'
       Permissions:
         - "org.global.read"
+        - "policy.read"
         - "project.read"
         - "project.write"
         - "project.delete"
@@ -206,6 +208,7 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_OWNER_VIEWER'
       Permissions:
+        - "policy.read"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
@@ -219,6 +222,7 @@ InternalAuthZ:
     - Role: 'PROJECT_OWNER_GLOBAL'
       Permissions:
         - "org.global.read"
+        - "policy.read"
         - "project.read"
         - "project.write"
         - "project.delete"
@@ -238,6 +242,7 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_OWNER_VIEWER_GLOBAL'
       Permissions:
+        - "policy.read"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
@@ -249,6 +254,7 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
+        - "policy.read"
         - "org.global.read"
         - "project.read"
         - "project.grant.read"
@@ -263,6 +269,7 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_GRANT_OWNER_VIEWER'
       Permissions:
+        - "policy.read"
         - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"

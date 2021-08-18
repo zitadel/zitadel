@@ -43,6 +43,10 @@ func (m *PasswordAgePolicy) ViewModel() string {
 	return passwordAgePolicyTable
 }
 
+func (p *PasswordAgePolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *PasswordAgePolicy) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }

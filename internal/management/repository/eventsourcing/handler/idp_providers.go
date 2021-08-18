@@ -57,6 +57,10 @@ func (m *IDPProvider) ViewModel() string {
 	return idpProviderTable
 }
 
+func (p *IDPProvider) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *IDPProvider) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
 }

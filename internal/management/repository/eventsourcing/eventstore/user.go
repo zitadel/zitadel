@@ -7,8 +7,9 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
@@ -41,6 +42,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 	if caos_errs.IsNotFound(viewErr) {
 		user = new(model.UserView)
 	}
+
 	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
@@ -125,6 +127,40 @@ func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName st
 
 func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) (bool, error) {
 	return repo.View.IsUserUnique(userName, email)
+}
+
+func (repo *UserRepo) GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error) {
+	data, err := repo.View.MetadataByKeyAndResourceOwner(userID, resourceOwner, key)
+	if err != nil {
+		return nil, err
+	}
+	return iam_model.MetadataViewToDomain(data), nil
+}
+
+func (repo *UserRepo) SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error) {
+	err := req.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
+	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-m0ds3").OnError(sequenceErr).Warn("could not read latest user sequence")
+	req.AppendAggregateIDQuery(userID)
+	req.AppendResourceOwnerQuery(resourceOwner)
+	metadata, count, err := repo.View.SearchMetadata(req)
+	if err != nil {
+		return nil, err
+	}
+	result := &domain.MetadataSearchResponse{
+		Offset:      req.Offset,
+		Limit:       req.Limit,
+		TotalResult: count,
+		Result:      iam_model.MetadataViewsToDomain(metadata),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
 }
 
 func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {

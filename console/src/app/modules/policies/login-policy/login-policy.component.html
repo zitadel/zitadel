@@ -1,21 +1,21 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
     <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
         <ng-template appHasRole [appHasRole]="['policy.delete']">
-            <button *ngIf="!isDefault" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
+            <button *ngIf="!isDefault" color="primary" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
                 mat-stroked-button>
                 {{'POLICY.RESET' | translate}}
             </button>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['policy.write']">
-            <button *ngIf="isDefault" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
+            <button *ngIf="isDefault" color="primary" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
                 mat-raised-button>
                 {{'POLICY.CREATECUSTOM' | translate}}
             </button>
@@ -150,7 +150,7 @@
         </ng-container>
         <app-mfa-table [service]="service" [serviceType]="serviceType"
             [componentType]="LoginMethodComponentType.MultiFactor"
-            [disabled]="(([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false) || ((['login_policy.factors'] | hasFeature | async) == false)">
+            [disabled]="(([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false) || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false)">
         </app-mfa-table>
 
         <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
@@ -162,7 +162,7 @@
         </ng-container>
         <app-mfa-table [service]="service" [serviceType]="serviceType"
             [componentType]="LoginMethodComponentType.SecondFactor"
-            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false || (['login_policy.factors'] | hasFeature | async) == false">
+            [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType == PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) == false || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) == false)">
         </app-mfa-table>
     </ng-container>
 
@@ -197,7 +197,7 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="!disabled && (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async))"
+        <div *ngIf="!disabled && ((serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async)) || serviceType == PolicyComponentServiceType.ADMIN)"
             class="new-idp" (click)="openDialog()" matRipple>
             <mat-icon>add</mat-icon>
         </div>
@@ -214,11 +214,10 @@
                 <i class="lab la-gitlab"></i>
             </div>
             <app-idp-table [service]="service" [serviceType]="serviceType"
-                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false || (['login_policy.idp'] | hasFeature | async) == false">
+                [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false || ((serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false))">
             </app-idp-table>
         </app-card>
     </ng-template>
 
-    <cnsl-links *ngIf="nextLinks" [links]="nextLinks"></cnsl-links>
-
+    <app-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="security"></app-policy-grid>
 </app-detail-layout>

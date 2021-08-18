@@ -30,9 +30,13 @@
             "styles": [
               "src/styles.scss"  
             ],
-            "scripts": [],
+            "scripts": [
+              "./node_modules/tinycolor2/dist/tinycolor-min.js"
+            ],
             "allowedCommonJsDependencies": [
                 "@angular/common/locales/de",
+                "src/app/proto/generated/zitadel/admin_pb",
+                "src/app/proto/generated/zitadel/management_pb",
                 "src/app/proto/generated/**",
                 "file-saver",
                 "qrcode"
@@ -89,7 +93,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
+              "serviceWorker": false,
               "ngswConfigPath": "ngsw-config.json"
             },
             "development": {}
@@ -132,7 +136,9 @@
               "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/tinycolor2/dist/tinycolor-min.js"
+            ]
           }
         },
         "lint": {

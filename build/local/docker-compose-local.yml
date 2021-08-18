@@ -1,8 +1,8 @@
-version: "3.8"
+version: '3.8'
 
 services:
   db:
-    profiles: ["database"]
+    profiles: ['database']
     restart: always
     networks:
       - zitadel
@@ -11,9 +11,29 @@ services:
     ports:
       - 8080:8080
       - 26257:26257
-  
+
+  minio:
+    profiles: ['backend']
+    image: minio/minio:RELEASE.2021-06-14T01-29-23Z
+    restart: on-failure
+    networks:
+      - zitadel
+    environment:
+      - MINIO_ACCESS_KEY=access_key
+      - MINIO_SECRET_KEY=secret_key
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    command:
+      - gateway
+      - nas
+      - /export
+
   db-migrations:
-    profiles: ["database"]
+    profiles: ['database']
     restart: on-failure
     networks:
       - zitadel
@@ -31,9 +51,9 @@ services:
       - FLYWAY_PLACEHOLDERS_authzpassword=NULL
       - FLYWAY_PLACEHOLDERS_queriespassword=NULL
     command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=5 migrate
-  
+
   keys:
-    profiles: ["init-backend"]
+    profiles: ['init-backend']
     restart: on-failure
     networks:
       - zitadel
@@ -47,7 +67,7 @@ services:
       - ./local.env
 
   backend-setup:
-    profiles: ["init-backend"]
+    profiles: ['init-backend']
     restart: on-failure
     networks:
       - zitadel
@@ -55,7 +75,7 @@ services:
       - keys
     build:
       context: ../..
-      dockerfile: build/dockerfile
+      dockerfile: build/zitadel/Dockerfile
       target: dev-go-build
       args:
         ENV: dev
@@ -63,20 +83,27 @@ services:
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
     env_file:
       - ./local.env
-    environment: 
+    environment:
       - ZITADEL_EVENTSTORE_HOST=db
-    command: [ "-setup-files=cmd/zitadel/setup.yaml", "-setup-files=cmd/zitadel/system-defaults.yaml", "-setup-files=cmd/zitadel/authz.yaml", "setup" ]
-  
+    command:
+      [
+        '-setup-files=cmd/zitadel/setup.yaml',
+        '-setup-files=cmd/zitadel/system-defaults.yaml',
+        '-setup-files=cmd/zitadel/authz.yaml',
+        'setup',
+      ]
+
   backend-run:
-    profiles: ["backend"]
+    profiles: ['backend']
     restart: on-failure
     networks:
       - zitadel
     depends_on:
       - db
+      - minio
     build:
       context: ../..
-      dockerfile: build/dockerfile
+      dockerfile: build/zitadel/Dockerfile
       target: dev-go-build
       args:
         ENV: dev
@@ -84,17 +111,27 @@ services:
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
     env_file:
       - ./local.env
-    environment: 
+    environment:
       - ZITADEL_EVENTSTORE_HOST=db
     ports:
       - 50002:50002
       - 50003:50003
-    command: [ "-console=false", "-localDevMode=true", "-config-files=cmd/zitadel/startup.yaml", "-config-files=cmd/zitadel/system-defaults.yaml", "-config-files=cmd/zitadel/authz.yaml", "start" ]
+    command:
+      [
+        '-console=false',
+        '-localDevMode=true',
+        '-config-files=cmd/zitadel/startup.yaml',
+        '-config-files=cmd/zitadel/system-defaults.yaml',
+        '-config-files=cmd/zitadel/authz.yaml',
+        'start',
+      ]
 
-  zitadel-setted-up:
-    profiles: ["setup"]
+  zitadel-started-up:
+    profiles: ['setup']
     networks:
       - zitadel
+    extra_hosts:
+      host.docker.internal: host-gateway
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.started
@@ -105,7 +142,7 @@ services:
       - FE_PORT=4200
 
   grpc-web-gateway:
-    profiles: ["frontend"]
+    profiles: ['frontend']
     restart: on-failure
     logging:
       driver: none
@@ -116,31 +153,31 @@ services:
       dockerfile: build/local/Dockerfile.gateway
     image: grpcweb/grpcwebproxy
     ports:
-      - "50000:8080"
+      - '50000:8080'
     environment:
       - BKD_HOST=backend-run
       - BKD_PORT=50001
-  
+
   frontend-local-run:
-    profiles: ["frontend"]
+    profiles: ['frontend']
     networks:
       - zitadel
     depends_on:
       - grpc-web-gateway
     build:
       context: ../..
-      dockerfile: build/dockerfile
+      dockerfile: build/console/Dockerfile
       target: dev-angular-build
       args:
         ENV: dev
     volumes:
       - ./environment.json:/console/src/assets/environment.json
-    command: sh -c "ng serve --host 0.0.0.0"
+    command: sh -c "ng serve --host 0.0.0.0 --disable-host-check"
     ports:
       - 4200:4200
 
   client-id:
-    profiles: ["init-frontend"]
+    profiles: ['init-frontend']
     networks:
       - zitadel
     build:

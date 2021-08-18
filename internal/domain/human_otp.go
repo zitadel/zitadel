@@ -37,7 +37,7 @@ func VerifyMFAOTP(code string, secret *crypto.CryptoValue, cryptoAlg crypto.Encr
 
 	valid := totp.Validate(code, decrypt)
 	if !valid {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode")
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.Provider0.InvalidCode")
 	}
 	return nil
 }

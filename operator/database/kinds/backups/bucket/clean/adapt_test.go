@@ -25,7 +25,7 @@ func TestBackup_Adapt1(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
-	version := "testVersion"
+	image := "testImage"
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	jobName := GetJobName(backupName)
@@ -43,11 +43,11 @@ func TestBackup_Adapt1(t *testing.T) {
 		tolerations,
 		secretName,
 		secretKey,
-		version,
 		getCommand(
 			databases,
 			users,
 		),
+		image,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -65,7 +65,7 @@ func TestBackup_Adapt1(t *testing.T) {
 		checkDBReady,
 		secretName,
 		secretKey,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)
@@ -86,7 +86,7 @@ func TestBackup_Adapt2(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
-	version := "testVersion2"
+	image := "testImage2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
@@ -104,11 +104,11 @@ func TestBackup_Adapt2(t *testing.T) {
 		tolerations,
 		secretName,
 		secretKey,
-		version,
 		getCommand(
 			databases,
 			users,
 		),
+		image,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -126,7 +126,7 @@ func TestBackup_Adapt2(t *testing.T) {
 		checkDBReady,
 		secretName,
 		secretKey,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)

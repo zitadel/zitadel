@@ -73,10 +73,7 @@ func TestManaged_Adapt1(t *testing.T) {
 	queried := map[string]interface{}{}
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,
@@ -132,7 +129,7 @@ func TestManaged_Adapt1(t *testing.T) {
 	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	ensure, err := query(k8sClient, queried)
@@ -184,10 +181,7 @@ func TestManaged_Adapt2(t *testing.T) {
 	queried := map[string]interface{}{}
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,
@@ -243,7 +237,7 @@ func TestManaged_Adapt2(t *testing.T) {
 	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	ensure, err := query(k8sClient, queried)

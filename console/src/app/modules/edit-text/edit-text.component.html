@@ -1,0 +1,31 @@
+<div *ngIf="currentMap">
+
+
+  <form [formGroup]="form" >
+    <ng-container *ngFor="let key of (current$ | async) | keyvalue">
+      <div class="block">
+        <div class="flex" *ngIf="(default$ | async) as defaultmap">
+          <cnsl-form-field class="formfield" >
+            <cnsl-label>{{key.key}}</cnsl-label>
+            <textarea class="text" cnslInput [formControlName]="key.key" [placeholder]="defaultmap[key.key]" [name]="key.key" [ngClass]="{'defaulttext': form.get(key.key)?.value === ''}"></textarea>
+            <div class="chips" *ngIf="warnText[key.key] == undefined">
+              <ng-container *ngFor="let chip of chips" >
+              <div class="chip" appCopyToClipboard [valueToCopy]="chip.value" (copiedValue)="copied = $event" (click)="addChip(key.key, chip.value)">
+                <span class="key">{{chip.key | translate}}</span>
+                <span class="value">{{chip.value}}</span>
+                <i *ngIf="copied != chip.value" class="las la-clipboard"></i>
+                <i *ngIf="copied == chip.value" class="las la-clipboard-check"></i>
+              </div>
+            </ng-container>
+            </div>
+          </cnsl-form-field>
+          <div class="actions">
+            <button matTooltip="{{'ACTIONS.RESETDEFAULT'| translate }}" mat-icon-button [disabled]="form.get(key.key)?.value == defaultmap[key.key] || disabled" (click)="form.get(key.key)?.setValue(defaultmap[key.key])" (mouseenter) = "form.get(key.key)?.value != defaultmap[key.key] && setWarnText(key.key, defaultmap[key.key])"  (mouseleave) ="setWarnText(key.key, undefined)"><i class="las la-history"></i></button>
+            <button matTooltip="{{'ACTIONS.RESETCURRENT'| translate }}" mat-icon-button [disabled]="form.get(key.key)?.value == currentMap[key.key] || disabled" (click)="form.get(key.key)?.setValue(currentMap[key.key])" (mouseenter) = "form.get(key.key)?.value != currentMap[key.key] && setWarnText(key.key, currentMap[key.key])"  (mouseleave) ="setWarnText(key.key, undefined)"><i class="las la-undo"></i></button>
+          </div>
+        </div>
+      </div>
+      <cnsl-info-section *ngIf="warnText[key.key] !== undefined" class="info" type="WARN">{{'ACTIONS.RESETTO'| translate }} <cite>'{{warnText[key.key]}}'</cite></cnsl-info-section>
+    </ng-container>
+  </form>
+</div>

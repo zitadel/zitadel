@@ -16,6 +16,20 @@ title: zitadel/auth.proto
 
 
 
+    GET: /healthz
+
+
+### GetSupportedLanguages
+
+> **rpc** GetSupportedLanguages([GetSupportedLanguagesRequest](#getsupportedlanguagesrequest))
+[GetSupportedLanguagesResponse](#getsupportedlanguagesresponse)
+
+Returns the default languages
+
+
+
+    GET: /languages
+
 
 ### GetMyUser
 
@@ -25,6 +39,8 @@ title: zitadel/auth.proto
 Returns my full blown user
 
 
+
+    GET: /users/me
 
 
 ### ListMyUserChanges
@@ -36,6 +52,8 @@ Returns the history of the authorized user (each event)
 
 
 
+    POST: /users/me/changes/_search
+
 
 ### ListMyUserSessions
 
@@ -45,6 +63,80 @@ Returns the history of the authorized user (each event)
 Returns the user sessions of the authorized user of the current useragent
 
 
+
+    POST: /users/me/sessions/_search
+
+
+### SetMyMetadata
+
+> **rpc** SetMyMetadata([SetMyMetadataRequest](#setmymetadatarequest))
+[SetMyMetadataResponse](#setmymetadataresponse)
+
+Sets a user metadata by key to the authorized user
+
+
+
+    POST: /users/me/metadata/{key}
+
+
+### BulkSetMyMetadata
+
+> **rpc** BulkSetMyMetadata([BulkSetMyMetadataRequest](#bulksetmymetadatarequest))
+[BulkSetMyMetadataResponse](#bulksetmymetadataresponse)
+
+Set a list of user metadata to the authorized user
+
+
+
+    POST: /users/me/metadata/_bulk
+
+
+### ListMyMetadata
+
+> **rpc** ListMyMetadata([ListMyMetadataRequest](#listmymetadatarequest))
+[ListMyMetadataResponse](#listmymetadataresponse)
+
+Returns the user metadata of the authorized user
+
+
+
+    POST: /users/me/metadata/_search
+
+
+### GetMyMetadata
+
+> **rpc** GetMyMetadata([GetMyMetadataRequest](#getmymetadatarequest))
+[GetMyMetadataResponse](#getmymetadataresponse)
+
+Returns the user metadata by key of the authorized user
+
+
+
+    GET: /users/me/metadata/{key}
+
+
+### RemoveMyMetadata
+
+> **rpc** RemoveMyMetadata([RemoveMyMetadataRequest](#removemymetadatarequest))
+[RemoveMyMetadataResponse](#removemymetadataresponse)
+
+Removes a user metadata by key to the authorized user
+
+
+
+    DELETE: /users/me/metadata/{key}
+
+
+### BulkRemoveMyMetadata
+
+> **rpc** BulkRemoveMyMetadata([BulkRemoveMyMetadataRequest](#bulkremovemymetadatarequest))
+[BulkRemoveMyMetadataResponse](#bulkremovemymetadataresponse)
+
+Set a list of user metadata to the authorized user
+
+
+
+    DELETE: /users/me/metadata/_bulk
 
 
 ### ListMyRefreshTokens
@@ -56,6 +148,8 @@ Returns the refresh tokens of the authorized user
 
 
 
+    POST: /users/me/tokens/refresh/_search
+
 
 ### RevokeMyRefreshToken
 
@@ -65,6 +159,8 @@ Returns the refresh tokens of the authorized user
 Revokes a single refresh token of the authorized user by its (token) id
 
 
+
+    DELETE: /users/me/tokens/refresh/{id}
 
 
 ### RevokeAllMyRefreshTokens
@@ -76,6 +172,8 @@ Revokes all refresh tokens of the authorized user
 
 
 
+    POST: /users/me/tokens/refresh/_revoke_all
+
 
 ### UpdateMyUserName
 
@@ -85,6 +183,8 @@ Revokes all refresh tokens of the authorized user
 Change the user name of the authorize user
 
 
+
+    PUT: /users/me/username
 
 
 ### GetMyPasswordComplexityPolicy
@@ -97,6 +197,8 @@ This policy defines how the password should look
 
 
 
+    GET: /policies/passwords/complexity
+
 
 ### UpdateMyPassword
 
@@ -106,6 +208,8 @@ This policy defines how the password should look
 Change the password of the authorized user
 
 
+
+    PUT: /users/me/password
 
 
 ### GetMyProfile
@@ -117,6 +221,8 @@ Returns the profile information of the authorized user
 
 
 
+    GET: /users/me/profile
+
 
 ### UpdateMyProfile
 
@@ -127,6 +233,8 @@ Changes the profile information of the authorized user
 
 
 
+    PUT: /users/me/profile
+
 
 ### GetMyEmail
 
@@ -136,6 +244,8 @@ Changes the profile information of the authorized user
 Returns the email address of the authorized user
 
 
+
+    GET: /users/me/email
 
 
 ### SetMyEmail
@@ -148,6 +258,8 @@ An email is sent to the given address, to verify it
 
 
 
+    PUT: /users/me/email
+
 
 ### VerifyMyEmail
 
@@ -157,6 +269,8 @@ An email is sent to the given address, to verify it
 Sets the email address to verified
 
 
+
+    POST: /users/me/email/_verify
 
 
 ### ResendMyEmailVerification
@@ -168,6 +282,8 @@ Sends a new email to the last given address to verify it
 
 
 
+    POST: /users/me/email/_resend_verification
+
 
 ### GetMyPhone
 
@@ -177,6 +293,8 @@ Sends a new email to the last given address to verify it
 Returns the phone number of the authorized user
 
 
+
+    GET: /users/me/phone
 
 
 ### SetMyPhone
@@ -189,6 +307,8 @@ An sms is sent to the number with a verification code
 
 
 
+    PUT: /users/me/phone
+
 
 ### VerifyMyPhone
 
@@ -198,6 +318,8 @@ An sms is sent to the number with a verification code
 Sets the phone number to verified
 
 
+
+    POST: /users/me/phone/_verify
 
 
 ### ResendMyPhoneVerification
@@ -209,6 +331,8 @@ Resends a sms to the last given phone number, to verify it
 
 
 
+    POST: /users/me/phone/_resend_verification
+
 
 ### RemoveMyPhone
 
@@ -218,6 +342,8 @@ Resends a sms to the last given phone number, to verify it
 Removed the phone number of the authorized user
 
 
+
+    DELETE: /users/me/phone
 
 
 ### RemoveMyAvatar
@@ -229,6 +355,8 @@ Remove my avatar
 
 
 
+    DELETE: /users/me/avatar
+
 
 ### ListMyLinkedIDPs
 
@@ -238,6 +366,8 @@ Remove my avatar
 Returns a list of all linked identity providers (social logins, eg. Google, Microsoft, AD, etc.)
 
 
+
+    POST: /users/me/idps/_search
 
 
 ### RemoveMyLinkedIDP
@@ -249,6 +379,8 @@ Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, et
 
 
 
+    DELETE: /users/me/idps/{idp_id}/{linked_user_id}
+
 
 ### ListMyAuthFactors
 
@@ -258,6 +390,8 @@ Removes a linked identity provider (social logins, eg. Google, Microsoft, AD, et
 Returns all configured authentication factors (second and multi)
 
 
+
+    POST: /users/me/auth_factors/_search
 
 
 ### AddMyAuthFactorOTP
@@ -270,6 +404,8 @@ Only one OTP can be configured per user
 
 
 
+    POST: /users/me/auth_factors/otp
+
 
 ### VerifyMyAuthFactorOTP
 
@@ -280,6 +416,8 @@ Verify the last added OTP (One Time Password)
 
 
 
+    POST: /users/me/auth_factors/otp/_verify
+
 
 ### RemoveMyAuthFactorOTP
 
@@ -289,6 +427,8 @@ Verify the last added OTP (One Time Password)
 Removed the configured OTP (One Time Password) Factor
 
 
+
+    DELETE: /users/me/auth_factors/otp
 
 
 ### AddMyAuthFactorU2F
@@ -301,6 +441,8 @@ Multiple U2Fs can be configured
 
 
 
+    POST: /users/me/auth_factors/u2f
+
 
 ### VerifyMyAuthFactorU2F
 
@@ -310,6 +452,8 @@ Multiple U2Fs can be configured
 Verifies the last added U2F (Universal Second Factor) of the authorized user
 
 
+
+    POST: /users/me/auth_factors/u2f/_verify
 
 
 ### RemoveMyAuthFactorU2F
@@ -321,15 +465,19 @@ Removes the U2F Authentication from the authorized user
 
 
 
+    DELETE: /users/me/auth_factors/u2f/{token_id}
+
 
 ### ListMyPasswordless
 
 > **rpc** ListMyPasswordless([ListMyPasswordlessRequest](#listmypasswordlessrequest))
 [ListMyPasswordlessResponse](#listmypasswordlessresponse)
 
-Returns all configured passwordless authentications of the authorized user
+Returns all configured passwordless authenticators of the authorized user
 
 
+
+    POST: /users/me/passwordless/_search
 
 
 ### AddMyPasswordless
@@ -337,10 +485,40 @@ Returns all configured passwordless authentications of the authorized user
 > **rpc** AddMyPasswordless([AddMyPasswordlessRequest](#addmypasswordlessrequest))
 [AddMyPasswordlessResponse](#addmypasswordlessresponse)
 
-Adds a new passwordless authentications to the authorized user
+Adds a new passwordless authenticator to the authorized user
 Multiple passwordless authentications can be configured
 
 
+
+    POST: /users/me/passwordless
+
+
+### AddMyPasswordlessLink
+
+> **rpc** AddMyPasswordlessLink([AddMyPasswordlessLinkRequest](#addmypasswordlesslinkrequest))
+[AddMyPasswordlessLinkResponse](#addmypasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the authorized user and returns it directly
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/me/passwordless/_link
+
+
+### SendMyPasswordlessLink
+
+> **rpc** SendMyPasswordlessLink([SendMyPasswordlessLinkRequest](#sendmypasswordlesslinkrequest))
+[SendMyPasswordlessLinkResponse](#sendmypasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the authorized user and sends it to the registered email address
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/me/passwordless/_send_link
 
 
 ### VerifyMyPasswordless
@@ -352,6 +530,8 @@ Verifies the last added passwordless configuration
 
 
 
+    POST: /users/me/passwordless/_verify
+
 
 ### RemoveMyPasswordless
 
@@ -361,6 +541,8 @@ Verifies the last added passwordless configuration
 Removes the passwordless configuration from the authorized user
 
 
+
+    DELETE: /users/me/passwordless/{token_id}
 
 
 ### ListMyUserGrants
@@ -372,6 +554,8 @@ Returns all user grants (authorizations) of the authorized user
 
 
 
+    POST: /usergrants/me/_search
+
 
 ### ListMyProjectOrgs
 
@@ -381,6 +565,8 @@ Returns all user grants (authorizations) of the authorized user
 Returns a list of organisations where the authorized user has a user grant (authorization) in the context of the requested project
 
 
+
+    POST: /global/projectorgs/_search
 
 
 ### ListMyZitadelFeatures
@@ -392,6 +578,8 @@ Returns a list of features, which are allowed on these organisation based on the
 
 
 
+    POST: /features/zitadel/me/_search
+
 
 ### ListMyZitadelPermissions
 
@@ -402,6 +590,8 @@ Returns the permissions the authorized user has in ZITADEL based on his manager 
 
 
 
+    POST: /permissions/zitadel/me/_search
+
 
 ### ListMyProjectPermissions
 
@@ -411,6 +601,21 @@ Returns the permissions the authorized user has in ZITADEL based on his manager 
 Returns a list of roles for the authorized user and project
 
 
+
+    POST: /permissions/me/_search
+
+
+### ListMyMemberships
+
+> **rpc** ListMyMemberships([ListMyMembershipsRequest](#listmymembershipsrequest))
+[ListMyMembershipsResponse](#listmymembershipsresponse)
+
+Show all the permissions my user has in ZITADEL (ZITADEL Manager)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /memberships/me/_search
 
 
 
@@ -458,6 +663,25 @@ This is an empty request
 
 
 
+### AddMyPasswordlessLinkRequest
+This is an empty request
+
+
+
+
+### AddMyPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
+
+
+
+
 ### AddMyPasswordlessRequest
 This is an empty request
 
@@ -471,6 +695,62 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | key |  zitadel.user.v1.WebAuthNKey | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkRemoveMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata | repeated BulkSetMyMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetMyMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -490,6 +770,28 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | email |  zitadel.user.v1.Email | - |  |
+
+
+
+
+### GetMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -566,6 +868,23 @@ the request parameters are read from the token-header
 
 
 
+### GetSupportedLanguagesRequest
+This is an empty request
+
+
+
+
+### GetSupportedLanguagesResponse
+This is an empty response
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| languages | repeated string | - |  |
+
+
+
+
 ### HealthzRequest
 This is an empty request
 
@@ -614,6 +933,54 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.idp.v1.IDPUserLink | - |  |
+
+
+
+
+### ListMyMembershipsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | the field the result is sorted |  |
+| queries | repeated zitadel.user.v1.MembershipQuery | criterias the client is looking for |  |
+
+
+
+
+### ListMyMembershipsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.Membership | - |  |
+
+
+
+
+### ListMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -870,6 +1237,28 @@ This is an empty request
 
 
 
+### RemoveMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveMyPasswordlessRequest
 
 
@@ -977,6 +1366,23 @@ This is an empty response
 
 
 
+### SendMyPasswordlessLinkRequest
+This is an empty request
+
+
+
+
+### SendMyPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetMyEmailRequest
 
 
@@ -989,6 +1395,29 @@ This is an empty response
 
 
 ### SetMyEmailResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetMyMetadataResponse
 
 
 

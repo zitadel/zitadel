@@ -8,10 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
-type MessageTextsView struct {
-	Texts   []*MessageTextView
-	Default bool
-}
 type MessageTextView struct {
 	AggregateID     string
 	MessageTextType string

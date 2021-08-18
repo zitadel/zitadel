@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-type PasswordLockoutPolicyView struct {
+type LockoutPolicyView struct {
 	AggregateID         string
-	MaxAttempts         uint64
+	MaxPasswordAttempts uint64
 	ShowLockOutFailures bool
 	Default             bool
 
@@ -16,32 +16,32 @@ type PasswordLockoutPolicyView struct {
 	Sequence     uint64
 }
 
-type PasswordLockoutPolicySearchRequest struct {
+type LockoutPolicySearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn PasswordLockoutPolicySearchKey
+	SortingColumn LockoutPolicySearchKey
 	Asc           bool
-	Queries       []*PasswordLockoutPolicySearchQuery
+	Queries       []*LockoutPolicySearchQuery
 }
 
-type PasswordLockoutPolicySearchKey int32
+type LockoutPolicySearchKey int32
 
 const (
-	PasswordLockoutPolicySearchKeyUnspecified PasswordLockoutPolicySearchKey = iota
-	PasswordLockoutPolicySearchKeyAggregateID
+	LockoutPolicySearchKeyUnspecified LockoutPolicySearchKey = iota
+	LockoutPolicySearchKeyAggregateID
 )
 
-type PasswordLockoutPolicySearchQuery struct {
-	Key    PasswordLockoutPolicySearchKey
+type LockoutPolicySearchQuery struct {
+	Key    LockoutPolicySearchKey
 	Method domain.SearchMethod
 	Value  interface{}
 }
 
-type PasswordLockoutPolicySearchResponse struct {
+type LockoutPolicySearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*PasswordLockoutPolicyView
+	Result      []*LockoutPolicyView
 	Sequence    uint64
 	Timestamp   time.Time
 }

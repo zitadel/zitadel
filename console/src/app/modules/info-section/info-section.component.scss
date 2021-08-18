@@ -2,6 +2,8 @@
 
 @mixin info-section-theme($theme) {
   $primary: map-get($theme, primary);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
@@ -25,29 +27,29 @@
     }
 
     &.info {
-      background-color: if($is-dark-theme, #6d6f7382, #e4e4e4);
-      color: if($is-dark-theme, #f0f0f0, #4a4a4a);
+      background-color: map-get($background, infosection);
+      color: map-get($foreground, infosection);
 
       .icon {
-        color: $primary-color;
+        color: map-get($foreground, infosection);
       }
     }
 
     &.success {
-      background-color: if($is-dark-theme, #4f566b, #cbf4c9);
-      color: if($is-dark-theme, #cbf4c9, #0e6245);
+      background-color: map-get($background, successinfosection);
+      color: map-get($foreground, successinfosection);
 
       .icon {
-        color: $primary-color;
+        color: map-get($foreground, successinfosection);
       }
     }
 
     &.warn {
-      background-color: if($is-dark-theme, #4f566b, #ffc1c1);
-      color: if($is-dark-theme, #ffc1c1, #620e0e);
+      background-color: map-get($background, warninfosection);
+      color: map-get($foreground, warninfosection);
 
       .icon {
-        color: if($is-dark-theme, #ffc1c1, #620e0e);
+        color: map-get($foreground, warninfosection);
       }
     }
   }

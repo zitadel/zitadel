@@ -78,7 +78,8 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 		}
 	}
 
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMFAInitVerify], data, nil)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAInitVerify], data, nil)
 }
 
 func generateQrCode(url string) (string, error) {

@@ -3,10 +3,12 @@
 @mixin app-card-theme($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat.get-color-from-palette($primary, A900);
+  $background: map-get($theme, background);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
   $accent-color: mat.get-color-from-palette($primary, 500);
+  $back: map-get($background, background);
+
   /* stylelint-enable */
 
   .cnsl-app-card {
@@ -25,7 +27,7 @@
     text-transform: uppercase;
     border-radius: .5rem;
     font-weight: 800;
-    background-color: $primary-dark;
+    background-color: $back;
     transition: background-color box-shadow .3s ease-in;
 
     &.web {

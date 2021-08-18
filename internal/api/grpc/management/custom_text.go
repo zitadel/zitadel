@@ -18,7 +18,7 @@ func (s *Server) GetCustomInitMessageText(ctx context.Context, req *mgmt_pb.GetC
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomInitMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -28,7 +28,7 @@ func (s *Server) GetDefaultInitMessageText(ctx context.Context, req *mgmt_pb.Get
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultInitMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -66,7 +66,7 @@ func (s *Server) GetCustomPasswordResetMessageText(ctx context.Context, req *mgm
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomPasswordResetMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -76,7 +76,7 @@ func (s *Server) GetDefaultPasswordResetMessageText(ctx context.Context, req *mg
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultPasswordResetMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -114,7 +114,7 @@ func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *mgmt_
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomVerifyEmailMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -124,7 +124,7 @@ func (s *Server) GetDefaultVerifyEmailMessageText(ctx context.Context, req *mgmt
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultVerifyEmailMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -162,7 +162,7 @@ func (s *Server) GetCustomVerifyPhoneMessageText(ctx context.Context, req *mgmt_
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomVerifyPhoneMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -172,7 +172,7 @@ func (s *Server) GetDefaultVerifyPhoneMessageText(ctx context.Context, req *mgmt
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultVerifyPhoneMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -210,7 +210,7 @@ func (s *Server) GetCustomDomainClaimedMessageText(ctx context.Context, req *mgm
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomDomainClaimedMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
@@ -220,11 +220,11 @@ func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *mg
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultDomainClaimedMessageTextResponse{
-		CustomText: text_grpc.ModelCustomMsgTextToPb(msg),
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
 	}, nil
 }
 
-func (s *Server) SetCustomDomainClaimedMessageText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
+func (s *Server) SetCustomDomainClaimedMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.SetCustomDomainClaimedMessageTextResponse, error) {
 	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
@@ -244,6 +244,102 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 		return nil, err
 	}
 	return &mgmt_pb.ResetCustomDomainClaimedMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) GetCustomPasswordlessRegistrationMessageText(ctx context.Context, req *mgmt_pb.GetCustomPasswordlessRegistrationMessageTextRequest) (*mgmt_pb.GetCustomPasswordlessRegistrationMessageTextResponse, error) {
+	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordlessRegistrationMessageType, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetCustomPasswordlessRegistrationMessageTextResponse{
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *mgmt_pb.GetDefaultPasswordlessRegistrationMessageTextRequest) (*mgmt_pb.GetDefaultPasswordlessRegistrationMessageTextResponse, error) {
+	msg, err := s.org.GetDefaultMessageText(ctx, domain.PasswordlessRegistrationMessageType, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDefaultPasswordlessRegistrationMessageTextResponse{
+		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetCustomPasswordlessRegistrationMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomPasswordlessRegistrationMessageTextRequest) (*mgmt_pb.SetCustomPasswordlessRegistrationMessageTextResponse, error) {
+	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetPasswordlessRegistrationCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetCustomPasswordlessRegistrationMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomPasswordlessRegistrationMessageTextToDefault(ctx context.Context, req *mgmt_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) (*mgmt_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveOrgMessageTexts(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordlessRegistrationMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) GetCustomLoginTexts(ctx context.Context, req *mgmt_pb.GetCustomLoginTextsRequest) (*mgmt_pb.GetCustomLoginTextsResponse, error) {
+	msg, err := s.org.GetLoginTexts(ctx, authz.GetCtxData(ctx).OrgID, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetCustomLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *mgmt_pb.GetDefaultLoginTextsRequest) (*mgmt_pb.GetDefaultLoginTextsResponse, error) {
+	msg, err := s.org.GetDefaultLoginTexts(ctx, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDefaultLoginTextsResponse{
+		CustomText: text_grpc.CustomLoginTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetCustomLoginText(ctx context.Context, req *mgmt_pb.SetCustomLoginTextsRequest) (*mgmt_pb.SetCustomLoginTextsResponse, error) {
+	result, err := s.command.SetOrgLoginText(ctx, authz.GetCtxData(ctx).OrgID, SetLoginCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetCustomLoginTextsResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *mgmt_pb.ResetCustomLoginTextsToDefaultRequest) (*mgmt_pb.ResetCustomLoginTextsToDefaultResponse, error) {
+	result, err := s.command.RemoveOrgLoginTexts(ctx, authz.GetCtxData(ctx).OrgID, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ResetCustomLoginTextsToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.EventDate,

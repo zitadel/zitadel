@@ -1,5 +1,5 @@
 FROM ubuntu:latest AS started
-#install dependencies
+#install dependencies with a workaround for the 412 error
 RUN apt-get update \
     && apt-get install curl -y
 

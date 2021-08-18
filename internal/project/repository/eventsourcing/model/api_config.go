@@ -6,6 +6,7 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -72,6 +73,9 @@ func (p *Project) appendChangeAPIConfigEvent(event *es_models.Event) error {
 	}
 
 	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
+		if p.Applications[i].APIConfig == nil {
+			return errors.ThrowInvalidArgument(nil, "MODEL-ADbsd", "api config is nil")
+		}
 		return p.Applications[i].APIConfig.setData(event)
 	}
 	return nil

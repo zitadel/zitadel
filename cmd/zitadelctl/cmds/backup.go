@@ -21,10 +21,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 	flags.StringVar(&backup, "backup", "", "Name used for backup folder")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
-		rv, err := getRv()
-		if err != nil {
-			return err
-		}
+		rv := getRv("backup", map[string]interface{}{"backup": backup}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -47,6 +44,7 @@ func BackupCommand(getRv GetRootValues) *cobra.Command {
 			); err != nil {
 				return err
 			}
+
 		} else {
 			if err := databases.CrdInstantBackup(
 				monitor,

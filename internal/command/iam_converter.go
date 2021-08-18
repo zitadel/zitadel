@@ -112,11 +112,19 @@ func writeModelToPasswordComplexityPolicy(wm *PasswordComplexityPolicyWriteModel
 	}
 }
 
-func writeModelToPasswordLockoutPolicy(wm *PasswordLockoutPolicyWriteModel) *domain.PasswordLockoutPolicy {
-	return &domain.PasswordLockoutPolicy{
+func writeModelToLockoutPolicy(wm *LockoutPolicyWriteModel) *domain.LockoutPolicy {
+	return &domain.LockoutPolicy{
 		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
-		MaxAttempts:         wm.MaxAttempts,
+		MaxPasswordAttempts: wm.MaxPasswordAttempts,
 		ShowLockOutFailures: wm.ShowLockOutFailures,
+	}
+}
+
+func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
+		TOSLink:     wm.TOSLink,
+		PrivacyLink: wm.PrivacyLink,
 	}
 }
 
@@ -137,6 +145,8 @@ func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *domain.OIDCIDPConfig {
 		IDPConfigID:           wm.IDPConfigID,
 		IDPDisplayNameMapping: wm.IDPDisplayNameMapping,
 		Issuer:                wm.Issuer,
+		AuthorizationEndpoint: wm.AuthorizationEndpoint,
+		TokenEndpoint:         wm.TokenEndpoint,
 		Scopes:                wm.Scopes,
 		UsernameMapping:       wm.UserNameMapping,
 	}

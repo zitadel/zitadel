@@ -102,7 +102,7 @@ func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
 		token.State = int32(model.MFAStateReady)
 		return nil
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.MFA.U2F.NotExisting")
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.MFA.Provider1.NotExisting")
 }
 
 func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
@@ -115,7 +115,7 @@ func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
 		token.setData(event)
 		return nil
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-5Ms8h", "Errors.Users.MFA.U2F.NotExisting")
+	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-5Ms8h", "Errors.Users.MFA.Provider1.NotExisting")
 }
 
 func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {

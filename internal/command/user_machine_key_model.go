@@ -1,8 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/user"
@@ -65,13 +66,16 @@ func (wm *MachineKeyWriteModel) Reduce() error {
 }
 
 func (wm *MachineKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			user.MachineKeyAddedEventType,
 			user.MachineKeyRemovedEventType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		Builder()
 }
 
 func (wm *MachineKeyWriteModel) Exists() bool {

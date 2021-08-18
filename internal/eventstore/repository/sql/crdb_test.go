@@ -5,10 +5,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lib/pq"
-	_ "github.com/lib/pq"
-
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/lib/pq"
 )
 
 func TestCRDB_placeholder(t *testing.T) {
@@ -749,8 +747,10 @@ func TestCRDB_Filter(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -771,9 +771,11 @@ func TestCRDB_Filter(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsEvent,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
-						repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+							repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -837,8 +839,10 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsMaxSequence,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -859,8 +863,10 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			args: args{
 				searchQuery: &repository.SearchQuery{
 					Columns: repository.ColumnsMaxSequence,
-					Filters: []*repository.Filter{
-						repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
+						},
 					},
 				},
 			},
@@ -1093,20 +1099,6 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 	return e
 }
 
-func generateEventWithData(t *testing.T, aggregateID string, data []byte) *repository.Event {
-	t.Helper()
-	return &repository.Event{
-		AggregateID:   aggregateID,
-		AggregateType: repository.AggregateType(t.Name()),
-		EditorService: "svc",
-		EditorUser:    "user",
-		ResourceOwner: "ro",
-		Type:          "test.created",
-		Version:       "v1",
-		Data:          data,
-	}
-}
-
 func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
 	t.Helper()
 	e := &repository.UniqueConstraint{
@@ -1126,24 +1118,5 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 		Action:      repository.UniqueConstraintRemoved,
 	}
 
-	return e
-}
-
-func generateAddAsset(t *testing.T, id string, asset []byte) *repository.Asset {
-	t.Helper()
-	e := &repository.Asset{
-		ID:     id,
-		Asset:  asset,
-		Action: repository.AssetAdded,
-	}
-	return e
-}
-
-func generateRemoveAsset(t *testing.T, id string) *repository.Asset {
-	t.Helper()
-	e := &repository.Asset{
-		ID:     id,
-		Action: repository.AssetRemoved,
-	}
 	return e
 }

@@ -19,5 +19,5 @@ func (l *Login) linkUsers(w http.ResponseWriter, r *http.Request, authReq *domai
 func (l *Login) renderLinkUsersDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var errType, errMessage string
 	data := l.getUserData(r, authReq, "Linking Users Done", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLinkUsersDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLinkUsersDone], data, nil)
 }

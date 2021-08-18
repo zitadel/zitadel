@@ -49,6 +49,10 @@ func (k *Key) ViewModel() string {
 	return keyTable
 }
 
+func (k *Key) Subscription() *v1.Subscription {
+	return k.subscription
+}
+
 func (_ *Key) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.KeyPairAggregate}
 }

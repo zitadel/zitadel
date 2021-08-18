@@ -4,7 +4,7 @@ module.exports = {
     {
       type: 'category',
       label: 'User',
-      items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login', ],
+      items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
       collapsed: false,
     },
     {
@@ -31,7 +31,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Frameworks',
-      items: ['quickstarts/flutter'],
+      items: ['quickstarts/flutter', 'quickstarts/nextjs'],
       collapsed: false,
     },
     {
@@ -48,41 +48,41 @@ module.exports = {
       label: 'Get to know ZITADEL',
       collapsed: false,
       items: [
-          'guides/usage/get-started',
-          'guides/usage/organizations',
-          'guides/usage/projects',
-          'guides/usage/oauth-recommended-flows',
-          'guides/usage/serviceusers',
-          'guides/usage/access-zitadel-apis',
-          'guides/usage/identity-brokering',
+        'guides/usage/get-started',
+        'guides/usage/organizations',
+        'guides/usage/projects',
+        'guides/usage/oauth-recommended-flows',
+        'guides/usage/serviceusers',
+        'guides/usage/access-zitadel-apis',
+        'guides/usage/identity-brokering',
       ],
     },
-      {
+    {
+      type: 'category',
+      label: 'Installation',
+      collapsed: false,
+      items: [
+        {
           type: 'category',
-          label: 'Installation',
-          collapsed: false,
+          label: 'CAOS Managed',
+          collapsed: true,
           items: [
-              {
-                  type: 'category',
-                  label: 'CAOS Managed',
-                  collapsed: true,
-                  items: [
-                      'guides/installation/shared-cloud',
-                      'guides/installation/managed-dedicated-instance'
-                  ],
-              },
-              {
-                  type: 'category',
-                  label: 'Self Managed',
-                  collapsed: true,
-                  items: [
-                      'guides/installation/crd',
-                      'guides/installation/gitops',
-                      'guides/installation/orbos'
-                  ],
-              },
+            'guides/installation/shared-cloud',
+            'guides/installation/managed-dedicated-instance'
           ],
-      }
+        },
+        {
+          type: 'category',
+          label: 'Self Managed',
+          collapsed: true,
+          items: [
+            'guides/installation/crd',
+            'guides/installation/gitops',
+            'guides/installation/orbos'
+          ],
+        },
+      ],
+    }
   ],
   apis: [
     'apis/introduction',
@@ -114,7 +114,9 @@ module.exports = {
         'apis/proto/change',
         'apis/proto/idp',
         'apis/proto/member',
+        'apis/proto/metadata',
         'apis/proto/message',
+        'apis/proto/text',
         'apis/proto/object',
         'apis/proto/options',
       ],
@@ -132,11 +134,11 @@ module.exports = {
       label: 'OpenID Connect & OAuth',
       collapsed: true,
       items: [
-          'apis/openidoauth/endpoints',
-          'apis/openidoauth/scopes',
-          'apis/openidoauth/claims',
-          'apis/openidoauth/authn-methods',
-          'apis/openidoauth/grant-types'
+        'apis/openidoauth/endpoints',
+        'apis/openidoauth/scopes',
+        'apis/openidoauth/claims',
+        'apis/openidoauth/authn-methods',
+        'apis/openidoauth/grant-types'
       ],
     },
   ],
@@ -144,6 +146,7 @@ module.exports = {
     'concepts/introduction',
     'concepts/architecture',
     'concepts/principles',
+    'concepts/eventstore',
   ],
   legal: [
     'legal/introduction',
@@ -160,11 +163,20 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Dedicated Instance',
+      collapsed: false,
+      items: [
+        'legal/terms-of-service-dedicated',
+        'legal/dedicated-instance-annex',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Policies',
       collapsed: false,
       items: [
         'legal/privacy-policy',
-        'legal/acceptable-use-policy', 
+        'legal/acceptable-use-policy',
         'legal/rate-limit-policy'
       ],
     }

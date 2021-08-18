@@ -60,6 +60,10 @@ func (p *NotifyUser) ViewModel() string {
 	return userTable
 }
 
+func (p *NotifyUser) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *NotifyUser) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
 }

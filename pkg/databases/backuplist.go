@@ -19,7 +19,6 @@ func GitOpsListBackups(
 ) {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
-		monitor.Error(err)
 		return nil, err
 	}
 
@@ -35,7 +34,6 @@ func CrdListBackups(
 ) {
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
-		monitor.Error(err)
 		return nil, err
 	}
 
@@ -52,7 +50,6 @@ func listBackups(
 ) {
 	backups, err := orbdb.BackupListFunc()(monitor, k8sClient, desired)
 	if err != nil {
-		monitor.Error(err)
 		return nil, err
 	}
 

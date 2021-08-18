@@ -40,7 +40,8 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegisterOption], data, funcs)
+	translator := l.getTranslator(authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOption], data, funcs)
 }
 
 func (l *Login) handleRegisterOptionCheck(w http.ResponseWriter, r *http.Request) {

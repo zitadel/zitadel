@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/orbos/mntr"
+
 	"github.com/caos/orbos/pkg/secret/read"
 
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -111,6 +113,10 @@ func literalsConfigMap(
 		}
 	}
 
+	sentryEnv, _, doIngest := mntr.Environment()
+	literalsConfigMap["SENTRY_ENVIRONMENT"] = sentryEnv
+	literalsConfigMap["SENTRY_USAGE"] = strconv.FormatBool(doIngest)
+
 	db, err := database.GetDatabaseInQueried(queried)
 	if err == nil {
 		literalsConfigMap["ZITADEL_EVENTSTORE_HOST"] = db.Host
@@ -191,6 +197,13 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
 			}
 		}
+
+		_, dsns, doIngest := mntr.Environment()
+		zitadelDsn := ""
+		if doIngest {
+			zitadelDsn = dsns["zitadel"]
+		}
+		literalsSecretVars["SENTRY_DSN"] = zitadelDsn
 	}
 	return literalsSecretVars, nil
 }

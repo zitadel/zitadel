@@ -80,7 +80,9 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 }
 
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, project.AggregateType).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			project.GrantMemberAddedType,
@@ -88,5 +90,6 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantMemberRemovedType,
 			project.GrantMemberCascadeRemovedType,
 			project.GrantRemovedType,
-			project.ProjectRemovedType)
+			project.ProjectRemovedType).
+		Builder()
 }

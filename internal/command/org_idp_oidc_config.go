@@ -30,6 +30,8 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 		config.IDPConfigID,
 		config.ClientID,
 		config.Issuer,
+		config.AuthorizationEndpoint,
+		config.TokenEndpoint,
 		config.ClientSecretString,
 		c.idpConfigSecretCrypto,
 		config.IDPDisplayNameMapping,

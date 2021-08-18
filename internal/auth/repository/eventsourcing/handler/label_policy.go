@@ -46,6 +46,10 @@ func (m *LabelPolicy) ViewModel() string {
 	return labelPolicyTable
 }
 
+func (p *LabelPolicy) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *LabelPolicy) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
@@ -110,7 +114,7 @@ func (m *LabelPolicy) processLabelPolicy(event *models.Event) (err error) {
 }
 
 func (m *LabelPolicy) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
+	logging.LogWithFields("SPOOL-2ff7s", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
 }
 

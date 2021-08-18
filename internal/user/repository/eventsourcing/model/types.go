@@ -69,6 +69,10 @@ const (
 
 	DomainClaimed     models.EventType = "user.domain.claimed"
 	DomainClaimedSent models.EventType = "user.domain.claimed.sent"
+
+	UserMetadataSet        models.EventType = "user.metadata.set"
+	UserMetadataRemoved    models.EventType = "user.metadata.removed"
+	UserMetadataRemovedAll models.EventType = "user.metadata.removed.all"
 )
 
 // the following consts are for user(v2).human

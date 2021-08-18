@@ -27,6 +27,8 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		config.IDPConfigID,
 		config.ClientID,
 		config.Issuer,
+		config.AuthorizationEndpoint,
+		config.TokenEndpoint,
 		config.ClientSecretString,
 		c.idpConfigSecretCrypto,
 		config.IDPDisplayNameMapping,

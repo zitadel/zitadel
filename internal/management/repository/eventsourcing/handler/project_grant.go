@@ -54,6 +54,10 @@ func (p *ProjectGrant) ViewModel() string {
 	return grantedProjectTable
 }
 
+func (p *ProjectGrant) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *ProjectGrant) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }

@@ -41,3 +41,11 @@ func orgDomainWriteModelToOrgDomain(wm *OrgDomainWriteModel) *domain.OrgDomain {
 		ValidationCode: wm.ValidationCode,
 	}
 }
+
+func orgWriteModelToPrivacyPolicy(wm *OrgPrivacyPolicyWriteModel) *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		ObjectRoot:  writeModelToObjectRoot(wm.PrivacyPolicyWriteModel.WriteModel),
+		TOSLink:     wm.TOSLink,
+		PrivacyLink: wm.PrivacyLink,
+	}
+}

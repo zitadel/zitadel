@@ -37,6 +37,7 @@ func AdaptFunc(
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordsName string,
+	customImageRegistry string,
 ) (
 	func(
 		necessaryUsers map[string]string,
@@ -82,9 +83,9 @@ func AdaptFunc(
 					secretVarsName,
 					secretPasswordsName,
 					namespace,
-					componentLabels,
 					nodeselector,
 					tolerations,
+					customImageRegistry,
 				)
 
 				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
@@ -115,13 +116,30 @@ func AdaptFunc(
 
 }
 
-func jobDef(name *labels.Name, users []string, version *string, resources *k8s.Resources, cmName string, certPath string, secretName string, secretPath string, consoleCMName string, secretVarsName string, secretPasswordsName string, namespace string, componentLabels *labels.Component, nodeselector map[string]string, tolerations []corev1.Toleration) *batchv1.Job {
+func jobDef(
+	name *labels.Name,
+	users []string,
+	version *string,
+	resources *k8s.Resources,
+	cmName string,
+	certPath string,
+	secretName string,
+	secretPath string,
+	consoleCMName string,
+	secretVarsName string,
+	secretPasswordsName string,
+	namespace string,
+	nodeselector map[string]string,
+	tolerations []corev1.Toleration,
+	customImageRegistry string,
+) *batchv1.Job {
 	initContainers := []corev1.Container{
 		deployment.GetInitContainer(
 			rootSecret,
 			dbSecrets,
 			users,
 			deployment.RunAsUser,
+			customImageRegistry,
 		)}
 
 	containers := []corev1.Container{
@@ -141,6 +159,7 @@ func jobDef(name *labels.Name, users []string, version *string, resources *k8s.R
 			users,
 			dbSecrets,
 			"setup",
+			customImageRegistry,
 		)}
 
 	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users)

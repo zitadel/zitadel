@@ -59,6 +59,10 @@ func (i *ExternalIDP) ViewModel() string {
 	return externalIDPTable
 }
 
+func (i *ExternalIDP) Subscription() *v1.Subscription {
+	return i.subscription
+}
+
 func (i *ExternalIDP) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
 }

@@ -49,6 +49,10 @@ func (a *Application) ViewModel() string {
 	return applicationTable
 }
 
+func (a *Application) Subscription() *v1.Subscription {
+	return a.subscription
+}
+
 func (_ *Application) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }
@@ -78,6 +82,7 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		app.ProjectRoleCheck = project.ProjectRoleCheck
+		app.HasProjectCheck = project.HasProjectCheck
 		app.ProjectRoleAssertion = project.ProjectRoleAssertion
 
 		err = app.AppendEvent(event)

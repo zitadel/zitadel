@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	_ "github.com/caos/zitadel/internal/statik"
 )
@@ -25,7 +27,7 @@ func validate(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, 
 	}
 	err := validate.Validate()
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	return handler(ctx, req)
 }

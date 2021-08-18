@@ -134,7 +134,6 @@ func createDialOptions(g Gateway) []grpc.DialOption {
 func addInterceptors(handler http.Handler, g Gateway) http.Handler {
 	handler = http_mw.DefaultMetricsHandler(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
-	handler = http_mw.NoCacheInterceptor(handler)
 	if interceptor, ok := g.(grpcGatewayCustomInterceptor); ok {
 		handler = interceptor.GatewayHTTPInterceptor(handler)
 	}

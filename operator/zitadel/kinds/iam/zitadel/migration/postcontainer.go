@@ -1,8 +1,11 @@
 package migration
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	"strings"
+
+	"github.com/caos/zitadel/operator/common"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 func getPostContainers(
@@ -10,11 +13,13 @@ func getPostContainers(
 	dbPort string,
 	migrationUser string,
 	secretPasswordName string,
+	customImageRegistry string,
 ) []corev1.Container {
+
 	return []corev1.Container{
 		{
 			Name:    "delete-flyway-user",
-			Image:   "cockroachdb/cockroach:v20.2.3",
+			Image:   common.CockroachImage.Reference(customImageRegistry),
 			Command: []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{

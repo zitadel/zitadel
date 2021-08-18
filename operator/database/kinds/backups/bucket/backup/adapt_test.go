@@ -28,7 +28,7 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
-	version := "testVersion"
+	image := "testImage"
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	dbURL := "testDB"
@@ -50,7 +50,6 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 			secretName,
 			secretKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -60,6 +59,7 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
 		),
 	)
 
@@ -82,7 +82,7 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)
@@ -107,7 +107,7 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
-	version := "testVersion2"
+	image := "testImage2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
@@ -127,7 +127,6 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 			secretName,
 			secretKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -137,6 +136,7 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
 		),
 	)
 
@@ -159,7 +159,7 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)
@@ -184,7 +184,7 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
-	version := "testVersion"
+	image := "testImage"
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	jobName := GetJobName(backupName)
@@ -205,7 +205,6 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 			secretName,
 			secretKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -215,6 +214,7 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
 		),
 	)
 
@@ -236,7 +236,7 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)
@@ -261,7 +261,7 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
-	version := "testVersion2"
+	image := "testImage2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
@@ -282,7 +282,6 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 			secretName,
 			secretKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -292,6 +291,7 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
 		),
 	)
 
@@ -313,7 +313,7 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)

@@ -18,11 +18,8 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		}
 	)
 
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rv, err := getRv()
-		if err != nil {
-			return err
-		}
+	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
+		rv := getRv("backuplist", nil, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -40,15 +37,13 @@ func BackupListCommand(getRv GetRootValues) *cobra.Command {
 		if rv.Gitops {
 			backupsT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
 			if err != nil {
-				monitor.Error(err)
-				return nil
+				return err
 			}
 			backups = backupsT
 		} else {
 			backupsT, err := databases.CrdListBackups(monitor, k8sClient)
 			if err != nil {
-				monitor.Error(err)
-				return nil
+				return err
 			}
 			backups = backupsT
 		}

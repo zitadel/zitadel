@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 🚀 Feature Request
+    url: https://github.com/caos/zitadel/discussions/categories/ideas
+    about: Tell us about your idea in the discussions
+  - name: ❓ Questions
+    url: https://github.com/caos/zitadel/discussions/categories/q-a
+    about: Ask for help in our Q&A discussions

@@ -107,6 +107,7 @@ func (repo *UserGrantRepo) SearchMyUserMemberships(ctx context.Context, request 
 	if err != nil {
 		return nil, err
 	}
+	request.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
 	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
 	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
 

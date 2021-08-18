@@ -1,29 +1,29 @@
 package zitadel
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
-
-	"github.com/caos/orbos/pkg/helper"
+	"strings"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/orbos/pkg/secret"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
-
 	core "k8s.io/api/core/v1"
 
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/helper"
 	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/services"
-	"github.com/pkg/errors"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
 )
 
 func AdaptFunc(
@@ -35,6 +35,7 @@ func AdaptFunc(
 	action string,
 	version *string,
 	features []string,
+	customImageRegistry string,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -53,8 +54,19 @@ func AdaptFunc(
 		internalMonitor := monitor.WithField("kind", "iam")
 
 		desiredKind, err := parseDesiredV0(desired)
+
+		_, _, sendAnalytics := mntr.Environment()
+		if sendAnalytics &&
+			desiredKind != nil &&
+			desiredKind.Spec != nil &&
+			desiredKind.Spec.Configuration != nil &&
+			desiredKind.Spec.Configuration.DNS != nil &&
+			desiredKind.Spec.Configuration.DNS.Domain != "" {
+			monitor.SwitchEnvironment(strings.ToLower(strings.ReplaceAll(desiredKind.Spec.Configuration.DNS.Domain, ".", "-")))
+		}
+
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
 
@@ -141,6 +153,7 @@ func AdaptFunc(
 			usersWithoutPWs,
 			nodeselector,
 			tolerations,
+			customImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -162,6 +175,7 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
+			customImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -189,6 +203,7 @@ func AdaptFunc(
 			migration.GetDoneFunc(monitor, namespace, action),
 			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			setup.GetDoneFunc(monitor, namespace, action),
+			customImageRegistry,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err

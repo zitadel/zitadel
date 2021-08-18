@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 
@@ -45,6 +46,10 @@ func (m *MessageText) ViewModel() string {
 	return mailTextTable
 }
 
+func (m *MessageText) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *MessageText) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{iam_es_model.IAMAggregate}
 }
@@ -80,19 +85,19 @@ func (m *MessageText) processMessageText(event *es_models.Event) (err error) {
 	switch event.Type {
 	case model.CustomTextSet,
 		model.CustomTextRemoved:
-		text := new(iam_model.CustomText)
+		text := new(iam_model.CustomTextView)
 		err = text.SetData(event)
 		if err != nil {
 			return err
 		}
-		message, err = m.view.MessageTextByIDs(event.AggregateID, text.Template, text.Language.String())
+		message, err = m.view.MessageTextByIDs(event.AggregateID, text.Template, text.Language)
 		if err != nil && !caos_errs.IsNotFound(err) {
 			return err
 		}
 		if caos_errs.IsNotFound(err) {
 			err = nil
 			message = new(iam_model.MessageTextView)
-			message.Language = text.Language.String()
+			message.Language = text.Language
 			message.MessageTextType = text.Template
 			message.CreationDate = event.CreationDate
 		}

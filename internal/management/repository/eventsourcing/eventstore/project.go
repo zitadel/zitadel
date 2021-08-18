@@ -47,7 +47,13 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 		project = new(model.ProjectView)
 	}
 
-	events, esErr := repo.getProjectEvents(ctx, id, project.Sequence)
+	sequence := project.Sequence
+	currentSequence, err := repo.View.GetLatestProjectSequence()
+	if err == nil {
+		sequence = currentSequence.CurrentSequence
+	}
+
+	events, esErr := repo.getProjectEvents(ctx, id, sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8yfKu", "Errors.Project.NotFound")
 	}

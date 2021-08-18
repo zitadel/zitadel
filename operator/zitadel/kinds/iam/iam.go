@@ -3,16 +3,16 @@ package iam
 import (
 	"fmt"
 
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	core "k8s.io/api/core/v1"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
+
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel"
-	"github.com/pkg/errors"
-	core "k8s.io/api/core/v1"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 func Adapt(
@@ -27,6 +27,7 @@ func Adapt(
 	action string,
 	version *string,
 	features []string,
+	customImageRegistry string,
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
@@ -45,9 +46,19 @@ func Adapt(
 
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/ZITADEL":
-		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version)
-		return zitadel.AdaptFunc(apiLabels, nodeselector, tolerations, dbClient, namespace, action, version, features)(monitor, desiredTree, currentTree)
+		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version())
+		return zitadel.AdaptFunc(
+			apiLabels,
+			nodeselector,
+			tolerations,
+			dbClient,
+			namespace,
+			action,
+			version,
+			features,
+			customImageRegistry,
+		)(monitor, desiredTree, currentTree)
 	default:
-		return nil, nil, nil, nil, nil, false, errors.Errorf("unknown iam kind %s", desiredTree.Common.Kind)
+		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("unknown iam kind %s", desiredTree.Common.Kind))
 	}
 }

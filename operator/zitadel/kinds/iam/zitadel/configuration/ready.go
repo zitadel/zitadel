@@ -1,9 +1,10 @@
 package configuration
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/pkg/errors"
 )
 
 func GetReadyFunc(
@@ -18,23 +19,23 @@ func GetReadyFunc(
 	return func(k8sClient kubernetes.ClientInt) error {
 		monitor.Debug("Waiting for configuration to be created")
 		if err := k8sClient.WaitForSecret(namespace, secretName, timeout); err != nil {
-			return errors.Wrap(err, "error while waiting for secret")
+			return fmt.Errorf("error while waiting for secret: %w", err)
 		}
 
 		if err := k8sClient.WaitForSecret(namespace, secretVarsName, timeout); err != nil {
-			return errors.Wrap(err, "error while waiting for vars secret ")
+			return fmt.Errorf("error while waiting for vars secret: %w", err)
 		}
 
 		if err := k8sClient.WaitForSecret(namespace, secretPasswordName, timeout); err != nil {
-			return errors.Wrap(err, "error while waiting for password secret")
+			return fmt.Errorf("error while waiting for password secret: %w", err)
 		}
 
 		if err := k8sClient.WaitForConfigMap(namespace, cmName, timeout); err != nil {
-			return errors.Wrap(err, "error while waiting for configmap")
+			return fmt.Errorf("error while waiting for configmap: %w", err)
 		}
 
 		if err := k8sClient.WaitForConfigMap(namespace, consoleCMName, timeout); err != nil {
-			return errors.Wrap(err, "error while waiting for console configmap")
+			return fmt.Errorf("error while waiting for console configmap: %w", err)
 		}
 		monitor.Debug("configuration is created")
 		return nil

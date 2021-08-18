@@ -165,6 +165,9 @@ func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
 	}
 
 	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
+		if p.Applications[i].OIDCConfig == nil {
+			return errors.ThrowInvalidArgument(nil, "MODEL-aBR5G", "oidc config is nil")
+		}
 		return p.Applications[i].OIDCConfig.setData(event)
 	}
 	return nil

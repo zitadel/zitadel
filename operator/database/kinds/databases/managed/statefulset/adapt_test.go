@@ -1,6 +1,8 @@
 package statefulset
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -13,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"testing"
 )
 
 func TestStatefulset_JoinExec0(t *testing.T) {
@@ -49,12 +50,12 @@ func TestStatefulset_JoinExec2(t *testing.T) {
 func TestStatefulset_Resources0(t *testing.T) {
 	equals := corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			"cpu":    resource.MustParse("100m"),
-			"memory": resource.MustParse("512Mi"),
+			"cpu":    resource.MustParse("1"),
+			"memory": resource.MustParse("6Gi"),
 		},
 		Limits: corev1.ResourceList{
-			"cpu":    resource.MustParse("100m"),
-			"memory": resource.MustParse("512Mi"),
+			"cpu":    resource.MustParse("4"),
+			"memory": resource.MustParse("8Gi"),
 		},
 	}
 
@@ -291,7 +292,7 @@ func TestStatefulset_Adapt1(t *testing.T) {
 		image,
 		serviceAccountName,
 		replicaCount,
-		storageCapacity,
+		resource.MustParse(storageCapacity),
 		dbPort,
 		httpPort,
 		storageClass,
@@ -487,7 +488,7 @@ func TestStatefulset_Adapt2(t *testing.T) {
 		image,
 		serviceAccountName,
 		replicaCount,
-		storageCapacity,
+		resource.MustParse(storageCapacity),
 		dbPort,
 		httpPort,
 		storageClass,

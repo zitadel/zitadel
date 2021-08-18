@@ -54,12 +54,15 @@ func (wm *IAMMemberWriteModel) Reduce() error {
 }
 
 func (wm *IAMMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.MemberWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.MemberWriteModel.AggregateID).
 		EventTypes(
 			iam.MemberAddedEventType,
 			iam.MemberChangedEventType,
 			iam.MemberRemovedEventType,
-			iam.MemberCascadeRemovedEventType)
+			iam.MemberCascadeRemovedEventType).
+		Builder()
 }

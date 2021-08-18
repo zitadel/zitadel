@@ -7,10 +7,10 @@ import (
 	"testing"
 )
 
-func TestAppendAddPasswordLockoutPolicyEvent(t *testing.T) {
+func TestAppendAddLockoutPolicyEvent(t *testing.T) {
 	type args struct {
 		org    *Org
-		policy *iam_es_model.PasswordLockoutPolicy
+		policy *iam_es_model.LockoutPolicy
 		event  *es_models.Event
 	}
 	tests := []struct {
@@ -19,13 +19,13 @@ func TestAppendAddPasswordLockoutPolicyEvent(t *testing.T) {
 		result *Org
 	}{
 		{
-			name: "append add password age policy event",
+			name: "append add lockout policy event",
 			args: args{
 				org:    &Org{},
-				policy: &iam_es_model.PasswordLockoutPolicy{MaxAttempts: 10},
+				policy: &iam_es_model.LockoutPolicy{MaxPasswordAttempts: 10},
 				event:  &es_models.Event{},
 			},
-			result: &Org{PasswordLockoutPolicy: &iam_es_model.PasswordLockoutPolicy{MaxAttempts: 10}},
+			result: &Org{LockoutPolicy: &iam_es_model.LockoutPolicy{MaxPasswordAttempts: 10}},
 		},
 	}
 	for _, tt := range tests {
@@ -34,18 +34,18 @@ func TestAppendAddPasswordLockoutPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.policy)
 				tt.args.event.Data = data
 			}
-			tt.args.org.appendAddPasswordLockoutPolicyEvent(tt.args.event)
-			if tt.result.PasswordLockoutPolicy.MaxAttempts != tt.args.org.PasswordLockoutPolicy.MaxAttempts {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.PasswordLockoutPolicy.MaxAttempts, tt.args.org.PasswordLockoutPolicy.MaxAttempts)
+			tt.args.org.appendAddLockoutPolicyEvent(tt.args.event)
+			if tt.result.LockoutPolicy.MaxPasswordAttempts != tt.args.org.LockoutPolicy.MaxPasswordAttempts {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LockoutPolicy.MaxPasswordAttempts, tt.args.org.LockoutPolicy.MaxPasswordAttempts)
 			}
 		})
 	}
 }
 
-func TestAppendChangePasswordLockoutPolicyEvent(t *testing.T) {
+func TestAppendChangeLockoutPolicyEvent(t *testing.T) {
 	type args struct {
 		org    *Org
-		policy *iam_es_model.PasswordLockoutPolicy
+		policy *iam_es_model.LockoutPolicy
 		event  *es_models.Event
 	}
 	tests := []struct {
@@ -54,16 +54,16 @@ func TestAppendChangePasswordLockoutPolicyEvent(t *testing.T) {
 		result *Org
 	}{
 		{
-			name: "append change password age policy event",
+			name: "append change lockout policy event",
 			args: args{
-				org: &Org{PasswordLockoutPolicy: &iam_es_model.PasswordLockoutPolicy{
-					MaxAttempts: 10,
+				org: &Org{LockoutPolicy: &iam_es_model.LockoutPolicy{
+					MaxPasswordAttempts: 10,
 				}},
-				policy: &iam_es_model.PasswordLockoutPolicy{MaxAttempts: 5, ShowLockOutFailures: true},
+				policy: &iam_es_model.LockoutPolicy{MaxPasswordAttempts: 5, ShowLockOutFailures: true},
 				event:  &es_models.Event{},
 			},
-			result: &Org{PasswordLockoutPolicy: &iam_es_model.PasswordLockoutPolicy{
-				MaxAttempts:         5,
+			result: &Org{LockoutPolicy: &iam_es_model.LockoutPolicy{
+				MaxPasswordAttempts: 5,
 				ShowLockOutFailures: true,
 			}},
 		},
@@ -74,12 +74,12 @@ func TestAppendChangePasswordLockoutPolicyEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.policy)
 				tt.args.event.Data = data
 			}
-			tt.args.org.appendChangePasswordLockoutPolicyEvent(tt.args.event)
-			if tt.result.PasswordLockoutPolicy.MaxAttempts != tt.args.org.PasswordLockoutPolicy.MaxAttempts {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.PasswordLockoutPolicy.MaxAttempts, tt.args.org.PasswordLockoutPolicy.MaxAttempts)
+			tt.args.org.appendChangeLockoutPolicyEvent(tt.args.event)
+			if tt.result.LockoutPolicy.MaxPasswordAttempts != tt.args.org.LockoutPolicy.MaxPasswordAttempts {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LockoutPolicy.MaxPasswordAttempts, tt.args.org.LockoutPolicy.MaxPasswordAttempts)
 			}
-			if tt.result.PasswordLockoutPolicy.ShowLockOutFailures != tt.args.org.PasswordLockoutPolicy.ShowLockOutFailures {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.PasswordLockoutPolicy.ShowLockOutFailures, tt.args.org.PasswordLockoutPolicy.ShowLockOutFailures)
+			if tt.result.LockoutPolicy.ShowLockOutFailures != tt.args.org.LockoutPolicy.ShowLockOutFailures {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.LockoutPolicy.ShowLockOutFailures, tt.args.org.LockoutPolicy.ShowLockOutFailures)
 			}
 		})
 	}

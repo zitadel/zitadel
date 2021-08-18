@@ -36,6 +36,19 @@ title: zitadel/policy.proto
 
 
 
+### LockoutPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| max_password_attempts |  uint64 | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### LoginPolicy
 
 
@@ -98,15 +111,15 @@ title: zitadel/policy.proto
 
 
 
-### PasswordLockoutPolicy
+### PrivacyPolicy
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
-| max_attempts |  uint64 | - |  |
-| show_lockout_failure |  bool | - |  |
+| tos_link |  string | - |  |
+| privacy_link |  string | - |  |
 | is_default |  bool | - |  |
 
 

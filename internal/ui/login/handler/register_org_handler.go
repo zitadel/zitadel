@@ -65,7 +65,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), userIDs)
+	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), userIDs, true)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -85,12 +85,11 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	if formData == nil {
 		formData = new(registerOrgFormData)
 	}
-
 	data := registerOrgData{
 		baseData:            l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
-	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, "0")
+	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, "0")
 	if pwPolicy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = pwPolicy.MinLength
@@ -113,7 +112,8 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		data.IamDomain = orgPolicy.IAMDomain
 	}
 
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegisterOrg], data, nil)
+	translator := l.getTranslator(authRequest)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

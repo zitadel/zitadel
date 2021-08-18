@@ -32,6 +32,8 @@ func TestDeployment_Adapt(t *testing.T) {
 	secretName := "testSecret"
 	consoleCMName := "testConsoleCM"
 	cmName := "testCM"
+	customImageRegistry := ""
+
 	usersMap := map[string]string{"test": "test"}
 	users := []string{}
 	for _, user := range usersMap {
@@ -86,6 +88,7 @@ func TestDeployment_Adapt(t *testing.T) {
 							dbSecrets,
 							users,
 							RunAsUser,
+							customImageRegistry,
 						),
 					},
 					Containers: []corev1.Container{
@@ -105,6 +108,7 @@ func TestDeployment_Adapt(t *testing.T) {
 							users,
 							dbSecrets,
 							"start",
+							customImageRegistry,
 						),
 					},
 					Volumes: GetVolumes(
@@ -154,6 +158,7 @@ func TestDeployment_Adapt(t *testing.T) {
 		migrationDone,
 		configurationDone,
 		setupDone,
+		customImageRegistry,
 	)
 	assert.NoError(t, err)
 	queried := map[string]interface{}{}

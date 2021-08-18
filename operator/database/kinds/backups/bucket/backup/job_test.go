@@ -1,11 +1,12 @@
 package backup
 
 import (
+	"testing"
+
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 func TestBackup_JobSpec1(t *testing.T) {
@@ -13,10 +14,10 @@ func TestBackup_JobSpec1(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
-	version := "testVersion"
 	command := "test"
 	secretKey := "testKey"
 	secretName := "testSecretName"
+	image := "testImage"
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -26,7 +27,7 @@ func TestBackup_JobSpec1(t *testing.T) {
 				Tolerations:   tolerations,
 				Containers: []corev1.Container{{
 					Name:  backupName,
-					Image: image + ":" + version,
+					Image: image,
 					Command: []string{
 						"/bin/bash",
 						"-c",
@@ -62,7 +63,7 @@ func TestBackup_JobSpec1(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, version, command))
+	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image))
 }
 
 func TestBackup_JobSpec2(t *testing.T) {
@@ -70,10 +71,10 @@ func TestBackup_JobSpec2(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
-	version := "testVersion2"
 	command := "test2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
+	image := "testImage2"
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -83,7 +84,7 @@ func TestBackup_JobSpec2(t *testing.T) {
 				Tolerations:   tolerations,
 				Containers: []corev1.Container{{
 					Name:  backupName,
-					Image: image + ":" + version,
+					Image: image,
 					Command: []string{
 						"/bin/bash",
 						"-c",
@@ -119,5 +120,5 @@ func TestBackup_JobSpec2(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, version, command))
+	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image))
 }

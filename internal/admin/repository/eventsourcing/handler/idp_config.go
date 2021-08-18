@@ -39,6 +39,10 @@ func (i *IDPConfig) subscribe() {
 	}()
 }
 
+func (i *IDPConfig) Subscription() *v1.Subscription {
+	return i.subscription
+}
+
 func (i *IDPConfig) ViewModel() string {
 	return idpConfigTable
 }

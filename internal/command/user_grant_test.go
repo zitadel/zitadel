@@ -140,7 +140,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -187,7 +187,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -229,7 +229,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -272,7 +272,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -331,7 +331,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -403,7 +403,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -503,24 +503,6 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid permissions, error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				userGrant: &domain.UserGrant{
-					UserID: "user1",
-				},
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "invalid usergrant, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -536,6 +518,36 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "invalid permissions, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "usergrant1",
+					},
+					UserID: "user1",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsPermissionDenied,
 			},
 		},
 		{
@@ -705,7 +717,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -764,7 +776,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -818,7 +830,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -873,7 +885,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -944,7 +956,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -1031,7 +1043,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(

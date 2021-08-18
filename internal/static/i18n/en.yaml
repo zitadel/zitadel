@@ -92,6 +92,7 @@ Errors:
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
+      NotFound: External IDP not found
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
@@ -355,6 +356,15 @@ Errors:
     AlreadyExists: Custom text already exists
     Invalid: Custom text invalid
     NotFound: Custom text not found
+  TranslationFile:
+    ReadError: Error in reading translation file
+    MergeError: Translation file could not be merged with custom translations
+    NotFound: Translation file doesn't exist
+  MetaData:
+    NotFound: Metadata not found
+    NoData: Metadata list is empty
+    Invalid: Metadata is invalid
+    KeyNotExisting: One or more keys do not exist
 EventTypes:
   user:
     added: User added
@@ -474,8 +484,21 @@ EventTypes:
             failed: Passwordless Login check failed
           signcount:
             changed: Checksum of the Passwordless Login Token has been changed
+        initialization:
+          code:
+            added: Passwordless initialisation code added
+            sent: Passwordless initialisation code sent
+            requested: Passwordless initialisation code requested
+            check:
+              succeeded: Passwordless initialisation code successfuly checked
+              failed: Passwordless initialisation code check failed
       signed:
         out: User signed out
+      refresh:
+        token:
+          added: Refresh Token created
+          renewed: Refresh Token renewed
+          removed: Refresh Token removed
     locked: User locked
     unlocked: User unlocked
     deactivated: User deactivated
@@ -573,6 +596,11 @@ EventTypes:
         config:
           added: SAML IDP configuration added
           changed: SAML IDP configuration changed
+    customtext:
+      set: Custom text set
+      removed: Custom text removed
+      template:
+        removed: Custom text template removed
     policy:
       login:
         added: Login Policy added
@@ -622,6 +650,10 @@ EventTypes:
           removed: Font removed from Label Policy
         assets:
           removed: Assets removed from Label Policy
+      privacy:
+        added: Privacy policy and TOS added
+        changed: Privacy policy and TOS changed
+        removed: Privacy policy and TOS removed
   project:
     added: Project added
     changed: Project changed

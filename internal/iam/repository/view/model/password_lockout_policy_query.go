@@ -6,53 +6,53 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-type PasswordLockoutPolicySearchRequest iam_model.PasswordLockoutPolicySearchRequest
-type PasswordLockoutPolicySearchQuery iam_model.PasswordLockoutPolicySearchQuery
-type PasswordLockoutPolicySearchKey iam_model.PasswordLockoutPolicySearchKey
+type LockoutPolicySearchRequest iam_model.LockoutPolicySearchRequest
+type LockoutPolicySearchQuery iam_model.LockoutPolicySearchQuery
+type LockoutPolicySearchKey iam_model.LockoutPolicySearchKey
 
-func (req PasswordLockoutPolicySearchRequest) GetLimit() uint64 {
+func (req LockoutPolicySearchRequest) GetLimit() uint64 {
 	return req.Limit
 }
 
-func (req PasswordLockoutPolicySearchRequest) GetOffset() uint64 {
+func (req LockoutPolicySearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req PasswordLockoutPolicySearchRequest) GetSortingColumn() repository.ColumnKey {
-	if req.SortingColumn == iam_model.PasswordLockoutPolicySearchKeyUnspecified {
+func (req LockoutPolicySearchRequest) GetSortingColumn() repository.ColumnKey {
+	if req.SortingColumn == iam_model.LockoutPolicySearchKeyUnspecified {
 		return nil
 	}
-	return PasswordLockoutPolicySearchKey(req.SortingColumn)
+	return LockoutPolicySearchKey(req.SortingColumn)
 }
 
-func (req PasswordLockoutPolicySearchRequest) GetAsc() bool {
+func (req LockoutPolicySearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req PasswordLockoutPolicySearchRequest) GetQueries() []repository.SearchQuery {
+func (req LockoutPolicySearchRequest) GetQueries() []repository.SearchQuery {
 	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
-		result[i] = PasswordLockoutPolicySearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
+		result[i] = LockoutPolicySearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req PasswordLockoutPolicySearchQuery) GetKey() repository.ColumnKey {
-	return PasswordLockoutPolicySearchKey(req.Key)
+func (req LockoutPolicySearchQuery) GetKey() repository.ColumnKey {
+	return LockoutPolicySearchKey(req.Key)
 }
 
-func (req PasswordLockoutPolicySearchQuery) GetMethod() domain.SearchMethod {
+func (req LockoutPolicySearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 
-func (req PasswordLockoutPolicySearchQuery) GetValue() interface{} {
+func (req LockoutPolicySearchQuery) GetValue() interface{} {
 	return req.Value
 }
 
-func (key PasswordLockoutPolicySearchKey) ToColumnName() string {
-	switch iam_model.PasswordLockoutPolicySearchKey(key) {
-	case iam_model.PasswordLockoutPolicySearchKeyAggregateID:
-		return PasswordLockoutKeyAggregateID
+func (key LockoutPolicySearchKey) ToColumnName() string {
+	switch iam_model.LockoutPolicySearchKey(key) {
+	case iam_model.LockoutPolicySearchKeyAggregateID:
+		return LockoutKeyAggregateID
 	default:
 		return ""
 	}

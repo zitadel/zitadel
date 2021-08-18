@@ -32,34 +32,36 @@ type UserView struct {
 }
 
 type HumanView struct {
-	PasswordSet            bool
-	PasswordChangeRequired bool
-	UsernameChangeRequired bool
-	PasswordChanged        time.Time
-	FirstName              string
-	LastName               string
-	NickName               string
-	DisplayName            string
-	AvatarKey              string
-	AvatarURL              string
-	PreSignedAvatar        *url.URL
-	PreferredLanguage      string
-	Gender                 Gender
-	Email                  string
-	IsEmailVerified        bool
-	Phone                  string
-	IsPhoneVerified        bool
-	Country                string
-	Locality               string
-	PostalCode             string
-	Region                 string
-	StreetAddress          string
-	OTPState               MFAState
-	U2FTokens              []*WebAuthNView
-	PasswordlessTokens     []*WebAuthNView
-	MFAMaxSetUp            req_model.MFALevel
-	MFAInitSkipped         time.Time
-	InitRequired           bool
+	PasswordSet              bool
+	PasswordInitRequired     bool
+	PasswordChangeRequired   bool
+	UsernameChangeRequired   bool
+	PasswordChanged          time.Time
+	FirstName                string
+	LastName                 string
+	NickName                 string
+	DisplayName              string
+	AvatarKey                string
+	AvatarURL                string
+	PreSignedAvatar          *url.URL
+	PreferredLanguage        string
+	Gender                   Gender
+	Email                    string
+	IsEmailVerified          bool
+	Phone                    string
+	IsPhoneVerified          bool
+	Country                  string
+	Locality                 string
+	PostalCode               string
+	Region                   string
+	StreetAddress            string
+	OTPState                 MFAState
+	U2FTokens                []*WebAuthNView
+	PasswordlessTokens       []*WebAuthNView
+	MFAMaxSetUp              req_model.MFALevel
+	MFAInitSkipped           time.Time
+	InitRequired             bool
+	PasswordlessInitRequired bool
 }
 
 type WebAuthNView struct {

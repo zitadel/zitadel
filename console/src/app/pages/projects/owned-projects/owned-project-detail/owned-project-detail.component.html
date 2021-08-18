@@ -89,6 +89,9 @@
                         <mat-checkbox [(ngModel)]="project.projectRoleCheck" (change)="saveProject()" color="primary">
                             {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
+                        <mat-checkbox [(ngModel)]="project.hasProjectCheck" (change)="saveProject()" color="primary">
+                          {{'PROJECT.HAS_PROJECT' | translate}}</mat-checkbox>
+                        <p class="desc">{{'PROJECT.HAS_PROJECT_DESCRIPTION' | translate}}</p>
                         <div class="divider"></div>
                         <app-project-roles
                             [disabled]="(['project.role.write$', 'project.role.write:'+ project.id]| hasRole | async) == false"

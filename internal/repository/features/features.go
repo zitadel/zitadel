@@ -35,7 +35,10 @@ type FeaturesSetEvent struct {
 	LabelPolicyPrivateLabel  *bool                 `json:"labelPolicyPrivateLabel,omitempty"`
 	LabelPolicyWatermark     *bool                 `json:"labelPolicyWatermark,omitempty"`
 	CustomDomain             *bool                 `json:"customDomain,omitempty"`
-	CustomText               *bool                 `json:"customText,omitempty"`
+	PrivacyPolicy            *bool                 `json:"privacyPolicy,omitempty"`
+	MetadataUser             *bool                 `json:"metadataUser,omitempty"`
+	CustomTextMessage        *bool                 `json:"customTextMessage,omitempty"`
+	CustomTextLogin          *bool                 `json:"customTextLogin,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -154,11 +157,30 @@ func ChangeCustomDomain(customDomain bool) func(event *FeaturesSetEvent) {
 	}
 }
 
-func ChangeCustomText(customText bool) func(event *FeaturesSetEvent) {
+func ChangePrivacyPolicy(privacyPolicy bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.CustomText = &customText
+		e.PrivacyPolicy = &privacyPolicy
 	}
 }
+
+func ChangeMetadataUser(metadataUser bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.MetadataUser = &metadataUser
+	}
+}
+
+func ChangeCustomTextMessage(customTextMessage bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.CustomTextMessage = &customTextMessage
+	}
+}
+
+func ChangeCustomTextLogin(customTextLogin bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.CustomTextLogin = &customTextLogin
+	}
+}
+
 func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

@@ -42,6 +42,10 @@ func (h *testHandler) ViewModel() string {
 	return h.viewModel
 }
 
+func (h *testHandler) Subscription() *v1.Subscription {
+	return nil
+}
+
 func (h *testHandler) EventQuery() (*models.SearchQuery, error) {
 	if h.queryError != nil {
 		return nil, h.queryError

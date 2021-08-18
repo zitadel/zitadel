@@ -23,10 +23,11 @@ We add the label "good first issue" for problems we think are a good starting po
 
 If you like to contribute fork the ZITADEL repository. After you implemented the new feature create a PullRequest in the ZITADEL reposiotry.
 
-Make sure you use semantic release. 
-feat: New Feature
-fix: Bug Fix
-docs: Documentation
+Make sure you use semantic release:
+
+* feat: New Feature
+* fix: Bug Fix
+* docs: Documentation
 
 ## Want to start ZITADEL?
 

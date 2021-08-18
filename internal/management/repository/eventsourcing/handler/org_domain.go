@@ -42,6 +42,10 @@ func (d *OrgDomain) ViewModel() string {
 	return orgDomainTable
 }
 
+func (d *OrgDomain) Subscription() *v1.Subscription {
+	return d.subscription
+}
+
 func (_ *OrgDomain) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate}
 }

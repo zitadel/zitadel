@@ -8,6 +8,8 @@ import {
   AddMyAuthFactorOTPResponse,
   AddMyAuthFactorU2FRequest,
   AddMyAuthFactorU2FResponse,
+  AddMyPasswordlessLinkRequest,
+  AddMyPasswordlessLinkResponse,
   AddMyPasswordlessRequest,
   AddMyPasswordlessResponse,
   GetMyEmailRequest,
@@ -24,6 +26,8 @@ import {
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
   ListMyLinkedIDPsResponse,
+  ListMyMembershipsRequest,
+  ListMyMembershipsResponse,
   ListMyPasswordlessRequest,
   ListMyPasswordlessResponse,
   ListMyProjectOrgsRequest,
@@ -54,6 +58,8 @@ import {
   ResendMyEmailVerificationResponse,
   ResendMyPhoneVerificationRequest,
   ResendMyPhoneVerificationResponse,
+  SendMyPasswordlessLinkRequest,
+  SendMyPasswordlessLinkResponse,
   SetMyEmailRequest,
   SetMyEmailResponse,
   SetMyPhoneRequest,
@@ -74,7 +80,7 @@ import {
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { Gender, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
+import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
 
@@ -346,6 +352,24 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserGrants(req, null).then(resp => resp.toObject());
   }
 
+  public listMyMemberships(limit: number, offset: number,
+    queryList?: MembershipQuery[],
+  ): Promise<ListMyMembershipsResponse.AsObject> {
+    const req = new ListMyMembershipsRequest();
+    const metadata = new ListQuery();
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.auth.listMyMemberships(req, null).then(resp => resp.toObject());
+  }
+
   public getMyEmail(): Promise<GetMyEmailResponse.AsObject> {
     const req = new GetMyEmailRequest();
     return this.grpcService.auth.getMyEmail(req, null).then(resp => resp.toObject());
@@ -491,6 +515,16 @@ export class GrpcAuthService {
     return this.grpcService.auth.verifyMyPasswordless(
       req, null,
     ).then(resp => resp.toObject());
+  }
+
+  public sendMyPasswordlessLink(): Promise<SendMyPasswordlessLinkResponse.AsObject> {
+    const req = new SendMyPasswordlessLinkRequest();
+    return this.grpcService.auth.sendMyPasswordlessLink(req, null).then(resp => resp.toObject());
+  }
+
+  public addMyPasswordlessLink(): Promise<AddMyPasswordlessLinkResponse.AsObject> {
+    const req = new AddMyPasswordlessLinkRequest();
+    return this.grpcService.auth.addMyPasswordlessLink(req, null).then(resp => resp.toObject());
   }
 
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {

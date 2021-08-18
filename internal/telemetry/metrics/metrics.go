@@ -2,8 +2,9 @@ package metrics
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
+
+	"go.opentelemetry.io/otel/metric"
 )
 
 const (

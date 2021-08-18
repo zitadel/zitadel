@@ -7,7 +7,7 @@ type SearchQuery struct {
 	Columns Columns
 	Limit   uint64
 	Desc    bool
-	Filters []*Filter
+	Filters [][]*Filter
 }
 
 //Columns defines which fields of the event are needed for the query

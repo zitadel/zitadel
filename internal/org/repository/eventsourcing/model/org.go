@@ -30,7 +30,7 @@ type Org struct {
 	LoginPolicy              *iam_es_model.LoginPolicy              `json:"-"`
 	PasswordComplexityPolicy *iam_es_model.PasswordComplexityPolicy `json:"-"`
 	PasswordAgePolicy        *iam_es_model.PasswordAgePolicy        `json:"-"`
-	PasswordLockoutPolicy    *iam_es_model.PasswordLockoutPolicy    `json:"-"`
+	LockoutPolicy            *iam_es_model.LockoutPolicy            `json:"-"`
 }
 
 func OrgToModel(org *Org) *org_model.Org {
@@ -60,8 +60,8 @@ func OrgToModel(org *Org) *org_model.Org {
 	if org.PasswordAgePolicy != nil {
 		converted.PasswordAgePolicy = iam_es_model.PasswordAgePolicyToModel(org.PasswordAgePolicy)
 	}
-	if org.PasswordLockoutPolicy != nil {
-		converted.PasswordLockoutPolicy = iam_es_model.PasswordLockoutPolicyToModel(org.PasswordLockoutPolicy)
+	if org.LockoutPolicy != nil {
+		converted.LockoutPolicy = iam_es_model.LockoutPolicyToModel(org.LockoutPolicy)
 	}
 	return converted
 }
@@ -196,12 +196,12 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 		err = o.appendChangePasswordAgePolicyEvent(event)
 	case PasswordAgePolicyRemoved:
 		o.appendRemovePasswordAgePolicyEvent(event)
-	case PasswordLockoutPolicyAdded:
-		err = o.appendAddPasswordLockoutPolicyEvent(event)
-	case PasswordLockoutPolicyChanged:
-		err = o.appendChangePasswordLockoutPolicyEvent(event)
-	case PasswordLockoutPolicyRemoved:
-		o.appendRemovePasswordLockoutPolicyEvent(event)
+	case LockoutPolicyAdded:
+		err = o.appendAddLockoutPolicyEvent(event)
+	case LockoutPolicyChanged:
+		err = o.appendChangeLockoutPolicyEvent(event)
+	case LockoutPolicyRemoved:
+		o.appendRemoveLockoutPolicyEvent(event)
 	}
 	if err != nil {
 		return err

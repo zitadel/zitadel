@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/operator/crtlgitops"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
-	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
+	kuberneteszit "github.com/caos/zitadel/pkg/kubernetes"
 	"github.com/spf13/cobra"
 )
 
@@ -46,10 +46,7 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 
-		rv, err := getRv()
-		if err != nil {
-			return err
-		}
+		rv := getRv("destroy", nil, "")
 		defer func() {
 			err = rv.ErrFunc(err)
 		}()
@@ -75,11 +72,11 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 			"version": version,
 		}).Info("Destroying Orb")
 
-		if err := kubernetes2.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
+		if err := kuberneteszit.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
 			return err
 		}
 
-		if err := kubernetes2.ScaleDatabaseOperator(monitor, k8sClient, 0); err != nil {
+		if err := kuberneteszit.ScaleDatabaseOperator(monitor, k8sClient, 0); err != nil {
 			return err
 		}
 
@@ -123,8 +120,6 @@ func destroyOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kube
 			}
 			spec := desired.Spec
 
-			// at takeoff the artifacts have to be applied
-			spec.SelfReconciling = true
 			_, del := orbzit.Reconcile(monitor, spec, gitops)
 			if err := del(k8sClient); err != nil {
 				return err
@@ -152,8 +147,6 @@ func destroyDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kube
 			}
 			spec := desired.Spec
 
-			// at takeoff the artifacts have to be applied
-			spec.SelfReconciling = true
 			_, del := orbdb.Reconcile(monitor, spec, gitops)
 			if err := del(k8sClient); err != nil {
 				return err

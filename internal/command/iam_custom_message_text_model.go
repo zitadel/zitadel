@@ -39,9 +39,11 @@ func (wm *IAMCustomMessageTextReadModel) Reduce() error {
 }
 
 func (wm *IAMCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		EventTypes(
-			iam.CustomTextSetEventType)
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
+		EventTypes(iam.CustomTextSetEventType).
+		Builder()
 }

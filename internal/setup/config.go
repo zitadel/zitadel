@@ -22,6 +22,8 @@ type IAMSetUp struct {
 	Step14 *command.Step14
 	Step15 *command.Step15
 	Step16 *command.Step16
+	Step17 *command.Step17
+	Step18 *command.Step18
 }
 
 func (setup *IAMSetUp) Steps(currentDone domain.Step) ([]command.Step, error) {
@@ -44,6 +46,8 @@ func (setup *IAMSetUp) Steps(currentDone domain.Step) ([]command.Step, error) {
 		setup.Step14,
 		setup.Step15,
 		setup.Step16,
+		setup.Step17,
+		setup.Step18,
 	} {
 		if step.Step() <= currentDone {
 			continue

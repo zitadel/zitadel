@@ -19,10 +19,9 @@ const (
 	secretPath         = "/secrets/sa.json"
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
-	image              = "cockroachdb/cockroach"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
-	timeout            = 15 * time.Minute
+	timeout            = 45 * time.Minute
 	saJsonBase64Env    = "SAJSON"
 )
 
@@ -40,7 +39,7 @@ func AdaptFunc(
 	secretKey string,
 	dbURL string,
 	dbPort int32,
-	version string,
+	image string,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -65,8 +64,8 @@ func AdaptFunc(
 		tolerations,
 		secretName,
 		secretKey,
-		version,
 		command,
+		image,
 	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)

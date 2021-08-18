@@ -17,7 +17,6 @@ func GitOpsClear(
 ) error {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 
@@ -45,18 +44,15 @@ func clear(
 
 	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, managed.Clean)(monitor, desired, current)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 	queried := map[string]interface{}{}
 	ensure, err := query(k8sClient, queried)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 
 	if err := ensure(k8sClient); err != nil {
-		monitor.Error(err)
 		return err
 	}
 

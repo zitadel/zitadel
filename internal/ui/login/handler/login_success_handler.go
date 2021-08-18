@@ -41,5 +41,5 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 	if authReq != nil {
 		data.RedirectURI = l.oidcAuthCallbackURL
 	}
-	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLoginSuccess], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
 }

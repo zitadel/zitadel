@@ -3,6 +3,9 @@ package eventsourcing
 import (
 	"context"
 
+	"github.com/caos/logging"
+	"github.com/rakyll/statik/fs"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
@@ -14,7 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	es2 "github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
 	key_model "github.com/caos/zitadel/internal/key/model"
@@ -76,6 +79,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
+
 	keyChan := make(chan *key_model.KeyView)
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
 	locker := spooler.NewLocker(sqlClient)
@@ -95,6 +101,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			Command:                    command,
 			AuthRequests:               authReq,
 			View:                       view,
+			Eventstore:                 es,
 			UserSessionViewProvider:    view,
 			UserViewProvider:           view,
 			UserCommandProvider:        command,
@@ -102,7 +109,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,
 			LoginPolicyViewProvider:    view,
+			LockoutPolicyViewProvider:  view,
 			UserGrantProvider:          view,
+			ProjectProvider:            view,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
@@ -150,9 +159,11 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			SearchLimit:    conf.SearchLimit,
 			View:           view,
 			SystemDefaults: systemDefaults,
+			Eventstore:     es,
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
+			LoginDir:       statikLoginFS,
 			IAMV2QuerySide: queries,
 		},
 		eventstore.FeaturesRepo{

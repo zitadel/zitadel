@@ -3,6 +3,7 @@ package command
 import (
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
 )
@@ -42,13 +43,16 @@ func (wm *OrgCustomMessageTextReadModel) Reduce() error {
 }
 
 func (wm *OrgCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,
-			org.CustomTextTemplateRemovedEventType)
+			org.CustomTextTemplateRemovedEventType).
+		Builder()
 }
 
 type OrgCustomMessageTemplatesReadModel struct {
@@ -71,10 +75,19 @@ func (wm *OrgCustomMessageTemplatesReadModel) AppendEvents(events ...eventstore.
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:
+			if !domain.IsMessageTextType(e.Template) {
+				continue
+			}
 			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextSetEvent)
 		case *org.CustomTextRemovedEvent:
+			if !domain.IsMessageTextType(e.Template) {
+				continue
+			}
 			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextRemovedEvent)
 		case *org.CustomTextTemplateRemovedEvent:
+			if !domain.IsMessageTextType(e.Template) {
+				continue
+			}
 			wm.CustomMessageTemplatesReadModel.AppendEvents(&e.CustomTextTemplateRemovedEvent)
 		}
 	}
@@ -85,11 +98,14 @@ func (wm *OrgCustomMessageTemplatesReadModel) Reduce() error {
 }
 
 func (wm *OrgCustomMessageTemplatesReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
-		AggregateIDs(wm.CustomMessageTemplatesReadModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.CustomMessageTemplatesReadModel.AggregateID).
 		EventTypes(
 			org.CustomTextSetEventType,
 			org.CustomTextRemovedEventType,
-			org.CustomTextTemplateRemovedEventType)
+			org.CustomTextTemplateRemovedEventType).
+		Builder()
 }

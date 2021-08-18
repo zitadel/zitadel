@@ -1,9 +1,11 @@
 {{template "main-top" .}}
 
 <div class="head">
+    <h1>{{t "VerifyMFAU2F.Title"}}</h1>
+
     {{ template "user-profile" . }}
 
-    <p>{{t "MFAVerifyU2F.Description"}}</p>
+    <p>{{t "VerifyMFAU2F.Description"}}</p>
 </div>
 
 <form action="{{ mfaInitU2FLoginUrl }}" method="POST">
@@ -14,25 +16,25 @@
     <input type="hidden" name="credentialAssertionData" value="{{ .CredentialCreationData }}"/>
     <input type="hidden" name="credentialData"/>
 
-    <p class="wa-no-support error hidden">{{t "WebAuthN.NotSupported"}}</p>
+    <p class="wa-no-support error hidden">{{t "VerifyMFAU2F.NotSupported"}}</p>
 
     <div id="wa-error" class="error hidden">
         <span class="cause"></span>
-        <span>{{t "WebAuthN.Error.Retry"}}</span>
+        <span>{{t "VerifyMFAU2F.ErrorRetry"}}</span>
     </div>
 
     {{ template "error-message" .}}
 
     <div class="lgn-actions" id="webauthn">
         <span class="fill-space"></span>
-        <a id="btn-login" class="lgn-raised-button lgn-primary wa-support">{{t "Actions.ValidateToken"}}</a>
+        <a id="btn-login" class="lgn-raised-button lgn-primary wa-support">{{t "VerifyMFAU2F.ValidateTokenButtonText"}}</a>
     </div>
 
     {{ if .MFAProviders }}
         <div class="lgn-mfa-other">
-            <p>{{t "MFA.ChooseOther"}}</p>
+            <p>{{t "MFAProvider.ChooseOther"}}</p>
             {{ range $provider := .MFAProviders}}
-                {{ $providerName := (t (printf "MFA.Provider%v" $provider)) }}
+                {{ $providerName := (t (printf "MFAProvider.Provider%v" $provider)) }}
                 <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}">{{$providerName}}</button>
             {{ end }}
         </div>

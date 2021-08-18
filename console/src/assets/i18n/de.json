@@ -60,7 +60,7 @@
     "IAM": "Identity- und Access-Management",
     "IAM_DESC": "Verwalte Deine Organisationen und Administratoren.",
     "IAM_BUTTON": "ZITADEL verwalten",
-    "WELCOME": "Willkommen",
+    "WELCOME": "Loslegen mit ZITADEL",
     "WELCOMESENTENCE": "Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
     "DISCLAIMER": "Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
@@ -107,6 +107,9 @@
   },
   "ACTIONS": {
     "SET":"Übernehmen",
+    "RESETDEFAULT":"Auf Standard zurücksetzen",
+    "RESETTO":"Zurücksetzen auf: ",
+    "RESETCURRENT":"Auf aktuellen Wert zurücksetzen",
     "SHOW":"Aufklappen",
     "HIDE":"Zuklappen",
     "SAVE": "Speichern",
@@ -136,7 +139,9 @@
     "PIN": "Anpinnen",
     "CONFIGURE": "Konfigurieren",
     "SEND": "Senden",
-    "NEWVALUE": "Neuer Wert"
+    "NEWVALUE": "Neuer Wert",
+    "RESTORE":"Wiederherstellen",
+    "CONTINUEWITHOUTSAVE":"Ohne speichern fortfahren"
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -169,7 +174,9 @@
       "REACTIVATE": "Reaktivieren",
       "DEACTIVATE": "Deaktivieren",
       "FILTER": "Filter",
-      "DELETE": "Benutzer löschen"
+      "DELETE": "Benutzer löschen",
+      "UNLOCK": "Benutzer entsperren",
+      "LOCKEDDESCRIPTION":"Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
@@ -196,6 +203,7 @@
       "EMPTY": "Keine Einträge"
     },
     "PASSWORDLESS": {
+      "SEND":"Registrierungslink senden",
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
@@ -222,7 +230,17 @@
       },
       "DIALOG": {
         "DELETE_TITLE": "Passwordless entfernen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?"
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
+        "ADD_TITLE":"Passwortlose Authentifizierung",
+        "ADD_DESCRIPTION":"Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwordlosen Authentifizierungsmethode.",
+        "SEND_DESCRIPTION":"Senden Sie sich einen Registrierungslink an Ihre email adresse.",
+        "SEND":"Registrierungslink senden",
+        "SENT":"Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup forzufahren.",
+        "QRCODE_DESCRIPTION":"QR-Code zum scannen mit einem anderen Gerät generieren.",
+        "QRCODE":"QR-Code generieren",
+        "QRCODE_SCAN":"Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät forzufahren.",
+        "NEW_DESCRIPTION":"Verwenden Sie dieses Gerät um Passwordless aufzusetzen.",
+        "NEW":"Hinzufügen"
       }
     },
     "MFA": {
@@ -416,7 +434,8 @@
     "STATE": {
       "0": "Unbekannt",
       "1": "Aktiv",
-      "2": "Abgelaufen"
+      "2": "Abgelaufen",
+      "4": "Gesperrt"
     },
     "SEARCH": {
       "FOUND": "Gefunden"
@@ -455,11 +474,15 @@
       "SELECTEDKEYSDELETED": "Selektierte Schlüssel gelöscht.",
       "KEYADDED": "Schlüssel hinzugefügt!",
       "MACHINEADDED": "Service User erstellt!",
-      "DELETED": "Benutzer erfolgreich gelöscht!"
+      "DELETED": "Benutzer erfolgreich gelöscht!",
+      "UNLOCKED":"Benutzer erfolgreich freigeschaltet!",
+      "PASSWORDLESSREGISTRATIONSENT":"Link via email versendet."
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
       "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
+      "ORGCONTEXT":"Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
+      "USERCONTEXT":"Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DISPLAYNAME": "Anzeigename",
@@ -628,7 +651,8 @@
       "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
       "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
       "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
-      "CUSTOMTEXT": "Benutzerdefinierte Texte"
+      "CUSTOMTEXT": "Benutzerdefinierte Texte",
+      "PRIVACYPOLICY":"Datenschutzrichtlinie und AGB - benutzerdefiniert"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -636,7 +660,7 @@
       "2": "Annuliert",
       "3": "Durch IAM Owner gesetzt"
     },
-    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!",
+    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer Organisation nicht freigeschaltet!",
     "RETENTIONDAYS": "Tage"
   },
   "POLICY": {
@@ -664,8 +688,13 @@
       "COLORS":"Farben",
       "FONT":"Schrift",
       "ADVANCEDBEHAVIOR":"Erweitertes Verhalten",
-      "DROP":"Bild hier ablegen",
+      "DROP":"Bild hier ablegen oder",
       "RELEASE":"Jetzt loslassen",
+      "DROPFONT":"Fontdatei hier ablegen",
+      "RELEASEFONT":"Jetzt loslassen",
+      "MAXSIZE":"Die maximale Grösse von Uploads ist mit 524kB begrenzt",
+      "MAXSIZEEXCEEDED":"Maximale Grösse von 524kB überschritten",
+      "FONTINLOGINONLY":"Die Schriftart wird momentan nur im Login interface angezeigt.",
       "PREVIEW": {
         "TITLE":"Anmeldung",
         "SECOND":"mit ZITADEL-Konto anmelden.",
@@ -680,7 +709,7 @@
     },
     "PWD_LOCKOUT": {
       "TITLE": "Passwortsperre",
-      "DESCRIPTION": "Standardmässig sind die Passwortwiederholungen bei Falscheingabe nicht begrenzt. Du musst diese Richtlinie installieren, wenn Du Wiederholungsversuche anzeigen, oder eine maximale Anzahl von wiederholten Passworteingaben festlegen möchtest."
+      "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
     "IAM_POLICY": {
       "TITLE": "Zugangseinstellungen IAM",
@@ -696,6 +725,102 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "SAVED": "Erfolgreich gespeichert."
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Datenschutzbestimmungen und AGB",
+      "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
+      "TOSLINK":"Link zu den Allgemeinen Geschäftsbedingungen",
+      "POLICYLINK":"Link zur den Datenschutzrichtlinien",
+      "SAVED": "Saved successfully!",
+      "RESET_TITLE":"Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION":"Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE":"Login Interface Texte",
+      "DESCRIPTION": "Definiere die Texte für das Logininterface. Wenn Texte leer sind, wird der als Platzhalter angezeigte Standardwert verwendet.",
+      "DESCRIPTION_SHORT":"Definiere die Texte für das Logininterface.",
+     "NEWERVERSIONEXISTS":"Neuere Version verfügbar",
+      "CURRENTDATE":"Momentaner Stand",
+      "CHANGEDATE":"Neuer Stand vom",
+      "KEYNAME":"Login Screen / Interface",
+      "RESET_TITLE":"Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "UNSAVED_TITLE":"Ohne speichern fortfahren?",
+      "UNSAVED_DESCRIPTION":"Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
+      "LOCALE":"Sprachcode",
+      "LOCALES": {
+        "de":"German",
+        "en":"English",
+        "it":"Italian",
+        "fr":"French"
+      },
+      "KEYS": {
+        "emailVerificationDoneText":"Email Verification erfolgreich",
+        "emailVerificationText":"Email Verification",
+        "externalUserNotFoundText":"Externer Benutzer nicht gefunden",
+        "footerText":"Fusszeile",
+        "initMfaDoneText":"MFA Initialisierung erfolgreich",
+        "initMfaOtpText":"MFA Initialisierung",
+        "initMfaPromptText":"MFA Einrichtungsaufforderung",
+        "initMfaU2fText":"Universeller Zweitfaktor Initialisierung",
+        "initPasswordDoneText":"Passwort Initialisierung erfolgreich",
+        "initPasswordText":"Password Initialisierung",
+        "initializeDoneText":"Benutzereinrichtung erfolgreich",
+        "initializeUserText":"Benutzereinrichtung",
+        "linkingUserDoneText":"Benutzerverlinkung erfolgreich",
+        "loginText":"Anmelden",
+        "logoutText":"Abmelden",
+        "mfaProvidersText":"MFA Provider",
+        "passwordChangeDoneText":"Passwortwechsel erfolgreich",
+        "passwordChangeText":"Passwortwechsel",
+        "passwordResetDoneText":"Passwort zurücksetzen erfolgreich",
+        "passwordText":"Passwort",
+        "registrationOptionText":"Registrierungsoptionen",
+        "registrationOrgText":"Organisation registrieren",
+        "registrationUserText":"Benutzer registrieren",
+        "selectAccountText":"Account wählen",
+        "successLoginText":"Erfolgreiche Anmeldung",
+        "usernameChangeDoneText":"Benutzernamenwechsel erfolgreich",
+        "usernameChangeText":"Benutzernamenwechsel",
+        "verifyMfaOtpText":"OTP Verifikation",
+        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation",
+        "passwordlessPromptText":"Passwordless Aufforderung",
+        "passwordlessRegistrationDoneText":"Passwordless setzen erfolgreich",
+        "passwordlessRegistrationText":"Passwordless Registrierung",
+        "passwordlessText":"Passwordless"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE":"Email Texte",
+      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
+      "TYPES": {
+        "INIT":"Initialisierung",
+        "VE":"Emailverifikation",
+        "VP":"Telefonnummerverifikation",
+        "PR":"Password Wiederherstellung",
+        "DC":"Domainbeanspruchung",
+        "PL":"Passwordless"
+      },
+      "CHIPS": {
+        "firstname":"Vorname",
+        "lastname":"Nachname",
+        "code":"Code",
+        "preferredLoginName":"Bevorzugter Anmeldename",
+        "displayName":"Anzeigename",
+        "nickName":"Spitzname",
+        "loginnames":"Loginnamen",
+        "domain":"Domain",
+        "lastEmail":"Letzte email",
+        "lastPhone":"Letzte Telefonnummer",
+        "verifiedEmail":"Verifizierte email",
+        "verifiedPhone":"Verifizierte Telefonnummer",
+        "changedate":"Änderungsdatum",
+        "username":"Username",
+        "tempUsername":"Temp. Username"
+      },
+      "TOAST": {
+        "UPDATED":"Benutzerdefinierte Texte gespeichert."
+      }
     },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
     "BTN_INSTALL": "Installieren",
@@ -905,10 +1030,12 @@
       "SELECTGROUPTOOLTIP": "Wähle alle Rollen der Gruppe {{group}} aus.",
       "OPTIONS": "Optionen",
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
-      "ASSERTION_DESCRIPTION": "Rolleninformationen werden der Authentisierung per Token, UserInfo Endpoint oder anderen Methoden bereitgestellt, die in Applikationseinstellungen definiert sind.",
+      "ASSERTION_DESCRIPTION": "Rolleninformationen werden auf dem UserInfo Endpoint oder je nach Applikationseinstellungen in Tokens oder anderen Methoden bereitgestellt.",
       "CHECK": "Rollen bei Authentisierung prüfen",
       "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einem entsprechenden Rolle authentifiziert werden."
     },
+    "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
+    "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der Benutzer nicht authentifiziert werden.",
     "TABLE": {
       "TOTAL": "Einträge gesamt:",
       "SELECTION": "ausgewählt",
@@ -1170,9 +1297,9 @@
       "OVERVIEWSECTION": "Übersicht",
       "OVERVIEWTITLE": "Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
       "ACCESSTOKENROLEASSERTION": "Benutzerrollen dem Access Token hinzufügen",
-      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Bei Auswahl werden dem Access Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Bei Auswahl werden dem Access Token die angeforderten Rollen des authentifizierten Benutzers hinzugefügt.",
       "IDTOKENROLEASSERTION": "Benutzerrollen im ID Token",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "Bei Auswahl werden dem Id Token die Rollen des Authentifizierten Benutzers hinzugefügt.",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Bei Auswahl werden dem ID Token die angeforderten Rollen des authentifizierten Benutzers hinzugefügt.",
       "IDTOKENUSERINFOASSERTION": "User Info im ID Token",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
       "CLOCKSKEW": "ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",

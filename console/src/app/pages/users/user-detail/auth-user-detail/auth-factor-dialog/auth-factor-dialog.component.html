@@ -6,13 +6,13 @@
         <p class="desc">{{'USER.MFA.DIALOG.ADD_MFA_DESCRIPTION' | translate}}</p>
 
         <div class="type-selection">
-            <button mat-raised-button [disabled]="data.otpDisabled" (click)="selectType(AuthFactorType.OTP)">
+            <button mat-raised-button color="primary" [disabled]="data.otpDisabled" (click)="selectType(AuthFactorType.OTP)">
                 <div class="otp-btn">
                     <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>
                     <span>{{'USER.MFA.OTP' | translate}}</span>
                 </div>
             </button>
-            <button mat-raised-button (click)="selectType(AuthFactorType.U2F)">
+            <button mat-raised-button color="primary" (click)="selectType(AuthFactorType.U2F)">
                 <div class="u2f-btn">
                     <div class="icon-row">
                         <i matTooltip="Fingerprint" class="las la-fingerprint"></i>

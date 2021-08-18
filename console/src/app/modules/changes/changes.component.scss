@@ -22,11 +22,12 @@
 
 @mixin changes-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map-get($theme, foreground);
 
   .scroll-container {
     max-height: 50vh;
     overflow-y: scroll;
-    border-bottom: 1px solid if($is-dark-theme, #303131, #e3e8ee);
+    border-bottom: 1px solid map-get($foreground, divider);
     margin-bottom: .5rem;
 
     .date {
@@ -114,11 +115,13 @@
 
         /* stylelint-disable */
         $primary: map-get($theme, primary);
-        $primary-dark: mat.get-color-from-palette($primary, A800);
+        $is-dark-theme: map-get($theme, is-dark);
+        $transparent-color: if($is-dark-theme, rgba(#8795a1, .2), rgba(#8795a1, .2));
+
         /* stylelint-enable */
 
         &.change-item-back {
-          background-color: rgba($primary-dark, .93);
+          background-color: rgba($transparent-color, .93);
           transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
         }
       }

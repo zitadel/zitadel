@@ -1,6 +1,10 @@
 package bucket
 
 import (
+	"fmt"
+
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
@@ -9,10 +13,9 @@ import (
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
-	"github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -32,6 +35,7 @@ func AdaptFunc(
 	dbURL string,
 	dbPort int32,
 	features []string,
+	customImageRegistry string,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -51,7 +55,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
 
@@ -65,6 +69,8 @@ func AdaptFunc(
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
+
+		image := common.BackupImage.Reference(customImageRegistry, version)
 
 		_, destroyB, err := backup.AdaptFunc(
 			internalMonitor,
@@ -82,7 +88,7 @@ func AdaptFunc(
 			dbURL,
 			dbPort,
 			features,
-			version,
+			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -102,7 +108,7 @@ func AdaptFunc(
 			secretKey,
 			dbURL,
 			dbPort,
-			version,
+			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -120,7 +126,7 @@ func AdaptFunc(
 			checkDBReady,
 			secretName,
 			secretKey,
-			version,
+			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -177,7 +183,7 @@ func AdaptFunc(
 					dbURL,
 					dbPort,
 					features,
-					version,
+					image,
 				)
 				if err != nil {
 					return nil, err
@@ -197,7 +203,7 @@ func AdaptFunc(
 					secretKey,
 					dbURL,
 					dbPort,
-					version,
+					image,
 				)
 				if err != nil {
 					return nil, err
@@ -215,7 +221,7 @@ func AdaptFunc(
 					checkDBReady,
 					secretName,
 					secretKey,
-					version,
+					image,
 				)
 				if err != nil {
 					return nil, err
@@ -255,7 +261,6 @@ func AdaptFunc(
 							operator.EnsureFuncToQueryFunc(restore.GetCleanupFunc(monitor, namespace, name)),
 						)
 					}
-
 				}
 
 				for _, cleanup := range cleanupQueries {

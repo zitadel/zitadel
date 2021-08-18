@@ -3,8 +3,14 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/caos/logging"
+	"github.com/getsentry/sentry-go"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
@@ -36,6 +42,9 @@ import (
 	"github.com/caos/zitadel/internal/ui/login"
 	"github.com/caos/zitadel/openapi"
 )
+
+// build argument
+var version = "dev"
 
 type Config struct {
 	Log            logging.Config
@@ -89,6 +98,32 @@ const (
 )
 
 func main() {
+	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
+
+	if enableSentry {
+		sentryVersion := version
+		if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(version)) {
+			sentryVersion = "dev"
+		}
+		err := sentry.Init(sentry.ClientOptions{
+			Environment: os.Getenv("SENTRY_ENVIRONMENT"),
+			Release:     fmt.Sprintf("zitadel-%s", sentryVersion),
+		})
+		if err != nil {
+			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
+		}
+		sentry.CaptureMessage("sentry started")
+		logging.Log("MAIN-adgf3").Info("sentry started")
+		defer func() {
+			err := recover()
+
+			if err != nil {
+				sentry.CurrentHub().Recover(err)
+				sentry.Flush(2 * time.Second)
+				panic(err)
+			}
+		}()
+	}
 	flag.Var(configPaths, "config-files", "paths to the config files")
 	flag.Var(setupPaths, "setup-files", "paths to the setup files")
 	flag.Parse()
@@ -167,7 +202,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
-	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, static, roles, *localDevMode)
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, roles, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
@@ -181,7 +216,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo))
+		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
 	}
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)

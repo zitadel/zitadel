@@ -44,6 +44,10 @@ func (p *Project) ViewModel() string {
 	return projectTable
 }
 
+func (p *Project) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (_ *Project) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{es_model.ProjectAggregate}
 }

@@ -15,12 +15,6 @@ type Request interface {
 
 type AuthRequestType int32
 
-var (
-	authRequestTypeMapping = map[AuthRequestType]Request{
-		AuthRequestTypeOIDC: &AuthRequestOIDC{},
-	}
-)
-
 const (
 	AuthRequestTypeOIDC AuthRequestType = iota
 	AuthRequestTypeSAML

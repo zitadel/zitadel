@@ -1,6 +1,9 @@
 package command
 
 import (
+	"time"
+
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
@@ -124,9 +127,11 @@ func (wm *HumanWebAuthNWriteModel) appendVerifiedEvent(e *user.HumanWebAuthNVeri
 }
 
 func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanU2FTokenAddedType,
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanU2FTokenAddedType,
@@ -135,7 +140,8 @@ func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPasswordlessTokenSignCountChangedType,
 			user.HumanU2FTokenRemovedType,
 			user.HumanPasswordlessTokenRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		Builder()
 }
 
 type HumanU2FTokensReadModel struct {
@@ -199,13 +205,16 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 }
 
 func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanU2FTokenAddedType,
 			user.HumanU2FTokenVerifiedType,
-			user.HumanU2FTokenRemovedType)
+			user.HumanU2FTokenRemovedType).
+		Builder()
 
 }
 
@@ -279,13 +288,16 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 }
 
 func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanPasswordlessTokenVerifiedType,
-			user.HumanPasswordlessTokenRemovedType)
+			user.HumanPasswordlessTokenRemovedType).
+		Builder()
 
 }
 
@@ -349,13 +361,15 @@ func (wm *HumanU2FLoginReadModel) Reduce() error {
 }
 
 func (rm *HumanU2FLoginReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanU2FTokenBeginLoginType,
-			user.UserRemovedType,
-		)
+			user.UserRemovedType).
+		Builder()
 }
 
 type HumanPasswordlessLoginReadModel struct {
@@ -408,12 +422,117 @@ func (wm *HumanPasswordlessLoginReadModel) Reduce() error {
 }
 
 func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(rm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(rm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanPasswordlessTokenBeginLoginType,
-			user.UserRemovedType,
-		)
+			user.UserRemovedType).
+		Builder()
 
+}
+
+type HumanPasswordlessInitCodeWriteModel struct {
+	eventstore.WriteModel
+
+	CodeID     string
+	Attempts   uint8
+	CryptoCode *crypto.CryptoValue
+	Expiration time.Duration
+	State      domain.PasswordlessInitCodeState
+}
+
+func NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner string) *HumanPasswordlessInitCodeWriteModel {
+	return &HumanPasswordlessInitCodeWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		CodeID: codeID,
+	}
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessInitCodeAddedEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeRequestedEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeSentEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeCheckFailedEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
+			if wm.CodeID == e.ID {
+				wm.WriteModel.AppendEvents(e)
+			}
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanPasswordlessInitCodeAddedEvent:
+			wm.appendAddedEvent(e)
+		case *user.HumanPasswordlessInitCodeRequestedEvent:
+			wm.appendRequestedEvent(e)
+		case *user.HumanPasswordlessInitCodeSentEvent:
+			wm.State = domain.PasswordlessInitCodeStateActive
+		case *user.HumanPasswordlessInitCodeCheckFailedEvent:
+			wm.appendCheckFailedEvent(e)
+		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
+			wm.State = domain.PasswordlessInitCodeStateRemoved
+		case *user.UserRemovedEvent:
+			wm.State = domain.PasswordlessInitCodeStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) appendAddedEvent(e *user.HumanPasswordlessInitCodeAddedEvent) {
+	wm.CryptoCode = e.Code
+	wm.Expiration = e.Expiry
+	wm.State = domain.PasswordlessInitCodeStateActive
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) appendRequestedEvent(e *user.HumanPasswordlessInitCodeRequestedEvent) {
+	wm.CryptoCode = e.Code
+	wm.Expiration = e.Expiry
+	wm.State = domain.PasswordlessInitCodeStateRequested
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) appendCheckFailedEvent(e *user.HumanPasswordlessInitCodeCheckFailedEvent) {
+	wm.Attempts++
+	if wm.Attempts == 3 { //TODO: config?
+		wm.State = domain.PasswordlessInitCodeStateRemoved
+	}
+}
+
+func (wm *HumanPasswordlessInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(user.HumanPasswordlessInitCodeAddedType,
+			user.HumanPasswordlessInitCodeRequestedType,
+			user.HumanPasswordlessInitCodeSentType,
+			user.HumanPasswordlessInitCodeCheckFailedType,
+			user.HumanPasswordlessInitCodeCheckSucceededType,
+			user.UserRemovedType).
+		Builder()
 }

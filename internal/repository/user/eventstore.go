@@ -45,6 +45,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UserDomainClaimedType, DomainClaimedEventMapper).
 		RegisterFilterEventMapper(UserDomainClaimedSentType, DomainClaimedSentEventMapper).
 		RegisterFilterEventMapper(UserUserNameChangedType, UsernameChangedEventMapper).
+		RegisterFilterEventMapper(MetadataSetType, MetadataSetEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedType, MetadataRemovedEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper).
 		RegisterFilterEventMapper(HumanAddedType, HumanAddedEventMapper).
 		RegisterFilterEventMapper(HumanRegisteredType, HumanRegisteredEventMapper).
 		RegisterFilterEventMapper(HumanInitialCodeAddedType, HumanInitialCodeAddedEventMapper).
@@ -96,6 +99,11 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPasswordlessTokenBeginLoginType, HumanPasswordlessBeginLoginEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenCheckSucceededType, HumanPasswordlessCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanPasswordlessTokenCheckFailedType, HumanPasswordlessCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessInitCodeAddedType, HumanPasswordlessInitCodeAddedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessInitCodeRequestedType, HumanPasswordlessInitCodeRequestedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessInitCodeSentType, HumanPasswordlessInitCodeSentEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessInitCodeCheckFailedType, HumanPasswordlessInitCodeCodeCheckFailedEventMapper).
+		RegisterFilterEventMapper(HumanPasswordlessInitCodeCheckSucceededType, HumanPasswordlessInitCodeCodeCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanRefreshTokenAddedType, HumanRefreshTokenAddedEventMapper).
 		RegisterFilterEventMapper(HumanRefreshTokenRenewedType, HumanRefreshTokenRenewedEventEventMapper).
 		RegisterFilterEventMapper(HumanRefreshTokenRemovedType, HumanRefreshTokenRemovedEventEventMapper).

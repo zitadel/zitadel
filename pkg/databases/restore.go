@@ -17,7 +17,6 @@ func GitOpsRestore(
 ) error {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 	return restore(monitor, k8sClient, desired, name)
@@ -30,7 +29,6 @@ func CrdRestore(
 ) error {
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 	return restore(monitor, k8sClient, desired, name)

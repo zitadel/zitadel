@@ -22,7 +22,6 @@ const (
 	saJsonBase64Env          = "SAJSON"
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
-	image                    = "cockroachdb/cockroach"
 	rootSecretName           = "cockroachdb.client.root"
 	timeout                  = 15 * time.Minute
 	Normal                   = "backup"
@@ -45,7 +44,7 @@ func AdaptFunc(
 	dbURL string,
 	dbPort int32,
 	features []string,
-	version string,
+	image string,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -68,8 +67,8 @@ func AdaptFunc(
 		secretName,
 		secretKey,
 		backupName,
-		version,
 		command,
+		image,
 	)
 
 	destroyers := []operator.DestroyFunc{}

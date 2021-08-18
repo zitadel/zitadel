@@ -60,7 +60,7 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		},
 	}
 
-	initContainers := []corev1.Container{deployment.GetInitContainer(rootSecret, dbSecrets, users, deployment.RunAsUser)}
+	initContainers := []corev1.Container{deployment.GetInitContainer(rootSecret, dbSecrets, users, deployment.RunAsUser, "")}
 	containers := []corev1.Container{deployment.GetContainer(
 		containerName,
 		version,
@@ -77,6 +77,7 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		users,
 		dbSecrets,
 		"setup",
+		"",
 	)}
 	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users)
 
@@ -133,6 +134,7 @@ func TestSetup_AdaptFunc(t *testing.T) {
 		consoleCMName,
 		secretVarsName,
 		secretPasswordsName,
+		"",
 	)
 
 	queried := map[string]interface{}{}

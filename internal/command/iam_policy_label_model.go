@@ -62,9 +62,11 @@ func (wm *IAMLabelPolicyWriteModel) Reduce() error {
 }
 
 func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, iam.AggregateType).
-		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(iam.AggregateType).
+		AggregateIDs(wm.LabelPolicyWriteModel.AggregateID).
 		EventTypes(
 			iam.LabelPolicyAddedEventType,
 			iam.LabelPolicyChangedEventType,
@@ -77,8 +79,8 @@ func (wm *IAMLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			iam.LabelPolicyIconDarkAddedEventType,
 			iam.LabelPolicyIconDarkRemovedEventType,
 			iam.LabelPolicyFontAddedEventType,
-			iam.LabelPolicyFontRemovedEventType,
-		)
+			iam.LabelPolicyFontRemovedEventType).
+		Builder()
 }
 
 func (wm *IAMLabelPolicyWriteModel) NewChangedEvent(

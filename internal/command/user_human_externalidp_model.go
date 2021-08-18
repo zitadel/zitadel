@@ -27,6 +27,30 @@ func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resource
 	}
 }
 
+func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *user.HumanExternalIDPAddedEvent:
+			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.HumanExternalIDPRemovedEvent:
+			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.HumanExternalIDPCascadeRemovedEvent:
+			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
 func (wm *HumanExternalIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -47,11 +71,14 @@ func (wm *HumanExternalIDPWriteModel) Reduce() error {
 }
 
 func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanExternalIDPAddedType,
 			user.HumanExternalIDPRemovedType,
 			user.HumanExternalIDPCascadeRemovedType,
-			user.UserRemovedType)
+			user.UserRemovedType).
+		Builder()
 }

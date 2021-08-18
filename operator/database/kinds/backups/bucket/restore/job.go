@@ -15,9 +15,8 @@ func getJob(
 	tolerations []corev1.Toleration,
 	secretName string,
 	secretKey string,
-	version string,
 	command string,
-
+	image string,
 ) *batchv1.Job {
 	return &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
@@ -33,7 +32,7 @@ func getJob(
 					RestartPolicy: corev1.RestartPolicyNever,
 					Containers: []corev1.Container{{
 						Name:  nameLabels.Name(),
-						Image: image + ":" + version,
+						Image: image,
 						Command: []string{
 							"/bin/bash",
 							"-c",

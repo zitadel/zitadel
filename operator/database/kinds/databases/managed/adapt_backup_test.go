@@ -21,10 +21,7 @@ import (
 func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backupName string) *tree.Tree {
 
 	bucketDesired := getDesiredTree(t, masterkey, &bucket.DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &bucket.Spec{
 			Verbose: true,
 			Cron:    "testCron",
@@ -39,10 +36,7 @@ func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backu
 	bucketDesired.Parsed = bucketDesiredKind
 
 	return getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,
@@ -83,7 +77,7 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 	bucket.SetBackup(k8sClient, namespace, labels, saJson)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
@@ -122,7 +116,7 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}
@@ -150,6 +144,7 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{}
+	version := "testVersion"
 	masterkey := "testMk"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	saJson := "testSA"
@@ -162,7 +157,7 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features)(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	databases := []string{"test1", "test2"}

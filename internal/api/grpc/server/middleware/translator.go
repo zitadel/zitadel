@@ -3,12 +3,13 @@ package middleware
 import (
 	"context"
 	"errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/i18n"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/i18n"
 )
 
 type localizers interface {
@@ -35,10 +36,8 @@ func translateError(ctx context.Context, err error, translator *i18n.Translator)
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
 		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil))
-	} else {
-		return err
 	}
-	return caosErr
+	return err
 }
 
 func newZitadelTranslator(defaultLanguage language.Tag) *i18n.Translator {

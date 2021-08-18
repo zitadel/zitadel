@@ -44,6 +44,10 @@ func (m *MailTemplate) ViewModel() string {
 	return mailTemplateTable
 }
 
+func (m *MailTemplate) Subscription() *v1.Subscription {
+	return m.subscription
+}
+
 func (_ *MailTemplate) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
 }
@@ -97,7 +101,7 @@ func (m *MailTemplate) processMailTemplate(event *es_models.Event) (err error) {
 }
 
 func (m *MailTemplate) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Djo9", "id", event.AggregateID).WithError(err).Warn("something went wrong in label template handler")
+	logging.LogWithFields("SPOOL-1n87f", "id", event.AggregateID).WithError(err).Warn("something went wrong in label template handler")
 	return spooler.HandleError(event, err, m.view.GetLatestMailTemplateFailedEvent, m.view.ProcessedMailTemplateFailedEvent, m.view.ProcessedMailTemplateSequence, m.errorCountUntilSkip)
 }
 

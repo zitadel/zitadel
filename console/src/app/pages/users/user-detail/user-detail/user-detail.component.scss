@@ -18,9 +18,18 @@
     flex: 1;
   }
 
+  .unlock-button {
+    margin-left: .5rem;
+  }
+
   .state-button {
     margin-left: .5rem;
   }
+}
+
+.locked {
+  display: block;
+  margin: 1rem 0;
 }
 
 .img-phone-email {

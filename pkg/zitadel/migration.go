@@ -18,7 +18,6 @@ func CrdMigrations(
 ) error {
 	desired, err := zitadel.ReadCrd(k8sClient)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 
@@ -35,7 +34,6 @@ func GitOpsMigrations(
 ) error {
 	desired, err := gitClient.ReadTree(git.ZitadelFile)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 

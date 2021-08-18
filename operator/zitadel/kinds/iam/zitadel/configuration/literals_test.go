@@ -295,6 +295,8 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_LOCATION":      "",
 		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "",
 		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
+		"SENTRY_ENVIRONMENT":                  "",
+		"SENTRY_USAGE":                        "false",
 	}
 
 	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
@@ -380,6 +382,8 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_LOCATION":      "location",
 		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "bucketprefix",
 		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
+		"SENTRY_ENVIRONMENT":                  "",
+		"SENTRY_USAGE":                        "false",
 	}
 	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
 
@@ -459,6 +463,7 @@ func TestConfiguration_LiteralsSecretVars(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      "",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "",
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredEmpty)
 	assert.NoError(t, err)
@@ -475,6 +480,7 @@ func TestConfiguration_LiteralsSecretVarsFull(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      "sid",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "accesskeyid",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "secretaccesskey",
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 
@@ -532,6 +538,7 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      sid,
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     akid,
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": sak,
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
+	"github.com/caos/zitadel/internal/api/grpc/metadata"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
@@ -38,12 +39,33 @@ func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest)
 	}
 }
 
+func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
+	metadata := make([]*domain.Metadata, len(req.Metadata))
+	for i, data := range req.Metadata {
+		metadata[i] = &domain.Metadata{
+			Key:   data.Key,
+			Value: data.Value,
+		}
+	}
+	return metadata
+}
+
+func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) *domain.MetadataSearchRequest {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	return &domain.MetadataSearchRequest{
+		Offset:  offset,
+		Limit:   limit,
+		Asc:     asc,
+		Queries: metadata.MetadataQueriesToModel(req.Queries),
+	}
+}
+
 func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {
 	h := &domain.Human{
 		Username: req.UserName,
 	}
 	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
-	logging.Log("MANAG-3GUFJ").OnError(err).Debug("language malformed")
+	logging.Log("MANAG-M029f").OnError(err).Debug("language malformed")
 	h.Profile = &domain.Profile{
 		FirstName:         req.Profile.FirstName,
 		LastName:          req.Profile.LastName,
@@ -69,13 +91,13 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 	return h
 }
 
-func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) *domain.Human {
-	h := &domain.Human{
+func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool) {
+	human = &domain.Human{
 		Username: req.UserName,
 	}
 	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
 	logging.Log("MANAG-3GUFJ").OnError(err).Debug("language malformed")
-	h.Profile = &domain.Profile{
+	human.Profile = &domain.Profile{
 		FirstName:         req.Profile.FirstName,
 		LastName:          req.Profile.LastName,
 		NickName:          req.Profile.NickName,
@@ -83,22 +105,22 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) *domain
 		PreferredLanguage: preferredLanguage,
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
-	h.Email = &domain.Email{
+	human.Email = &domain.Email{
 		EmailAddress:    req.Email.Email,
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
-		h.Phone = &domain.Phone{
+		human.Phone = &domain.Phone{
 			PhoneNumber:     req.Phone.Phone,
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
 	if req.Password != "" {
-		h.Password = &domain.Password{SecretString: req.Password}
-		h.Password.ChangeRequired = req.PasswordChangeRequired
+		human.Password = &domain.Password{SecretString: req.Password}
+		human.Password.ChangeRequired = req.PasswordChangeRequired
 	}
 
-	return h
+	return human, req.RequestPasswordlessRegistration
 }
 
 func AddMachineUserRequestToDomain(req *mgmt_pb.AddMachineUserRequest) *domain.Machine {

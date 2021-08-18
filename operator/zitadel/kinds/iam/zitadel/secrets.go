@@ -124,5 +124,6 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secretKey := "secretaccesskey"
 	secrets[secretKey] = conf.AssetStorage.SecretAccessKey
 	existing[secretKey] = conf.AssetStorage.ExistingSecretAccessKey
+
 	return secrets, existing
 }

@@ -13,6 +13,8 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
+@import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
+@import 'src/app/pages/projects/granted-projects/granted-project-list/granted-project-grid/granted-project-grid.component';
 @import 'src/app/app.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
@@ -44,4 +46,6 @@
   @include onboarding-theme($theme);
   @include tier-theme($theme);
   @include private-label-theme($theme);
+  @include owned-project-grid-theme($theme);
+  @include granted-project-grid-theme($theme);
 }

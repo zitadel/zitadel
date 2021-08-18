@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
@@ -42,12 +43,15 @@ func (wm *OrgMailTemplateWriteModel) Reduce() error {
 }
 
 func (wm *OrgMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent, org.AggregateType).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
 		EventTypes(
 			org.MailTemplateAddedEventType,
 			org.MailTemplateChangedEventType,
-			org.MailTemplateRemovedEventType)
+			org.MailTemplateRemovedEventType).
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

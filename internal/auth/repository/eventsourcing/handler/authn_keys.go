@@ -46,6 +46,10 @@ func (k *AuthNKeys) ViewModel() string {
 	return authnKeysTable
 }
 
+func (k *AuthNKeys) Subscription() *v1.Subscription {
+	return k.subscription
+}
+
 func (_ *AuthNKeys) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user_model.UserAggregate, proj_model.ProjectAggregate}
 }

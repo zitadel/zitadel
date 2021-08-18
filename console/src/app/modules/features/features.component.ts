@@ -115,7 +115,6 @@ export class FeaturesComponent implements OnDestroy {
       this.subService.getLink(this.org.id, window.location.href)
         .then(payload => {
           this.stripeLoading = false;
-          console.log(payload);
           this.stripeURL = payload.redirect_url;
         })
         .catch(error => {
@@ -162,6 +161,7 @@ export class FeaturesComponent implements OnDestroy {
         req.setLabelPolicyWatermark(this.features.labelPolicyWatermark);
         req.setCustomDomain(this.features.customDomain);
         req.setCustomText(this.features.customText);
+        req.setPrivacyPolicy(this.features.privacyPolicy);
 
         this.adminService.setOrgFeatures(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);

@@ -1,6 +1,8 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
+    <h1>{{t "InitUser.Title" }}</h1>
+
     {{ template "user-profile" . }}
 
     <p>{{t "InitUser.Description" }}</p>
@@ -16,14 +18,14 @@
 
     <div class="fields">
         <div class="field">
-            <label class="lgn-label" for="code">{{t "InitUser.Code"}}</label>
+            <label class="lgn-label" for="code">{{t "InitUser.CodeLabel"}}</label>
             <input class="lgn-input" {{if .ErrMessage}}shake {{end}} type="text" id="code" name="code" value="{{.Code}}" autocomplete="off" autofocus
                 required>
         </div>
 
         {{ if not .PasswordSet }}
         <div class="field">
-            <label class="lgn-label" for="password">{{t "InitUser.NewPassword"}}</label>
+            <label class="lgn-label" for="password">{{t "InitUser.NewPasswordLabel"}}</label>
             <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
                 data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
                 data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="password" name="password"
@@ -31,7 +33,7 @@
             {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">
-            <label class="lgn-label" for="passwordconfirm">{{t "InitUser.NewPasswordConfirm"}}</label>
+            <label class="lgn-label" for="passwordconfirm">{{t "InitUser.NewPasswordConfirmLabel"}}</label>
             <input class="lgn-input" type="password" id="passwordconfirm" name="passwordconfirm"
                 autocomplete="new-password" autofocus required>
         </div>
@@ -47,11 +49,11 @@
         </a>
 
         <button type="submit" id="init-button" name="resend" value="false"
-            class="lgn-primary lgn-raised-button">{{t "Actions.Next"}}</button>
+            class="lgn-primary lgn-raised-button">{{t "InitUser.NextButtonText"}}</button>
 
         <span class="fill-space"></span>
 
-        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "Actions.Resend" }}</button>
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitUser.ResendButtonText" }}</button>
     </div>
 </form>
 

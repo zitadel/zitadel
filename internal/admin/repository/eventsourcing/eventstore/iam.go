@@ -2,11 +2,20 @@ package eventstore
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
 	"strings"
+	"sync"
+
+	"github.com/ghodss/yaml"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 
@@ -23,12 +32,30 @@ import (
 )
 
 type IAMRepository struct {
-	Eventstore      v1.Eventstore
-	SearchLimit     uint64
-	View            *admin_view.View
-	SystemDefaults  systemdefaults.SystemDefaults
-	Roles           []string
-	PrefixAvatarURL string
+	Eventstore                          v1.Eventstore
+	SearchLimit                         uint64
+	View                                *admin_view.View
+	SystemDefaults                      systemdefaults.SystemDefaults
+	Roles                               []string
+	PrefixAvatarURL                     string
+	LoginDir                            http.FileSystem
+	NotificationDir                     http.FileSystem
+	LoginTranslationFileContents        map[string][]byte
+	NotificationTranslationFileContents map[string][]byte
+	mutex                               sync.Mutex
+	supportedLangs                      []language.Tag
+}
+
+func (repo *IAMRepository) Languages(ctx context.Context) ([]language.Tag, error) {
+	if len(repo.supportedLangs) == 0 {
+		langs, err := i18n.SupportedLanguages(repo.LoginDir)
+		if err != nil {
+			logging.Log("ADMIN-tiMWs").WithError(err).Debug("unable to parse language")
+			return nil, err
+		}
+		repo.supportedLangs = langs
+	}
+	return repo.supportedLangs, nil
 }
 
 func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
@@ -138,6 +165,7 @@ func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.LoginPolicyView)
 	}
+
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
@@ -210,6 +238,7 @@ func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordComplexityPolicyView)
 	}
+
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-1Mc0s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
@@ -235,6 +264,7 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.PasswordAgePolicyView)
 	}
+
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-vMyS3", "Errors.IAM.PasswordAgePolicy.NotFound")
@@ -252,29 +282,30 @@ func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	return iam_es_model.PasswordAgeViewToModel(policy), nil
 }
 
-func (repo *IAMRepository) GetDefaultPasswordLockoutPolicy(ctx context.Context) (*iam_model.PasswordLockoutPolicyView, error) {
-	policy, viewErr := repo.View.PasswordLockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
+func (repo *IAMRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
+	policy, viewErr := repo.View.LockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordLockoutPolicyView)
+		policy = new(iam_es_model.LockoutPolicyView)
 	}
+
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2M9oP", "Errors.IAM.LockoutPolicy.NotFound")
 	}
 	if esErr != nil {
 		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordLockoutViewToModel(policy), nil
+		return iam_es_model.LockoutViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordLockoutViewToModel(policy), nil
+			return iam_es_model.LockoutViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.PasswordLockoutViewToModel(policy), nil
+	return iam_es_model.LockoutViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
@@ -285,6 +316,7 @@ func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgI
 	if caos_errs.IsNotFound(viewErr) {
 		policy = new(iam_es_model.OrgIAMPolicyView)
 	}
+
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-MkoL0", "Errors.IAM.OrgIAMPolicy.NotFound")
@@ -350,21 +382,93 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultMessageTexts(ctx context.Context) (*iam_model.MessageTextsView, error) {
-	text, err := repo.View.MessageTexts(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
+func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	var err error
+	contents, ok := repo.NotificationTranslationFileContents[lang]
+	if !ok {
+		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if caos_errs.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		repo.NotificationTranslationFileContents[lang] = contents
 	}
-	return iam_es_model.MessageTextsViewToModel(text, true), err
+	messageTexts := new(domain.MessageTexts)
+	if err := yaml.Unmarshal(contents, messageTexts); err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-3N9fs", "Errors.TranslationFile.ReadError")
+	}
+	return messageTexts.GetMessageTextByType(textType), nil
 }
 
-func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*iam_model.MessageTextView, error) {
-	text, err := repo.View.MessageTextByIDs(repo.SystemDefaults.IamID, textType, lang)
+func (repo *IAMRepository) GetCustomMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, textType, lang)
 	if err != nil {
 		return nil, err
 	}
-	text.Default = true
-	return iam_es_model.MessageTextViewToModel(text), err
+	result := iam_es_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts)
+	result.Default = true
+	return result, err
+}
+
+func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
+	policy, viewErr := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if caos_errs.IsNotFound(viewErr) {
+		policy = new(iam_es_model.PrivacyPolicyView)
+	}
+	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-84Nfs", "Errors.IAM.PrivacyPolicy.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-0p3Fs").WithError(esErr).Debug("error retrieving new events")
+		return iam_es_model.PrivacyViewToModel(policy), nil
+	}
+	policyCopy := *policy
+	for _, event := range events {
+		if err := policyCopy.AppendEvent(event); err != nil {
+			return iam_es_model.PrivacyViewToModel(policy), nil
+		}
+	}
+	result := iam_es_model.PrivacyViewToModel(policy)
+	result.Default = true
+	return result, nil
+}
+
+func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+	contents, ok := repo.LoginTranslationFileContents[lang]
+	var err error
+	if !ok {
+		contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if caos_errs.IsNotFound(err) {
+			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		repo.LoginTranslationFileContents[lang] = contents
+	}
+	loginText := new(domain.CustomLoginText)
+	if err := yaml.Unmarshal(contents, loginText); err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-GHR3Q", "Errors.TranslationFile.ReadError")
+	}
+	return loginText, nil
+}
+
+func (repo *IAMRepository) GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
@@ -373,4 +477,19 @@ func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+func (repo *IAMRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
+	r, err := dir.Open(filename)
+	if os.IsNotExist(err) {
+		return nil, caos_errs.ThrowNotFound(err, "TEXT-3n9fs", "Errors.TranslationFile.NotFound")
+	}
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
+	}
+	contents, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
+	}
+	return contents, nil
 }

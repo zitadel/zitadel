@@ -80,6 +80,9 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 	if existingAPI.State == domain.AppStateUnspecified || existingAPI.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
 	}
+	if !existingAPI.IsAPI() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gnwt3", "Errors.Project.App.IsNotAPI")
+	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 	changedEvent, hasChanged, err := existingAPI.NewChangedEvent(
 		ctx,
@@ -116,6 +119,9 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	}
 	if existingAPI.State == domain.AppStateUnspecified || existingAPI.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2g66f", "Errors.Project.App.NotExisting")
+	}
+	if !existingAPI.IsAPI() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
 	cryptoSecret, stringPW, err := domain.NewClientSecret(c.applicationSecretGenerator)
 	if err != nil {

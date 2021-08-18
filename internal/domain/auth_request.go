@@ -47,6 +47,10 @@ type AuthRequest struct {
 	LoginPolicy            *LoginPolicy
 	AllowedExternalIDPs    []*IDPProvider
 	LabelPolicy            *LabelPolicy
+	PrivacyPolicy          *PrivacyPolicy
+	LockoutPolicy          *LockoutPolicy
+	DefaultTranslations    []*CustomText
+	OrgTranslations        []*CustomText
 }
 
 type ExternalUser struct {
@@ -108,11 +112,11 @@ const (
 )
 
 func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
-	request, ok := authRequestTypeMapping[requestType]
-	if !ok {
-		return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
+	switch requestType {
+	case AuthRequestTypeOIDC:
+		return &AuthRequest{Request: &AuthRequestOIDC{}}, nil
 	}
-	return &AuthRequest{Request: request}, nil
+	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
 
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {

@@ -25,7 +25,7 @@ func TestBackup_Adapt1(t *testing.T) {
 	timestamp := "testTs"
 	backupName := "testName2"
 	bucketName := "testBucket2"
-	version := "testVersion"
+	image := "testImage2"
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	dbURL := "testDB"
@@ -45,7 +45,6 @@ func TestBackup_Adapt1(t *testing.T) {
 		tolerations,
 		secretName,
 		secretKey,
-		version,
 		getCommand(
 			timestamp,
 			bucketName,
@@ -55,6 +54,7 @@ func TestBackup_Adapt1(t *testing.T) {
 			dbURL,
 			dbPort,
 		),
+		image,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -74,7 +74,7 @@ func TestBackup_Adapt1(t *testing.T) {
 		secretKey,
 		dbURL,
 		dbPort,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)
@@ -95,7 +95,7 @@ func TestBackup_Adapt2(t *testing.T) {
 	timestamp := "testTs"
 	backupName := "testName2"
 	bucketName := "testBucket2"
-	version := "testVersion2"
+	image := "testImage2"
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	dbURL := "testDB"
@@ -115,7 +115,6 @@ func TestBackup_Adapt2(t *testing.T) {
 		tolerations,
 		secretName,
 		secretKey,
-		version,
 		getCommand(
 			timestamp,
 			bucketName,
@@ -125,6 +124,7 @@ func TestBackup_Adapt2(t *testing.T) {
 			dbURL,
 			dbPort,
 		),
+		image,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -144,7 +144,7 @@ func TestBackup_Adapt2(t *testing.T) {
 		secretKey,
 		dbURL,
 		dbPort,
-		version,
+		image,
 	)
 
 	assert.NoError(t, err)

@@ -16,7 +16,7 @@ title: {{.Name}}
 
 {{ .Description}}
 
-{{$httpOption := .Option "validate.rules"}}
+{{$httpOption := .Option "google.api.http"}}
 {{range $httpOption.Rules}}
     {{ .Method }}: {{ .Pattern }}
 {{end}}

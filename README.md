@@ -35,20 +35,22 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 * User interface for administration
 * APIs for Management, Administration, and Authentication
 * Policy configuration and enforcement
+* Private Labeling
 
 ## Run ZITADEL anywhere
 
 ### Self-Managed
 
 You can run an automatically operated **ZITADEL** instance on a CNCF compliant Kubernetes cluster of your choice:
-- [CRD Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/crd)
-- [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
-- [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
+
+* [CRD Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/crd)
+* [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
+* [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
 
 ### CAOS-Managed
 
-- **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
-- **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
+* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
+* **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
 ## Start using ZITADEL
 
@@ -57,6 +59,7 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
 
 ### Client libraries
+
 * [Go](https://github.com/caos/zitadel-go) client library
 * [.NET](https://github.com/caos/zitadel-net) client library
 * [Dart](https://github.com/caos/zitadel-dart) client library
@@ -70,16 +73,19 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 ## Showcase
 
 ### Passwordless Login
+
 Use our login widget to allow easy and sucure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
-- works on all modern platforms, devices, and browsers
-- phishing resistant alternative
-- requires only one gesture by the user
-- easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
+
+* works on all modern platforms, devices, and browsers
+* phishing resistant alternative
+* requires only one gesture by the user
+* easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 ![passwordless-iphone](https://user-images.githubusercontent.com/1366906/118765439-5fa3f180-b87b-11eb-937b-b4acb7854086.gif)
 
 ### Admin Console
+
 Use [Console](https://docs.zitadel.ch/docs/manuals/introduction) or our [APIs](https://docs.zitadel.ch/docs/apis/introduction) to setup organizations, projects and applications.
 
 Register new applications
@@ -87,6 +93,9 @@ Register new applications
 
 Delegate the right to assign roles to another organization
 ![projects_create_org_grant](https://user-images.githubusercontent.com/1366906/118766069-39cb1c80-b87c-11eb-84cf-f5becce4e9b6.gif)
+
+Customize login and console with your design  
+![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
 ## How To Contribute
 
@@ -102,6 +111,15 @@ See the policy [here](./SECURITY.md)
 * [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect SDK (client and server) for Go
 * [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
+## Usage Data
+
+ZITADEL components send errors and usage data to CAOS Ltd., so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-analytics` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-analytics` flag.
+
+We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
+
+Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
+
+We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
 ## License
 
 See the exact licensing terms [here](./LICENSE)

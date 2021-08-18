@@ -47,6 +47,10 @@ func (p *Features) subscribe() {
 	}()
 }
 
+func (p *Features) Subscription() *v1.Subscription {
+	return p.subscription
+}
+
 func (p *Features) ViewModel() string {
 	return featuresTable
 }
