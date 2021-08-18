@@ -10,6 +10,25 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+type CustomLoginTextsReadModel struct {
+	eventstore.WriteModel
+	CustomLoginTexts map[string]*CustomText
+}
+
+func (wm *CustomLoginTextsReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *policy.CustomTextSetEvent:
+			wm.CustomLoginTexts[e.Template+e.Language.String()] = &CustomText{Language: e.Language, Template: e.Template}
+		case *policy.CustomTextTemplateRemovedEvent:
+			if _, ok := wm.CustomLoginTexts[e.Template+e.Language.String()]; ok {
+				delete(wm.CustomLoginTexts, e.Template)
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
 type CustomLoginTextReadModel struct {
 	eventstore.WriteModel
 
@@ -558,6 +577,9 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				continue
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
+			if e.Template != domain.LoginCustomText {
+				continue
+			}
 			wm.State = domain.PolicyStateRemoved
 		}
 	}
