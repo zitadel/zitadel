@@ -8,6 +8,12 @@ type SubscriptionHandler interface {
 	SubscribeEvents(map[eventstore.AggregateType][]eventstore.EventType)
 }
 
+func NewSubscriptionHandler() SubscriptionHandler {
+	return &subscriptionHandler{
+		queue: make(chan eventstore.EventReader, 100),
+	}
+}
+
 type subscriptionHandler struct {
 	sub   *eventstore.Subscription
 	queue chan eventstore.EventReader
