@@ -33,7 +33,7 @@ func MetadataByKey(db *gorm.DB, table, aggregateID, key string) (*model.Metadata
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, keyQuery)
 	err := query(db, metadata)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-29kkd", "Errors.Metadata.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-m0pes", "Errors.Metadata.NotExisting")
 	}
 	return metadata, err
 }
@@ -69,12 +69,12 @@ func PutMetadata(db *gorm.DB, table string, customText *model.MetadataView) erro
 func DeleteMetadata(db *gorm.DB, table, aggregateID, key string) error {
 	aggregateIDQuery := repository.Key{Key: model.MetadataSearchKey(domain.MetadataSearchKeyAggregateID), Value: aggregateID}
 	keyQuery := repository.Key{Key: model.MetadataSearchKey(domain.MetadataSearchKeyKey), Value: key}
-	delete := repository.PrepareDeleteByKeys(table, aggregateIDQuery, keyQuery)
-	return delete(db)
+	deleteMD := repository.PrepareDeleteByKeys(table, aggregateIDQuery, keyQuery)
+	return deleteMD(db)
 }
 
 func DeleteMetadataByAggregateID(db *gorm.DB, table, aggregateID string) error {
 	aggregateIDQuery := repository.Key{Key: model.MetadataSearchKey(domain.MetadataSearchKeyAggregateID), Value: aggregateID}
-	delete := repository.PrepareDeleteByKeys(table, aggregateIDQuery)
-	return delete(db)
+	deleteMD := repository.PrepareDeleteByKeys(table, aggregateIDQuery)
+	return deleteMD(db)
 }
