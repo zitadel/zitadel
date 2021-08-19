@@ -78,7 +78,7 @@ You will ensure that units eligible for Support Service are maintained and upgra
 
 ### Support Process
 
-You will ensure to follow the support process as outlined in the [Annex](support-services) to this document.
+You will ensure to follow the support process, especially provide all required initial information to the issue, as outlined in the [Annex](support-services) to this document.
 
 ### Security
 
@@ -106,7 +106,7 @@ You will ensure that your vicarious agents, customers and third parties fulfill 
 
 ### Payment
 
-Fees for the initial or any subsequent term of Support Services booked will be due and payable net 30 days from date of invoice. All payments to CAOS will be made in CHF or EUR to our bank account.
+Fees for the initial or any subsequent term of Support Services booked will be due and payable net 30 days from date of invoice. All payments to CAOS will be made in CHF or EUR to our bank account, as indicated in the PO.
 
 ### Offsetting
 
