@@ -45,6 +45,8 @@ Severity 2| not applicable | not applicable | 12 business hours | 2 business hou
 Severity 3| not applicable | not applicable | 24 business hours | 12 business hours | 24 business hours | 12 business hours
 Severity 4| not applicable | not applicable | 48 business hours | 24 business hours | 48 business hours | 24 business hours
 
+If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
+
 ### Communication
 
 - Support is available in Swiss-German, German, and English
@@ -115,7 +117,9 @@ Severity Level | Description
 The customer may escalate support requests following the escalation process:
 
 1. For non-urgent needs, the client may request management escalation within the ticket. A manager will review the request and provide a response within one business day.
-2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@caos.ch
+2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@caos.ch. A manager will review the request and provide response within one business day.
+
+If we fail to provide a response to the escalation, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
 ### Termination
 
