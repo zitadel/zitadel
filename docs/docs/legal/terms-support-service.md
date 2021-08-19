@@ -54,6 +54,21 @@ The Description of Support Services is available as [Annex](support-services) to
 
 The parties may enter a service level agreement, as specified in our [Support Service Description](support-services), for booked Support Services. Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with CAOS.
 
+### Service credit
+
+Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Annex](support-services) per service level objective.
+
+Customer must request service credit and must notify CAOS in writing (email sufficient) within 30 days of becoming eligible for service credit and must prove failure of CAOS to meet the stated objective. CAOS will confirm or reject the claim with reasons for a refusal within 10 days. Service credit will in no case be paid as a cash equivalent. No further guarantees are provided.
+
+### Escalation
+
+The customer may escalate support requests following the escalation process:
+
+1. For non-urgent needs, the client may request management escalation within the ticket. A manager will review the request and provide a response within one business day.
+2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@caos.ch. A manager will review the request and provide response within one business day.
+
+If we fail to provide a response to the escalation, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
+
 ### Limited influence
 
 Be advised that the scope of our influence is limited. For example, the actual accessibility of a service is also dependent on the connection to and between various Internet Service Providers ("ISPs"). Portions of our services, i.e. software components, may also be beyond our influence and be subject to their own contractual conditions. You accept that in such cases we reject any responsibility.
@@ -138,15 +153,11 @@ Please contact us for current fees.
 
 ### Termination by you
 
-You may terminate the Framework Agreement at any time by ceasing your use of the services and deleting your customer account on our website.
+You may terminate the Framework Agreement by providing written notice (email is sufficient) of termination at least 30 days prior to the end of the term.
 
 ### Termination by us
 
 We may terminate the Framework Agreement at any time via email message with a notice period of 90 days. Any use of the services will cease at the end of this period and the Framework Agreement will be terminated.
-
-### Automatic termination
-
-If you have neither used services nor made payment for a period of 3 years, the Framework Agreement will be considered automatically terminated at the end of this period.
 
 ### No reimbursement
 
