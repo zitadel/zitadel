@@ -19,14 +19,14 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          label: 'Quickstarts',
-          docId: 'quickstarts/introduction',
+          label: 'Guides',
+          docId: 'guides/introduction',
           position: 'left',
         },
         {
           type: 'doc',
-          label: 'Guides',
-          docId: 'guides/introduction',
+          label: 'Quickstarts',
+          docId: 'quickstarts/introduction',
           position: 'left',
         },
         {

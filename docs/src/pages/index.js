@@ -9,17 +9,6 @@ import ThemedImage from '@theme/ThemedImage';
 
 const features = [
   {
-    title: 'Quickstarts',
-    darkImageUrl: 'img/index/Quickstarts-dark.svg',
-    lightImageUrl: 'img/index/Quickstarts-light.svg',
-    link: 'docs/quickstarts/introduction',
-    description: (
-      <>
-        Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
-      </>
-    ),
-  },
-  {
     title: 'Guides',
     darkImageUrl: 'img/index/Guides-dark.svg',
     lightImageUrl: 'img/index/Guides-light.svg',
@@ -28,6 +17,17 @@ const features = [
       <>
         Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
       </>
+    ),
+  },
+  {
+    title: 'Quickstarts',
+    darkImageUrl: 'img/index/Quickstarts-dark.svg',
+    lightImageUrl: 'img/index/Quickstarts-light.svg',
+    link: 'docs/quickstarts/introduction',
+    description: (
+        <>
+          Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
+        </>
     ),
   },
   {

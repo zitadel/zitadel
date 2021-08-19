@@ -161,6 +161,8 @@ module.exports = {
   concepts: [
     'concepts/introduction',
     'concepts/architecture',
+    'concepts/policies',
+    'concepts/managers',
     'concepts/principles',
     'concepts/eventstore',
   ],
@@ -170,12 +172,6 @@ module.exports = {
       type: 'category',
       label: 'User',
       items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Administrator',
-      items: ['manuals/admin-managers', 'manuals/admin-policies'],
       collapsed: false,
     },
   ],

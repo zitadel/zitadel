@@ -2,7 +2,6 @@
 title: ZITADEL Managers
 ---
 
-
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers.
 
 - **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole IAM.

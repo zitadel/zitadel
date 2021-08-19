@@ -14,7 +14,7 @@ Each policy can be overriden and resetted to the default.
 
 With the password complexity policy you can define the requirements for a users password.
 
-The following properties can be set: 
+The following properties can be set:
 - Minimum Length
 - Has Uppercase
 - Has Lowercase
@@ -50,10 +50,10 @@ If a user is locked, an administrator has to unlock it in the ZITADEL console
 ### Multifactors / Second Factors
 
 In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
-Multifactors: 
+Multifactors:
 - U2F (Universal Second Factor) with PIN
 
-Secondfactors: 
+Secondfactors:
 - OTP (One Time Password)
 - U2F (Universal Second Factor)
 
