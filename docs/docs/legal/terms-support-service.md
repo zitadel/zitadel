@@ -24,6 +24,10 @@ Any provisions which deviate from these TOS must be agreed in writing between th
 
 You may only transfer the Framework Agreement or Services used in the context of the Framework Agreement to third parties with our prior written consent.
 
+### Term
+
+Coverage under this Agreement will start with Booking of Support Services, for a minimum period of 12 months. Support Services agreements will automatically renew for additional one year terms upon submission of a purchase order for renewal, unless either you or CAOS provides written notice of termination at least 30 days prior to the end of any such term. Each renewal will be at CAOS' then-current rate. In the event that you accesses CAOS Support services in any way after the Agreement has expired or been terminated, you will continue to be bound by this Agreement, which will continue to apply to the services after such expiration or termination.
+
 ## Our Services
 
 ### Type and scope of the services
@@ -178,7 +182,7 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 These TOS shall enter into force as of 16.06.2021.
 
-Last revised: July 20, 2021
+Last revised: August 20, 2021
 
 ### Amendments
 
