@@ -1,33 +1,20 @@
 ---
-title: Terms of Service Agreement
+title: Terms and Conditions for Support Services
 custom_edit_url: null
 --- 
 ## General
 
 ### Introduction
 
-CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
+CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers amongst other services and websites (**Services**) as well commercial support services for its software products (**Support Services**).
 
-The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by creating a user or organisation within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**, **Purchase Order**) and subsequently terminate them.
-
-The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any services.
+The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by accepting a **Purchase Order** (**"PO"**) for the specified Support Services (**Booking**). Jointly you and CAOS will be referred to as **the Parties**. The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any other services. 
 
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Service Level Description**](service-level-description) - What service levels do we guarantee you
 * [**Support Service Descriptions**](support-services) - How we provide support services to you
-
-The following policies complement the TOS. When accepting the TOS, you accept these policies.
-
-* [**Privacy Policy**](privacy-policy) - How we process personal data on our websites and products
 * [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
-* [**Rate Limit Policy**](rate-limit-policy) - How we avoid overloads of our services
-
-This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
-
-* [**Dedicated Instance Terms**](terms-of-service-dedicated) - How we provide our services for a dedicated instance
-* [**Annex to the Dedicated Instance Terms**](dedicated-instance-annex) - Describe differences of services and guarantees with different providers
 
 ### Alterations
 
@@ -41,7 +28,7 @@ You may only transfer the Framework Agreement or Services used in the context of
 
 ### Type and scope of the services
 
-We provide the Services under the conditions stated on our websites at the time of booking.
+We provide the Services under the conditions stated on our websites and the PO at the time of booking.
 
 ### Modifications of services offered
 
@@ -49,7 +36,7 @@ We are entitled to offer new services, to withdraw existing services (**Terminat
 
 ### Modification of services booked by you
 
-You may change or terminate Services or Subscriptions booked by you at any time. You may, where applicable, add more Services (e.g. add-ons) to your existing Services at any time.
+You may change or terminate Services booked by you at any time. Modifications will take effect in the next billing period, or as agreed otherwise between the Parties. Changing services booked by you requires a new PO, stating the new conditions of the services after Modification, to be accepted by the Parties. The standard billing period of this Agreement
 
 ### Due care
 
@@ -57,21 +44,15 @@ We take all appropriate physical and electronic precautions to ensure the securi
 
 The [Annex of the data processing agreement](data-processing-agreement#annex-regarding-security-measures) outlines the measures we take in more detail.
 
-### Support
+### Support Service
 
-We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](support-services) to this document.
+The Description of Support Services is available as [Annex](support-services) to this document.
 
-Customers without a Subscription or a Subscription plan that does not include Support Services should post inquiries and issues regarding ZITADEL from customers to our [GitHub Discussions](https://github.com/caos/zitadel/discussions), whenever feasible.
-
-If you need support integrating or setting up ZITADEL, please contact our consulting team.
+The parties may enter a service level agreement, as specified in our [Support Service Description](support-services), for booked Support Services. Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with CAOS.
 
 ### Limited influence
 
 Be advised that the scope of our influence is limited. For example, the actual accessibility of a service is also dependent on the connection to and between various Internet Service Providers ("ISPs"). Portions of our services, i.e. software components, may also be beyond our influence and be subject to their own contractual conditions. You accept that in such cases we reject any responsibility.
-
-### Service level
-
-Customers with a Subscription may be eligible for a SLA as outlined in our [Service Level Description](service-level-description).
 
 ### Inclusion of third parties
 
