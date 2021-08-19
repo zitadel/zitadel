@@ -5,11 +5,13 @@ custom_edit_url: null
 
 ## Introduction
 
-This annex of the [Framework Agreement](terms-of-service) describes the support services offered by us for our Services.
+This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
+
+[ADD ALSO SUPPORT PROGRAM; REMOVE ZITADEL CLOUD]
 
 Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS Ltd. directly.
 
-Last revised: July 20, 2021
+Last revised: August 20, 2021
 
 ## Support Services
 
@@ -21,7 +23,7 @@ Last revised: July 20, 2021
 
 ### Description of Services
 
-Customers in ZITADEL Cloud FREE plan or using the Open Source Version of ZITADEL are excluded from the support plans. Support features for Subscription plans are as follows: 
+Customers in ZITADEL Cloud FREE plan or using the Open Source Version of ZITADEL are excluded from the support plans. Support features for Subscription plans are as follows:
 
 Subscription Plans | FREE | OUTPOST | STARBASE | FORTRESS | DEDICATED STANDARD | DEDICATED ADVANCED
 --- | --- | --- | --- | --- | --- | ---
@@ -50,7 +52,7 @@ If we fail to provide the initial response time objective, you will be entitled 
 ### Communication
 
 - Support is available in Swiss-German, German, and English
-- Default contact: Whenever customers require support, Customers should consult the documentation of ZITADEL or post a question to our community.
+- Default contact: Whenever customers require support, Customers should consult the documentation of the service or product or post a question to our community.
 - When Customer is eligible for support services through a Subscription Plan, Customer may contact CAOS support via the following channels
 
 Support Feature | Contact information
@@ -59,7 +61,7 @@ eMail Support | support@zitadel.ch
 Chat Support | Private chat channel between CAOS and Customer that is opened when Subscription becomes active
 Phone Support | +41 43 215 27 34
 
-- ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our statuspage](https://status.zitadel.ch).
+- ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.ch).
 - Questions regarding pricing, billing, and invoicing of our services should be addressed to billing@caos.ch.
 - Security related questions and incidents can also be directly addressed to security@caos.ch.
 
@@ -76,20 +78,20 @@ We offer TAM services only bundled with specific subscription plans, and the opt
 
 ### Support request
 
-CAOS agrees to handle support incidents in the following scenarios: 
+CAOS agrees to handle support incidents in the following scenarios:
 
-1. ZITADEL Cloud software or configuration as provided by CAOS contains errors or critical security-related issues
-2. ZITADEL Cloud requires upgrades or changes through the customer
-3. ZITADEL Cloud have incorrect or missing documentation
+1. Service, product or configuration as provided by CAOS contains errors or critical security-related issues
+2. Service or product requires upgrades or changes through the customer
+3. Service or product has incorrect or missing documentation
 
 Support features include:
 
-- Answer questions regarding usage of specific features or configurations of ZITADEL Cloud 
-- Provide high-level suggestions regarding appropriate usage, features or configurations of ZITADEL Cloud functionality and configuration
+- Answer questions regarding usage of specific features or configurations
+- Provide high-level suggestions regarding appropriate usage, features or configurations
 - Assist in troubleshooting of issues to isolate potential root cause
 - Document and advise alternative solutions for reported defects
 
-Excluded are broader consulting & customer-specific engineering requests regarding use of ZITADEL Cloud. Moreover first level support requests by Customer’s end users must be handled by the Customer directly.
+Excluded are broader consulting & customer-specific engineering requests regarding use of our products and services. Moreover support requests from Customer’s end users must be handled by the Customer directly.
 
 ### Support service process
 
@@ -102,7 +104,7 @@ The customer may submit support requests (“ticket”) through any means of eli
 
 CAOS will review the case information and determine the severity level (see below), working with the customer to assess the urgency of the request and use reasonable efforts to respond to support requests within the initial response time.
 
-CAOS will use reasonable efforts to resolve support request as defined below, but does not guarantee a workaround, resolution or resolution time
+CAOS will use reasonable efforts to resolve support request as defined below, but does not guarantee a workaround, resolution or resolution time.
 
 Severity Level | Description
 --- | --- 
