@@ -9,17 +9,6 @@ import ThemedImage from '@theme/ThemedImage';
 
 const features = [
   {
-    title: 'Manuals',
-    darkImageUrl: 'img/index/Manual-dark.svg',
-    lightImageUrl: 'img/index/Manual-light.svg',
-    link: 'docs/manuals/introduction',
-    description: (
-      <>
-        Follow this guide to get started with ZITADEL as a user.
-      </>
-    ),
-  },
-  {
     title: 'Quickstarts',
     darkImageUrl: 'img/index/Quickstarts-dark.svg',
     lightImageUrl: 'img/index/Quickstarts-light.svg',

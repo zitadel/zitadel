@@ -1,19 +1,4 @@
 module.exports = {
-  manuals: [
-    'manuals/introduction',
-    {
-      type: 'category',
-      label: 'User',
-      items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Administrator',
-      items: ['manuals/admin-managers', 'manuals/admin-policies'],
-      collapsed: false,
-    },
-  ],
   quickstarts: [
     'quickstarts/introduction',
     {
@@ -49,13 +34,43 @@ module.exports = {
       label: 'Get to know ZITADEL',
       collapsed: false,
       items: [
-        'guides/usage/get-started',
-        'guides/usage/organizations',
-        'guides/usage/projects',
-        'guides/usage/oauth-recommended-flows',
-        'guides/usage/serviceusers',
-        'guides/usage/access-zitadel-apis',
-        'guides/usage/identity-brokering',
+        'guides/basics/get-started',
+        'guides/basics/organizations',
+        'guides/basics/projects',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Authentication',
+      collapsed: false,
+      items: [
+        'guides/authentication/identity-brokering',
+        'guides/authentication/serviceusers',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Authorization',
+      collapsed: false,
+      items: [
+        'guides/authorization/oauth-recommended-flows',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'API',
+      collapsed: false,
+      items: [
+        'guides/api/access-zitadel-apis'
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Customization',
+      collapsed: false,
+      items: [
+        'guides/customization/branding',
+        'guides/customization/texts',
       ],
     },
     {
@@ -148,6 +163,21 @@ module.exports = {
     'concepts/architecture',
     'concepts/principles',
     'concepts/eventstore',
+  ],
+  manuals: [
+    'manuals/introduction',
+    {
+      type: 'category',
+      label: 'User',
+      items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
+      collapsed: false,
+    },
+    {
+      type: 'category',
+      label: 'Administrator',
+      items: ['manuals/admin-managers', 'manuals/admin-policies'],
+      collapsed: false,
+    },
   ],
   legal: [
     'legal/introduction',

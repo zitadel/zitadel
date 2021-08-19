@@ -19,12 +19,6 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          docId: 'manuals/introduction',
-          label: 'Manuals',
-          position: 'left',
-        },
-        {
-          type: 'doc',
           label: 'Quickstarts',
           docId: 'quickstarts/introduction',
           position: 'left',
@@ -45,6 +39,12 @@ module.exports = {
           type: 'doc',
           docId: 'concepts/introduction',
           label: 'Concepts',
+          position: 'left',
+        },
+        {
+          type: 'doc',
+          docId: 'manuals/introduction',
+          label: 'Help',
           position: 'left',
         },
         {
