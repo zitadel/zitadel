@@ -3,11 +3,11 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -61,7 +61,12 @@ func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader
 	}
 	err := json.Unmarshal(event.Data, machineKeyAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key removed")
+		//first events had wrong payload.
+		// the keys were removed later, that's why we ignore them here.
+		if unwrapErr, ok := err.(*json.UnmarshalTypeError); ok && unwrapErr.Field == "publicKey" {
+			return machineKeyAdded, nil
+		}
+		return nil, errors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key added")
 	}
 
 	return machineKeyAdded, nil
