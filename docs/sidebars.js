@@ -172,6 +172,14 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Support Program',
+      collapsed: false,
+      items: [
+        'legal/terms-support-service'
+      ],
+    },
+    {
+      type: 'category',
       label: 'Policies',
       collapsed: false,
       items: [
