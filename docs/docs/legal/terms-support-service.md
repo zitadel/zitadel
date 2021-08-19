@@ -110,6 +110,10 @@ In the event of default we reserve the right to transfer our claim to a collecti
 
 ### Lapsed Service Fee
 
+In case the term of the Support Service contract has expired within 1 to 180 days, you will be required to pay a Lapsed Service Fee in addition to purchasing and activating a one-year renewal contract term. The renewal term's start date will also be backdated to begin coverage from the service's original expiration date.
+
+### Recertification Fee
+
 ## Termination
 
 ### Termination by you
