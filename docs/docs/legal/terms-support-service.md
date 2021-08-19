@@ -72,6 +72,14 @@ At our request you will provide your truthful contact information and keep it up
 
 You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these these TOS, and our [Acceptable Use Policy](acceptable-use-policy) at all times.
 
+### Maintenance of units
+
+You will ensure that units eligible for Support Service are maintained and upgraded frequently. If you operate units with a release date older than 180 days since our latest stable release, the term is continued but CAOS is not required to handle any support request for that unit until the units are upgraded and recertified.
+
+### Support Process
+
+You will ensure to follow the support process as outlined in the [Annex](support-services) to this document.
+
 ### Security
 
 You will take appropriate measures to prevent any misuse of the services you booked. These include, for example, securing the software used and the prompt installation of security updates as well as using suitably secure passwords.
@@ -116,10 +124,11 @@ Please contact us for current fees.
 
 ### Recertification Fee
 
-Recertification of a unit, to be covered under Support Services is required for:
+Recertification of a unit, to be covered under Support Services, is required for:
 
-* Products and Services with where Support Services have been expired for more than 180 days
-* Request for support on products and services purchased or supported from non-authorized resellers
+* units for which Support Services have been expired for more than 180 days
+* units that run a release that is older than 180 days from the products most recent release
+* requests for support on products and services purchased or supported from non-authorized resellers
 
 Recertification of a unit requires payment of a Recertification Fee which results in inspection and documentation of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
 
