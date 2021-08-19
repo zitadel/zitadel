@@ -33,7 +33,7 @@ func MetadataByKey(db *gorm.DB, table, aggregateID, key string) (*model.Metadata
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, keyQuery)
 	err := query(db, metadata)
 	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-29kkd", "Errors.Metadata.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-m0pes", "Errors.Metadata.NotExisting")
 	}
 	return metadata, err
 }
