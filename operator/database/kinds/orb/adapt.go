@@ -77,6 +77,10 @@ func AdaptFunc(
 		databaseCurrent := &tree.Tree{}
 
 		operatorLabels := mustDatabaseOperator(binaryVersion)
+		version := ""
+		if binaryVersion != nil {
+			version = *binaryVersion
+		}
 
 		queryDB, destroyDB, configureDB, secrets, existing, migrate, err := databases.Adapt(
 			orbMonitor,
@@ -87,7 +91,7 @@ func AdaptFunc(
 			timestamp,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
-			*binaryVersion,
+			version,
 			features,
 			desiredKind.Spec.CustomImageRegistry,
 		)
