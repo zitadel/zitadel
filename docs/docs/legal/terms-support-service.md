@@ -96,13 +96,9 @@ You will ensure that your vicarious agents, customers and third parties fulfill 
 
 ## Financial
 
-### Credit and payment
+### Payment
 
-Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically and in advance from your payment account.
-
-### Payment procedure
-
-If payment upon invoice is agreed, the payment deadline shall be 30 days after receipt of the invoice.
+Fees for the initial or any subsequent term of Support Services booked will be due and payable net 30 days from date of invoice. All payments to CAOS will be made in CHF or EUR to our bank account.
 
 ### Offsetting
 
@@ -111,6 +107,8 @@ Offsetting against a counterclaim is prohibited.
 ### Collection
 
 In the event of default we reserve the right to transfer our claim to a collections agency. You will bear any resulting costs insofar as legally permissible.
+
+### Lapsed Service Fee
 
 ## Termination
 
