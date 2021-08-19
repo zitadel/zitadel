@@ -31,6 +31,11 @@
   --get-started-bg: --ifm-font-color-base;
 }
 
+.menu li li a {
+  font-size: 14px;
+  padding: 2px 14px;
+}
+
 .docusaurus-highlight-code-line {
   background-color: rgb(72, 77, 91);
   display: block;
