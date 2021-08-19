@@ -41,7 +41,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -76,7 +76,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -104,7 +104,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -148,7 +148,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -240,7 +240,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -277,7 +277,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -309,7 +309,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -367,7 +367,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -486,7 +486,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 						eventFromEventPusher(
@@ -521,7 +521,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -568,7 +568,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),
@@ -609,7 +609,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1",
+								"projectname1", true, true, true,
 							),
 						),
 					),

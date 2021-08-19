@@ -47,7 +47,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.EventPusher) []*repository.E
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
-			AggregateType: repository.AggregateType(event.Aggregate().Typ),
+			AggregateType: repository.AggregateType(event.Aggregate().Type),
 			ResourceOwner: event.Aggregate().ResourceOwner,
 			EditorService: event.EditorService(),
 			EditorUser:    event.EditorUser(),
@@ -138,18 +138,19 @@ func expectFilterOrgMemberNotFound() expect {
 func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
-		ID:               "",
-		Sequence:         0,
-		PreviousSequence: 0,
-		CreationDate:     time.Time{},
-		Type:             repository.EventType(event.Type()),
-		Data:             data,
-		EditorService:    event.EditorService(),
-		EditorUser:       event.EditorUser(),
-		Version:          repository.Version(event.Aggregate().Version),
-		AggregateID:      event.Aggregate().ID,
-		AggregateType:    repository.AggregateType(event.Aggregate().Typ),
-		ResourceOwner:    event.Aggregate().ResourceOwner,
+		ID:                            "",
+		Sequence:                      0,
+		PreviousAggregateSequence:     0,
+		PreviousAggregateTypeSequence: 0,
+		CreationDate:                  time.Time{},
+		Type:                          repository.EventType(event.Type()),
+		Data:                          data,
+		EditorService:                 event.EditorService(),
+		EditorUser:                    event.EditorUser(),
+		Version:                       repository.Version(event.Aggregate().Version),
+		AggregateID:                   event.Aggregate().ID,
+		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		ResourceOwner:                 event.Aggregate().ResourceOwner,
 	}
 }
 

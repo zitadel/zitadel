@@ -84,6 +84,7 @@ func (a *Application) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		app.ProjectRoleCheck = project.ProjectRoleCheck
+		app.HasProjectCheck = project.HasProjectCheck
 		app.ProjectRoleAssertion = project.ProjectRoleAssertion
 
 		err = app.AppendEvent(event)

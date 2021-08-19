@@ -3,7 +3,7 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"

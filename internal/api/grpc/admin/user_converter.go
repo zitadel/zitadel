@@ -14,6 +14,7 @@ func setUpOrgHumanToDomain(human *admin_grpc.SetUpOrgRequest_Human) *domain.Huma
 		Profile:  setUpOrgHumanProfileToDomain(human.Profile),
 		Email:    setUpOrgHumanEmailToDomain(human.Email),
 		Phone:    setUpOrgHumanPhoneToDomain(human.Phone),
+		Password: setUpOrgHumanPasswordToDomain(human.Password),
 	}
 }
 
@@ -47,4 +48,11 @@ func setUpOrgHumanPhoneToDomain(phone *admin_grpc.SetUpOrgRequest_Human_Phone) *
 		PhoneNumber:     phone.Phone,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
+}
+
+func setUpOrgHumanPasswordToDomain(password string) *domain.Password {
+	if password == "" {
+		return nil
+	}
+	return domain.NewPassword(password)
 }
