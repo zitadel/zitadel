@@ -6,7 +6,7 @@ custom_edit_url: null
 
 ### Introduction
 
-CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers amongst other services and websites (**Services**) as well commercial support services for its software products (**Support Services**).
+CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers amongst other services and websites (**Services**) as well commercial support services (**Support Services**) for units of CAOS software products.
 
 The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by accepting a **Purchase Order** (**"PO"**) for the specified Support Services (**Booking**). Jointly you and CAOS will be referred to as **the Parties**. The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any other services. 
 
@@ -110,9 +110,20 @@ In the event of default we reserve the right to transfer our claim to a collecti
 
 ### Lapsed Service Fee
 
-In case the term of the Support Service contract has expired within 1 to 180 days, you will be required to pay a Lapsed Service Fee in addition to purchasing and activating a one-year renewal contract term. The renewal term's start date will also be backdated to begin coverage from the service's original expiration date.
+In case the term of the Support Service contract has expired within 1 to 180 days, you will be required to pay a Lapsed Service fee in addition to purchasing and activating a one-year renewal contract term at the then-current fee and conditions. The renewal term's start date will also be backdated to begin coverage from the service's original expiration date.
+
+Please contact us for current fees.
 
 ### Recertification Fee
+
+Recertification of a unit, to be covered under Support Services is required for:
+
+* Products and Services with where Support Services have been expired for more than 180 days
+* Request for support on products and services purchased or supported from non-authorized resellers
+
+Recertification of a unit requires payment of a Recertification Fee which results in inspection and documentation of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
+
+Please contact us for current fees.
 
 ## Termination
 
