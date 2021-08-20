@@ -44,6 +44,7 @@ module.exports = {
       label: 'Authentication',
       collapsed: false,
       items: [
+        'guides/authentication/login-users',
         'guides/authentication/identity-brokering',
         'guides/authentication/serviceusers',
       ],

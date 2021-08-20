@@ -131,6 +131,7 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/caos/zitadel/edit/main/docs/',
+          remarkPlugins: [require('mdx-mermaid')],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

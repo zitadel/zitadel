@@ -19,6 +19,8 @@
     "@mdx-js/react": "^1.6.21",
     "clsx": "^1.1.1",
     "docusaurus-plugin-plausible": "^0.0.5",
+    "mdx-mermaid": "^1.1.0",
+    "mermaid": "^8.11.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
