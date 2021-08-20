@@ -7,8 +7,6 @@ custom_edit_url: null
 
 This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
 
-[ADD ALSO SUPPORT PROGRAM; REMOVE ZITADEL CLOUD]
-
 Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS Ltd. directly.
 
 Last revised: August 20, 2021
@@ -123,6 +121,8 @@ The customer may escalate support requests following the escalation process:
 
 If we fail to provide a response to the escalation, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
-### Termination
+### Termination and downgrade of subscription
 
-If the customer decides to terminate, or downgrade the subscription, the customer may continue to use the software products, but the support level will be adjusted according to the new ZITADEL Cloud Subscription Plan. CAOS does not provide support on per-issue-basis.
+If the customer decides to terminate, or downgrade the a ZITADEL Cloud subscription, the customer may continue to use the software products, but the support level will be adjusted according to the new ZITADEL Cloud Subscription Plan. This does not apply for self-hosted units where customer booked Support Services. CAOS does not provide support on per-issue-basis.
+
+## Trainings
