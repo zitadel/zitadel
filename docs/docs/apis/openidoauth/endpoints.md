@@ -2,6 +2,9 @@
 title: Endpoints
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located within the issuer domain.
@@ -15,7 +18,7 @@ For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be th
 
 > The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
 
-Required request Parameters
+### Required request Parameters
 
 | Parameter     | Description                                                                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -24,14 +27,38 @@ Required request Parameters
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
 | scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`         |
 
-Required parameters for PKCE (see PKCE guide for more information)
+<Tabs
+    groupId="token-auth-methods"
+    defaultValue="client_secret_basic"
+    values={[
+        {label: 'client_secret_basic', value: 'client_secret_basic'},
+        {label: 'client_secret_post', value: 'client_secret_post'},
+        {label: 'none (PKCE)', value: 'none'},
+        {label: 'private_key_jwt', value: 'private_key_jwt'},
+    ]}
+>
+<TabItem value="client_secret_basic">
+no additional parameters required
+</TabItem>
+<TabItem value="client_secret_post">
+no additional parameters required
+</TabItem>
+<TabItem value="none">
 
 | Parameter             | Description                                           |
 | --------------------- | ----------------------------------------------------- |
 | code_challenge        | The SHA-256 value of the generated code_verifier      |
 | code_challenge_method | Method used to generate the challenge, must be `S256` |
 
-Optional parameters
+see PKCE guide for more information
+
+</TabItem>
+<TabItem value="private_key_jwt">
+no additional parameters required
+</TabItem>
+</Tabs>
+
+### Optional parameters
 
 | Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -42,14 +69,14 @@ Optional parameters
 | prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one <br />`create`: the registration form will be displayed to the user directly |
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well.                                                                                                                                                                                                                                                                          |
 
-Successful Code Response
+### Successful Code Response
 
 | Property | Description                                                                   |
 | -------- | ----------------------------------------------------------------------------- |
 | code     | Opaque string which will be necessary to request tokens on the token endpoint |
 | state    | Unmodified `state` parameter from the request                                 |
 
-Successful Implicit Response
+### Successful Implicit Response
 
 | Property     | Description                                                 |
 | ------------ | ----------------------------------------------------------- |
@@ -58,7 +85,7 @@ Successful Implicit Response
 | id_token     | Only returned if `response_type` included `id_token`        |
 | token_type   | Type of the `access_token`. Value is always `Bearer`        |
 
-Error Response
+### Error Response
 
 Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
 
@@ -77,7 +104,7 @@ the error will be display directly to the user on the auth server
 
 ### Authorization Code Grant (Code Exchange)
 
-Required request Parameters
+### Required request Parameters
 
 | Parameter    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
@@ -87,11 +114,22 @@ Required request Parameters
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
-When using `client_secret_basic`
+<Tabs
+    groupId="token-auth-methods"
+    defaultValue="client_secret_basic"
+    values={[
+        {label: 'client_secret_basic', value: 'client_secret_basic'},
+        {label: 'client_secret_post', value: 'client_secret_post'},
+        {label: 'none (PKCE)', value: 'none'},
+        {label: 'private_key_jwt', value: 'private_key_jwt'},
+    ]}
+>
+<TabItem value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
-When using `client_secret_post`
+</TabItem>
+<TabItem value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -100,15 +138,17 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-When using `none` (PKCE)
+</TabItem>
+<TabItem value="none">
 
-Send your code_verifier for us to recompute the code_challenge of the authorization request.
+Send your `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
 | Parameter     | Description                                                  |
 | ------------- | ------------------------------------------------------------ |
 | code_verifier | code_verifier previously used to generate the code_challenge |
 
-When using `private_key_jwt`
+</TabItem>
+<TabItem value="private_key_jwt">
 
 Send a client assertion as JWT for us to validate the signature against the registered public key.
 
@@ -117,11 +157,14 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
 
+</TabItem>
+</Tabs> 
+
 ### JWT Profile Grant
 
 ---
 
-Required request Parameters
+### Required request Parameters
 
 | Parameter  | Description                                                                                                                   |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -143,7 +186,7 @@ curl --request POST \
 
 ---
 
-Required request Parameters
+### Required request Parameters
 
 | Parameter     | Description                                                                         |
 | ------------- | ----------------------------------------------------------------------------------- |
@@ -153,11 +196,22 @@ Required request Parameters
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
-When using `client_secret_basic`
+<Tabs
+    groupId="token-auth-methods"
+    defaultValue="client_secret_basic"
+    values={[
+        {label: 'client_secret_basic', value: 'client_secret_basic'},
+        {label: 'client_secret_post', value: 'client_secret_post'},
+        {label: 'none (PKCE)', value: 'none'},
+        {label: 'private_key_jwt', value: 'private_key_jwt'},
+    ]}
+>
+<TabItem value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
-When using `client_secret_post`
+</TabItem>
+<TabItem value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -166,18 +220,23 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-When using `none` (PKCE)
+</TabItem>
+<TabItem value="none">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
-When using `private_key_jwt`
+</TabItem>
+<TabItem value="private_key_jwt">
 
-Send a client assertion as JWT for us to validate the signature against the registered public key.
+Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                     |
 | --------------------- | --------------------------------------------------------------------------------------------------------------- |
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
+
+</TabItem>
+</Tabs>
 
 ## introspection_endpoint
 
@@ -189,15 +248,23 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
-When using `client_secret_basic`
+<Tabs
+    groupId="introspect-auth-methods"
+    defaultValue="client_secret_basic"
+    values={[
+        {label: 'client_secret_basic', value: 'client_secret_basic'},
+        {label: 'private_key_jwt', value: 'private_key_jwt'},
+    ]}
+>
+<TabItem value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
----
+</TabItem>
 
-When using `private_key_jwt`
+<TabItem value="private_key_jwt">
 
-Send a client assertion as JWT for us to validate the signature against the registered public key.
+Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                 |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -212,6 +279,9 @@ curl --request POST \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
+
+</TabItem>
+</Tabs>
 
 ## userinfo_endpoint
 
