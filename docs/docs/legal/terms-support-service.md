@@ -60,6 +60,10 @@ Failure to provide the agreed service level objectives during the term of the Ag
 
 Customer must request service credit and must notify CAOS in writing (email sufficient) within 30 days of becoming eligible for service credit and must prove failure of CAOS to meet the stated objective. CAOS will confirm or reject the claim with reasons for a refusal within 10 days. Service credit will in no case be paid as a cash equivalent. No further guarantees are provided.
 
+### Service review
+
+If not otherwise agreed, CAOS offers a yearly review meeting with you to discuss the service quality and any feedback you might have. We are not required to participate in the meeting after the term has expired.
+
 ### Limited influence
 
 Be advised that the scope of our influence is limited. For example, the actual accessibility of a service is also dependent on the connection to and between various Internet Service Providers ("ISPs"). Portions of our services, i.e. software components, may also be beyond our influence and be subject to their own contractual conditions. You accept that in such cases we reject any responsibility.
