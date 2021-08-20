@@ -120,9 +120,3 @@ The customer may escalate support requests following the escalation process:
 2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@caos.ch. A manager will review the request and provide response within one business day.
 
 If we fail to provide a response to the escalation, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
-
-### Termination and downgrade of subscription
-
-If the customer decides to terminate, or downgrade the a ZITADEL Cloud subscription, the customer may continue to use the software products, but the support level will be adjusted according to the new ZITADEL Cloud Subscription Plan. This does not apply for self-hosted units where customer booked Support Services. CAOS does not provide support on per-issue-basis.
-
-## Trainings
