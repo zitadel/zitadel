@@ -18,7 +18,10 @@ For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be th
 
 > The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
 
-### Required request Parameters
+The authorization_endpoint is the starting point for all initial user authentications. The user agent (browser) will be redirected to this endpoint to
+authenticate the user in exchange for an authorization_code (authorization code flow) or tokens (implicit flow). 
+
+### Required request parameters
 
 | Parameter     | Description                                                                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -26,6 +29,8 @@ For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be th
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
 | scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`         |
+
+Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
     groupId="token-auth-methods"
@@ -58,18 +63,21 @@ no additional parameters required
 </TabItem>
 </Tabs>
 
-### Optional parameters
+### Additional parameters
 
-| Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. Should be provided when using prompt `none`.                                                                                                                                                                                                                                                                                              |
-| login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`                                                                                                                                                                                                                                                                                                         |
-| max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                               |
-| nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation.                                                                                                                                                                                                                                                                                                          |
+| Parameter     | Description                                                                                                                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. **Should** be provided when using prompt `none`.                                                                                                                        |
+| login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`                                                                                                                                       |
+| max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                             |
+| nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation. **Must** be provided when using **implicit flow**.                                                                                     |
 | prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one <br />`create`: the registration form will be displayed to the user directly |
-| state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well.                                                                                                                                                                                                                                                                          |
+| state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well, therefore highly **recommended**.                                                                      |
+| ui_locales    | Spaces delimited list of preferred locales for the login UI, e.g. `de-CH de en`. If none is provided or matches the possible locales provided by the login UI, the `accept-language` header of the browser will be taken into account.          |
 
 ### Successful Code Response
+
+When your `response_type` was `code` and no error occurred, the following response will be returned: 
 
 | Property | Description                                                                   |
 | -------- | ----------------------------------------------------------------------------- |
@@ -78,12 +86,16 @@ no additional parameters required
 
 ### Successful Implicit Response
 
-| Property     | Description                                                 |
-| ------------ | ----------------------------------------------------------- |
-| access_token | Only returned if `response_type` included `token`           |
-| expires_in   | Number of second until the expiration of the `access_token` |
-| id_token     | Only returned if `response_type` included `id_token`        |
-| token_type   | Type of the `access_token`. Value is always `Bearer`        |
+When your `response_type` was either `it_token` or `id_token token` and no error occurred, the following response will be returned:
+
+| Property     | Description                                                                           |
+| ------------ | ------------------------------------------------------------------------------------- |
+| access_token | Only returned if `response_type` included `token`                                     |
+| expires_in   | Number of second until the expiration of the `access_token`                           |
+| id_token     | An `id_token` of the authorized user                                                  |
+| token_type   | Type of the `access_token`. Value is always `Bearer`                                  |
+| scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| state        | Unmodified `state` parameter from the request                                         |
 
 ### Error Response
 
@@ -94,9 +106,19 @@ the error will be display directly to the user on the auth server
 
 | Property          | Description                                                          |
 | ----------------- | -------------------------------------------------------------------- |
-| error             | An OAuth / OIDC error_type                                           |
+| error             | An OAuth / OIDC [error_type](#authorize-errors)                      |
 | error_description | Description of the error type or additional information of the error |
 | state             | Unmodified `state` parameter from the request                        |
+
+#### Possible errors {#authorize-errors}
+
+| error_type                | Possible reason                                                                                                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| invalid_request           | The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.                            |
+| invalid_scope             | The requested scope is invalid. Typically the required `openid` value is missing.                                                                                            |
+| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration. |
+| unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                       |
+| server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                  |
 
 ## token_endpoint
 
