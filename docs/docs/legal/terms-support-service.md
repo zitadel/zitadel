@@ -136,7 +136,7 @@ Recertification of a unit, to be covered under Support Services, is required for
 * units that run a release that is older than 180 days from the products most recent release
 * requests for support on products and services purchased or supported from non-authorized resellers
 
-Recertification of a unit requires payment of a Recertification Fee which results in inspection and documentation of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
+Recertification of a unit requires payment of a Recertification Fee which results in a [checkup](https://docs.zitadel.ch/docs/guides/installation/checkup) of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
 
 Please contact us for current fees.
 
