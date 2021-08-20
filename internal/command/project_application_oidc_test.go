@@ -87,7 +87,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 				),
@@ -116,7 +116,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project"),
+								"project", true, true, true),
 						),
 					),
 					expectPush(

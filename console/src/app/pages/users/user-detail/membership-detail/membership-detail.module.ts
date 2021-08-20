@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -19,34 +20,35 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { MembershipDetailComponent } from './membership-detail.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: MembershipDetailComponent,
-        canActivate: [],
-        data: {
-            roles: ['user.write'],
-        },
+  {
+    path: '',
+    component: MembershipDetailComponent,
+    canActivate: [],
+    data: {
+      roles: ['user.write'],
     },
+  },
 ];
 @NgModule({
-    declarations: [MembershipDetailComponent],
-    imports: [
-        CommonModule,
-        RouterModule.forChild(routes),
-        TranslateModule,
-        DetailLayoutModule,
-        MatCheckboxModule,
-        MatTableModule,
-        PaginatorModule,
-        MatProgressSpinnerModule,
-        LocalizedDatePipeModule,
-        TimestampToDatePipeModule,
-        HasRoleModule,
-        MatIconModule,
-        MatButtonModule,
-        HasRolePipeModule,
-        RefreshTableModule,
-        MatTooltipModule,
-    ],
+  declarations: [MembershipDetailComponent],
+  imports: [
+    CommonModule,
+    RouterModule.forChild(routes),
+    TranslateModule,
+    DetailLayoutModule,
+    MatCheckboxModule,
+    MatTableModule,
+    PaginatorModule,
+    MatProgressSpinnerModule,
+    LocalizedDatePipeModule,
+    TimestampToDatePipeModule,
+    HasRoleModule,
+    MatIconModule,
+    MatButtonModule,
+    HasRolePipeModule,
+    RefreshTableModule,
+    MatTooltipModule,
+    InfoSectionModule,
+  ],
 })
 export class MembershipDetailModule { }

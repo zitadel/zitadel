@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -116,7 +117,18 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
-	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, externalIDP)
+	if orgID == "" || !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.User.Invalid")
+	}
+	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.OrgIAMPolicy.NotFound")
+	}
+	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
+	}
+	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, externalIDP, orgIAMPolicy, pwPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -150,20 +162,12 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	return writeModelToHuman(registeredHuman), nil
 }
 
-func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if human != nil && human.Username == "" {
 		human.Username = human.EmailAddress
 	}
 	if orgID == "" || !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-9dk45", "Errors.User.Invalid")
-	}
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
-	if err != nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.OrgIAMPolicy.NotFound")
-	}
-	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
-	if err != nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
 	}
 	if human.Password != nil && human.SecretString != "" {
 		human.ChangeRequired = false

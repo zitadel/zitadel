@@ -18,6 +18,7 @@ func Start(conf Config) (*SQL, *sql.DB, error) {
 	if err != nil {
 		return nil, nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}
+
 	return &SQL{
 		client: client,
 	}, client, nil

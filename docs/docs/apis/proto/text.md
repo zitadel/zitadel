@@ -39,6 +39,32 @@ title: zitadel/text.proto
 
 
 
+### ExternalRegistrationUserOverviewScreenText
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| title |  string | - | string.max_len: 200<br />  |
+| description |  string | - | string.max_len: 500<br />  |
+| email_label |  string | - | string.max_len: 200<br />  |
+| username_label |  string | - | string.max_len: 200<br />  |
+| firstname_label |  string | - | string.max_len: 200<br />  |
+| lastname_label |  string | - | string.max_len: 200<br />  |
+| nickname_label |  string | - | string.max_len: 200<br />  |
+| language_label |  string | - | string.max_len: 200<br />  |
+| phone_label |  string | - | string.max_len: 200<br />  |
+| tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
+| tos_confirm |  string | - | string.max_len: 200<br />  |
+| tos_link_text |  string | - | string.max_len: 200<br />  |
+| tos_confirm_and |  string | - | string.max_len: 200<br />  |
+| privacy_link_text |  string | - | string.max_len: 200<br />  |
+| back_button_text |  string | - | string.max_len: 200<br />  |
+| next_button_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
 ### ExternalUserNotFoundScreenText
 
 
@@ -49,6 +75,11 @@ title: zitadel/text.proto
 | description |  string | - | string.max_len: 500<br />  |
 | link_button_text |  string | - | string.max_len: 100<br />  |
 | auto_register_button_text |  string | - | string.max_len: 100<br />  |
+| tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
+| tos_confirm |  string | - | string.max_len: 200<br />  |
+| tos_link_text |  string | - | string.max_len: 200<br />  |
+| privacy_link_text |  string | - | string.max_len: 200<br />  |
+| tos_confirm_and |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -246,6 +277,7 @@ title: zitadel/text.proto
 | passwordless_prompt_text |  PasswordlessPromptScreenText | - |  |
 | passwordless_registration_text |  PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -405,6 +437,7 @@ title: zitadel/text.proto
 | title |  string | - | string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
 | next_button_text |  string | - | string.max_len: 100<br />  |
+| cancel_button_text |  string | - | string.max_len: 100<br />  |
 
 
 
