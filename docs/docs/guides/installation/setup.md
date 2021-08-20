@@ -1,5 +1,5 @@
 ---
-title: ZITADEL setup by CAOS
+title: ZITADEL setup
 ---
 
 We provide services to setup our ZITADEL with the operators also provided by us.

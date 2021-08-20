@@ -1,5 +1,5 @@
 ---
-title: ORBOS and ZITADEL setup by CAOS
+title: ZITADEL setup with ORBOS
 ---
 
 We provide services to setup our ORBOS and ZITADEL with the operators also provided by us.

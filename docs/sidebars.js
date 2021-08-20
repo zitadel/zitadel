@@ -73,7 +73,7 @@ module.exports = {
         },
         {
           type: 'category',
-          label: 'Setup by CAOS',
+          label: 'CAOS Service Packages',
           collapsed: true,
           items: [
             'guides/installation/setup',
