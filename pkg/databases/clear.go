@@ -20,7 +20,7 @@ func GitOpsClear(
 		return err
 	}
 
-	return clear(monitor, k8sClient, desired)
+	return clear(monitor, k8sClient, desired, true)
 }
 
 func CrdClear(
@@ -32,17 +32,18 @@ func CrdClear(
 		return err
 	}
 
-	return clear(monitor, k8sClient, desired)
+	return clear(monitor, k8sClient, desired, false)
 }
 
 func clear(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	desired *tree.Tree,
+	gitops bool,
 ) error {
 	current := &tree.Tree{}
 
-	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, managed.Clean)(monitor, desired, current)
+	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, gitops, managed.Clean)(monitor, desired, current)
 	if err != nil {
 		return err
 	}

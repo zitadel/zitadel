@@ -2,6 +2,7 @@ package orb
 
 import (
 	"fmt"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/caos/zitadel/operator/database/kinds/databases"
 )
@@ -106,7 +106,7 @@ func AdaptFunc(
 		dbOrBackup := false
 		for _, feature := range features {
 			switch feature {
-			case "database", backup.Instant, backup.Normal, restore.Instant, clean.Instant:
+			case "database", backup.Instant, backup.Normal, restore.Instant, managed.Clean:
 				if !dbOrBackup {
 					dbOrBackup = true
 					queriers = append(queriers,

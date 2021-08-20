@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"fmt"
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
@@ -12,7 +13,6 @@ import (
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3/restore"
-	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -57,7 +57,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, errors.Wrap(err, "parsing desired state failed")
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %s", err)
 		}
 		desired.Parsed = desiredKind
 

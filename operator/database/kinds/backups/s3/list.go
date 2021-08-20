@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -11,7 +12,6 @@ import (
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/database/kinds/backups/core"
-	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -19,7 +19,7 @@ func BackupList() core.BackupListFunc {
 	return func(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, name string, desired *tree.Tree) ([]string, error) {
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, errors.Wrap(err, "parsing desired state failed")
+			return nil, fmt.Errorf("parsing desired state failed: %s", err)
 		}
 		desired.Parsed = desiredKind
 

@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/pkg/errors"
 )
 
 type DesiredV0 struct {
@@ -48,7 +47,7 @@ func ParseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
 	}
 
 	if err := desiredTree.Original.Decode(desiredKind); err != nil {
-		return nil, errors.Wrap(err, "parsing desired state failed")
+		return nil, fmt.Errorf("parsing desired state failed: %s", err)
 	}
 
 	return desiredKind, nil

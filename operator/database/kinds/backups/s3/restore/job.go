@@ -2,7 +2,6 @@ package restore
 
 import (
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -20,7 +19,7 @@ func getJob(
 	secretAccessKeyKey string,
 	sessionTokenName string,
 	sessionTokenKey string,
-	version string,
+	image string,
 	command string,
 
 ) *batchv1.Job {
@@ -38,7 +37,7 @@ func getJob(
 					RestartPolicy: corev1.RestartPolicyNever,
 					Containers: []corev1.Container{{
 						Name:  nameLabels.Name(),
-						Image: common.BackupImage.Reference("", version),
+						Image: image,
 						Command: []string{
 							"/bin/bash",
 							"-c",
