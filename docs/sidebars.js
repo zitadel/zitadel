@@ -73,6 +73,16 @@ module.exports = {
         },
         {
           type: 'category',
+          label: 'CAOS Service Packages',
+          collapsed: true,
+          items: [
+            'guides/installation/setup',
+            'guides/installation/setup-orbos',
+            'guides/installation/checkup'
+          ],
+        },
+        {
+          type: 'category',
           label: 'Self Managed',
           collapsed: true,
           items: [
