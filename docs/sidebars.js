@@ -165,6 +165,14 @@ module.exports = {
     'concepts/managers',
     'concepts/principles',
     'concepts/eventstore',
+    {
+      type: 'category',
+      label: 'Use Cases',
+      collapsed: true,
+      items: [
+        'concepts/usecases/saas'
+      ],
+    },
   ],
   manuals: [
     'manuals/introduction',
