@@ -16,10 +16,20 @@ For example with [zitadel.ch](https://zitadel.ch), issuer.zitadel.ch would be th
 
 [https://accounts.zitadel.ch/oauth/v2/authorize](https://accounts.zitadel.ch/oauth/v2/authorize)
 
-> The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
+:::note
+The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
+:::
 
 The authorization_endpoint is the starting point for all initial user authentications. The user agent (browser) will be redirected to this endpoint to
 authenticate the user in exchange for an authorization_code (authorization code flow) or tokens (implicit flow). 
+
+<details>
+    <summary>Links to specs</summary>
+    <ul>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc6749#section-3.1">Section 3.1 of OAuth2.0 (RFC6749)</a></li>
+        <li><a href="https://openid.net/specs/openid-connect-core-1_0.html#AuthorizationEndpoint">Section 3.1.2 of OpenID Connect Core 1.0 incorporating errata set 1</a></li>
+    </ul>
+</details>
 
 ### Required request parameters
 
@@ -28,7 +38,15 @@ authenticate the user in exchange for an authorization_code (authorization code 
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
-| scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`         |
+| scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
+
+:::important
+Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) whenever an access_token is issued, 
+the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`. 
+
+Send the access_token to the [userinfo_endpoint](#userinfo_endpoint) or [introspection_endpoint](#introspection_endpoint) the retrieve these claims
+or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
+:::
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -101,8 +119,10 @@ When your `response_type` was either `it_token` or `id_token token` and no error
 
 Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
 
-> If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
+:::note
+If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
 the error will be display directly to the user on the auth server
+:::
 
 | Property          | Description                                                          |
 | ----------------- | -------------------------------------------------------------------- |
@@ -299,7 +319,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 ### Error response
 
-//TODO: errors
+> //TODO: errors
 
 ## introspection_endpoint
 
