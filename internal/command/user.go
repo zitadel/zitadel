@@ -188,7 +188,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	}
 	var events []eventstore.EventPusher
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, orgIAMPolicy.UserLoginMustBeDomain))
+	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.ExternalIDPs, orgIAMPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
