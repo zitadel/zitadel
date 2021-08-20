@@ -52,7 +52,7 @@ no additional parameters required
 
 | Parameter             | Description                                           |
 | --------------------- | ----------------------------------------------------- |
-| code_challenge        | The SHA-256 value of the generated code_verifier      |
+| code_challenge        | The SHA-256 value of the generated `code_verifier`    |
 | code_challenge_method | Method used to generate the challenge, must be `S256` |
 
 see PKCE guide for more information
@@ -124,9 +124,15 @@ the error will be display directly to the user on the auth server
 
 [https://api.zitadel.ch/oauth/v2/token](https://api.zitadel.ch/oauth/v2/token)
 
+The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`. 
+When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
+When using [`refresh_token`](#authorization-code-grant-code-exchange) or [`urn:ietf:params:oauth:grant-type:jwt-bearer` (JWT Profile)](#jwt-profile-grant) you will call this endpoint directly.
+
 ### Authorization Code Grant (Code Exchange)
 
-### Required request Parameters
+As mention above, when using `authorization_code` grant, this endpoint will be your second request for authorizing a user with its user agent (browser).
+
+#### Required request Parameters
 
 | Parameter    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
@@ -180,19 +186,28 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
 
 </TabItem>
-</Tabs> 
+</Tabs>
+
+#### Successful code response {#token-code-response}
+
+| Property      | Description                                                                           |
+| ------------- | ------------------------------------------------------------------------------------- |
+| access_token  | An `access_token` as JWT or opaque token                                              |
+| expires_in    | Number of second until the expiration of the `access_token`                           |
+| id_token      | An `id_token` of the authorized user                                                  |
+| scope         | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| refresh_token | An opaque token. Only returned if `offline_access` scope was requested                |
+| token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
 
 ### JWT Profile Grant
 
----
-
-### Required request Parameters
+#### Required request Parameters
 
 | Parameter  | Description                                                                                                                   |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
-| assertion  | JWT built and signed according to [Using JWTs for Client Authentication](#Using JWTs for Client Authentication)               |
-| scope      | [Scopes](Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile` |
+| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants)               |
+| scope      | [Scopes](Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`              |
 
 ```BASH
 curl --request POST \
@@ -204,16 +219,27 @@ curl --request POST \
   --data client_assertion=eyJhbGciOiJSUzI1Ni...
 ```
 
+#### Successful JWT Profile response {#token-jwt-response}
+
+| Property      | Description                                                                           |
+| ------------- | ------------------------------------------------------------------------------------- |
+| access_token  | An `access_token` as JWT or opaque token                                              |
+| expires_in    | Number of second until the expiration of the `access_token`                           |
+| id_token      | An `id_token` of the authorized service user                                          |
+| scope         | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
+
 ### Refresh Token Grant
 
----
+To request a new `access_token` without user interaction, you can use the `refresh_token` grant. 
+See [offline_access Scope](Scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
 
-### Required request Parameters
+#### Required request Parameters
 
-| Parameter     | Description                                                                         |
-| ------------- | ----------------------------------------------------------------------------------- |
-| grant_type    | Must be `refresh_token`                                                             |
-| refresh_token | The refresh_token previously issued in the last auth code or refresh token request. |
+| Parameter     | Description                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| grant_type    | Must be `refresh_token`                                                                      |
+| refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request. |
 | scope         | [Scopes](Scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -260,9 +286,27 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 </TabItem>
 </Tabs>
 
+#### Successful refresh token response {#token-refresh-response}
+
+| Property      | Description                                                                           |
+| ------------- | ------------------------------------------------------------------------------------- |
+| access_token  | An `access_token` as JWT or opaque token                                              |
+| expires_in    | Number of second until the expiration of the `access_token`                           |
+| id_token      | An `id_token` of the authorized user                                                  |
+| scope         | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| refresh_token | An new opaque refresh_token.                                                          |
+| token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
+
+### Error response
+
+//TODO: errors
+
 ## introspection_endpoint
 
 [https://api.zitadel.ch/oauth/v2/introspect](https://api.zitadel.ch/oauth/v2/introspect)
+
+This endpoint enables client to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
+this endpoint will check if the token is not revoked (by client or logout).
 
 | Parameter | Description     |
 | --------- | --------------- |
@@ -305,9 +349,45 @@ curl --request POST \
 </TabItem>
 </Tabs>
 
+### Successful introspection response {#introspect-response}
+
+Upon successful authorization of the client a response with the boolean `active` is returned, indicating if the provided token 
+is active and the requesting client is part of the token audience.
+
+If `active` is **true**, further information will be provided:
+
+| Property  | Description                                          |
+| --------- | ---------------------------------------------------- |
+| scope     | Space delimited list of scopes granted to the token. |
+
+Additionally and depending on the granted scopes, information about the authorized user is provided. 
+Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
+
+### Error response {#introspect-error-response}
+
+If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
+
 ## userinfo_endpoint
 
 [https://api.zitadel.ch/oauth/v2/userinfo](https://api.zitadel.ch/oauth/v2/userinfo)
+
+This endpoint will return information about the authorized user.
+
+Send the `access_token` of the **user** (not the client) as Bearer Token in the `authorization` header:
+```BASH
+curl --request GET \
+  --url https://api.zitadel.ch/oauth/v2/userinfo
+  --header 'Authorization: Bearer dsfdsjk29fm2as...'
+```
+
+### Successful userinfo response {#userinfo-response}
+
+If the `access_token` is valid, the information about the user depending on the granted scopes is returned.
+Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
+
+### Error response {#userinfo-error-response}
+
+If the token is invalid or expired, an HTTP 401 will be returned.
 
 ## end_session_endpoint
 
