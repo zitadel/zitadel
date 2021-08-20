@@ -9,7 +9,7 @@ This annex of the [Framework Agreement](terms-of-service) and the [Support Servi
 
 Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS Ltd. directly.
 
-Last revised: August 20, 2021
+Last revised: August 23, 2021
 
 ## Support Services
 
