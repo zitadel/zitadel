@@ -92,6 +92,24 @@ module.exports = {
           ],
         },
       ],
+    },
+    {
+      type: 'category',
+      label: 'Trainings',
+      collapsed: false,
+      items: [
+        'guides/trainings/introduction',
+        {
+          type: 'category',
+          label: 'Support Service',
+          collapsed: true,
+          items: [
+            'guides/trainings/supportservice/operations',
+            'guides/trainings/supportservice/application',
+            'guides/trainings/supportservice/recurring',
+          ],
+        },
+      ],
     }
   ],
   apis: [
