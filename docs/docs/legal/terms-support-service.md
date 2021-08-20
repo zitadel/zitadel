@@ -90,6 +90,12 @@ You will ensure that units eligible for Support Service are maintained and upgra
 
 You will ensure to follow the support process, especially provide all required initial information to the issue, as outlined in the [Annex](support-services) to this document.
 
+### Training of support staff
+
+You will ensure regular training of your support staff. Your support staff must be able to provide the required information for support issues to us, and thus requires access and up-to-date knowledge of the services.
+
+Initial know-how transfer for the services will be organized in training sessions conducted by us. We can provide knowledge sessions throughout the term to train newly onboarded staff, update your support staff about important updates, or refresh knowledge in specified areas. In case we notice insufficient quality of support requests from Customers, we will propose appropriate training sessions.
+
 ### Security
 
 You will take appropriate measures to prevent any misuse of the services you booked. These include, for example, securing the software used and the prompt installation of security updates as well as using suitably secure passwords.
@@ -165,7 +171,6 @@ We are entitled to suspend and terminate services used by you if
 * Your credit has been used up by services and/or any applicable credit limit has been reached;
 * You are in default in the payment of open invoices and/or prompt payment seems unlikely (i.e. in the event of insolvency proceedings);
 * Your services were used illegally or in breach of contract, or if there is reasonable suspicion of such use (i.e. in the event of complaints or abuse reports);
-* Other customers' services are being negatively affected in breach of the fair use provision, including in the event of your services being subject to attacks by third parties (i.e. DoS/DDoS attacks);
 * We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
 
 We reserve the right to immediately terminate the Framework Agreement in such cases.
