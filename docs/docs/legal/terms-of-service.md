@@ -197,7 +197,7 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 These TOS shall enter into force as of 16.06.2021.
 
-Last revised: July 20, 2021
+Last revised: August 23, 2021
 
 ### Amendments
 
