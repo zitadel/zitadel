@@ -26,7 +26,7 @@ You may only transfer the Framework Agreement or Services used in the context of
 
 ### Term
 
-Coverage under this Agreement will start with Booking of Support Services, for a minimum period of 12 months. Support Services agreements will automatically renew for additional one year terms upon submission of a purchase order for renewal, unless either you or CAOS provides written notice of termination at least 30 days prior to the end of any such term. Each renewal will be at CAOS' then-current rate. In the event that you accesses CAOS Support services in any way after the Agreement has expired or been terminated, you will continue to be bound by this Agreement, which will continue to apply to the services after such expiration or termination.
+Coverage under this Agreement will start with Booking of Support Services, for a minimum period of 12 months. Support Services agreements will automatically renew for additional one year terms upon submission of a purchase order for renewal, unless either you or CAOS provides written notice (email sufficient) of termination of any such term. Each renewal will be at CAOS' then-current rate. In the event that you accesses CAOS Support services in any way after the Agreement has expired or been terminated, you will continue to be bound by this Agreement, which will continue to apply to the services after such expiration or termination.
 
 ## Our Services
 
