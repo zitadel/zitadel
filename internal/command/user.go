@@ -179,7 +179,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
 	}
 
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
