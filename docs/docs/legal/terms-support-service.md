@@ -18,7 +18,7 @@ This Agreement has the following appendices. When you enter the Agreement with u
 
 ### Alterations
 
-Any provisions which deviate from these TOS must be agreed in writing between the Customer and us. Such agreements shall take precedence over the TOS outlined in this document.
+Any provisions which deviate from these TOS must be agreed in writing (mail sufficient) between the Customer and us. Such agreements shall take precedence over the TOS outlined in this document.
 
 ### Transfer
 
@@ -80,7 +80,7 @@ At our request you will provide your truthful contact information and keep it up
 
 ### Use
 
-You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these these TOS, and our [Acceptable Use Policy](acceptable-use-policy) at all times.
+You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these TOS, and our [Acceptable Use Policy](acceptable-use-policy) at all times.
 
 ### Maintenance of units
 
@@ -102,7 +102,6 @@ You will take appropriate measures to prevent any misuse of the services you boo
 
 ### Disaster recovery
 
-We take care of the necessary disaster recovery measures. The goal is to maintain a maximum 24h old restore point off all the vital data.
 
 Any liability for damages, indirect or direct, in case of data loss is explicitly rejected.
 
@@ -143,10 +142,10 @@ Please contact us for current fees.
 Recertification of a unit, to be covered under Support Services, is required for:
 
 * units for which Support Services have been expired for more than 180 days
-* units that run a release that is older than 180 days from the products most recent release
+* units that run a release that is older than 180 days from the products most recent stable release
 * requests for support on products and services purchased or supported from non-authorized resellers
 
-Recertification of a unit requires payment of a Recertification Fee which results in a [checkup](https://docs.zitadel.ch/docs/guides/installation/checkup) of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
+Recertification of a unit requires payment of a Recertification Fee which results in a [checkup](/docs/guides/installation/checkup) of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
 
 Please contact us for current fees.
 

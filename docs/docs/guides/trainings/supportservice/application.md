@@ -2,7 +2,7 @@
 title: Application Support Trainings
 ---
 
-## ZITADEL Developer
+## ZITADEL Support
 
 In this session your second level support will gain an understanding on how to extract relevant information for technical support questions and root cause analysis.
 

@@ -59,6 +59,5 @@ In this training you will learn how to customize tooling or more detailed aspect
 * Monitoring
 * Alerting
 * Ingress/API-Gateway
-* GitOps
 
 **Price**: [Get a quote](https://zitadel.ch/contact)

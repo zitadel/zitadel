@@ -2,7 +2,7 @@
 title: Introduction
 ---
 
-The following pages describe recommended training sessions for managing and supporting ZITADEL.
+The following pages describe the recommended training sessions for managing and supporting ZITADEL.
 
 ## ZITADEL Support Services Trainings
 

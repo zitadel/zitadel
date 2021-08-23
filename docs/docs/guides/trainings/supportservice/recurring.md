@@ -4,7 +4,7 @@ title: Recurring Trainings
 
 ## ZITADEL Support Refresher
 
-In this session you can refresh knowledge about existing and gain experience with new features of ZITADEL to keep the quality of your support high. We recommend one day training per support staff.
+In this session you can refresh knowledge about existing and gain experience with new features of ZITADEL to keep the quality of your support high. We recommend an one day training per support staff.
 
 **Audience**: 1st / 2nd Level Support Staff, Solution Owner, QA Manager (optional)  
 **Duration**: 1 day / support staff
