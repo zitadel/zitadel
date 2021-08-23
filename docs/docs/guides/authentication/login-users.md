@@ -43,9 +43,11 @@ This flow is the same when using PKCE or JWT with Private Key for authentication
 
 ## Create Application
 
-- choose app type
-- go into console
-- follow wizard
+To create an application, open your project in Console and start by clicking on the "New" button in the Application section.
+
+#### Application type
+
+This will start a wizard asking you for an application name and a type.
 
 <Tabs
     groupId="app-type"
@@ -58,6 +60,14 @@ This flow is the same when using PKCE or JWT with Private Key for authentication
 >
 <TabItem value="web">
 
+#### Authentication method
+
+After selecting WEB, you'll next have to choose an authentication method. As mentioned before we recommend using PKCE.
+For even better security you could switch to JWT or just rely on the standard Code Flow. For security reasons we don't
+recommend using POST and will not cover it in this guide.
+
+Please change the authentication method here as well, if you did so in the wizard, so we can better guide you through the process:
+
 <Tabs
     groupId="auth-type"
     default="pkce"
@@ -67,18 +77,22 @@ This flow is the same when using PKCE or JWT with Private Key for authentication
         {'label': 'JWT with Private Key', 'value': 'jwt'},
     ]}
 >
-<TabItem value="web">
-</TabItem>
 </Tabs>
-1. pkce
-2. basic
-3. jwt
-4. post
 
-redirects...
+#### redirect_uri
+
+After selecting the authentication method, you can register a redirect_uri and post_logout_redirect_uri.
+The redirect_uri will be called after user authentication for code exchange. 
+
+You can even register multiple, but typically one will be enough. If you need to distinguish between different scenarios 
+or environments we recommend using the `state` parameter for the former and multiple projects for the latter.
 
 </TabItem>
 <TabItem value="native">
+
+#### Authentication method
+
+When selecting Native the authentication method always needs to be PKCE.
 
 <Tabs
     groupId="auth-type"
@@ -87,18 +101,34 @@ redirects...
         {'label': 'PKCE', 'value': 'pkce'},
     ]}
 >
-<TabItem value="pkce">
-</TabItem>
 </Tabs>
 
-redirects...
+#### redirect_uri
 
-enable refresh_token
+Native clients might have to register multiple redirect_uris as operating system have different requirements.
+Typically, you register a redirect_uri starting with a custom protocol, e.g. `ch.zitadel.app://callback`.
+You're also allowed to use http://localhost, http://127.0.0.1 and http:[::1] without specifying a port: `http://locahost/callback`.
 
-additional origins
+#### post creation actions
+
+After the application creation, you might want to set additional options like `refresh_token` and `additional origins`.
+
+If you want to request refresh_tokens and use them to renew the user's access_tokens without their interaction,
+enable them in the OIDC Configuration section by ticking the checkbox.
+
+When calling the userinfo_endpoint or any ZITADEL API, we will check if an origin header is sent. This is automatically done
+by the user agent. If one is sent we will check if the origin is allowed for your application. By default, all computed
+origins of the redirect_uri list are allowed.
+So if your native app is built with a JavaScript base framework like ReactNative and you only specified redirect_uris 
+with a custom protocol, you will need to add the origin where the app is served from, e.g. `http://localhost:8100`. 
 
 </TabItem>
 <TabItem value="spa">
+
+#### Authentication method
+
+When selecting SPA the recommended authentication method is again PKCE. All common Frameworks like Angular, React, Vue.js and so on
+are able to successfully authenticate with PKCE. Our Managament UI Console for instance uses PKCE as well.
 
 <Tabs
     groupId="auth-type"
@@ -108,11 +138,30 @@ additional origins
         {'label': 'Implicit', 'value': 'implicit'},
     ]}
 >
-<TabItem value="pkce">
+<TabItem value="pkce"></TabItem>
+<TabItem value="implicit">
+
+:::caution Security Notice
+In contrast to the Code Flow, where you'll receive a code for token exchange, with the implicit flow you'll receive
+the tokens directly from the authorization endpoint. This is unsecure and might lead to token leakage and replay attacks.
+It will further be removed in OAuth 2.1 for the exact same reason.
+
+We therefore discourage the use of Implicit Flow and do not cover the flow in this guide.
+:::
+
+If you still need to rely on the implicit flow, simply keep in mind that the response on the authorization_endpoint is
+the same you would be given on the token_endpoint and check the [OAuth / OIDC endpoint documentation](../../apis/openidoauth/endpoints.md) for more information.
+
 </TabItem>
 </Tabs>
 
-redirects...
+#### redirect_uri
+
+After selecting the authentication method, you can register a redirect_uri and post_logout_redirect_uri.
+The redirect_uri will be called after user authentication for code exchange.
+
+You can even register multiple, but typically one will be enough. If you need to distinguish between different scenarios
+or environments we recommend using the `state` parameter for the former and multiple projects for the latter.
 
 </TabItem>
 </Tabs>
@@ -124,7 +173,7 @@ on /authorize with at least the following parameters:
 - `client_id`: this tells the authorization server which application it is, copy from Console
 - `redirect_uri`: where the authorization code is sent to after the user authentication, must be one of the registered in the previous step
 - `response_type`: if you want to have a code (authorization code flow) or directly a token (implicit flow), so when ever possible use `code`
-- `scope`: what scope you want to grant to the access_token / id_token, minimum is `openid`, typically you will have `openid profile email`
+- `scope`: what scope you want to grant to the access_token / id_token, minimum is `openid`, if you're unsure what you need you might start with `openid profile email`
 
 We recommend always using two additional parameters `state` and `nonce`. The former enables you to transfer a state through
 the authentication process. The latter is used to bind the client session with the id_token and to mitigate replay attacks.
@@ -223,7 +272,7 @@ Check the [error response section](../../apis/openidoauth/endpoints#error-respon
 
 ## Token request
 
-Next you will have to exchange the given `code` for the tokens. For this HTTP POST request you will need to provide the following:
+Next you will have to exchange the given `code` for the tokens. For this HTTP POST request (form-urlencoded) you will need to provide the following:
 - code: the code that was issued from the authorization request
 - grant_type: must be `authorization_code`
 - redirect_uri: callback uri where the code was sent to. Must match exactly the redirect_uri of the authorization request
@@ -273,7 +322,7 @@ curl --request POST \
 </TabItem>
 <TabItem value="jwt">
 
-Send a `client_assertion` as JWT and the `client_assertion_type` `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+Send a JWT in the `client_assertion` and set the `client_assertion_type` to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
 for us to validate the signature against the registered public key:
 
 ```curl

@@ -7,7 +7,7 @@ sequenceDiagram
     RO-->>App: Open App
     App->>AS: Authorization Rrequest to /authorize
     AS->>RO: redirect to login
-    RO->>AS: authentication
+    RO->>AS: user authentication
     AS->>App: authorization code response
     App->>AS: authorization code + client authentication to /token
     AS->>App: access_token (refresh_token, id_token)
