@@ -95,7 +95,6 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="highlight"
-                [ngClass]="{'disabled': serviceType==PolicyComponentServiceType.MGMT && row?.providerType == IDPOwnerType.IDP_OWNER_TYPE_SYSTEM}"
                 mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
         </table>

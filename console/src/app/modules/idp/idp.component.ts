@@ -1,11 +1,11 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
+import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { switchMap, take, takeUntil } from 'rxjs/operators';
 import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import { UpdateOrgIDPOIDCConfigRequest, UpdateOrgIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -21,7 +21,7 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
   templateUrl: './idp.component.html',
   styleUrls: ['./idp.component.scss'],
 })
-export class IdpComponent implements OnInit, OnDestroy {
+export class IdpComponent implements OnDestroy {
   public mappingFields: OIDCMappingField[] = [];
   public styleFields: IDPStylingType[] = [];
 
@@ -30,11 +30,13 @@ export class IdpComponent implements OnInit, OnDestroy {
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
-  private subscription?: Subscription;
+  private destroy$: Subject<void> = new Subject();
   public projectId: string = '';
 
   public idpForm!: FormGroup;
   public oidcConfigForm!: FormGroup;
+
+  public canWrite = this.authService.isAllowed([this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : this.serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : '']);
 
   constructor(
     private toast: ToastService,
@@ -58,65 +60,75 @@ export class IdpComponent implements OnInit, OnDestroy {
       usernameMapping: new FormControl(0),
     });
 
-    this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
+    this.route.data.pipe(
+      takeUntil(this.destroy$),
+      switchMap(data => {
+        this.serviceType = data.serviceType;
+        switch (this.serviceType) {
+          case PolicyComponentServiceType.MGMT:
+            this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
+            break;
+          case PolicyComponentServiceType.ADMIN:
+            this.service = this.injector.get(AdminService as Type<AdminService>);
 
-          break;
-      }
-
-      this.mappingFields = [
-        OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-        OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
-      this.styleFields = [
-        IDPStylingType.STYLING_TYPE_UNSPECIFIED,
-        IDPStylingType.STYLING_TYPE_GOOGLE];
-
-      return this.route.params.pipe(take(1));
-    })).subscribe((params) => {
-      const { id } = params;
-      if (id) {
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
-            if (resp.idp) {
-              const idpObject = resp.idp;
-              this.idpForm.patchValue(idpObject);
-              if (idpObject.oidcConfig) {
-                this.oidcConfigForm.patchValue(idpObject.oidcConfig);
-              }
-            }
-          });
-        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-          (this.service as AdminService).getIDPByID(id).then(resp => {
-            if (resp.idp) {
-              const idpObject = resp.idp;
-              this.idpForm.patchValue(idpObject);
-              if (idpObject.oidcConfig) {
-                this.oidcConfigForm.patchValue(idpObject.oidcConfig);
-              }
-            }
-          });
+            break;
         }
+
+        this.mappingFields = [
+          OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+          OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
+        this.styleFields = [
+          IDPStylingType.STYLING_TYPE_UNSPECIFIED,
+          IDPStylingType.STYLING_TYPE_GOOGLE];
+
+        return this.route.params.pipe(take(1));
+      })).subscribe((params) => {
+        const { id } = params;
+        if (id) {
+          this.checkWrite();
+
+          if (this.serviceType === PolicyComponentServiceType.MGMT) {
+
+            (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
+              if (resp.idp) {
+                const idpObject = resp.idp;
+                this.idpForm.patchValue(idpObject);
+                if (idpObject.oidcConfig) {
+                  this.oidcConfigForm.patchValue(idpObject.oidcConfig);
+                }
+              }
+            });
+          } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+            (this.service as AdminService).getIDPByID(id).then(resp => {
+              if (resp.idp) {
+                const idpObject = resp.idp;
+                this.idpForm.patchValue(idpObject);
+                if (idpObject.oidcConfig) {
+                  this.oidcConfigForm.patchValue(idpObject.oidcConfig);
+                }
+              }
+            });
+          }
+        }
+      });
+  }
+
+  public checkWrite(): void {
+    this.canWrite.pipe(take(1)).subscribe(canWrite => {
+      if (canWrite) {
+        this.idpForm.enable();
+        this.oidcConfigForm.enable();
+      } else {
+        this.idpForm.disable();
+        this.oidcConfigForm.disable();
       }
     });
   }
 
-  public get canWrite(): Observable<boolean> {
-    return this.authService.isAllowed([this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : this.serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : '']);
-  }
-
-  public ngOnInit(): void {
-    this.subscription = this.route.params.subscribe(params => this.getData(params));
-  }
-
   public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private getData({ projectid }: Params): void {

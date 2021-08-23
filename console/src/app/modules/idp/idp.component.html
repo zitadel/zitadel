@@ -46,7 +46,7 @@
                             <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
                             <input cnslInput formControlName="clientId" />
                         </cnsl-form-field>
-                        <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection"
+                        <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection" [disabled]="(canWrite | async) === false"
                             [ngModelOptions]="{standalone: true}">
                             Update Client Secret
                         </mat-checkbox>
@@ -69,7 +69,7 @@
                         <cnsl-form-field appearance="outline" class="formfield fullwidth">
                             <mat-chip-list class="chip-list" #chipScopesList aria-label="scope selection">
                                 <mat-chip class="chip" *ngFor="let scope of scopesList?.value" selectable="false"
-                                    removable (removed)="removeScope(scope)">
+                                    removable (removed)="removeScope(scope)" [disabled]="(canWrite | async) === false">
                                     {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
                                 </mat-chip>
                             </mat-chip-list>

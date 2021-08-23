@@ -49,11 +49,12 @@ tr {
       visibility: visible;
     }
   }
-}
 
-.disabled,
-.disabled * {
-  opacity: .8;
+  &.disabled,
+  &.disabled * {
+    opacity: .8;
+    cursor: default;
+  }
 }
 
 .avatar {
