@@ -40,7 +40,7 @@ We are entitled to offer new services, to withdraw existing services (**Terminat
 
 ### Modification of services booked by you
 
-You may change or terminate Services booked by you at any time. Modifications will take effect in the next billing period, or as agreed otherwise between the Parties. Changing services booked by you requires a new PO, stating the new conditions of the services after Modification, to be accepted by the Parties. The standard billing period of this Agreement
+You may change or terminate Services booked by you at any time. Modifications will take effect in the next billing period, or as agreed otherwise between the Parties. Changing services booked by you requires a new PO, stating the new conditions of the services after Modification, to be accepted by the Parties.
 
 ### Due care
 
