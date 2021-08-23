@@ -86,9 +86,9 @@
                 <td mat-cell *matCellDef="let idp">
                     <button
                         [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IDPOwnerType.IDP_OWNER_TYPE_ORG"
-                        mat-icon-button color="warn" matTooltip="{{'IAM.VIEWS.DELETE' | translate}}"
+                        mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}"
                         (click)="removeIdp(idp)">
-                        <i class="las la-trash"></i>
+                        <mat-icon>remove_circle</mat-icon>
                     </button>
                 </td>
             </ng-container>

@@ -40,10 +40,6 @@ td {
 tr {
   outline: none;
 
-  &.disabled * {
-    opacity: .8;
-  }
-
   button {
     visibility: hidden;
   }
@@ -53,6 +49,11 @@ tr {
       visibility: visible;
     }
   }
+}
+
+.disabled,
+.disabled * {
+  opacity: .8;
 }
 
 .avatar {

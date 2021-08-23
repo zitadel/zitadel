@@ -4,12 +4,13 @@ import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import { UpdateOrgIDPOIDCConfigRequest, UpdateOrgIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -40,6 +41,7 @@ export class IdpComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private route: ActivatedRoute,
     private _location: Location,
+    private authService: GrpcAuthService,
   ) {
     this.idpForm = new FormGroup({
       id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
@@ -103,6 +105,10 @@ export class IdpComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  public get canWrite(): Observable<boolean> {
+    return this.authService.isAllowed([this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : this.serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : '']);
   }
 
   public ngOnInit(): void {

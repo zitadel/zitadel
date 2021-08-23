@@ -24,7 +24,7 @@
             </ng-container>
 
             <div class="btn-wrapper">
-                <button color="primary" mat-raised-button class="continue-button" [disabled]="idpForm.invalid"
+                <button color="primary" mat-raised-button class="continue-button" [disabled]="idpForm.invalid || (canWrite | async) === false"
                     type="submit">
                     {{ 'ACTIONS.SAVE' | translate }}
                 </button>
@@ -96,7 +96,7 @@
 
                 <div class="btn-wrapper">
                     <button color="primary" mat-raised-button class="continue-button"
-                        [disabled]="oidcConfigForm.invalid" type="submit">
+                        [disabled]="oidcConfigForm.invalid || (canWrite | async) === false" type="submit">
                         {{ 'ACTIONS.SAVE' | translate }}
                     </button>
                 </div>
