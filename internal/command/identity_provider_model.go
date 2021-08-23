@@ -23,6 +23,8 @@ func (wm *IdentityProviderWriteModel) Reduce() error {
 			wm.State = domain.IdentityProviderStateActive
 		case *policy.IdentityProviderRemovedEvent:
 			wm.State = domain.IdentityProviderStateRemoved
+		case *policy.LoginPolicyRemovedEvent:
+			wm.State = domain.IdentityProviderStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
