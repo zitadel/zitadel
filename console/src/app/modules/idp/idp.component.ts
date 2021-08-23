@@ -4,7 +4,7 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { switchMap, take, takeUntil } from 'rxjs/operators';
 import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
@@ -36,7 +36,9 @@ export class IdpComponent implements OnDestroy {
   public idpForm!: FormGroup;
   public oidcConfigForm!: FormGroup;
 
-  public canWrite = this.authService.isAllowed([this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : this.serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : '']);
+  public canWrite: Observable<boolean> = this.authService.isAllowed([this.serviceType === PolicyComponentServiceType.ADMIN ?
+    'iam.idp.write' : this.serviceType === PolicyComponentServiceType.MGMT ?
+      'org.idp.write' : '']);
 
   constructor(
     private toast: ToastService,
