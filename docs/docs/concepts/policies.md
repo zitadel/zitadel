@@ -65,7 +65,7 @@ You can configure all kinds of external identity providers for identity brokerin
 Create a new identity provider configuration and enable it in the list afterwards.
 
 For a detailed guide about how to configure a new identity provider for identity brokering have a look at our guide:
-[Identity Brokering](../guides/usage/identity-brokering)
+[Identity Brokering](../guides/authentication/identity-brokering)
 
 ## Private Labeling / Branding
 

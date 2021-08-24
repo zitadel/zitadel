@@ -11,7 +11,7 @@ At the end of the guide you should have an application able to login a user and 
 
 Before we can start building our application we have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your [Project](https://console.zitadel.ch/projects) and add a new application at the top of the page.
-Select User Agent and continue. More about the different app types can you find [here](https://docs.zitadel.ch/docs/guides/usage/oauth-recommended-flows#different-client-profiles).
+Select User Agent and continue. More about the different app types can you find [here](https://docs.zitadel.ch/docs/guides/authorization/oauth-recommended-flows#different-client-profiles).
 We recommend that you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
 
 ### Redirect URLs

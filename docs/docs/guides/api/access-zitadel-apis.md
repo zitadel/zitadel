@@ -21,8 +21,8 @@ title: Access ZITADEL APIs
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/usage/oauth-recommended-flows">Recommended Authorization Flows</a></li>
-                <li>Knowledge of <a href="/docs/guides/usage/serviceusers">Service Users</a></li>
+                <li>Knowledge of <a href="/docs/guides/authorization/oauth-recommended-flows">Recommended Authorization Flows</a></li>
+                <li>Knowledge of <a href="/docs/guides/authentication/serviceusers">Service Users</a></li>
             </ul>
         </td>
     </tr>
@@ -37,12 +37,12 @@ ZITADEL Managers are Users who have permission to manage ZITADEL itself. There a
 - **Project Mangers**: In this level the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organisation.
 
-On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../manuals/admin-managers)
+On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../concepts/managers)
 
 
 ## Exercise: Add ORG_OWNER to Service User
 
-Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](serviceusers))
+Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](../authentication/serviceusers))
 
 1. Navigate to Organisation Detail
 2. Click the **+** button in the right part of console, in the managers part of details
