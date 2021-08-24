@@ -25,32 +25,34 @@ type AuthRequest struct {
 	MaxAuthAge    *time.Duration
 	Request       Request
 
-	levelOfAssurance       LevelOfAssurance
-	UserID                 string
-	UserName               string
-	LoginName              string
-	DisplayName            string
-	AvatarKey              string
-	PresignedAvatar        string
-	UserOrgID              string
-	RequestedOrgID         string
-	RequestedOrgName       string
-	RequestedPrimaryDomain string
-	SelectedIDPConfigID    string
-	LinkingUsers           []*ExternalUser
-	PossibleSteps          []NextStep
-	PasswordVerified       bool
-	MFAsVerified           []MFAType
-	Audience               []string
-	AuthTime               time.Time
-	Code                   string
-	LoginPolicy            *LoginPolicy
-	AllowedExternalIDPs    []*IDPProvider
-	LabelPolicy            *LabelPolicy
-	PrivacyPolicy          *PrivacyPolicy
-	LockoutPolicy          *LockoutPolicy
-	DefaultTranslations    []*CustomText
-	OrgTranslations        []*CustomText
+	levelOfAssurance         LevelOfAssurance
+	UserID                   string
+	UserName                 string
+	LoginName                string
+	DisplayName              string
+	AvatarKey                string
+	PresignedAvatar          string
+	UserOrgID                string
+	RequestedOrgID           string
+	RequestedOrgName         string
+	RequestedPrimaryDomain   string
+	ApplicationResourceOwner string
+	PrivateLabelingSetting   PrivateLabelingSetting
+	SelectedIDPConfigID      string
+	LinkingUsers             []*ExternalUser
+	PossibleSteps            []NextStep
+	PasswordVerified         bool
+	MFAsVerified             []MFAType
+	Audience                 []string
+	AuthTime                 time.Time
+	Code                     string
+	LoginPolicy              *LoginPolicy
+	AllowedExternalIDPs      []*IDPProvider
+	LabelPolicy              *LabelPolicy
+	PrivacyPolicy            *PrivacyPolicy
+	LockoutPolicy            *LockoutPolicy
+	DefaultTranslations      []*CustomText
+	OrgTranslations          []*CustomText
 }
 
 type ExternalUser struct {

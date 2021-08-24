@@ -6,7 +6,6 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -49,36 +48,6 @@ func APIConfigToModel(config *APIConfig) *model.APIConfig {
 		ClientKeys:     ClientKeysToModel(config.ClientKeys),
 	}
 	return oidcConfig
-}
-
-func (p *Project) appendAddAPIConfigEvent(event *es_models.Event) error {
-	config := new(APIConfig)
-	err := config.setData(event)
-	if err != nil {
-		return err
-	}
-	config.ObjectRoot.CreationDate = event.CreationDate
-	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
-		p.Applications[i].Type = int32(model.AppTypeAPI)
-		p.Applications[i].APIConfig = config
-	}
-	return nil
-}
-
-func (p *Project) appendChangeAPIConfigEvent(event *es_models.Event) error {
-	config := new(APIConfig)
-	err := config.setData(event)
-	if err != nil {
-		return err
-	}
-
-	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
-		if p.Applications[i].APIConfig == nil {
-			return errors.ThrowInvalidArgument(nil, "MODEL-ADbsd", "api config is nil")
-		}
-		return p.Applications[i].APIConfig.setData(event)
-	}
-	return nil
 }
 
 func (o *APIConfig) setData(event *es_models.Event) error {

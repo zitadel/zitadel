@@ -31,6 +31,8 @@ message Project {
     bool project_role_check = 6;
     // ZITADEL checks if the org of the user has permission to this project
     bool has_project_check = 7;
+    // Defines from where the private labeling should be triggered
+    PrivateLabelingSetting private_labeling_setting = 8;
 }
 
 message GrantedProject {
@@ -88,6 +90,12 @@ enum ProjectState {
     PROJECT_STATE_UNSPECIFIED = 0;
     PROJECT_STATE_ACTIVE = 1;
     PROJECT_STATE_INACTIVE = 2;
+}
+
+enum PrivateLabelingSetting {
+    PRIVATE_LABELING_SETTING_UNSPECIFIED = 0;
+    PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY = 1;
+    PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY = 2;
 }
 
 enum ProjectGrantState {

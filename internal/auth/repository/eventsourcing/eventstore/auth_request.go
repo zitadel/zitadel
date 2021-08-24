@@ -124,6 +124,8 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	request.Audience = appIDs
 	request.AppendAudIfNotExisting(app.ProjectID)
+	request.ApplicationResourceOwner = app.ResourceOwner
+	request.PrivateLabelingSetting = app.PrivateLabelingSetting
 	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
@@ -510,7 +512,16 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
+	privateLabelingOrgID := domain.IAMID
+	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
+		privateLabelingOrgID = request.ApplicationResourceOwner
+	}
+	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || request.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
+		if request.UserOrgID != "" {
+			privateLabelingOrgID = request.UserOrgID
+		}
+	}
+	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
 		return err
 	}

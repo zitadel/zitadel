@@ -45,7 +45,14 @@ func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, r
 		projectRole = domain.RoleProjectOwnerGlobal
 	}
 	events := []eventstore.EventPusher{
-		project.NewProjectAddedEvent(ctx, projectAgg, projectAdd.Name, projectAdd.ProjectRoleAssertion, projectAdd.ProjectRoleCheck, projectAdd.HasProjectCheck),
+		project.NewProjectAddedEvent(
+			ctx,
+			projectAgg,
+			projectAdd.Name,
+			projectAdd.ProjectRoleAssertion,
+			projectAdd.ProjectRoleCheck,
+			projectAdd.HasProjectCheck,
+			projectAdd.PrivateLabelingSetting),
 		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
 	}
 	return events, addedProject, nil
@@ -93,7 +100,8 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 		projectChange.Name,
 		projectChange.ProjectRoleAssertion,
 		projectChange.ProjectRoleCheck,
-		projectChange.HasProjectCheck)
+		projectChange.HasProjectCheck,
+		projectChange.PrivateLabelingSetting)
 	if err != nil {
 		return nil, err
 	}

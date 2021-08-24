@@ -3453,6 +3453,7 @@ message AddProjectRequest {
     bool project_role_assertion = 2;
     bool project_role_check = 3;
     bool has_project_check = 4;
+    zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 5 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddProjectResponse {
@@ -3466,6 +3467,7 @@ message UpdateProjectRequest {
     bool project_role_assertion = 3;
     bool project_role_check = 4;
     bool has_project_check = 5;
+    zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 6 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateProjectResponse {
