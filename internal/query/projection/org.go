@@ -9,18 +9,22 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/caos/zitadel/internal/eventstore/handler/v3"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
 type OrgProjection struct {
-	crdb.StatementHandler
+	v3.Handler
 }
 
-func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgProjection {
+func NewOrgProjection(ctx context.Context, config v3.HandlerConfig) *OrgProjection {
 	p := &OrgProjection{}
 	config.ProjectionName = "projections.orgs"
 	config.Reducers = p.reducers()
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+
+	p.Handler = v3.NewHandler(config)
+	p.Handler.Project(ctx)
+
 	return p
 }
 

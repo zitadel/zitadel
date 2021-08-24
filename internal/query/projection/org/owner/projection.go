@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/caos/zitadel/internal/eventstore/handler/v3"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 	"golang.org/x/text/language"
@@ -28,7 +29,8 @@ type OrgOwner struct {
 }
 
 type OrgOwnerProjection struct {
-	crdb.StatementHandler
+	v3.Handler
+	es *eventstore.Eventstore
 }
 
 const (
@@ -47,11 +49,15 @@ const (
 	userGenderCol    = "gender"
 )
 
-func NewOrgOwnerProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgOwnerProjection {
+func NewOrgOwnerProjection(ctx context.Context, config v3.HandlerConfig) *OrgOwnerProjection {
 	p := &OrgOwnerProjection{}
 	config.ProjectionName = "projections.org_owners"
 	config.Reducers = p.reducers()
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+
+	p.Handler = v3.NewHandler(config)
+	p.es = config.Eventstore
+	p.Handler.Project(ctx)
+
 	return p
 }
 
@@ -311,7 +317,7 @@ func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ow
 }
 
 func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userID string) (handler.Statement, error) {
-	events, err := p.Eventstore.FilterEvents(context.Background(),
+	events, err := p.es.FilterEvents(context.Background(),
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			AddQuery().
 			AggregateTypes(user.AggregateType).

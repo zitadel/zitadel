@@ -16,6 +16,12 @@ var (
 	ErrSomeStmtsFailed = errors.New("some statements failed")
 )
 
+type Statements []Statement
+
+func (stmts Statements) Len() int           { return len(stmts) }
+func (stmts Statements) Swap(i, j int)      { stmts[i], stmts[j] = stmts[j], stmts[i] }
+func (stmts Statements) Less(i, j int) bool { return stmts[i].Sequence < stmts[j].Sequence }
+
 type Statement struct {
 	AggregateType    eventstore.AggregateType
 	Sequence         uint64

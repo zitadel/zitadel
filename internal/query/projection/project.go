@@ -6,18 +6,22 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/caos/zitadel/internal/eventstore/handler/v3"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
 type ProjectProjection struct {
-	crdb.StatementHandler
+	v3.Handler
 }
 
-func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
+func NewProjectProjection(ctx context.Context, config v3.HandlerConfig) *ProjectProjection {
 	p := &ProjectProjection{}
 	config.ProjectionName = "projections.projects"
 	config.Reducers = p.reducers()
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+
+	p.Handler = v3.NewHandler(config)
+	p.Handler.Project(ctx)
+
 	return p
 }
 
