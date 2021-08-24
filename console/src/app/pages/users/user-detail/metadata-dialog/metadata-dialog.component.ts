@@ -1,7 +1,8 @@
 import { Component, Inject, Injector, Type } from '@angular/core';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
+import { BulkSetUserMetadataRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -13,11 +14,13 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./metadata-dialog.component.scss'],
 })
 export class MetadataDialogComponent {
-  public metadata: Partial<Metadata.AsObject>[] = [];
   public injData: any = {};
   private service!: GrpcAuthService | ManagementService;
   public loading: boolean = true;
   public ts!: Timestamp.AsObject | undefined;
+
+  public formArray!: FormArray;
+  public formGroup!: FormGroup;
 
   constructor(
     private injector: Injector,
@@ -36,18 +39,39 @@ export class MetadataDialogComponent {
     }
 
     this.load();
+
+    this.formGroup = new FormGroup({
+      key: new FormControl('', [Validators.required]),
+      value: new FormControl('', [Validators.required]),
+    });
+
+    this.formArray = new FormArray([this.formGroup]);
+  }
+
+
+  public addEntry(): void {
+    const newGroup = new FormGroup({
+      key: new FormControl('', [Validators.required]),
+      value: new FormControl('', [Validators.required]),
+    });
+
+    this.formArray.push(newGroup);
+  }
+
+  public removeEntry(index: number): void {
+    this.formArray.removeAt(index);
   }
 
   public load(): void {
     this.loadMetadata().then(() => {
       this.loading = false;
-      if (this.metadata.length === 0) {
+      if (this.formArray.length === 0) {
         this.addEntry();
       }
     }).catch(error => {
       this.loading = false;
       this.toast.showError(error);
-      if (this.metadata.length === 0) {
+      if (this.formArray.length === 0) {
         this.addEntry();
       }
     });
@@ -57,67 +81,58 @@ export class MetadataDialogComponent {
     this.loading = true;
     if (this.data.serviceType === 'MGMT' && this.injData.userId) {
       return (this.service as ManagementService).listUserMetadata(this.injData.userId).then(resp => {
-        this.metadata = resp.resultList;
+        this.formArray.patchValue(resp.resultList);
         this.ts = resp.details?.viewTimestamp;
       });
     } else {
       return (this.service as GrpcAuthService).listMyMetadata().then(resp => {
-        this.metadata = resp.resultList;
+        this.formArray.patchValue(resp.resultList);
         this.ts = resp.details?.viewTimestamp;
       });
     }
   }
 
-  public addEntry(): void {
-    const newGroup = {
-      key: '',
-      value: '',
-    };
+  public setMetadataAndClose(): void {
+    this.loading = true;
+    const metadataList = this.formArray.value;
 
-    this.metadata.push(newGroup);
-  }
+    switch (this.injData.serviceType) {
+      case 'MGMT':
+        const bulk = metadataList.map((element: any) => {
+          const e = new BulkSetUserMetadataRequest.Metadata();
+          e.setKey(element.key);
+          e.setValue(element.value);
+          return e;
+        });
 
-  public removeEntry(index: number): void {
-    const key = this.metadata[index].key;
-    if (key) {
-      this.removeMetadata(key).then(() => {
-        this.metadata.splice(index, 1);
-        if (this.metadata.length === 0) {
-          this.addEntry();
-        }
-      });
-    } else {
-      this.metadata.splice(index, 1);
-    }
-  }
-
-  public saveElement(index: number): void {
-    const metadataElement = this.metadata[index];
-
-    if (metadataElement.key && metadataElement.value) {
-      this.setMetadata(metadataElement.key, metadataElement.value as string);
-    }
-  }
-
-  public setMetadata(key: string, value: string): void {
-    console.log(key, value, this.injData.userId);
-    if (key && value) {
-      switch (this.injData.serviceType) {
-        case 'MGMT': (this.service as ManagementService).setUserMetadata(key, value, this.injData.userId)
+        (this.service as ManagementService).bulkSetUserMetadata(metadataList, this.injData.userId)
           .then(() => {
             this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
+            this.loading = false;
+            this.dialogRef.close();
           }).catch(error => {
+            this.loading = false;
             this.toast.showError(error);
           });
-          break;
-        case 'AUTH': (this.service as GrpcAuthService).setMyMetadata(key, value)
+        break;
+      case 'AUTH':
+        const mybulk = metadataList.map((element: any) => {
+          const e = new BulkSetUserMetadataRequest.Metadata();
+          e.setKey(element.key);
+          e.setValue(element.value);
+          return e;
+        });
+
+        (this.service as GrpcAuthService).bulkSetMyMetadata(mybulk)
           .then(() => {
             this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
+            this.loading = false;
+            this.dialogRef.close();
           }).catch(error => {
+            this.loading = false;
             this.toast.showError(error);
           });
-          break;
-      }
+        break;
     }
   }
 

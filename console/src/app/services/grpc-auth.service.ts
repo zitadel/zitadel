@@ -12,6 +12,8 @@ import {
   AddMyPasswordlessLinkResponse,
   AddMyPasswordlessRequest,
   AddMyPasswordlessResponse,
+  BulkSetMyMetadataRequest,
+  BulkSetMyMetadataResponse,
   GetMyEmailRequest,
   GetMyEmailResponse,
   GetMyMetadataRequest,
@@ -311,6 +313,12 @@ export class GrpcAuthService {
     req.setKey(key);
     req.setValue(value);
     return this.grpcService.auth.setMyMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public bulkSetMyMetadata(list: BulkSetMyMetadataRequest.Metadata[]): Promise<BulkSetMyMetadataResponse.AsObject> {
+    const req = new BulkSetMyMetadataRequest();
+    req.setMetadataList(list);
+    return this.grpcService.auth.bulkSetMyMetadata(req, null).then(resp => resp.toObject());
   }
 
   public removeMyMetadata(key: string): Promise<RemoveMyMetadataResponse.AsObject> {

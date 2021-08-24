@@ -64,6 +64,8 @@ import {
   BulkAddProjectRolesResponse,
   BulkRemoveUserGrantRequest,
   BulkRemoveUserGrantResponse,
+  BulkSetUserMetadataRequest,
+  BulkSetUserMetadataResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -1237,6 +1239,14 @@ export class ManagementService {
     req.setValue(value);
     req.setId(userId);
     return this.grpcService.mgmt.setUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public bulkSetUserMetadata(list: BulkSetUserMetadataRequest.Metadata[], userId: string):
+    Promise<BulkSetUserMetadataResponse.AsObject> {
+    const req = new BulkSetUserMetadataRequest();
+    req.setMetadataList(list);
+    req.setId(userId);
+    return this.grpcService.mgmt.bulkSetUserMetadata(req, null).then(resp => resp.toObject());
   }
 
   public removeUserMetadata(key: string, userId: string): Promise<RemoveUserMetadataResponse.AsObject> {
