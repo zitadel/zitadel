@@ -37,16 +37,6 @@ The Login Policy defines how the login process should look like and which authen
 
 ![Login Policy](/img/manuals/policies/console_org_login.png)
 
-## Lockout Policy
-
-Define when a user should be blocked.
-
-The following properties are possible:
-- Maximum Password Attempts: When the user has reached the maximum password attempts the user will be locked
-
-If a user is locked, an administrator has to unlock it in the ZITADEL console
-
-
 ### Multifactors / Second Factors
 
 In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
@@ -66,6 +56,16 @@ Create a new identity provider configuration and enable it in the list afterward
 
 For a detailed guide about how to configure a new identity provider for identity brokering have a look at our guide:
 [Identity Brokering](../guides/authentication/identity-brokering)
+
+## Lockout Policy
+
+Define when a user should be blocked.
+
+The following properties are possible:
+- Maximum Password Attempts: When the user has reached the maximum password attempts the user will be locked
+
+If a user is locked, an administrator has to unlock it in the ZITADEL console
+
 
 ## Private Labeling / Branding
 
