@@ -1464,30 +1464,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "user invalid, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-					},
-					Password: &domain.Password{
-						SecretString: "password",
-					},
-				},
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "org policy not found, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1553,6 +1529,50 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "user invalid, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{

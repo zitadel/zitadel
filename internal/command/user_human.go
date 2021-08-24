@@ -117,8 +117,8 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
-	if orgID == "" || !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.User.Invalid")
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")
 	}
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
