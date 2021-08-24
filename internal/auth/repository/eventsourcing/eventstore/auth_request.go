@@ -512,11 +512,11 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	privateLabelingOrgID := ""
+	privateLabelingOrgID := domain.IAMID
 	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
 		privateLabelingOrgID = request.ApplicationResourceOwner
 	}
-	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy {
+	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || request.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
 		if request.UserOrgID != "" {
 			privateLabelingOrgID = request.UserOrgID
 		}
