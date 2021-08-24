@@ -660,7 +660,7 @@
       "2": "Annuliert",
       "3": "Durch IAM Owner gesetzt"
     },
-    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer organisation nicht freigeschaltet!",
+    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer Organisation nicht freigeschaltet!",
     "RETENTIONDAYS": "Tage"
   },
   "POLICY": {

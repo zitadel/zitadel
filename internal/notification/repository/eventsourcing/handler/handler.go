@@ -4,14 +4,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 )
