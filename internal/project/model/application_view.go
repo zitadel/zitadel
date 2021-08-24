@@ -8,14 +8,17 @@ import (
 )
 
 type ApplicationView struct {
-	ID                   string
-	ProjectID            string
-	Name                 string
-	CreationDate         time.Time
-	ChangeDate           time.Time
-	State                AppState
-	ProjectRoleAssertion bool
-	ProjectRoleCheck     bool
+	ID                     string
+	ProjectID              string
+	Name                   string
+	CreationDate           time.Time
+	ChangeDate             time.Time
+	ResourceOwner          string
+	State                  AppState
+	ProjectRoleAssertion   bool
+	ProjectRoleCheck       bool
+	HasProjectCheck        bool
+	PrivateLabelingSetting domain.PrivateLabelingSetting
 
 	IsOIDC                     bool
 	OIDCVersion                OIDCVersion

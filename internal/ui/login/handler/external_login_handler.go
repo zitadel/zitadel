@@ -275,6 +275,9 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 			username = linkingUser.Email
 		}
 	}
+	if username == "" {
+		username = linkingUser.Email
+	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {
 		splittedUsername := strings.Split(username, "@")
@@ -309,6 +312,9 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 		if linkingUser.IsEmailVerified && linkingUser.Email != "" {
 			displayName = linkingUser.Email
 		}
+	}
+	if displayName == "" {
+		displayName = linkingUser.Email
 	}
 
 	externalIDP := &domain.ExternalIDP{

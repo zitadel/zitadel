@@ -74,6 +74,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 								context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 							),
 							),
 							eventFromEventPusher(project.NewProjectMemberAddedEvent(
@@ -93,10 +94,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
 				ownerID:       "user1",
@@ -124,6 +126,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 								context.Background(),
 								&project.NewAggregate("project1", "globalorg").Aggregate,
 								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 							),
 							),
 							eventFromEventPusher(project.NewProjectMemberAddedEvent(
@@ -143,10 +146,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "globalorg",
 				ownerID:       "user1",
@@ -157,10 +161,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 						ResourceOwner: "globalorg",
 						AggregateID:   "project1",
 					},
-					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 			},
 		},
@@ -183,6 +188,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 								context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 							),
 							),
 							eventFromEventPusher(project.NewProjectMemberAddedEvent(
@@ -202,10 +208,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				project: &domain.Project{
-					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
 				ownerID:       "user1",
@@ -216,10 +223,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 						ResourceOwner: "org1",
 						AggregateID:   "project1",
 					},
-					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 			},
 		},
@@ -332,7 +340,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -365,7 +374,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 					),
 				),
@@ -376,10 +386,11 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name:                 "project",
-					ProjectRoleAssertion: true,
-					ProjectRoleCheck:     true,
-					HasProjectCheck:      true,
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
 			},
@@ -396,7 +407,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 					),
 					expectPush(
@@ -409,7 +421,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 									"project-new",
 									false,
 									false,
-									false),
+									false,
+									domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
@@ -423,10 +436,11 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name:                 "project-new",
-					ProjectRoleAssertion: false,
-					ProjectRoleCheck:     false,
-					HasProjectCheck:      false,
+					Name:                   "project-new",
+					ProjectRoleAssertion:   false,
+					ProjectRoleCheck:       false,
+					HasProjectCheck:        false,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
 			},
@@ -436,10 +450,11 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					Name:                 "project-new",
-					ProjectRoleAssertion: false,
-					ProjectRoleCheck:     false,
-					HasProjectCheck:      false,
+					Name:                   "project-new",
+					ProjectRoleAssertion:   false,
+					ProjectRoleCheck:       false,
+					HasProjectCheck:        false,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
 				},
 			},
 		},
@@ -452,7 +467,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 					),
 					expectPush(
@@ -465,7 +481,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 									"",
 									false,
 									false,
-									false),
+									false,
+									domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy),
 							),
 						},
 					),
@@ -477,10 +494,11 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name:                 "project",
-					ProjectRoleAssertion: false,
-					ProjectRoleCheck:     false,
-					HasProjectCheck:      false,
+					Name:                   "project",
+					ProjectRoleAssertion:   false,
+					ProjectRoleCheck:       false,
+					HasProjectCheck:        false,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
 			},
@@ -490,10 +508,11 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					Name:                 "project",
-					ProjectRoleAssertion: false,
-					ProjectRoleCheck:     false,
-					HasProjectCheck:      false,
+					Name:                   "project",
+					ProjectRoleAssertion:   false,
+					ProjectRoleCheck:       false,
+					HasProjectCheck:        false,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
 				},
 			},
 		},
@@ -594,7 +613,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -622,7 +642,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 						eventFromEventPusher(
 							project.NewProjectDeactivatedEvent(context.Background(),
@@ -649,7 +670,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 					),
 					expectPush(
@@ -770,7 +792,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -798,7 +821,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 					),
 				),
@@ -821,7 +845,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 						eventFromEventPusher(
 							project.NewProjectDeactivatedEvent(context.Background(),
@@ -946,7 +971,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 						eventFromEventPusher(
 							project.NewProjectRemovedEvent(context.Background(),
@@ -974,7 +1000,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 						),
 					),
 					expectPush(
@@ -1020,11 +1047,12 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 	}
 }
 
-func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck, hasProjectCheck bool) *project.ProjectChangeEvent {
+func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck, hasProjectCheck bool, privateLabelingSetting domain.PrivateLabelingSetting) *project.ProjectChangeEvent {
 	changes := []project.ProjectChanges{
 		project.ChangeProjectRoleAssertion(roleAssertion),
 		project.ChangeProjectRoleCheck(roleCheck),
 		project.ChangeHasProjectCheck(hasProjectCheck),
+		project.ChangePrivateLabelingSetting(privateLabelingSetting),
 	}
 	if newName != "" {
 		changes = append(changes, project.ChangeName(newName))

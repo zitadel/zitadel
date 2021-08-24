@@ -8,14 +8,16 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
 )
 
 func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
 	return &domain.Project{
-		Name:                 req.Name,
-		ProjectRoleAssertion: req.ProjectRoleAssertion,
-		ProjectRoleCheck:     req.ProjectRoleCheck,
-		HasProjectCheck:      req.HasProjectCheck,
+		Name:                   req.Name,
+		ProjectRoleAssertion:   req.ProjectRoleAssertion,
+		ProjectRoleCheck:       req.ProjectRoleCheck,
+		HasProjectCheck:        req.HasProjectCheck,
+		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
 	}
 }
 
@@ -24,10 +26,22 @@ func ProjectUpdateToDomain(req *mgmt_pb.UpdateProjectRequest) *domain.Project {
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.Id,
 		},
-		Name:                 req.Name,
-		ProjectRoleAssertion: req.ProjectRoleAssertion,
-		ProjectRoleCheck:     req.ProjectRoleCheck,
-		HasProjectCheck:      req.HasProjectCheck,
+		Name:                   req.Name,
+		ProjectRoleAssertion:   req.ProjectRoleAssertion,
+		ProjectRoleCheck:       req.ProjectRoleCheck,
+		HasProjectCheck:        req.HasProjectCheck,
+		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
+	}
+}
+
+func privateLabelingSettingToDomain(setting proj_pb.PrivateLabelingSetting) domain.PrivateLabelingSetting {
+	switch setting {
+	case proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY:
+		return domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy
+	case proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY:
+		return domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy
+	default:
+		return domain.PrivateLabelingSettingUnspecified
 	}
 }
 
