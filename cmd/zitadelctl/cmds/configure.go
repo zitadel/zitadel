@@ -42,7 +42,7 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 		rv := getRv("configure", map[string]interface{}{
 			"masterkey":  newMasterKey != "",
 			"newRepoURL": newRepoURL,
-			"newRepoKey": newRepoKey,
+			"newRepoKey": newRepoKey != "",
 		}, "")
 		defer func() {
 			err = rv.ErrFunc(err)
