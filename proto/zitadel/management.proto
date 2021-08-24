@@ -990,8 +990,7 @@ service ManagementService {
     }
 
     // Adds an new project to the organisation
-    rpc AddProject(AddProjectRequest
-        ) returns (AddProjectResponse) {
+    rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
             body: "*"
