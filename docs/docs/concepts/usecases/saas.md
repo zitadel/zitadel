@@ -40,7 +40,7 @@ In the project you will configure all your roles and applications (clients and A
 
 ### Project Settings
 
-If it should only be allowed to login to the application of the project if a user has an authorization, this can be configured on the project. (Check roles on authentication)
+You can configure `check roles on authentication` on the project, if you want to restrict access to users that have the correct authorization for the project.
 
 ### Project Grant
 
