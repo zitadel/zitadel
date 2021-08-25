@@ -67,7 +67,7 @@ The private labeling (branding) and the login policy of the requested organisati
 More about the [Scopes](../../apis/openidoauth/scopes)
 :::
 
-2. Show Private Labeling (Branding) of the project organisation
+2. Show private labeling (branding) of the project organisation
 
 On the project can be configured, what kind of branding should be shown.
 In the default the design of ZITADEL will be shown, but as soon as the user is identified, the policy of the users organisation will be triggered.
