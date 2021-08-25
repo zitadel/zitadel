@@ -61,7 +61,7 @@ There are some different use cases how the login should behave and look like:
 1. Restrict Organization
 
 With the primary domain scope the organization will be restricted to the requested domain, this means only users of the requestd organization will be able to login.
-The private labeling (branding) and the login policy of the requested organization will trigger automatically.
+The private labeling (branding) and the login policy of the requested organization will be set automatically.
 
 :::note
 More about the [Scopes](../../apis/openidoauth/scopes)
@@ -71,7 +71,7 @@ More about the [Scopes](../../apis/openidoauth/scopes)
 
 You can configure on project-level which branding should be shown to users.
 In the default the design of ZITADEL will be shown, but as soon as the user is identified, the policy of the users organization will be triggered.
-If the setting is set to Ensure Project Resource Owner Setting, the private labeling of the project organization will always be triggered.
+If the setting is set to `Ensure Project Resource Owner Setting`, the private labeling of the project organization will always be triggered.
 The last possibility is to show the private labeling of the project organization and as soon as the user is identitfied the user organization settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.
 :::note
