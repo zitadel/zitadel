@@ -20,7 +20,7 @@ An organisation is the top level in ZITADEL.
 In an organisation projects and users are managed by the organisation.
 You need at least one organisation for your own company in our case "The Timing Company".
 
-For your costumers you have different possibilities:
+For your customers you have different possibilities:
 1. Your customer already owns an organisation ZITADEL
 2. Your customer creates a new organisation in ZITADEL by itself
 3. You create an organisation for your customer (If you like to verify the domain, the customer has to do it)
