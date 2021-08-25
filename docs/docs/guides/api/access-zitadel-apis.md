@@ -33,9 +33,9 @@ title: Access ZITADEL APIs
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers. 
 
 - **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole IAM. 
-- **Org Managers**: Managers in the Organisation Level are able to manage everything within the granted Organisation.
+- **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
 - **Project Mangers**: In this level the user is able to manage a project.
-- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organisation.
+- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
 On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../concepts/managers)
 
@@ -44,7 +44,7 @@ On each level we have some different Roles. Here you can find more about the dif
 
 Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](../authentication/serviceusers))
 
-1. Navigate to Organisation Detail
+1. Navigate to Organization Detail
 2. Click the **+** button in the right part of console, in the managers part of details
 3. Search the user and select it
 4. Choose the role ORG_OWNER

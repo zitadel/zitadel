@@ -6,9 +6,9 @@ You are able to customize some of the texts in ZITADEL.
 
 ## Message Texts
 Sometimes the users will get an email or phone message from ZITADEL (e.g Password Reset Request).
-ZITADEL already has some good standard texts, but maybe you would like to customize it for your organisation.
+ZITADEL already has some good standard texts, but maybe you would like to customize it for your organization.
 
-Go to the message text policy on your organisation and you will find the different kinds of messages that are sent from ZITADEL. 
+Go to the message text policy on your organization and you will find the different kinds of messages that are sent from ZITADEL. 
 Choose the template and the language you like to edit. 
 You can now change all the texts from a message. 
 As soon as you click into a input field you will see some attribute chips below the field. 

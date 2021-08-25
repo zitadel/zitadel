@@ -5,7 +5,7 @@ title: Go
 This integration guide shows you how to integrate **ZITADEL** into your Go application.
 It demonstrates how to fetch some data from the ZITADEL management API.
 
-At the end of the guide you should have an application able to read the details of your organisation.
+At the end of the guide you should have an application able to read the details of your organization.
 
 ## Prerequisites
 
@@ -127,7 +127,7 @@ If you've run into any other problem, don't hesitate to contact us or raise an i
 
 ### Whats next?
 
-Now you can proceed implementing our APIs by adding more calls or trying to overwrite the organisation context:
+Now you can proceed implementing our APIs by adding more calls or trying to overwrite the organization context:
 
 ```go
     respOverwrite, err := client.GetMyOrg(middleware.SetOrgID(ctx, "74161146763996133"), &pb.GetMyOrgRequest{})

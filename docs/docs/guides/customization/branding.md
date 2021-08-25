@@ -3,7 +3,7 @@ title: Branding
 ---
 
 ZITADEL offers various customisation options for your branding. 
-Head over to the Private Labeling Policy on your Organisation Page.
+Head over to the Private Labeling Policy on your Organization Page.
 
 ## How it works
 You are able to customize a light and a dark mode.
@@ -34,8 +34,8 @@ In the advanced behavior you can choose if the loginname suffix (domain e.g road
 If you like to trigger your settings for your applications you have different possibilities.
 
 ### 1. Primary Domain Scope
-Send a primary domain scope with your authorization request to trigger your organisation.
-The primary domain scope will restrict the login to your organisation, so only users of your own organisation will be able to login.
+Send a primary domain scope with your authorization request to trigger your organization.
+The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
 
 ### 2. Setting on your Project
 Set the private labeling setting on your project to define which branding should trigger.
