@@ -44,11 +44,10 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		return nil, err
 	}
 
-	// turned off for this release
-	// err = projection.Start(ctx, es, projections)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err = projection.Start(ctx, es, projections)
+	if err != nil {
+		return nil, err
+	}
 
 	return repo, nil
 }
