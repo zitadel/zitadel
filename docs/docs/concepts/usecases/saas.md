@@ -44,7 +44,7 @@ You can configure `check roles on authentication` on the project, if you want to
 
 ### Project Grant
 
-To give a customer permissions to a project, a project grant to the customer is need (Search by domain).
+To give a customer permissions to a project, a project grant to the customer is needed (search the granted organization by its domain).
 It is also possible to only allow the customer to use specific roles.
 As soon as a project grant exists, the customer will see the project in the granted projects section of his organisation and will be able to authorize his own users to the given proejct.
 
