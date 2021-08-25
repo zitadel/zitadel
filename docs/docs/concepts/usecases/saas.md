@@ -69,7 +69,7 @@ More about the [Scopes](../../apis/openidoauth/scopes)
 
 2. Show private labeling (branding) of the project organisation
 
-On the project can be configured, what kind of branding should be shown.
+You can configure on project-level which branding should be shown to users.
 In the default the design of ZITADEL will be shown, but as soon as the user is identified, the policy of the users organisation will be triggered.
 If the setting is set to Ensure Project Resource Owner Setting, the private labeling of the project organisation will always be triggered.
 The last possibility is to show the private labeling of the project organisation and as soon as the user is identitfied the user organisation settings will be triggered.
