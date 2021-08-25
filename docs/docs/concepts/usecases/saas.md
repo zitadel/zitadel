@@ -26,9 +26,7 @@ For your costumers you have different possibilities:
 3. You create an organisation for your customer (If you like to verify the domain, the customer has to do it)
 
 :::note
-
 Subscriptions are organisation based. This means, that each organisation can choose her own tier based on the needed features.
-
 :::
 
 ## Project
@@ -40,11 +38,35 @@ These projects should be created in "The Timing Company" organisation, because t
 
 In the project you will configure all your roles and applications (clients and APIs).
 
-To give a customer permissions to a project, a project grant to the customer is need (Search by domain).
-It is also possible to only allow the customer to use specific roles.
-As soon as a project grant exists, the customer will see the project in the granted projects section of his organisation, and will be able to authorize his own users to the given proejct.
+### Project Settings
 
+If it should only be allowed to login to the application of the project if a user has an authorization, this can be configured on the project. (Check roles on authentication)
 
 ### Project Grant
 
+To give a customer permissions to a project, a project grant to the customer is need (Search by domain).
+It is also possible to only allow the customer to use specific roles.
+As soon as a project grant exists, the customer will see the project in the granted projects section of his organisation and will be able to authorize his own users to the given proejct.
 
+## Authorizations
+
+To give a user permission to a project an authorization is need.
+All organisations which own the project or got it granted are able to authorize users.
+It is also possible to authorize users outside the own company if the exact login name of the user is known.
+
+## Project Login
+
+There are some different use cases how the login should behave and look like:
+
+1. Restrict Organisation
+
+With the primary domain scope the organisation will be restricted to the requested domain, this means only users of the requestd organisation will be able to login.
+The private labeling (branding) and the login policy of the requested organisation will trigger automatically.
+
+2. Show Private Labeling (Branding) of the project organisation
+
+On the project can be configured, what kind of branding should be shown.
+In the default the design of ZITADEL will be shown, but as soon as the user is identified, the policy of the users organisation will be triggered.
+If the setting is set to Ensure Project Resource Owner Setting, the private labeling of the project organisation will always be triggered.
+The last possibility is to show the private labeling of the project organisation and as soon as the user is identitfied the user organisation settings will be triggered.
+For this the Allow User Resource Owner Setting should be set.
