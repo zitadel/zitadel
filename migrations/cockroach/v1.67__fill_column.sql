@@ -2,7 +2,7 @@ BEGIN;
 
 SET experimental_enable_hash_sharded_indexes = true;
 
-CREATE TABLE events_new (
+CREATE TABLE eventstore.events_new (
     id UUID DEFAULT gen_random_uuid(),
     event_type TEXT,
     aggregate_type TEXT NOT NULL,
@@ -18,12 +18,31 @@ CREATE TABLE events_new (
     previous_aggregate_type_sequence BIGINT,
 
     CONSTRAINT event_sequence_pk PRIMARY KEY (event_sequence DESC) USING HASH WITH BUCKET_COUNT = 10,
-    CONSTRAINT previous_sequence_unique UNIQUE (previous_sequence DESC),
+    CONSTRAINT previous_sequence_unique UNIQUE (previous_aggregate_sequence DESC),
     INDEX agg_type_agg_id (aggregate_type, aggregate_id),
     INDEX max_sequence (aggregate_type, aggregate_id, event_sequence DESC),
     INDEX default_event_query (aggregate_type, aggregate_id, event_type, resource_owner),
     INDEX agg_type (aggregate_type)
-) AS SELECT 
+);
+
+COMMIT;
+BEGIN;
+
+INSERT INTO eventstore.events_new(
+    id,
+    event_type,
+    aggregate_type,
+    aggregate_id,
+    aggregate_version,
+    event_sequence,
+    previous_aggregate_sequence,
+    creation_date,
+    event_data,
+    editor_user,
+    editor_service,
+    resource_owner,
+    previous_aggregate_type_sequence
+) SELECT 
     id,
     event_type,
     aggregate_type,
@@ -44,9 +63,19 @@ CREATE TABLE events_new (
     FROM eventstore.events
     ORDER BY event_sequence;
 
+COMMIT;
+BEGIN;
 
-ALTER TABLE eventstore.events RENAME TO eventstore.events_old;
-ALTER TABLE eventstore.events_new RENAME TO eventstore.events;
+ALTER TABLE eventstore.events RENAME TO events_old;
+ALTER SEQUENCE eventstore.event_seq OWNED BY eventstore.events_new.previous_aggregate_sequence;
+
+COMMIT;
+BEGIN;
+
+ALTER TABLE eventstore.events_new RENAME TO events;
+
+COMMIT;
+BEGIN;
 
 INSERT INTO eventstore.events (
     id,
