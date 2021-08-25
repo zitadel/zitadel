@@ -170,3 +170,57 @@ func (wm *OrgDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgDomainRemovedEventType).
 		Builder()
 }
+
+type OrgDomainVerifiedWriteModel struct {
+	eventstore.WriteModel
+
+	Domain   string
+	Verified bool
+}
+
+func NewOrgDomainVerifiedWriteModel(domain string) *OrgDomainVerifiedWriteModel {
+	return &OrgDomainVerifiedWriteModel{
+		WriteModel: eventstore.WriteModel{},
+		Domain:     domain,
+	}
+}
+
+func (wm *OrgDomainVerifiedWriteModel) AppendEvents(events ...eventstore.EventReader) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.DomainVerifiedEvent:
+			if e.Domain != wm.Domain {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *org.DomainRemovedEvent:
+			if e.Domain != wm.Domain {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgDomainVerifiedWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *org.DomainVerifiedEvent:
+			wm.Verified = true
+			wm.ResourceOwner = e.Aggregate().ResourceOwner
+		case *org.DomainRemovedEvent:
+			wm.Verified = false
+		}
+	}
+	return nil
+}
+
+func (wm *OrgDomainVerifiedWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.OrgDomainVerifiedEventType,
+			org.OrgDomainRemovedEventType).
+		Builder()
+}
