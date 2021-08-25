@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -117,8 +118,8 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string) (*domain.Human, error) {
-	if orgID == "" || !human.IsValid() || externalIDP == nil && (human.Password == nil || human.SecretString == "") {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.User.Invalid")
+	if orgID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")
 	}
 	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
 	if err != nil {
@@ -178,6 +179,19 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, externalIDP *domain.ExternalIDP, selfregister, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
+	}
+	if !orgIAMPolicy.UserLoginMustBeDomain {
+		usernameSplit := strings.Split(human.Username, "@")
+		if len(usernameSplit) != 2 {
+			return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
+		}
+		domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
+		if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
+			return nil, nil, err
+		}
+		if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
+			return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+		}
 	}
 	userID, err := c.idGenerator.Next()
 	if err != nil {
