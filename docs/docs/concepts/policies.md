@@ -59,7 +59,7 @@ For a detailed guide about how to configure a new identity provider for identity
 
 ## Lockout Policy
 
-Define when a user should be blocked.
+Define when a user should be locked.
 
 The following properties are possible:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the user will be locked
