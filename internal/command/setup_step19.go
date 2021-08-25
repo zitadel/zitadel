@@ -24,7 +24,6 @@ func (s *Step19) execute(ctx context.Context, commandSide *Commands) error {
 
 func (c *Commands) SetupStep19(ctx context.Context, step *Step19) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
-		//iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		events := make([]eventstore.EventPusher, 0)
 		orgs := newOrgsWithUsernameNotDomain()
 		if err := c.eventstore.FilterToQueryReducer(ctx, orgs); err != nil {
