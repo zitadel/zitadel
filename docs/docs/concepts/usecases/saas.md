@@ -2,7 +2,7 @@
 title: Saas Product with Authentication and Authorization
 ---
 
-This is an example architecture for a typical saas product. 
+This is an example architecture for a typical SaaS product. 
 To illustrate it a fictional organisation and project is taken.
 
 ## Example Case
