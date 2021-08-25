@@ -9,7 +9,7 @@ To illustrate it a fictional organisation and project is taken.
 
 The Timing Company has a product called Time.
 They have two environments, the development and the production environment.
-In this case the time uses authentication and authorizations from ZITADEL.
+In this case Time uses authentication and authorizations from ZITADEL.
 This means that the users and also their authorizations will be managed within ZITADEL.
 
 ![Architecture](/img/concepts/usecase/saas.png)
