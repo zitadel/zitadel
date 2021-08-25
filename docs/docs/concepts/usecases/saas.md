@@ -25,7 +25,7 @@ For your costumers you have different possibilities:
 2. Your customer creates a new organisation in ZITADEL by itself
 3. You create an organisation for your customer (If you like to verify the domain, the customer has to do it)
 
-:::note
+:::info
 Subscriptions are organisation based. This means, that each organisation can choose her own tier based on the needed features.
 :::
 
@@ -63,6 +63,10 @@ There are some different use cases how the login should behave and look like:
 With the primary domain scope the organisation will be restricted to the requested domain, this means only users of the requestd organisation will be able to login.
 The private labeling (branding) and the login policy of the requested organisation will trigger automatically.
 
+:::note
+More about the [Scopes](../../apis/openidoauth/scopes)
+:::
+
 2. Show Private Labeling (Branding) of the project organisation
 
 On the project can be configured, what kind of branding should be shown.
@@ -70,3 +74,6 @@ In the default the design of ZITADEL will be shown, but as soon as the user is i
 If the setting is set to Ensure Project Resource Owner Setting, the private labeling of the project organisation will always be triggered.
 The last possibility is to show the private labeling of the project organisation and as soon as the user is identitfied the user organisation settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.
+:::note
+More about [Private Labeling](../../guides/customization/branding)
+:::
