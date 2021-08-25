@@ -50,7 +50,7 @@ As soon as a project grant exists, the customer will see the project in the gran
 
 ## Authorizations
 
-To give a user permission to a project an authorization is need.
+To give a user permission to a project an authorization is needed.
 All organisations which own the project or got it granted are able to authorize users.
 It is also possible to authorize users outside the own company if the exact login name of the user is known.
 
