@@ -20,6 +20,6 @@
 </ng-container>
 
 <ng-template #emptyList>
-  <p class="empty-desc">{{'USER.METADATA.EMPTY' | translate}}</p>
   <p *ngIf="ts" class="ts">{{ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
+  <p class="empty-desc">{{'USER.METADATA.EMPTY' | translate}}</p>
 </ng-template>

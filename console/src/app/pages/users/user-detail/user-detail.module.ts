@@ -32,6 +32,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { HasFeatureModule } from '../../../directives/has-feature/has-feature.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
 import {
@@ -50,12 +51,12 @@ import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
 import { MembershipsComponent } from './memberships/memberships.component';
 import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
+import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
-import { MetadataComponent } from './metadata/metadata.component';
 
 @NgModule({
   declarations: [
@@ -100,6 +101,7 @@ import { MetadataComponent } from './metadata/metadata.component';
     CardModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    HasFeatureModule,
     MatTooltipModule,
     HasRoleModule,
     TranslateModule,

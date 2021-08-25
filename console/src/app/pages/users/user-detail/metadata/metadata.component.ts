@@ -43,10 +43,8 @@ export class MetadataComponent implements OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
-      if (resp) {
-
-      }
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadMetadata();
     });
   }
 
@@ -55,7 +53,12 @@ export class MetadataComponent implements OnInit {
     if (this.userId && this.serviceType === 'MGMT') {
       return (this.service as ManagementService).listUserMetadata(this.userId).then(resp => {
         this.loading = false;
-        this.metadata = resp.resultList;
+        this.metadata = resp.resultList.map(md => {
+          return {
+            key: md.key,
+            value: atob(md.value as string),
+          };
+        });
         this.ts = resp.details?.viewTimestamp;
       }).catch((error) => {
         this.loading = false;
@@ -64,7 +67,12 @@ export class MetadataComponent implements OnInit {
     } else {
       return (this.service as GrpcAuthService).listMyMetadata().then(resp => {
         this.loading = false;
-        this.metadata = resp.resultList;
+        this.metadata = resp.resultList.map(md => {
+          return {
+            key: md.key,
+            value: atob(md.value as string),
+          };
+        });
         this.ts = resp.details?.viewTimestamp;
       }).catch((error) => {
         this.loading = false;

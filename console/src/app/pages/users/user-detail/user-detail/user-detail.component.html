@@ -126,17 +126,19 @@
       <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
         <mat-tab label="Details">
           <div class="side-padding">
-          <ng-template appHasRole [appHasRole]="['user.membership.read']">
-            <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
-          </ng-template>
+            <ng-template appHasRole [appHasRole]="['user.membership.read']">
+              <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
+            </ng-template>
 
-          <cnsl-metadata *ngIf="user?.id" [userId]="user.id" serviceType="MGMT"></cnsl-metadata>
-        </div>
-      </mat-tab>
-      <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
-        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
-        </app-changes>
-      </mat-tab>
+            <ng-template appHasFeature [appHasFeature]="['metadata.user']">
+              <cnsl-metadata *ngIf="user?.id" [userId]="user.id" serviceType="MGMT"></cnsl-metadata>
+            </ng-template>
+          </div>
+        </mat-tab>
+        <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
+          <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
+          </app-changes>
+        </mat-tab>
       </mat-tab-group>
     </div>
 </app-meta-layout>
