@@ -102,10 +102,10 @@ export class ExternalIdpsComponent implements OnInit {
         let promise;
         if (this.service instanceof ManagementService) {
           promise = (this.service as ManagementService)
-            .removeHumanLinkedIDP(idp.providedUserId, idp.idpId, idp.userId);
+            .removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId);
         } else if (this.service instanceof GrpcAuthService) {
           promise = (this.service as GrpcAuthService)
-            .removeMyLinkedIDP(idp.providedUserId, idp.idpId);
+            .removeMyLinkedIDP(idp.idpId, idp.providedUserId);
         }
 
         if (promise) {
