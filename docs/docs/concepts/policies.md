@@ -8,7 +8,7 @@ The default configuration can be overridden for each organization.
 ## General
 
 You can find these settings in the menu organization in the section polcies.
-Each policy can be overridden and resetted to the default.
+Each policy can be overridden and reset to the default.
 
 ## Password Complexity
 
