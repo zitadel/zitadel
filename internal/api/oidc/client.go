@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -281,7 +282,7 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 
 	userMetaData := make(map[string]string)
 	for _, md := range metaData.Result {
-		userMetaData[md.Key] = string(md.Value)
+		userMetaData[md.Key] = base64.StdEncoding.EncodeToString(md.Value)
 	}
 	return userMetaData, nil
 }
