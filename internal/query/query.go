@@ -44,7 +44,12 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		return nil, err
 	}
 
-	err = projection.Start(ctx, es, projections)
+	sqlClient, err := projections.CRDB.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	err = projection.Start(ctx, sqlClient, es, projections)
 	if err != nil {
 		return nil, err
 	}

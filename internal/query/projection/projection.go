@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore"
@@ -9,12 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/query/projection/org/owner"
 )
 
-func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error {
-	sqlClient, err := config.CRDB.Start()
-	if err != nil {
-		return err
-	}
-
+func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config) error {
 	handlerConfig := handler.HandlerConfig{
 		IteratorConfig: handler.IteratorConfig{
 			Client:     sqlClient,
