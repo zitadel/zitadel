@@ -282,7 +282,7 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 
 	userMetaData := make(map[string]string)
 	for _, md := range metaData.Result {
-		userMetaData[md.Key] = base64.StdEncoding.EncodeToString(md.Value)
+		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
 	}
 	return userMetaData, nil
 }
