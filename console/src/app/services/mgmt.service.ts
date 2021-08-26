@@ -835,8 +835,8 @@ export class ManagementService {
 
   public removeHumanLinkedIDP(
     idpId: string,
-    userId: string,
     linkedUserId: string,
+    userId: string,
   ): Promise<RemoveHumanLinkedIDPResponse.AsObject> {
     const req = new RemoveHumanLinkedIDPRequest();
     req.setIdpId(idpId);
