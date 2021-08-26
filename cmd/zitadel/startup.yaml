@@ -31,6 +31,9 @@ EventstoreBase:
   Host: $ZITADEL_EVENTSTORE_HOST
   Port: $ZITADEL_EVENTSTORE_PORT
   Database: 'eventstore'
+  MaxOpenConns: 3
+  MaxConnLifetime: 5m
+  MaxConnIdleTime: 5m
   SSL:
     Mode: $CR_SSL_MODE
     RootCert: $CR_ROOT_CERT
@@ -39,6 +42,9 @@ Commands:
   Eventstore:
     User: 'eventstore'
     Password: $CR_EVENTSTORE_PASSWORD
+    MaxOpenConns: 5
+    MaxConnLifetime: 5m
+    MaxConnIdleTime: 5m
     SSL:
       Cert: $CR_EVENTSTORE_CERT
       Key: $CR_EVENTSTORE_KEY
@@ -47,6 +53,9 @@ Queries:
   Eventstore:
     User: 'queries'
     Password: $CR_QUERIES_PASSWORD
+    MaxOpenConns: 2
+    MaxConnLifetime: 5m
+    MaxConnIdleTime: 5m
     SSL:
       Cert: $CR_QUERIES_CERT
       Key: $CR_QUERIES_KEY
@@ -62,6 +71,9 @@ AuthZ:
           User: 'authz'
           Database: 'eventstore'
           Password: $CR_AUTHZ_PASSWORD
+          MaxOpenConns: 3
+          MaxConnLifetime: 5m
+          MaxConnIdleTime: 5m
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -77,6 +89,9 @@ AuthZ:
       User: 'authz'
       Database: 'authz'
       Password: $CR_AUTHZ_PASSWORD
+      MaxOpenConns: 3
+      MaxConnLifetime: 5m
+      MaxConnIdleTime: 5m
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
@@ -100,6 +115,9 @@ Auth:
         User: 'auth'
         Database: 'eventstore'
         Password: $CR_AUTH_PASSWORD
+        MaxOpenConns: 3
+        MaxConnLifetime: 5m
+        MaxConnIdleTime: 5m
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -116,6 +134,9 @@ Auth:
       User: 'auth'
       Database: 'auth'
       Password: $CR_AUTH_PASSWORD
+      MaxOpenConns: 3
+      MaxConnLifetime: 5m
+      MaxConnIdleTime: 5m
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
@@ -127,6 +148,9 @@ Auth:
     User: 'auth'
     Database: 'auth'
     Password: $CR_AUTH_PASSWORD
+    MaxOpenConns: 3
+    MaxConnLifetime: 5m
+    MaxConnIdleTime: 5m
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -150,6 +174,9 @@ Admin:
         User: 'adminapi'
         Database: 'eventstore'
         Password: $CR_ADMINAPI_PASSWORD
+        MaxOpenConns: 3
+        MaxConnLifetime: 5m
+        MaxConnIdleTime: 5m
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -165,6 +192,9 @@ Admin:
     User: 'adminapi'
     Database: 'adminapi'
     Password: $CR_ADMINAPI_PASSWORD
+    MaxOpenConns: 3
+    MaxConnLifetime: 5m
+    MaxConnIdleTime: 5m
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -188,6 +218,9 @@ Mgmt:
         User: 'management'
         Database: 'eventstore'
         Password: $CR_MANAGEMENT_PASSWORD
+        MaxOpenConns: 3
+        MaxConnLifetime: 5m
+        MaxConnIdleTime: 5m
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -203,6 +236,9 @@ Mgmt:
     User: 'management'
     Database: 'management'
     Password: $CR_MANAGEMENT_PASSWORD
+    MaxOpenConns: 3
+    MaxConnLifetime: 5m
+    MaxConnIdleTime: 5m
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -312,6 +348,9 @@ Notification:
           User: 'notification'
           Database: 'eventstore'
           Password: $CR_NOTIFICATION_PASSWORD
+          MaxOpenConns: 2
+          MaxConnLifetime: 5m
+          MaxConnIdleTime: 5m
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -327,6 +366,9 @@ Notification:
       User: 'notification'
       Database: 'notification'
       Password: $CR_NOTIFICATION_PASSWORD
+      MaxOpenConns: 2
+      MaxConnLifetime: 5m
+      MaxConnIdleTime: 5m
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
