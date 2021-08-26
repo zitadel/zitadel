@@ -24,7 +24,7 @@ import (
 const (
 	ScopeProjectRolePrefix = "urn:zitadel:iam:org:project:role:"
 	ClaimProjectRoles      = "urn:zitadel:iam:org:project:roles"
-	ScopeUserMetaData      = "urn:zitadel:user:metadata"
+	ScopeUserMetaData      = "urn:zitadel:iam:user:metadata"
 	ClaimUserMetaData      = ScopeUserMetaData
 
 	oidcCtx = "oidc"
