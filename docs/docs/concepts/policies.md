@@ -61,7 +61,7 @@ For a detailed guide about how to configure a new identity provider for identity
 
 Define when an account should be locked.
 
-The following properties are possible:
+The following settings are available:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the user will be locked
 
 If a user is locked, an administrator has to unlock it in the ZITADEL console
