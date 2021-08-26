@@ -20,7 +20,7 @@ An organization is the top level in ZITADEL.
 In an organization projects and users are managed by the organization.
 You need at least one organization for your own company in our case "The Timing Company".
 
-For your custumers you have different possibilities:
+For your customers you have different possibilities:
 1. Your customer already owns an organization ZITADEL
 2. Your customer creates a new organization in ZITADEL by itself
 3. You create an organization for your customer (If you like to verify the domain, the customer has to do it)
