@@ -839,7 +839,6 @@ export class ManagementService {
     linkedUserId: string,
   ): Promise<RemoveHumanLinkedIDPResponse.AsObject> {
     const req = new RemoveHumanLinkedIDPRequest();
-    req.setUserId(userId);
     req.setIdpId(idpId);
     req.setUserId(userId);
     req.setLinkedUserId(linkedUserId);

@@ -77,7 +77,6 @@
     padding: 10px;
     border: 1px solid var(--grey);
     border-radius: .5rem;
-    cursor: pointer;
     position: relative;
     min-height: 70px;
     min-width: 150px;
@@ -106,6 +105,8 @@
     }
 
     &:not(.disabled) {
+      cursor: default;
+
       &:hover {
         .rm {
           display: block;
@@ -118,6 +119,10 @@
       width: 100%;
       object-fit: scale-down;
     }
+  }
+
+  .new-idp:not(.disabled) {
+    cursor: pointer;
   }
 }
 

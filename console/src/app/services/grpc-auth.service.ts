@@ -429,11 +429,11 @@ export class GrpcAuthService {
   }
 
   public removeMyLinkedIDP(
-    externalUserId: string,
     idpId: string,
+    linkedUserId: string,
   ): Promise<RemoveMyLinkedIDPResponse.AsObject> {
     const req = new RemoveMyLinkedIDPRequest();
-    req.setLinkedUserId(externalUserId);
+    req.setLinkedUserId(linkedUserId);
     req.setIdpId(idpId);
     return this.grpcService.auth.removeMyLinkedIDP(req, null).then(resp => resp.toObject());
   }
