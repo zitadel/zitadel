@@ -2,7 +2,7 @@
 title: Customized Texts
 ---
 
-You are able to customize some of the texts in ZITADEL.
+You are able to customize the texts used from ZITADEL.
 
 ## Message Texts
 Sometimes the users will get an email or phone message from ZITADEL (e.g Password Reset Request).

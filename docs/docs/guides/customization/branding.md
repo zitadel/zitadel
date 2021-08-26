@@ -1,12 +1,12 @@
 ---
-title: Branding
+title: Brand Customization
 ---
 
-ZITADEL offers various customisation options for your branding. 
+ZITADEL offers various customization options for your projects brand design. 
 Head over to the Private Labeling Policy on your Organization Page.
 
 ## How it works
-You are able to customize a light and a dark mode.
+You are able to customize the light and a dark mode separately.
 All your changes will be shown in the preview window on the right side.
 As soon as you are happy with your configuration click the "Apply configuration" button.
 After this your settings will trigger in your system. The login and the emails will be sent with your branding.

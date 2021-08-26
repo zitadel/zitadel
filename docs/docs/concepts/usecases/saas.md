@@ -3,7 +3,7 @@ title: Saas Product with Authentication and Authorization
 ---
 
 This is an example architecture for a typical SaaS product. 
-To illustrate it a fictional organization and project is taken.
+To illustrate it, a fictional organization and project is used.
 
 ## Example Case
 
@@ -16,25 +16,25 @@ This means that the users and also their authorizations will be managed within Z
 
 ## Organization
 
-An organization is the top level in ZITADEL. 
+An organization is the ZITADEL resource which contains users, projects, applications, policies and so on. 
 In an organization projects and users are managed by the organization.
 You need at least one organization for your own company in our case "The Timing Company".
 
 For your customers you have different possibilities:
-1. Your customer already owns an organization ZITADEL
+1. Your customer already owns an organization in ZITADEL
 2. Your customer creates a new organization in ZITADEL by itself
 3. You create an organization for your customer (If you like to verify the domain, the customer has to do it)
 
 :::info
-Subscriptions are organization based. This means, that each organization can choose her own tier based on the needed features.
+Subscriptions are organization based. This means, that each organization can choose their own tier based on the needed features.
 :::
 
 ## Project
 
 The idea of projects is to have a vessel for all components who are closely related to each other.
 
-In our use case we would have two different projects, for each environment one. So lets call it "Time Dev" and "Time Prod".
-These projects should be created in "The Timing Company" organization, because this is the owner of the project.
+In this use case we would have two different projects, for each environment one. So lets call it "Time Dev" and "Time Prod".
+These projects should be created in "The Timing Company" organization, because it is the owner of the project.
 
 In the project you will configure all your roles and applications (clients and APIs).
 
@@ -44,14 +44,14 @@ You can configure `check roles on authentication` on the project, if you want to
 
 ### Project Grant
 
-To give a customer permissions to a project, a project grant to the customer is needed (search the granted organization by its domain).
-It is also possible to delegate only specific roles of the project to a customer.
+To give a customer permissions to a project, a project grant to the customers organization is needed (search the granted organization by its domain).
+It is also possible to delegate only specific roles of the project to a certain customer.
 As soon as a project grant exists, the customer will see the project in the granted projects section of his organization and will be able to authorize his own users to the given project.
 
 ## Authorizations
 
 To give a user permission to a project an authorization is needed.
-All organizations which own the project or got it granted are able to authorize users.
+All organizations which own the project or received a grant are able to authorize users.
 It is also possible to authorize users outside the own company if the exact login name of the user is known.
 
 ## Project Login

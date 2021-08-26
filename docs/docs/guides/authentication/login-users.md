@@ -53,9 +53,9 @@ This will start a wizard asking you for an application name and a type.
     groupId="app-type"
     default="web"
     values={[
-        {'label': 'Web', 'value': 'web'},
-        {'label': 'Native', 'value': 'native'},
-        {'label': 'SPA', 'value': 'spa'},
+        {'label': 'Web Application', 'value': 'web'},
+        {'label': 'Native Application', 'value': 'native'},
+        {'label': 'Single Page Application', 'value': 'spa'},
     ]}
 >
 <TabItem value="web">
