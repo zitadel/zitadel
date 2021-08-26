@@ -27,6 +27,8 @@ const (
 	ClaimProjectRoles      = "urn:zitadel:iam:org:project:roles"
 	ScopeUserMetaData      = "urn:zitadel:iam:user:metadata"
 	ClaimUserMetaData      = ScopeUserMetaData
+	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
+	ClaimResourceOwner     = ScopeResourceOwner
 
 	oidcCtx = "oidc"
 )
@@ -191,6 +193,14 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 		userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
 	}
 
+	resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if len(resourceOwner) > 0 {
+		userInfo.AppendClaims(ClaimResourceOwner, resourceOwner)
+	}
+
 	if len(roles) == 0 || applicationID == "" {
 		return nil
 	}
@@ -253,6 +263,13 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	if len(userMetaData) > 0 {
 		claims = appendClaim(claims, ClaimUserMetaData, userMetaData)
 	}
+	resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if len(resourceOwner) > 0 {
+		claims = appendClaim(claims, ClaimResourceOwner, resourceOwner)
+	}
 	return claims, err
 }
 
@@ -285,6 +302,18 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
 	}
 	return userMetaData, nil
+}
+
+func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
+	resourceOwner, err := o.repo.OrgByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]string{
+		"id":             resourceOwner.AggregateID,
+		"name":           resourceOwner.Name,
+		"primary_domain": resourceOwner.PrimaryDomain,
+	}, nil
 }
 
 func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {
