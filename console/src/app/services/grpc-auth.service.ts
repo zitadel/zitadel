@@ -140,11 +140,22 @@ export class GrpcAuthService {
 
   public async getActiveOrg(id?: string): Promise<Org.AsObject> {
     if (id) {
-      const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
-      if (org && this.cachedOrgs.find(tmp => tmp.id === org.id)) {
-        return org;
+      const find = this.cachedOrgs.find(tmp => tmp.id === id);
+      if (find) {
+        this.setActiveOrg(find);
+        return Promise.resolve(find);
+      } else {
+        const orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
+        this.cachedOrgs = orgs;
+
+        const find = this.cachedOrgs.find(tmp => tmp.id === id);
+        if (find) {
+          this.setActiveOrg(find);
+          return Promise.resolve(find);
+        } else {
+          return Promise.reject(new Error('requested organization not found'));
+        }
       }
-      return Promise.reject(new Error('no cached org'));
     } else {
       let orgs = this.cachedOrgs;
       if (orgs.length === 0) {

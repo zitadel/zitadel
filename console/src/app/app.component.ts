@@ -6,10 +6,10 @@ import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
-import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
+import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
@@ -55,8 +55,7 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   public filterControl: FormControl = new FormControl('');
-  private authSub: Subscription = new Subscription();
-  private orgSub: Subscription = new Subscription();
+  private destroy$: Subject<void> = new Subject();
   public labelpolicy!: LabelPolicy.AsObject;
 
   public hideAdminWarn: boolean = true;
@@ -76,6 +75,7 @@ export class AppComponent implements OnDestroy {
     public domSanitizer: DomSanitizer,
     private router: Router,
     update: UpdateService,
+    private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
     console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px');
@@ -174,16 +174,27 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'),
     );
 
+    this.activatedRoute.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(route => {
+        const { org } = route;
+        if (org) {
+          this.authService.getActiveOrg(org).then(org => {
+            this.org = org;
+          });
+        }
+      });
+
     this.loadPrivateLabelling();
 
     this.getProjectCount();
 
-    this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
+    this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe(org => {
       this.org = org;
       this.getProjectCount();
     });
 
-    this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
+    this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
       if (authenticated) {
         this.authService.getActiveOrg().then(org => {
           this.org = org;
@@ -217,8 +228,8 @@ export class AppComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.authSub.unsubscribe();
-    this.orgSub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public toggleAdminHide(): void {

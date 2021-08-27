@@ -1,0 +1,33 @@
+.title {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.desc {
+  color: var(--grey);
+  font-size: .9rem;
+}
+
+.radio-button {
+  margin: .5rem 0;
+  .label {
+    white-space: normal;
+  }
+}
+
+.info {
+  margin: 1rem 0;
+  display: block;
+}
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+
+  button {
+    border-radius: .5rem;
+  }
+}

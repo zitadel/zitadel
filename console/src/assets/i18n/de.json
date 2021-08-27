@@ -910,6 +910,25 @@
         "OWNED": "Eigene Projekte",
         "GRANTED": "Berechtigte Projekte"
       },
+      "PRIVATELABEL": {
+        "TITLE":"Private Labeling Verhalten",
+        "0": {
+          "TITLE":"Unspezifiziert",
+          "DESC":"Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt."
+        },
+        "1": {
+          "TITLE":"Durchsetzung der Richtlinie des Projekteigentümers",
+          "DESC":"Das Privatelabeling der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
+        },
+        "2": {
+          "TITLE":"Durchsetzung der Richtlinie des Benutzereigentümers",
+          "DESC":"Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auch die Einstellung der von ihm gewählten Organisation gewechselt."
+        },
+        "DIALOG":{
+          "TITLE":"Privatelabeling Verhalten",
+          "DESCRIPTION":"Bestimmen Sie das Verhalten des Projektes im Bezug auf das Privatelabeling."
+        }
+      },
       "PINNED": "Angepinnt",
       "ALL": "Alle",
       "CREATEDON": "Erstellt am",
