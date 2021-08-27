@@ -179,8 +179,8 @@ export class AppComponent implements OnDestroy {
       .subscribe(route => {
         const { org } = route;
         if (org) {
-          this.authService.getActiveOrg(org).then(org => {
-            this.org = org;
+          this.authService.getActiveOrg(org).then(queriedOrg => {
+            this.org = queriedOrg;
           });
         }
       });

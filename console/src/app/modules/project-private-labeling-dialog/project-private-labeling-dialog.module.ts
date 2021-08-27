@@ -18,7 +18,7 @@ import { ProjectPrivateLabelingDialogComponent } from './project-private-labelin
     MatButtonModule,
     FormsModule,
     MatRadioModule,
-    InfoSectionModule
+    InfoSectionModule,
   ],
 })
 export class ProjectPrivateLabelingDialogModule { }

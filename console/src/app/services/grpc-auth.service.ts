@@ -148,10 +148,10 @@ export class GrpcAuthService {
         const orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
         this.cachedOrgs = orgs;
 
-        const find = this.cachedOrgs.find(tmp => tmp.id === id);
-        if (find) {
-          this.setActiveOrg(find);
-          return Promise.resolve(find);
+        const toFind = this.cachedOrgs.find(tmp => tmp.id === id);
+        if (toFind) {
+          this.setActiveOrg(toFind);
+          return Promise.resolve(toFind);
         } else {
           return Promise.reject(new Error('requested organization not found'));
         }
