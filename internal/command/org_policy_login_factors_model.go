@@ -156,6 +156,13 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Reduce() error {
 		case *org.LoginPolicyMultiFactorRemovedEvent:
 			wm.ensureMultiFactor(e.MFAType)
 			wm.MultiFactors[e.MFAType].Org = domain.FactorStateRemoved
+		case *org.LoginPolicyRemovedEvent:
+			for factorType, _ := range wm.SecondFactors {
+				wm.SecondFactors[factorType].Org = domain.FactorStateRemoved
+			}
+			for factorType, _ := range wm.MultiFactors {
+				wm.MultiFactors[factorType].Org = domain.FactorStateRemoved
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -194,6 +201,7 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 			org.LoginPolicySecondFactorRemovedEventType,
 			org.LoginPolicyMultiFactorAddedEventType,
 			org.LoginPolicyMultiFactorRemovedEventType,
+			org.LoginPolicyRemovedEventType,
 		).
 		Builder()
 }
