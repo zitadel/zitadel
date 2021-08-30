@@ -28,7 +28,7 @@ const (
 	ScopeUserMetaData      = "urn:zitadel:iam:user:metadata"
 	ClaimUserMetaData      = ScopeUserMetaData
 	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
-	ClaimResourceOwner     = ScopeResourceOwner
+	ClaimResourceOwner     = ScopeResourceOwner + ":"
 
 	oidcCtx = "oidc"
 )
@@ -185,12 +185,12 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 				userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
 			}
 		case ScopeResourceOwner:
-			resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
 			if err != nil {
 				return err
 			}
-			if len(resourceOwner) > 0 {
-				userInfo.AppendClaims(ClaimResourceOwner, resourceOwner)
+			for claim, value := range resourceOwnerClaims {
+				userInfo.AppendClaims(claim, value)
 			}
 
 		default:
@@ -251,12 +251,12 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 				claims = appendClaim(claims, ClaimUserMetaData, userMetaData)
 			}
 		case ScopeResourceOwner:
-			resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
 			if err != nil {
 				return nil, err
 			}
-			if len(resourceOwner) > 0 {
-				claims = appendClaim(claims, ClaimResourceOwner, resourceOwner)
+			for claim, value := range resourceOwnerClaims {
+				claims = appendClaim(claims, claim, value)
 			}
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
@@ -315,9 +315,9 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 		return nil, err
 	}
 	return map[string]string{
-		"id":             resourceOwner.AggregateID,
-		"name":           resourceOwner.Name,
-		"primary_domain": resourceOwner.PrimaryDomain,
+		ClaimResourceOwner + "id":             resourceOwner.AggregateID,
+		ClaimResourceOwner + "name":           resourceOwner.Name,
+		ClaimResourceOwner + "primary_domain": resourceOwner.PrimaryDomain,
 	}, nil
 }
 
