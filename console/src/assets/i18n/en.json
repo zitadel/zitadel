@@ -916,7 +916,7 @@
         "TITLE":"Private Labeling Setting",
         "0": {
           "TITLE":"Unspecified",
-          "DESC":"As soon as the user is identified, the private labeling of the its selected organisation will be shown."
+          "DESC":"As soon as the user is identified, the private labeling of the organisation of the identified user will be shown, before the system default is shown."
         },
         "1": {
           "TITLE":"Enforce project resource owner Policy",
