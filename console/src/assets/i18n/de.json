@@ -914,7 +914,7 @@
         "TITLE":"Private Labeling Verhalten",
         "0": {
           "TITLE":"Unspezifiziert",
-          "DESC":"Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt."
+          "DESC":"Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
         },
         "1": {
           "TITLE":"Durchsetzung der Richtlinie des Projekteigentümers",
