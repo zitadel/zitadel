@@ -67,12 +67,12 @@ COMMIT;
 BEGIN;
 
 ALTER TABLE eventstore.events RENAME TO events_old;
-ALTER SEQUENCE eventstore.event_seq OWNED BY eventstore.events_new.previous_aggregate_sequence;
 
 COMMIT;
 BEGIN;
 
 ALTER TABLE eventstore.events_new RENAME TO events;
+ALTER SEQUENCE eventstore.event_seq OWNED BY eventstore.events.event_sequence;
 
 COMMIT;
 BEGIN;
