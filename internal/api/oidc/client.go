@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -22,14 +23,10 @@ import (
 )
 
 const (
-	scopeOpenID  = "openid"
-	scopeProfile = "profile"
-	scopeEmail   = "email"
-	scopePhone   = "phone"
-	scopeAddress = "address"
-
 	ScopeProjectRolePrefix = "urn:zitadel:iam:org:project:role:"
 	ClaimProjectRoles      = "urn:zitadel:iam:org:project:roles"
+	ScopeUserMetaData      = "urn:zitadel:iam:user:metadata"
+	ClaimUserMetaData      = ScopeUserMetaData
 
 	oidcCtx = "oidc"
 )
@@ -186,6 +183,13 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 			}
 		}
 	}
+	userMetaData, err := o.assertUserMetaData(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if len(userMetaData) > 0 {
+		userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
+	}
 
 	if len(roles) == 0 || applicationID == "" {
 		return nil
@@ -197,7 +201,6 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
-
 	return nil
 }
 
@@ -243,6 +246,13 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	if len(projectRoles) > 0 {
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
+	userMetaData, err := o.assertUserMetaData(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if len(userMetaData) > 0 {
+		claims = appendClaim(claims, ClaimUserMetaData, userMetaData)
+	}
 	return claims, err
 }
 
@@ -262,6 +272,19 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 		}
 	}
 	return projectRoles, nil
+}
+
+func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
+	metaData, err := o.repo.SearchUserMetadata(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	userMetaData := make(map[string]string)
+	for _, md := range metaData.Result {
+		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
+	}
+	return userMetaData, nil
 }
 
 func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {
