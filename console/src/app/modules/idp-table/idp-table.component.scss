@@ -40,10 +40,6 @@ td {
 tr {
   outline: none;
 
-  &.disabled * {
-    opacity: .8;
-  }
-
   button {
     visibility: hidden;
   }
@@ -52,6 +48,12 @@ tr {
     button {
       visibility: visible;
     }
+  }
+
+  &.disabled,
+  &.disabled * {
+    opacity: .8;
+    cursor: default;
   }
 }
 
