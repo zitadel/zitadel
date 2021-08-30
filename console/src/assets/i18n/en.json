@@ -924,7 +924,7 @@
         },
         "2": {
           "TITLE":"Allow Login User resource owner policy",
-          "DESC":"The private labeling of the organization of the project will be shown, but as soon as the user is identified, the setting of its selected organization will be shown."
+          "DESC":"The private labeling of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown."
         },
         "DIALOG":{
           "TITLE":"Privatelabeling Setting",
