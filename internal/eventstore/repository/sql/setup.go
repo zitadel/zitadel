@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 
+	"github.com/caos/logging"
 	repo "github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -54,7 +55,7 @@ func (db *CRDB) Step20(ctx context.Context, latestSequence uint64) error {
 		if err = tx.Commit(); err != nil {
 			return err
 		}
-
+		logging.LogWithFields("SQL-bXVwS", "currentSeq", currentSequence, "maxSeq", maxSequence).Info("events updated")
 		maxSequence = currentSequence + 1000
 	}
 	return nil
