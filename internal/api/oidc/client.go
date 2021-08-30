@@ -176,6 +176,23 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 				continue
 			}
 			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
+		case ScopeUserMetaData:
+			userMetaData, err := o.assertUserMetaData(ctx, userID)
+			if err != nil {
+				return err
+			}
+			if len(userMetaData) > 0 {
+				userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
+			}
+		case ScopeResourceOwner:
+			resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return err
+			}
+			if len(resourceOwner) > 0 {
+				userInfo.AppendClaims(ClaimResourceOwner, resourceOwner)
+			}
+
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
@@ -185,22 +202,6 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 			}
 		}
 	}
-	userMetaData, err := o.assertUserMetaData(ctx, userID)
-	if err != nil {
-		return err
-	}
-	if len(userMetaData) > 0 {
-		userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
-	}
-
-	resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
-	if err != nil {
-		return err
-	}
-	if len(resourceOwner) > 0 {
-		userInfo.AppendClaims(ClaimResourceOwner, resourceOwner)
-	}
-
 	if len(roles) == 0 || applicationID == "" {
 		return nil
 	}
@@ -240,6 +241,24 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
 	for _, scope := range scopes {
+		switch scope {
+		case ScopeUserMetaData:
+			userMetaData, err := o.assertUserMetaData(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			if len(userMetaData) > 0 {
+				claims = appendClaim(claims, ClaimUserMetaData, userMetaData)
+			}
+		case ScopeResourceOwner:
+			resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			if len(resourceOwner) > 0 {
+				claims = appendClaim(claims, ClaimResourceOwner, resourceOwner)
+			}
+		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
@@ -255,20 +274,6 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	}
 	if len(projectRoles) > 0 {
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
-	}
-	userMetaData, err := o.assertUserMetaData(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if len(userMetaData) > 0 {
-		claims = appendClaim(claims, ClaimUserMetaData, userMetaData)
-	}
-	resourceOwner, err := o.assertUserResourceOwner(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if len(resourceOwner) > 0 {
-		claims = appendClaim(claims, ClaimResourceOwner, resourceOwner)
 	}
 	return claims, err
 }
