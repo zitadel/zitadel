@@ -922,7 +922,7 @@
         },
         "2": {
           "TITLE":"Durchsetzung der Richtlinie des Benutzereigentümers",
-          "DESC":"Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auch die Einstellung der von ihm gewählten Organisation gewechselt."
+          "DESC":"Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
         },
         "DIALOG":{
           "TITLE":"Privatelabeling Verhalten",
