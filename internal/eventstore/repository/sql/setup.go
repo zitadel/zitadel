@@ -8,23 +8,19 @@ import (
 )
 
 func (db *CRDB) Step20(ctx context.Context, latestSequence uint64) error {
-	currentSequence := uint64(1)
-	maxSequence := uint64(1000)
-	previousSequences := make(map[repo.AggregateType]uint64)
-	for maxSequence < latestSequence {
+	currentSequence := uint64(0)
+	limit := uint64(100)
+	previousSequences := make(map[repo.AggregateType]Sequence)
+	for currentSequence < latestSequence {
 		events, err := db.Filter(ctx, &repo.SearchQuery{
 			Columns: repo.ColumnsEvent,
+			Limit:   limit,
 			Filters: [][]*repo.Filter{
 				{
 					&repo.Filter{
 						Field:     repo.FieldSequence,
 						Operation: repo.OperationGreater,
-						Value:     currentSequence - 1,
-					},
-					&repo.Filter{
-						Field:     repo.FieldSequence,
-						Operation: repo.OperationLess,
-						Value:     maxSequence,
+						Value:     currentSequence,
 					},
 				},
 			},
@@ -42,21 +38,21 @@ func (db *CRDB) Step20(ctx context.Context, latestSequence uint64) error {
 			if _, err := tx.Exec("SAVEPOINT event_update"); err != nil {
 				return err
 			}
-			if _, err = tx.Exec("UPDATE eventstore.events SET previous_aggregate_type_sequence = $1 WHERE event_sequence = $2", previousSequences[event.AggregateType], event.Sequence); err != nil {
+			seq := Sequence(previousSequences[event.AggregateType])
+			if _, err = tx.Exec("UPDATE eventstore.events SET previous_aggregate_type_sequence = $1 WHERE event_sequence = $2", &seq, event.Sequence); err != nil {
 				return err
 			}
 			if _, err = tx.Exec("RELEASE SAVEPOINT event_update"); err != nil {
 				return err
 			}
-			previousSequences[event.AggregateType] = event.Sequence
+			previousSequences[event.AggregateType] = Sequence(event.Sequence)
 			currentSequence = event.Sequence
 		}
 
 		if err = tx.Commit(); err != nil {
 			return err
 		}
-		logging.LogWithFields("SQL-bXVwS", "currentSeq", currentSequence, "maxSeq", maxSequence).Info("events updated")
-		maxSequence = currentSequence + 1000
+		logging.LogWithFields("SQL-bXVwS", "currentSeq", currentSequence, "events", len(events)).Info("events updated")
 	}
 	return nil
 }
