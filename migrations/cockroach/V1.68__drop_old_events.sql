@@ -1,1 +1,1 @@
-REVOKE UPDATE ON TABLE eventstore.events TO eventstore;
+REVOKE UPDATE ON TABLE eventstore.events FROM eventstore;
