@@ -1,5 +1,1 @@
-BEGIN;
-
-DROP TABLE eventstore.events_old;
-
-COMMIT;
+REVOKE UPDATE ON TABLE eventstore.events TO eventstore;
