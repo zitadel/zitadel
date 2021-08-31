@@ -5,31 +5,35 @@ title: Claims
 ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
 Please check below the matrix for an overview where which scope is asserted.
 
-| Claims                                          | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
-|:------------------------------------------------|:---------------|----------------|---------------------------------------------|--------------------------------------|
-| acr                                             | No             | No             | Yes                                         | No                                   |
-| address                                         | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| amr                                             | No             | No             | Yes                                         | No                                   |
-| aud                                             | No             | No             | Yes                                         | When JWT                             |
-| auth_time                                       | No             | No             | Yes                                         | No                                   |
-| azp                                             | No             | No             | Yes                                         | When JWT                             |
-| email                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| email_verified                                  | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| exp                                             | No             | No             | Yes                                         | When JWT                             |
-| family_name                                     | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| gender                                          | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| given_name                                      | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| iat                                             | No             | No             | Yes                                         | When JWT                             |
-| iss                                             | No             | No             | Yes                                         | When JWT                             |
-| locale                                          | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| name                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| nonce                                           | No             | No             | Yes                                         | No                                   |
-| phone                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| phone_verified                                  | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| preferred_username (username when Introspect )  | When requested | When requested | Yes                                         | No                                   |
-| sub                                             | Yes            | Yes            | Yes                                         | When JWT                             |
-| urn:zitadel:iam:org:domain:primary:{domainname} | When requested | When requested | When requested                              | When JWT and requested               |
-| urn:zitadel:iam:org:project:roles:{rolename}    | When requested | When requested | When requested or configured                | When JWT and requested or configured |
+| Claims                                            | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
+|:--------------------------------------------------|:---------------|----------------|---------------------------------------------|--------------------------------------|
+| acr                                               | No             | No             | Yes                                         | No                                   |
+| address                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| amr                                               | No             | No             | Yes                                         | No                                   |
+| aud                                               | No             | No             | Yes                                         | When JWT                             |
+| auth_time                                         | No             | No             | Yes                                         | No                                   |
+| azp                                               | No             | No             | Yes                                         | When JWT                             |
+| email                                             | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| email_verified                                    | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| exp                                               | No             | No             | Yes                                         | When JWT                             |
+| family_name                                       | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| gender                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| given_name                                        | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| iat                                               | No             | No             | Yes                                         | When JWT                             |
+| iss                                               | No             | No             | Yes                                         | When JWT                             |
+| locale                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| name                                              | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| nonce                                             | No             | No             | Yes                                         | No                                   |
+| phone                                             | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| phone_verified                                    | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| preferred_username (username when Introspect )    | When requested | When requested | Yes                                         | No                                   |
+| sub                                               | Yes            | Yes            | Yes                                         | When JWT                             |
+| urn:zitadel:iam:org:domain:primary:{domainname}   | When requested | When requested | When requested                              | When JWT and requested               |
+| urn:zitadel:iam:org:project:roles:{rolename}      | When requested | When requested | When requested or configured                | When JWT and requested or configured |
+| urn:zitadel:iam:user:metadata                     | When requested | When requested | When requested               | When JWT and requested |
+| urn:zitadel:iam:user:resourceowner:id             | When requested | When requested | When requested               | When JWT and requested |
+| urn:zitadel:iam:user:resourceowner:name           | When requested | When requested | When requested               | When JWT and requested |
+| urn:zitadel:iam:user:resourceowner:primary_domain | When requested | When requested | When requested               | When JWT and requested |
 
 ## Standard Claims
 
@@ -64,8 +68,12 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ZITADEL reserves some claims to assert certain data.
 
-| Claims                                          | Example                                                                                              | Description                                                                                                                                                                        |
-|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| urn:zitadel:iam:org:domain:primary:{domainname} | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                  | This claim represents the primary domain of the organization the user belongs to.                                                                                                  |
-| urn:zitadel:iam:org:project:roles:{rolename}    | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
-| urn:zitadel:iam:roles:{rolename}                | TBA                                                                                                  | TBA                                                                                                                                                                                |
+| Claims                                            | Example                                                                                              | Description                                                                                                                                                                        |
+|:--------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| urn:zitadel:iam:org:domain:primary:{domainname}   | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                  | This claim represents the primary domain of the organization the user belongs to.                                                                                                  |
+| urn:zitadel:iam:org:project:roles:{rolename}      | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
+| urn:zitadel:iam:roles:{rolename}                  | TBA                                                                                                  | TBA                                                                                                                                                                                |
+| urn:zitadel:iam:user:metadata                     | `{"urn:zitadel:iam:user:metadata": [ {"key": "VmFsdWU=" } ] }`                                       | The metadata claim will include all metadata of a user. The values are base64 encoded.                                                                                             |
+| urn:zitadel:iam:user:resourceowner:id             | `{"urn:zitadel:iam:user:resourceowner:id": "orgid"}` | When requested | When requested               | This claim represents the id of the resource owner organisation of the user.                                                                                                       |
+| urn:zitadel:iam:user:resourceowner:name           | `{"urn:zitadel:iam:user:resourceowner:name": "ACME"}` | When requested | When requested              | This claim represents the name of the resource owner organisation of the user.                                                                                                     |
+| urn:zitadel:iam:user:resourceowner:primary_domain | `{"urn:zitadel:iam:user:resourceowner:primary_domain": "acme.ch"}` | When requested | When requested | This claim represents the primary domain of the resource owner organisation of the user.                                                                                           |
