@@ -9,7 +9,7 @@ import (
 
 func (db *CRDB) Step20(ctx context.Context, latestSequence uint64) error {
 	currentSequence := uint64(0)
-	limit := uint64(100)
+	limit := uint64(1000)
 	previousSequences := make(map[repo.AggregateType]Sequence)
 	for currentSequence < latestSequence {
 		events, err := db.Filter(ctx, &repo.SearchQuery{
