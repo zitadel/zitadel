@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+import "google/protobuf/duration.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.action.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/action";
+
+message Action {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    ActionState state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the state of the action";
+        }
+    ];
+    string name = 4 [
+       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           example: "\"log context\"";
+       }
+    ];
+    string script = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"function log(context, calls){console.log(context)}\"";
+        }
+    ];
+    google.protobuf.Duration timeout = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "after which time the action will be terminated if not finished";
+        }
+    ];
+    bool allowed_to_fail = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "when true, the next action will be called even if this action fails";
+        }
+    ];
+}
+
+enum ActionState {
+    ACTION_STATE_UNSPECIFIED = 0;
+    ACTION_STATE_INACTIVE = 1;
+    ACTION_STATE_ACTIVE = 2;
+}
+
+message ActionIDQuery {
+    string id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+}
+
+message ActionNameQuery {
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"log\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+//ActionStateQuery is always equals
+message ActionStateQuery {
+    ActionState state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the action";
+        }
+    ];
+}
+
+enum ActionFieldName {
+    ACTION_FIELD_NAME_UNSPECIFIED = 0;
+    ACTION_FIELD_NAME_NAME = 1;
+    ACTION_FIELD_NAME_ID = 2;
+    ACTION_FIELD_NAME_STATE = 3;
+}
+
+message Flow {
+    FlowType type = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "\"the type of the flow\"";
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    FlowState state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the state of the flow";
+        }
+    ];
+    map<int32, TriggerAction> triggers = 4;
+}
+
+enum FlowType {
+    FLOW_TYPE_UNSPECIFIED = 0;
+    FLOW_TYPE_REGISTER = 1;
+    FLOW_TYPE_LOGIN = 2;
+}
+
+enum FlowState {
+    FLOW_STATE_UNSPECIFIED = 0;
+    FLOW_STATE_INACTIVE = 1;
+    FLOW_STATE_ACTIVE = 2;
+}
+
+enum TriggerType {
+    TRIGGER_TYPE_UNSPECIFIED = 0;
+    TRIGGER_TYPE_PRE_REGISTER = 1;
+    TRIGGER_TYPE_POST_REGISTER = 2;
+    TRIGGER_TYPE_POST_LOGIN = 3;
+}
+
+message TriggerAction {
+    map<int32, Action> actions = 1;
+}
+
+enum FlowFieldName {
+    FLOW_FIELD_NAME_UNSPECIFIED = 0;
+    FLOW_FIELD_NAME_TYPE = 1;
+    FLOW_FIELD_NAME_STATE = 2;
+}
+
+//FlowTypeQuery is always equals
+message FlowTypeQuery {
+    FlowType state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "type of the flow";
+        }
+    ];
+}
+
+//FlowStateQuery is always equals
+message FlowStateQuery {
+    FlowState state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the flow";
+        }
+    ];
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/action"
 
 	"github.com/caos/zitadel/internal/api/http"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -78,6 +79,7 @@ func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults
 	usr_grant_repo.RegisterEventMappers(repo.eventstore)
 	proj_repo.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
+	action.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {
