@@ -84,7 +84,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
 				),
@@ -113,7 +114,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
 					expectPush(
@@ -180,7 +182,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true),
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
 					expectPush(

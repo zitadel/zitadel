@@ -34,7 +34,7 @@
             <div class="meta-row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="project && project.state !== undefined" class="state"
-                    [ngClass]="{'active': project.state === ProjectState.PROJECTSTATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECTSTATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                    [ngClass]="{'active': project.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': project.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE}">{{'PROJECT.STATE.'+project.state | translate}}</span>
             </div>
         </div>
 

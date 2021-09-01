@@ -66,6 +66,7 @@ title: zitadel/project.proto
 | project_role_assertion |  bool | describes if roles of user should be added in token |  |
 | project_role_check |  bool | ZITADEL checks if the user has at least one on this project |  |
 | has_project_check |  bool | ZITADEL checks if the org of the user has permission to this project |  |
+| private_labeling_setting |  PrivateLabelingSetting | Defines from where the private labeling should be triggered |  |
 
 
 
@@ -158,6 +159,18 @@ title: zitadel/project.proto
 
 
 ## Enums
+
+
+### PrivateLabelingSetting {#privatelabelingsetting}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PRIVATE_LABELING_SETTING_UNSPECIFIED | 0 | - |
+| PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY | 1 | - |
+| PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY | 2 | - |
+
+
 
 
 ### ProjectGrantState {#projectgrantstate}

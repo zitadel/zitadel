@@ -11,11 +11,12 @@ import (
 type ProjectWriteModel struct {
 	eventstore.WriteModel
 
-	Name                 string
-	ProjectRoleAssertion bool
-	ProjectRoleCheck     bool
-	HasProjectCheck      bool
-	State                domain.ProjectState
+	Name                   string
+	ProjectRoleAssertion   bool
+	ProjectRoleCheck       bool
+	HasProjectCheck        bool
+	PrivateLabelingSetting domain.PrivateLabelingSetting
+	State                  domain.ProjectState
 }
 
 func NewProjectWriteModel(projectID string, resourceOwner string) *ProjectWriteModel {
@@ -35,6 +36,7 @@ func (wm *ProjectWriteModel) Reduce() error {
 			wm.ProjectRoleAssertion = e.ProjectRoleAssertion
 			wm.ProjectRoleCheck = e.ProjectRoleCheck
 			wm.HasProjectCheck = e.HasProjectCheck
+			wm.PrivateLabelingSetting = e.PrivateLabelingSetting
 			wm.State = domain.ProjectStateActive
 		case *project.ProjectChangeEvent:
 			if e.Name != nil {
@@ -48,6 +50,9 @@ func (wm *ProjectWriteModel) Reduce() error {
 			}
 			if e.HasProjectCheck != nil {
 				wm.HasProjectCheck = *e.HasProjectCheck
+			}
+			if e.PrivateLabelingSetting != nil {
+				wm.PrivateLabelingSetting = *e.PrivateLabelingSetting
 			}
 		case *project.ProjectDeactivatedEvent:
 			if wm.State == domain.ProjectStateRemoved {
@@ -87,6 +92,7 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	projectRoleAssertion,
 	projectRoleCheck,
 	hasProjectCheck bool,
+	privateLabelingSetting domain.PrivateLabelingSetting,
 ) (*project.ProjectChangeEvent, bool, error) {
 	changes := make([]project.ProjectChanges, 0)
 	var err error
@@ -104,6 +110,9 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	}
 	if wm.HasProjectCheck != hasProjectCheck {
 		changes = append(changes, project.ChangeHasProjectCheck(hasProjectCheck))
+	}
+	if wm.PrivateLabelingSetting != privateLabelingSetting {
+		changes = append(changes, project.ChangePrivateLabelingSetting(privateLabelingSetting))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
 
@@ -52,6 +53,19 @@ func OrgToModel(org *OrgView) *org_model.OrgView {
 		ResourceOwner: org.ResourceOwner,
 		Sequence:      org.Sequence,
 		State:         org_model.OrgState(org.State),
+	}
+}
+
+func OrgToDomain(org *OrgView) *domain.Org {
+	return &domain.Org{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  org.ID,
+			ChangeDate:   org.ChangeDate,
+			CreationDate: org.CreationDate,
+			Sequence:     org.Sequence,
+		},
+		Name:          org.Name,
+		PrimaryDomain: org.Domain,
 	}
 }
 

@@ -34,7 +34,7 @@ const routes: Routes = [
         loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
         canActivate: [RoleGuard],
         data: {
-          roles: ['iam.idp.read'],
+          roles: ['org.idp.read'],
           serviceType: PolicyComponentServiceType.MGMT,
         },
       },
