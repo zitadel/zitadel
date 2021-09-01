@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
@@ -12,12 +13,12 @@ import (
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
-	isUnique, err := s.org.IsOrgUnique(ctx, req.Name, req.Domain)
+	isUnique, err := s.query.IsOrgUnique(ctx, req.Name, req.Domain)
 	return &admin_pb.IsOrgUniqueResponse{IsUnique: isUnique}, err
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
-	org, err := s.org.OrgByID(ctx, req.Id)
+	org, err := s.query.OrgByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -25,15 +26,15 @@ func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest
 }
 
 func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*admin_pb.ListOrgsResponse, error) {
-	query, err := listOrgRequestToModel(req)
+	queries, err := listOrgRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.org.SearchOrgs(ctx, query)
+	orgs, err := s.query.SearchOrgs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgViewsToPb(orgs.Result)}, nil
+	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgViewsToPb(orgs)}, nil
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {

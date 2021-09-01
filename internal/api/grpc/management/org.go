@@ -17,7 +17,7 @@ import (
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {
-	org, err := s.org.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
+	org, err := s.query.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,10 +25,11 @@ func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*m
 }
 
 func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgByDomainGlobalRequest) (*mgmt_pb.GetOrgByDomainGlobalResponse, error) {
-	org, err := s.org.OrgByDomainGlobal(ctx, req.Domain)
+	org, err := s.query.OrgByDomainGlobal(ctx, req.Domain)
 	if err != nil {
 		return nil, err
 	}
+
 	return &mgmt_pb.GetOrgByDomainGlobalResponse{Org: org_grpc.OrgViewToPb(org)}, nil
 }
 

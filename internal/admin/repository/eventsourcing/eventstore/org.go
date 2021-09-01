@@ -3,49 +3,50 @@ package eventstore
 import (
 	"context"
 
+	"github.com/caos/logging"
+
+	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-
-	"github.com/caos/logging"
-
-	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 type OrgRepo struct {
 	Eventstore v1.Eventstore
 
-	View *admin_view.View
+	View  *admin_view.View
+	Query *query.Queries
 
 	SearchLimit    uint64
 	SystemDefaults systemdefaults.SystemDefaults
 }
 
-func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
-	org, viewErr := repo.View.OrgByID(id)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
+func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*query.Org, error) {
+	org, queryErr := repo.Query.OrgByID(ctx, id)
+	if queryErr != nil && !errors.IsNotFound(queryErr) {
+		return nil, queryErr
 	}
-	if errors.IsNotFound(viewErr) {
-		org = new(model.OrgView)
+	if errors.IsNotFound(queryErr) {
+		org = new(query.Org)
 	}
 
 	events, esErr := repo.getOrgEvents(ctx, id, org.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
+	if errors.IsNotFound(queryErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.Org.NotFound")
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return model.OrgToModel(org), nil
+		return org, nil
 	}
 	orgCopy := *org
 	for _, event := range events {

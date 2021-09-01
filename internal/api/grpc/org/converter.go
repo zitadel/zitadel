@@ -5,12 +5,13 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/query"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	org_pb "github.com/caos/zitadel/pkg/grpc/org"
 )
 
-func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []*org_model.OrgSearchQuery, err error) {
-	q := make([]*org_model.OrgSearchQuery, len(queries))
+func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = OrgQueryToModel(query)
 		if err != nil {
@@ -20,22 +21,14 @@ func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []*org_model.OrgSearchQuer
 	return q, nil
 }
 
-func OrgQueryToModel(query *org_pb.OrgQuery) (*org_model.OrgSearchQuery, error) {
-	switch q := query.Query.(type) {
+func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
+	switch q := apiQuery.Query.(type) {
 	case *org_pb.OrgQuery_DomainQuery:
-		return &org_model.OrgSearchQuery{
-			Key:    org_model.OrgSearchKeyOrgDomain,
-			Method: object.TextMethodToModel(q.DomainQuery.Method),
-			Value:  q.DomainQuery.Domain,
-		}, nil
+		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org_pb.OrgQuery_NameQuery:
-		return &org_model.OrgSearchQuery{
-			Key:    org_model.OrgSearchKeyOrgName,
-			Method: object.TextMethodToModel(q.NameQuery.Method),
-			Value:  q.NameQuery.Name,
-		}, nil
+		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-vR9nC", "List.Query.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -69,7 +62,7 @@ func OrgQueryToUserGrantQueryModel(query *org_pb.OrgQuery) (*grant_model.UserGra
 	}
 }
 
-func OrgViewsToPb(orgs []*org_model.OrgView) []*org_pb.Org {
+func OrgViewsToPb(orgs []*query.Org) []*org_pb.Org {
 	o := make([]*org_pb.Org, len(orgs))
 	for i, org := range orgs {
 		o[i] = OrgViewToPb(org)
@@ -77,7 +70,7 @@ func OrgViewsToPb(orgs []*org_model.OrgView) []*org_pb.Org {
 	return o
 }
 
-func OrgViewToPb(org *org_model.OrgView) *org_pb.Org {
+func OrgViewToPb(org *query.Org) *org_pb.Org {
 	return &org_pb.Org{
 		Id:    org.ID,
 		State: OrgStateToPb(org.State),
@@ -113,11 +106,11 @@ func OrgToPb(org *grant_model.Org) *org_pb.Org {
 	}
 }
 
-func OrgStateToPb(state org_model.OrgState) org_pb.OrgState {
+func OrgStateToPb(state domain.OrgState) org_pb.OrgState {
 	switch state {
-	case org_model.OrgStateActive:
+	case domain.OrgStateActive:
 		return org_pb.OrgState_ORG_STATE_ACTIVE
-	case org_model.OrgStateInactive:
+	case domain.OrgStateInactive:
 		return org_pb.OrgState_ORG_STATE_INACTIVE
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
