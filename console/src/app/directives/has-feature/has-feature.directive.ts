@@ -3,7 +3,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 
 @Directive({
-  selector: '[appHasFeatuer]',
+  selector: '[appHasFeature]',
 })
 
 export class HasFeatureDirective {
