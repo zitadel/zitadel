@@ -34,7 +34,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "iam"}), k8sClient)
+		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "iam"}, ""), k8sClient)
 
 		go func() {
 			started := time.Now()

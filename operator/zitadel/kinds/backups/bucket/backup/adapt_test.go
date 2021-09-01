@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/kubernetes"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/golang/mock/gomock"
@@ -28,13 +29,21 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	image := "testImage"
-	saSecretName := "testSaSecretName"
-	saSecretKey := "testSaSecretKey"
-	configSecretName := "testConfigSecretName"
-	configSecretKey := "testConfigSecretKey"
+	secretName := "testSecretName"
+	saSecretKey := "testKey"
+	akidKey := "testAKID"
+	sakKey := "testSAK"
+	endpoint := "testEndpoint"
+	prefix := "testPrefix"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
+
+	checkDBReady := func(k8sClient kubernetes.ClientInt) error {
+		return nil
+	}
 
 	jobDef := getJob(
 		namespace,
@@ -42,15 +51,21 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		getJobSpecDef(
 			nodeselector,
 			tolerations,
-			saSecretName,
+			secretName,
 			saSecretKey,
-			configSecretName,
-			configSecretKey,
+			akidKey,
+			sakKey,
 			backupName,
 			getBackupCommand(
 				timestamp,
 				bucketName,
 				backupName,
+				certPath,
+				saSecretPath,
+				dbURL,
+				dbPort,
+				endpoint,
+				prefix,
 			),
 			image,
 		),
@@ -64,17 +79,22 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
+		checkDBReady,
 		bucketName,
 		cron,
-		saSecretName,
+		secretName,
 		saSecretKey,
-		configSecretName,
-		configSecretKey,
+		akidKey,
+		sakKey,
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		image,
+		endpoint,
+		prefix,
 	)
 
 	assert.NoError(t, err)
@@ -90,6 +110,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 	features := []string{Instant}
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	bucketName := "testBucket2"
 	cron := "testCron2"
 	timestamp := "test2"
@@ -98,13 +120,19 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
 	image := "testImage2"
-	saSecretName := "testSaSecretName2"
-	saSecretKey := "testSaSecretKey2"
-	configSecretName := "testConfigSecretName2"
-	configSecretKey := "testConfigSecretKey2"
+	saSecretKey := "testKey2"
+	akidKey := "testAKID2"
+	sakKey := "testSAK2"
+	endpoint := "testEndpoint2"
+	prefix := "testPrefix2"
+	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
+
+	checkDBReady := func(k8sClient kubernetes.ClientInt) error {
+		return nil
+	}
 
 	jobDef := getJob(
 		namespace,
@@ -112,15 +140,21 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		getJobSpecDef(
 			nodeselector,
 			tolerations,
-			saSecretName,
+			secretName,
 			saSecretKey,
-			configSecretName,
-			configSecretKey,
+			akidKey,
+			sakKey,
 			backupName,
 			getBackupCommand(
 				timestamp,
 				bucketName,
 				backupName,
+				certPath,
+				saSecretPath,
+				dbURL,
+				dbPort,
+				endpoint,
+				prefix,
 			),
 			image,
 		),
@@ -134,17 +168,22 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
+		checkDBReady,
 		bucketName,
 		cron,
-		saSecretName,
+		secretName,
 		saSecretKey,
-		configSecretName,
-		configSecretKey,
+		akidKey,
+		sakKey,
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		image,
+		endpoint,
+		prefix,
 	)
 
 	assert.NoError(t, err)
@@ -163,18 +202,26 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 	bucketName := "testBucket"
 	cron := "testCron"
 	timestamp := "test"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	image := "testImage"
-	saSecretName := "testSaSecretName"
-	saSecretKey := "testSaSecretKey"
-	configSecretName := "testConfigSecretName"
-	configSecretKey := "testConfigSecretKey"
+	saSecretKey := "testKey"
+	akidKey := "testAKID"
+	sakKey := "testSAK"
+	endpoint := "testEndpoint"
+	prefix := "testPrefix"
+	secretName := "testSecretName"
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
+
+	checkDBReady := func(k8sClient kubernetes.ClientInt) error {
+		return nil
+	}
 
 	jobDef := getCronJob(
 		namespace,
@@ -183,15 +230,21 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		getJobSpecDef(
 			nodeselector,
 			tolerations,
-			saSecretName,
+			secretName,
 			saSecretKey,
-			configSecretName,
-			configSecretKey,
+			akidKey,
+			sakKey,
 			backupName,
 			getBackupCommand(
 				timestamp,
 				bucketName,
 				backupName,
+				certPath,
+				saSecretPath,
+				dbURL,
+				dbPort,
+				endpoint,
+				prefix,
 			),
 			image,
 		),
@@ -204,17 +257,22 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
+		checkDBReady,
 		bucketName,
 		cron,
-		saSecretName,
+		secretName,
 		saSecretKey,
-		configSecretName,
-		configSecretKey,
+		akidKey,
+		sakKey,
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		image,
+		endpoint,
+		prefix,
 	)
 
 	assert.NoError(t, err)
@@ -230,6 +288,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 	features := []string{Normal}
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	bucketName := "testBucket2"
 	cron := "testCron2"
 	timestamp := "test2"
@@ -238,13 +298,19 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
 	image := "testImage2"
-	saSecretName := "testSaSecretName2"
-	saSecretKey := "testSaSecretKey2"
-	configSecretName := "testConfigSecretName2"
-	configSecretKey := "testConfigSecretKey2"
+	saSecretKey := "testKey2"
+	akidKey := "testAKID2"
+	sakKey := "testSAK2"
+	endpoint := "testEndpoint2"
+	prefix := "testPrefix2"
+	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
+
+	checkDBReady := func(k8sClient kubernetes.ClientInt) error {
+		return nil
+	}
 
 	jobDef := getCronJob(
 		namespace,
@@ -253,15 +319,21 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		getJobSpecDef(
 			nodeselector,
 			tolerations,
-			saSecretName,
+			secretName,
 			saSecretKey,
-			configSecretName,
-			configSecretKey,
+			akidKey,
+			sakKey,
 			backupName,
 			getBackupCommand(
 				timestamp,
 				bucketName,
 				backupName,
+				certPath,
+				saSecretPath,
+				dbURL,
+				dbPort,
+				endpoint,
+				prefix,
 			),
 			image,
 		),
@@ -274,17 +346,22 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
+		checkDBReady,
 		bucketName,
 		cron,
-		saSecretName,
+		secretName,
 		saSecretKey,
-		configSecretName,
-		configSecretKey,
+		akidKey,
+		sakKey,
 		timestamp,
 		nodeselector,
 		tolerations,
+		dbURL,
+		dbPort,
 		features,
 		image,
+		endpoint,
+		prefix,
 	)
 
 	assert.NoError(t, err)

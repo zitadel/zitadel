@@ -16,12 +16,13 @@ func TestDatabase_Adapt(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	host := "host"
 	port := "port"
+	httpPort := "80"
 	users := []string{"test"}
 
 	monitor := mntr.Monitor{}
 	queried := map[string]interface{}{}
 
-	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return(host, port, nil)
+	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return(host, port, httpPort, nil)
 	dbClient.EXPECT().ListUsers(monitor, k8sClient).Return([]string{"test"}, nil)
 
 	_, err := GetDatabaseInQueried(queried)
@@ -46,12 +47,13 @@ func TestDatabase_Adapt2(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	host := "host2"
 	port := "port2"
+	httpPort := "8080"
 	users := []string{"test2"}
 
 	monitor := mntr.Monitor{}
 	queried := map[string]interface{}{}
 
-	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return(host, port, nil)
+	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return(host, port, httpPort, nil)
 	dbClient.EXPECT().ListUsers(monitor, k8sClient).Return(users, nil)
 
 	_, err := GetDatabaseInQueried(queried)
@@ -78,7 +80,7 @@ func TestDatabase_AdaptFailConnection(t *testing.T) {
 	monitor := mntr.Monitor{}
 	queried := map[string]interface{}{}
 
-	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).MinTimes(1).MaxTimes(1).Return("", "", errors.New("fail"))
+	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).MinTimes(1).MaxTimes(1).Return("", "", "", errors.New("fail"))
 	dbClient.EXPECT().ListUsers(monitor, k8sClient).MinTimes(1).MaxTimes(1).Return([]string{"test"}, nil)
 
 	_, err := GetDatabaseInQueried(queried)
@@ -100,11 +102,12 @@ func TestDatabase_AdaptFailUsers(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	host := "host"
 	port := "port"
+	httpPort := "80"
 
 	monitor := mntr.Monitor{}
 	queried := map[string]interface{}{}
 
-	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return(host, port, nil)
+	dbClient.EXPECT().GetConnectionInfo(monitor, k8sClient).Return(host, port, httpPort, nil)
 	dbClient.EXPECT().ListUsers(monitor, k8sClient).Return(nil, errors.New("fail"))
 
 	_, err := GetDatabaseInQueried(queried)

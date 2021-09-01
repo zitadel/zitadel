@@ -25,6 +25,7 @@ func AdaptFunc(
 	binaryVersion *string,
 	gitops bool,
 	features []string,
+	timestamp string,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -98,6 +99,7 @@ func AdaptFunc(
 			&desiredKind.Spec.Version,
 			features,
 			desiredKind.Spec.CustomImageRegistry,
+			timestamp,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err

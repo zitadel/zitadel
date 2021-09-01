@@ -3,11 +3,13 @@ package zitadel
 import (
 	"errors"
 	"fmt"
+	"github.com/caos/orbos/pkg/secret/read"
+	"github.com/caos/zitadel/operator/zitadel/kinds/backups"
 	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
-	core "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/helper"
@@ -26,29 +28,37 @@ import (
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
 )
 
+const (
+	ScaleDown = "scaledown"
+	ScaleUp   = "scaleup"
+	Zitadel   = "iam"
+	Migration = "migration"
+)
+
 func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
-	tolerations []core.Toleration,
+	tolerations []corev1.Toleration,
 	dbClient database.Client,
 	namespace string,
 	action string,
 	version *string,
 	features []string,
 	customImageRegistry string,
+	timestamp string,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
 		desired *tree.Tree,
 		current *tree.Tree,
 	) (
-		operator.QueryFunc,
-		operator.DestroyFunc,
-		operator.ConfigureFunc,
-		map[string]*secret.Secret,
-		map[string]*secret.Existing,
-		bool,
-		error,
+		_ operator.QueryFunc,
+		_ operator.DestroyFunc,
+		_ operator.ConfigureFunc,
+		_ map[string]*secret.Secret,
+		_ map[string]*secret.Existing,
+		migrate bool,
+		err error,
 	) {
 
 		internalMonitor := monitor.WithField("kind", "iam")
@@ -222,6 +232,7 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
+		configurers := make([]operator.ConfigureFunc, 0)
 		destroyers := make([]operator.DestroyFunc, 0)
 		for _, feature := range features {
 			switch feature {
@@ -274,8 +285,60 @@ func AdaptFunc(
 		}
 
 		queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
+		backupLabels := labels.MustForComponent(apiLabels, "backup")
+		if desiredKind.Spec.Backups != nil {
+			oneBackup := false
+			for backupName := range desiredKind.Spec.Backups {
+				if timestamp != "" && strings.HasPrefix(timestamp, backupName) {
+					oneBackup = true
+				}
+			}
+
+			for backupName, desiredBackup := range desiredKind.Spec.Backups {
+				currentBackup := &tree.Tree{}
+				if timestamp == "" || !oneBackup || (timestamp != "" && strings.HasPrefix(timestamp, backupName)) {
+					_, destroyB, configureB, secrets, existing, migrateB, err := backups.Adapt(
+						internalMonitor,
+						desiredBackup,
+						currentBackup,
+						backupName,
+						namespace,
+						backupLabels,
+						func(k8sClient kubernetes.ClientInt) error {
+							return nil
+						},
+						strings.TrimPrefix(timestamp, backupName+"."),
+						nodeselector,
+						tolerations,
+						*version,
+						"",
+						0,
+						features,
+						customImageRegistry,
+						"",
+						"",
+						"",
+						"",
+					)
+					if err != nil {
+						return nil, nil, nil, nil, nil, false, err
+					}
+
+					migrate = migrate || migrateB
+
+					secret.AppendSecrets(backupName, allSecrets, secrets, allExisting, existing)
+					destroyers = append(destroyers, destroyB)
+					configurers = append(configurers, configureB)
+				}
+			}
+		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				dbURL, _, dbPort, err := dbClient.GetConnectionInfo(monitor, k8sClient)
+				if err != nil {
+					return nil, err
+				}
+
 				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
 				if err != nil {
 					return nil, err
@@ -289,7 +352,7 @@ func AdaptFunc(
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
 					switch feature {
-					case "migration":
+					case Migration:
 						queriers = append(queriers,
 							//configuration
 							queryCfg,
@@ -298,7 +361,7 @@ func AdaptFunc(
 							queryReadyM,
 							operator.EnsureFuncToQueryFunc(migration.GetCleanupFunc(monitor, namespace, action)),
 						)
-					case "iam":
+					case Zitadel:
 						queriers = append(queriers,
 							//configuration
 							queryCfg,
@@ -321,92 +384,153 @@ func AdaptFunc(
 							//apply ambassador crds after zitadel is ready
 							queryAmbassador,
 						)
-					case "scaledown":
+					case ScaleDown:
 						queriers = append(queriers,
 							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespace, zitadelDeploymentName)(0)),
 						)
-					case "scaleup":
+					case ScaleUp:
 						queriers = append(queriers,
 							operator.EnsureFuncToQueryFunc(deployment.GetScaleFunc(monitor, namespace, zitadelDeploymentName)(desiredKind.Spec.ReplicaCount)),
 						)
 					}
 				}
 
+				if desiredKind.Spec.Backups != nil {
+
+					aid, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Configuration.AssetStorage.AccessKeyID, desiredKind.Spec.Configuration.AssetStorage.ExistingAccessKeyID)
+					if err != nil {
+						return nil, err
+					}
+					sak, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Configuration.AssetStorage.SecretAccessKey, desiredKind.Spec.Configuration.AssetStorage.ExistingSecretAccessKey)
+					if err != nil {
+						return nil, err
+					}
+
+					oneBackup := false
+					for backupName := range desiredKind.Spec.Backups {
+						if timestamp != "" && strings.HasPrefix(timestamp, backupName) {
+							oneBackup = true
+						}
+					}
+
+					for backupName, desiredBackup := range desiredKind.Spec.Backups {
+						currentBackup := &tree.Tree{}
+						if timestamp == "" || !oneBackup || (timestamp != "" && strings.HasPrefix(timestamp, backupName)) {
+							port, err := strconv.Atoi(dbPort)
+							if err != nil {
+								return nil, err
+							}
+
+							queryB, _, _, _, _, _, err := backups.Adapt(
+								internalMonitor,
+								desiredBackup,
+								currentBackup,
+								backupName,
+								namespace,
+								backupLabels,
+								func(k8sClient kubernetes.ClientInt) error {
+									return nil
+								},
+								strings.TrimPrefix(timestamp, backupName+"."),
+								nodeselector,
+								tolerations,
+								*version,
+								dbURL,
+								int32(port),
+								features,
+								customImageRegistry,
+								desiredKind.Spec.Configuration.AssetStorage.Endpoint,
+								aid,
+								sak,
+								desiredKind.Spec.Configuration.AssetStorage.BucketPrefix,
+							)
+							if err != nil {
+								return nil, err
+							}
+
+							queriers = append(queriers, queryB)
+						}
+					}
+				}
+
 				return operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 			},
 			operator.DestroyersToDestroyFunc(monitor, destroyers),
-			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+			operator.ConfigurersToConfigureFunc(
+				internalMonitor,
+				append(configurers,
+					func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+						if desiredKind.Spec == nil {
+							desiredKind.Spec = &Spec{}
+						}
+						if desiredKind.Spec.Configuration == nil {
+							desiredKind.Spec.Configuration = &configuration.Configuration{}
+						}
+						if desiredKind.Spec.Configuration.Secrets == nil {
+							desiredKind.Spec.Configuration.Secrets = &configuration.Secrets{}
+						}
+						if desiredKind.Spec.Configuration.Secrets.CookieID == "" {
+							desiredKind.Spec.Configuration.Secrets.CookieID = "cookiekey_1"
+						}
+						if desiredKind.Spec.Configuration.Secrets.OTPVerificationID == "" {
+							desiredKind.Spec.Configuration.Secrets.OTPVerificationID = "otpverificationkey_1"
+						}
+						if desiredKind.Spec.Configuration.Secrets.DomainVerificationID == "" {
+							desiredKind.Spec.Configuration.Secrets.DomainVerificationID = "domainverificationkey_1"
+						}
+						if desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID == "" {
+							desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID = "idpconfigverificationkey_1"
+						}
+						if desiredKind.Spec.Configuration.Secrets.OIDCKeysID == "" {
+							desiredKind.Spec.Configuration.Secrets.OIDCKeysID = "oidckey_1"
+						}
+						if desiredKind.Spec.Configuration.Secrets.UserVerificationID == "" {
+							desiredKind.Spec.Configuration.Secrets.UserVerificationID = "userverificationkey_1"
+						}
+						if gitops && desiredKind.Spec.Configuration.Secrets.Keys == nil {
+							desiredKind.Spec.Configuration.Secrets.Keys = &secret.Secret{}
+						}
+						if !gitops && desiredKind.Spec.Configuration.Secrets.ExistingKeys == nil {
+							desiredKind.Spec.Configuration.Secrets.ExistingKeys = &secret.Existing{}
+						}
 
-				if desiredKind.Spec == nil {
-					desiredKind.Spec = &Spec{}
-				}
-				if desiredKind.Spec.Configuration == nil {
-					desiredKind.Spec.Configuration = &configuration.Configuration{}
-				}
-				if desiredKind.Spec.Configuration.Secrets == nil {
-					desiredKind.Spec.Configuration.Secrets = &configuration.Secrets{}
-				}
-				if desiredKind.Spec.Configuration.Secrets.CookieID == "" {
-					desiredKind.Spec.Configuration.Secrets.CookieID = "cookiekey_1"
-				}
-				if desiredKind.Spec.Configuration.Secrets.OTPVerificationID == "" {
-					desiredKind.Spec.Configuration.Secrets.OTPVerificationID = "otpverificationkey_1"
-				}
-				if desiredKind.Spec.Configuration.Secrets.DomainVerificationID == "" {
-					desiredKind.Spec.Configuration.Secrets.DomainVerificationID = "domainverificationkey_1"
-				}
-				if desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID == "" {
-					desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID = "idpconfigverificationkey_1"
-				}
-				if desiredKind.Spec.Configuration.Secrets.OIDCKeysID == "" {
-					desiredKind.Spec.Configuration.Secrets.OIDCKeysID = "oidckey_1"
-				}
-				if desiredKind.Spec.Configuration.Secrets.UserVerificationID == "" {
-					desiredKind.Spec.Configuration.Secrets.UserVerificationID = "userverificationkey_1"
-				}
-				if gitops && desiredKind.Spec.Configuration.Secrets.Keys == nil {
-					desiredKind.Spec.Configuration.Secrets.Keys = &secret.Secret{}
-				}
-				if !gitops && desiredKind.Spec.Configuration.Secrets.ExistingKeys == nil {
-					desiredKind.Spec.Configuration.Secrets.ExistingKeys = &secret.Existing{}
-				}
+						keys := make(map[string]string)
+						if gitops {
+							if err := yaml.Unmarshal([]byte(desiredKind.Spec.Configuration.Secrets.Keys.Value), keys); err != nil {
+								return err
+							}
+						} else {
+							return errors.New("configure is not yet implemented for CRD mode")
+						}
 
-				keys := make(map[string]string)
-				if gitops {
-					if err := yaml.Unmarshal([]byte(desiredKind.Spec.Configuration.Secrets.Keys.Value), keys); err != nil {
-						return err
-					}
-				} else {
-					return errors.New("configure is not yet implemented for CRD mode")
-				}
+						if _, ok := keys[desiredKind.Spec.Configuration.Secrets.CookieID]; !ok {
+							keys[desiredKind.Spec.Configuration.Secrets.CookieID] = helper.RandStringBytes(32)
+						}
+						if _, ok := keys[desiredKind.Spec.Configuration.Secrets.OTPVerificationID]; !ok {
+							keys[desiredKind.Spec.Configuration.Secrets.OTPVerificationID] = helper.RandStringBytes(32)
+						}
+						if _, ok := keys[desiredKind.Spec.Configuration.Secrets.DomainVerificationID]; !ok {
+							keys[desiredKind.Spec.Configuration.Secrets.DomainVerificationID] = helper.RandStringBytes(32)
+						}
+						if _, ok := keys[desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID]; !ok {
+							keys[desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID] = helper.RandStringBytes(32)
+						}
+						if _, ok := keys[desiredKind.Spec.Configuration.Secrets.OIDCKeysID]; !ok {
+							keys[desiredKind.Spec.Configuration.Secrets.OIDCKeysID] = helper.RandStringBytes(32)
+						}
+						if _, ok := keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID]; !ok {
+							keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID] = helper.RandStringBytes(32)
+						}
 
-				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.CookieID]; !ok {
-					keys[desiredKind.Spec.Configuration.Secrets.CookieID] = helper.RandStringBytes(32)
-				}
-				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.OTPVerificationID]; !ok {
-					keys[desiredKind.Spec.Configuration.Secrets.OTPVerificationID] = helper.RandStringBytes(32)
-				}
-				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.DomainVerificationID]; !ok {
-					keys[desiredKind.Spec.Configuration.Secrets.DomainVerificationID] = helper.RandStringBytes(32)
-				}
-				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID]; !ok {
-					keys[desiredKind.Spec.Configuration.Secrets.IDPConfigVerificationID] = helper.RandStringBytes(32)
-				}
-				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.OIDCKeysID]; !ok {
-					keys[desiredKind.Spec.Configuration.Secrets.OIDCKeysID] = helper.RandStringBytes(32)
-				}
-				if _, ok := keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID]; !ok {
-					keys[desiredKind.Spec.Configuration.Secrets.UserVerificationID] = helper.RandStringBytes(32)
-				}
+						newKeys, err := yaml.Marshal(keys)
+						if err != nil {
+							return err
+						}
 
-				newKeys, err := yaml.Marshal(keys)
-				if err != nil {
-					return err
-				}
-
-				desiredKind.Spec.Configuration.Secrets.Keys.Value = string(newKeys)
-				return nil
-			},
+						desiredKind.Spec.Configuration.Secrets.Keys.Value = string(newKeys)
+						return nil
+					}),
+			),
 			allSecrets,
 			allExisting,
 			false,

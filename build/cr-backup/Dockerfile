@@ -1,22 +1,43 @@
-FROM cockroachdb/cockroach:v20.2.3
+#######################
+## By default we build the prod enviroment
+ARG ENV=prod
 
-RUN microdnf install curl wget tar gzip
+#######################
+## Go base build
+## Speed up this step by mounting your local go mod pkg directory
+#######################
+FROM golang:1.16 as go-base
 
-RUN wget https://storage.googleapis.com/oauth2l/latest/linux_amd64.tgz
-RUN tar zxvf linux_amd64.tgz
-RUN mv linux_amd64/oauth2l /usr/local/bin/oauth2l && rm -rf linux_amd64
+WORKDIR src/github.com/caos/zitadel/
+COPY go.mod go.sum ./
+RUN go mod download
 
-COPY build/cr-backup/scripts/backup-cockroach.sh /scripts/backup.sh
-RUN chmod +x /scripts/backup.sh
+## Go prod build
+FROM go-base as prod-go-build
+COPY . .
+RUN CGO_ENABLED=0 go build \
+      -a \
+      -installsuffix cgo \
+      -o backupctl \
+      ./cmd/backupctl/main.go
 
-COPY build/cr-backup/scripts/restore-cockroach.sh /scripts/restore.sh
-RUN chmod +x /scripts/restore.sh
+## Go dev build
+FROM go-base as dev-go-build
+RUN go get github.com/go-delve/delve/cmd/dlv
 
-COPY build/cr-backup/scripts/clean-db-cockroach.sh /scripts/clean-db.sh
-RUN chmod +x /scripts/clean-db.sh
-COPY build/cr-backup/scripts/clean-migration-cockroach.sh /scripts/clean-migration.sh
-RUN chmod +x /scripts/clean-migration.sh
-COPY build/cr-backup/scripts/clean-user-cockroach.sh /scripts/clean-user.sh
-RUN chmod +x /scripts/clean-user.sh
+#######################
+## Final Production Image
+#######################
+FROM alpine:latest as artifact
 
-ENTRYPOINT [ "/cockroach" ]
+COPY --from=prod-go-build /go/src/github.com/caos/zitadel/backupctl /app/backupctl
+RUN chmod a+x /app/backupctl
+
+## CokroachDB Image for cockroach binary
+FROM cockroachdb/cockroach:v20.2.3 as final
+
+RUN microdnf install rsync
+
+COPY --from=artifact /app /
+HEALTHCHECK NONE
+ENTRYPOINT ["/backupctl"]

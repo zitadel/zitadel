@@ -103,7 +103,7 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 						"configure",
 						nil,
 						rv.Gitops,
-						nil,
+						nil, "",
 					)(rv.Monitor, desired, &tree.Tree{})
 					if err != nil {
 						return nil, nil, err

@@ -36,7 +36,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 
-	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})); err != nil {
+	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"}, "")); err != nil {
 		return res, err
 	}
 

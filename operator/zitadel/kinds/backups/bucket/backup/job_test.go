@@ -15,10 +15,10 @@ func TestBackup_JobSpec1(t *testing.T) {
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	command := "test"
-	saSecretName := "testSaSecretName"
-	saSecretKey := "testSaSecretKey"
-	configSecretName := "testConfigSecretName"
-	configSecretKey := "testConfigSecretKey"
+	backupSecretName := "testSecret"
+	saSecretKey := "testSaKey"
+	assetAKIDKey := "testAkidKey"
+	assetSAKKey := "testSakKey"
 	image := "testImage"
 
 	equals := batchv1.JobSpec{
@@ -35,39 +35,76 @@ func TestBackup_JobSpec1(t *testing.T) {
 						"-c",
 						command,
 					},
-					VolumeMounts: []corev1.VolumeMount{{
-						Name:      saInternalSecretName,
-						SubPath:   saSecretKey,
-						MountPath: saSecretPath,
-					}, {
-						Name:      configInternalSecretName,
-						SubPath:   configSecretKey,
-						MountPath: configSecretPath,
-					}},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      certsInternalSecretName,
+							MountPath: certPath,
+						}, {
+							Name:      saInternalSecretName,
+							SubPath:   saSecretKey,
+							MountPath: saSecretPath,
+						}, {
+							Name:      akidInternalSecretName,
+							SubPath:   assetAKIDKey,
+							MountPath: akidSecretPath,
+						}, {
+							Name:      sakInternalSecretName,
+							SubPath:   assetSAKKey,
+							MountPath: sakSecretPath,
+						},
+					},
 					ImagePullPolicy: corev1.PullAlways,
 				}},
-				Volumes: []corev1.Volume{{
-					Name: saInternalSecretName,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName:  saSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+				Volumes: []corev1.Volume{
+					{
+						Name: certsInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  rootSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: saInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: akidInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: sakInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
 						},
 					},
-				}, {
-					Name: configInternalSecretName,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName:  configSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
-						},
-					},
-				}},
+				},
 			},
 		},
 	}
 
-	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, saSecretName, saSecretKey, configSecretName, configSecretKey, backupName, command, image))
+	assert.Equal(t, equals, getJobSpecDef(
+		nodeselector,
+		tolerations,
+		backupSecretName,
+		saSecretKey,
+		assetAKIDKey,
+		assetSAKKey,
+		backupName,
+		command,
+		image,
+	))
 }
 
 func TestBackup_JobSpec2(t *testing.T) {
@@ -76,10 +113,10 @@ func TestBackup_JobSpec2(t *testing.T) {
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
 	command := "test2"
-	saSecretName := "testSaSecretName2"
-	saSecretKey := "testSaSecretKey2"
-	configSecretName := "testConfigSecretName2"
-	configSecretKey := "testConfigSecretKey2"
+	backupSecretName := "testSecret2"
+	saSecretKey := "testSaKey2"
+	assetAKIDKey := "testAkidKey2"
+	assetSAKKey := "testSakKey2"
 	image := "testImage2"
 
 	equals := batchv1.JobSpec{
@@ -96,37 +133,74 @@ func TestBackup_JobSpec2(t *testing.T) {
 						"-c",
 						command,
 					},
-					VolumeMounts: []corev1.VolumeMount{{
-						Name:      saInternalSecretName,
-						SubPath:   saSecretKey,
-						MountPath: saSecretPath,
-					}, {
-						Name:      configInternalSecretName,
-						SubPath:   configSecretKey,
-						MountPath: configSecretPath,
-					}},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      certsInternalSecretName,
+							MountPath: certPath,
+						}, {
+							Name:      saInternalSecretName,
+							SubPath:   saSecretKey,
+							MountPath: saSecretPath,
+						}, {
+							Name:      akidInternalSecretName,
+							SubPath:   assetAKIDKey,
+							MountPath: akidSecretPath,
+						}, {
+							Name:      sakInternalSecretName,
+							SubPath:   assetSAKKey,
+							MountPath: sakSecretPath,
+						},
+					},
 					ImagePullPolicy: corev1.PullAlways,
 				}},
-				Volumes: []corev1.Volume{{
-					Name: saInternalSecretName,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName:  saSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+				Volumes: []corev1.Volume{
+					{
+						Name: certsInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  rootSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: saInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: akidInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: sakInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
 						},
 					},
-				}, {
-					Name: configInternalSecretName,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName:  configSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
-						},
-					},
-				}},
+				},
 			},
 		},
 	}
 
-	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, saSecretName, saSecretKey, configSecretName, configSecretKey, backupName, command, image))
+	assert.Equal(t, equals, getJobSpecDef(
+		nodeselector,
+		tolerations,
+		backupSecretName,
+		saSecretKey,
+		assetAKIDKey,
+		assetSAKKey,
+		backupName,
+		command,
+		image,
+	))
 }

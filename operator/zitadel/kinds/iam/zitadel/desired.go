@@ -26,6 +26,7 @@ type Spec struct {
 	Tolerations   []corev1.Toleration          `yaml:"tolerations,omitempty"`
 	Affinity      *k8s.Affinity                `yaml:"affinity,omitempty"`
 	Resources     *k8s.Resources               `yaml:"resources,omitempty"`
+	Backups       map[string]*tree.Tree        `yaml:"backups,omitempty"`
 }
 
 func (s *Spec) validate() (err error) {

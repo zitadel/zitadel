@@ -75,7 +75,7 @@ func getAllSecrets(
 		allExisting,
 		func() (t *tree.Tree, err error) { return crdzit.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, bool, error) {
-			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc(orb, "secret", nil, gitops, []string{})(monitor, t, &tree.Tree{})
+			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc(orb, "secret", nil, gitops, []string{}, "")(monitor, t, &tree.Tree{})
 			return secrets, existing, migrate, err
 		},
 	); err != nil {

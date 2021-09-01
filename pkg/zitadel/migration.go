@@ -50,7 +50,7 @@ func migrations(
 	desired *tree.Tree,
 ) error {
 	current := &tree.Tree{}
-	query, _, _, _, _, _, err := orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"})(monitor, desired, current)
+	query, _, _, _, _, _, err := orb.AdaptFunc(orbCfg, "migration", version, gitops, []string{"migration"}, "")(monitor, desired, current)
 	if err != nil {
 		return err
 	}

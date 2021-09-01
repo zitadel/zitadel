@@ -9,9 +9,23 @@ func TestBackup_Command1(t *testing.T) {
 	timestamp := ""
 	bucketName := "test"
 	backupName := "test"
+	dbURL := "testDB"
+	dbPort := int32(80)
+	enpoint := "testEndpoint"
+	prefix := "testPrefix"
 
-	cmd := getBackupCommand(timestamp, bucketName, backupName)
-	equals := "export BACKUP_NAME=$(date +%Y-%m-%dT%H:%M:%SZ) && rclone --no-check-certificate --config /secrets/rconfig sync minio:test bucket:test/backup--${test}"
+	cmd := getBackupCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		saSecretPath,
+		dbURL,
+		dbPort,
+		enpoint,
+		prefix,
+	)
+	equals := "export " + backupNameEnv + "=$(date +%Y-%m-%dT%H:%M:%SZ) && backupctl backup gcs --backupname=test --backupnameenv=BACKUP_NAME --asset-endpoint=testEndpoint --asset-akid=$(cat /secrets/akid) --asset-sak=$(cat /secrets/sak) --asset-prefix=testPrefix --host=testDB --port=80 --destination-sajsonpath=/secrets/sa.json --destination-buckettest --certs-dir=/cockroach/cockroach-certs"
 	assert.Equal(t, equals, cmd)
 }
 
@@ -19,28 +33,22 @@ func TestBackup_Command2(t *testing.T) {
 	timestamp := "test"
 	bucketName := "test"
 	backupName := "test"
+	dbURL := "testDB"
+	dbPort := int32(80)
+	enpoint := "testEndpoint"
+	prefix := "testPrefix"
 
-	cmd := getBackupCommand(timestamp, bucketName, backupName)
-	equals := "export BACKUP_NAME=test && rclone --no-check-certificate --config /secrets/rconfig sync minio:test bucket:test/backup--${test}"
-	assert.Equal(t, equals, cmd)
-}
-
-func TestBackup_Command3(t *testing.T) {
-	timestamp := ""
-	bucketName := "testBucket2"
-	backupName := "testBackup2"
-
-	cmd := getBackupCommand(timestamp, bucketName, backupName)
-	equals := "export BACKUP_NAME=$(date +%Y-%m-%dT%H:%M:%SZ) && rclone --no-check-certificate --config /secrets/rconfig sync minio:testBucket2 bucket:testBucket2/backup--${testBackup2}"
-	assert.Equal(t, equals, cmd)
-}
-
-func TestBackup_Command4(t *testing.T) {
-	timestamp := "test2"
-	bucketName := "testBucket2"
-	backupName := "testBackup2"
-
-	cmd := getBackupCommand(timestamp, bucketName, backupName)
-	equals := "export BACKUP_NAME=test2 && rclone --no-check-certificate --config /secrets/rconfig sync minio:testBucket2 bucket:testBucket2/backup--${testBackup2}"
+	cmd := getBackupCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		saSecretPath,
+		dbURL,
+		dbPort,
+		enpoint,
+		prefix,
+	)
+	equals := "export " + backupNameEnv + "=test && backupctl backup gcs --backupname=test --backupnameenv=BACKUP_NAME --asset-endpoint=testEndpoint --asset-akid=$(cat /secrets/akid) --asset-sak=$(cat /secrets/sak) --asset-prefix=testPrefix --host=testDB --port=80 --destination-sajsonpath=/secrets/sa.json --destination-buckettest --certs-dir=/cockroach/cockroach-certs"
 	assert.Equal(t, equals, cmd)
 }

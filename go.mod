@@ -13,6 +13,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.6.0
 	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75
 	github.com/allegro/bigcache v1.2.1
+	github.com/aws/aws-sdk-go v1.40.7 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.6.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.3.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.2.1 // indirect

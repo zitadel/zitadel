@@ -13,10 +13,10 @@ import (
 func CrdGetConnectionInfo(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
-) (string, string, error) {
+) (string, string, string, error) {
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	return getConnectionInfo(monitor, k8sClient, desired, false)
@@ -26,11 +26,11 @@ func GitOpsGetConnectionInfo(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
-) (string, string, error) {
+) (string, string, string, error) {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		monitor.Error(err)
-		return "", "", err
+		return "", "", "", err
 	}
 
 	return getConnectionInfo(monitor, k8sClient, desired, true)
@@ -41,22 +41,22 @@ func getConnectionInfo(
 	k8sClient kubernetes.ClientInt,
 	desired *tree.Tree,
 	gitOps bool,
-) (string, string, error) {
+) (string, string, string, error) {
 	current := &tree.Tree{}
 
 	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, gitOps, "database")(monitor, desired, current)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	queried := map[string]interface{}{}
 	_, err = query(k8sClient, queried)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	currentDB, err := coredb.ParseQueriedForDatabase(queried)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
-	return currentDB.GetURL(), currentDB.GetPort(), nil
+	return currentDB.GetURL(), currentDB.GetPort(), currentDB.GetHTTPPort(), nil
 }

@@ -27,6 +27,10 @@ func (c *CurrentDBList) GetPort() string {
 	return ""
 }
 
+func (c *CurrentDBList) GetHTTPPort() string {
+	return ""
+}
+
 func (c *CurrentDBList) GetReadyQuery() operator.EnsureFunc {
 	return nil
 }

@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -9,6 +9,12 @@ func getBackupCommand(
 	timestamp string,
 	bucketName string,
 	backupName string,
+	certsFolder string,
+	serviceAccountPath string,
+	dbURL string,
+	dbPort int32,
+	assetEndpoint string,
+	assetPrefix string,
 ) string {
 
 	backupCommands := make([]string, 0)
@@ -20,14 +26,23 @@ func getBackupCommand(
 
 	backupCommands = append(backupCommands,
 		strings.Join([]string{
-			"rclone",
-			"--no-check-certificate",
-			"--config",
-			configSecretPath,
-			"sync",
-			sourceName + ":" + bucketName,
-			destinationName + ":" + filepath.Join(bucketName, cronJobNamePrefix+"-${"+backupName+"}"),
-		}, " "))
+			"backupctl",
+			"backup",
+			"gcs",
+			"--backupname=" + backupName,
+			"--backupnameenv=" + backupNameEnv,
+			"--asset-endpoint=" + assetEndpoint,
+			"--asset-akid=$(cat " + akidSecretPath + ")",
+			"--asset-sak=$(cat " + sakSecretPath + ")",
+			"--asset-prefix=" + assetPrefix,
+			"--host=" + dbURL,
+			"--port=" + strconv.Itoa(int(dbPort)),
+			"--destination-sajsonpath=" + serviceAccountPath,
+			"--destination-bucket" + bucketName,
+			"--certs-dir=" + certsFolder,
+		}, " ",
+		),
+	)
 
 	return strings.Join(backupCommands, " && ")
 }

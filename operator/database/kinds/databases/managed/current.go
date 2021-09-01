@@ -5,8 +5,11 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 )
+
+var _ core.DatabaseCurrent = (*Current)(nil)
 
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
@@ -16,6 +19,7 @@ type Current struct {
 type CurrentDB struct {
 	URL               string
 	Port              string
+	HTTPPort          string
 	ReadyFunc         operator.EnsureFunc
 	CA                *certificate.Current
 	AddUserFunc       func(user string) (operator.QueryFunc, error)
@@ -30,6 +34,10 @@ func (c *Current) GetURL() string {
 
 func (c *Current) GetPort() string {
 	return c.Current.Port
+}
+
+func (c *Current) GetHTTPPort() string {
+	return c.Current.HTTPPort
 }
 
 func (c *Current) GetReadyQuery() operator.EnsureFunc {

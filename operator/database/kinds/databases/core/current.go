@@ -14,6 +14,7 @@ const queriedName = "database"
 type DatabaseCurrent interface {
 	GetURL() string
 	GetPort() string
+	GetHTTPPort() string
 	GetReadyQuery() operator.EnsureFunc
 	GetCertificateKey() *rsa.PrivateKey
 	SetCertificateKey(*rsa.PrivateKey)

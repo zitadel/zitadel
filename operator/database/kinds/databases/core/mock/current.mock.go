@@ -63,6 +63,20 @@ func (mr *MockDatabaseCurrentMockRecorder) GetPort() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPort", reflect.TypeOf((*MockDatabaseCurrent)(nil).GetPort))
 }
 
+// GetHTTPPort mocks base method
+func (m *MockDatabaseCurrent) GetHTTPPort() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetHTTPPort")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetHTTPPort indicates an expected call of GetHTTPPort
+func (mr *MockDatabaseCurrentMockRecorder) GetHTTPPort() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHTTPPort", reflect.TypeOf((*MockDatabaseCurrent)(nil).GetHTTPPort))
+}
+
 // GetReadyQuery mocks base method
 func (m *MockDatabaseCurrent) GetReadyQuery() operator.EnsureFunc {
 	m.ctrl.T.Helper()

@@ -13,9 +13,9 @@ import (
 	"github.com/caos/orbos/pkg/treelabels"
 
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/caos/zitadel/operator/database/kinds/databases"
+	"github.com/caos/zitadel/operator/zitadel/kinds/backups/bucket/backup"
+	"github.com/caos/zitadel/operator/zitadel/kinds/backups/bucket/restore"
 )
 
 const (
@@ -75,12 +75,7 @@ func AdaptFunc(
 		}*/
 
 		databaseCurrent := &tree.Tree{}
-
 		operatorLabels := mustDatabaseOperator(binaryVersion)
-		version := ""
-		if binaryVersion != nil {
-			version = *binaryVersion
-		}
 
 		queryDB, destroyDB, configureDB, secrets, existing, migrate, err := databases.Adapt(
 			orbMonitor,
@@ -88,10 +83,6 @@ func AdaptFunc(
 			databaseCurrent,
 			NamespaceStr,
 			treelabels.MustForAPI(desiredKind.Database, operatorLabels),
-			timestamp,
-			desiredKind.Spec.NodeSelector,
-			desiredKind.Spec.Tolerations,
-			version,
 			features,
 			desiredKind.Spec.CustomImageRegistry,
 		)

@@ -2,6 +2,7 @@ package iam
 
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/kubernetes"
 
 	core "k8s.io/api/core/v1"
 
@@ -28,6 +29,7 @@ func Adapt(
 	version *string,
 	features []string,
 	customImageRegistry string,
+	timestamp string,
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
@@ -43,7 +45,6 @@ func Adapt(
 			err = fmt.Errorf("adapting %s failed: %w", desiredTree.Common.Kind, err)
 		}
 	}()
-
 	switch desiredTree.Common.Kind {
 	case "zitadel.caos.ch/ZITADEL":
 		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version())
@@ -57,8 +58,27 @@ func Adapt(
 			version,
 			features,
 			customImageRegistry,
+			timestamp,
 		)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("unknown iam kind %s", desiredTree.Common.Kind))
+	}
+}
+
+func GetBackupList(
+	monitor mntr.Monitor,
+	k8sClient kubernetes.ClientInt,
+	desiredTree *tree.Tree,
+) (
+	[]string,
+	error,
+) {
+	switch desiredTree.Common.Kind {
+	case "zitadel.caos.ch/ZITADEL":
+		return zitadel.BackupList()(monitor, k8sClient, desiredTree)
+	case "databases.caos.ch/ProvidedDatabse":
+		return nil, mntr.ToUserError(fmt.Errorf("no backups supported for database kind %s", desiredTree.Common.Kind))
+	default:
+		return nil, mntr.ToUserError(fmt.Errorf("unknown database kind %s", desiredTree.Common.Kind))
 	}
 }

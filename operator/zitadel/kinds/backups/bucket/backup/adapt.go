@@ -1,29 +1,35 @@
 package backup
 
 import (
+	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
+	"time"
+
+	"github.com/caos/zitadel/operator"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/cronjob"
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
 	corev1 "k8s.io/api/core/v1"
-	"time"
 )
 
 const (
-	defaultMode              int32 = 256
-	saInternalSecretName           = "sa-json"
-	saSecretPath                   = "/secrets/sa.json"
-	configInternalSecretName       = "rconfig"
-	configSecretPath               = "/secrets/rconfig"
-	cronJobNamePrefix              = "backup-"
-	backupNameEnv                  = "BACKUP_NAME"
-	timeout                        = 15 * time.Minute
-	sourceName                     = "minio"
-	destinationName                = "bucket"
-	Normal                         = "assetbackup"
-	Instant                        = "assetinstantbackup"
+	defaultMode             int32 = 256
+	certPath                      = "/cockroach/cockroach-certs"
+	saInternalSecretName          = "sa-json"
+	saSecretPath                  = "/secrets/sa.json"
+	akidInternalSecretName        = "akid"
+	akidSecretPath                = "/secrets/akid"
+	sakInternalSecretName         = "sak"
+	sakSecretPath                 = "/secrets/sak"
+	backupNameEnv                 = "BACKUP_NAME"
+	cronJobNamePrefix             = "backup-"
+	certsInternalSecretName       = "client-certs"
+	rootSecretName                = "cockroachdb.client.root"
+	timeout                       = 15 * time.Minute
+	Normal                        = "backup"
+	Instant                       = "instantbackup"
 )
 
 func AdaptFunc(
@@ -31,36 +37,52 @@ func AdaptFunc(
 	backupName string,
 	namespace string,
 	componentLabels *labels.Component,
+	checkDBReady operator.EnsureFunc,
 	bucketName string,
 	cron string,
-	saSecretName string,
+	backupSecretName string,
 	saSecretKey string,
-	configSecretName string,
-	configSecretKey string,
+	assetAKIDKey string,
+	assetSAKKey string,
 	timestamp string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
+	dbURL string,
+	dbPort int32,
 	features []string,
 	image string,
+	assetEndpoint string,
+	assetPrefix string,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
 	err error,
 ) {
 
+	destroyS, err := secret.AdaptFuncToDestroy(namespace, backupName)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	command := getBackupCommand(
 		timestamp,
 		bucketName,
 		backupName,
+		certPath,
+		saSecretPath,
+		dbURL,
+		dbPort,
+		assetEndpoint,
+		assetPrefix,
 	)
 
 	jobSpecDef := getJobSpecDef(
 		nodeselector,
 		tolerations,
-		saSecretName,
+		backupSecretName,
 		saSecretKey,
-		configSecretName,
-		configSecretKey,
+		assetAKIDKey,
+		assetSAKKey,
 		backupName,
 		command,
 		image,
@@ -107,15 +129,19 @@ func AdaptFunc(
 		case Normal:
 			destroyers = append(destroyers,
 				operator.ResourceDestroyToZitadelDestroy(destroyCJ),
+				operator.ResourceDestroyToZitadelDestroy(destroyS),
 			)
 			queriers = append(queriers,
+				operator.EnsureFuncToQueryFunc(checkDBReady),
 				operator.ResourceQueryToZitadelQuery(queryCJ),
 			)
 		case Instant:
 			destroyers = append(destroyers,
 				operator.ResourceDestroyToZitadelDestroy(destroyJ),
+				operator.ResourceDestroyToZitadelDestroy(destroyS),
 			)
 			queriers = append(queriers,
+				operator.EnsureFuncToQueryFunc(checkDBReady),
 				operator.ResourceQueryToZitadelQuery(queryJ),
 			)
 		}

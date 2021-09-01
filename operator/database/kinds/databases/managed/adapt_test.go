@@ -63,15 +63,11 @@ func TestManaged_Adapt1(t *testing.T) {
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
 
 	namespace := "testNs"
-	timestamp := "testTs"
-	nodeselector := map[string]string{"test": "test"}
-	tolerations := []corev1.Toleration{}
 	features := []string{"database"}
 	masterkey := "testMk"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	dbCurrent := coremock.NewMockDatabaseCurrent(gomock.NewController(t))
 	queried := map[string]interface{}{}
-	version := "test"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
@@ -130,7 +126,7 @@ func TestManaged_Adapt1(t *testing.T) {
 	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features, "")(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	ensure, err := query(k8sClient, queried)
@@ -143,7 +139,6 @@ func TestManaged_Adapt1(t *testing.T) {
 func TestManaged_Adapt2(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
-	timestamp := "testTs"
 
 	nodeLabels := map[string]string{
 		"app.kubernetes.io/component":  "database2",
@@ -173,14 +168,11 @@ func TestManaged_Adapt2(t *testing.T) {
 
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "v1"), "database2")
 
-	nodeselector := map[string]string{"test2": "test2"}
-	var tolerations []corev1.Toleration
 	features := []string{"database"}
 	masterkey := "testMk2"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	dbCurrent := coremock.NewMockDatabaseCurrent(gomock.NewController(t))
 	queried := map[string]interface{}{}
-	version := "test"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
@@ -239,7 +231,7 @@ func TestManaged_Adapt2(t *testing.T) {
 	dbCurrent.EXPECT().SetCertificateKey(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplySecret(gomock.Any()).MinTimes(1).MaxTimes(1)
 
-	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features, "")(monitor, desired, &tree.Tree{})
+	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, features, "")(monitor, desired, &tree.Tree{})
 	assert.NoError(t, err)
 
 	ensure, err := query(k8sClient, queried)

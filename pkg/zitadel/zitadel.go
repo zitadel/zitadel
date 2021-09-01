@@ -48,7 +48,7 @@ func scaleDown(
 	desired *tree.Tree,
 ) error {
 	current := &tree.Tree{}
-	query, _, _, _, _, _, err := orb.AdaptFunc(orbCfg, "scaledown", version, gitops, []string{"scaledown"})(monitor, desired, current)
+	query, _, _, _, _, _, err := orb.AdaptFunc(orbCfg, "scaledown", version, gitops, []string{"scaledown"}, "")(monitor, desired, current)
 	if err != nil {
 		return err
 	}

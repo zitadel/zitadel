@@ -35,13 +35,14 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // GetConnectionInfo mocks base method
-func (m *MockClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error) {
+func (m *MockClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetConnectionInfo", monitor, k8sClient)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret2, _ := ret[2].(string)
+	ret3, _ := ret[3].(error)
+	return ret0, ret1, ret2, ret3
 }
 
 // GetConnectionInfo indicates an expected call of GetConnectionInfo

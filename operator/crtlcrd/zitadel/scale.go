@@ -13,7 +13,7 @@ func ScaleDown(
 	version *string,
 ) (bool, error) {
 	noZitadel := false
-	if err := Takeoff(monitor, k8sClient, orb.AdaptFunc(nil, "scaledown", version, false, []string{"scaledown"})); err != nil {
+	if err := Takeoff(monitor, k8sClient, orb.AdaptFunc(nil, "scaledown", version, false, []string{"scaledown"}, "")); err != nil {
 		if macherrs.IsNotFound(err) {
 			noZitadel = true
 		} else {
@@ -28,5 +28,5 @@ func ScaleUp(
 	k8sClient *kubernetes.Client,
 	version *string,
 ) error {
-	return Takeoff(monitor, k8sClient, orb.AdaptFunc(nil, "scaleup", version, false, []string{"scaleup"}))
+	return Takeoff(monitor, k8sClient, orb.AdaptFunc(nil, "scaleup", version, false, []string{"scaleup"}, ""))
 }

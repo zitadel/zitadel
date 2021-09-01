@@ -2,11 +2,8 @@ package managed
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"strconv"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -17,7 +14,6 @@ import (
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/operator/database/kinds/backups"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
@@ -40,10 +36,6 @@ const (
 func Adapter(
 	componentLabels *labels.Component,
 	namespace string,
-	timestamp string,
-	nodeselector map[string]string,
-	tolerations []corev1.Toleration,
-	version string,
 	features []string,
 	customImageRegistry string,
 ) operator.AdaptFunc {
@@ -203,7 +195,7 @@ func Adapter(
 			)
 		}
 
-		if desiredKind.Spec.Backups != nil {
+		/*if desiredKind.Spec.Backups != nil {
 
 			oneBackup := false
 			for backupName := range desiredKind.Spec.Backups {
@@ -244,13 +236,14 @@ func Adapter(
 					configurers = append(configurers, configureB)
 				}
 			}
-		}
+		}*/
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
 				if err != nil || queriedCurrentDB == nil {
 					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
+					currentDB.Current.HTTPPort = strconv.Itoa(int(cockroachHTTPPort))
 					currentDB.Current.URL = PublicServiceName
 					currentDB.Current.ReadyFunc = checkDBReady
 					currentDB.Current.AddUserFunc = addUser
@@ -266,14 +259,7 @@ func Adapter(
 				return ensure, err
 			},
 			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
-			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
-				for i := range configurers {
-					if err := configurers[i](k8sClient, queried, gitops); err != nil {
-						return err
-					}
-				}
-				return nil
-			},
+			operator.ConfigurersToConfigureFunc(internalMonitor, configurers),
 			allSecrets,
 			allExisting,
 			migrate,

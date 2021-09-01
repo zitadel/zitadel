@@ -17,15 +17,14 @@ type DesiredV0 struct {
 
 type Spec struct {
 	Verbose         bool
-	Force           bool                  `yaml:"force,omitempty"`
-	ReplicaCount    int                   `yaml:"replicaCount,omitempty"`
-	StorageCapacity string                `yaml:"storageCapacity,omitempty"`
-	StorageClass    string                `yaml:"storageClass,omitempty"`
-	NodeSelector    map[string]string     `yaml:"nodeSelector,omitempty"`
-	Tolerations     []corev1.Toleration   `yaml:"tolerations,omitempty"`
-	ClusterDns      string                `yaml:"clusterDNS,omitempty"`
-	Backups         map[string]*tree.Tree `yaml:"backups,omitempty"`
-	Resources       *k8s.Resources        `yaml:"resources,omitempty"`
+	Force           bool                `yaml:"force,omitempty"`
+	ReplicaCount    int                 `yaml:"replicaCount,omitempty"`
+	StorageCapacity string              `yaml:"storageCapacity,omitempty"`
+	StorageClass    string              `yaml:"storageClass,omitempty"`
+	NodeSelector    map[string]string   `yaml:"nodeSelector,omitempty"`
+	Tolerations     []corev1.Toleration `yaml:"tolerations,omitempty"`
+	ClusterDns      string              `yaml:"clusterDNS,omitempty"`
+	Resources       *k8s.Resources      `yaml:"resources,omitempty"`
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {

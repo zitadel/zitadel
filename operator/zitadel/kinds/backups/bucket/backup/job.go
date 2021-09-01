@@ -49,10 +49,10 @@ func getJob(
 func getJobSpecDef(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	saSecretName string,
+	backupSecretName string,
 	saSecretKey string,
-	configSecretName string,
-	configSecretKey string,
+	assetAKIDKey string,
+	assetSAKKey string,
 	backupName string,
 	command string,
 	image string,
@@ -63,45 +63,69 @@ func getJobSpecDef(
 				RestartPolicy: corev1.RestartPolicyNever,
 				NodeSelector:  nodeselector,
 				Tolerations:   tolerations,
-				Containers: []corev1.Container{
-					{},
-
-					{
-						Name:  backupName,
-						Image: image,
-						Command: []string{
-							"/bin/bash",
-							"-c",
-							command,
-						},
-						VolumeMounts: []corev1.VolumeMount{{
+				Containers: []corev1.Container{{
+					Name:  backupName,
+					Image: image,
+					Command: []string{
+						"/bin/bash",
+						"-c",
+						command,
+					},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      certsInternalSecretName,
+							MountPath: certPath,
+						}, {
 							Name:      saInternalSecretName,
 							SubPath:   saSecretKey,
 							MountPath: saSecretPath,
 						}, {
-							Name:      configInternalSecretName,
-							SubPath:   configSecretKey,
-							MountPath: configSecretPath,
-						}},
-						ImagePullPolicy: corev1.PullAlways,
-					}},
-				Volumes: []corev1.Volume{{
-					Name: saInternalSecretName,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName:  saSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+							Name:      akidInternalSecretName,
+							SubPath:   assetAKIDKey,
+							MountPath: akidSecretPath,
+						}, {
+							Name:      sakInternalSecretName,
+							SubPath:   assetSAKKey,
+							MountPath: sakSecretPath,
 						},
 					},
-				}, {
-					Name: configInternalSecretName,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName:  configSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
-						},
-					},
+					ImagePullPolicy: corev1.PullAlways,
 				}},
+				Volumes: []corev1.Volume{
+					{
+						Name: certsInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  rootSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: saInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: akidInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					}, {
+						Name: sakInternalSecretName,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName:  backupSecretName,
+								DefaultMode: helpers.PointerInt32(defaultMode),
+							},
+						},
+					},
+				},
 			},
 		},
 	}

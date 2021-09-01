@@ -127,3 +127,15 @@ func DestroyersToDestroyFunc(monitor mntr.Monitor, destroyers []DestroyFunc) Des
 		return nil
 	}
 }
+func ConfigurersToConfigureFunc(monitor mntr.Monitor, configurers []ConfigureFunc) ConfigureFunc {
+	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
+		monitor.Info("configuring...")
+		for i := range configurers {
+			if err := configurers[i](k8sClient, queried, gitops); err != nil {
+				return fmt.Errorf("error while configuring: %w", err)
+			}
+		}
+		monitor.Info("configured")
+		return nil
+	}
+}

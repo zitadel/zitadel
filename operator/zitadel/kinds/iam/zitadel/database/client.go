@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -13,7 +12,7 @@ var _ Client = (*GitOpsClient)(nil)
 var _ Client = (*CrdClient)(nil)
 
 type Client interface {
-	GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error)
+	GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, string, error)
 	DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error
 	AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error
 	ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error)
@@ -48,7 +47,7 @@ func newGit(monitor mntr.Monitor, repoURL string, repoKey string) (*git.Client, 
 	return gitClient, nil
 }
 
-func (c *GitOpsClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error) {
+func (c *GitOpsClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, string, error) {
 	return databases.GitOpsGetConnectionInfo(
 		monitor,
 		k8sClient,
@@ -66,7 +65,7 @@ func NewCrdClient(monitor mntr.Monitor) *CrdClient {
 	}
 }
 
-func (c *CrdClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error) {
+func (c *CrdClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, string, error) {
 	return databases.CrdGetConnectionInfo(
 		monitor,
 		k8sClient,

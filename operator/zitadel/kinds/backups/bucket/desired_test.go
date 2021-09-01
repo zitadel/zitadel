@@ -1,11 +1,12 @@
 package bucket
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
-	"testing"
 )
 
 const (
@@ -13,7 +14,7 @@ const (
 	cron       = "testCron"
 	bucketName = "testBucket"
 	saJson     = "testSa"
-	yamlFile   = `kind: zitadel.caos.ch/BucketBackup
+	yamlFile   = `kind: databases.caos.ch/BucketBackup
 version: v0
 spec:
     verbose: true
@@ -25,23 +26,20 @@ spec:
         value: luyAqtopzwLcaIhJj7KhWmbUsA7cQg==
 `
 
-	yamlFileWithoutSecret = `kind: zitadel.caos.ch/BucketBackup
+	yamlFileWithoutSecret = `kind: databases.caos.ch/BucketBackup
 version: v0
 spec:
     verbose: true
     cron: testCron
     bucket: testBucket
 `
-	yamlEmpty = `kind: zitadel.caos.ch/BucketBackup
+	yamlEmpty = `kind: databases.caos.ch/BucketBackup
 version: v0`
 )
 
 var (
 	desired = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "zitadel.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -54,10 +52,7 @@ var (
 		},
 	}
 	desiredWithoutSecret = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "zitadel.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -65,10 +60,7 @@ var (
 		},
 	}
 	desiredEmpty = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "zitadel.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: false,
 			Cron:    "",
@@ -80,10 +72,7 @@ var (
 	}
 
 	desiredNil = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "zitadel.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 	}
 )
 
@@ -106,7 +95,9 @@ func getDesiredTree(t *testing.T, masterkey string, desired *DesiredV0) *tree.Tr
 }
 
 func TestBucket_DesiredParse(t *testing.T) {
-	assert.Equal(t, yamlFileWithoutSecret, string(marshalYaml(t, masterkey, &desiredWithoutSecret)))
+
+	result := string(marshalYaml(t, masterkey, &desiredWithoutSecret))
+	assert.Equal(t, yamlFileWithoutSecret, result)
 
 	desiredTree := unmarshalYaml(t, masterkey, []byte(yamlFile))
 	desiredKind, err := ParseDesiredV0(desiredTree)

@@ -19,7 +19,7 @@ func ScaleDown(
 	gitops bool,
 ) (bool, error) {
 	noZitadel := false
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", version, gitops, []string{"scaledown"}), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaledown", version, gitops, []string{"scaledown"}, ""), k8sClient)(); err != nil {
 		if macherrs.IsNotFound(err) {
 			noZitadel = true
 		} else {
@@ -37,5 +37,5 @@ func ScaleUp(
 	version *string,
 	gitops bool,
 ) error {
-	return zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, gitops, []string{"scaleup"}), k8sClient)()
+	return zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbCfg, "scaleup", version, gitops, []string{"scaleup"}, ""), k8sClient)()
 }

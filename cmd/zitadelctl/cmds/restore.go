@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"errors"
+	"github.com/caos/zitadel/pkg/zitadel"
 
 	"github.com/caos/orbos/mntr"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/caos/zitadel/operator/crtlcrd"
 	"github.com/caos/zitadel/operator/crtlgitops"
 
-	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
@@ -46,13 +46,13 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 
 		list := make([]string, 0)
 		if rv.Gitops {
-			listT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
+			listT, err := zitadel.GitOpsListBackups(monitor, gitClient, k8sClient)
 			if err != nil {
 				return err
 			}
 			list = listT
 		} else {
-			listT, err := databases.CrdListBackups(monitor, k8sClient)
+			listT, err := zitadel.CrdListBackups(monitor, k8sClient)
 			if err != nil {
 				return err
 			}
