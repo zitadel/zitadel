@@ -1,7 +1,7 @@
 .head {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #ffffff20;
+  border-bottom: 1px solid #81868a30;
   flex-wrap: wrap;
   margin-bottom: 1rem;
 
@@ -37,6 +37,30 @@
     .zitadel-warning {
       font-size: 14px;
       color: rgb(201, 51, 71);
+    }
+  }
+}
+
+.privatelabel-info {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #81868a30;
+  padding: .5rem 0 1rem 0;
+
+  .setting-title {
+    font-size: 14px;
+    color: var(--grey);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .setting-desc {
+    margin: 0;
+    display: flex;
+    align-items: center;
+
+    .icon-button {
+      margin-left: .5rem;
     }
   }
 }
