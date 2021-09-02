@@ -107,6 +107,7 @@
   },
   "ACTIONS": {
     "ACTIONS":"Aktionen",
+    "RENAME":"Rename",
     "SET":"Set",
     "RESETDEFAULT":"Reset to Default",
     "RESETTO":"Reset to: ",
@@ -918,6 +919,7 @@
     "PAGES": {
       "TITLE": "Project",
       "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
+      "DELETE":"Delete Project",
       "LIST": "Projects",
       "LISTDESCRIPTION": "Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
       "DETAIL": "Detail",
@@ -982,6 +984,11 @@
       "2": "Granted"
     },
     "NAME": "Name",
+    "NAMEDIALOG": {
+      "TITLE":"Rename Project",
+      "DESCRIPTION":"Enter the new name for your project",
+      "NAME":"New Name"
+    },
     "MEMBER": {
       "TITLE": "Managers",
       "TITLEDESC": "Managers can make changes to this project based on their role.",

@@ -1,14 +1,46 @@
-.metadata-set {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: .5rem;
+.metadata-details {
+  padding-bottom: 1rem;
 
-  .first {
-    font-size: 14px;
-    color: var(--grey);
+  .actions {
+    display: flex;
+    align-items: center;
+
+    .edit {
+      font-size: 14px;
+    }
+  }
+
+  .meta-row {
+    display: flex;
+    margin-bottom: .5rem;
+    align-items: center;
+
+    .first {
+      flex: 1;
+      font-size: 13px;
+      margin-right: .5rem;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .second {
+      font-size: 13px;
+    }
+  }
+
+  .metadata-set {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: .5rem;
+
+    .first {
+      font-size: 14px;
+      color: var(--grey);
+    }
   }
 }
-
 .border-t {
   border-top: 1px solid #81868a40;
 }
@@ -19,6 +51,7 @@
 }
 
 .empty-desc {
+  margin: 0;
   font-size: 14px;
   color: var(--grey);
 }
@@ -31,7 +64,6 @@
 
 .refresh-btn {
   float: left;
-  margin: .5rem 0 .5rem 1rem;
 
   .icon {
     font-size: 1.2rem;

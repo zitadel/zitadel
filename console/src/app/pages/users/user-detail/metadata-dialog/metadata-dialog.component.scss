@@ -1,3 +1,29 @@
+.title-row {
+  display: flex;
+  align-items: center;
+
+  .title {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .ts {
+    margin: 0;
+    font-size: 14px;
+    color: var(--grey);
+  }
+
+  .icon-button {
+    .icon {
+      font-size: 1.2rem;
+    }
+  }  
+}
+
 .content {
   display: flex;
   align-items: center;
@@ -15,18 +41,6 @@
   .rm-button,
   .set-button {
     margin-top: 14px;
-  }
-}
-
-.controlrow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 400px;
-
-  .ts {
-    font-size: 14px;
-    color: var(--grey);
   }
 }
 

@@ -30,6 +30,13 @@
 
   .actions-trigger {
     margin-top: .25rem;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      margin-left: .5rem;
+      margin-right: -.5rem;
+    }
   }
 
   .warn-item{
@@ -41,6 +48,12 @@
 .locked {
   display: block;
   margin: 1rem 0;
+}
+
+.icon-button {
+  .icon {
+    font-size: 1.2rem;
+  }
 }
 
 .img-phone-email {

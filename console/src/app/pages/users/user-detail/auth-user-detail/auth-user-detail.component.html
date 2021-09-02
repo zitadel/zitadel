@@ -24,8 +24,8 @@
 
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-            <button card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
-                <mat-icon>refresh</mat-icon>
+            <button class="icon-button" card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+                <mat-icon class="icon">refresh</mat-icon>
             </button>
             <app-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" canWrite="true"
                 (editType)="openEditDialog($event)" (enteredPhoneCode)="enteredPhoneCode($event)"
@@ -34,10 +34,7 @@
             </app-contact>
         </app-card>
 
-        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
-        description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
-          <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
-        </app-card>
+        <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
 
         <app-auth-passwordless *ngIf="user" #mfaComponent></app-auth-passwordless>
 
@@ -51,6 +48,10 @@
                 [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
         </app-card>
+
+        <ng-template appHasFeature [appHasFeature]="['metadata.user']">
+          <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
+        </ng-template>
     </div>
 
     <div *ngIf="user" class="side" metainfo>
@@ -70,9 +71,7 @@
             <ng-template appHasRole [appHasRole]="['user.membership.read']">
               <app-memberships [auth]="true" [user]="user"></app-memberships>
             </ng-template>
-  
-            <cnsl-metadata [userId]="user.id"></cnsl-metadata>
-          </div>
+            </div>
         </mat-tab>
         <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
           <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" [id]="user.id">

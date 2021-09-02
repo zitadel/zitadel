@@ -107,6 +107,7 @@
   },
   "ACTIONS": {
     "ACTIONS":"Aktionen",
+    "RENAME":"Umbenennen",
     "SET":"Übernehmen",
     "RESETDEFAULT":"Auf Standard zurücksetzen",
     "RESETTO":"Zurücksetzen auf: ",
@@ -916,6 +917,7 @@
     "PAGES": {
       "TITLE": "Projekt",
       "DESCRIPTION": "Hier kannst Du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist.",
+      "DELETE":"Projekt löschen",
       "LIST": "Projekte",
       "LISTDESCRIPTION": "Hier findest Du alle Projekte, für die Du Aktionen anzeigen oder ausführen darfst. Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
       "DETAIL": "Details",
@@ -980,6 +982,11 @@
       "2": "Berechtigt"
     },
     "NAME": "Name",
+    "NAMEDIALOG": {
+      "TITLE":"Projekt umbenennen",
+      "DESCRIPTION":"Geben Sie den neuen Namen für Ihr Projekt an!",
+      "NAME":"Projektname"
+    },
     "MEMBER": {
       "TITLE": "Manager",
       "TITLEDESC": "Manager können Änderungen an diesem Projekt vornehmen, wenn sie die nötigen Rollen haben.",
