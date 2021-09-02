@@ -37,15 +37,3 @@ func (s ActionState) Valid() bool {
 func (s ActionState) Exists() bool {
 	return s != ActionStateUnspecified && s != ActionStateRemoved
 }
-
-type FlowType int32
-
-const (
-	FlowTypeUnspecified FlowType = iota
-	FlowTypeRegister
-	flowTypeCount
-)
-
-func (s FlowType) Valid() bool {
-	return s >= 0 && s < flowTypeCount
-}

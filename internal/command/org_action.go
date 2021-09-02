@@ -73,6 +73,66 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 	return writeModelToObjectDetails(&existingAction.WriteModel), nil
 }
 
+func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
+	if actionID == "" || resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-DAhk5", "Errors.Action.ActionIDMissing")
+	}
+
+	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !existingAction.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-NRmhu", "Errors.Action.NotFound")
+	}
+	if existingAction.State != domain.ActionStateActive {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Dgj92", "Errors.Action.NotActive")
+	}
+	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
+	events := []eventstore.EventPusher{
+		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
+	}
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingAction, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingAction.WriteModel), nil
+}
+
+func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
+	if actionID == "" || resourceOwner == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-BNm56", "Errors.Action.ActionIDMissing")
+	}
+
+	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !existingAction.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Aa22g", "Errors.Action.NotFound")
+	}
+	if existingAction.State != domain.ActionStateInactive {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
+	}
+	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
+	events := []eventstore.EventPusher{
+		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
+	}
+	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingAction, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingAction.WriteModel), nil
+}
+
 func (c *Commands) DeleteAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.Action.ActionIDMissing")
@@ -100,34 +160,6 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID string, resourceOw
 	return writeModelToObjectDetails(&existingAction.WriteModel), nil
 }
 
-func (c *Commands) DeleteFlow(ctx context.Context, flowType domain.FlowType, resourceOwner string) (*domain.ObjectDetails, error) {
-	if !flowType.Valid() || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfw2h", "Errors.Action.FlowTypeMissing")
-	}
-	//TODO: !
-	//existingFlow, err := c.getFlowWriteModelByID(ctx, flowType, resourceOwner)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//if !existingFlow.State.Exists() {
-	//	return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgh4h", "Errors.Flow.NotFound")
-	//}
-	//actionAgg := ActionAggregateFromWriteModel(&existingFlow.WriteModel)
-	//events := []eventstore.EventPusher{
-	//	action.NewFlowRemovedEvent(ctx, actionAgg, flowType),
-	//}
-	//pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//err = AppendAndReduce(existingFlow, pushedEvents...)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return writeModelToObjectDetails(&existingFlow.WriteModel), nil
-	return nil, nil
-}
-
 func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string, resourceOwner string) (*ActionWriteModel, error) {
 	actionWriteModel := NewActionWriteModel(actionID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
@@ -136,13 +168,3 @@ func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string,
 	}
 	return actionWriteModel, nil
 }
-
-//TODO: !
-//func (c *Commands) getFlowWriteModelByID(ctx context.Context, flowType string, resourceOwner string) (*FlowWriteModel, error) {
-//	flowWriteModel := NewFlowWriteModel(flowType, resourceOwner)
-//	err := c.eventstore.FilterToQueryReducer(ctx, flowWriteModel)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return flowWriteModel, nil
-//}

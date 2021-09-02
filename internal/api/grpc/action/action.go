@@ -13,3 +13,12 @@ func FlowTypeToDomain(flowType action_pb.FlowType) domain.FlowType {
 		return domain.FlowTypeUnspecified
 	}
 }
+
+func TriggerTypeToDomain(flowType action_pb.TriggerType) domain.TriggerType {
+	switch flowType { //TODO: converter
+	case action_pb.TriggerType_TRIGGER_TYPE_PRE_REGISTER:
+		return domain.TriggerTypePreRegister
+	default:
+		return domain.TriggerTypeUnspecified
+	}
+}

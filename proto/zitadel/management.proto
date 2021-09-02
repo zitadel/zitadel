@@ -2713,6 +2713,20 @@ service ManagementService {
         };
     }
 
+    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_deactivate"
+            body: "*"
+        };
+    }
+
+    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_reactivate"
+            body: "*"
+        };
+    }
+
     rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
         option (google.api.http) = {
             delete: "/actions/{id}"
@@ -5158,6 +5172,22 @@ message DeleteActionRequest {
 }
 
 message DeleteActionResponse {}
+
+message DeactivateActionRequest {
+    string id = 1;
+}
+
+message DeactivateActionResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ReactivateActionRequest {
+    string id = 1;
+}
+
+message ReactivateActionResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 message ListFlowsRequest {
     //list limitations and ordering

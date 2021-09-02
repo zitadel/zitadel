@@ -2707,6 +2707,30 @@ Change OIDC identity provider configuration of the organisation
     PUT: /actions/{id}
 
 
+### DeactivateAction
+
+> **rpc** DeactivateAction([DeactivateActionRequest](#deactivateactionrequest))
+[DeactivateActionResponse](#deactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_deactivate
+
+
+### ReactivateAction
+
+> **rpc** ReactivateAction([ReactivateActionRequest](#reactivateactionrequest))
+[ReactivateActionResponse](#reactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_reactivate
+
+
 ### DeleteAction
 
 > **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
@@ -3649,6 +3673,28 @@ This is an empty request
 
 
 ### CreateFlowResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### DeactivateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### DeactivateActionResponse
 
 
 
@@ -5804,6 +5850,28 @@ This is an empty request
 
 
 ### LockUserResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ReactivateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### ReactivateActionResponse
 
 
 
