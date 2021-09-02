@@ -54,7 +54,7 @@
     "@angular/language-service": "~12.2.4",
     "@types/jasmine": "~3.8.2",
     "@types/jasminewd2": "~2.0.10",
-    "@types/node": "^15.12.1",
+    "@types/node": "^16.7.6",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.7.1",
     "jasmine-spec-reporter": "~7.0.0",
