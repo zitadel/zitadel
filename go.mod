@@ -3,7 +3,8 @@ module github.com/caos/zitadel
 go 1.16
 
 require (
-	cloud.google.com/go/storage v1.16.0
+	cloud.google.com/go/storage v1.16.1
+	cloud.google.com/go/trace v0.1.0 // indirect
 	github.com/BurntSushi/toml v0.4.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
@@ -15,14 +16,14 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.15.7
+	github.com/caos/oidc v0.15.8
 	github.com/caos/orbos v1.5.14-0.20210803090517-905668247c09
 	github.com/cockroachdb/cockroach-go/v2 v2.1.1
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
 	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/golang/glog v0.0.0-20210429001901-424d2337a529
+	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/csrf v1.7.1
@@ -42,7 +43,7 @@ require (
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
-	github.com/minio/minio-go/v7 v7.0.12
+	github.com/minio/minio-go/v7 v7.0.13
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
@@ -66,21 +67,21 @@ require (
 	go.opentelemetry.io/otel/sdk/export/metric v0.22.0
 	go.opentelemetry.io/otel/sdk/metric v0.22.0
 	go.opentelemetry.io/otel/trace v1.0.0-RC2
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/oauth2 v0.0.0-20210805134026-6f1e6394065a
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/text v0.3.6
+	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.5
-	google.golang.org/api v0.52.0
-	google.golang.org/genproto v0.0.0-20210805201207-89edb61ffb67
-	google.golang.org/grpc v1.39.1
+	google.golang.org/api v0.56.0
+	google.golang.org/genproto v0.0.0-20210828152312-66f60bf46e71
+	google.golang.org/grpc v1.40.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
-	k8s.io/api v0.22.0
-	k8s.io/apiextensions-apiserver v0.22.0
-	k8s.io/apimachinery v0.22.0
-	k8s.io/client-go v0.22.0
-	sigs.k8s.io/controller-runtime v0.9.5
+	k8s.io/api v0.22.1
+	k8s.io/apiextensions-apiserver v0.22.1
+	k8s.io/apimachinery v0.22.1
+	k8s.io/client-go v0.22.1
+	sigs.k8s.io/controller-runtime v0.10.0
 )
