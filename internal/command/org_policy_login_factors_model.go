@@ -34,6 +34,8 @@ func (wm *OrgSecondFactorWriteModel) AppendEvents(events ...eventstore.EventRead
 			if wm.MFAType == e.MFAType {
 				wm.WriteModel.AppendEvents(&e.SecondFactorRemovedEvent)
 			}
+		case *org.LoginPolicyRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.LoginPolicyRemovedEvent)
 		}
 	}
 }
@@ -50,7 +52,8 @@ func (wm *OrgSecondFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.WriteModel.AggregateID).
 		EventTypes(
 			org.LoginPolicySecondFactorAddedEventType,
-			org.LoginPolicySecondFactorRemovedEventType).
+			org.LoginPolicySecondFactorRemovedEventType,
+			org.LoginPolicyRemovedEventType).
 		Builder()
 }
 
@@ -81,6 +84,8 @@ func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReade
 			if wm.MFAType == e.MFAType {
 				wm.WriteModel.AppendEvents(&e.MultiFactorRemovedEvent)
 			}
+		case *org.LoginPolicyRemovedEvent:
+			wm.WriteModel.AppendEvents(&e.LoginPolicyRemovedEvent)
 		}
 	}
 }
@@ -97,7 +102,8 @@ func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.WriteModel.AggregateID).
 		EventTypes(
 			org.LoginPolicyMultiFactorAddedEventType,
-			org.LoginPolicyMultiFactorRemovedEventType).
+			org.LoginPolicyMultiFactorRemovedEventType,
+			org.LoginPolicyRemovedEventType).
 		Builder()
 }
 
@@ -150,6 +156,13 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Reduce() error {
 		case *org.LoginPolicyMultiFactorRemovedEvent:
 			wm.ensureMultiFactor(e.MFAType)
 			wm.MultiFactors[e.MFAType].Org = domain.FactorStateRemoved
+		case *org.LoginPolicyRemovedEvent:
+			for factorType, _ := range wm.SecondFactors {
+				wm.SecondFactors[factorType].Org = domain.FactorStateRemoved
+			}
+			for factorType, _ := range wm.MultiFactors {
+				wm.MultiFactors[factorType].Org = domain.FactorStateRemoved
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -188,6 +201,7 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 			org.LoginPolicySecondFactorRemovedEventType,
 			org.LoginPolicyMultiFactorAddedEventType,
 			org.LoginPolicyMultiFactorRemovedEventType,
+			org.LoginPolicyRemovedEventType,
 		).
 		Builder()
 }
