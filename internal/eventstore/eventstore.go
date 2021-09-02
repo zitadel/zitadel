@@ -229,3 +229,7 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 		return repository.UniqueConstraintAdd
 	}
 }
+
+func (es *Eventstore) Step20(ctx context.Context, latestSequence uint64) error {
+	return es.repo.Step20(ctx, latestSequence)
+}
