@@ -106,6 +106,7 @@
     }
   },
   "ACTIONS": {
+    "ACTIONS":"Aktionen",
     "SET":"Übernehmen",
     "RESETDEFAULT":"Auf Standard zurücksetzen",
     "RESETTO":"Zurücksetzen auf: ",
@@ -174,9 +175,14 @@
       "REACTIVATE": "Reaktivieren",
       "DEACTIVATE": "Deaktivieren",
       "FILTER": "Filter",
+      "STATE":"Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
       "LOCKEDDESCRIPTION":"Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
+    },
+    "DETAILS": {
+      "DATECREATED":"Erstellt",
+      "DATECHANGED":"Geändert"
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",

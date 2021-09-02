@@ -1,8 +1,7 @@
-import { Component, Inject, Injector, Type } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -15,26 +14,15 @@ import { ToastService } from 'src/app/services/toast.service';
 export class MetadataDialogComponent {
   public metadata: Partial<Metadata.AsObject>[] = [];
   public injData: any = {};
-  private service!: GrpcAuthService | ManagementService;
   public loading: boolean = true;
   public ts!: Timestamp.AsObject | undefined;
 
   constructor(
-    private injector: Injector,
+    private service: ManagementService,
     private toast: ToastService,
     public dialogRef: MatDialogRef<MetadataDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) {
-
     this.injData = data;
-    switch (this.data.serviceType) {
-      case 'MGMT':
-        this.service = this.injector.get(ManagementService as Type<ManagementService>);
-        break;
-      case 'AUTH':
-        this.service = this.injector.get(GrpcAuthService as Type<GrpcAuthService>);
-        break;
-    }
-
     this.load();
   }
 
@@ -53,10 +41,10 @@ export class MetadataDialogComponent {
     });
   }
 
-  public loadMetadata(): Promise<any> {
+  public loadMetadata(): Promise<void> {
     this.loading = true;
-    if (this.data.serviceType === 'MGMT' && this.injData.userId) {
-      return (this.service as ManagementService).listUserMetadata(this.injData.userId).then(resp => {
+    if (this.injData.userId) {
+      return this.service.listUserMetadata(this.injData.userId).then(resp => {
         this.metadata = resp.resultList.map(md => {
           return {
             key: md.key,
@@ -66,15 +54,7 @@ export class MetadataDialogComponent {
         this.ts = resp.details?.viewTimestamp;
       });
     } else {
-      return (this.service as GrpcAuthService).listMyMetadata().then(resp => {
-        this.metadata = resp.resultList.map(md => {
-          return {
-            key: md.key,
-            value: atob(md.value as string),
-          };
-        });
-        this.ts = resp.details?.viewTimestamp;
-      });
+      return Promise.reject();
     }
   }
 
@@ -112,42 +92,22 @@ export class MetadataDialogComponent {
   public setMetadata(key: string, value: string): void {
     console.log(key, value, this.injData.userId);
     if (key && value) {
-      switch (this.injData.serviceType) {
-        case 'MGMT': (this.service as ManagementService).setUserMetadata(key, btoa(value), this.injData.userId)
-          .then(() => {
-            this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-          break;
-        case 'AUTH': (this.service as GrpcAuthService).setMyMetadata(key, btoa(value))
-          .then(() => {
-            this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-          break;
-      }
+      this.service.setUserMetadata(key, btoa(value), this.injData.userId)
+        .then(() => {
+          this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
+        }).catch(error => {
+          this.toast.showError(error);
+        });
     }
   }
 
-  public removeMetadata(key: string): Promise<any> {
-    switch (this.injData.serviceType) {
-      case 'MGMT': return (this.service as ManagementService).removeUserMetadata(key, this.injData.userId)
-        .then(() => {
-          this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-      case 'AUTH': return (this.service as GrpcAuthService).removeMyMetadata(key)
-        .then(() => {
-          this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-      default:
-        return Promise.reject();
-    }
+  public removeMetadata(key: string): Promise<void> {
+    return this.service.removeUserMetadata(key, this.injData.userId)
+      .then((resp) => {
+        this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
   }
 
   closeDialog(): void {

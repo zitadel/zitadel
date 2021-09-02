@@ -1,29 +1,40 @@
 .head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  padding-bottom: .5rem;
+  padding-bottom: 2rem;
 
   a {
     display: block;
     margin-right: 2rem;
   }
 
-  h1 {
-    margin: 0;
-    margin-right: 1rem;
+  .head-row {
+    display: flex;
+    flex-direction: column;
+
+    h1 {
+      margin: 0;
+      margin-right: 1rem;
+    }
+
+    p {
+      margin: .5rem 0;
+      color: var(--grey);
+    }
   }
 
   .fill-space {
     flex: 1;
   }
 
-  .unlock-button {
-    margin-left: .5rem;
+  .actions-trigger {
+    margin-top: .25rem;
   }
 
-  .state-button {
-    margin-left: .5rem;
+  .warn-item{
+    color: #620e0e !important;
+    background-color: #ffc1c1 !important;
   }
 }
 

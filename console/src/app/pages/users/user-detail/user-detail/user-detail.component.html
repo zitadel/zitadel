@@ -4,14 +4,16 @@
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{user.human ? user.human?.profile?.displayName : user.machine?.name}}</h1>
-
-            <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
+            <div class="head-row">
+              <h1>{{user.human ? user.human?.profile?.displayName : user.machine?.name}}</h1>
+              <p *ngIf="user?.preferredLoginName">{{user?.preferredLoginName}}</p>
+            </div>
+            <!-- <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
                 <button mat-icon-button color="warn" matTooltip="{{'USER.PAGES.DELETE' | translate}}"
                     (click)="deleteUser()"><i class="las la-trash"></i></button>
-            </ng-template>
+            </ng-template> -->
 
-            <span class="fill-space"></span>
+            <!-- <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
               <button class="unlock-button" mat-stroked-button color="warn"
@@ -19,13 +21,25 @@
                   (click)="unlockUser()">{{'USER.PAGES.UNLOCK' |
                   translate}}</button>
          
-                <button class="state-button" mat-stroked-button color="warn"
-                    *ngIf="user?.state !== UserState.USER_STATE_INACTIVE"
-                    (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
-                    translate}}</button>
-                <button class="state-button" mat-stroked-button color="warn"
-                    *ngIf="user?.state == UserState.USER_STATE_INACTIVE"
-                    (click)="changeState(UserState.USER_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
+                
+            </ng-template> -->
+
+            <span class="fill-space"></span>
+            <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
+              <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">{{'ACTIONS.ACTIONS' | translate}}</button>
+              <mat-menu #actions="matMenu" xPosition="before">
+                  <button mat-menu-item
+                        *ngIf="user?.state !== UserState.USER_STATE_INACTIVE"
+                        (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
+                        translate}}</button>
+                  <button mat-menu-item
+                      *ngIf="user?.state == UserState.USER_STATE_INACTIVE"
+                      (click)="changeState(UserState.USER_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
+                <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
+                  <button mat-menu-item matTooltip="{{'USER.PAGES.DELETE' | translate}}"
+                      (click)="deleteUser()"><span [style.color]="'var(--warn)'">{{'USER.PAGES.DELETE' | translate}}</span></button>
+                </ng-template>
+              </mat-menu>
             </ng-template>
         </div>
 
@@ -34,19 +48,7 @@
         <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" type="WARN">{{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
-        <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
-            description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
-            <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
-                <span>{{login}} </span>
-                <button color="primary" [disabled]="copied == login"
-                    [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
-                    <i *ngIf="copied != login" class="las la-clipboard"></i>
-                    <i *ngIf="copied == login" class="las la-clipboard-check"></i>
-
-                </button>
-            </div>
-        </app-card>
+        <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
 
         <ng-template appHasRole [appHasRole]="['user.read$', 'user.read:'+user?.id]">
             <app-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
@@ -116,7 +118,7 @@
             <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
         </div>
         <div class="meta-row">
-            <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
+            <span class="first">{{'USER.PAGES.STATE' | translate}}</span>
             <span *ngIf="user && user.state !== undefined" class="state"
                 [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">{{'USER.DATA.STATE'+user.state
                 | translate}}</span>

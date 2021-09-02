@@ -1,7 +1,7 @@
 <app-meta-layout>
     <div class="max-width-container">
         <div class="header-row">
-            <div>
+            <div class="text">
                 <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
                 <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
             </div>
@@ -14,18 +14,7 @@
 
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
-        <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
-            description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
-            <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
-                <span>{{login}}</span>
-                <button color="primary" [disabled]="copied == login"
-                    [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
-                    <i *ngIf="copied != login" class="las la-clipboard"></i>
-                    <i *ngIf="copied == login" class="las la-clipboard-check"></i>
-                </button>
-            </div>
-        </app-card>
+        <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
 
         <app-card *ngIf="user && user.human?.profile" class=" app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
             <app-detail-form [showEditImage]="true" [preferredLoginName]="user.preferredLoginName" [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
@@ -82,7 +71,7 @@
               <app-memberships [auth]="true" [user]="user"></app-memberships>
             </ng-template>
   
-            <cnsl-metadata serviceType="AUTH"></cnsl-metadata>
+            <cnsl-metadata [userId]="user.id"></cnsl-metadata>
           </div>
         </mat-tab>
         <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">

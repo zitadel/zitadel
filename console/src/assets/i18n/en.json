@@ -106,6 +106,7 @@
     }
   },
   "ACTIONS": {
+    "ACTIONS":"Aktionen",
     "SET":"Set",
     "RESETDEFAULT":"Reset to Default",
     "RESETTO":"Reset to: ",
@@ -174,9 +175,14 @@
       "REACTIVATE": "Reactivate",
       "DEACTIVATE": "Deactivate",
       "FILTER": "Filter",
+      "STATE":"Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
       "LOCKEDDESCRIPTION":"This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
+    },
+    "DETAILS": {
+      "DATECREATED":"Created",
+      "DATECHANGED":"Changed"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",

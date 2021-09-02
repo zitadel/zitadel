@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
@@ -33,6 +34,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { HasFeatureModule } from '../../../directives/has-feature/has-feature.module';
+import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
 import {
@@ -106,7 +108,9 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     HasRoleModule,
     TranslateModule,
     MatTableModule,
+    InfoRowModule,
     PaginatorModule,
+    MatMenuModule,
     SharedModule,
     RefreshTableModule,
     CopyToClipboardModule,

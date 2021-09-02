@@ -1,0 +1,51 @@
+.info-row {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -0.5rem;
+
+  @media only screen and (min-width: 500px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    margin: .5rem .5rem;
+    flex: 1;
+    align-items: flex-start;
+    box-sizing: border-box;
+
+    &:not(.login-names) {
+      min-width: 100px;
+    }
+
+    .title {
+      font-size: 14px;
+      color: var(--grey);
+      margin: 0;
+    }
+
+    .desc {
+      margin: .5rem 0;
+      font-size: 14px;
+      padding: 2px 0;
+    }
+
+    .login-name-row {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      align-items: stretch;
+
+      button {
+        transition: opacity .15s ease-in-out;
+        background-color: #8795a110;
+        border: 1px solid #8795a160;
+        border-radius: 4px;
+        padding: .25rem 1rem;
+        margin: .5rem 0;
+      }
+    }
+  }
+}

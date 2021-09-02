@@ -12,12 +12,8 @@ import {
   AddMyPasswordlessLinkResponse,
   AddMyPasswordlessRequest,
   AddMyPasswordlessResponse,
-  BulkSetMyMetadataRequest,
-  BulkSetMyMetadataResponse,
   GetMyEmailRequest,
   GetMyEmailResponse,
-  GetMyMetadataRequest,
-  GetMyMetadataResponse,
   GetMyPasswordComplexityPolicyRequest,
   GetMyPasswordComplexityPolicyResponse,
   GetMyPhoneRequest,
@@ -32,8 +28,6 @@ import {
   ListMyLinkedIDPsResponse,
   ListMyMembershipsRequest,
   ListMyMembershipsResponse,
-  ListMyMetadataRequest,
-  ListMyMetadataResponse,
   ListMyPasswordlessRequest,
   ListMyPasswordlessResponse,
   ListMyProjectOrgsRequest,
@@ -56,8 +50,6 @@ import {
   RemoveMyAvatarResponse,
   RemoveMyLinkedIDPRequest,
   RemoveMyLinkedIDPResponse,
-  RemoveMyMetadataRequest,
-  RemoveMyMetadataResponse,
   RemoveMyPasswordlessRequest,
   RemoveMyPasswordlessResponse,
   RemoveMyPhoneRequest,
@@ -70,8 +62,6 @@ import {
   SendMyPasswordlessLinkResponse,
   SetMyEmailRequest,
   SetMyEmailResponse,
-  SetMyMetadataRequest,
-  SetMyMetadataResponse,
   SetMyPhoneRequest,
   SetMyPhoneResponse,
   UpdateMyPasswordRequest,
@@ -88,7 +78,6 @@ import {
   VerifyMyPhoneResponse,
 } from '../proto/generated/zitadel/auth_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
-import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
@@ -293,49 +282,6 @@ export class GrpcAuthService {
     return this.grpcService.auth.getMyUser(
       new GetMyUserRequest(), null,
     ).then(resp => resp.toObject());
-  }
-
-  public listMyMetadata(offset?: number, limit?: number, queryList?: MetadataQuery[]):
-    Promise<ListMyMetadataResponse.AsObject> {
-    const req = new ListMyMetadataRequest();
-    const metadata = new ListQuery();
-    if (offset) {
-      metadata.setOffset(offset);
-    }
-    if (limit) {
-      metadata.setLimit(limit);
-    }
-    if (queryList) {
-      req.setQueriesList(queryList);
-    }
-    return this.grpcService.auth.listMyMetadata(req, null).then(resp => resp.toObject());
-  }
-
-  public getMyMetadata(key?: string): Promise<GetMyMetadataResponse.AsObject> {
-    const req = new GetMyMetadataRequest();
-    if (key) {
-      req.setKey(key);
-    }
-    return this.grpcService.auth.getMyMetadata(req, null).then(resp => resp.toObject());
-  }
-
-  public setMyMetadata(key: string, value: string): Promise<SetMyMetadataResponse.AsObject> {
-    const req = new SetMyMetadataRequest();
-    req.setKey(key);
-    req.setValue(value);
-    return this.grpcService.auth.setMyMetadata(req, null).then(resp => resp.toObject());
-  }
-
-  public bulkSetMyMetadata(list: BulkSetMyMetadataRequest.Metadata[]): Promise<BulkSetMyMetadataResponse.AsObject> {
-    const req = new BulkSetMyMetadataRequest();
-    req.setMetadataList(list);
-    return this.grpcService.auth.bulkSetMyMetadata(req, null).then(resp => resp.toObject());
-  }
-
-  public removeMyMetadata(key: string): Promise<RemoveMyMetadataResponse.AsObject> {
-    const req = new RemoveMyMetadataRequest();
-    req.setKey(key);
-    return this.grpcService.auth.removeMyMetadata(req, null).then(resp => resp.toObject());
   }
 
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse.AsObject> {

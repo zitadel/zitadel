@@ -5,41 +5,20 @@
   margin-bottom: 2rem;
   flex-wrap: wrap;
 
-  .h1 {
-    margin-top: 0;
-  }
+  .text {
+    flex: 1;
+    .h1 {
+      margin-top: 0;
+    }
 
-  .sub {
-    color: var(--grey);
-    max-width: 500px;
+    .sub {
+      color: var(--grey);
+      max-width: 500px;
+    }
   }
 
   .theme {
     min-width: 250px;
-  }
-}
-
-.login-name-row {
-  display: flex;
-  align-items: center;
-
-  button {
-    transition: opacity .15s ease-in-out;
-    visibility: hidden;
-    opacity: 0;
-
-    &[disabled] {
-      visibility: visible;
-      color: white;
-      opacity: 1;
-    }
-  }
-
-  &:hover {
-    button {
-      visibility: visible;
-      opacity: 1;
-    }
   }
 }
 

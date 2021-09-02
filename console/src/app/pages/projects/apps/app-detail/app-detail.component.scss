@@ -236,7 +236,7 @@
 
   .error {
     font-size: 13px;
-    color: #f44336;
+    color: var(--warn);
     margin: 0 .5rem 1.5rem .5rem;
   }
 }
