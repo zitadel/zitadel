@@ -549,6 +549,8 @@ func (repo *testRepo) Health(ctx context.Context) error {
 	return nil
 }
 
+func (repo *testRepo) Step20(context.Context, uint64) error { return nil }
+
 func (repo *testRepo) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	if repo.err != nil {
 		return repo.err
