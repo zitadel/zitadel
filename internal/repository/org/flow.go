@@ -22,7 +22,7 @@ func NewTriggerActionsSetEvent(
 	aggregate *eventstore.Aggregate,
 	flowType domain.FlowType,
 	triggerType domain.TriggerType,
-	actionIDs map[int32]string,
+	actionIDs []string,
 ) *TriggerActionsSetEvent {
 	return &TriggerActionsSetEvent{
 		TriggerActionsSetEvent: *flow.NewTriggerActionsSetEvent(

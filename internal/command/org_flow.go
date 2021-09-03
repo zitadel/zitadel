@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -36,7 +37,7 @@ func (c *Commands) DeleteFlow(ctx context.Context, flowType domain.FlowType, res
 	return nil, nil
 }
 
-func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, actionIDs map[int32]string, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, actionIDs []string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if !flowType.Valid() || !triggerType.Valid() || resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfhj5", "Errors.Flow.FlowTypeMissing")
 	}
@@ -50,7 +51,16 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 	if !existingFlow.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgh4h", "Errors.Flow.NotFound")
 	}
-	//TODO: check if actions exist
+	if reflect.DeepEqual(existingFlow.Triggers[triggerType], actionIDs) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Nfh52", "Errors.Flow.NoChanges")
+	}
+	exists, err := c.actionsIDsExist(ctx, actionIDs, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dg422", "Errors.Flow.ActionIDsNotExist")
+	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewTriggerActionsSetEvent(ctx, orgAgg, flowType, triggerType, actionIDs))
 	if err != nil {
@@ -70,4 +80,10 @@ func (c *Commands) getOrgFlowWriteModelByType(ctx context.Context, flowType doma
 		return nil, err
 	}
 	return flowWriteModel, nil
+}
+
+func (c *Commands) actionsIDsExist(ctx context.Context, ids []string, resourceOwner string) (bool, error) {
+	actionIDsModel := NewActionsExistModel(ids, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, actionIDsModel)
+	return len(actionIDsModel.actionIDs) == len(actionIDsModel.checkedIDs), err
 }

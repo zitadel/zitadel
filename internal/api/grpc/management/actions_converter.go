@@ -26,3 +26,24 @@ func updateActionRequestToDomain(req *mgmt_pb.UpdateActionRequest) *domain.Actio
 		AllowedToFail: req.AllowedToFail,
 	}
 }
+
+func listActionsToQuery(req *mgmt_pb.ListActionsRequest) *interface{} {
+	//offset, limit, asc := object.ListQueryToModel(req.Query)
+	//return &iam_model.IDPConfigSearchRequest{
+	//	Offset:        offset,
+	//	Limit:         limit,
+	//	Asc:           asc,
+	//	SortingColumn: action_grpc.ActionFieldNameToDomain(req.SortingColumn),
+	//	Queries:       actionQueries(req.Queries),
+	//}
+	return nil
+}
+
+//func actionQueries(queries []*mgmt_pb.ActionQuery) {
+//	for i, query := range queries {
+//		switch query.Query {
+//		case *action_pb.ActionIDQuery:
+//
+//		}
+//	}
+//}

@@ -38,7 +38,7 @@ type TriggerActionsSetEvent struct {
 
 	FlowType    domain.FlowType
 	TriggerType domain.TriggerType
-	ActionIDs   map[int32]string
+	ActionIDs   []string
 }
 
 func (e *TriggerActionsSetEvent) Data() interface{} {
@@ -53,7 +53,7 @@ func NewTriggerActionsSetEvent(
 	base *eventstore.BaseEvent,
 	flowType domain.FlowType,
 	triggerType domain.TriggerType,
-	actionIDs map[int32]string,
+	actionIDs []string,
 ) *TriggerActionsSetEvent {
 	return &TriggerActionsSetEvent{
 		BaseEvent:   *base,

@@ -76,5 +76,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(IDPOIDCConfigAddedEventType, IDPOIDCConfigAddedEventMapper).
 		RegisterFilterEventMapper(IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(FeaturesSetEventType, FeaturesSetEventMapper).
-		RegisterFilterEventMapper(FeaturesRemovedEventType, FeaturesRemovedEventMapper)
+		RegisterFilterEventMapper(FeaturesRemovedEventType, FeaturesRemovedEventMapper).
+		RegisterFilterEventMapper(TriggerActionsSetEventType, TriggerActionsSetEventMapper)
 }

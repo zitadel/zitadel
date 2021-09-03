@@ -102,3 +102,49 @@ func (wm *ActionWriteModel) NewChangedEvent(
 func ActionAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, action.AggregateType, action.AggregateVersion)
 }
+
+type ActionExistsModel struct {
+	eventstore.WriteModel
+
+	actionIDs  []string
+	checkedIDs []string
+}
+
+func NewActionsExistModel(actionIDs []string, resourceOwner string) *ActionExistsModel {
+	return &ActionExistsModel{
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: resourceOwner,
+		},
+		actionIDs: actionIDs,
+	}
+}
+
+func (wm *ActionExistsModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *action.AddedEvent:
+			wm.checkedIDs = append(wm.checkedIDs, e.Aggregate().ID)
+		case *action.RemovedEvent:
+			for i := len(wm.checkedIDs) - 1; i >= 0; i-- {
+				if wm.checkedIDs[i] == e.Aggregate().ID {
+					wm.checkedIDs[i] = wm.checkedIDs[len(wm.checkedIDs)-1]
+					wm.checkedIDs[len(wm.checkedIDs)-1] = ""
+					wm.checkedIDs = wm.checkedIDs[:len(wm.checkedIDs)-1]
+					break
+				}
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ActionExistsModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(action.AggregateType).
+		AggregateIDs(wm.actionIDs...).
+		EventTypes(action.AddedEventType,
+			action.RemovedEventType).
+		Builder()
+}

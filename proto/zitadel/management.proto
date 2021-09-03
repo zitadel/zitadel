@@ -2691,11 +2691,19 @@ service ManagementService {
             post: "/actions/_search"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.read"
+        };
     }
 
     rpc GetAction(GetActionRequest) returns (GetActionResponse) {
         option (google.api.http) = {
             get: "/actions/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.read"
         };
     }
 
@@ -2704,12 +2712,20 @@ service ManagementService {
             post: "/actions"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+        };
     }
 
     rpc UpdateAction(UpdateActionRequest) returns (UpdateActionResponse) {
         option (google.api.http) = {
             put: "/actions/{id}"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
         };
     }
 
@@ -2718,12 +2734,20 @@ service ManagementService {
             post: "/actions/{id}/_deactivate"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+        };
     }
 
     rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
         option (google.api.http) = {
             post: "/actions/{id}/_reactivate"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
         };
     }
 
@@ -2732,12 +2756,20 @@ service ManagementService {
             delete: "/actions/{id}"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.delete"
+        };
     }
 
     rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {
         option (google.api.http) = {
             post: "/flows/_search"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
         };
     }
 
@@ -2746,11 +2778,19 @@ service ManagementService {
             post: "/flows"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.write"
+        };
     }
 
     rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
         option (google.api.http) = {
             get: "/flows/{type}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
         };
     }
 
@@ -2758,12 +2798,20 @@ service ManagementService {
         option (google.api.http) = {
             delete: "/flows/{type}"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.delete"
+        };
     }
 
     rpc SetTriggerActions(SetTriggerActionsRequest) returns (SetTriggerActionsResponse) {
         option (google.api.http) = {
             post: "/flows/{flow_type}/trigger/{trigger_type}"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.write"
         };
     }
 }
@@ -5238,7 +5286,7 @@ message DeleteFlowResponse {}
 message SetTriggerActionsRequest {
     zitadel.action.v1.FlowType flow_type = 1;
     zitadel.action.v1.TriggerType trigger_type = 2;
-    map<int32, string> action_ids = 3;
+    repeated string action_ids = 3;
 }
 
 message SetTriggerActionsResponse {

@@ -7358,19 +7358,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | flow_type |  zitadel.action.v1.FlowType | - |  |
 | trigger_type |  zitadel.action.v1.TriggerType | - |  |
-| action_ids | map SetTriggerActionsRequest.ActionIdsEntry | - |  |
-
-
-
-
-### SetTriggerActionsRequest.ActionIdsEntry
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| key |  int32 | - |  |
-| value |  string | - |  |
+| action_ids | repeated string | - |  |
 
 
 

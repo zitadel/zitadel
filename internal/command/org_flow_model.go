@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/flow"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -35,7 +34,6 @@ func (wm *OrgFlowWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(org.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		EventTypes(flow.TriggerActionsSetEventType).
+		EventTypes(org.TriggerActionsSetEventType).
 		Builder()
 }

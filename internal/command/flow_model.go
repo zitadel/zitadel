@@ -11,6 +11,7 @@ type FlowWriteModel struct {
 
 	FlowType domain.FlowType
 	State    domain.FlowState
+	Triggers map[domain.TriggerType][]string
 }
 
 func NewFlowWriteModel(flowType domain.FlowType, resourceOwner string) *FlowWriteModel {
@@ -20,6 +21,8 @@ func NewFlowWriteModel(flowType domain.FlowType, resourceOwner string) *FlowWrit
 			ResourceOwner: resourceOwner,
 		},
 		FlowType: flowType,
+		State:    domain.FlowStateActive, //TODO: ?
+		Triggers: make(map[domain.TriggerType][]string),
 	}
 }
 
@@ -27,7 +30,7 @@ func (wm *FlowWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *flow.TriggerActionsSetEvent:
-			_ = e
+			wm.Triggers[e.TriggerType] = e.ActionIDs
 		}
 	}
 	return wm.WriteModel.Reduce()

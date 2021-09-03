@@ -9,6 +9,8 @@ import (
 )
 
 func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsRequest) (*mgmt_pb.ListActionsResponse, error) {
+	//listActionsToQuery(req)
+	//actions, err := s.query.SearchActions(ctx, )
 	return nil, nil
 }
 
