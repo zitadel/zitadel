@@ -521,6 +521,9 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 			privateLabelingOrgID = request.UserOrgID
 		}
 	}
+	if request.RequestedOrgID != "" {
+		privateLabelingOrgID = request.RequestedOrgID
+	}
 	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
 		return err

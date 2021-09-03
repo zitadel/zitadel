@@ -97,30 +97,6 @@ service AuthService {
         };
     }
 
-    // Sets a user metadata by key to the authorized user
-    rpc SetMyMetadata(SetMyMetadataRequest) returns (SetMyMetadataResponse) {
-        option (google.api.http) = {
-            post: "/users/me/metadata/{key}"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    // Set a list of user metadata to the authorized user
-    rpc BulkSetMyMetadata(BulkSetMyMetadataRequest) returns (BulkSetMyMetadataResponse) {
-        option (google.api.http) = {
-            post: "/users/me/metadata/_bulk"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
     // Returns the user metadata of the authorized user
     rpc ListMyMetadata(ListMyMetadataRequest) returns (ListMyMetadataResponse) {
         option (google.api.http) = {
@@ -137,29 +113,6 @@ service AuthService {
     rpc GetMyMetadata(GetMyMetadataRequest) returns (GetMyMetadataResponse) {
         option (google.api.http) = {
             get: "/users/me/metadata/{key}"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    // Removes a user metadata by key to the authorized user
-    rpc RemoveMyMetadata(RemoveMyMetadataRequest) returns (RemoveMyMetadataResponse) {
-        option (google.api.http) = {
-            delete: "/users/me/metadata/{key}"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
-    // Set a list of user metadata to the authorized user
-    rpc BulkRemoveMyMetadata(BulkRemoveMyMetadataRequest) returns (BulkRemoveMyMetadataResponse) {
-        option (google.api.http) = {
-            delete: "/users/me/metadata/_bulk"
-            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
