@@ -22,6 +22,6 @@ import { NameDialogComponent } from './name-dialog.component';
   ],
   exports: [
     NameDialogComponent,
-  ]
+  ],
 })
 export class NameDialogModule { }

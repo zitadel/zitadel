@@ -164,7 +164,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         name: this.app.name,
         titleKey: 'APP.NAMEDIALOG.TITLE',
         descKey: 'APP.NAMEDIALOG.DESCRIPTION',
-        labelKey: 'APP.NAMEDIALOG.NAME'
+        labelKey: 'APP.NAMEDIALOG.NAME',
       },
       width: '400px',
     });

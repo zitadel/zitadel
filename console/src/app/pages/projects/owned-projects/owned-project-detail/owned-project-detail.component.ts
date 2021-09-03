@@ -80,7 +80,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         name: this.project.name,
         titleKey: 'PROJECT.NAMEDIALOG.TITLE',
         descKey: 'PROJECT.NAMEDIALOG.DESCRIPTION',
-        labelKey: 'PROJECT.NAMEDIALOG.NAME'
+        labelKey: 'PROJECT.NAMEDIALOG.NAME',
       },
       width: '400px',
     });
