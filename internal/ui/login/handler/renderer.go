@@ -426,6 +426,9 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 
 func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
 	privateLabelingOrgID := domain.IAMID
+	if authReq == nil {
+		return privateLabelingOrgID
+	}
 	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
 		privateLabelingOrgID = authReq.ApplicationResourceOwner
 	}

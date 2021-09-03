@@ -213,7 +213,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(&testEvent{
+					*NewNoOpStatement(&testEvent{
 						aggregateType:    "agg",
 						sequence:         6,
 						previousSequence: 0,
@@ -243,7 +243,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "testAgg",
 							sequence:         7,
@@ -280,7 +280,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -321,7 +321,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -362,7 +362,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(&testEvent{
+					*NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 5,
@@ -393,7 +393,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(&testEvent{
+					*NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 0,
@@ -429,7 +429,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				stmts: []handler.Statement{
-					NewNoOpStatement(&testEvent{
+					*NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 0,
@@ -704,7 +704,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -733,7 +733,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -745,7 +745,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val1",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 
 						&testEvent{
 							aggregateType:    "agg",
@@ -781,7 +781,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -793,7 +793,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         6,
@@ -805,7 +805,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -845,7 +845,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -857,7 +857,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val1",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         6,
@@ -869,7 +869,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val2",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -910,7 +910,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 			},
 			args: args{
 				stmts: []handler.Statement{
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -922,7 +922,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         6,
@@ -934,7 +934,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					NewCreateStatement(
+					*NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -946,6 +946,29 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
+					*NewMultiStatement(
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         8,
+							previousSequence: 7,
+						},
+						AddCreateStatement(
+							[]handler.Column{
+								{
+									Name:  "col",
+									Value: "val",
+								},
+							},
+						),
+						AddCreateStatement(
+							[]handler.Column{
+								{
+									Name:  "col",
+									Value: "val",
+								},
+							},
+						),
+					),
 				},
 				sequences: currentSequences{
 					"agg": 2,
@@ -962,8 +985,12 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
 				},
-				idx: 2,
+				idx: 3,
 			},
 		},
 	}
@@ -1043,7 +1070,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement(
+				stmt: *NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1071,7 +1098,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement(
+				stmt: *NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1101,7 +1128,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement(
+				stmt: *NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1131,7 +1158,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewNoOpStatement(&testEvent{
+				stmt: *NewNoOpStatement(&testEvent{
 					aggregateType:    "agg",
 					sequence:         1,
 					previousSequence: 0,
@@ -1150,7 +1177,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: NewCreateStatement(
+				stmt: *NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1532,16 +1559,14 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 	}
 }
 
-func testReduce(stmts ...handler.Statement) handler.Reduce {
-	return func(event eventstore.EventReader) ([]handler.Statement, error) {
-		return []handler.Statement{
-			NewNoOpStatement(event),
-		}, nil
+func testReduce() handler.Reduce {
+	return func(event eventstore.EventReader) (*handler.Statement, error) {
+		return NewNoOpStatement(event), nil
 	}
 }
 
 func testReduceErr(err error) handler.Reduce {
-	return func(event eventstore.EventReader) ([]handler.Statement, error) {
+	return func(event eventstore.EventReader) (*handler.Statement, error) {
 		return nil, err
 	}
 }

@@ -6,10 +6,10 @@ import (
 )
 
 //reduce implements handler.Reduce function
-func (h *StatementHandler) reduce(event eventstore.EventReader) ([]handler.Statement, error) {
+func (h *StatementHandler) reduce(event eventstore.EventReader) (*handler.Statement, error) {
 	reduce, ok := h.reduces[event.Type()]
 	if !ok {
-		return []handler.Statement{NewNoOpStatement(event)}, nil
+		return NewNoOpStatement(event), nil
 	}
 
 	return reduce(event)
