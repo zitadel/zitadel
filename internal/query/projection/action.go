@@ -64,29 +64,27 @@ const (
 	actionNameCol          = "name"
 )
 
-func (p *ActionProjection) reduceActionAdded(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *ActionProjection) reduceActionAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*action.AddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewCreateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(actionIDCol, e.Aggregate().ID),
-				handler.NewCol(actionCreationDateCol, e.CreationDate()),
-				handler.NewCol(actionChangeDateCol, e.CreationDate()),
-				handler.NewCol(actionResourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(actionSequenceCol, e.Sequence()),
-				handler.NewCol(actionNameCol, e.Name),
-				handler.NewCol(actionStateCol, domain.ActionStateActive),
-			},
-		),
-	}, nil
+	return crdb.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(actionIDCol, e.Aggregate().ID),
+			handler.NewCol(actionCreationDateCol, e.CreationDate()),
+			handler.NewCol(actionChangeDateCol, e.CreationDate()),
+			handler.NewCol(actionResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(actionSequenceCol, e.Sequence()),
+			handler.NewCol(actionNameCol, e.Name),
+			handler.NewCol(actionStateCol, domain.ActionStateActive),
+		},
+	), nil
 }
 
-func (p *ActionProjection) reduceActionChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *ActionProjection) reduceActionChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*action.ChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-q4oq8", "seq", event.Sequence, "expected", action.ChangedEventType).Error("wrong event type")
@@ -99,71 +97,63 @@ func (p *ActionProjection) reduceActionChanged(event eventstore.EventReader) ([]
 	if e.Name != nil {
 		values = append(values, handler.NewCol(actionNameCol, e.Name))
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			values,
-			[]handler.Condition{
-				handler.NewCond(actionIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		values,
+		[]handler.Condition{
+			handler.NewCond(actionIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
 
-func (p *ActionProjection) reduceActionDeactivated(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *ActionProjection) reduceActionDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*action.DeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-1gwdc", "seq", event.Sequence, "expectedType", action.DeactivatedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BApK4", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(actionChangeDateCol, e.CreationDate()),
-				handler.NewCol(actionSequenceCol, e.Sequence()),
-				handler.NewCol(actionStateCol, domain.ActionStateInactive),
-			},
-			[]handler.Condition{
-				handler.NewCond(actionIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(actionChangeDateCol, e.CreationDate()),
+			handler.NewCol(actionSequenceCol, e.Sequence()),
+			handler.NewCol(actionStateCol, domain.ActionStateInactive),
+		},
+		[]handler.Condition{
+			handler.NewCond(actionIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
 
-func (p *ActionProjection) reduceActionReactivated(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *ActionProjection) reduceActionReactivated(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*action.ReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Vjwiy", "seq", event.Sequence, "expectedType", action.ReactivatedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-o37De", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(actionChangeDateCol, e.CreationDate()),
-				handler.NewCol(actionSequenceCol, e.Sequence()),
-				handler.NewCol(actionStateCol, domain.ActionStateActive),
-			},
-			[]handler.Condition{
-				handler.NewCond(actionIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(actionChangeDateCol, e.CreationDate()),
+			handler.NewCol(actionSequenceCol, e.Sequence()),
+			handler.NewCol(actionStateCol, domain.ActionStateActive),
+		},
+		[]handler.Condition{
+			handler.NewCond(actionIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
 
-func (p *ActionProjection) reduceActionRemoved(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *ActionProjection) reduceActionRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-79OhB", "seq", event.Sequence, "expectedType", action.RemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-4TbKT", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewDeleteStatement(
-			e,
-			[]handler.Condition{
-				handler.NewCond(actionIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(actionIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
