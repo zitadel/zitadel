@@ -631,7 +631,7 @@ func TestNewMultiStatement(t *testing.T) {
 	type args struct {
 		table string
 		event *testEvent
-		execs []func(eventstore.EventReader) execute
+		execs []func(eventstore.EventReader) Exec
 	}
 
 	type want struct {
@@ -671,7 +671,7 @@ func TestNewMultiStatement(t *testing.T) {
 					previousSequence: 0,
 					aggregateType:    "agg",
 				},
-				execs: []func(eventstore.EventReader) execute{
+				execs: []func(eventstore.EventReader) Exec{
 					AddDeleteStatement(
 						[]handler.Condition{
 							{

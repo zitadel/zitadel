@@ -139,7 +139,7 @@ func NewNoOpStatement(event eventstore.EventReader) *handler.Statement {
 	}
 }
 
-func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.EventReader) execute) *handler.Statement {
+func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.EventReader) Exec) *handler.Statement {
 	if len(opts) == 0 {
 		return NewNoOpStatement(event)
 	}
@@ -155,26 +155,26 @@ func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.Eve
 	}
 }
 
-type execute func(ex handler.Executer, projectionName string) error
+type Exec func(ex handler.Executer, projectionName string) error
 
-func AddCreateStatement(columns []handler.Column, opts ...execOption) func(eventstore.EventReader) execute {
-	return func(event eventstore.EventReader) execute {
+func AddCreateStatement(columns []handler.Column, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
 		return NewCreateStatement(event, columns, opts...).Execute
 	}
 }
 
-func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.EventReader) execute {
-	return func(event eventstore.EventReader) execute {
+func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
 		return NewUpsertStatement(event, values, opts...).Execute
 	}
 }
-func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) execute {
-	return func(event eventstore.EventReader) execute {
+func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
 		return NewUpdateStatement(event, values, conditions, opts...).Execute
 	}
 }
-func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) execute {
-	return func(event eventstore.EventReader) execute {
+func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
 		return NewDeleteStatement(event, conditions, opts...).Execute
 	}
 }
