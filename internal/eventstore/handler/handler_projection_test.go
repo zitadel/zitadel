@@ -798,7 +798,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 				shouldPush: initTimer(),
 			},
 			args: args{
-				update: testUpdate(t, 4, nil),
+				update: testUpdate(t, 2, nil),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 						AddQuery().
