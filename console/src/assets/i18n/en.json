@@ -109,6 +109,8 @@
     "ACTIONS":"Aktionen",
     "RENAME":"Rename",
     "SET":"Set",
+    "COPY":"Copy to Clipboard",
+    "COPIED":"Copied to clipboard.",
     "RESETDEFAULT":"Reset to Default",
     "RESETTO":"Reset to: ",
     "RESETCURRENT":"Reset to current",
@@ -170,8 +172,6 @@
       "MY": "My Informations",
       "LOGINNAMES": "Loginnames",
       "LOGINNAMESDESC": "These are your login names:",
-      "COPY": "Copy to Clipboard",
-      "COPIED": "Copied to clipboard.",
       "NOUSER": "No associated users.",
       "REACTIVATE": "Reactivate",
       "DEACTIVATE": "Deactivate",
@@ -1241,6 +1241,11 @@
       "CREATE_OIDC": "OIDC Application",
       "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "STATE":"State",
+      "DATECREATED":"Created",
+      "DATECHANGED":"Changed",
+      "URLS":"Urls",
+      "DELETE":"Delete App",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -1270,6 +1275,11 @@
           "DESC": "Read our documentation on creating applications or contact our support"
         }
       }
+    },
+    "NAMEDIALOG": {
+      "TITLE":"Rename App",
+      "DESCRIPTION":"Enter the new name for your app",
+      "NAME":"New Name"
     },
     "NAME": "Name",
     "TYPE": "Application Type",

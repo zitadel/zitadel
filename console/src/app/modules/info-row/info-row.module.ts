@@ -14,7 +14,7 @@ import { InfoRowComponent } from './info-row.component';
 
 @NgModule({
   declarations: [
-    InfoRowComponent
+    InfoRowComponent,
   ],
   imports: [
     CommonModule,
@@ -28,6 +28,6 @@ import { InfoRowComponent } from './info-row.component';
   ],
   exports: [
     InfoRowComponent,
-  ]
+  ],
 })
 export class InfoRowModule { }

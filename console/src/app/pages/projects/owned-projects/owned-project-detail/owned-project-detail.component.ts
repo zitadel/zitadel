@@ -21,6 +21,8 @@ import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { NameDialogComponent } from '../../../../modules/name-dialog/name-dialog.component';
+
 @Component({
   selector: 'app-owned-project-detail',
   templateUrl: './owned-project-detail.component.html',
@@ -41,7 +43,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
   public grid: boolean = true;
   private subscription?: Subscription;
-  public editstate: boolean = false;
 
   public isZitadel: boolean = false;
 
@@ -71,6 +72,25 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  public openNameDialog(): void {
+    const dialogRef = this.dialog.open(NameDialogComponent, {
+      data: {
+        name: this.project.name,
+        titleKey: 'PROJECT.NAMEDIALOG.TITLE',
+        descKey: 'PROJECT.NAMEDIALOG.DESCRIPTION',
+        labelKey: 'PROJECT.NAMEDIALOG.NAME'
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe(name => {
+      if (name) {
+        this.project.name = name;
+        this.updateName();
+      }
+    });
   }
 
   public openPrivateLabelingDialog(): void {
@@ -221,7 +241,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
   public updateName(): void {
     this.saveProject();
-    this.editstate = false;
   }
 
   public openAddMember(): void {

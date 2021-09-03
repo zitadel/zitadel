@@ -109,6 +109,8 @@
     "ACTIONS":"Aktionen",
     "RENAME":"Umbenennen",
     "SET":"Übernehmen",
+    "COPY":"In die Zwischenablage kopieren",
+    "COPIED":"In die Zwischenablage kopiert.",
     "RESETDEFAULT":"Auf Standard zurücksetzen",
     "RESETTO":"Zurücksetzen auf: ",
     "RESETCURRENT":"Auf aktuellen Wert zurücksetzen",
@@ -170,8 +172,6 @@
       "MY": "Meine Informationen",
       "LOGINNAMES": "Login-Namen",
       "LOGINNAMESDESC": "Mit diesen Namen kannst Du Dich anmelden.",
-      "COPY": "In die Zwischenablage kopieren",
-      "COPIED": "In die Zwischenablage kopiert.",
       "NOUSER": "Kein Benutzer",
       "REACTIVATE": "Reaktivieren",
       "DEACTIVATE": "Deaktivieren",
@@ -1232,13 +1232,18 @@
     }
   },
   "APP": {
-    "LIST": "Anwendungen",
+    "LIST": "Apps",
     "PAGES": {
       "TITLE": "Anwendung",
-      "DESCRIPTION": "Hier kannst Du Deine Anwendungen bearbeiten und deren Konfiguration anpassen.",
+      "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE_OIDC": "OIDC-Anwendung",
       "CREATE_OIDC_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
       "CREATE_OIDC_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
+      "STATE":"Status",
+      "DATECREATED":"Erstellt",
+      "DATECHANGED":"Geändert",
+      "URLS":"Urls",
+      "DELETE":"App löschen",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -1267,6 +1272,11 @@
           "DESC": "Lesen Sie unsere Dokumentation zum Erstellen von Applikation oder kontaktieren Sie unseren Support"
         }
       }
+    },
+    "NAMEDIALOG": {
+      "TITLE":"App umbenennen",
+      "DESCRIPTION":"Geben Sie den neuen Namen für Ihre App an!",
+      "NAME":"Appname"
     },
     "NAME": "Name",
     "TYPE": "Anwendungstyp",

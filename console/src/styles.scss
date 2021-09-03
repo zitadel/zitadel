@@ -339,7 +339,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   border-radius: 6px !important;
 }
 
-.mat-menu-item{
+.mat-menu-item {
   line-height: 35px !important;
   height: 35px !important;
 }
@@ -350,7 +350,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 
   --color-main: var(--theme-light-primary-500);
   --warn: #cd3d56;
-  
+
   $background: map-get($caos-light-app-theme, background);
 
   .sidenav,

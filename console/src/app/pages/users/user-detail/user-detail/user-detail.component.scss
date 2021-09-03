@@ -20,6 +20,7 @@
 
     p {
       margin: .5rem 0;
+      font-size: 14px;
       color: var(--grey);
     }
   }
@@ -37,11 +38,6 @@
       margin-left: .5rem;
       margin-right: -.5rem;
     }
-  }
-
-  .warn-item{
-    color: #620e0e !important;
-    background-color: #ffc1c1 !important;
   }
 }
 

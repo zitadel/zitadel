@@ -14,10 +14,20 @@
   }
 
   h1 {
-    font-size: 1.2rem;
     margin: 0 1rem;
     margin-left: 2rem;
     font-weight: normal;
+  }
+
+  .actions-trigger {
+    margin-top: .25rem;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      margin-left: .5rem;
+      margin-right: -.5rem;
+    }
   }
 
   .full-width {

@@ -11,37 +11,34 @@
                 <span *ngIf="app?.apiConfig">API</span>
             </div>
             <ng-container *ngIf="isZitadel === false">
-                <ng-template appHasRole [appHasRole]="['project.app.write:'+projectId, 'project.app.write']">
-
-                    <button *ngIf="!editState" matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button
-                        (click)="editState = !editState" aria-label="edit app name">
-                        <i class="las la-edit"></i>
+              <span class="fill-space"></span>
+              <ng-template appHasRole [appHasRole]="['project.app.write:'+projectId, 'project.app.write']">
+                <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
+                  <span>{{'ACTIONS.ACTIONS' | translate}}</span>
+                  <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+                </button>
+                <mat-menu #actions="matMenu" xPosition="before">
+                  <button mat-menu-item (click)="openNameDialog()"
+                    aria-label="Edit project name" *ngIf="isZitadel === false">
+                    {{'ACTIONS.RENAME' | translate}}
+                  </button>
+                  <button mat-menu-item
+                    *ngIf="app?.state !== AppState.APP_STATE_INACTIVE"
+                    (click)="changeState(AppState.APP_STATE_INACTIVE)">
+                    {{'ACTIONS.DEACTIVATE' | translate}}
+                  </button>
+                  <button mat-menu-item *ngIf="app?.state == AppState.APP_STATE_INACTIVE"
+                    (click)="changeState(AppState.APP_STATE_ACTIVE)">
+                    {{'ACTIONS.REACTIVATE' | translate}}
+                  </button>
+                  <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+                    <button mat-menu-item matTooltip="{{'APP.PAGES.DELETE' | translate}}"
+                        (click)="deleteApp()">
+                        <span [style.color]="'var(--warn)'">{{'APP.PAGES.DELETE' | translate}}</span>
                     </button>
-                    <button *ngIf="editState" (click)="saveApp()" [disabled]="appNameForm.invalid || name?.disabled"
-                        mat-icon-button>
-                        <i class="las la-save"></i>
-                    </button>
-
-                    <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
-                        <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
-                            (click)="deleteApp()" aria-label="delete app">
-                            <i class="las la-trash"></i>
-                        </button>
-                    </ng-template>
-
-                    <span class="fill-space"></span>
-
-                    <button class="state-button" mat-stroked-button color="warn"
-                        *ngIf="app && app.state !== undefined && app?.state !== AppState.APP_STATE_INACTIVE"
-                        (click)="changeState(AppState.APP_STATE_INACTIVE)">
-                        {{'ACTIONS.DEACTIVATE' | translate}}
-                    </button>
-                    <button class="state-button" mat-stroked-button
-                        *ngIf="app && app.state !== undefined && app?.state !== AppState.APP_STATE_ACTIVE"
-                        (click)="changeState(AppState.APP_STATE_ACTIVE)">
-                        {{'ACTIONS.REACTIVATE' | translate}}
-                    </button>
-                </ng-template>
+                  </ng-template>
+                </mat-menu>
+              </ng-template>
             </ng-container>
 
             <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
@@ -50,104 +47,68 @@
 
         <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
 
-        <form *ngIf="app && editState" [formGroup]="appNameForm">
-            <div class="name-content">
-                <cnsl-form-field class="name-field">
-                    <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="name" />
-                </cnsl-form-field>
-            </div>
-        </form>
-
-        <div class="environment-wrapper">
-            <div class="environment" *ngIf="app?.oidcConfig?.clientId">
-                <span class="key">{{'APP.OIDC.INFO.CLIENTID' | translate}}</span>
-                <div class="environment-row">
-                    <span>{{this.app.oidcConfig?.clientId}}</span>
-                    <button color="primary" [disabled]="copiedKey == this.app.oidcConfig?.clientId"
-                        [matTooltip]="(copiedKey != this.app.oidcConfig?.clientId ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                        appCopyToClipboard [valueToCopy]="this.app.oidcConfig?.clientId"
-                        (copiedValue)="copiedKey = 'clientId'" mat-icon-button>
-                        <i *ngIf="copiedKey != 'clientId'" class="las la-clipboard"></i>
-                        <i *ngIf="copiedKey == 'clientId'" class="las la-clipboard-check"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="environment" *ngIf="app?.apiConfig?.clientId">
-              <span class="key">{{'APP.API.INFO.CLIENTID' | translate}}</span>
-              <div class="environment-row">
-                  <span>{{this.app.apiConfig?.clientId}}</span>
-                  <button color="primary" [disabled]="copiedKey == this.app.apiConfig?.clientId"
-                      [matTooltip]="(copiedKey != this.app.apiConfig?.clientId ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                      appCopyToClipboard [valueToCopy]="this.app.apiConfig?.clientId"
-                      (copiedValue)="copiedKey = 'clientId'" mat-icon-button>
-                      <i *ngIf="copiedKey != 'clientId'" class="las la-clipboard"></i>
-                      <i *ngIf="copiedKey == 'clientId'" class="las la-clipboard-check"></i>
-                  </button>
-              </div>
-          </div>
-            <ng-container *ngFor="let environmentV of (environmentMap | keyvalue)">
-                <div *ngIf="environmentV.value" class="environment">
-                    <span class="key">{{environmentV.key}}</span>
-                    <div class="environment-row">
-                        <span>{{environmentV.value}}</span>
-                        <button color="primary" [disabled]="copiedKey == environmentV.value"
-                            [matTooltip]="(copiedKey != environmentV.value ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                            appCopyToClipboard [valueToCopy]="environmentV.value"
-                            (copiedValue)="copiedKey = environmentV.key" mat-icon-button>
-                            <i *ngIf="copiedKey != environmentV.key" class="las la-clipboard"></i>
-                            <i *ngIf="copiedKey == environmentV.key" class="las la-clipboard-check"></i>
-                        </button>
-                    </div>
-                </div>
-            </ng-container>
-        </div>
-
         <div class="compliance"
-            *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
-            <cnsl-info-section class="problem" type="WARN">
-                <ul style="margin: 0;">
-                    <li style="margin: 0 0 .5rem 0;"
-                        *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
-                        {{problem.localizedMessage}}</li>
-                </ul>
-            </cnsl-info-section>
+          *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
+          <cnsl-info-section class="problem" type="WARN">
+              <ul style="margin: 0;">
+                  <li style="margin: 0 0 .5rem 0;"
+                      *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
+                      {{problem.localizedMessage}}</li>
+              </ul>
+          </cnsl-info-section>
         </div>
 
-        <div class="content" *ngIf="app?.oidcConfig">
-            <h3 class="full-width section-title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}</h3>
+        <cnsl-info-row *ngIf="app" [app]="app"></cnsl-info-row>
 
-            <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
-                matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
-                {{ 'APP.OIDC.DEVMODE' | translate }}
-            </mat-slide-toggle>
-
-            <cnsl-info-section class="step-description" *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
-                <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
-            </cnsl-info-section>
-
-            <cnsl-info-section class="step-description"
+        <div *ngIf="app?.oidcConfig" class="expandables">
+            <div class="expandable">
+              <p class="title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}
+                  <button mat-icon-button (click)="showRedirects = !showRedirects"
+                      matTooltip="{{(showRedirects ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
+                      <mat-icon *ngIf="!showRedirects">expand_more</mat-icon>
+                      <mat-icon *ngIf="showRedirects">expand_less</mat-icon>
+                  </button>
+              </p>
+              <ng-container *ngIf="showRedirects">
+                <cnsl-info-section *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
+                  <div class="dev-col">
+                    <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
+                    <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
+                    matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
+                    {{ 'APP.OIDC.DEVMODE' | translate }}
+                    </mat-slide-toggle>
+                  </div>
+                </cnsl-info-section>
+                <cnsl-info-section
                 *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
-                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}
-            </cnsl-info-section>
+                  <div class="dev-col">
+                    <span>{{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</span>
+                    <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
+                    matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
+                    {{ 'APP.OIDC.DEVMODE' | translate }}
+                    </mat-slide-toggle>
+                  </div>
+                </cnsl-info-section>
+    
+                <div class="content">
+                  <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
+                      [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
+                      (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
+                      title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+                      [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
+                  </cnsl-redirect-uris>
+      
+                  <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
+                      [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
+                      [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
+                      title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+                      [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
+                  </cnsl-redirect-uris>
+                </div>
+              </ng-container>
+            </div>
 
-            <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
-                [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
-                (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
-                title="{{ 'APP.OIDC.REDIRECT' | translate }}"
-                [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
-            </cnsl-redirect-uris>
-
-            <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
-                [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
-                [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
-                title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-                [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
-            </cnsl-redirect-uris>
-
-            <div style="margin: .5rem" class="divider"></div>
-
-            <div class="additional-origins">
+            <div class="expandable">
                 <p class="title">{{'APP.ADDITIONALORIGINS' | translate}}
                     <button mat-icon-button (click)="showAdditionalOrigins = !showAdditionalOrigins"
                         matTooltip="{{(showAdditionalOrigins ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
