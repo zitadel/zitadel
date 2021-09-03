@@ -24,8 +24,9 @@ var (
 	ErrUpdate = errors.New("update err")
 )
 
-func newTestStatement(seq, previousSeq uint64) Statement {
+func newTestStatement(aggType eventstore.AggregateType, seq, previousSeq uint64) Statement {
 	return Statement{
+		AggregateType:    aggType,
 		Sequence:         seq,
 		PreviousSequence: previousSeq,
 	}
@@ -83,7 +84,7 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 				shouldPush: initTimer(),
 			},
 			args: args{
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -96,21 +97,21 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 			name: "existing stmts",
 			fields: fields{
 				stmts: []Statement{
-					newTestStatement(1, 0),
+					newTestStatement("aggregate1", 1, 0),
 				},
 				pushSet:    false,
 				shouldPush: initTimer(),
 			},
 			args: args{
-				reduce: testReduce(newTestStatement(2, 1)),
+				reduce: testReduce(newTestStatement("aggregate1", 2, 1)),
 			},
 			want: want{
 				isErr: func(err error) bool {
 					return err == nil
 				},
 				stmts: []Statement{
-					newTestStatement(1, 0),
-					newTestStatement(2, 1),
+					newTestStatement("aggregate1", 1, 0),
+					newTestStatement("aggregate1", 2, 1),
 				},
 			},
 		},
@@ -163,7 +164,7 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				query:  testQuery(nil, 0, ErrQuery),
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			fields: fields{},
 			want: want{
@@ -185,7 +186,7 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 					5,
 					nil,
 				),
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -211,7 +212,7 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 					5,
 					nil,
 				),
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -237,7 +238,7 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 					5,
 					nil,
 				),
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -284,7 +285,7 @@ func TestProjectionHandler_fetchBulkStmts(t *testing.T) {
 					2,
 					nil,
 				),
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
@@ -366,8 +367,8 @@ func TestProjectionHandler_push(t *testing.T) {
 			name: "previous lock",
 			fields: fields{
 				stmts: []Statement{
-					newTestStatement(1, 0),
-					newTestStatement(2, 1),
+					newTestStatement("aggregate1", 1, 0),
+					newTestStatement("aggregate1", 2, 1),
 				},
 				pushSet: true,
 			},
@@ -375,7 +376,7 @@ func TestProjectionHandler_push(t *testing.T) {
 				ctx:          context.Background(),
 				previousLock: 200 * time.Millisecond,
 				update:       testUpdate(t, 2, nil),
-				reduce:       testReduce(),
+				reduce:       nil,
 			},
 			want: want{
 				isErr:        func(err error) bool { return err == nil },
@@ -386,15 +387,15 @@ func TestProjectionHandler_push(t *testing.T) {
 			name: "error in update",
 			fields: fields{
 				stmts: []Statement{
-					newTestStatement(1, 0),
-					newTestStatement(2, 1),
+					newTestStatement("aggregate1", 1, 0),
+					newTestStatement("aggregate1", 2, 1),
 				},
 				pushSet: true,
 			},
 			args: args{
 				ctx:    context.Background(),
 				update: testUpdate(t, 2, errors.New("some error")),
-				reduce: testReduce(),
+				reduce: testReduceEmpty(),
 			},
 			want: want{
 				isErr: func(err error) bool { return err.Error() == "some error" },
@@ -754,7 +755,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 					nil,
 				),
 				reduce: testReduce(
-					newTestStatement(2, 1),
+					newTestStatement("aggregate1", 2, 1),
 				),
 				ctx: context.Background(),
 			},
@@ -807,8 +808,7 @@ func TestProjectionHandler_prepareExecuteBulk(t *testing.T) {
 					nil,
 				),
 				reduce: testReduce(
-					newTestStatement(1, 0),
-					newTestStatement(2, 1),
+					newTestStatement("aggregate1", 0, 1),
 				),
 				ctx: context.Background(),
 			},
@@ -846,14 +846,20 @@ func testUpdate(t *testing.T, expectedStmtCount int, returnedErr error) Update {
 	}
 }
 
-func testReduce(stmts ...Statement) Reduce {
-	return func(event eventstore.EventReader) ([]Statement, error) {
-		return stmts, nil
+func testReduce(stmts Statement) Reduce {
+	return func(event eventstore.EventReader) (*Statement, error) {
+		return &stmts, nil
+	}
+}
+
+func testReduceEmpty() Reduce {
+	return func(event eventstore.EventReader) (*Statement, error) {
+		return nil, nil
 	}
 }
 
 func testReduceErr(err error) Reduce {
-	return func(event eventstore.EventReader) ([]Statement, error) {
+	return func(event eventstore.EventReader) (*Statement, error) {
 		return nil, err
 	}
 }

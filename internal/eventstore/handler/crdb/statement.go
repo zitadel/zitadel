@@ -23,7 +23,7 @@ func WithTableSuffix(name string) func(*execConfig) {
 	}
 }
 
-func NewCreateStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) handler.Statement {
+func NewCreateStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -40,7 +40,7 @@ func NewCreateStatement(event eventstore.EventReader, values []handler.Column, o
 		return "INSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -48,7 +48,7 @@ func NewCreateStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) handler.Statement {
+func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -65,7 +65,7 @@ func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, o
 		return "UPSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -73,7 +73,7 @@ func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, conditions []handler.Condition, opts ...execOption) handler.Statement {
+func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -98,7 +98,7 @@ func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, c
 		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -106,7 +106,7 @@ func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, c
 	}
 }
 
-func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condition, opts ...execOption) handler.Statement {
+func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	wheres, args := conditionsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
@@ -123,7 +123,7 @@ func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condi
 		return "DELETE FROM " + config.tableName + " WHERE " + wheresPlaceholders
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -131,11 +131,51 @@ func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condi
 	}
 }
 
-func NewNoOpStatement(event eventstore.EventReader) handler.Statement {
-	return handler.Statement{
+func NewNoOpStatement(event eventstore.EventReader) *handler.Statement {
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+	}
+}
+
+func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.EventReader) execute) *handler.Statement {
+	if len(opts) == 0 {
+		return NewNoOpStatement(event)
+	}
+	execs := make([]func(ex handler.Executer, projectionName string) error, len(opts))
+	for i, opt := range opts {
+		execs[i] = opt(event)
+	}
+	return &handler.Statement{
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          multiExec(execs),
+	}
+}
+
+type execute func(ex handler.Executer, projectionName string) error
+
+func AddCreateStatement(columns []handler.Column, opts ...execOption) func(eventstore.EventReader) execute {
+	return func(event eventstore.EventReader) execute {
+		return NewCreateStatement(event, columns, opts...).Execute
+	}
+}
+
+func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.EventReader) execute {
+	return func(event eventstore.EventReader) execute {
+		return NewUpsertStatement(event, values, opts...).Execute
+	}
+}
+func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) execute {
+	return func(event eventstore.EventReader) execute {
+		return NewUpdateStatement(event, values, conditions, opts...).Execute
+	}
+}
+func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) execute {
+	return func(event eventstore.EventReader) execute {
+		return NewDeleteStatement(event, conditions, opts...).Execute
 	}
 }
 
@@ -185,6 +225,17 @@ func exec(config execConfig, q query, opts []execOption) func(ex handler.Execute
 			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
+		return nil
+	}
+}
+
+func multiExec(execList []func(ex handler.Executer, projectionName string) error) func(ex handler.Executer, projectionName string) error {
+	return func(ex handler.Executer, projectionName string) error {
+		for _, exec := range execList {
+			if err := exec(ex, projectionName); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 }

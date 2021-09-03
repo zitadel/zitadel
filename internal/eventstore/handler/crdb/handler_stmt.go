@@ -202,11 +202,13 @@ func (h *StatementHandler) fetchPreviousStmts(
 	}
 
 	for _, event := range events {
-		stmts, err := reduce(event)
+		stmt, err := reduce(event)
 		if err != nil {
 			return nil, err
 		}
-		previousStmts = append(previousStmts, stmts...)
+		if stmt != nil {
+			previousStmts = append(previousStmts, *stmt)
+		}
 	}
 	return previousStmts, nil
 }
