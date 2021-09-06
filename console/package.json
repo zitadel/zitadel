@@ -16,7 +16,7 @@
     "@angular/compiler": "~12.2.0",
     "@angular/core": "~12.2.0",
     "@angular/forms": "~12.2.0",
-    "@angular/material": "^12.1.1",
+    "@angular/material": "^12.2.4",
     "@angular/material-moment-adapter": "^12.2.0",
     "@angular/platform-browser": "~12.2.0",
     "@angular/platform-browser-dynamic": "~12.2.0",
