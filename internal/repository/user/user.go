@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -162,6 +163,7 @@ type UserRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	userName          string
+	externalIDPs      []*domain.ExternalIDP
 	loginMustBeDomain bool
 }
 
@@ -170,13 +172,21 @@ func (e *UserRemovedEvent) Data() interface{} {
 }
 
 func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain)}
+	events := make([]*eventstore.EventUniqueConstraint, 0)
+	if e.userName != "" {
+		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain))
+	}
+	for _, idp := range e.externalIDPs {
+		events = append(events, NewRemoveExternalIDPUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
+	}
+	return events
 }
 
 func NewUserRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userName string,
+	externalIDPs []*domain.ExternalIDP,
 	userLoginMustBeDomain bool,
 ) *UserRemovedEvent {
 	return &UserRemovedEvent{
@@ -186,6 +196,7 @@ func NewUserRemovedEvent(
 			UserRemovedType,
 		),
 		userName:          userName,
+		externalIDPs:      externalIDPs,
 		loginMustBeDomain: userLoginMustBeDomain,
 	}
 }

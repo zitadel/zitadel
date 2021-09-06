@@ -66,7 +66,7 @@ func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, c
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
-			AggregateType: repository.AggregateType(event.Aggregate().Typ),
+			AggregateType: repository.AggregateType(event.Aggregate().Type),
 			ResourceOwner: event.Aggregate().ResourceOwner,
 			EditorService: event.EditorService(),
 			EditorUser:    event.EditorUser(),
@@ -228,4 +228,8 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 	default:
 		return repository.UniqueConstraintAdd
 	}
+}
+
+func (es *Eventstore) Step20(ctx context.Context, latestSequence uint64) error {
+	return es.repo.Step20(ctx, latestSequence)
 }

@@ -67,30 +67,6 @@ Returns the user sessions of the authorized user of the current useragent
     POST: /users/me/sessions/_search
 
 
-### SetMyMetadata
-
-> **rpc** SetMyMetadata([SetMyMetadataRequest](#setmymetadatarequest))
-[SetMyMetadataResponse](#setmymetadataresponse)
-
-Sets a user metadata by key to the authorized user
-
-
-
-    POST: /users/me/metadata/{key}
-
-
-### BulkSetMyMetadata
-
-> **rpc** BulkSetMyMetadata([BulkSetMyMetadataRequest](#bulksetmymetadatarequest))
-[BulkSetMyMetadataResponse](#bulksetmymetadataresponse)
-
-Set a list of user metadata to the authorized user
-
-
-
-    POST: /users/me/metadata/_bulk
-
-
 ### ListMyMetadata
 
 > **rpc** ListMyMetadata([ListMyMetadataRequest](#listmymetadatarequest))
@@ -113,30 +89,6 @@ Returns the user metadata by key of the authorized user
 
 
     GET: /users/me/metadata/{key}
-
-
-### RemoveMyMetadata
-
-> **rpc** RemoveMyMetadata([RemoveMyMetadataRequest](#removemymetadatarequest))
-[RemoveMyMetadataResponse](#removemymetadataresponse)
-
-Removes a user metadata by key to the authorized user
-
-
-
-    DELETE: /users/me/metadata/{key}
-
-
-### BulkRemoveMyMetadata
-
-> **rpc** BulkRemoveMyMetadata([BulkRemoveMyMetadataRequest](#bulkremovemymetadatarequest))
-[BulkRemoveMyMetadataResponse](#bulkremovemymetadataresponse)
-
-Set a list of user metadata to the authorized user
-
-
-
-    DELETE: /users/me/metadata/_bulk
 
 
 ### ListMyRefreshTokens

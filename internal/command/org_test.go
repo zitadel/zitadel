@@ -86,6 +86,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username1",
+								nil,
 								true,
 							),
 						),

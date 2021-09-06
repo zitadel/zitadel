@@ -23,7 +23,7 @@ const (
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
 	rootSecretName           = "cockroachdb.client.root"
-	timeout                  = 15 * time.Minute
+	timeout                  = 45 * time.Minute
 	Normal                   = "backup"
 	Instant                  = "instantbackup"
 )

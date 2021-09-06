@@ -21,6 +21,9 @@ type UserRepository interface {
 	MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error)
 
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
+
+	SearchUserMetadata(ctx context.Context, userID string) (*domain.MetadataSearchResponse, error)
+	OrgByUserID(ctx context.Context, userID string) (*domain.Org, error)
 }
 
 type myUserRepo interface {

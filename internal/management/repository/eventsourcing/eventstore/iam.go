@@ -2,9 +2,9 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/query"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type IAMRepository struct {

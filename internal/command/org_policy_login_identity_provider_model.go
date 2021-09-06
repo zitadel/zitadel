@@ -34,6 +34,8 @@ func (wm *OrgIdentityProviderWriteModel) AppendEvents(events ...eventstore.Event
 				continue
 			}
 			wm.IdentityProviderWriteModel.AppendEvents(&e.IdentityProviderRemovedEvent)
+		case *org.LoginPolicyRemovedEvent:
+			wm.IdentityProviderWriteModel.AppendEvents(&e.LoginPolicyRemovedEvent)
 		}
 	}
 }
@@ -50,6 +52,7 @@ func (wm *OrgIdentityProviderWriteModel) Query() *eventstore.SearchQueryBuilder 
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			org.LoginPolicyIDPProviderAddedEventType,
-			org.LoginPolicyIDPProviderRemovedEventType).
+			org.LoginPolicyIDPProviderRemovedEventType,
+			org.LoginPolicyRemovedEventType).
 		Builder()
 }
