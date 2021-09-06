@@ -18,6 +18,7 @@
 :root {
   --grey: #8795a1;
   --warn: #ff3b5b;
+  --success: #10b981;
   --table-row-back: #363738;
 }
 
@@ -350,6 +351,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 
   --color-main: var(--theme-light-primary-500);
   --warn: #cd3d56;
+  --success: #10b981;
 
   $background: map-get($caos-light-app-theme, background);
 
@@ -390,6 +392,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 
   --color-main: var(--theme-dark-primary-500);
   --warn: #ff3b5b;
+  --success: #10b981;
   $background: map-get($caos-dark-app-theme, background);
 
   .sidenav,

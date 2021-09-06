@@ -34,7 +34,7 @@
             </app-contact>
         </app-card>
 
-        <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
+        <app-external-idps [userId]="user?.id" [service]="userService"></app-external-idps>
 
         <app-auth-passwordless *ngIf="user" #mfaComponent></app-auth-passwordless>
 

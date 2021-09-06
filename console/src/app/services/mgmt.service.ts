@@ -1186,6 +1186,7 @@ export class ManagementService {
   ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
     const req = new UpdateCustomLockoutPolicyRequest();
     req.setMaxPasswordAttempts(maxAttempts);
+
     return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 

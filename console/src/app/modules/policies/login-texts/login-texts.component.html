@@ -35,11 +35,8 @@
     </cnsl-form-field>
   </form>
 
-  <cnsl-info-section class="warn"
-    *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) == false"
-    type="WARN">
-    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
-    'custom_text.login'})}}
+  <cnsl-info-section *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.login'})"></span>
   </cnsl-info-section>
 
   <div class="divider"></div>

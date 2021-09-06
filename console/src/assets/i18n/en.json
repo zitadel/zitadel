@@ -145,7 +145,8 @@
     "SEND": "Send",
     "NEWVALUE": "New Value",
     "RESTORE":"Restore",
-    "CONTINUEWITHOUTSAVE":"Continue without saving"
+    "CONTINUEWITHOUTSAVE":"Continue without saving",
+    "GOTOFEATURES":"Go to features"
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
@@ -641,6 +642,8 @@
     "TITLE": "Features",
     "DESCRIPTION": "Here you can see your ZITADEL Features based on your Tier.",
     "BTN-EDIT": "Display Featureset",
+    "AVAILABLE":"unlocked",
+    "UNAVAILABLE":"locked",
     "TIER": {
       "NAME": "Tier Name",
       "DETAILS": "Billing Details",
@@ -657,20 +660,29 @@
       "QUESTIONS": "For questions regarding payments contact our support ",
       "BTN": "Change Tier"
     },
+    "HEADERS": {
+      "LOGINPOLICY":"Login Policy",
+      "PASSWORD":"Password",
+      "LABELPOLICY":"Privatelabelling",
+      "DOMAIN":"Organization Domain",
+      "TEXTSANDLINKS":"Texts and Links",
+      "METADATA":"Metadata"
+    },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
-      "LOGINPOLICYUSERNAMELOGIN": "Login Policy: Allow login with Username - custom",
-      "LOGINPOLICYPASSWORDRESET": "Login Policy: Hide reset password link - custom",
-      "LOGINPOLICYREGISTRATION": "Login Policy: Allow self registration - custom",
-      "LOGINPOLICYIDP": "Login Policy: Identity Provider - custom",
-      "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
-      "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
-      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
-      "LABELPOLICYWATERMARK": "Label Policy - watermark",
-      "CUSTOMDOMAIN": "Domain Verification - available",
-      "CUSTOMTEXT": "Custom texts",
-      "PRIVACYPOLICY":"Privacy Policy and TOS - custom",
+      "LOGINPOLICYUSERNAMELOGIN": "Allow login with Username",
+      "LOGINPOLICYPASSWORDRESET": "Hide reset password link",
+      "LOGINPOLICYREGISTRATION": "Allow self registration",
+      "LOGINPOLICYIDP": "Identity Providers",
+      "LOGINPOLICYFACTORS": "Multifactors",
+      "LOGINPOLICYPASSWORDLESS": "Passwordless Authentication",
+      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy",
+      "LABELPOLICYPRIVATELABEL": "Colors, Logo, Icon, Textappearance",
+      "LABELPOLICYWATERMARK": "Remove ZITADEL watermark",
+      "CUSTOMDOMAIN": "Organization domain verification",
+      "CUSTOMTEXTLOGIN": "Custom login interface texts",
+      "CUSTOMTEXTMESSAGE":"Custom notification mail texts",
+      "PRIVACYPOLICY":"Custom Privacy Policy and TOS Links",
       "METADATAUSER":"User Metadata"
     },
     "TIERSTATES": {
@@ -679,7 +691,7 @@
       "2": "Cancelled",
       "3": "Grandfathered"
     },
-    "NOTAVAILABLE": "Feature {{value}} is missing on your organization.",
+    "NOTAVAILABLE": "Feature <strong>{{value}}</strong> is missing on your organization.",
     "RETENTIONDAYS": "Days"
   },
   "POLICY": {

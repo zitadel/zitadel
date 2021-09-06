@@ -145,7 +145,8 @@
     "SEND": "Senden",
     "NEWVALUE": "Neuer Wert",
     "RESTORE":"Wiederherstellen",
-    "CONTINUEWITHOUTSAVE":"Ohne speichern fortfahren"
+    "CONTINUEWITHOUTSAVE":"Ohne speichern fortfahren",
+    "GOTOFEATURES":"Zu den Features"
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -641,6 +642,8 @@
     "TITLE": "Features",
     "DESCRIPTION": "Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe einsehen.",
     "BTN-EDIT": "Featureset anzeigen",
+    "AVAILABLE":"freigeschaltet",
+    "UNAVAILABLE":"nicht freigeschaltet",
     "TIER": {
       "NAME": "Preisstufe Name",
       "DETAILS": "Abrechnungsdetails",
@@ -657,20 +660,29 @@
       "QUESTIONS": "Bei Fragen kontaktieren Sie unseren Support per Mail an ",
       "BTN": "Preisstufe ändern"
     },
+    "HEADERS": {
+      "LOGINPOLICY":"Login Richtlinie",
+      "PASSWORD":"Passwort",
+      "LABELPOLICY":"Privatelabelling",
+      "DOMAIN":"Organisations Domänen",
+      "TEXTSANDLINKS":"Texte und Links",
+      "METADATA":"Metadata"
+    },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
-      "LOGINPOLICYUSERNAMELOGIN": "Login Richtlinie: Login mit Username erlauben - benutzerdefiniert",
-      "LOGINPOLICYPASSWORDRESET": "Login Richtlinie: Passwort vergessen Link nicht anzeigen - benutzerdefiniert",
-      "LOGINPOLICYREGISTRATION": "Login Richtlinie: Registration erlauben - benutzerdefiniert",
-      "LOGINPOLICYIDP": "Login Richtlinie: Identity Providers - benutzerdefiniert",
-      "LOGINPOLICYFACTORS": "Login Richtlinie: Multifaktoren - benutzerdefiniert",
-      "LOGINPOLICYPASSWORDLESS": "Login Richtlinie: Passwortlose Authentifizierung - benutzerdefiniert",
-      "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie - benutzerdefiniert",
-      "LABELPOLICYPRIVATELABEL": "Label Richtlinie - benutzerdefiniert",
-      "LABELPOLICYWATERMARK": "Label Richtlinie - Wasserzeichen",
-      "CUSTOMDOMAIN": "Domänen Verifikation - verfügbar",
-      "CUSTOMTEXT": "Benutzerdefinierte Texte",
-      "PRIVACYPOLICY":"Datenschutzrichtlinie und AGB - benutzerdefiniert",
+      "LOGINPOLICYUSERNAMELOGIN": "Login mit Username erlauben",
+      "LOGINPOLICYPASSWORDRESET": "Passwort vergessen Link nicht anzeigen",
+      "LOGINPOLICYREGISTRATION": "Registration erlauben",
+      "LOGINPOLICYIDP": "Identity Providers",
+      "LOGINPOLICYFACTORS": "Multifaktoren",
+      "LOGINPOLICYPASSWORDLESS": "Passwortlose Authentifizierung",
+      "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie",
+      "LABELPOLICYPRIVATELABEL": "Farben, Logo, Icon und Texterscheinungsbild",
+      "LABELPOLICYWATERMARK": "ZITADEL Wasserzeichen entfernen",
+      "CUSTOMDOMAIN": "Domänverifikation",
+      "CUSTOMTEXTLOGIN": "Benutzerdefinierte Logininterface Texte",
+      "CUSTOMTEXTMESSAGE":"Benutzerdefinierte Benachrichtigungstexte",
+      "PRIVACYPOLICY":"Benutzerdefinierte Datenschutzrichtlinie und AGB",
       "METADATAUSER":"User Metadata"
     },
     "TIERSTATES": {
@@ -679,7 +691,7 @@
       "2": "Annuliert",
       "3": "Durch IAM Owner gesetzt"
     },
-    "NOTAVAILABLE": "Feature {{value}} ist auf Ihrer Organisation nicht freigeschaltet!",
+    "NOTAVAILABLE": "Feature <strong>{{value}}</strong> ist auf Ihrer Organisation nicht freigeschaltet!",
     "RETENTIONDAYS": "Tage"
   },
   "POLICY": {

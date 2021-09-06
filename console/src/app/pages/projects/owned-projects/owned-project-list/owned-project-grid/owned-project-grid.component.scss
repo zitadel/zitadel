@@ -57,10 +57,6 @@
     min-height: 166px;
     transition: box-shadow .1s ease-in;
 
-    &.inactive {
-      color: var(--grey);
-    }
-
     img {
       height: 50px;
       width: 50px;
@@ -81,10 +77,29 @@
         color: var(--grey);
       }
 
-      .name {
-        margin-top: 1rem;
-        font-size: 1.2rem;
-        margin-bottom: .5rem;
+      .name-row {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0 .5rem 0;
+
+        .name {
+          font-size: 1.2rem;
+          margin-right: .5rem;
+        }
+
+        .state-dot {
+          height: 8px;
+          width: 8px;
+          border-radius: 50%;
+
+          &.active {
+            background-color: var(--success);
+          }
+
+          &.inactive {
+            background-color: var(--warn);
+          }
+        }
       }
 
       .description {

@@ -7,9 +7,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasFeatureModule } from 'src/app/directives/has-feature/has-feature.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
@@ -29,6 +31,8 @@ import { PasswordComplexityPolicyComponent } from './password-complexity-policy.
     HasRoleModule,
     MatTooltipModule,
     TranslateModule,
+    HasFeatureModule,
+    HasFeaturePipeModule,
     DetailLayoutModule,
     MatProgressSpinnerModule,
     PolicyGridModule,
