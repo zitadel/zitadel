@@ -19,7 +19,6 @@ require (
 	github.com/caos/orbos v1.5.14-0.20210803090517-905668247c09
 	github.com/cockroachdb/cockroach-go/v2 v2.1.1
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
-	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20210429001901-424d2337a529
@@ -57,23 +56,23 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.22.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.22.0
-	go.opentelemetry.io/otel v1.0.0-RC2
+	go.opentelemetry.io/otel v1.0.0-RC3
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.21.0
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.0.0-RC2
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.0.0-RC3
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.0.0-RC2
 	go.opentelemetry.io/otel/metric v0.22.0
-	go.opentelemetry.io/otel/sdk v1.0.0-RC2
+	go.opentelemetry.io/otel/sdk v1.0.0-RC3
 	go.opentelemetry.io/otel/sdk/export/metric v0.22.0
 	go.opentelemetry.io/otel/sdk/metric v0.22.0
-	go.opentelemetry.io/otel/trace v1.0.0-RC2
+	go.opentelemetry.io/otel/trace v1.0.0-RC3
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/oauth2 v0.0.0-20210805134026-6f1e6394065a
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.6
 	golang.org/x/tools v0.1.5
 	google.golang.org/api v0.52.0
-	google.golang.org/genproto v0.0.0-20210805201207-89edb61ffb67
-	google.golang.org/grpc v1.39.1
+	google.golang.org/genproto v0.0.0-20210805201207-89edb61ffb67 // indirect
+	google.golang.org/grpc v1.40.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
