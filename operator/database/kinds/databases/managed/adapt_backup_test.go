@@ -11,7 +11,6 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -152,9 +151,9 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	saJson := "testSA"
 	backupName := "testBucket"
 
-	features := []string{restore.Instant, clean.Instant}
+	features := []string{restore.Instant}
 	bucket.SetRestore(k8sClient, namespace, backupName, labels, saJson)
-	SetClean(k8sClient, namespace, 1)
+	//SetClean(k8sClient, namespace, 1)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second).Times(1)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)

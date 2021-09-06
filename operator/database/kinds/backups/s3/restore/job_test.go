@@ -2,7 +2,6 @@ package restore
 
 import (
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"
@@ -15,7 +14,7 @@ func TestBackup_Job1(t *testing.T) {
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
-	version := "testVersion"
+	image := "testVersion"
 	command := "test"
 	accessKeyIDName := "testAKIN"
 	accessKeyIDKey := "testAKIK"
@@ -51,7 +50,7 @@ func TestBackup_Job1(t *testing.T) {
 						Tolerations:   tolerations,
 						Containers: []corev1.Container{{
 							Name:  jobName,
-							Image: common.BackupImage.Reference("", version),
+							Image: image,
 							Command: []string{
 								"/bin/bash",
 								"-c",
@@ -121,7 +120,7 @@ func TestBackup_Job1(t *testing.T) {
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
-		version,
+		image,
 		command,
 	))
 }
@@ -130,7 +129,7 @@ func TestBackup_Job2(t *testing.T) {
 	nodeselector := map[string]string{"test2": "test2"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
-	version := "testVersion2"
+	image := "testVersion2"
 	command := "test2"
 	accessKeyIDName := "testAKIN2"
 	accessKeyIDKey := "testAKIK2"
@@ -166,7 +165,7 @@ func TestBackup_Job2(t *testing.T) {
 						Tolerations:   tolerations,
 						Containers: []corev1.Container{{
 							Name:  jobName,
-							Image: common.BackupImage.Reference("", version),
+							Image: image,
 							Command: []string{
 								"/bin/bash",
 								"-c",
@@ -236,6 +235,6 @@ func TestBackup_Job2(t *testing.T) {
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
-		version,
+		image,
 		command))
 }
