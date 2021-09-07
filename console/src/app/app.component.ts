@@ -4,7 +4,6 @@ import { DOCUMENT, ViewportScroller } from '@angular/common';
 import { Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
-import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
@@ -35,7 +34,6 @@ import { UpdateService } from './services/update.service';
   ],
 })
 export class AppComponent implements OnDestroy {
-  @ViewChild('drawer') public drawer!: MatDrawer;
   @ViewChild('input', { static: false }) input!: ElementRef;
   public isHandset$: Observable<boolean> = this.breakpointObserver
     .observe('(max-width: 599px)')

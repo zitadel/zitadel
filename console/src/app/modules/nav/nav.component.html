@@ -1,0 +1,120 @@
+<div class="nav-row">
+  <div class="left-list">
+      <a @navitem class="nav-item" [routerLinkActive]="['active']"
+          [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/']">
+          <i class="icon las la-home"></i>
+          <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
+      </a>
+
+      <ng-container *ngIf="authenticationService.authenticationChanged | async">
+          <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
+              [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
+              [routerLink]="['/users/me']">
+              <i class="icon las la-user-circle"></i>
+              <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
+          </a>
+      </ng-container>
+
+      <div *ngIf="org" [@navAnimation]="org">
+          <ng-template appHasRole
+              [appHasRole]="['org.read']">
+              <div @navitem class="divider">
+                  <div class="line"></div>
+                  <span>{{org?.name ? org.name : ('MENU.ORGSECTION' | translate)}}</span>
+                  <div class="hiddenline"></div>
+              </div>
+          </ng-template>
+
+          <ng-template appHasRole [appHasRole]="['org.read']">
+              <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/org']">
+                  <i class="icon las la-cog"></i>
+                  <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
+              </a>
+          </ng-template>
+
+          <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
+              <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
+                  <i class="icon las la-layer-group"></i>
+
+                  <div class="c_label">
+                      <span> {{'MENU.PROJECT' | translate}} </span>
+                      <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
+                          class="count">{{mgmtService?.ownedProjectsCount | async}}</span>
+                  </div>
+              </a>
+
+              <a @navitem matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
+                  *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
+                  class="nav-item" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/granted-projects']">
+                  <i class="icon las la-layer-group"></i>
+                  <div class="c_label">
+                      <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
+                      <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
+                  </div>
+              </a>
+          </ng-template>
+
+          <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+              <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/users/list/humans']"
+                  [routerLinkActiveOptions]="{ exact: true }">
+                  <i class="icon las la-user-friends"></i>
+                  <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
+              </a>
+
+              <a @navitem matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/users/list/machines']"
+                  [routerLinkActiveOptions]="{ exact: true }">
+                  <i class="icon las la-users-cog"></i>
+                  <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
+              </a>
+          </ng-template>
+
+          <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
+              <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
+                  [routerLinkActiveOptions]="{ exact: true }">
+                  <i class="icon las la-shield-alt"></i>
+                  <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
+              </a>
+          </ng-template>
+      </div>
+
+      <ng-container *ngIf="iamuser$ | async">
+          <div @navitem class="divider">
+              <div class="line"></div>
+              <span>{{'MENU.ADMINSECTION' | translate}}</span>
+              <div class="hiddenline"></div>
+          </div>
+          <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMPOLICIES' | translate}}" class="nav-item"
+              [routerLinkActive]="['active']" [routerLink]="[ '/iam','policies']">
+              <i class="icon las la-cog"></i>
+              <span class="label">{{'MENU.IAMPOLICIES' | translate}}</span>
+          </a>
+
+          <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMEVENTSTORE' | translate}}" class="nav-item"
+              [routerLinkActive]="['active']" [routerLink]="[ '/iam', 'eventstore']">
+              <i class="icon las la-database"></i>
+              <span class="label">{{'MENU.IAMEVENTSTORE' | translate}}</span>
+          </a>
+      </ng-container>
+
+      <span class="fill-space"></span>
+
+      <!-- <div class="toc-line" *ngIf="privacyPolicy">
+          <a class="toc" [href]="privacyPolicy.tosLink" alt="Terms and Conditions"
+              target="_blank">{{'MENU.TOS'
+              | translate}}</a>
+              <span class="slash">|</span>
+          <a class="toc" [href]="privacyPolicy.privacyLink" alt="Privacy Policy "
+              target="_blank">{{'MENU.PRIVACY'
+              | translate}}</a>
+          <span>&nbsp;&nbsp;&nbsp;</span>
+      </div> -->
+  </div>
+  <span class="fill-space"></span>
+  <div></div>
+</div>

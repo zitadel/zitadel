@@ -1,0 +1,19 @@
+.nav-row {
+  display: flex;
+  align-items: center;
+
+  .left-list {
+    display: flex;
+    align-items: center;
+
+    .nav-item {
+      border-radius: 50vw;
+      padding: .25rem 1rem;
+      margin-right: 1rem;
+    }
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+}

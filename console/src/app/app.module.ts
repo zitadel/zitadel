@@ -35,6 +35,7 @@ import { OutsideClickModule } from './directives/outside-click/outside-click.mod
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { InputModule } from './modules/input/input.module';
+import { NavModule } from './modules/nav/nav.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
@@ -101,6 +102,7 @@ const authConfig: AuthConfig = {
         useClass: WebpackTranslateLoader,
       },
     }),
+    NavModule,
     MatNativeDateModule,
     QuicklinkModule,
     AccountsCardModule,
