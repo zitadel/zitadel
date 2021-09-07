@@ -581,7 +581,6 @@
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
-      "CUSTOMDOMAINFEATUREMISSING":"The Feature custom-domain is not active on your organization!",
       "ORGDOMAIN": {
         "TITLE": "Organisation Domain Ownership Verification",
         "VERIFICATION": "Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",

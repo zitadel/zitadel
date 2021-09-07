@@ -31,8 +31,8 @@
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
 
-                <cnsl-info-section type="WARN" *ngIf="(['custom_domain'] | hasFeature | async) == false" class="custom-domain-deactivated">
-                    {{'ORG.PAGES.CUSTOMDOMAINFEATUREMISSING' | translate}}
+                <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+                  <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
                 </cnsl-info-section>
             
                 <button [disabled]="(canwrite$ | async) == false || (['custom_domain'] | hasFeature | async) == false" matTooltip="Add domain" mat-raised-button
