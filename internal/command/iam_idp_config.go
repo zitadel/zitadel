@@ -37,6 +37,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.Name,
 			config.Type,
 			config.StylingType,
+			config.AutoRegister,
 		),
 		iam_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
@@ -77,7 +78,7 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, iamAgg, config.IDPConfigID, config.Name, config.StylingType)
+	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, iamAgg, config.IDPConfigID, config.Name, config.StylingType, config.AutoRegister)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}

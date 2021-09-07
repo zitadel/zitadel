@@ -2428,6 +2428,7 @@ message AddOIDCIDPRequest {
             description: "definition which field is mapped to the email of the user";
         }
     ];
+    bool auto_register = 9;
 }
 
 message AddOIDCIDPResponse {
@@ -2458,6 +2459,7 @@ message UpdateIDPRequest {
             description: "some identity providers specify the styling of the button to their login";
         }
     ];
+    bool auto_register = 4;
 }
 
 message UpdateIDPResponse {

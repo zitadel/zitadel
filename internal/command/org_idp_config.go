@@ -40,6 +40,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			config.Name,
 			config.Type,
 			config.StylingType,
+			config.AutoRegister,
 		),
 		org_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
@@ -83,7 +84,8 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 		orgAgg,
 		config.IDPConfigID,
 		config.Name,
-		config.StylingType)
+		config.StylingType,
+		config.AutoRegister)
 
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")

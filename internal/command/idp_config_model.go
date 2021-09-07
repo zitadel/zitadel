@@ -11,9 +11,10 @@ type IDPConfigWriteModel struct {
 
 	State domain.IDPConfigState
 
-	ConfigID    string
-	Name        string
-	StylingType domain.IDPConfigStylingType
+	ConfigID     string
+	Name         string
+	AutoRegister bool
+	StylingType  domain.IDPConfigStylingType
 }
 
 func (rm *IDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
@@ -42,6 +43,7 @@ func (rm *IDPConfigWriteModel) reduceConfigAddedEvent(e *idpconfig.IDPConfigAdde
 	rm.ConfigID = e.ConfigID
 	rm.Name = e.Name
 	rm.StylingType = e.StylingType
+	rm.AutoRegister = e.AutoRegister
 	rm.State = domain.IDPConfigStateActive
 }
 
@@ -51,6 +53,9 @@ func (rm *IDPConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigCh
 	}
 	if e.StylingType != nil && e.StylingType.Valid() {
 		rm.StylingType = *e.StylingType
+	}
+	if e.AutoRegister != nil {
+		rm.AutoRegister = *e.AutoRegister
 	}
 }
 

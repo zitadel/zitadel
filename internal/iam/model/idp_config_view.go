@@ -13,6 +13,7 @@ type IDPConfigView struct {
 	IDPConfigID     string
 	Name            string
 	StylingType     IDPStylingType
+	AutoRegister    bool
 	State           IDPConfigState
 	CreationDate    time.Time
 	ChangeDate      time.Time
