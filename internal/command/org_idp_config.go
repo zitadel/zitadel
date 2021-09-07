@@ -70,12 +70,12 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Gh8ds", "Errors.ResourceOwnerMissing")
 	}
-	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, config.AggregateID)
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-1J9fs", "Errors.Org.IDPConfig.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -107,7 +107,7 @@ func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-BBmd0", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
@@ -187,7 +187,7 @@ func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-4M9so", "Errors.Org.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-2m90f", "Errors.Org.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }

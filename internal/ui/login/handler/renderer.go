@@ -223,7 +223,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-sio0W", "could not get authreq"))
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
