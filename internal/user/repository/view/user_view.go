@@ -22,6 +22,27 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	return user, err
 }
 
+func UserByIDAndResourceOwner(db *gorm.DB, table, userID, resourceOwner string) (*model.UserView, error) {
+	user := new(model.UserView)
+	userIDQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyUserID,
+		Method: domain.SearchMethodListContains,
+		Value:  userID,
+	}
+	resourceOwnerQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyResourceOwner,
+		Method: domain.SearchMethodEquals,
+		Value:  resourceOwner,
+	}
+	query := repository.PrepareGetByQuery(table, userIDQuery, resourceOwnerQuery)
+	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-fb93Fs", "Errors.User.NotFound")
+	}
+	user.SetEmptyUserType()
+	return user, err
+}
+
 func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error) {
 	user := new(model.UserView)
 	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
