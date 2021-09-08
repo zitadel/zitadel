@@ -40,7 +40,6 @@ The primary domain scope will restrict the login to your organization, so only u
 ### 2. Setting on your Project
 Set the private labeling setting on your project to define which branding should trigger.
 
-
 ## Reset to default
 If you don't like your customization anymore click the "reset policy" button.
 All your settings will be removed and the default settings of the system will trigger.
