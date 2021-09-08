@@ -723,6 +723,7 @@
       "DROPFONT":"Fontdatei hier ablegen",
       "RELEASEFONT":"Jetzt loslassen",
       "MAXSIZE":"Die maximale Grösse von Uploads ist mit 524kB begrenzt",
+      "EMAILNOSVG":"Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED":"Maximale Grösse von 524kB überschritten",
       "FONTINLOGINONLY":"Die Schriftart wird momentan nur im Login interface angezeigt.",
       "PREVIEW": {
