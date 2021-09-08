@@ -257,6 +257,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
+	case *domain.RedirectToExternalIDPStep:
+		l.handleIDP(w, r, authReq, authReq.SelectedIDPConfigID)
 	case *domain.InitPasswordStep:
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *domain.PasswordStep:

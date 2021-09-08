@@ -133,6 +133,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
 	}
+
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
@@ -636,6 +637,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, new(domain.LoginStep))
 		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
+		}
+		if request.SelectedIDPConfigID != "" {
+			return append(steps, &domain.RedirectToExternalIDPStep{}), nil
 		}
 		if len(request.Prompt) == 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 			users, err := repo.usersForUserSelection(request)
