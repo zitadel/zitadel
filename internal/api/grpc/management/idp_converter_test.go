@@ -116,7 +116,6 @@ func Test_updateIDPToDomain(t *testing.T) {
 				"OIDCConfig",
 				"State",
 				"Type", //TODO: type should not be changeable
-				"AutoRegister",
 			)
 		})
 	}
