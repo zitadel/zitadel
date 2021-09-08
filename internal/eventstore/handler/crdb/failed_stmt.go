@@ -20,7 +20,7 @@ const (
 		") AS failure_count"
 )
 
-func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt handler.Statement, execErr error) (shouldContinue bool) {
+func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt *handler.Statement, execErr error) (shouldContinue bool) {
 	failureCount, err := h.failureCount(tx, stmt.Sequence)
 	if err != nil {
 		logging.LogWithFields("CRDB-WJaFk", "projection", h.ProjectionName, "seq", stmt.Sequence).WithError(err).Warn("unable to get failure count")
