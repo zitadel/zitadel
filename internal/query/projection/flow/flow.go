@@ -74,6 +74,7 @@ const (
 	actionStateCol         = "flow_state"
 	actionSequenceCol      = "sequence"
 	actionNameCol          = "name"
+	actionScriptCol        = "script"
 )
 
 func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.EventReader) (*handler.Statement, error) {
@@ -120,6 +121,7 @@ func (p *FlowProjection) reduceFlowActionAdded(event eventstore.EventReader) (*h
 			handler.NewCol(actionResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(actionSequenceCol, e.Sequence()),
 			handler.NewCol(actionNameCol, e.Name),
+			handler.NewCol(actionScriptCol, e.Script),
 		},
 		crdb.WithTableSuffix(actionTableSuffix),
 	), nil
@@ -136,7 +138,10 @@ func (p *FlowProjection) reduceFlowActionChanged(event eventstore.EventReader) (
 		handler.NewCol(actionSequenceCol, e.Sequence()),
 	}
 	if e.Name != nil {
-		values = append(values, handler.NewCol(actionNameCol, e.Name))
+		values = append(values, handler.NewCol(actionNameCol, *e.Name))
+	}
+	if e.Script != nil {
+		values = append(values, handler.NewCol(actionScriptCol, *e.Script))
 	}
 	return crdb.NewUpdateStatement(
 		e,

@@ -22,7 +22,8 @@ type FlowType int32
 
 const (
 	FlowTypeUnspecified FlowType = iota
-	FlowTypeRegister
+	FlowTypeExternalAuthentication
+	FlowTypeExternalRegistration
 	flowTypeCount
 )
 
@@ -32,8 +33,14 @@ func (s FlowType) Valid() bool {
 
 func (s FlowType) HasTrigger(triggerType TriggerType) bool {
 	switch triggerType {
-	case TriggerTypePreRegister:
-		return s == FlowTypeRegister
+	case TriggerTypePostAuthentication:
+		if s == FlowTypeExternalAuthentication {
+			return true
+		}
+		if s == FlowTypeExternalRegistration {
+			return true
+		}
+		return false
 	default:
 		return false
 	}
@@ -43,7 +50,7 @@ type TriggerType int32
 
 const (
 	TriggerTypeUnspecified TriggerType = iota
-	TriggerTypePreRegister
+	TriggerTypePostAuthentication
 	triggerTypeCount
 )
 

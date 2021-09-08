@@ -191,8 +191,8 @@ FlowTypeQuery is always equals
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | FLOW_TYPE_UNSPECIFIED | 0 | - |
-| FLOW_TYPE_REGISTER | 1 | - |
-| FLOW_TYPE_LOGIN | 2 | - |
+| FLOW_TYPE_EXTERNAL_AUTHENTICATION | 1 | - |
+| FLOW_TYPE_EXTERNAL_REGISTRATION | 2 | - |
 
 
 
@@ -203,9 +203,7 @@ FlowTypeQuery is always equals
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | TRIGGER_TYPE_UNSPECIFIED | 0 | - |
-| TRIGGER_TYPE_PRE_REGISTER | 1 | - |
-| TRIGGER_TYPE_POST_REGISTER | 2 | - |
-| TRIGGER_TYPE_POST_LOGIN | 3 | - |
+| TRIGGER_TYPE_POST_AUTHENTICATION | 1 | - |
 
 
 

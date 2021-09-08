@@ -46,3 +46,17 @@ CREATE TABLE zitadel.projections.flows_triggers (
 --     FROM projections.flows_orgs o
 --            JOIN projections.flows_users u ON o.id = u.org_id
 --       );
+
+CREATE VIEW zitadel.projections.flows_actions_triggers AS (
+    SELECT a.id AS action_id,
+        a.name,
+        a.creation_date,
+        a.resource_owner,
+        a.sequence,
+        a.change_date,
+        a.script,
+        t.flow_type,
+        t.trigger_type
+    FROM zitadel.projections.flows_triggers t
+           JOIN zitadel.projections.flows_actions a ON t.action_id = a.id
+      );

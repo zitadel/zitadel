@@ -20,6 +20,9 @@ func (wm *OrgFlowWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.TriggerActionsSetEvent:
+			if e.FlowType != wm.FlowType {
+				continue
+			}
 			wm.FlowWriteModel.AppendEvents(&e.TriggerActionsSetEvent)
 		}
 	}

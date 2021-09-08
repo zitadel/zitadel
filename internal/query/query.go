@@ -2,7 +2,9 @@ package query
 
 import (
 	"context"
+	"database/sql"
 
+	sq "github.com/Masterminds/squirrel"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
@@ -23,6 +25,8 @@ type Queries struct {
 	eventstore   *eventstore.Eventstore
 	idGenerator  id.Generator
 	secretCrypto crypto.Crypto
+
+	client *sql.DB
 }
 
 type Config struct {
@@ -30,10 +34,19 @@ type Config struct {
 }
 
 func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
+	sqlClient, err := projections.CRDB.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	sq.StatementBuilder = sq.StatementBuilder.PlaceholderFormat(sq.Dollar) //TODO: ?
+
 	repo = &Queries{
 		iamID:       defaults.IamID,
 		eventstore:  es,
 		idGenerator: id.SonyFlakeGenerator,
+		client:      sqlClient,
+		//querier: querier,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)

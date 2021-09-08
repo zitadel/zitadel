@@ -3642,7 +3642,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| script |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| script |  string | - | string.min_len: 1<br /> string.max_len: 2000<br />  |
 | timeout |  google.protobuf.Duration | - | duration.lte.seconds: 20<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
 | allowed_to_fail |  bool | - |  |
 
@@ -7453,7 +7453,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| script |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| script |  string | - | string.min_len: 1<br /> string.max_len: 2000<br />  |
 | timeout |  google.protobuf.Duration | - | duration.lte.seconds: 20<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
 | allowed_to_fail |  bool | - |  |
 

@@ -5148,7 +5148,7 @@ message CreateActionRequest {
         }
     ];
     string script = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 2000},
          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
              example: "\"function log(context, calls){console.log(context)}\"";
          }
@@ -5193,7 +5193,7 @@ message UpdateActionRequest {
         }
     ];
     string script = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 2000},
          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
              example: "\"function log(context, calls){console.log(context)}\"";
          }

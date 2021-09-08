@@ -155,12 +155,26 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *dom
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	externalUser, err := l.customMapping(externalUser, tokens, authReq, idpConfig)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil
 		}
 		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
+	}
+	if len(externalUser.Metadatas) > 0 {
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			return
+		}
+		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
@@ -228,8 +242,9 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
+	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, linkingUser.Metadatas, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return

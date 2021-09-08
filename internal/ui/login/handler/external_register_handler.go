@@ -119,10 +119,15 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
-	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
+	user, _, err = l.customRegistrationMapping(user, tokens, authReq, idpConfig)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil, nil)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *iam_model.OrgIAMPolicyView, human *domain.Human, idp *domain.ExternalIDP, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *iam_model.OrgIAMPolicyView, human *domain.Human, idp *domain.ExternalIDP, metadata []*domain.Metadata, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -144,6 +149,7 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		ExternalEmailVerified:      human.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+		//UserInfo:                   User,
 	}
 	if human.Phone != nil {
 		data.Phone = human.PhoneNumber
