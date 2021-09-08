@@ -143,7 +143,7 @@ func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.Eve
 	if len(opts) == 0 {
 		return NewNoOpStatement(event)
 	}
-	execs := make([]func(ex handler.Executer, projectionName string) error, len(opts))
+	execs := make([]Exec, len(opts))
 	for i, opt := range opts {
 		execs[i] = opt(event)
 	}
