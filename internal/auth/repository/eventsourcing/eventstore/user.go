@@ -17,6 +17,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -307,16 +308,39 @@ func (repo *UserRepo) GetMyMetadataByKey(ctx context.Context, key string) (*doma
 	return iam_model.MetadataViewToDomain(data), nil
 }
 
+func (repo *UserRepo) OrgByUserID(ctx context.Context, userID string) (*domain.Org, error) {
+	user, err := repo.View.UserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	org, err := repo.View.OrgByID(user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return org_model.OrgToDomain(org), nil
+}
+
+func (repo *UserRepo) SearchUserMetadata(ctx context.Context, userID string) (*domain.MetadataSearchResponse, error) {
+	req := new(domain.MetadataSearchRequest)
+	return repo.searchUserMetadata(userID, "", req)
+}
+
 func (repo *UserRepo) SearchMyMetadata(ctx context.Context, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	err := req.EnsureLimit(repo.SearchLimit)
 	if err != nil {
 		return nil, err
 	}
+	return repo.searchUserMetadata(ctxData.UserID, ctxData.ResourceOwner, req)
+}
+
+func (repo *UserRepo) searchUserMetadata(userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error) {
 	sequence, sequenceErr := repo.View.GetLatestUserSequence()
 	logging.Log("EVENT-N9fsd").OnError(sequenceErr).Warn("could not read latest user sequence")
-	req.AppendAggregateIDQuery(ctxData.UserID)
-	req.AppendResourceOwnerQuery(ctxData.ResourceOwner)
+	req.AppendAggregateIDQuery(userID)
+	if resourceOwner != "" {
+		req.AppendResourceOwnerQuery(resourceOwner)
+	}
 	metadata, count, err := repo.View.SearchMetadata(req)
 	if err != nil {
 		return nil, err

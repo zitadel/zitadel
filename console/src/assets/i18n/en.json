@@ -912,6 +912,25 @@
         "OWNED": "Owned Projects",
         "GRANTED": "Granted Projects"
       },
+      "PRIVATELABEL": {
+        "TITLE":"Private Labeling Setting",
+        "0": {
+          "TITLE":"Unspecified",
+          "DESC":"As soon as the user is identified, the private labeling of the organisation of the identified user will be shown, before the system default is shown."
+        },
+        "1": {
+          "TITLE":"Enforce project resource owner Policy",
+          "DESC":"The private labeling of the organisation which owns the project will be shown"
+        },
+        "2": {
+          "TITLE":"Allow Login User resource owner policy",
+          "DESC":"The private labeling of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown."
+        },
+        "DIALOG":{
+          "TITLE":"Privatelabeling Setting",
+          "DESCRIPTION":"Select the behaviour of the login, when using the project."
+        }
+      },
       "PINNED": "Pinned",
       "ALL": "All",
       "CREATEDON": "Created on",

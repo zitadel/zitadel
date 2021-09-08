@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -22,14 +23,12 @@ import (
 )
 
 const (
-	scopeOpenID  = "openid"
-	scopeProfile = "profile"
-	scopeEmail   = "email"
-	scopePhone   = "phone"
-	scopeAddress = "address"
-
 	ScopeProjectRolePrefix = "urn:zitadel:iam:org:project:role:"
 	ClaimProjectRoles      = "urn:zitadel:iam:org:project:roles"
+	ScopeUserMetaData      = "urn:zitadel:iam:user:metadata"
+	ClaimUserMetaData      = ScopeUserMetaData
+	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
+	ClaimResourceOwner     = ScopeResourceOwner + ":"
 
 	oidcCtx = "oidc"
 )
@@ -177,6 +176,23 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 				continue
 			}
 			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
+		case ScopeUserMetaData:
+			userMetaData, err := o.assertUserMetaData(ctx, userID)
+			if err != nil {
+				return err
+			}
+			if len(userMetaData) > 0 {
+				userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
+			}
+		case ScopeResourceOwner:
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return err
+			}
+			for claim, value := range resourceOwnerClaims {
+				userInfo.AppendClaims(claim, value)
+			}
+
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
@@ -186,7 +202,6 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 			}
 		}
 	}
-
 	if len(roles) == 0 || applicationID == "" {
 		return nil
 	}
@@ -197,7 +212,6 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
-
 	return nil
 }
 
@@ -227,6 +241,24 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
 	for _, scope := range scopes {
+		switch scope {
+		case ScopeUserMetaData:
+			userMetaData, err := o.assertUserMetaData(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			if len(userMetaData) > 0 {
+				claims = appendClaim(claims, ClaimUserMetaData, userMetaData)
+			}
+		case ScopeResourceOwner:
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			for claim, value := range resourceOwnerClaims {
+				claims = appendClaim(claims, claim, value)
+			}
+		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
@@ -262,6 +294,31 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 		}
 	}
 	return projectRoles, nil
+}
+
+func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
+	metaData, err := o.repo.SearchUserMetadata(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	userMetaData := make(map[string]string)
+	for _, md := range metaData.Result {
+		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
+	}
+	return userMetaData, nil
+}
+
+func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
+	resourceOwner, err := o.repo.OrgByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]string{
+		ClaimResourceOwner + "id":             resourceOwner.AggregateID,
+		ClaimResourceOwner + "name":           resourceOwner.Name,
+		ClaimResourceOwner + "primary_domain": resourceOwner.PrimaryDomain,
+	}, nil
 }
 
 func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {

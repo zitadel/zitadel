@@ -106,6 +106,12 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	if strings.HasPrefix(scope, authreq_model.ProjectIDScope) {
 		return true
 	}
+	if strings.HasPrefix(scope, ScopeUserMetaData) {
+		return true
+	}
+	if strings.HasPrefix(scope, ScopeResourceOwner) {
+		return true
+	}
 	for _, allowedScope := range c.allowedScopes {
 		if scope == allowedScope {
 			return true
