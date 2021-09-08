@@ -722,6 +722,7 @@
       "RELEASE":"Release",
       "DROPFONT":"Drop fontfile here",
       "RELEASEFONT":"Release",
+      "USEOFLOGO":"Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organisation switcher in console",
       "MAXSIZE":"The maximum size is limited to 524kB",
       "EMAILNOSVG":"The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED":"Maximum size of 524kB exceeded.",
