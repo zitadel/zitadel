@@ -168,11 +168,13 @@ func AddUpsertStatement(values []handler.Column, opts ...execOption) func(events
 		return NewUpsertStatement(event, values, opts...).Execute
 	}
 }
+
 func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
 	return func(event eventstore.EventReader) Exec {
 		return NewUpdateStatement(event, values, conditions, opts...).Execute
 	}
 }
+
 func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
 	return func(event eventstore.EventReader) Exec {
 		return NewDeleteStatement(event, conditions, opts...).Execute
