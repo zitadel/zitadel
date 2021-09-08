@@ -663,6 +663,41 @@ func TestNewMultiStatement(t *testing.T) {
 			},
 		},
 		{
+			name: "no condition",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				execs: []func(eventstore.EventReader) Exec{
+					AddDeleteStatement(
+						[]handler.Condition{},
+					),
+					AddCreateStatement(
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						}),
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoCondition)
+				},
+			},
+		},
+		{
 			name: "correct",
 			args: args{
 				table: "my_table",
