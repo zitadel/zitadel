@@ -18,7 +18,7 @@ type ProjectionHandlerConfig struct {
 }
 
 //Update updates the projection with the given statements
-type Update func(context.Context, []Statement, Reduce) (unexecutedStmts []Statement, err error)
+type Update func(context.Context, []*Statement, Reduce) (unexecutedStmts []*Statement, err error)
 
 //Reduce reduces the given event to a statement
 //which is used to update the projection
@@ -46,7 +46,7 @@ type ProjectionHandler struct {
 	ProjectionName string
 
 	lockMu sync.Mutex
-	stmts  []Statement
+	stmts  []*Statement
 }
 
 func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
@@ -165,9 +165,7 @@ func (h *ProjectionHandler) processEvent(
 	h.lockMu.Lock()
 	defer h.lockMu.Unlock()
 
-	if stmt != nil {
-		h.stmts = append(h.stmts, *stmt)
-	}
+	h.stmts = append(h.stmts, stmt)
 
 	return nil
 }

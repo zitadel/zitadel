@@ -162,7 +162,7 @@ func TestStatementHandler_Update(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		stmts  []handler.Statement
+		stmts  []*handler.Statement
 		reduce handler.Reduce
 	}
 	tests := []struct {
@@ -212,8 +212,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewNoOpStatement(&testEvent{
+				stmts: []*handler.Statement{
+					NewNoOpStatement(&testEvent{
 						aggregateType:    "agg",
 						sequence:         6,
 						previousSequence: 0,
@@ -242,8 +242,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "testAgg",
 							sequence:         7,
@@ -279,8 +279,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -320,8 +320,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -361,8 +361,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewNoOpStatement(&testEvent{
+				stmts: []*handler.Statement{
+					NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 5,
@@ -392,8 +392,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewNoOpStatement(&testEvent{
+				stmts: []*handler.Statement{
+					NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 0,
@@ -428,8 +428,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
-					*NewNoOpStatement(&testEvent{
+				stmts: []*handler.Statement{
+					NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 0,
@@ -684,7 +684,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 		failedEventsTable string
 	}
 	type args struct {
-		stmts     []handler.Statement
+		stmts     []*handler.Statement
 		sequences currentSequences
 	}
 	type want struct {
@@ -703,8 +703,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -732,8 +732,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -745,7 +745,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val1",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 
 						&testEvent{
 							aggregateType:    "agg",
@@ -780,8 +780,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				failedEventsTable: "failed_events",
 			},
 			args: args{
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -793,7 +793,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         6,
@@ -805,7 +805,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -844,8 +844,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				failedEventsTable: "failed_events",
 			},
 			args: args{
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -857,7 +857,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val1",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         6,
@@ -869,7 +869,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val2",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -909,8 +909,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmts: []handler.Statement{
-					*NewCreateStatement(
+				stmts: []*handler.Statement{
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         5,
@@ -922,7 +922,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         6,
@@ -934,7 +934,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					*NewCreateStatement(
+					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         7,
@@ -946,7 +946,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
-					*NewMultiStatement(
+					NewMultiStatement(
 						&testEvent{
 							aggregateType:    "agg",
 							sequence:         8,
@@ -1052,7 +1052,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 		projectionName string
 	}
 	type args struct {
-		stmt handler.Statement
+		stmt *handler.Statement
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -1070,7 +1070,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: *NewCreateStatement(
+				stmt: NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1098,7 +1098,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: *NewCreateStatement(
+				stmt: NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1128,7 +1128,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: *NewCreateStatement(
+				stmt: NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,
@@ -1158,7 +1158,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: *NewNoOpStatement(&testEvent{
+				stmt: NewNoOpStatement(&testEvent{
 					aggregateType:    "agg",
 					sequence:         1,
 					previousSequence: 0,
@@ -1177,7 +1177,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmt: *NewCreateStatement(
+				stmt: NewCreateStatement(
 					&testEvent{
 						aggregateType:    "agg",
 						sequence:         1,

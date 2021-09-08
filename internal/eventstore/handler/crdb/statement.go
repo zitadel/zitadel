@@ -208,7 +208,7 @@ func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []stri
 
 type query func(config execConfig) string
 
-func exec(config execConfig, q query, opts []execOption) func(ex handler.Executer, projectionName string) error {
+func exec(config execConfig, q query, opts []execOption) Exec {
 	return func(ex handler.Executer, projectionName string) error {
 		if projectionName == "" {
 			return handler.ErrNoProjection
@@ -231,7 +231,7 @@ func exec(config execConfig, q query, opts []execOption) func(ex handler.Execute
 	}
 }
 
-func multiExec(execList []func(ex handler.Executer, projectionName string) error) func(ex handler.Executer, projectionName string) error {
+func multiExec(execList []Exec) Exec {
 	return func(ex handler.Executer, projectionName string) error {
 		for _, exec := range execList {
 			if err := exec(ex, projectionName); err != nil {
