@@ -17,6 +17,10 @@ func (v *View) UserByID(userID string) (*model.UserView, error) {
 	return view.UserByID(v.Db, userTable, userID)
 }
 
+func (v *View) UserByIDAndResourceOwner(userID, resourceOwner string) (*model.UserView, error) {
+	return view.UserByIDAndResourceOwner(v.Db, userTable, userID, resourceOwner)
+}
+
 func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	return view.SearchUsers(v.Db, userTable, request)
 }

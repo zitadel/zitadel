@@ -20,7 +20,7 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
-	user, err := s.user.UserByID(ctx, req.Id)
+	user, err := s.user.UserByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
