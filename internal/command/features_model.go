@@ -30,6 +30,7 @@ type FeaturesWriteModel struct {
 	MetadataUser             bool
 	CustomTextMessage        bool
 	CustomTextLogin          bool
+	LockoutPolicy            bool
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {
@@ -93,6 +94,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.CustomTextLogin != nil {
 				wm.CustomTextLogin = *e.CustomTextLogin
+			}
+			if e.LockoutPolicy != nil {
+				wm.LockoutPolicy = *e.LockoutPolicy
 			}
 		case *features.FeaturesRemovedEvent:
 			wm.State = domain.FeaturesStateRemoved
