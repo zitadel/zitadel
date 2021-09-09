@@ -71,12 +71,12 @@ Use the scope `urn:zitadel:iam:org:project:id:{projectid}:aud` to include the pr
 curl --request POST \
   --url https://api.zitadel.ch/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data grant_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
+  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email urn:zitadel:iam:org:project:id:69234237810729019:aud' \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
-* `grant_type` must be set to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+* `grant_type` must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 * `scope` should contain any [Scopes](../../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 

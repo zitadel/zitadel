@@ -32,8 +32,8 @@ type externalIDPCallbackData struct {
 }
 
 type externalNotFoundOptionFormData struct {
-	Link         bool `schema:"link"`
-	AutoRegister bool `schema:"autoregister"`
+	Link         bool `schema:"linkbutton"`
+	AutoRegister bool `schema:"autoregisterbutton"`
 	ResetLinking bool `schema:"resetlinking"`
 	TermsConfirm bool `schema:"terms-confirm"`
 }
@@ -275,6 +275,9 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 			username = linkingUser.Email
 		}
 	}
+	if username == "" {
+		username = linkingUser.Email
+	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {
 		splittedUsername := strings.Split(username, "@")
@@ -309,6 +312,9 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 		if linkingUser.IsEmailVerified && linkingUser.Email != "" {
 			displayName = linkingUser.Email
 		}
+	}
+	if displayName == "" {
+		displayName = linkingUser.Email
 	}
 
 	externalIDP := &domain.ExternalIDP{

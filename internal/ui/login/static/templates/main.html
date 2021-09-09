@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ resourceThemeUrl "css/zitadel.css" .Theme }}" type="text/css">
     <link rel="icon" type="image/x-icon" href="{{ resourceThemeUrl "favicon.ico" .Theme }}">
     {{ if hasCustomPolicy .LabelPolicy }}
-    <link rel="stylesheet" href="{{ variablesCssFileUrl .OrgID .LabelPolicy}}" type="text/css">
+    <link rel="stylesheet" href="{{ variablesCssFileUrl .PrivateLabelingOrgID .LabelPolicy}}" type="text/css">
     {{ end}}
     <link rel="stylesheet" href="{{ resourceThemeUrl "../../fonts/lgn-icons/css/lgn-icon-font.css" .Theme }}">
 

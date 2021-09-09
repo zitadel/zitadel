@@ -151,8 +151,14 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
-		if requiredFeature == domain.FeatureCustomText {
-			if !features.CustomText {
+		if requiredFeature == domain.FeatureCustomTextMessage {
+			if !features.CustomTextMessage {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
+		if requiredFeature == domain.FeatureCustomTextLogin {
+			if !features.CustomTextLogin {
 				return MissingFeatureErr(requiredFeature)
 			}
 			continue

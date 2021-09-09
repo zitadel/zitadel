@@ -26,6 +26,8 @@ import {
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
   ListMyLinkedIDPsResponse,
+  ListMyMembershipsRequest,
+  ListMyMembershipsResponse,
   ListMyPasswordlessRequest,
   ListMyPasswordlessResponse,
   ListMyProjectOrgsRequest,
@@ -78,7 +80,7 @@ import {
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { Gender, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
+import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageService } from './storage.service';
 
@@ -138,11 +140,22 @@ export class GrpcAuthService {
 
   public async getActiveOrg(id?: string): Promise<Org.AsObject> {
     if (id) {
-      const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
-      if (org && this.cachedOrgs.find(tmp => tmp.id === org.id)) {
-        return org;
+      const find = this.cachedOrgs.find(tmp => tmp.id === id);
+      if (find) {
+        this.setActiveOrg(find);
+        return Promise.resolve(find);
+      } else {
+        const orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
+        this.cachedOrgs = orgs;
+
+        const toFind = this.cachedOrgs.find(tmp => tmp.id === id);
+        if (toFind) {
+          this.setActiveOrg(toFind);
+          return Promise.resolve(toFind);
+        } else {
+          return Promise.reject(new Error('requested organization not found'));
+        }
       }
-      return Promise.reject(new Error('no cached org'));
     } else {
       let orgs = this.cachedOrgs;
       if (orgs.length === 0) {
@@ -350,6 +363,24 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserGrants(req, null).then(resp => resp.toObject());
   }
 
+  public listMyMemberships(limit: number, offset: number,
+    queryList?: MembershipQuery[],
+  ): Promise<ListMyMembershipsResponse.AsObject> {
+    const req = new ListMyMembershipsRequest();
+    const metadata = new ListQuery();
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.auth.listMyMemberships(req, null).then(resp => resp.toObject());
+  }
+
   public getMyEmail(): Promise<GetMyEmailResponse.AsObject> {
     const req = new GetMyEmailRequest();
     return this.grpcService.auth.getMyEmail(req, null).then(resp => resp.toObject());
@@ -409,11 +440,11 @@ export class GrpcAuthService {
   }
 
   public removeMyLinkedIDP(
-    externalUserId: string,
     idpId: string,
+    linkedUserId: string,
   ): Promise<RemoveMyLinkedIDPResponse.AsObject> {
     const req = new RemoveMyLinkedIDPRequest();
-    req.setLinkedUserId(externalUserId);
+    req.setLinkedUserId(linkedUserId);
     req.setIdpId(idpId);
     return this.grpcService.auth.removeMyLinkedIDP(req, null).then(resp => resp.toObject());
   }

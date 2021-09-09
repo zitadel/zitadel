@@ -46,7 +46,7 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	human := setUpOrgHumanToDomain(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
 	org := setUpOrgOrgToDomain(req.Org)
 
-	objectDetails, err := s.command.SetUpOrg(ctx, org, human, userIDs)
+	objectDetails, err := s.command.SetUpOrg(ctx, org, human, userIDs, false)
 	if err != nil {
 		return nil, err
 	}

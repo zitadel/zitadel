@@ -26,6 +26,7 @@ const (
 	NextStepPasswordless
 	NextStepPasswordlessRegistrationPrompt
 	NextStepRegistration
+	NextStepProjectRequired
 )
 
 type LoginStep struct{}
@@ -159,6 +160,12 @@ type GrantRequiredStep struct{}
 
 func (s *GrantRequiredStep) Type() NextStepType {
 	return NextStepGrantRequired
+}
+
+type ProjectRequiredStep struct{}
+
+func (s *ProjectRequiredStep) Type() NextStepType {
+	return NextStepProjectRequired
 }
 
 type RedirectToCallbackStep struct{}

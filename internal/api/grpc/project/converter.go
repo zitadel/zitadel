@@ -2,6 +2,7 @@ package project
 
 import (
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
@@ -9,12 +10,14 @@ import (
 
 func ProjectToPb(project *proj_model.ProjectView) *proj_pb.Project {
 	return &proj_pb.Project{
-		Id:                   project.ProjectID,
-		Details:              object_grpc.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
-		Name:                 project.Name,
-		State:                projectStateToPb(project.State),
-		ProjectRoleAssertion: project.ProjectRoleAssertion,
-		ProjectRoleCheck:     project.ProjectRoleCheck,
+		Id:                     project.ProjectID,
+		Details:                object_grpc.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
+		Name:                   project.Name,
+		State:                  projectStateToPb(project.State),
+		ProjectRoleAssertion:   project.ProjectRoleAssertion,
+		ProjectRoleCheck:       project.ProjectRoleCheck,
+		HasProjectCheck:        project.HasProjectCheck,
+		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
 	}
 }
 
@@ -57,6 +60,17 @@ func projectStateToPb(state proj_model.ProjectState) proj_pb.ProjectState {
 		return proj_pb.ProjectState_PROJECT_STATE_INACTIVE
 	default:
 		return proj_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
+	}
+}
+
+func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) proj_pb.PrivateLabelingSetting {
+	switch setting {
+	case domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy:
+		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY
+	case domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy:
+		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY
+	default:
+		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
 	}
 }
 

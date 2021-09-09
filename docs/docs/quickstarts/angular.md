@@ -30,7 +30,7 @@ Continue and Create the application.
 
 ### Client ID and Secret
 
-After successful app creation a popup will appear showing you your clientID as well as a secret.
+After successful app creation a popup will appear showing you your clientID.
 Copy your client ID as it will be needed in the next step.
 
 ## Angular Setup
@@ -58,7 +58,6 @@ const authConfig: AuthConfig = {
     responseType: 'code',
     oidc: true,
     clientId: 'YOUR-CLIENT-ID', // replace with your appid
-    dummyClientSecret: 'YOUR-SECRET', // required by library
     issuer: 'https://issuer.zitadel.ch',
     redirectUri: 'http://localhost:4200/auth/callback',
     postLogoutRedirectUri: 'http://localhost:4200/signedout', // optional

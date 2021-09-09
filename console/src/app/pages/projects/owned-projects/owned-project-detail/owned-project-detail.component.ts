@@ -8,12 +8,15 @@ import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import {
+  ProjectPrivateLabelingDialogComponent,
+} from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
 import { ListAppsResponse, UpdateProjectRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
-import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { PrivateLabelingSetting, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -68,6 +71,22 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  public openPrivateLabelingDialog(): void {
+    const dialogRef = this.dialog.open(ProjectPrivateLabelingDialogComponent, {
+      data: {
+        setting: this.project.privateLabelingSetting,
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp: PrivateLabelingSetting) => {
+      if (resp !== undefined) {
+        this.project.privateLabelingSetting = resp;
+        this.saveProject();
+      }
+    });
   }
 
   private async getData({ id }: Params): Promise<void> {
@@ -185,6 +204,8 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     req.setName(this.project.name);
     req.setProjectRoleAssertion(this.project.projectRoleAssertion);
     req.setProjectRoleCheck(this.project.projectRoleCheck);
+    req.setHasProjectCheck(this.project.hasProjectCheck);
+    req.setPrivateLabelingSetting(this.project.privateLabelingSetting);
 
     this.mgmtService.updateProject(req).then(() => {
       this.toast.showInfo('PROJECT.TOAST.UPDATED', true);

@@ -11,11 +11,16 @@ import (
 )
 
 type wantExecuter struct {
-	query         string
-	args          []interface{}
+	params        []params
+	i             int
 	t             *testing.T
 	wasExecuted   bool
 	shouldExecute bool
+}
+
+type params struct {
+	query string
+	args  []interface{}
 }
 
 var errTestErr = errors.New("some error")
@@ -34,12 +39,18 @@ func (ex *wantExecuter) check(t *testing.T) {
 func (ex *wantExecuter) Exec(query string, args ...interface{}) (sql.Result, error) {
 	ex.t.Helper()
 	ex.wasExecuted = true
-	if query != ex.query {
-		ex.t.Errorf("wrong query:\n  expected:\n    %q\n  got:\n    %q", ex.query, query)
+	if ex.i >= len(ex.params) {
+		ex.t.Errorf("did not expect more exec, but got:\n    %q with %q", query, args)
+		return nil, nil
 	}
-	if !reflect.DeepEqual(ex.args, args) {
-		ex.t.Errorf("wrong args:\n  expected:\n    %v\n  got:\n    %v", ex.args, args)
+	p := ex.params[ex.i]
+	if query != p.query {
+		ex.t.Errorf("wrong query:\n  expected:\n    %q\n  got:\n    %q", p.query, query)
 	}
+	if !reflect.DeepEqual(p.args, args) {
+		ex.t.Errorf("wrong args:\n  expected:\n    %v\n  got:\n    %v", p.args, args)
+	}
+	ex.i++
 	return nil, nil
 }
 
@@ -137,9 +148,13 @@ func TestNewCreateStatement(t *testing.T) {
 				sequence:         1,
 				previousSequence: 1,
 				executer: &wantExecuter{
-					query:         "INSERT INTO my_table (col1) VALUES ($1)",
+					params: []params{
+						{
+							query: "INSERT INTO my_table (col1) VALUES ($1)",
+							args:  []interface{}{"val"},
+						},
+					},
 					shouldExecute: true,
-					args:          []interface{}{"val"},
 				},
 				isErr: func(err error) bool {
 					return err == nil
@@ -255,9 +270,13 @@ func TestNewUpsertStatement(t *testing.T) {
 				sequence:         1,
 				previousSequence: 1,
 				executer: &wantExecuter{
-					query:         "UPSERT INTO my_table (col1) VALUES ($1)",
+					params: []params{
+						{
+							query: "UPSERT INTO my_table (col1) VALUES ($1)",
+							args:  []interface{}{"val"},
+						},
+					},
 					shouldExecute: true,
-					args:          []interface{}{"val"},
 				},
 				isErr: func(err error) bool {
 					return err == nil
@@ -283,8 +302,8 @@ func TestNewUpdateStatement(t *testing.T) {
 	type args struct {
 		table      string
 		event      *testEvent
-		conditions []handler.Column
 		values     []handler.Column
+		conditions []handler.Condition
 	}
 	type want struct {
 		table            string
@@ -314,7 +333,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -344,7 +363,7 @@ func TestNewUpdateStatement(t *testing.T) {
 					previousSequence: 0,
 				},
 				values: []handler.Column{},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -379,7 +398,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Column{},
+				conditions: []handler.Condition{},
 			},
 			want: want{
 				table:            "my_table",
@@ -409,7 +428,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -422,9 +441,13 @@ func TestNewUpdateStatement(t *testing.T) {
 				sequence:         1,
 				previousSequence: 1,
 				executer: &wantExecuter{
-					query:         "UPDATE my_table SET (col1) = ($1) WHERE (col2 = $2)",
+					params: []params{
+						{
+							query: "UPDATE my_table SET (col1) = ($1) WHERE (col2 = $2)",
+							args:  []interface{}{"val", 1},
+						},
+					},
 					shouldExecute: true,
-					args:          []interface{}{"val", 1},
 				},
 				isErr: func(err error) bool {
 					return err == nil
@@ -450,7 +473,7 @@ func TestNewDeleteStatement(t *testing.T) {
 	type args struct {
 		table      string
 		event      *testEvent
-		conditions []handler.Column
+		conditions []handler.Condition
 	}
 
 	type want struct {
@@ -475,7 +498,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col2",
 						Value: 1,
@@ -504,7 +527,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conditions: []handler.Column{},
+				conditions: []handler.Condition{},
 			},
 			want: want{
 				table:            "my_table",
@@ -528,7 +551,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					previousSequence: 0,
 					aggregateType:    "agg",
 				},
-				conditions: []handler.Column{
+				conditions: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: 1,
@@ -541,9 +564,13 @@ func TestNewDeleteStatement(t *testing.T) {
 				sequence:         1,
 				previousSequence: 1,
 				executer: &wantExecuter{
-					query:         "DELETE FROM my_table WHERE (col1 = $1)",
+					params: []params{
+						{
+							query: "DELETE FROM my_table WHERE (col1 = $1)",
+							args:  []interface{}{1},
+						},
+					},
 					shouldExecute: true,
-					args:          []interface{}{1},
 				},
 				isErr: func(err error) bool {
 					return err == nil
@@ -572,7 +599,7 @@ func TestNewNoOpStatement(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want handler.Statement
+		want *handler.Statement
 	}{
 		{
 			name: "generate correctly",
@@ -583,7 +610,7 @@ func TestNewNoOpStatement(t *testing.T) {
 					previousSequence: 3,
 				},
 			},
-			want: handler.Statement{
+			want: &handler.Statement{
 				AggregateType:    "agg",
 				Execute:          nil,
 				Sequence:         5,
@@ -596,6 +623,174 @@ func TestNewNoOpStatement(t *testing.T) {
 			if got := NewNoOpStatement(tt.args.event); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewNoOpStatement() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestNewMultiStatement(t *testing.T) {
+	type args struct {
+		table string
+		event *testEvent
+		execs []func(eventstore.EventReader) Exec
+	}
+
+	type want struct {
+		table            string
+		aggregateType    eventstore.AggregateType
+		sequence         uint64
+		previousSequence uint64
+		executer         *wantExecuter
+		isErr            func(error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "no op",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				execs: nil,
+			},
+			want: want{
+				executer: nil,
+			},
+		},
+		{
+			name: "no condition",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				execs: []func(eventstore.EventReader) Exec{
+					AddDeleteStatement(
+						[]handler.Condition{},
+					),
+					AddCreateStatement(
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						}),
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoCondition)
+				},
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					sequence:         1,
+					previousSequence: 0,
+					aggregateType:    "agg",
+				},
+				execs: []func(eventstore.EventReader) Exec{
+					AddDeleteStatement(
+						[]handler.Condition{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						}),
+					AddCreateStatement(
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						}),
+					AddUpsertStatement(
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						}),
+					AddUpdateStatement(
+						[]handler.Column{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						},
+						[]handler.Condition{
+							{
+								Name:  "col1",
+								Value: 1,
+							},
+						}),
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "DELETE FROM my_table WHERE (col1 = $1)",
+							args:  []interface{}{1},
+						},
+						{
+							query: "INSERT INTO my_table (col1) VALUES ($1)",
+							args:  []interface{}{1},
+						},
+						{
+							query: "UPSERT INTO my_table (col1) VALUES ($1)",
+							args:  []interface{}{1},
+						},
+						{
+							query: "UPDATE my_table SET (col1) = ($1) WHERE (col1 = $2)",
+							args:  []interface{}{1, 1},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stmt := NewMultiStatement(tt.args.event, tt.args.execs...)
+
+			if tt.want.executer != nil && stmt.Execute == nil {
+				t.Error("expected executer, but was nil")
+			}
+			if stmt.Execute == nil {
+				return
+			}
+			tt.want.executer.t = t
+			err := stmt.Execute(tt.want.executer, tt.args.table)
+			if !tt.want.isErr(err) {
+				t.Errorf("unexpected error: %v", err)
+			}
+			tt.want.executer.check(t)
 		})
 	}
 }
@@ -735,7 +930,7 @@ func Test_columnsToQuery(t *testing.T) {
 
 func Test_columnsToWhere(t *testing.T) {
 	type args struct {
-		cols        []handler.Column
+		conds       []handler.Condition
 		paramOffset int
 	}
 	type want struct {
@@ -758,7 +953,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "no offset",
 			args: args{
-				cols: []handler.Column{
+				conds: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -774,7 +969,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "multiple cols",
 			args: args{
-				cols: []handler.Column{
+				conds: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -794,7 +989,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "2 offset",
 			args: args{
-				cols: []handler.Column{
+				conds: []handler.Condition{
 					{
 						Name:  "col1",
 						Value: "val1",
@@ -810,7 +1005,7 @@ func Test_columnsToWhere(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotWheres, gotValues := columnsToWhere(tt.args.cols, tt.args.paramOffset)
+			gotWheres, gotValues := conditionsToWhere(tt.args.conds, tt.args.paramOffset)
 			if !reflect.DeepEqual(gotWheres, tt.want.wheres) {
 				t.Errorf("columnsToWhere() gotWheres = %v, want %v", gotWheres, tt.want.wheres)
 			}

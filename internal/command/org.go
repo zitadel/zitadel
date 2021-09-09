@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -30,7 +31,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, claimedUserIDs []string) (*domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
 	orgIAMPolicy, err := c.getDefaultOrgIAMPolicy(ctx)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.IAM.OrgIAMPolicy.NotFound")
@@ -39,7 +40,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.IAM.PasswordComplexity.NotFound")
 	}
-	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, orgIAMPolicy, pwPolicy, claimedUserIDs)
+	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, orgIAMPolicy, pwPolicy, claimedUserIDs, selfregistered)
 	if err != nil {
 		return nil, err
 	}
@@ -161,13 +162,26 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) setUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, loginPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy, claimedUserIDs []string) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.EventPusher, err error) {
+func (c *Commands) setUpOrg(
+	ctx context.Context,
+	organisation *domain.Org,
+	admin *domain.Human,
+	loginPolicy *domain.OrgIAMPolicy,
+	pwPolicy *domain.PasswordComplexityPolicy,
+	claimedUserIDs []string,
+	selfregistered bool,
+) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.EventPusher, err error) {
 	orgAgg, orgWriteModel, addOrgEvents, err := c.addOrg(ctx, organisation, claimedUserIDs)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
 
-	userEvents, human, err := c.addHuman(ctx, orgAgg.ID, admin, loginPolicy, pwPolicy)
+	var userEvents []eventstore.EventPusher
+	if selfregistered {
+		userEvents, human, err = c.registerHuman(ctx, orgAgg.ID, admin, nil, loginPolicy, pwPolicy)
+	} else {
+		userEvents, human, err = c.addHuman(ctx, orgAgg.ID, admin, loginPolicy, pwPolicy)
+	}
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}

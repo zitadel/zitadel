@@ -19,6 +19,9 @@ import {
   MFAProvidersText,
   PasswordChangeDoneScreenText,
   PasswordChangeScreenText,
+  PasswordlessPromptScreenText,
+  PasswordlessRegistrationDoneScreenText,
+  PasswordlessRegistrationScreenText,
   PasswordlessScreenText,
   PasswordResetDoneScreenText,
   PasswordScreenText,
@@ -312,6 +315,40 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r29.setTitle(map.verifyMfaU2fText?.title ?? '');
   r29.setValidateTokenText(map.verifyMfaU2fText?.validateTokenText ?? '');
   req.setVerifyMfaU2fText(r29);
+
+  const r30 = new PasswordlessPromptScreenText();
+  r30.setDescription(map.passwordlessPromptText?.description ?? '');
+  r30.setDescriptionInit(map.passwordlessPromptText?.descriptionInit ?? '');
+  r30.setNextButtonText(map.passwordlessPromptText?.nextButtonText ?? '');
+  r30.setPasswordlessButtonText(map.passwordlessPromptText?.passwordlessButtonText ?? '');
+  r30.setSkipButtonText(map.passwordlessPromptText?.skipButtonText ?? '');
+  r30.setTitle(map.passwordlessPromptText?.title ?? '');
+  req.setPasswordlessPromptText(r30);
+
+  const r31 = new PasswordlessRegistrationDoneScreenText();
+  r31.setDescription(map.passwordlessRegistrationDoneText?.description ?? '');
+  r31.setNextButtonText(map.passwordlessRegistrationDoneText?.nextButtonText ?? '');
+  r31.setTitle(map.passwordlessRegistrationDoneText?.title ?? '');
+  req.setPasswordlessRegistrationDoneText(r31);
+
+  const r32 = new PasswordlessRegistrationScreenText();
+  r32.setDescription(map.passwordlessRegistrationText?.description ?? '');
+  r32.setErrorRetry(map.passwordlessRegistrationText?.errorRetry ?? '');
+  r32.setNotSupported(map.passwordlessRegistrationText?.notSupported ?? '');
+  r32.setRegisterTokenButtonText(map.passwordlessRegistrationText?.registerTokenButtonText ?? '');
+  r32.setTitle(map.passwordlessRegistrationText?.title ?? '');
+  r32.setTokenNameLabel(map.passwordlessRegistrationText?.tokenNameLabel ?? '');
+  req.setPasswordlessRegistrationText(r32);
+
+
+  const r33 = new PasswordlessScreenText();
+  r33.setDescription(map.passwordlessText?.description ?? '');
+  r33.setErrorRetry(map.passwordlessText?.errorRetry ?? '');
+  r33.setLoginWithPwButtonText(map.passwordlessText?.loginWithPwButtonText ?? '');
+  r33.setNotSupported(map.passwordlessText?.notSupported ?? '');
+  r33.setTitle(map.passwordlessText?.title ?? '');
+  r33.setValidateTokenButtonText(map.passwordlessText?.validateTokenButtonText ?? '');
+  req.setPasswordlessText(r33);
 
   return req;
 }

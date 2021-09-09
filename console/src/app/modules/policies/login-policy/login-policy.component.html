@@ -1,7 +1,7 @@
 <app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
     [description]="(serviceType==PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-    <p class="default" *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</p>
+    <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
@@ -177,7 +177,7 @@
 
     <div class="idps">
         <div class="idp"
-            [ngClass]="{'disabled': disabled || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false)}"
+            [ngClass]="{'disabled': (disabled || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false))}"
             *ngFor="let idp of idps">
             <button
                 [disabled]="disabled || (serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false)"
@@ -206,13 +206,7 @@
     <ng-template appHasRole [appHasRole]="['org.idp.read']">
         <app-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
             [expanded]="false">
-            <div card-actions>
-                <i class="lab la-google"></i>
-                <i class="lab la-facebook"></i>
-                <i class="lab la-apple"></i>
-                <i class="lab la-github"></i>
-                <i class="lab la-gitlab"></i>
-            </div>
+
             <app-idp-table [service]="service" [serviceType]="serviceType"
                 [disabled]="([serviceType == PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType == PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) == false || ((serviceType == PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) == false))">
             </app-idp-table>

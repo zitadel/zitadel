@@ -13,8 +13,9 @@ import (
 type UserWriteModel struct {
 	eventstore.WriteModel
 
-	UserName  string
-	UserState domain.UserState
+	UserName     string
+	ExternalIDPs []*domain.ExternalIDP
+	UserState    domain.UserState
 }
 
 func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
@@ -23,6 +24,7 @@ func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		ExternalIDPs: make([]*domain.ExternalIDP, 0),
 	}
 }
 
@@ -39,6 +41,24 @@ func (wm *UserWriteModel) Reduce() error {
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
+		case *user.HumanExternalIDPAddedEvent:
+			wm.ExternalIDPs = append(wm.ExternalIDPs, &domain.ExternalIDP{IDPConfigID: e.IDPConfigID, ExternalUserID: e.ExternalUserID})
+		case *user.HumanExternalIDPRemovedEvent:
+			idx, _ := wm.ExternalIDPByID(e.IDPConfigID, e.ExternalUserID)
+			if idx < 0 {
+				continue
+			}
+			copy(wm.ExternalIDPs[idx:], wm.ExternalIDPs[idx+1:])
+			wm.ExternalIDPs[len(wm.ExternalIDPs)-1] = nil
+			wm.ExternalIDPs = wm.ExternalIDPs[:len(wm.ExternalIDPs)-1]
+		case *user.HumanExternalIDPCascadeRemovedEvent:
+			idx, _ := wm.ExternalIDPByID(e.IDPConfigID, e.ExternalUserID)
+			if idx < 0 {
+				continue
+			}
+			copy(wm.ExternalIDPs[idx:], wm.ExternalIDPs[idx+1:])
+			wm.ExternalIDPs[len(wm.ExternalIDPs)-1] = nil
+			wm.ExternalIDPs = wm.ExternalIDPs[:len(wm.ExternalIDPs)-1]
 		case *user.MachineAddedEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
@@ -76,6 +96,9 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanInitializedCheckSucceededType,
+			user.HumanExternalIDPAddedType,
+			user.HumanExternalIDPRemovedType,
+			user.HumanExternalIDPCascadeRemovedType,
 			user.MachineAddedEventType,
 			user.UserUserNameChangedType,
 			user.MachineChangedEventType,
@@ -124,4 +147,13 @@ func hasUserState(check domain.UserState, states ...domain.UserState) bool {
 		}
 	}
 	return false
+}
+
+func (wm *UserWriteModel) ExternalIDPByID(idpID, externalUserID string) (idx int, idp *domain.ExternalIDP) {
+	for idx, idp = range wm.ExternalIDPs {
+		if idp.IDPConfigID == idpID && idp.ExternalUserID == externalUserID {
+			return idx, idp
+		}
+	}
+	return -1, nil
 }

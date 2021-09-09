@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -38,6 +39,11 @@ type Executer interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 }
 
+type Column struct {
+	Name  string
+	Value interface{}
+}
+
 func NewCol(name string, value interface{}) Column {
 	return Column{
 		Name:  name,
@@ -54,7 +60,11 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
-type Column struct {
-	Name  string
-	Value interface{}
+type Condition Column
+
+func NewCond(name string, value interface{}) Condition {
+	return Condition{
+		Name:  name,
+		Value: value,
+	}
 }

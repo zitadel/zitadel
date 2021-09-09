@@ -39,9 +39,7 @@ func (h *StatementHandler) handleLock(ctx context.Context, errs chan error, lock
 
 func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Duration) error {
 	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-	//the var is float for not losing ms of the lock
-	interval := float64(lockDuration) / float64(time.Second)
-	res, err := h.client.Exec(h.lockStmt, h.workerName, interval, h.ProjectionName)
+	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Seconds(), h.ProjectionName)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}
