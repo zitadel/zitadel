@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/pkg/grpc/org"
 )
 
 func listOrgRequestToModel(req *admin.ListOrgsRequest) (*query.OrgSearchQueries, error) {
@@ -18,11 +19,20 @@ func listOrgRequestToModel(req *admin.ListOrgsRequest) (*query.OrgSearchQueries,
 		SearchRequest: query.SearchRequest{
 			Offset:        offset,
 			Limit:         limit,
-			SortingColumn: req.SortingColumn.String(),
+			SortingColumn: fieldNameToOrgColumn(req.SortingColumn),
 			Asc:           asc,
 		},
 		Queries: queries,
 	}, nil
+}
+
+func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.SortingColumn {
+	switch fieldName {
+	case org.OrgFieldName_ORG_FIELD_NAME_NAME:
+		return query.OrgColumnName
+	default:
+		return nil
+	}
 }
 
 func setUpOrgOrgToDomain(req *admin.SetUpOrgRequest_Org) *domain.Org {

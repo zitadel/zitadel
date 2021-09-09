@@ -28,11 +28,11 @@ type Config struct {
 
 type EsRepository struct {
 	spooler *es_spol.Spooler
+	eventstore.OrgRepo
 	eventstore.IAMRepository
 	eventstore.AdministratorRepo
 	eventstore.FeaturesRepo
 	eventstore.UserRepo
-	eventstore.OrgRepo
 }
 
 func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
@@ -60,6 +60,10 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 
 	return &EsRepository{
 		spooler: spool,
+		OrgRepo: eventstore.OrgRepo{
+			View:           view,
+			SystemDefaults: systemDefaults,
+		},
 		IAMRepository: eventstore.IAMRepository{
 			Eventstore:                          es,
 			View:                                view,
@@ -87,10 +91,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			SearchLimit:     conf.SearchLimit,
 			SystemDefaults:  systemDefaults,
 			PrefixAvatarURL: assetsAPI,
-		},
-		OrgRepo: eventstore.OrgRepo{
-			View:           view,
-			SystemDefaults: systemDefaults,
 		},
 	}, nil
 }

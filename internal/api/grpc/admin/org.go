@@ -5,11 +5,11 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
@@ -30,12 +30,18 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	orgs, _, err := s.query.SearchOrgs(ctx, queries)
+	orgs, totalResult, err := s.query.SearchOrgs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	//TODO: return count
-	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgViewsToPb(orgs)}, nil
+	return &admin_pb.ListOrgsResponse{
+		Result: org_grpc.OrgViewsToPb(orgs),
+		Details: &obj_pb.ListDetails{
+			TotalResult: totalResult,
+			// TODO: ProcessedSequence: ,
+			// TODO: ViewTimestamp: ,
+		},
+	}, nil
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {

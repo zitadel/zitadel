@@ -141,14 +141,6 @@ type OrgSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *OrgSearchQueries) ToQuery(query squirrel.SelectBuilder) squirrel.SelectBuilder {
-	query = q.SearchRequest.ToQuery(query)
-	for _, q := range q.Queries {
-		query = q.ToQuery(query)
-	}
-	return query
-}
-
 func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery("domain", value, method)
 }
@@ -157,6 +149,43 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery("name", value, method)
 }
 
-func newOrgIDSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery("id", id, TextEquals)
+func (q *OrgSearchQueries) ToQuery(query squirrel.SelectBuilder) squirrel.SelectBuilder {
+	query = q.SearchRequest.ToQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
+}
+
+type OrgColumn int32
+
+const (
+	OrgColumnCreationDate OrgColumn = iota + 1
+	OrgColumnChangeDate
+	OrgColumnResourceOwner
+	OrgColumnState
+	OrgColumnSequence
+	OrgColumnName
+	OrgColumnDomain
+)
+
+func (c OrgColumn) toColumnName() string {
+	switch c {
+	case OrgColumnCreationDate:
+		return "creation_date"
+	case OrgColumnChangeDate:
+		return "change_date"
+	case OrgColumnResourceOwner:
+		return "resource_owner"
+	case OrgColumnState:
+		return "org_state"
+	case OrgColumnSequence:
+		return "sequence"
+	case OrgColumnName:
+		return "name"
+	case OrgColumnDomain:
+		return "domain"
+	default:
+		return ""
+	}
 }

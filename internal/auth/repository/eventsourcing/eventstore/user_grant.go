@@ -28,7 +28,7 @@ type UserGrantRepo struct {
 	AuthZRepo       *authz_repo.EsRepository
 	PrefixAvatarURL string
 
-	query *query.Queries
+	Query *query.Queries
 }
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
@@ -202,7 +202,7 @@ func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]st
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := query.OrgSearchQueries{
 		SearchRequest: query.SearchRequest{
-			SortingColumn: "name",
+			SortingColumn: query.OrgColumnName,
 			Asc:           true,
 		},
 	}
@@ -218,7 +218,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 			}
 		}
 	}
-	orgs, count, err := repo.query.SearchOrgs(context.TODO(), &searchRequest)
+	orgs, count, err := repo.Query.SearchOrgs(context.TODO(), &searchRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectO
 	if err != nil {
 		return nil, err
 	}
-	org, err := repo.query.OrgByID(context.TODO(), user.ResourceOwner)
+	org, err := repo.Query.OrgByID(context.TODO(), user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

@@ -10,9 +10,11 @@ import (
 type SearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn string
+	SortingColumn SortingColumn
 	Asc           bool
 }
+
+type SortingColumn interface{ toColumnName() string }
 
 func (req *SearchRequest) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Offset > 0 {
@@ -22,12 +24,12 @@ func (req *SearchRequest) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		query = query.Limit(req.Limit)
 	}
 
-	if req.SortingColumn != "" {
+	if req.SortingColumn != nil {
 		clause := "LOWER(?)"
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query.OrderByClause(clause, req.SortingColumn)
+		query.OrderByClause(clause, req.SortingColumn.toColumnName())
 	}
 
 	return query

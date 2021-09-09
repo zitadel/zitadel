@@ -155,6 +155,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IamID:       systemDefaults.IamID,
 			Auth:        authZ,
 			AuthZRepo:   authZRepo,
+			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
