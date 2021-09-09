@@ -13,7 +13,7 @@ import (
 )
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
-	if config.OIDCConfig == nil || config.JWTConfig == nil {
+	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
 	}
 
@@ -22,11 +22,6 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 		return nil, err
 	}
 	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
-
-	clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
-	if err != nil {
-		return nil, err
-	}
 
 	iamAgg := IAMAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.EventPusher{
@@ -40,6 +35,11 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 		),
 	}
 	if config.OIDCConfig != nil {
+		clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+		if err != nil {
+			return nil, err
+		}
+
 		events = append(events, iam_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
 			iamAgg,

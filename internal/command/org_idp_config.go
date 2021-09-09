@@ -16,7 +16,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
 	}
-	if config.OIDCConfig == nil {
+	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
 
@@ -25,11 +25,6 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 		return nil, err
 	}
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
-
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
-	if err != nil {
-		return nil, err
-	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.EventPusher{
@@ -41,7 +36,13 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			config.Type,
 			config.StylingType,
 		),
-		org_repo.NewIDPOIDCConfigAddedEvent(
+	}
+	if config.OIDCConfig != nil {
+		clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, org_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
 			orgAgg,
 			config.OIDCConfig.ClientID,
@@ -52,7 +53,14 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			clientSecret,
 			config.OIDCConfig.IDPDisplayNameMapping,
 			config.OIDCConfig.UsernameMapping,
-			config.OIDCConfig.Scopes...),
+			config.OIDCConfig.Scopes...))
+	} else if config.JWTConfig != nil {
+		events = append(events, org_repo.NewIDPJWTConfigAddedEvent(
+			ctx,
+			orgAgg,
+			idpConfigID,
+			config.JWTConfig.Issuer,
+			config.JWTConfig.KeysEndpoint))
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {

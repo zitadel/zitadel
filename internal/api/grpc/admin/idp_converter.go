@@ -66,6 +66,14 @@ func updateOIDCConfigToDomain(req *admin_pb.UpdateIDPOIDCConfigRequest) *domain.
 	}
 }
 
+func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		IDPConfigID:  req.IdpId,
+		Issuer:       req.Issuer,
+		KeysEndpoint: req.KeysEndpoint,
+	}
+}
+
 func listIDPsToModel(req *admin_pb.ListIDPsRequest) *iam_model.IDPConfigSearchRequest {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &iam_model.IDPConfigSearchRequest{

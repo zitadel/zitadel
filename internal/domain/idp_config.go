@@ -56,7 +56,7 @@ type OIDCIDPConfig struct {
 
 type JWTIDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID
+	IDPConfigID  string
 	Issuer       string
 	KeysEndpoint string
 }

@@ -2618,7 +2618,7 @@ service ManagementService {
     }
 
     // Add a new jwt identity provider configuration in the organisation
-    rpc AddOrgJWTIDP(AddOrgOIDCIDPRequest) returns (AddOrgOIDCIDPResponse) {
+    rpc AddOrgJWTIDP(AddOrgJWTIDPRequest) returns (AddOrgJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt"
             body: "*"

@@ -2597,8 +2597,8 @@ Provider must be OIDC compliant
 
 ### AddOrgJWTIDP
 
-> **rpc** AddOrgJWTIDP([AddOrgOIDCIDPRequest](#addorgoidcidprequest))
-[AddOrgOIDCIDPResponse](#addorgoidcidpresponse)
+> **rpc** AddOrgJWTIDP([AddOrgJWTIDPRequest](#addorgjwtidprequest))
+[AddOrgJWTIDPResponse](#addorgjwtidpresponse)
 
 Add a new jwt identity provider configuration in the organisation
 
