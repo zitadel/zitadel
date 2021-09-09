@@ -40,6 +40,23 @@ func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRe
 		),
 	}, nil
 }
+
+func (s *Server) AddOrgJWTIDP(ctx context.Context, req *mgmt_pb.AddOrgJWTIDPRequest) (*mgmt_pb.AddOrgJWTIDPResponse, error) {
+	//config, err := s.command.AddIDPConfig(ctx, addJWTIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return &mgmt_pb.AddOrgJWTIDPResponse{
+	//	IdpId: config.IDPConfigID,
+	//	Details: object_pb.AddToDetailsPb(
+	//		config.Sequence,
+	//		config.ChangeDate,
+	//		config.ResourceOwner,
+	//	),
+	//}, nil
+	return nil, nil
+}
+
 func (s *Server) DeactivateOrgIDP(ctx context.Context, req *mgmt_pb.DeactivateOrgIDPRequest) (*mgmt_pb.DeactivateOrgIDPResponse, error) {
 	objectDetails, err := s.command.DeactivateIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -95,4 +112,19 @@ func (s *Server) UpdateOrgIDPOIDCConfig(ctx context.Context, req *mgmt_pb.Update
 			config.ResourceOwner,
 		),
 	}, nil
+}
+
+func (s *Server) UpdateOrgIDPJWTConfig(ctx context.Context, req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) (*mgmt_pb.UpdateOrgIDPJWTConfigResponse, error) {
+	//config, err := s.command.ChangeIDPJWTConfig(ctx, updateJWTConfigToDomain(req), authz.GetCtxData(ctx).OrgID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return &mgmt_pb.UpdateOrgIDPJWTConfigResponse{
+	//	Details: object_pb.ChangeToDetailsPb(
+	//		config.Sequence,
+	//		config.ChangeDate,
+	//		config.ResourceOwner,
+	//	),
+	//}, nil
+	return nil, nil
 }

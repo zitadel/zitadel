@@ -77,7 +77,20 @@ func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUs
 		ProvidedUserId:   link.ExternalUserID,
 		ProvidedUserName: link.UserDisplayName,
 		//TODO: as soon as saml is implemented we need to switch here
-		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+		//IdpType: IDPTypeToPb(link.Type),
+	}
+}
+
+func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
+	switch idpType {
+	case domain.IDPConfigTypeOIDC:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
+	case domain.IDPConfigTypeSAML:
+		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
+	case domain.IDPConfigTypeJWT:
+		return idp_pb.IDPType_IDP_TYPE_JWT
+	default:
+		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	}
 }
 

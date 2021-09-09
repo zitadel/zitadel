@@ -15,6 +15,7 @@ type IDPConfig struct {
 	StylingType IDPConfigStylingType
 	State       IDPConfigState
 	OIDCConfig  *OIDCIDPConfig
+	JWTConfig   *JWTIDPConfig
 }
 
 type IDPConfigView struct {
@@ -53,11 +54,19 @@ type OIDCIDPConfig struct {
 	UsernameMapping       OIDCMappingField
 }
 
+type JWTIDPConfig struct {
+	es_models.ObjectRoot
+	IDPConfigID
+	Issuer       string
+	KeysEndpoint string
+}
+
 type IDPConfigType int32
 
 const (
 	IDPConfigTypeOIDC IDPConfigType = iota
 	IDPConfigTypeSAML
+	IDPConfigTypeJWT
 
 	//count is for validation
 	idpConfigTypeCount

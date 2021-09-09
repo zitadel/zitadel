@@ -89,6 +89,18 @@ title: zitadel/idp.proto
 
 
 
+### JWTConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| issuer |  string | - |  |
+| keys_endpoint |  string | - |  |
+
+
+
+
 ### OIDCConfig
 
 
@@ -161,7 +173,8 @@ authorization framework of the identity provider
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | IDP_TYPE_UNSPECIFIED | 0 | - |
-| IDP_TYPE_OIDC | 1 | PLANNED: IDP_TYPE_SAML |
+| IDP_TYPE_OIDC | 1 | - |
+| IDP_TYPE_JWT | 3 | PLANNED: IDP_TYPE_SAML |
 
 
 

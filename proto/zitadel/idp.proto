@@ -114,6 +114,7 @@ enum IDPType {
     IDP_TYPE_UNSPECIFIED = 0;
     IDP_TYPE_OIDC = 1;
     //PLANNED: IDP_TYPE_SAML
+    IDP_TYPE_JWT = 3;
 }
 
 // the owner of the identity provider.
@@ -159,6 +160,22 @@ enum OIDCMappingField {
     OIDC_MAPPING_FIELD_UNSPECIFIED = 0;
     OIDC_MAPPING_FIELD_PREFERRED_USERNAME = 1;
     OIDC_MAPPING_FIELD_EMAIL = 2;
+}
+
+
+message JWTConfig {
+    string issuer = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the identity provider";
+        }
+    ];
+    string keys_endpoint = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/keys\"";
+            description: "the endpoint where the keys can be read";
+        }
+    ];
 }
 
 message IDPIDQuery {

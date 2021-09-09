@@ -401,6 +401,41 @@ service AdminService {
         };
     }
 
+    // Adds a new jwt identity provider configuration the IAM
+    rpc AddJWTIDP(AddJWTIDPRequest) returns (AddJWTIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/jwt";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "identity provider";
+            tags: "jwt";
+
+            responses: {
+                key: "200";
+                value: {
+                    description: "idp created";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Updates the specified idp
     // all fields are updated. If no value is provided the field will be empty afterwards.
     rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
@@ -598,7 +633,53 @@ service AdminService {
             };
         };
     }
-    
+
+    //Updates the jwt configuration of the specified idp
+    // all fields are updated. If no value is provided the field will be empty afterwards.
+    rpc UpdateIDPJWTConfig(UpdateIDPJWTConfigRequest) returns (UpdateIDPJWTConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/jwt_config";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "identity provider";
+            tags: "jwt";
+            responses: {
+                key: "200";
+                value: {
+                    description: "jwt config updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+            responses: {
+                key: "409";
+                value: {
+                    description: "precondition failed";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     rpc GetDefaultFeatures(GetDefaultFeaturesRequest) returns (GetDefaultFeaturesResponse) {
         option(google.api.http) = {
             get: "/features"
@@ -2435,6 +2516,50 @@ message AddOIDCIDPResponse {
     string idp_id = 2;
 }
 
+message AddJWTIDPRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["name", "issuer", "keys_endpoint"]
+        };
+    };
+
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
+    string issuer = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the jwt issuer of the identity provider";
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/keys\"";
+            description: "the endpoint where the keys can be found";
+            max_length: 200;
+        }
+    ];
+}
+
+message AddJWTIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
 message UpdateIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -2585,6 +2710,44 @@ message UpdateIDPOIDCConfigRequest {
 }
 
 message UpdateIDPOIDCConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateIDPJWTConfigRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["idp_id", "issuer", "keys_endpoint"]
+        };
+    };
+
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string issuer = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the jwt issuer of the identity provider";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the endpoint where the keys can be found";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateIDPJWTConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

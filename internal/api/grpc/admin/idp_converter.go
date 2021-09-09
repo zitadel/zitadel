@@ -30,6 +30,22 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *admin_pb.AddOIDCIDPRequest) *do
 	}
 }
 
+func addJWTIDPRequestToDomain(req *admin_pb.AddJWTIDPRequest) *domain.IDPConfig {
+	return &domain.IDPConfig{
+		Name:        req.Name,
+		JWTConfig:   addJWTIDPRequestToDomainJWTIDPConfig(req),
+		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:        domain.IDPConfigTypeJWT,
+	}
+}
+
+func addJWTIDPRequestToDomainJWTIDPConfig(req *admin_pb.AddJWTIDPRequest) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		Issuer:       req.Issuer,
+		KeysEndpoint: req.KeysEndpoint,
+	}
+}
+
 func updateIDPToDomain(req *admin_pb.UpdateIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
 		IDPConfigID: req.IdpId,

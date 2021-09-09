@@ -2595,6 +2595,18 @@ Provider must be OIDC compliant
     POST: /idps/oidc
 
 
+### AddOrgJWTIDP
+
+> **rpc** AddOrgJWTIDP([AddOrgOIDCIDPRequest](#addorgoidcidprequest))
+[AddOrgOIDCIDPResponse](#addorgoidcidpresponse)
+
+Add a new jwt identity provider configuration in the organisation
+
+
+
+    POST: /idps/jwt
+
+
 ### DeactivateOrgIDP
 
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
@@ -2657,6 +2669,18 @@ Change OIDC identity provider configuration of the organisation
 
 
     PUT: /idps/{idp_id}/oidc_config
+
+
+### UpdateOrgIDPJWTConfig
+
+> **rpc** UpdateOrgIDPJWTConfig([UpdateOrgIDPJWTConfigRequest](#updateorgidpjwtconfigrequest))
+[UpdateOrgIDPJWTConfigResponse](#updateorgidpjwtconfigresponse)
+
+Change JWT identity provider configuration of the organisation
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
 
 
 
@@ -3113,6 +3137,32 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddOrgJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddOrgJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
 
 
 
@@ -7332,6 +7382,30 @@ This is an empty request
 
 
 ### UpdateOIDCAppConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOrgIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateOrgIDPJWTConfigResponse
 
 
 
