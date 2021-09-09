@@ -638,15 +638,18 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
 		}
-		if request.SelectedIDPConfigID != "" {
-			return append(steps, &domain.RedirectToExternalIDPStep{}), nil
-		}
 		if len(request.Prompt) == 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
 			}
-			if len(users) > 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+			if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+				steps = append(steps, &domain.SelectUserStep{Users: users})
+			}
+			if request.SelectedIDPConfigID != "" {
+				steps = append(steps, &domain.RedirectToExternalIDPStep{})
+			}
+			if len(request.Prompt) == 0 && len(users) > 0 {
 				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
 		}
