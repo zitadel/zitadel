@@ -45,6 +45,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 				"OIDCConfig.AuthorizationEndpoint",
 				"OIDCConfig.TokenEndpoint",
 				"Type", //TODO: default (0) is oidc
+				"JWTConfig",
 			)
 		})
 	}
@@ -111,6 +112,7 @@ func Test_updateIDPToDomain(t *testing.T) {
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
 				"OIDCConfig",
+				"JWTConfig",
 				"State",
 				"Type", //TODO: type should not be changeable
 			)

@@ -155,6 +155,61 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "idp config jwt add, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewIDPConfigAddedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"config1",
+									"name1",
+									domain.IDPConfigTypeOIDC,
+									domain.IDPConfigStylingTypeGoogle,
+								),
+							),
+							eventFromEventPusher(
+								org.NewIDPJWTConfigAddedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									"config1",
+									"issuer",
+									"keys-endpoint",
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "org1")),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "config1"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				config: &domain.IDPConfig{
+					Name:        "name1",
+					StylingType: domain.IDPConfigStylingTypeGoogle,
+					JWTConfig: &domain.JWTIDPConfig{
+						Issuer:       "issuer",
+						KeysEndpoint: "keys-endpoint",
+					},
+				},
+			},
+			res: res{
+				want: &domain.IDPConfig{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
+					IDPConfigID: "config1",
+					Name:        "name1",
+					StylingType: domain.IDPConfigStylingTypeGoogle,
+					State:       domain.IDPConfigStateActive,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
