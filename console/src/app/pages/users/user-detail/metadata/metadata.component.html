@@ -9,8 +9,6 @@
   </div>
 
   <ng-container *ngIf="metadata?.length; else emptyList">
-    <!-- <p *ngIf="ts" class="ts">{{ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p> -->
-
     <div class="metadata-set" *ngFor="let md of metadata">
         <span class="first">{{md.key}}</span>
         <span class="second">{{ md.value }}</span>
@@ -18,7 +16,6 @@
   </ng-container>
 
   <ng-template #emptyList>
-    <!-- <p *ngIf="ts" class="ts">{{ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p> -->
     <p class="empty-desc">{{'USER.METADATA.EMPTY' | translate}}</p>
   </ng-template>
 </app-card>
