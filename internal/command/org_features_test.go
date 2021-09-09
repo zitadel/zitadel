@@ -1624,6 +1624,16 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
