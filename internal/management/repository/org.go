@@ -14,7 +14,6 @@ import (
 
 type OrgRepository interface {
 	Languages(ctx context.Context) ([]language.Tag, error)
-	OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error)
 	OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error)
 
 	SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error)

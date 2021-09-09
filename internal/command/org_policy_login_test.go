@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -21,7 +20,7 @@ import (
 func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	type fields struct {
 		eventstore    *eventstore.Eventstore
-		tokenVerifier *authz.TokenVerifier
+		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
 		ctx    context.Context
@@ -217,7 +216,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	type fields struct {
 		eventstore    *eventstore.Eventstore
-		tokenVerifier *authz.TokenVerifier
+		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
 		ctx    context.Context

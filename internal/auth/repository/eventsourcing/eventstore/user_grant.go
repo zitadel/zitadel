@@ -6,13 +6,13 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -27,6 +27,8 @@ type UserGrantRepo struct {
 	Auth            authz.Config
 	AuthZRepo       *authz_repo.EsRepository
 	PrefixAvatarURL string
+
+	query *query.Queries
 }
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
@@ -198,18 +200,25 @@ func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]st
 }
 
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
-	searchRequest := &org_model.OrgSearchRequest{
-		SortingColumn: org_model.OrgSearchKeyOrgNameIgnoreCase,
-		Asc:           true,
+	searchRequest := query.OrgSearchQueries{
+		SearchRequest: query.SearchRequest{
+			SortingColumn: "name",
+			Asc:           true,
+		},
 	}
 	if len(request.Queries) > 0 {
 		for _, q := range request.Queries {
 			if q.Key == grant_model.UserGrantSearchKeyOrgName {
-				searchRequest.Queries = append(searchRequest.Queries, &org_model.OrgSearchQuery{Key: org_model.OrgSearchKeyOrgName, Method: q.Method, Value: q.Value})
+				_ = &org_model.OrgSearchQuery{Key: org_model.OrgSearchKeyOrgName, Method: q.Method, Value: q.Value}
+				nameQuery, err := query.NewOrgNameSearchQuery(query.TextComparison(q.Method), q.Value.(string))
+				if err != nil {
+					return nil, err
+				}
+				searchRequest.Queries = append(searchRequest.Queries, nameQuery)
 			}
 		}
 	}
-	orgs, count, err := repo.View.SearchOrgs(searchRequest)
+	orgs, count, err := repo.query.SearchOrgs(context.TODO(), &searchRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +253,7 @@ func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectO
 	if err != nil {
 		return nil, err
 	}
-	org, err := repo.View.OrgByID(user.ResourceOwner)
+	org, err := repo.query.OrgByID(context.TODO(), user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +309,7 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 	return resp
 }
 
-func orgRespToOrgResp(orgs []*org_view_model.OrgView, count uint64) *grant_model.ProjectOrgSearchResponse {
+func orgRespToOrgResp(orgs []*query.Org, count uint64) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
 		TotalResult: count,
 	}

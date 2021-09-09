@@ -30,10 +30,11 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.query.SearchOrgs(ctx, queries)
+	orgs, _, err := s.query.SearchOrgs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
+	//TODO: return count
 	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgViewsToPb(orgs)}, nil
 }
 

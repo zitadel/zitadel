@@ -6,7 +6,6 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -131,7 +130,7 @@ func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, resourceOwner st
 	if defaultPolicy.HidePasswordReset != policy.HidePasswordReset {
 		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyPasswordReset)
 	}
-	return authz.CheckOrgFeatures(ctx, c.tokenVerifier, resourceOwner, requiredFeatures...)
+	return c.tokenVerifier.CheckOrgFeatures(ctx, resourceOwner, requiredFeatures...)
 }
 
 func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {

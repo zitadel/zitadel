@@ -18,9 +18,8 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/id"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
@@ -45,6 +44,8 @@ type AuthRequestRepo struct {
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
 
+	Query *query.Queries
+
 	IdGenerator id.Generator
 
 	PasswordCheckLifeTime      time.Duration
@@ -54,6 +55,11 @@ type AuthRequestRepo struct {
 	MultiFactorCheckLifeTime   time.Duration
 
 	IAMID string
+}
+
+type orgViewProvider interface {
+	OrgByID(string) (*query.Org, error)
+	OrgByPrimaryDomain(string) (*query.Org, error)
 }
 
 type userSessionViewProvider interface {
@@ -86,11 +92,6 @@ type userCommandProvider interface {
 	BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) error
 }
 
-type orgViewProvider interface {
-	OrgByID(string) (*org_view_model.OrgView, error)
-	OrgByPrimaryDomain(string) (*org_view_model.OrgView, error)
-}
-
 type userGrantProvider interface {
 	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
 	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
@@ -118,7 +119,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	request.Audience = appIDs
 	request.AppendAudIfNotExisting(app.ProjectID)
-	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
+	if err := setOrgID(repo.Query, request); err != nil {
 		return nil, err
 	}
 	if request.LoginHint != "" {
@@ -260,7 +261,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, userID)
 	if err != nil {
 		return err
 	}
@@ -438,7 +439,7 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
-	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -620,7 +621,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 		return steps, nil
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -866,13 +867,13 @@ func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID stri
 	return iam_view_model.CustomTextViewsToDomain(loginTexts), err
 }
 
-func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
+func setOrgID(orgViewProvider *query.Queries, request *domain.AuthRequest) error {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
 		return nil
 	}
 
-	org, err := orgViewProvider.OrgByPrimaryDomain(primaryDomain)
+	org, err := orgViewProvider.OrgByDomainGlobal(context.TODO(), primaryDomain)
 	if err != nil {
 		return err
 	}
@@ -969,7 +970,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries *query.Queries, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
 	// PLANNED: Check LockoutPolicy
 	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
@@ -985,11 +986,11 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
-	org, err := orgViewProvider.OrgByID(user.ResourceOwner)
+	org, err := queries.OrgByID(context.TODO(), user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if org.State != int32(org_model.OrgStateActive) {
+	if org.State != domain.OrgStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "Errors.User.NotActive")
 	}
 	return user, nil

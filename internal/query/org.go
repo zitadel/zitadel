@@ -83,21 +83,25 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 	return isUnique, nil
 }
 
-var orgsQuery = squirrel.Select("creation_date", "change_date", "resource_owner", "state", "sequence", "name", "domain").
+func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
+	_, err = q.OrgByID(ctx, id)
+	return err
+}
+
+var orgsQuery = squirrel.Select("creation_date", "change_date", "resource_owner", "state", "sequence", "name", "domain", "COUNT(name) OVER ()").
 	From("zitadel.projections.orgs")
 
-func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) ([]*Org, error) {
+func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) (orgs []*Org, count uint64, err error) {
 	stmt, args, err := query.ToQuery(orgsQuery).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
+		return nil, 0, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
+		return nil, 0, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
 	}
-
-	orgs := []*Org{}
+	orgs = make([]*Org, 0, query.Limit)
 	for rows.Next() {
 		org := new(Org)
 		rows.Scan(
@@ -108,15 +112,16 @@ func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) ([]*O
 			&org.Sequence,
 			&org.Name,
 			&org.Domain,
+			&count,
 		)
 		orgs = append(orgs, org)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-pA0Wj", "Errors.orgs.internal")
+		return nil, 0, errors.ThrowInternal(err, "QUERY-pA0Wj", "Errors.orgs.internal")
 	}
 
-	return orgs, nil
+	return orgs, count, nil
 }
 
 type Org struct {

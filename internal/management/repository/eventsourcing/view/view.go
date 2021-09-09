@@ -3,11 +3,13 @@ package view
 import (
 	"database/sql"
 
+	"github.com/caos/zitadel/internal/query"
 	"github.com/jinzhu/gorm"
 )
 
 type View struct {
-	Db *gorm.DB
+	Db    *gorm.DB
+	query *query.Queries
 }
 
 func StartView(sqlClient *sql.DB) (*View, error) {

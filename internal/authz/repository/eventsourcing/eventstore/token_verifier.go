@@ -109,10 +109,10 @@ func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context
 	return app.ProjectID, app.OriginAllowList, nil
 }
 
-func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) error {
-	_, err := repo.View.OrgByID(orgID)
-	return err
-}
+// func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) error {
+// 	_, err := repo.View.OrgByID(orgID)
+// 	return err
+// }
 
 func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
 	features, err := repo.View.FeaturesByAggregateID(orgID)

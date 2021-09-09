@@ -64,22 +64,6 @@ func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error
 	return repo.supportedLangs, nil
 }
 
-func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
-	org, err := repo.View.OrgByID(id)
-	if err != nil {
-		return nil, err
-	}
-	return model.OrgToModel(org), nil
-}
-
-func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
-	verifiedDomain, err := repo.View.VerifiedOrgDomain(domain)
-	if err != nil {
-		return nil, err
-	}
-	return repo.OrgByID(ctx, verifiedDomain.OrgID)
-}
-
 func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
 	policy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {

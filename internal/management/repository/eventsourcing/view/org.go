@@ -1,9 +1,12 @@
 package view
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -11,8 +14,8 @@ const (
 	orgTable = "management.orgs"
 )
 
-func (v *View) OrgByID(orgID string) (*model.OrgView, error) {
-	return org_view.OrgByID(v.Db, orgTable, orgID)
+func (v *View) OrgByID(orgID string) (*query.Org, error) {
+	return v.query.OrgByID(context.TODO(), orgID)
 }
 
 func (v *View) PutOrg(org *model.OrgView, event *models.Event) error {

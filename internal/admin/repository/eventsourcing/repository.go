@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/static"
 )
@@ -28,11 +28,11 @@ type Config struct {
 
 type EsRepository struct {
 	spooler *es_spol.Spooler
-	eventstore.OrgRepo
 	eventstore.IAMRepository
 	eventstore.AdministratorRepo
 	eventstore.FeaturesRepo
 	eventstore.UserRepo
+	eventstore.OrgRepo
 }
 
 func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
@@ -60,12 +60,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 
 	return &EsRepository{
 		spooler: spool,
-		OrgRepo: eventstore.OrgRepo{
-			Eventstore:     es,
-			View:           view,
-			SearchLimit:    conf.SearchLimit,
-			SystemDefaults: systemDefaults,
-		},
 		IAMRepository: eventstore.IAMRepository{
 			Eventstore:                          es,
 			View:                                view,
@@ -93,6 +87,10 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			SearchLimit:     conf.SearchLimit,
 			SystemDefaults:  systemDefaults,
 			PrefixAvatarURL: assetsAPI,
+		},
+		OrgRepo: eventstore.OrgRepo{
+			View:           view,
+			SystemDefaults: systemDefaults,
 		},
 	}, nil
 }

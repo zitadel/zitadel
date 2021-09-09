@@ -34,8 +34,6 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, command *command.Commands, static static.Storage, localDevMode bool) []query.Handler {
 	handlers := []query.Handler{
-		newOrg(
-			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newIAMMember(
 			handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es}),
 		newIDPConfig(
