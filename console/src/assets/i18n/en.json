@@ -676,6 +676,7 @@
       "LOGINPOLICYFACTORS": "Multifactors",
       "LOGINPOLICYPASSWORDLESS": "Passwordless Authentication",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy",
+      "LOCKOUTPOLICY":"Lockout Policy",
       "LABELPOLICYPRIVATELABEL": "Colors, Logo, Icon, Textappearance",
       "LABELPOLICYWATERMARK": "Remove ZITADEL watermark",
       "CUSTOMDOMAIN": "Organization domain verification",

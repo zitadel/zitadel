@@ -676,6 +676,7 @@
       "LOGINPOLICYFACTORS": "Multifaktoren",
       "LOGINPOLICYPASSWORDLESS": "Passwortlose Authentifizierung",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie",
+      "LOCKOUTPOLICY":"Passwortsperre",
       "LABELPOLICYPRIVATELABEL": "Farben, Logo, Icon und Texterscheinungsbild",
       "LABELPOLICYWATERMARK": "ZITADEL Wasserzeichen entfernen",
       "CUSTOMDOMAIN": "Domänverifikation",

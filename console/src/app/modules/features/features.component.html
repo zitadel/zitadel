@@ -154,6 +154,20 @@
           </mat-slide-toggle>
         </div>
 
+        <div class="row">
+          <div class="featureavatar yellow">
+            <mat-icon class="icon smaller" svgIcon="mdi_textbox_password"></mat-icon>
+          </div>
+
+          <span class="left-desc">{{'FEATURES.DATA.LOCKOUTPOLICY' | translate}}</span>
+          <span class="fill-space"></span>
+          <template [ngTemplateOutlet]="templateRef"
+          [ngTemplateOutletContext]="{active: features.lockoutPolicy}"></template>
+          <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.lockoutPolicy"
+              *ngIf="(['iam.features.write'] | hasRole | async)">
+          </mat-slide-toggle>
+        </div>
+
         <p class="feature-section">{{'FEATURES.HEADERS.LABELPOLICY' | translate}}</p>
 
         <div class="row">
