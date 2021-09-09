@@ -12,6 +12,9 @@ func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, p
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-8fJif", "Errors.ResourceOwnerMissing")
 	}
 	addedPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-0olDf", "Errors.ORG.LockoutPolicy.AlreadyExists")
 	}
