@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-const orgByIDStmt = "SELECT creation_date, change_date, resource_owner, state, sequence, name, domain FROM zitadel.projections.orgs WHERE id = $1"
+const orgByIDStmt = "SELECT creation_date, change_date, resource_owner, org_state, sequence, name, domain FROM zitadel.projections.orgs WHERE id = $1"
 
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	org := &Org{ID: id}
@@ -39,7 +39,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	return org, nil
 }
 
-const orgByDomainStmt = "SELECT id, creation_date, change_date, resource_owner, state, sequence, name, domain FROM zitadel.projections.orgs WHERE domain = $1"
+const orgByDomainStmt = "SELECT id, creation_date, change_date, resource_owner, org_state, sequence, name, domain FROM zitadel.projections.orgs WHERE domain = $1"
 
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	org := new(Org)
@@ -88,7 +88,7 @@ func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
 	return err
 }
 
-var orgsQuery = squirrel.Select("creation_date", "change_date", "resource_owner", "state", "sequence", "name", "domain", "COUNT(name) OVER ()").
+var orgsQuery = squirrel.Select("creation_date", "change_date", "resource_owner", "org_state", "sequence", "name", "domain", "COUNT(name) OVER ()").
 	From("zitadel.projections.orgs")
 
 func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) (orgs []*Org, count uint64, err error) {

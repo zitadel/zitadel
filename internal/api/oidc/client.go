@@ -310,14 +310,18 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	resourceOwner, err := o.repo.OrgByUserID(ctx, userID)
+	user, err := o.repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return map[string]string{
-		ClaimResourceOwner + "id":             resourceOwner.AggregateID,
+		ClaimResourceOwner + "id":             resourceOwner.ID,
 		ClaimResourceOwner + "name":           resourceOwner.Name,
-		ClaimResourceOwner + "primary_domain": resourceOwner.PrimaryDomain,
+		ClaimResourceOwner + "primary_domain": resourceOwner.Domain,
 	}, nil
 }
 
