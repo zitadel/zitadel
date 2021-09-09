@@ -33,6 +33,10 @@ func (p *FlowProjection) reducers() []handler.AggregateReducer {
 					Event:  org.TriggerActionsSetEventType,
 					Reduce: p.reduceTriggerActionsSetEventType,
 				},
+				{
+					Event:  org.FlowClearedEventType,
+					Reduce: p.reduceFlowClearedEventType,
+				},
 			},
 		},
 		{
@@ -63,7 +67,8 @@ const (
 	flowResourceOwnerCol = "resource_owner"
 	flowStateCol         = "flow_state"
 	//flowSequenceCol      = "sequence"
-	flowActionIDCol = "action_id"
+	flowActionTriggerSequenceCol = "trigger_sequence"
+	flowActionIDCol              = "action_id"
 
 	actionTableSuffix = "actions"
 	//actionFlowTypeCol      = "flow_type"
@@ -99,11 +104,27 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 				handler.NewCol(flowTypeCol, e.FlowType),
 				handler.NewCol(flowTriggerTypeCol, e.TriggerType),
 				handler.NewCol(flowActionIDCol, id),
+				handler.NewCol(flowActionTriggerSequenceCol, i),
 			},
 			crdb.WithTableSuffix(triggerTableSuffix),
 		)
 	}
 	return crdb.NewMultiStatement(e, stmts...), nil
+}
+
+func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*org.FlowClearedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("was not an trigger actions set event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(flowTypeCol, e.FlowType),
+		},
+		crdb.WithTableSuffix(triggerTableSuffix),
+	), nil
 }
 
 func (p *FlowProjection) reduceFlowActionAdded(event eventstore.EventReader) (*handler.Statement, error) {

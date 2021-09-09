@@ -6,6 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/object"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 )
@@ -104,4 +105,27 @@ func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc boo
 		return
 	}
 	return query.Offset, uint64(query.Limit), query.Asc
+}
+
+func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
+	switch method {
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
+		return query.TextEquals
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
+		return query.TextEqualsIgnore
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
+		return query.TextStartsWith
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+		return query.TextStartsWithIgnore
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
+		return query.TextContains
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+		return query.TextContainsIgnore
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+		return query.TextEndsWith
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+		return query.TextEndsWithIgnore
+	default:
+		return -1
+	}
 }

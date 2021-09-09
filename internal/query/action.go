@@ -5,12 +5,24 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 )
 
-var actionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "name", "script").
-	From("zitadel.projections.flows_actions").PlaceholderFormat(squirrel.Dollar)
+var actionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "id", "name", "script", "timeout", "allowed_to_fail").
+	From("zitadel.projections.actions").PlaceholderFormat(squirrel.Dollar)
+
+func (q *Queries) GetAction(ctx context.Context, id string, orgID string) (*Action, error) {
+	idQuery, _ := newActionIDSearchQuery(id)
+	actions, err := q.SearchActions(ctx, &ActionSearchQueries{Queries: []SearchQuery{idQuery}})
+	if err != nil {
+		return nil, err
+	}
+	if len(actions) != 1 {
+
+	}
+	return actions[0], err
+}
 
 func (q *Queries) SearchActions(ctx context.Context, query *ActionSearchQueries) ([]*Action, error) {
 	stmt, args, err := query.ToQuery(actionsQuery).ToSql()
@@ -32,8 +44,11 @@ func (q *Queries) SearchActions(ctx context.Context, query *ActionSearchQueries)
 			&org.ResourceOwner,
 			//&org.State,
 			&org.Sequence,
+			&org.ID,
 			&org.Name,
 			&org.Script,
+			&org.Timeout,
+			&org.AllowedToFail,
 		)
 		actions = append(actions, org)
 	}
@@ -72,8 +87,16 @@ func (q *ActionSearchQueries) ToQuery(query squirrel.SelectBuilder) squirrel.Sel
 	return query
 }
 
+func NewActionResourceOwnerQuery(id string) (SearchQuery, error) {
+	return NewTextQuery("resource_owner", id, TextEquals)
+}
+
 func NewActionNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery("name", value, method)
+}
+
+func NewActionStateSearchQuery(value domain.ActionState) (SearchQuery, error) {
+	return NewIntQuery("state", int(value), IntEquals)
 }
 
 func newActionIDSearchQuery(id string) (SearchQuery, error) {

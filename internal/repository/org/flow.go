@@ -11,6 +11,7 @@ import (
 
 var (
 	TriggerActionsSetEventType = orgEventTypePrefix + flow.TriggerActionsSetEventType
+	FlowClearedEventType       = orgEventTypePrefix + flow.FlowClearedEventType
 )
 
 type TriggerActionsSetEvent struct {
@@ -43,4 +44,32 @@ func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.EventRead
 	}
 
 	return &TriggerActionsSetEvent{TriggerActionsSetEvent: *e.(*flow.TriggerActionsSetEvent)}, nil
+}
+
+type FlowClearedEvent struct {
+	flow.FlowClearedEvent
+}
+
+func NewFlowClearedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	flowType domain.FlowType,
+) *FlowClearedEvent {
+	return &FlowClearedEvent{
+		FlowClearedEvent: *flow.NewFlowClearedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				FlowClearedEventType),
+			flowType),
+	}
+}
+
+func FlowClearedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e, err := flow.FlowClearedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FlowClearedEvent{FlowClearedEvent: *e.(*flow.FlowClearedEvent)}, nil
 }

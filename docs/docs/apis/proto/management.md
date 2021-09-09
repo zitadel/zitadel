@@ -2743,30 +2743,6 @@ Change OIDC identity provider configuration of the organisation
     DELETE: /actions/{id}
 
 
-### ListFlows
-
-> **rpc** ListFlows([ListFlowsRequest](#listflowsrequest))
-[ListFlowsResponse](#listflowsresponse)
-
-
-
-
-
-    POST: /flows/_search
-
-
-### CreateFlow
-
-> **rpc** CreateFlow([CreateFlowRequest](#createflowrequest))
-[CreateFlowResponse](#createflowresponse)
-
-
-
-
-
-    POST: /flows
-
-
 ### GetFlow
 
 > **rpc** GetFlow([GetFlowRequest](#getflowrequest))
@@ -2779,10 +2755,10 @@ Change OIDC identity provider configuration of the organisation
     GET: /flows/{type}
 
 
-### DeleteFlow
+### ClearFlow
 
-> **rpc** DeleteFlow([DeleteFlowRequest](#deleteflowrequest))
-[DeleteFlowResponse](#deleteflowresponse)
+> **rpc** ClearFlow([ClearFlowRequest](#clearflowrequest))
+[ClearFlowResponse](#clearflowresponse)
 
 
 
@@ -3635,6 +3611,28 @@ This is an empty request
 
 
 
+### ClearFlowRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.action.v1.FlowType | - |  |
+
+
+
+
+### ClearFlowResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### CreateActionRequest
 
 
@@ -3657,28 +3655,6 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | id |  string | - |  |
-
-
-
-
-### CreateFlowRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| type |  zitadel.action.v1.FlowType | - |  |
-
-
-
-
-### CreateFlowResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -3870,35 +3846,6 @@ This is an empty request
 
 ### DeleteActionResponse
 
-
-
-
-
-### DeleteFlowRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| type |  zitadel.action.v1.FlowType | - |  |
-
-
-
-
-### DeleteFlowResponse
-
-
-
-
-
-### FlowQuery
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.flow_type_query |  zitadel.action.v1.FlowTypeQuery | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.flow_state_query |  zitadel.action.v1.FlowStateQuery | - |  |
 
 
 
@@ -5178,32 +5125,6 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.app.v1.App | - |  |
-
-
-
-
-### ListFlowsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
-| sorting_column |  zitadel.action.v1.FlowFieldName | the field the result is sorted |  |
-| queries | repeated FlowQuery | criteria the client is looking for |  |
-
-
-
-
-### ListFlowsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| sorting_column |  zitadel.action.v1.FlowFieldName | - |  |
-| result | repeated zitadel.action.v1.Flow | - |  |
 
 
 

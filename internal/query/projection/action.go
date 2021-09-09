@@ -62,6 +62,9 @@ const (
 	actionStateCol         = "action_state"
 	actionSequenceCol      = "sequence"
 	actionNameCol          = "name"
+	actionScriptCol        = "script"
+	actionTimeoutCol       = "timeout"
+	actionAllowedToFailCol = "allowed_to_fail"
 )
 
 func (p *ActionProjection) reduceActionAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -79,6 +82,9 @@ func (p *ActionProjection) reduceActionAdded(event eventstore.EventReader) (*han
 			handler.NewCol(actionResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(actionSequenceCol, e.Sequence()),
 			handler.NewCol(actionNameCol, e.Name),
+			handler.NewCol(actionScriptCol, e.Script),
+			handler.NewCol(actionTimeoutCol, e.Timeout),
+			handler.NewCol(actionAllowedToFailCol, e.AllowedToFail),
 			handler.NewCol(actionStateCol, domain.ActionStateActive),
 		},
 	), nil
@@ -95,7 +101,16 @@ func (p *ActionProjection) reduceActionChanged(event eventstore.EventReader) (*h
 		handler.NewCol(actionSequenceCol, e.Sequence()),
 	}
 	if e.Name != nil {
-		values = append(values, handler.NewCol(actionNameCol, e.Name))
+		values = append(values, handler.NewCol(actionNameCol, *e.Name))
+	}
+	if e.Script != nil {
+		values = append(values, handler.NewCol(actionScriptCol, *e.Script))
+	}
+	if e.Timeout != nil {
+		values = append(values, handler.NewCol(actionTimeoutCol, *e.Timeout))
+	}
+	if e.AllowedToFail != nil {
+		values = append(values, handler.NewCol(actionAllowedToFailCol, *e.AllowedToFail))
 	}
 	return crdb.NewUpdateStatement(
 		e,

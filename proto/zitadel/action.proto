@@ -102,7 +102,8 @@ message Flow {
             description: "the state of the flow";
         }
     ];
-    map<int32, TriggerAction> triggers = 4;
+    //map<TriggerType, TriggerAction> triggers = 4;
+    repeated TriggerAction trigger_actions = 4;
 }
 
 enum FlowType {
@@ -123,7 +124,8 @@ enum TriggerType {
 }
 
 message TriggerAction {
-    map<int32, Action> actions = 1;
+    TriggerType trigger_type = 1;
+    repeated Action actions = 2;
 }
 
 enum FlowFieldName {

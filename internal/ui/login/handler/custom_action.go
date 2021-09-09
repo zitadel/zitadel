@@ -14,15 +14,15 @@ func (l *Login) customMapping(user *domain.ExternalUser, tokens *oidc.Tokens, re
 	if err != nil {
 		return nil, err
 	}
-	ctx := &actions.Context{ExternalUser: user, Tokens: tokens}
-	apiuser := *user
+	ctx := (&actions.Context{}).SetToken(tokens)
+	api := (&actions.API{}).SetExternalUser(user).SetMetadata(&user.Metadatas)
 	for _, a := range triggerActions {
-		err = actions.Run(ctx, a.Script, a.Name, a.Timeout, a.AllowedToFail, actions.SetExternalUser(&apiuser))
+		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
 		if err != nil {
 			return nil, err
 		}
 	}
-	return &apiuser, err
+	return user, err
 }
 
 func (l *Login) customRegistrationMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.Human, []*domain.Metadata, error) {
@@ -30,16 +30,11 @@ func (l *Login) customRegistrationMapping(user *domain.Human, tokens *oidc.Token
 	if err != nil {
 		return nil, nil, err
 	}
-	t := *tokens
-	ctx := &actions.Context{User: user, Tokens: &t}
-
-	//apiuser := actions.NewUser(user.FirstName, user.LastName)
-	apiuser := func(firstname string) {
-		user.FirstName = firstname
-	}
+	ctx := (&actions.Context{}).SetToken(tokens)
 	metadata := make([]*domain.Metadata, 0)
+	api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
 	for _, a := range triggerActions {
-		err = actions.Run(ctx, a.Script, a.Name, a.Timeout, a.AllowedToFail, actions.SetUser(apiuser), actions.SetMetadata(metadata))
+		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
 		if err != nil {
 			return nil, nil, err
 		}

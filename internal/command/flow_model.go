@@ -30,7 +30,12 @@ func (wm *FlowWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *flow.TriggerActionsSetEvent:
+			if wm.Triggers == nil {
+				wm.Triggers = make(map[domain.TriggerType][]string)
+			}
 			wm.Triggers[e.TriggerType] = e.ActionIDs
+		case *flow.FlowClearedEvent:
+			wm.Triggers = nil
 		}
 	}
 	return wm.WriteModel.Reduce()

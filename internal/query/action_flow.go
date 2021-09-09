@@ -16,7 +16,7 @@ func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType d
 	return q.SearchActionsFromFlow(ctx, &TriggerActionSearchQueries{Queries: []SearchQuery{flowTypeQuery, triggerTypeQuery}})
 }
 
-var triggerActionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "name", "script").
+var triggerActionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "action_id", "name", "script", "trigger_type", "trigger_sequence").
 	From("zitadel.projections.flows_actions_triggers").PlaceholderFormat(squirrel.Dollar)
 
 func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActionSearchQueries) ([]*Action, error) {
@@ -37,8 +37,9 @@ func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActio
 			&org.CreationDate,
 			&org.ChangeDate,
 			&org.ResourceOwner,
-			//&org.State,
 			&org.Sequence,
+			//&org.State,
+			&org.ID,
 			&org.Name,
 			&org.Script,
 		)
@@ -52,17 +53,60 @@ func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActio
 	return actions, nil
 }
 
-type TriggerAction struct {
+func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType) (*Flow, error) {
+	flowTypeQuery, _ := NewTriggerActionFlowTypeSearchQuery(flowType)
+	return q.SearchFlow(ctx, &TriggerActionSearchQueries{Queries: []SearchQuery{flowTypeQuery}})
+}
+
+func (q *Queries) SearchFlow(ctx context.Context, query *TriggerActionSearchQueries) (*Flow, error) {
+	stmt, args, err := query.ToQuery(triggerActionsQuery.OrderBy("flow_type", "trigger_type", "trigger_sequence")).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
+	}
+
+	flow := &Flow{
+		TriggerActions: make(map[domain.TriggerType][]*Action),
+	}
+	for rows.Next() {
+		action := new(Action)
+		var triggerType domain.TriggerType
+		var triggerSequence int
+		rows.Scan(
+			&action.CreationDate,
+			&action.ChangeDate,
+			&action.ResourceOwner,
+			&action.Sequence,
+			//&action.State,
+			&action.ID,
+			&action.Name,
+			&action.Script,
+			&triggerType,
+			&triggerSequence,
+		)
+
+		flow.TriggerActions[triggerType] = append(flow.TriggerActions[triggerType], action)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-pA0Wj", "Errors.actions.internal")
+	}
+
+	return flow, nil
+}
+
+type Flow struct {
 	ID            string    `col:"id"`
 	CreationDate  time.Time `col:"creation_date"`
 	ChangeDate    time.Time `col:"change_date"`
 	ResourceOwner string    `col:"resource_owner"`
 	Sequence      uint64    `col:"sequence"`
 
-	Name          string        `col:"name"`
-	Script        string        `col:"script"`
-	Timeout       time.Duration `col:"-"`
-	AllowedToFail bool          `col:"-"`
+	TriggerActions map[domain.TriggerType][]*Action
 }
 
 type TriggerActionSearchQueries struct {

@@ -1,8 +1,11 @@
 package management
 
 import (
+	action_grpc "github.com/caos/zitadel/internal/api/grpc/action"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -27,23 +30,35 @@ func updateActionRequestToDomain(req *mgmt_pb.UpdateActionRequest) *domain.Actio
 	}
 }
 
-func listActionsToQuery(req *mgmt_pb.ListActionsRequest) *interface{} {
-	//offset, limit, asc := object.ListQueryToModel(req.Query)
-	//return &iam_model.IDPConfigSearchRequest{
-	//	Offset:        offset,
-	//	Limit:         limit,
-	//	Asc:           asc,
-	//	SortingColumn: action_grpc.ActionFieldNameToDomain(req.SortingColumn),
-	//	Queries:       actionQueries(req.Queries),
-	//}
-	return nil
+func listActionsToQuery(id string, req *mgmt_pb.ListActionsRequest) (_ *query.ActionSearchQueries, err error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries := make([]query.SearchQuery, len(req.Queries)+1)
+	queries[0], err = query.NewActionResourceOwnerQuery(id)
+	if err != nil {
+		return nil, err
+	}
+	for i, actionQuery := range req.Queries {
+		queries[i+1], err = ActionQueryToQuery(actionQuery.Query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &query.ActionSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
 }
 
-//func actionQueries(queries []*mgmt_pb.ActionQuery) {
-//	for i, query := range queries {
-//		switch query.Query {
-//		case *action_pb.ActionIDQuery:
-//
-//		}
-//	}
-//}
+func ActionQueryToQuery(query interface{}) (query.SearchQuery, error) {
+	switch q := query.(type) {
+	case *mgmt_pb.ActionQuery_ActionNameQuery:
+		return action_grpc.ActionNameQuery(q.ActionNameQuery)
+	case *mgmt_pb.ActionQuery_ActionStateQuery:
+		return action_grpc.ActionStateQuery(q.ActionStateQuery)
+	}
+	return nil, nil
+}

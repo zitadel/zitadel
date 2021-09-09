@@ -2762,28 +2762,6 @@ service ManagementService {
         };
     }
 
-    rpc ListFlows(ListFlowsRequest) returns (ListFlowsResponse) {
-        option (google.api.http) = {
-            post: "/flows/_search"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "org.flow.read"
-        };
-    }
-
-    rpc CreateFlow(CreateFlowRequest) returns (CreateFlowResponse) {
-        option (google.api.http) = {
-            post: "/flows"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "org.flow.write"
-        };
-    }
-
     rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
         option (google.api.http) = {
             get: "/flows/{type}"
@@ -2794,9 +2772,9 @@ service ManagementService {
         };
     }
 
-    rpc DeleteFlow(DeleteFlowRequest) returns (DeleteFlowResponse) {
+    rpc ClearFlow(ClearFlowRequest) returns (ClearFlowResponse) {
         option (google.api.http) = {
-            delete: "/flows/{type}"
+            post: "/flows/{type}/_clear"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -5237,30 +5215,6 @@ message ReactivateActionResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListFlowsRequest {
-    //list limitations and ordering
-    zitadel.v1.ListQuery query = 1;
-    //the field the result is sorted
-    zitadel.action.v1.FlowFieldName sorting_column = 2;
-    //criteria the client is looking for
-    repeated FlowQuery queries = 3;
-}
-
-message FlowQuery {
-    oneof query {
-        option (validate.required) = true;
-
-        zitadel.action.v1.FlowTypeQuery flow_type_query = 1;
-        zitadel.action.v1.FlowStateQuery flow_state_query = 2;
-    }
-}
-
-message ListFlowsResponse {
-    zitadel.v1.ListDetails details = 1;
-    zitadel.action.v1.FlowFieldName sorting_column = 2;
-    repeated zitadel.action.v1.Flow result = 3;
-}
-
 message GetFlowRequest {
     zitadel.action.v1.FlowType type = 1;
 }
@@ -5269,19 +5223,13 @@ message GetFlowResponse {
     zitadel.action.v1.Flow flow = 1;
 }
 
-message CreateFlowRequest {
+message ClearFlowRequest {
     zitadel.action.v1.FlowType type = 1;
 }
 
-message CreateFlowResponse {
+message ClearFlowResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
-
-message DeleteFlowRequest {
-    zitadel.action.v1.FlowType type = 1;
-}
-
-message DeleteFlowResponse {}
 
 message SetTriggerActionsRequest {
     zitadel.action.v1.FlowType flow_type = 1;

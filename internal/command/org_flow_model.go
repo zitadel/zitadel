@@ -24,6 +24,11 @@ func (wm *OrgFlowWriteModel) AppendEvents(events ...eventstore.EventReader) {
 				continue
 			}
 			wm.FlowWriteModel.AppendEvents(&e.TriggerActionsSetEvent)
+		case *org.FlowClearedEvent:
+			if e.FlowType != wm.FlowType {
+				continue
+			}
+			wm.FlowWriteModel.AppendEvents(&e.FlowClearedEvent)
 		}
 	}
 }
@@ -38,5 +43,6 @@ func (wm *OrgFlowWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(org.AggregateType).
 		EventTypes(org.TriggerActionsSetEventType).
+		EventTypes(org.FlowClearedEventType).
 		Builder()
 }

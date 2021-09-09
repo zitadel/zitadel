@@ -40,7 +40,7 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 	//NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	//NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	//owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
-	//NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
+	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
 	flow.NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	return nil
 }

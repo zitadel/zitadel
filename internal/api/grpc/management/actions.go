@@ -4,18 +4,30 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	action_grpc "github.com/caos/zitadel/internal/api/grpc/action"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsRequest) (*mgmt_pb.ListActionsResponse, error) {
-	//listActionsToQuery(req)
-	//actions, err := s.query.SearchActions(ctx, )
-	return nil, nil
+	query, _ := listActionsToQuery(authz.GetCtxData(ctx).OrgID, req)
+	actions, err := s.query.SearchActions(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListActionsResponse{
+		Result: action_grpc.ActionsToPb(actions),
+	}, nil
 }
 
 func (s *Server) GetAction(ctx context.Context, req *mgmt_pb.GetActionRequest) (*mgmt_pb.GetActionResponse, error) {
-	return nil, nil
+	action, err := s.query.GetAction(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetActionResponse{
+		Action: action_grpc.ActionToPb(action),
+	}, nil
 }
 
 func (s *Server) CreateAction(ctx context.Context, req *mgmt_pb.CreateActionRequest) (*mgmt_pb.CreateActionResponse, error) {
