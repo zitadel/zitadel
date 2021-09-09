@@ -296,6 +296,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					CustomTextLogin:          false,
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -1349,6 +1350,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					CustomTextLogin:          false,
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
