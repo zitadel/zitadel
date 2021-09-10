@@ -11,11 +11,11 @@ import (
 type SearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn SortingColumn
+	SortingColumn Column
 	Asc           bool
 }
 
-type SortingColumn interface{ toColumnName() string }
+type Column interface{ toColumnName() string }
 
 func (req *SearchRequest) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Offset > 0 {
@@ -26,7 +26,7 @@ func (req *SearchRequest) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	}
 
 	if req.SortingColumn != nil {
-		clause := "LOWER(?)"
+		clause := "LOWER(" + sqlPlaceholder + ")"
 		if !req.Asc {
 			clause += " DESC"
 		}
@@ -43,16 +43,16 @@ type SearchQuery interface {
 }
 
 type TextQuery struct {
-	Column  string
+	Column  Column
 	Text    string
 	Compare TextComparison
 }
 
-func NewTextQuery(column, value string, compare TextComparison) (*TextQuery, error) {
+func NewTextQuery(column Column, value string, compare TextComparison) (*TextQuery, error) {
 	if compare < 0 || compare >= textMax {
 		return nil, errors.New("invalid compare")
 	}
-	if column == "" {
+	if column == nil || column.toColumnName() == "" {
 		return nil, errors.New("missing column")
 	}
 	return &TextQuery{
@@ -67,24 +67,24 @@ func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (s *TextQuery) comp() map[string]interface{} {
+func (s *TextQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column: s.Text}
+		return sq.Eq{s.Column.toColumnName(): s.Text}
 	case TextEqualsIgnoreCase:
-		return sq.Eq{"LOWER(" + s.Column + ")": strings.ToLower(s.Text)}
+		return sq.Eq{"LOWER(" + s.Column.toColumnName() + ")": strings.ToLower(s.Text)}
 	case TextStartsWith:
-		return sq.Like{s.Column: s.Text + sqlPlaceholder}
+		return sq.Like{s.Column.toColumnName(): s.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column + ")": strings.ToLower(s.Text) + sqlPlaceholder}
+		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": strings.ToLower(s.Text) + "%"}
 	case TextEndsWith:
-		return sq.Like{s.Column: sqlPlaceholder + s.Text}
+		return sq.Like{s.Column.toColumnName(): "%" + s.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column + ")": sqlPlaceholder + strings.ToLower(s.Text)}
+		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": "%" + strings.ToLower(s.Text)}
 	case TextContains:
-		return sq.Like{s.Column: sqlPlaceholder + s.Text + sqlPlaceholder}
+		return sq.Like{s.Column.toColumnName(): "%" + s.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column + ")": sqlPlaceholder + strings.ToLower(s.Text) + sqlPlaceholder}
+		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}
 	}
 	return nil
 }

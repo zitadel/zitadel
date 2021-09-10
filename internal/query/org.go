@@ -6,20 +6,54 @@ import (
 	errs "errors"
 	"time"
 
-	"github.com/Masterminds/squirrel"
+	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 )
 
-const orgByIDStmt = "SELECT creation_date, change_date, resource_owner, org_state, sequence, name, domain FROM zitadel.projections.orgs WHERE id = $1"
+const orgTable = "zitadel.projections.orgs"
+
+var (
+	orgsQuery = sq.Select(
+		OrgColumnID.toColumnName(),
+		OrgColumnCreationDate.toColumnName(),
+		OrgColumnChangeDate.toColumnName(),
+		OrgColumnResourceOwner.toColumnName(),
+		OrgColumnState.toColumnName(),
+		OrgColumnSequence.toColumnName(),
+		OrgColumnName.toColumnName(),
+		OrgColumnDomain.toColumnName(),
+		"COUNT(name) OVER ()").
+		From(orgTable).PlaceholderFormat(sq.Dollar)
+
+	orgQuery = sq.Select(
+		OrgColumnCreationDate.toColumnName(),
+		OrgColumnChangeDate.toColumnName(),
+		OrgColumnResourceOwner.toColumnName(),
+		OrgColumnState.toColumnName(),
+		OrgColumnSequence.toColumnName(),
+		OrgColumnName.toColumnName(),
+		OrgColumnDomain.toColumnName()).
+		From(orgTable).PlaceholderFormat(sq.Dollar)
+
+	orgUniqueQuery = sq.Select("COUNT(*) = 0").
+			From(orgTable).PlaceholderFormat(sq.Dollar)
+)
 
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
+	query, args, err := orgQuery.Where(sq.Eq{
+		OrgColumnID.toColumnName(): id,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-L39bz", "Errors.orgs.invalid.request")
+	}
+
 	org := &Org{ID: id}
-	row := q.client.QueryRowContext(ctx, orgByIDStmt, id)
+	row := q.client.QueryRowContext(ctx, query, args...)
 	if row.Err() != nil {
 		return nil, errors.ThrowNotFound(row.Err(), "QUERY-P3Cmb", "error.internal")
 	}
-	err := row.Scan(
+	err = row.Scan(
 		&org.CreationDate,
 		&org.ChangeDate,
 		&org.ResourceOwner,
@@ -39,15 +73,20 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	return org, nil
 }
 
-const orgByDomainStmt = "SELECT id, creation_date, change_date, resource_owner, org_state, sequence, name, domain FROM zitadel.projections.orgs WHERE domain = $1"
-
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
-	org := new(Org)
-	row := q.client.QueryRowContext(ctx, orgByDomainStmt, domain)
-	if row.Err() != nil {
-		return nil, errors.ThrowNotFound(row.Err(), "QUERY-P3Cmb", "error.internal")
+	query, args, err := orgQuery.Where(sq.Eq{
+		OrgColumnDomain.toColumnName(): domain,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-Me8DB", "Errors.orgs.invalid.request")
 	}
-	err := row.Scan(
+
+	org := new(Org)
+	row := q.client.QueryRowContext(ctx, query, args...)
+	if row.Err() != nil {
+		return nil, errors.ThrowNotFound(row.Err(), "QUERY-5plRd", "error.internal")
+	}
+	err = row.Scan(
 		&org.ID,
 		&org.CreationDate,
 		&org.ChangeDate,
@@ -60,18 +99,24 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 
 	if err != nil {
 		if errs.Is(err, sql.ErrNoRows) {
-			return nil, errors.ThrowNotFound(err, "QUERY-VQhIc", "errors.orgs.not_found")
+			return nil, errors.ThrowNotFound(err, "QUERY-1RBM2", "errors.orgs.not_found")
 		}
-		return nil, errors.ThrowInternal(err, "QUERY-yCNV9", "errors.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-kBjpb", "errors.internal")
 	}
 
 	return org, nil
 }
 
-const orgUniqueStmt = "SELECT COUNT(*) = 0 FROM zitadel.projections.orgs WHERE name = $1 AND domain = $2"
-
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
-	row := q.client.QueryRowContext(ctx, orgUniqueStmt, name, domain)
+	query, args, err := orgUniqueQuery.Where(sq.Eq{
+		OrgColumnName.toColumnName():   name,
+		OrgColumnDomain.toColumnName(): domain,
+	}).ToSql()
+	if err != nil {
+		return false, errors.ThrowInvalidArgument(err, "QUERY-OrAo1", "Errors.orgs.invalid.request")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
 	if row.Err() != nil {
 		return false, errors.ThrowNotFound(row.Err(), "QUERY-eAvMO", "error.internal")
 	}
@@ -88,9 +133,6 @@ func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
 	return err
 }
 
-var orgsQuery = squirrel.Select("creation_date", "change_date", "resource_owner", "org_state", "sequence", "name", "domain", "COUNT(name) OVER ()").
-	From("zitadel.projections.orgs")
-
 func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) (orgs []*Org, count uint64, err error) {
 	stmt, args, err := query.ToQuery(orgsQuery).ToSql()
 	if err != nil {
@@ -105,6 +147,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) (orgs
 	for rows.Next() {
 		org := new(Org)
 		rows.Scan(
+			&org.ID,
 			&org.CreationDate,
 			&org.ChangeDate,
 			&org.ResourceOwner,
@@ -142,14 +185,14 @@ type OrgSearchQueries struct {
 }
 
 func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery("domain", value, method)
+	return NewTextQuery(OrgColumnDomain, value, method)
 }
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery("name", value, method)
+	return NewTextQuery(OrgColumnName, value, method)
 }
 
-func (q *OrgSearchQueries) ToQuery(query squirrel.SelectBuilder) squirrel.SelectBuilder {
+func (q *OrgSearchQueries) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.ToQuery(query)
 	for _, q := range q.Queries {
 		query = q.ToQuery(query)
@@ -167,6 +210,7 @@ const (
 	OrgColumnSequence
 	OrgColumnName
 	OrgColumnDomain
+	OrgColumnID
 )
 
 func (c OrgColumn) toColumnName() string {
@@ -185,6 +229,8 @@ func (c OrgColumn) toColumnName() string {
 		return "name"
 	case OrgColumnDomain:
 		return "domain"
+	case OrgColumnID:
+		return "id"
 	default:
 		return ""
 	}

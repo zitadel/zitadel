@@ -16,8 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-
-	sq "github.com/Masterminds/squirrel"
 )
 
 type Queries struct {
@@ -38,8 +36,6 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	if err != nil {
 		return nil, err
 	}
-
-	sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 	repo = &Queries{
 		iamID:       defaults.IamID,

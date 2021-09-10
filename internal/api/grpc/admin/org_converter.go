@@ -26,7 +26,7 @@ func listOrgRequestToModel(req *admin.ListOrgsRequest) (*query.OrgSearchQueries,
 	}, nil
 }
 
-func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.SortingColumn {
+func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.Column {
 	switch fieldName {
 	case org.OrgFieldName_ORG_FIELD_NAME_NAME:
 		return query.OrgColumnName
