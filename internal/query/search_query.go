@@ -30,7 +30,7 @@ func (req *SearchRequest) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query.OrderByClause(clause, req.SortingColumn.toColumnName())
+		query = query.OrderByClause(clause, req.SortingColumn.toColumnName())
 	}
 
 	return query
@@ -48,12 +48,17 @@ type TextQuery struct {
 	Compare TextComparison
 }
 
+var (
+	ErrInvalidCompare = errors.New("invalid compare")
+	ErrMissingColumn  = errors.New("missing column")
+)
+
 func NewTextQuery(column Column, value string, compare TextComparison) (*TextQuery, error) {
-	if compare < 0 || compare >= textMax {
-		return nil, errors.New("invalid compare")
+	if compare < 0 || compare >= textCompareMax {
+		return nil, ErrInvalidCompare
 	}
 	if column == nil || column.toColumnName() == "" {
-		return nil, errors.New("missing column")
+		return nil, ErrMissingColumn
 	}
 	return &TextQuery{
 		Column:  column,
@@ -63,8 +68,7 @@ func NewTextQuery(column Column, value string, compare TextComparison) (*TextQue
 }
 
 func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = query.Where(q.comp())
-	return query
+	return query.Where(q.comp())
 }
 
 func (s *TextQuery) comp() sq.Sqlizer {
@@ -101,7 +105,7 @@ const (
 	TextContains
 	TextContainsIgnoreCase
 
-	textMax
+	textCompareMax
 )
 
 func TextCompareFromMethod(m domain.SearchMethod) TextComparison {
@@ -109,7 +113,7 @@ func TextCompareFromMethod(m domain.SearchMethod) TextComparison {
 	case domain.SearchMethodEquals:
 		return TextEquals
 	case domain.SearchMethodEqualsIgnoreCase:
-		return TextEndsWithIgnoreCase
+		return TextEqualsIgnoreCase
 	case domain.SearchMethodStartsWith:
 		return TextStartsWith
 	case domain.SearchMethodStartsWithIgnoreCase:
@@ -123,6 +127,6 @@ func TextCompareFromMethod(m domain.SearchMethod) TextComparison {
 	case domain.SearchMethodEndsWithIgnoreCase:
 		return TextEndsWithIgnoreCase
 	default:
-		return textMax
+		return textCompareMax
 	}
 }
