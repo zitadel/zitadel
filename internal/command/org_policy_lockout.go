@@ -11,8 +11,7 @@ func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, p
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-8fJif", "Errors.ResourceOwnerMissing")
 	}
-	addedPolicy := NewOrgLockoutPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	addedPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -36,8 +35,7 @@ func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3J9fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy := NewOrgLockoutPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +64,7 @@ func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) (*doma
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4J9fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy := NewOrgLockoutPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -86,4 +83,25 @@ func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) (*doma
 	}
 	return writeModelToObjectDetails(&existingPolicy.LockoutPolicyWriteModel.WriteModel), nil
 
+}
+
+func (c *Commands) removeLockoutPolicyIfExists(ctx context.Context, orgID string) (*org.LockoutPolicyRemovedEvent, error) {
+	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State != domain.PolicyStateActive {
+		return nil, nil
+	}
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
+	return org.NewLockoutPolicyRemovedEvent(ctx, orgAgg), nil
+}
+
+func (c *Commands) orgLockoutPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLockoutPolicyWriteModel, error) {
+	policy := NewOrgLockoutPolicyWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, policy)
+	if err != nil {
+		return nil, err
+	}
+	return policy, nil
 }

@@ -65,29 +65,27 @@ const (
 	orgNameCol          = "name"
 )
 
-func (p *OrgProjection) reduceOrgAdded(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", org.OrgAddedEventType).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewCreateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ID),
-				handler.NewCol(orgCreationDateCol, e.CreationDate()),
-				handler.NewCol(orgChangeDateCol, e.CreationDate()),
-				handler.NewCol(orgResourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(orgSequenceCol, e.Sequence()),
-				handler.NewCol(orgNameCol, e.Name),
-				handler.NewCol(orgStateCol, domain.OrgStateActive),
-			},
-		),
-	}, nil
+	return crdb.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(orgIDCol, e.Aggregate().ID),
+			handler.NewCol(orgCreationDateCol, e.CreationDate()),
+			handler.NewCol(orgChangeDateCol, e.CreationDate()),
+			handler.NewCol(orgResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(orgSequenceCol, e.Sequence()),
+			handler.NewCol(orgNameCol, e.Name),
+			handler.NewCol(orgStateCol, domain.OrgStateActive),
+		},
+	), nil
 }
 
-func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-q4oq8", "seq", event.Sequence, "expected", org.OrgChangedEventType).Error("wrong event type")
@@ -100,76 +98,68 @@ func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) ([]handle
 	if e.Name != "" {
 		values = append(values, handler.NewCol(orgNameCol, e.Name))
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			values,
-			[]handler.Condition{
-				handler.NewCond(orgIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		values,
+		[]handler.Condition{
+			handler.NewCond(orgIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
 
-func (p *OrgProjection) reduceOrgDeactivated(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgProjection) reduceOrgDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-1gwdc", "seq", event.Sequence, "expectedType", org.OrgDeactivatedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BApK4", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(orgChangeDateCol, e.CreationDate()),
-				handler.NewCol(orgSequenceCol, e.Sequence()),
-				handler.NewCol(orgStateCol, domain.OrgStateInactive),
-			},
-			[]handler.Condition{
-				handler.NewCond(orgIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(orgChangeDateCol, e.CreationDate()),
+			handler.NewCol(orgSequenceCol, e.Sequence()),
+			handler.NewCol(orgStateCol, domain.OrgStateInactive),
+		},
+		[]handler.Condition{
+			handler.NewCond(orgIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
 
-func (p *OrgProjection) reduceOrgReactivated(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgProjection) reduceOrgReactivated(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Vjwiy", "seq", event.Sequence, "expectedType", org.OrgReactivatedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-o37De", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(orgChangeDateCol, e.CreationDate()),
-				handler.NewCol(orgSequenceCol, e.Sequence()),
-				handler.NewCol(orgStateCol, domain.OrgStateActive),
-			},
-			[]handler.Condition{
-				handler.NewCond(orgIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(orgChangeDateCol, e.CreationDate()),
+			handler.NewCol(orgSequenceCol, e.Sequence()),
+			handler.NewCol(orgStateCol, domain.OrgStateActive),
+		},
+		[]handler.Condition{
+			handler.NewCond(orgIDCol, e.Aggregate().ID),
+		},
+	), nil
 }
 
-func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-79OhB", "seq", event.Sequence, "expectedType", org.OrgDomainPrimarySetEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-4TbKT", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(orgChangeDateCol, e.CreationDate()),
-				handler.NewCol(orgSequenceCol, e.Sequence()),
-				handler.NewCol(orgDomainCol, e.Domain),
-			},
-			[]handler.Condition{
-				handler.NewCond(orgIDCol, e.Aggregate().ID),
-			},
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(orgChangeDateCol, e.CreationDate()),
+			handler.NewCol(orgSequenceCol, e.Sequence()),
+			handler.NewCol(orgDomainCol, e.Domain),
+		},
+		[]handler.Condition{
+			handler.NewCond(orgIDCol, e.Aggregate().ID),
+		},
+	), nil
 }

@@ -110,7 +110,7 @@ func (p *OrgOwnerProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-kL530", "seq", event.Sequence, "expected", org.MemberAddedEventType).Error("wrong event type")
@@ -118,7 +118,7 @@ func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) ([]
 	}
 
 	if !isOrgOwner(e.Roles) {
-		return []handler.Statement{crdb.NewNoOpStatement(e)}, nil
+		return crdb.NewNoOpStatement(e), nil
 	}
 
 	stmt, err := p.addOwner(e, e.Aggregate().ResourceOwner, e.UserID)
@@ -126,10 +126,10 @@ func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) ([]
 		return nil, err
 	}
 
-	return []handler.Statement{stmt}, nil
+	return stmt, nil
 }
 
-func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-kL530", "seq", event.Sequence, "expected", org.MemberAddedEventType).Error("wrong event type")
@@ -137,7 +137,7 @@ func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.EventReader) (
 	}
 
 	if !isOrgOwner(e.Roles) {
-		return []handler.Statement{p.deleteOwner(e, e.Aggregate().ID, e.UserID)}, nil
+		return p.deleteOwner(e, e.Aggregate().ID, e.UserID), nil
 	}
 
 	stmt, err := p.addOwner(e, e.Aggregate().ResourceOwner, e.UserID)
@@ -145,41 +145,39 @@ func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.EventReader) (
 		return nil, err
 	}
 
-	return []handler.Statement{stmt}, nil
+	return stmt, nil
 }
 
-func (p *OrgOwnerProjection) reduceMemberRemoved(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceMemberRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-boIbP", "seq", event.Sequence, "expected", org.MemberRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pk6TS", "reduce.wrong.event.type")
 	}
 
-	return []handler.Statement{p.deleteOwner(e, e.Aggregate().ID, e.UserID)}, nil
+	return p.deleteOwner(e, e.Aggregate().ID, e.UserID), nil
 }
 
-func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-IHFwh", "seq", event.Sequence, "expected", user.HumanEmailChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-jMlwT", "reduce.wrong.event.type")
 	}
 
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(userEmailCol, e.EmailAddress),
-			},
-			[]handler.Condition{
-				handler.NewCond(userIDCol, e.Aggregate().ID),
-			},
-			crdb.WithTableSuffix(userTableSuffix),
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(userEmailCol, e.EmailAddress),
+		},
+		[]handler.Condition{
+			handler.NewCond(userIDCol, e.Aggregate().ID),
+		},
+		crdb.WithTableSuffix(userTableSuffix),
+	), nil
 }
 
-func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanProfileChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-WqgUS", "seq", event.Sequence, "expected", user.HumanProfileChangedType).Error("wrong event type")
@@ -201,41 +199,37 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e)}, nil
+		return crdb.NewNoOpStatement(e), nil
 	}
 
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			values,
-			[]handler.Condition{
-				handler.NewCond(userIDCol, e.Aggregate().ID),
-			},
-			crdb.WithTableSuffix(userTableSuffix),
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		values,
+		[]handler.Condition{
+			handler.NewCond(userIDCol, e.Aggregate().ID),
+		},
+		crdb.WithTableSuffix(userTableSuffix),
+	), nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-wbOrL", "seq", event.Sequence, "expected", org.OrgAddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pk6TS", "reduce.wrong.event.type")
 	}
-	return []handler.Statement{
-		crdb.NewCreateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(orgNameCol, e.Name),
-				handler.NewCol(orgCreationDateCol, e.CreationDate()),
-			},
-			crdb.WithTableSuffix(orgTableSuffix),
-		),
-	}, nil
+	return crdb.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(orgIDCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(orgNameCol, e.Name),
+			handler.NewCol(orgCreationDateCol, e.CreationDate()),
+		},
+		crdb.WithTableSuffix(orgTableSuffix),
+	), nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-piy2b", "seq", event.Sequence, "expected", org.OrgChangedEventType).Error("wrong event type")
@@ -248,46 +242,42 @@ func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) ([]h
 	}
 
 	if len(values) == 0 {
-		return []handler.Statement{crdb.NewNoOpStatement(e)}, nil
+		return crdb.NewNoOpStatement(e), nil
 	}
 
-	return []handler.Statement{
-		crdb.NewUpdateStatement(
-			e,
-			values,
-			[]handler.Condition{
-				handler.NewCond(orgIDCol, e.Aggregate().ResourceOwner),
-			},
-			crdb.WithTableSuffix(orgTableSuffix),
-		),
-	}, nil
+	return crdb.NewUpdateStatement(
+		e,
+		values,
+		[]handler.Condition{
+			handler.NewCond(orgIDCol, e.Aggregate().ResourceOwner),
+		},
+		crdb.WithTableSuffix(orgTableSuffix),
+	), nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) ([]handler.Statement, error) {
-	e, ok := event.(*org.OrgChangedEvent)
+func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-F1mHQ", "seq", event.Sequence, "expected", org.OrgRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-9ZR2w", "reduce.wrong.event.type")
 	}
 
-	return []handler.Statement{
+	return crdb.NewMultiStatement(e,
 		//delete org in org table
-		crdb.NewDeleteStatement(
-			e,
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(orgIDCol, e.Aggregate().ResourceOwner),
 			},
 			crdb.WithTableSuffix(orgTableSuffix),
 		),
 		// delete users of the org
-		crdb.NewDeleteStatement(
-			e,
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(userOrgIDCol, e.Aggregate().ResourceOwner),
 			},
 			crdb.WithTableSuffix(userTableSuffix),
 		),
-	}, nil
+	), nil
 }
 
 func isOrgOwner(roles []string) bool {
@@ -299,7 +289,7 @@ func isOrgOwner(roles []string) bool {
 	return false
 }
 
-func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) handler.Statement {
+func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) *handler.Statement {
 	return crdb.NewDeleteStatement(
 		event,
 		[]handler.Condition{
@@ -310,7 +300,7 @@ func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ow
 	)
 }
 
-func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userID string) (handler.Statement, error) {
+func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userID string) (*handler.Statement, error) {
 	events, err := p.Eventstore.FilterEvents(context.Background(),
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			AddQuery().
@@ -330,12 +320,12 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 			SequenceLess(event.Sequence()).
 			Builder())
 	if err != nil {
-		return handler.Statement{}, err
+		return nil, err
 	}
 
 	if len(events) == 0 {
 		logging.LogWithFields("mqd3w", "user", userID, "org", orgID, "seq", event.Sequence()).Warn("no events for user found")
-		return handler.Statement{}, errors.ThrowInternal(nil, "PROJE-Qk7Tv", "unable to find user events")
+		return nil, errors.ThrowInternal(nil, "PROJE-Qk7Tv", "unable to find user events")
 	}
 
 	owner := &OrgOwner{

@@ -2507,6 +2507,7 @@ This is an empty request
 | metadata_user |  bool | - |  |
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2695,6 +2696,7 @@ This is an empty request
 | metadata_user |  bool | - |  |
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
