@@ -12,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -209,8 +208,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 	if len(request.Queries) > 0 {
 		for _, q := range request.Queries {
 			if q.Key == grant_model.UserGrantSearchKeyOrgName {
-				_ = &org_model.OrgSearchQuery{Key: org_model.OrgSearchKeyOrgName, Method: q.Method, Value: q.Value}
-				nameQuery, err := query.NewOrgNameSearchQuery(query.TextComparison(q.Method), q.Value.(string))
+				nameQuery, err := query.NewOrgNameSearchQuery(query.TextCompareFromMethod(q.Method), q.Value.(string))
 				if err != nil {
 					return nil, err
 				}

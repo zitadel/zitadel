@@ -104,19 +104,19 @@ func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
 		return query.TextEquals
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
-		return query.TextEqualsIgnore
+		return query.TextEqualsIgnoreCase
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
 		return query.TextStartsWith
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
-		return query.TextStartsWithIgnore
+		return query.TextStartsWithIgnoreCase
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
 		return query.TextContains
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
-		return query.TextContainsIgnore
+		return query.TextContainsIgnoreCase
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
 		return query.TextEndsWith
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-		return query.TextEndsWithIgnore
+		return query.TextEndsWithIgnoreCase
 	default:
 		return -1
 	}

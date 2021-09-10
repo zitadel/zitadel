@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type SearchRequest struct {
@@ -70,19 +71,19 @@ func (s *TextQuery) comp() map[string]interface{} {
 	switch s.Compare {
 	case TextEquals:
 		return sq.Eq{s.Column: s.Text}
-	case TextEqualsIgnore:
+	case TextEqualsIgnoreCase:
 		return sq.Eq{"LOWER(" + s.Column + ")": strings.ToLower(s.Text)}
 	case TextStartsWith:
 		return sq.Like{s.Column: s.Text + sqlPlaceholder}
-	case TextStartsWithIgnore:
+	case TextStartsWithIgnoreCase:
 		return sq.Like{"LOWER(" + s.Column + ")": strings.ToLower(s.Text) + sqlPlaceholder}
 	case TextEndsWith:
 		return sq.Like{s.Column: sqlPlaceholder + s.Text}
-	case TextEndsWithIgnore:
+	case TextEndsWithIgnoreCase:
 		return sq.Like{"LOWER(" + s.Column + ")": sqlPlaceholder + strings.ToLower(s.Text)}
 	case TextContains:
 		return sq.Like{s.Column: sqlPlaceholder + s.Text + sqlPlaceholder}
-	case TextContainsIgnore:
+	case TextContainsIgnoreCase:
 		return sq.Like{"LOWER(" + s.Column + ")": sqlPlaceholder + strings.ToLower(s.Text) + sqlPlaceholder}
 	}
 	return nil
@@ -92,13 +93,36 @@ type TextComparison int
 
 const (
 	TextEquals TextComparison = iota
-	TextEqualsIgnore
+	TextEqualsIgnoreCase
 	TextStartsWith
-	TextStartsWithIgnore
+	TextStartsWithIgnoreCase
 	TextEndsWith
-	TextEndsWithIgnore
+	TextEndsWithIgnoreCase
 	TextContains
-	TextContainsIgnore
+	TextContainsIgnoreCase
 
 	textMax
 )
+
+func TextCompareFromMethod(m domain.SearchMethod) TextComparison {
+	switch m {
+	case domain.SearchMethodEquals:
+		return TextEquals
+	case domain.SearchMethodEqualsIgnoreCase:
+		return TextEndsWithIgnoreCase
+	case domain.SearchMethodStartsWith:
+		return TextStartsWith
+	case domain.SearchMethodStartsWithIgnoreCase:
+		return TextStartsWithIgnoreCase
+	case domain.SearchMethodContains:
+		return TextContains
+	case domain.SearchMethodContainsIgnoreCase:
+		return TextContainsIgnoreCase
+	case domain.SearchMethodEndsWith:
+		return TextEndsWith
+	case domain.SearchMethodEndsWithIgnoreCase:
+		return TextEndsWithIgnoreCase
+	default:
+		return textMax
+	}
+}
