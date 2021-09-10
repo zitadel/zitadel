@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { switchMap, take, takeUntil } from 'rxjs/operators';
 import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -51,6 +51,7 @@ export class IdpComponent implements OnDestroy {
       id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
       name: new FormControl('', [Validators.required]),
       stylingType: new FormControl('', [Validators.required]),
+      autoRegister: new FormControl(false, [Validators.required]),
     });
 
     this.oidcConfigForm = new FormGroup({
@@ -133,10 +134,6 @@ export class IdpComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  private getData({ projectid }: Params): void {
-    this.projectId = projectid;
-  }
-
   public updateIdp(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const req = new UpdateOrgIDPRequest();
@@ -144,6 +141,7 @@ export class IdpComponent implements OnDestroy {
       req.setIdpId(this.id?.value);
       req.setName(this.name?.value);
       req.setStylingType(this.stylingType?.value);
+      req.setAutoRegister(this.autoRegister?.value);
 
       (this.service as ManagementService).updateOrgIDP(req).then(() => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
@@ -157,6 +155,7 @@ export class IdpComponent implements OnDestroy {
       req.setIdpId(this.id?.value);
       req.setName(this.name?.value);
       req.setStylingType(this.stylingType?.value);
+      req.setAutoRegister(this.autoRegister?.value);
 
       (this.service as AdminService).updateIDP(req).then(() => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
@@ -252,6 +251,10 @@ export class IdpComponent implements OnDestroy {
 
   public get stylingType(): AbstractControl | null {
     return this.idpForm.get('stylingType');
+  }
+
+  public get autoRegister(): AbstractControl | null {
+    return this.idpForm.get('autoRegister');
   }
 
   public get clientId(): AbstractControl | null {

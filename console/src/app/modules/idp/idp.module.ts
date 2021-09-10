@@ -11,25 +11,27 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
+import { InfoSectionModule } from '../info-section/info-section.module';
 import { IdpRoutingModule } from './idp-routing.module';
 import { IdpComponent } from './idp.component';
 
 @NgModule({
-    declarations: [IdpComponent],
-    imports: [
-        CommonModule,
-        IdpRoutingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        InputModule,
-        MatButtonModule,
-        MatIconModule,
-        MatTooltipModule,
-        MatSelectModule,
-        TranslateModule,
-        MatCheckboxModule,
-        MatChipsModule,
-        DetailLayoutModule,
-    ],
+  declarations: [IdpComponent],
+  imports: [
+    CommonModule,
+    IdpRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    InputModule,
+    MatButtonModule,
+    MatIconModule,
+    InfoSectionModule,
+    MatTooltipModule,
+    MatSelectModule,
+    TranslateModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    DetailLayoutModule,
+  ],
 })
 export class IdpModule { }

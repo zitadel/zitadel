@@ -1130,6 +1130,8 @@
       "0": "No Styling",
       "1": "Google"
     },
+    "AUTOREGISTER":"Auto Register",
+    "AUTOREGISTER_DESC":"if enabled, the user will directly be redirected to the identity provider to authenticate",
     "TYPE": "Type",
     "ID": "ID",
     "NAME": "Name",

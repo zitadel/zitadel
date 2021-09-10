@@ -20,6 +20,14 @@
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
+                    <cnsl-info-section class="auto-reg-info">
+                      <div>
+                        <p class="auto-reg-desc">{{'IDP.AUTOREGISTER_DESC' | translate}}</p>
+                        <mat-checkbox formControlName="autoRegister" [disabled]="(canWrite | async) === false">
+                          {{'IDP.AUTOREGISTER' | translate}}
+                        </mat-checkbox>
+                      </div>
+                    </cnsl-info-section>
                 </div>
             </ng-container>
 

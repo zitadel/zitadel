@@ -48,6 +48,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
       idpDisplayNameMapping: new FormControl(0),
       usernameMapping: new FormControl(0),
+      autoRegister: new FormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe(data => {
@@ -92,6 +93,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       req.setScopesList(this.scopesList?.value);
       req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
       req.setUsernameMapping(this.usernameMapping?.value);
+      req.setAutoRegister(this.autoRegister?.value);
       this.loading = true;
       (this.service as ManagementService).addOrgOIDCIDP(req).then((idp) => {
         setTimeout(() => {
@@ -171,8 +173,13 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
   public get issuer(): AbstractControl | null {
     return this.formGroup.get('issuer');
   }
+
   public get scopesList(): AbstractControl | null {
     return this.formGroup.get('scopesList');
+  }
+
+  public get autoRegister(): AbstractControl | null {
+    return this.formGroup.get('autoRegister');
   }
 
   public get idpDisplayNameMapping(): AbstractControl | null {

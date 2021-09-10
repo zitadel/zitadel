@@ -1128,6 +1128,8 @@
       "0": "kein Styling",
       "1": "Google"
     },
+    "AUTOREGISTER":"Automatische Registrierung",
+    "AUTOREGISTER_DESC":"Wenn aktiviert, wird der Benutzer direkt zum Identitätsanbieter weitergeleitet, um sich zu authentifizieren",
     "TYPE": "Typ",
     "ID": "ID",
     "NAME": "Name",
