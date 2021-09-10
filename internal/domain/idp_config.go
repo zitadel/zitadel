@@ -9,13 +9,13 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID string
-	Type        IDPConfigType
-	Name        string
-	StylingType IDPConfigStylingType
-	State       IDPConfigState
-	OIDCConfig  *OIDCIDPConfig
-	JWTConfig   *JWTIDPConfig
+	IDPConfigID  string
+	Type         IDPConfigType
+	Name         string
+	StylingType  IDPConfigStylingType
+	State        IDPConfigState
+	OIDCConfig   *OIDCIDPConfig
+	JWTConfig    *JWTIDPConfig
 	AutoRegister bool
 }
 
@@ -40,6 +40,10 @@ type IDPConfigView struct {
 	OIDCUsernameMapping        OIDCMappingField
 	OAuthAuthorizationEndpoint string
 	OAuthTokenEndpoint         string
+
+	JWTEndpoint     string
+	JWTIssuer       string
+	JWTKeysEndpoint string
 }
 
 type OIDCIDPConfig struct {

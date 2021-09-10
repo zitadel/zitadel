@@ -7,12 +7,13 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID string
-	Type        IdpConfigType
-	Name        string
-	StylingType IDPStylingType
-	State       IDPConfigState
-	OIDCConfig  *OIDCIDPConfig
+	IDPConfigID  string
+	Type         IdpConfigType
+	Name         string
+	StylingType  IDPStylingType
+	State        IDPConfigState
+	OIDCConfig   *OIDCIDPConfig
+	JWTIDPConfig *JWTIDPConfig
 }
 
 type OIDCIDPConfig struct {
@@ -25,6 +26,14 @@ type OIDCIDPConfig struct {
 	Scopes                []string
 	IDPDisplayNameMapping OIDCMappingField
 	UsernameMapping       OIDCMappingField
+}
+
+type JWTIDPConfig struct {
+	es_models.ObjectRoot
+	IDPConfigID  string
+	JWTEndpoint  string
+	Issuer       string
+	KeysEndpoint string
 }
 
 type IdpConfigType int32

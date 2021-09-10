@@ -166,14 +166,23 @@ func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
 	}
 }
 
-func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
+func IDPViewToConfigPb(config *domain.IDPConfigView) idp_pb.IDPConfig {
+	if config.IsOIDC {
+		return &idp_pb.IDP_OidcConfig{
+			OidcConfig: &idp_pb.OIDCConfig{
+				ClientId:           config.OIDCClientID,
+				Issuer:             config.OIDCIssuer,
+				Scopes:             config.OIDCScopes,
+				DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+				UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
+			},
+		}
+	}
+	return &idp_pb.IDP_JwtConfig{
+		JwtConfig: &idp_pb.JWTConfig{
+			JwtEndpoint:  config.JWTEndpoint,
+			Issuer:       config.JWTIssuer,
+			KeysEndpoint: config.JWTKeysEndpoint,
 		},
 	}
 }

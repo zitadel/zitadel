@@ -17,6 +17,7 @@ type IDPConfigReadModel struct {
 	ProviderType domain.IdentityProviderType
 
 	OIDCConfig *OIDCConfigReadModel
+	JWTConfig  *JWTConfigReadModel
 }
 
 func NewIDPConfigReadModel(configID string) *IDPConfigReadModel {
@@ -45,6 +46,13 @@ func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 		case *idpconfig.OIDCConfigChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 			rm.OIDCConfig.AppendEvents(event)
+		case *idpconfig.JWTConfigAddedEvent:
+			rm.JWTConfig = &JWTConfigReadModel{}
+			rm.ReadModel.AppendEvents(e)
+			rm.JWTConfig.AppendEvents(event)
+		case *idpconfig.JWTConfigChangedEvent:
+			rm.ReadModel.AppendEvents(e)
+			rm.JWTConfig.AppendEvents(event)
 		}
 	}
 }
@@ -67,6 +75,11 @@ func (rm *IDPConfigReadModel) Reduce() error {
 
 	if rm.OIDCConfig != nil {
 		if err := rm.OIDCConfig.Reduce(); err != nil {
+			return err
+		}
+	}
+	if rm.JWTConfig != nil {
+		if err := rm.JWTConfig.Reduce(); err != nil {
 			return err
 		}
 	}

@@ -142,9 +142,8 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		}
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 	}
-	//if i
-	//l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
-	//return
+	l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+	return
 }
 
 func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelyingParty {

@@ -299,6 +299,7 @@ Errors:
     NotFound: AuthRequest konnte nicht gefunden werden
     UserAgentNotCorresponding: User Agent stimmt nicht überein
     UserAgentNotFound: User Agent ID nicht gefunden
+    TokenNotFound: Token nicht gefunden
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
   User:
     NotFound: Benutzer konnte nicht gefunden werden

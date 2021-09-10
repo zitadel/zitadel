@@ -300,6 +300,7 @@ Errors:
     NotFound: Could not find authrequest
     UserAgentNotCorresponding: User Agent does not correspond
     UserAgentNotFound: User Agent ID not found
+    TokenNotFound: Token not found
     RequestTypeNotSupported: Request type is not supported
   User:
     NotFound: User could not be found
