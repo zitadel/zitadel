@@ -22,6 +22,7 @@ title: zitadel/idp.proto
 | styling_type |  IDPStylingType | - |  |
 | owner |  IDPOwnerType | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.jwt_config |  JWTConfig | - |  |
 | auto_register |  bool | - |  |
 
 
@@ -86,6 +87,19 @@ title: zitadel/idp.proto
 | provided_user_id |  string | - |  |
 | provided_user_name |  string | - |  |
 | idp_type |  IDPType | - |  |
+
+
+
+
+### JWTConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -162,7 +176,8 @@ authorization framework of the identity provider
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | IDP_TYPE_UNSPECIFIED | 0 | - |
-| IDP_TYPE_OIDC | 1 | PLANNED: IDP_TYPE_SAML |
+| IDP_TYPE_OIDC | 1 | - |
+| IDP_TYPE_JWT | 3 | PLANNED: IDP_TYPE_SAML |
 
 
 

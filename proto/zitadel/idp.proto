@@ -37,7 +37,7 @@ message IDP {
     ];
     oneof config {
         OIDCConfig oidc_config = 7;
-        JWTConfig jwt_config = 8;
+        JWTConfig jwt_config = 9;
     }
     bool auto_register = 8;
 }
