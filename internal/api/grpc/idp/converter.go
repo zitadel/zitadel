@@ -143,14 +143,22 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 	}
 }
 
-func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
+	if config.IsOIDC {
+		return &idp_pb.IDP_OidcConfig{
+			OidcConfig: &idp_pb.OIDCConfig{
+				ClientId:           config.OIDCClientID,
+				Issuer:             config.OIDCIssuer,
+				Scopes:             config.OIDCScopes,
+				DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+				UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+			},
+		}
+	}
+	return &idp_pb.IDP_JwtConfig{
+		JwtConfig: &idp_pb.JWTConfig{
+			Issuer:       config.JWTIssuer,
+			KeysEndpoint: config.JWTKeysEndpoint,
 		},
 	}
 }

@@ -22,6 +22,7 @@ title: zitadel/idp.proto
 | styling_type |  IDPStylingType | - |  |
 | owner |  IDPOwnerType | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.jwt_config |  JWTConfig | - |  |
 
 
 

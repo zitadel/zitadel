@@ -37,6 +37,7 @@ message IDP {
     ];
     oneof config {
         OIDCConfig oidc_config = 7;
+        JWTConfig jwt_config = 8;
     }
 }
 

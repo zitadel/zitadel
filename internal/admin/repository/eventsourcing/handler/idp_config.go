@@ -9,6 +9,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	"github.com/caos/zitadel/internal/repository/iam"
 )
 
 const (
@@ -84,7 +85,9 @@ func (i *IDPConfig) processIDPConfig(event *es_models.Event) (err error) {
 		err = idp.AppendEvent(iam_model.IDPProviderTypeSystem, event)
 	case model.IDPConfigChanged,
 		model.OIDCIDPConfigAdded,
-		model.OIDCIDPConfigChanged:
+		model.OIDCIDPConfigChanged,
+		es_models.EventType(iam.IDPJWTConfigAddedEventType),
+		es_models.EventType(iam.IDPJWTConfigChangedEventType):
 		err = idp.SetData(event)
 		if err != nil {
 			return err

@@ -28,6 +28,8 @@ type IDPConfigView struct {
 	OIDCUsernameMapping        OIDCMappingField
 	OAuthAuthorizationEndpoint string
 	OAuthTokenEndpoint         string
+	JWTIssuer                  string
+	JWTKeysEndpoint            string
 }
 
 type IDPConfigSearchRequest struct {
