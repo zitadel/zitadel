@@ -56,11 +56,6 @@ type AuthRequestRepo struct {
 	IAMID string
 }
 
-type orgViewProvider interface {
-	OrgByID(context.Context, string) (*query.Org, error)
-	OrgByDomainGlobal(context.Context, string) (*query.Org, error)
-}
-
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error)
@@ -89,6 +84,11 @@ type userEventProvider interface {
 
 type userCommandProvider interface {
 	BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) error
+}
+
+type orgViewProvider interface {
+	OrgByID(context.Context, string) (*query.Org, error)
+	OrgByDomainGlobal(context.Context, string) (*query.Org, error)
 }
 
 type userGrantProvider interface {
