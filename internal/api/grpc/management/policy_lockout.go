@@ -53,7 +53,7 @@ func (s *Server) UpdateCustomLockoutPolicy(ctx context.Context, req *mgmt_pb.Upd
 }
 
 func (s *Server) ResetLockoutPolicyToDefault(ctx context.Context, req *mgmt_pb.ResetLockoutPolicyToDefaultRequest) (*mgmt_pb.ResetLockoutPolicyToDefaultResponse, error) {
-	objectDetails, err := s.command.RemovePasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveLockoutPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

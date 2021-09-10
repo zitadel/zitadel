@@ -60,21 +60,29 @@ func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string
 	return writeModelToLockoutPolicy(&existingPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-4J9fs", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4J9fs", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-D4zuz", "Errors.Org.LockoutPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-D4zuz", "Errors.Org.LockoutPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = c.eventstore.PushEvents(ctx, org.NewLockoutPolicyRemovedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLockoutPolicyRemovedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.LockoutPolicyWriteModel.WriteModel), nil
+
 }
 
 func (c *Commands) removeLockoutPolicyIfExists(ctx context.Context, orgID string) (*org.LockoutPolicyRemovedEvent, error) {
