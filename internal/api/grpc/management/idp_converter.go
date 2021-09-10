@@ -49,9 +49,10 @@ func addJWTIDPRequestToDomainJWTIDPConfig(req *mgmt_pb.AddOrgJWTIDPRequest) *dom
 
 func updateIDPToDomain(req *mgmt_pb.UpdateOrgIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		IDPConfigID: req.IdpId,
-		Name:        req.Name,
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		IDPConfigID:  req.IdpId,
+		Name:         req.Name,
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		AutoRegister: req.AutoRegister,
 	}
 }
 

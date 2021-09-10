@@ -27,6 +27,7 @@ const (
 	NextStepPasswordlessRegistrationPrompt
 	NextStepRegistration
 	NextStepProjectRequired
+	NextStepRedirectToExternalIDP
 )
 
 type LoginStep struct{}
@@ -66,6 +67,12 @@ const (
 	UserSessionStateActive UserSessionState = iota
 	UserSessionStateTerminated
 )
+
+type RedirectToExternalIDPStep struct{}
+
+func (s *RedirectToExternalIDPStep) Type() NextStepType {
+	return NextStepRedirectToExternalIDP
+}
 
 type InitUserStep struct {
 	PasswordSet bool

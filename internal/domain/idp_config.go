@@ -16,6 +16,7 @@ type IDPConfig struct {
 	State       IDPConfigState
 	OIDCConfig  *OIDCIDPConfig
 	JWTConfig   *JWTIDPConfig
+	AutoRegister bool
 }
 
 type IDPConfigView struct {
@@ -28,6 +29,7 @@ type IDPConfigView struct {
 	ChangeDate      time.Time
 	Sequence        uint64
 	IDPProviderType IdentityProviderType
+	AutoRegister    bool
 
 	IsOIDC                     bool
 	OIDCClientID               string

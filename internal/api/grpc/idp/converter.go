@@ -18,29 +18,31 @@ func IDPViewsToPb(idps []*iam_model.IDPConfigView) []*idp_pb.IDP {
 
 func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
 	return &idp_pb.IDP{
-		Id:          idp.IDPConfigID,
-		State:       ModelIDPStateToPb(idp.State),
-		Name:        idp.Name,
-		StylingType: ModelIDPStylingTypeToPb(idp.StylingType),
-		Owner:       ModelIDPProviderTypeToPb(idp.IDPProviderType),
-		Config:      ModelIDPViewToConfigPb(idp),
+		Id:           idp.IDPConfigID,
+		State:        ModelIDPStateToPb(idp.State),
+		Name:         idp.Name,
+		StylingType:  ModelIDPStylingTypeToPb(idp.StylingType),
+		AutoRegister: idp.AutoRegister,
+		Owner:        ModelIDPProviderTypeToPb(idp.IDPProviderType),
+		Config:       ModelIDPViewToConfigPb(idp),
 		Details: obj_grpc.ToViewDetailsPb(
 			idp.Sequence,
 			idp.CreationDate,
 			idp.ChangeDate,
-			"", //TODO: backend
+			idp.AggregateID,
 		),
 	}
 }
 
 func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
-		Id:          idp.AggregateID,
-		State:       IDPStateToPb(idp.State),
-		Name:        idp.Name,
-		StylingType: IDPStylingTypeToPb(idp.StylingType),
-		Config:      IDPViewToConfigPb(idp),
-		Details:     obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, ""), //TODO: resource owner in view
+		Id:           idp.AggregateID,
+		State:        IDPStateToPb(idp.State),
+		Name:         idp.Name,
+		StylingType:  IDPStylingTypeToPb(idp.StylingType),
+		AutoRegister: idp.AutoRegister,
+		Config:       IDPViewToConfigPb(idp),
+		Details:      obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, idp.AggregateID),
 	}
 	return mapped
 }

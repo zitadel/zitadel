@@ -306,6 +306,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"user not set no active session selected idp, redirect to external idp step",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&domain.AuthRequest{SelectedIDPConfigID: "id"}, false},
+			[]domain.NextStep{&domain.LoginStep{}, &domain.RedirectToExternalIDPStep{}},
+			nil,
+		},
+		{
 			"user not set, prompt select account and internal error, internal error",
 			fields{
 				userSessionViewProvider: &mockViewErrUserSession{},
