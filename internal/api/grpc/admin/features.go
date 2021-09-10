@@ -78,6 +78,7 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		MetadataUser:             req.MetadataUser,
 		CustomTextLogin:          req.CustomTextLogin || req.CustomText,
 		CustomTextMessage:        req.CustomTextMessage,
+		LockoutPolicy:            req.LockoutPolicy,
 		Actions:                  req.Actions,
 	}
 }
@@ -103,6 +104,7 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		MetadataUser:             req.MetadataUser,
 		CustomTextLogin:          req.CustomTextLogin || req.CustomText,
 		CustomTextMessage:        req.CustomTextMessage,
+		LockoutPolicy:            req.LockoutPolicy,
 		Actions:                  req.Actions,
 	}
 }

@@ -1201,6 +1201,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -2507,7 +2508,7 @@ This is an empty request
 | metadata_user |  bool | - |  |
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
-| actions |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2696,7 +2697,7 @@ This is an empty request
 | metadata_user |  bool | - |  |
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
-| actions |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2887,6 +2888,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 

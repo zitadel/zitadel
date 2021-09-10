@@ -143,7 +143,7 @@ func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.Eve
 	if len(opts) == 0 {
 		return NewNoOpStatement(event)
 	}
-	execs := make([]func(ex handler.Executer, projectionName string) error, len(opts))
+	execs := make([]Exec, len(opts))
 	for i, opt := range opts {
 		execs[i] = opt(event)
 	}
@@ -168,11 +168,13 @@ func AddUpsertStatement(values []handler.Column, opts ...execOption) func(events
 		return NewUpsertStatement(event, values, opts...).Execute
 	}
 }
+
 func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
 	return func(event eventstore.EventReader) Exec {
 		return NewUpdateStatement(event, values, conditions, opts...).Execute
 	}
 }
+
 func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
 	return func(event eventstore.EventReader) Exec {
 		return NewDeleteStatement(event, conditions, opts...).Execute
@@ -206,7 +208,7 @@ func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []stri
 
 type query func(config execConfig) string
 
-func exec(config execConfig, q query, opts []execOption) func(ex handler.Executer, projectionName string) error {
+func exec(config execConfig, q query, opts []execOption) Exec {
 	return func(ex handler.Executer, projectionName string) error {
 		if projectionName == "" {
 			return handler.ErrNoProjection
@@ -229,7 +231,7 @@ func exec(config execConfig, q query, opts []execOption) func(ex handler.Execute
 	}
 }
 
-func multiExec(execList []func(ex handler.Executer, projectionName string) error) func(ex handler.Executer, projectionName string) error {
+func multiExec(execList []Exec) Exec {
 	return func(ex handler.Executer, projectionName string) error {
 		for _, exec := range execList {
 			if err := exec(ex, projectionName); err != nil {

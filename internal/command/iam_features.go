@@ -53,6 +53,7 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.MetadataUser,
 		features.CustomTextMessage,
 		features.CustomTextLogin,
+		features.LockoutPolicy,
 		features.Actions,
 	)
 	if !hasChanged {

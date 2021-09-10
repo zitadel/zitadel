@@ -33,6 +33,7 @@ type IDPConfigView struct {
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	IDPState        int32     `json:"-" gorm:"column:idp_state"`
 	IDPProviderType int32     `json:"-" gorm:"column:idp_provider_type"`
+	AutoRegister    bool      `json:"autoRegister" gorm:"column:auto_register"`
 
 	IsOIDC                     bool                `json:"-" gorm:"column:is_oidc"`
 	OIDCClientID               string              `json:"clientId" gorm:"column:oidc_client_id"`
@@ -54,6 +55,7 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 		State:                      model.IDPConfigState(idp.IDPState),
 		Name:                       idp.Name,
 		StylingType:                model.IDPStylingType(idp.StylingType),
+		AutoRegister:               idp.AutoRegister,
 		Sequence:                   idp.Sequence,
 		CreationDate:               idp.CreationDate,
 		ChangeDate:                 idp.ChangeDate,

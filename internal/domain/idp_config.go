@@ -9,12 +9,13 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID string
-	Type        IDPConfigType
-	Name        string
-	StylingType IDPConfigStylingType
-	State       IDPConfigState
-	OIDCConfig  *OIDCIDPConfig
+	IDPConfigID  string
+	Type         IDPConfigType
+	Name         string
+	StylingType  IDPConfigStylingType
+	State        IDPConfigState
+	OIDCConfig   *OIDCIDPConfig
+	AutoRegister bool
 }
 
 type IDPConfigView struct {
@@ -27,6 +28,7 @@ type IDPConfigView struct {
 	ChangeDate      time.Time
 	Sequence        uint64
 	IDPProviderType IdentityProviderType
+	AutoRegister    bool
 
 	IsOIDC                     bool
 	OIDCClientID               string

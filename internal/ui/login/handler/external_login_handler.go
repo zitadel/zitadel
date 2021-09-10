@@ -165,7 +165,16 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		if errors.IsNotFound(err) {
 			err = nil
 		}
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		if !idpConfig.AutoRegister {
+			l.renderExternalNotFoundOption(w, r, authReq, err)
+			return
+		}
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, err)
+			return
+		}
+		l.handleAutoRegister(w, r, authReq)
 		return
 	}
 	if len(externalUser.Metadatas) > 0 {

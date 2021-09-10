@@ -30,6 +30,7 @@ type FeaturesWriteModel struct {
 	MetadataUser             bool
 	CustomTextMessage        bool
 	CustomTextLogin          bool
+	LockoutPolicy            bool
 	Actions                  bool
 }
 
@@ -94,6 +95,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.CustomTextLogin != nil {
 				wm.CustomTextLogin = *e.CustomTextLogin
+			}
+			if e.LockoutPolicy != nil {
+				wm.LockoutPolicy = *e.LockoutPolicy
 			}
 			if e.Actions != nil {
 				wm.Actions = *e.Actions

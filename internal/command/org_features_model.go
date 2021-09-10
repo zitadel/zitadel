@@ -78,6 +78,7 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	metadataUser,
 	customTextMessage,
 	customTextLogin,
+	lockoutPolicy,
 	actions bool,
 ) (*org.FeaturesSetEvent, bool) {
 
@@ -139,6 +140,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.CustomTextLogin != customTextLogin {
 		changes = append(changes, features.ChangeCustomTextLogin(customTextLogin))
+	}
+	if wm.LockoutPolicy != lockoutPolicy {
+		changes = append(changes, features.ChangeLockoutPolicy(lockoutPolicy))
 	}
 	if wm.Actions != actions {
 		changes = append(changes, features.ChangeActions(actions))

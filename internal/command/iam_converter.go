@@ -130,11 +130,12 @@ func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolic
 
 func writeModelToIDPConfig(wm *IDPConfigWriteModel) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
-		IDPConfigID: wm.ConfigID,
-		Name:        wm.Name,
-		State:       wm.State,
-		StylingType: wm.StylingType,
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		IDPConfigID:  wm.ConfigID,
+		Name:         wm.Name,
+		State:        wm.State,
+		StylingType:  wm.StylingType,
+		AutoRegister: wm.AutoRegister,
 	}
 }
 

@@ -12,6 +12,7 @@ type IDPConfigReadModel struct {
 	State        domain.IDPConfigState
 	ConfigID     string
 	Name         string
+	AutoRegister bool
 	StylingType  domain.IDPConfigStylingType
 	ProviderType domain.IdentityProviderType
 
@@ -77,6 +78,7 @@ func (rm *IDPConfigReadModel) reduceConfigAddedEvent(e *idpconfig.IDPConfigAdded
 	rm.Name = e.Name
 	rm.StylingType = e.StylingType
 	rm.State = domain.IDPConfigStateActive
+	rm.AutoRegister = e.AutoRegister
 }
 
 func (rm *IDPConfigReadModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigChangedEvent) {
@@ -85,6 +87,9 @@ func (rm *IDPConfigReadModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigCha
 	}
 	if e.StylingType != nil && e.StylingType.Valid() {
 		rm.StylingType = *e.StylingType
+	}
+	if e.AutoRegister != nil {
+		rm.AutoRegister = *e.AutoRegister
 	}
 }
 

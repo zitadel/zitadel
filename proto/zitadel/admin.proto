@@ -2428,6 +2428,7 @@ message AddOIDCIDPRequest {
             description: "definition which field is mapped to the email of the user";
         }
     ];
+    bool auto_register = 9;
 }
 
 message AddOIDCIDPResponse {
@@ -2458,6 +2459,7 @@ message UpdateIDPRequest {
             description: "some identity providers specify the styling of the button to their login";
         }
     ];
+    bool auto_register = 4;
 }
 
 message UpdateIDPResponse {
@@ -2615,6 +2617,7 @@ message SetDefaultFeaturesRequest {
     bool metadata_user = 19;
     bool custom_text_message = 20;
     bool custom_text_login = 21;
+    bool lockout_policy = 22;
     bool actions = 23;
 }
 
@@ -2654,7 +2657,8 @@ message SetOrgFeaturesRequest {
     bool metadata_user = 20;
     bool custom_text_message = 21;
     bool custom_text_login = 22;
-    bool actions = 23;
+    bool lockout_policy = 23;
+    bool actions = 24;
 }
 
 message SetOrgFeaturesResponse {

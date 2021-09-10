@@ -124,10 +124,30 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil, nil)
+	if !idpConfig.AutoRegister {
+		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
+		return
+	}
+	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *iam_model.OrgIAMPolicyView, human *domain.Human, idp *domain.ExternalIDP, metadata []*domain.Metadata, err error) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.ExternalIDP) {
+	resourceOwner := iam.GlobalOrgID
+	memberRoles := []string{domain.RoleOrgProjectCreator}
+
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
+		memberRoles = nil
+		resourceOwner = authReq.RequestedOrgID
+	}
+	_, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	l.renderNextStep(w, r, authReq)
+}
+
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *iam_model.OrgIAMPolicyView, human *domain.Human, idp *domain.ExternalIDP, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -149,7 +169,6 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		ExternalEmailVerified:      human.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
-		//UserInfo:                   User,
 	}
 	if human.Phone != nil {
 		data.Phone = human.PhoneNumber
