@@ -96,8 +96,9 @@ title: zitadel/idp.proto
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| issuer |  string | - |  |
-| keys_endpoint |  string | - |  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 

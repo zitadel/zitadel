@@ -90,6 +90,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 							iam.NewIDPJWTConfigAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"config1",
+								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
 							),
@@ -133,6 +134,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 							iam.NewIDPJWTConfigAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"config1",
+								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
 							),
@@ -145,6 +147,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				ctx: context.Background(),
 				config: &domain.JWTIDPConfig{
 					IDPConfigID:  "config1",
+					JWTEndpoint:  "jwt-endpoint",
 					Issuer:       "issuer",
 					KeysEndpoint: "keys-endpoint",
 				},
@@ -172,6 +175,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 							iam.NewIDPJWTConfigAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"config1",
+								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
 							),
@@ -182,6 +186,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 							eventFromEventPusher(
 								newDefaultIDPJWTConfigChangedEvent(context.Background(),
 									"config1",
+									"jwt-endpoint-changed",
 									"issuer-changed",
 									"keys-endpoint-changed",
 								),
@@ -195,6 +200,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				ctx: context.Background(),
 				config: &domain.JWTIDPConfig{
 					IDPConfigID:  "config1",
+					JWTEndpoint:  "jwt-endpoint-changed",
 					Issuer:       "issuer-changed",
 					KeysEndpoint: "keys-endpoint-changed",
 				},
@@ -206,6 +212,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 						ResourceOwner: "IAM",
 					},
 					IDPConfigID:  "config1",
+					JWTEndpoint:  "jwt-endpoint-changed",
 					Issuer:       "issuer-changed",
 					KeysEndpoint: "keys-endpoint-changed",
 				},
@@ -232,11 +239,12 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 	}
 }
 
-func newDefaultIDPJWTConfigChangedEvent(ctx context.Context, configID, issuer, keysEndpoint string) *iam.IDPJWTConfigChangedEvent {
+func newDefaultIDPJWTConfigChangedEvent(ctx context.Context, configID, jwtEndpoint, issuer, keysEndpoint string) *iam.IDPJWTConfigChangedEvent {
 	event, _ := iam.NewIDPJWTConfigChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		configID,
 		[]idpconfig.JWTConfigChanges{
+			idpconfig.ChangeJWTEndpoint(jwtEndpoint),
 			idpconfig.ChangeJWTIssuer(issuer),
 			idpconfig.ChangeKeysEndpoint(keysEndpoint),
 		},

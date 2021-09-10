@@ -156,6 +156,7 @@ func writeModelToIDPJWTConfig(wm *JWTConfigWriteModel) *domain.JWTIDPConfig {
 	return &domain.JWTIDPConfig{
 		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
 		IDPConfigID:  wm.IDPConfigID,
+		JWTEndpoint:  wm.JWTEndpoint,
 		Issuer:       wm.Issuer,
 		KeysEndpoint: wm.KeysEndpoint,
 	}

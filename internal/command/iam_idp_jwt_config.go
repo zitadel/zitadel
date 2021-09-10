@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
@@ -25,6 +26,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		ctx,
 		iamAgg,
 		config.IDPConfigID,
+		config.JWTEndpoint,
 		config.Issuer,
 		config.KeysEndpoint)
 	if err != nil {

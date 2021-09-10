@@ -165,16 +165,25 @@ enum OIDCMappingField {
 
 
 message JWTConfig {
-    string issuer = 1 [
+    string jwt_endpoint = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the issuer of the identity provider";
+            description: "the endpoint where the jwt can be extracted";
         }
     ];
-    string keys_endpoint = 2 [
+    string issuer = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+        }
+    ];
+    string keys_endpoint = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
-            description: "the endpoint where the keys can be read";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
         }
     ];
 }

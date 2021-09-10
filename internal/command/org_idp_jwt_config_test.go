@@ -110,6 +110,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"config1",
+								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
 							),
@@ -154,6 +155,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"config1",
+								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
 							),
@@ -166,6 +168,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 				ctx: context.Background(),
 				config: &domain.JWTIDPConfig{
 					IDPConfigID:  "config1",
+					JWTEndpoint:  "jwt-endpoint",
 					Issuer:       "issuer",
 					KeysEndpoint: "keys-endpoint",
 				},
@@ -194,6 +197,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"config1",
+								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
 							),
@@ -205,6 +209,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 								newIDPJWTConfigChangedEvent(context.Background(),
 									"org1",
 									"config1",
+									"jwt-endpoint-changed",
 									"issuer-changed",
 									"keys-endpoint-changed",
 								),
@@ -218,6 +223,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 				ctx: context.Background(),
 				config: &domain.JWTIDPConfig{
 					IDPConfigID:  "config1",
+					JWTEndpoint:  "jwt-endpoint-changed",
 					Issuer:       "issuer-changed",
 					KeysEndpoint: "keys-endpoint-changed",
 				},
@@ -230,6 +236,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					IDPConfigID:  "config1",
+					JWTEndpoint:  "jwt-endpoint-changed",
 					Issuer:       "issuer-changed",
 					KeysEndpoint: "keys-endpoint-changed",
 				},
@@ -256,11 +263,12 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 	}
 }
 
-func newIDPJWTConfigChangedEvent(ctx context.Context, orgID, configID, issuer, keysEndpoint string) *org.IDPJWTConfigChangedEvent {
+func newIDPJWTConfigChangedEvent(ctx context.Context, orgID, configID, jwtEndpoint, issuer, keysEndpoint string) *org.IDPJWTConfigChangedEvent {
 	event, _ := org.NewIDPJWTConfigChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		configID,
 		[]idpconfig.JWTConfigChanges{
+			idpconfig.ChangeJWTEndpoint(jwtEndpoint),
 			idpconfig.ChangeJWTIssuer(issuer),
 			idpconfig.ChangeKeysEndpoint(keysEndpoint),
 		},

@@ -22,6 +22,7 @@ func NewIDPJWTConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
+	jwtEndpoint,
 	issuer,
 	keysEndpoint string,
 ) *IDPJWTConfigAddedEvent {
@@ -34,6 +35,7 @@ func NewIDPJWTConfigAddedEvent(
 				IDPJWTConfigAddedEventType,
 			),
 			idpConfigID,
+			jwtEndpoint,
 			issuer,
 			keysEndpoint,
 		),

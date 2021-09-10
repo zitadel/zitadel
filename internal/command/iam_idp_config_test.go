@@ -146,6 +146,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 								iam.NewIDPJWTConfigAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
 									"config1",
+									"jwt-endpoint",
 									"issuer",
 									"keys-endpoint",
 								),
@@ -162,6 +163,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 					Name:        "name1",
 					StylingType: domain.IDPConfigStylingTypeGoogle,
 					JWTConfig: &domain.JWTIDPConfig{
+						JWTEndpoint:  "jwt-endpoint",
 						Issuer:       "issuer",
 						KeysEndpoint: "keys-endpoint",
 					},

@@ -45,6 +45,7 @@ type IDPConfigView struct {
 	OIDCUsernameMapping        int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
 	OAuthAuthorizationEndpoint string              `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
 	OAuthTokenEndpoint         string              `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
+	JWTEndpoint                string              `json:"jwtEndpoint" gorm:"jwt_endpoint"`
 	JWTKeysEndpoint            string              `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
@@ -74,6 +75,7 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 		view.OIDCIssuer = idp.OIDCIssuer
 		return view
 	}
+	view.JWTEndpoint = idp.JWTEndpoint
 	view.JWTIssuer = idp.OIDCIssuer
 	view.JWTKeysEndpoint = idp.JWTKeysEndpoint
 	return view

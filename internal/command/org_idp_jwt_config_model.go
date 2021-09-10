@@ -85,11 +85,15 @@ func (wm *IDPJWTConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
+	jwtEndpoint,
 	issuer,
 	keysEndpoint string,
 ) (*org.IDPJWTConfigChangedEvent, bool, error) {
 
 	changes := make([]idpconfig.JWTConfigChanges, 0)
+	if wm.JWTEndpoint != jwtEndpoint {
+		changes = append(changes, idpconfig.ChangeJWTEndpoint(jwtEndpoint))
+	}
 	if wm.Issuer != issuer {
 		changes = append(changes, idpconfig.ChangeJWTIssuer(issuer))
 	}

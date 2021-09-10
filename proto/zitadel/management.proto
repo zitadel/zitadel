@@ -4930,18 +4930,31 @@ message AddOrgJWTIDPRequest {
             description: "some identity providers specify the styling of the button to their login";
         }
     ];
-    string issuer = 3 [
+    string jwt_endpoint = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the jwt issuer of the identity provider";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
         }
     ];
-    string keys_endpoint = 4 [
+    string issuer = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
-            description: "the jwt issuer of the identity provider";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
         }
     ];
 }
@@ -5053,17 +5066,31 @@ message UpdateOrgIDPJWTConfigRequest {
             example: "\"69629023906488334\"";
         }
     ];
-    string issuer = 2 [
+    string jwt_endpoint = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the issuer of the jwt identity provider";
+            example: "\"https://accounts.google.com\"";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
         }
     ];
-    string keys_endpoint = 3 [
+    string issuer = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
-            description: "the endpoint where the keys can be found";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
         }
     ];
 }

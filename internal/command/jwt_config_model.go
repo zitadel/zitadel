@@ -10,6 +10,7 @@ type JWTConfigWriteModel struct {
 	eventstore.WriteModel
 
 	IDPConfigID  string
+	JWTEndpoint  string
 	Issuer       string
 	KeysEndpoint string
 	State        domain.IDPConfigState
@@ -36,12 +37,16 @@ func (wm *JWTConfigWriteModel) Reduce() error {
 
 func (wm *JWTConfigWriteModel) reduceConfigAddedEvent(e *idpconfig.JWTConfigAddedEvent) {
 	wm.IDPConfigID = e.IDPConfigID
+	wm.JWTEndpoint = e.JWTEndpoint
 	wm.Issuer = e.Issuer
 	wm.KeysEndpoint = e.KeysEndpoint
 	wm.State = domain.IDPConfigStateActive
 }
 
 func (wm *JWTConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.JWTConfigChangedEvent) {
+	if e.JWTEndpoint != nil {
+		wm.JWTEndpoint = *e.JWTEndpoint
+	}
 	if e.Issuer != nil {
 		wm.Issuer = *e.Issuer
 	}

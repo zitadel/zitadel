@@ -1198,6 +1198,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
@@ -2906,6 +2907,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 

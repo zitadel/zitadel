@@ -18,6 +18,7 @@ type JWTConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID  string `json:"idpConfigId"`
+	JWTEndpoint  string `json:"jwtEndpoint,omitempty"`
 	Issuer       string `json:"issuer,omitempty"`
 	KeysEndpoint string `json:"keysEndpoint,omitempty"`
 }
@@ -33,12 +34,14 @@ func (e *JWTConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 func NewJWTConfigAddedEvent(
 	base *eventstore.BaseEvent,
 	idpConfigID,
+	jwtEndpoint,
 	issuer,
 	keysEndpoint string,
 ) *JWTConfigAddedEvent {
 	return &JWTConfigAddedEvent{
 		BaseEvent:    *base,
 		IDPConfigID:  idpConfigID,
+		JWTEndpoint:  jwtEndpoint,
 		Issuer:       issuer,
 		KeysEndpoint: keysEndpoint,
 	}
@@ -62,6 +65,7 @@ type JWTConfigChangedEvent struct {
 
 	IDPConfigID string `json:"idpConfigId"`
 
+	JWTEndpoint  *string `json:"jwtEndpoint,omitempty"`
 	Issuer       *string `json:"issuer,omitempty"`
 	KeysEndpoint *string `json:"keysEndpoint,omitempty"`
 }
@@ -93,6 +97,12 @@ func NewJWTConfigChangedEvent(
 }
 
 type JWTConfigChanges func(*JWTConfigChangedEvent)
+
+func ChangeJWTEndpoint(jwtEndpoint string) func(*JWTConfigChangedEvent) {
+	return func(e *JWTConfigChangedEvent) {
+		e.JWTEndpoint = &jwtEndpoint
+	}
+}
 
 func ChangeJWTIssuer(issuer string) func(*JWTConfigChangedEvent) {
 	return func(e *JWTConfigChangedEvent) {

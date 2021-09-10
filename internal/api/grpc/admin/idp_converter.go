@@ -41,6 +41,7 @@ func addJWTIDPRequestToDomain(req *admin_pb.AddJWTIDPRequest) *domain.IDPConfig 
 
 func addJWTIDPRequestToDomainJWTIDPConfig(req *admin_pb.AddJWTIDPRequest) *domain.JWTIDPConfig {
 	return &domain.JWTIDPConfig{
+		JWTEndpoint:  req.JwtEndpoint,
 		Issuer:       req.Issuer,
 		KeysEndpoint: req.KeysEndpoint,
 	}
@@ -69,6 +70,7 @@ func updateOIDCConfigToDomain(req *admin_pb.UpdateIDPOIDCConfigRequest) *domain.
 func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JWTIDPConfig {
 	return &domain.JWTIDPConfig{
 		IDPConfigID:  req.IdpId,
+		JWTEndpoint:  req.JwtEndpoint,
 		Issuer:       req.Issuer,
 		KeysEndpoint: req.KeysEndpoint,
 	}

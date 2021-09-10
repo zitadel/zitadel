@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -58,6 +59,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			ctx,
 			iamAgg,
 			idpConfigID,
+			config.JWTConfig.JWTEndpoint,
 			config.JWTConfig.Issuer,
 			config.JWTConfig.KeysEndpoint,
 		))
