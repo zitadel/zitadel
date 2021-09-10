@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 )
@@ -41,7 +42,7 @@ func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel string, waitTime tim
 		if rows, _ := result.RowsAffected(); rows == 0 {
 			return caos_errs.ThrowAlreadyExists(nil, "SPOOL-lso0e", "view already locked")
 		}
-		// logging.LogWithFields("LOCKE-lOgbg", "view", viewModel, "locker", lockerID).Debug("locker changed")
+		logging.LogWithFields("LOCKE-lOgbg", "view", viewModel, "locker", lockerID).Debug("locker changed")
 		return nil
 	})
 }
