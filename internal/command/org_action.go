@@ -160,8 +160,33 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID string, resourceOw
 	return writeModelToObjectDetails(&existingAction.WriteModel), nil
 }
 
+func (c *Commands) removeActionsFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.EventPusher, error) {
+	existingActions, err := c.getActionsByOrgWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if len(existingActions.Actions) == 0 {
+		return nil, nil
+	}
+	events := make([]eventstore.EventPusher, 0, len(existingActions.Actions))
+	for id, name := range existingActions.Actions {
+		actionAgg := NewActionAggregate(id, resourceOwner)
+		events = append(events, action.NewRemovedEvent(ctx, actionAgg, name))
+	}
+	return events, nil
+}
+
 func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string, resourceOwner string) (*ActionWriteModel, error) {
 	actionWriteModel := NewActionWriteModel(actionID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return actionWriteModel, nil
+}
+
+func (c *Commands) getActionsByOrgWriteModelByID(ctx context.Context, resourceOwner string) (*ActionsListByOrgModel, error) {
+	actionWriteModel := NewActionsListByOrgModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
 	if err != nil {
 		return nil, err

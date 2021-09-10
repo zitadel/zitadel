@@ -32,6 +32,7 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		CustomTextMessage:        features.CustomTextMessage,
 		CustomTextLogin:          features.CustomTextLogin,
 		MetadataUser:             features.MetadataUser,
+		Actions:                  features.Actions,
 	}
 }
 

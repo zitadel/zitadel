@@ -77,7 +77,8 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	privacyPolicy,
 	metadataUser,
 	customTextMessage,
-	customTextLogin bool,
+	customTextLogin,
+	actions bool,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -138,6 +139,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.CustomTextLogin != customTextLogin {
 		changes = append(changes, features.ChangeCustomTextLogin(customTextLogin))
+	}
+	if wm.Actions != actions {
+		changes = append(changes, features.ChangeActions(actions))
 	}
 
 	if len(changes) == 0 {

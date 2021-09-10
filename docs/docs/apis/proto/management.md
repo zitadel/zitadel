@@ -2764,7 +2764,7 @@ Change OIDC identity provider configuration of the organisation
 
 
 
-    DELETE: /flows/{type}
+    POST: /flows/{type}/_clear
 
 
 ### SetTriggerActions

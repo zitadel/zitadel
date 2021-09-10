@@ -103,6 +103,13 @@ func ActionAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggreg
 	return eventstore.AggregateFromWriteModel(wm, action.AggregateType, action.AggregateVersion)
 }
 
+func NewActionAggregate(id, resourceOwner string) *eventstore.Aggregate {
+	return ActionAggregateFromWriteModel(&eventstore.WriteModel{
+		AggregateID:   id,
+		ResourceOwner: resourceOwner,
+	})
+}
+
 type ActionExistsModel struct {
 	eventstore.WriteModel
 
@@ -144,6 +151,43 @@ func (wm *ActionExistsModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(action.AggregateType).
 		AggregateIDs(wm.actionIDs...).
+		EventTypes(action.AddedEventType,
+			action.RemovedEventType).
+		Builder()
+}
+
+type ActionsListByOrgModel struct {
+	eventstore.WriteModel
+
+	Actions map[string]string
+}
+
+func NewActionsListByOrgModel(resourceOwner string) *ActionsListByOrgModel {
+	return &ActionsListByOrgModel{
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: resourceOwner,
+		},
+		Actions: make(map[string]string),
+	}
+}
+
+func (wm *ActionsListByOrgModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *action.AddedEvent:
+			wm.Actions[e.Aggregate().ID] = e.Name
+		case *action.RemovedEvent:
+			delete(wm.Actions, e.Aggregate().ID)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ActionsListByOrgModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(action.AggregateType).
 		EventTypes(action.AddedEventType,
 			action.RemovedEventType).
 		Builder()

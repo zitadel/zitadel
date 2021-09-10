@@ -25,6 +25,7 @@ const (
 	FeatureCustomTextMessage        = FeatureCustomText + ".message"
 	FeatureCustomTextLogin          = FeatureCustomText + ".login"
 	FeatureMetadataUser             = FeatureMetadata + ".user"
+	FeatureActions                  = "actions"
 )
 
 type Features struct {
@@ -51,6 +52,7 @@ type Features struct {
 	CustomTextLogin          bool
 	PrivacyPolicy            bool
 	MetadataUser             bool
+	Actions                  bool
 }
 
 type FeaturesState int32
