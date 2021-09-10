@@ -39,21 +39,21 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "invalid config, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		config: &domain.IDPConfig{},
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
+		{
+			name: "invalid config, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				config: &domain.IDPConfig{},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
 		{
 			name: "idp config oidc add, ok",
 			fields: fields{
