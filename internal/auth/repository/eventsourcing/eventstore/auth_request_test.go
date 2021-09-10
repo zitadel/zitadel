@@ -187,13 +187,13 @@ type mockViewOrg struct {
 	State domain.OrgState
 }
 
-func (m *mockViewOrg) OrgByID(string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByID(context.Context, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
 }
 
-func (m *mockViewOrg) OrgByPrimaryDomain(string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
@@ -201,11 +201,11 @@ func (m *mockViewOrg) OrgByPrimaryDomain(string) (*query.Org, error) {
 
 type mockViewErrOrg struct{}
 
-func (m *mockViewErrOrg) OrgByID(string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByID(context.Context, string) (*query.Org, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockViewErrOrg) OrgByPrimaryDomain(string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 

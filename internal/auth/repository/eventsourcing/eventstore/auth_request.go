@@ -45,8 +45,6 @@ type AuthRequestRepo struct {
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
 
-	Query *query.Queries
-
 	IdGenerator id.Generator
 
 	PasswordCheckLifeTime      time.Duration
@@ -59,8 +57,8 @@ type AuthRequestRepo struct {
 }
 
 type orgViewProvider interface {
-	OrgByID(string) (*query.Org, error)
-	OrgByPrimaryDomain(string) (*query.Org, error)
+	OrgByID(context.Context, string) (*query.Org, error)
+	OrgByDomainGlobal(context.Context, string) (*query.Org, error)
 }
 
 type userSessionViewProvider interface {
@@ -127,7 +125,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	request.AppendAudIfNotExisting(app.ProjectID)
 	request.ApplicationResourceOwner = app.ResourceOwner
 	request.PrivateLabelingSetting = app.PrivateLabelingSetting
-	if err := setOrgID(repo.Query, request); err != nil {
+	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
 	if request.LoginHint != "" {
@@ -269,7 +267,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID)
 	if err != nil {
 		return err
 	}
@@ -447,7 +445,7 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
-	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, request.UserID)
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -609,7 +607,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, externalIDP.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID)
 	if err != nil {
 		return err
 	}
@@ -649,7 +647,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 		return steps, nil
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.Query, repo.LockoutPolicyViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -918,7 +916,7 @@ func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID stri
 	return iam_view_model.CustomTextViewsToDomain(loginTexts), err
 }
 
-func setOrgID(orgViewProvider *query.Queries, request *domain.AuthRequest) error {
+func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
 		return nil
@@ -1021,7 +1019,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries *query.Queries, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
 	// PLANNED: Check LockoutPolicy
 	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
