@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -10,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
+	model2 "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/user/model"
@@ -113,18 +115,19 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err
 
 func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
 	return &domain.AuthRequest{
-		CreationDate:  time.Now(),
-		AgentID:       userAgentID,
-		BrowserInfo:   ParseBrowserInfoFromContext(ctx),
-		ApplicationID: authReq.ClientID,
-		CallbackURI:   authReq.RedirectURI,
-		TransferState: authReq.State,
-		Prompt:        PromptToBusiness(authReq.Prompt),
-		PossibleLOAs:  ACRValuesToBusiness(authReq.ACRValues),
-		UiLocales:     UILocalesToBusiness(authReq.UILocales),
-		LoginHint:     authReq.LoginHint,
-		MaxAuthAge:    MaxAgeToBusiness(authReq.MaxAge),
-		UserID:        userID,
+		CreationDate:        time.Now(),
+		AgentID:             userAgentID,
+		BrowserInfo:         ParseBrowserInfoFromContext(ctx),
+		ApplicationID:       authReq.ClientID,
+		CallbackURI:         authReq.RedirectURI,
+		TransferState:       authReq.State,
+		Prompt:              PromptToBusiness(authReq.Prompt),
+		PossibleLOAs:        ACRValuesToBusiness(authReq.ACRValues),
+		UiLocales:           UILocalesToBusiness(authReq.UILocales),
+		LoginHint:           authReq.LoginHint,
+		SelectedIDPConfigID: GetSelectedIDPIDFromScopes(authReq.Scopes),
+		MaxAuthAge:          MaxAgeToBusiness(authReq.MaxAge),
+		UserID:              userID,
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
@@ -194,6 +197,15 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 		locales[i] = tag.String()
 	}
 	return locales
+}
+
+func GetSelectedIDPIDFromScopes(scopes oidc.SpaceDelimitedArray) string {
+	for _, scope := range scopes {
+		if strings.HasPrefix(scope, model2.SelectIDPScope) {
+			return strings.TrimPrefix(scope, model2.SelectIDPScope)
+		}
+	}
+	return ""
 }
 
 func MaxAgeToBusiness(maxAge *uint) *time.Duration {

@@ -38,6 +38,7 @@ message IDP {
     oneof config {
         OIDCConfig oidc_config = 7;
     }
+    bool auto_register = 8;
 }
 
 message IDPUserLink {
