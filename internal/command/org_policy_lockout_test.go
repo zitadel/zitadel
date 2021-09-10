@@ -373,7 +373,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveLockoutPolicy(tt.args.ctx, tt.args.orgID)
+			_, err := r.RemoveLockoutPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

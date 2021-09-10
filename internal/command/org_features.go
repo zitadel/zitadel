@@ -44,6 +44,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.MetadataUser,
 		features.CustomTextMessage,
 		features.CustomTextLogin,
+		features.LockoutPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -155,6 +156,15 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 		}
 		if removePrivacyPolicyEvent != nil {
 			events = append(events, removePrivacyPolicyEvent)
+		}
+	}
+	if !features.LockoutPolicy {
+		removeLockoutPolicyEvent, err := c.removeLockoutPolicyIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removeLockoutPolicyEvent != nil {
+			events = append(events, removeLockoutPolicyEvent)
 		}
 	}
 	if !features.MetadataUser {

@@ -162,7 +162,7 @@ func TestStatementHandler_Update(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		stmts  []handler.Statement
+		stmts  []*handler.Statement
 		reduce handler.Reduce
 	}
 	tests := []struct {
@@ -212,7 +212,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewNoOpStatement(&testEvent{
 						aggregateType:    "agg",
 						sequence:         6,
@@ -242,7 +242,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "testAgg",
@@ -279,7 +279,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -320,7 +320,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -361,7 +361,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
@@ -392,7 +392,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
@@ -428,7 +428,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewNoOpStatement(&testEvent{
 						aggregateType:    "testAgg",
 						sequence:         7,
@@ -684,7 +684,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 		failedEventsTable string
 	}
 	type args struct {
-		stmts     []handler.Statement
+		stmts     []*handler.Statement
 		sequences currentSequences
 	}
 	type want struct {
@@ -703,7 +703,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -732,7 +732,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -780,7 +780,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				failedEventsTable: "failed_events",
 			},
 			args: args{
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -844,7 +844,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				failedEventsTable: "failed_events",
 			},
 			args: args{
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -909,7 +909,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			args: args{
-				stmts: []handler.Statement{
+				stmts: []*handler.Statement{
 					NewCreateStatement(
 						&testEvent{
 							aggregateType:    "agg",
@@ -946,6 +946,29 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 								Value: "val",
 							},
 						}),
+					NewMultiStatement(
+						&testEvent{
+							aggregateType:    "agg",
+							sequence:         8,
+							previousSequence: 7,
+						},
+						AddCreateStatement(
+							[]handler.Column{
+								{
+									Name:  "col",
+									Value: "val",
+								},
+							},
+						),
+						AddCreateStatement(
+							[]handler.Column{
+								{
+									Name:  "col",
+									Value: "val",
+								},
+							},
+						),
+					),
 				},
 				sequences: currentSequences{
 					"agg": 2,
@@ -962,8 +985,12 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
+					expectSavePoint(),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
+					expectSavePointRelease(),
 				},
-				idx: 2,
+				idx: 3,
 			},
 		},
 	}
@@ -1025,7 +1052,7 @@ func TestStatementHandler_executeStmt(t *testing.T) {
 		projectionName string
 	}
 	type args struct {
-		stmt handler.Statement
+		stmt *handler.Statement
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -1532,16 +1559,14 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 	}
 }
 
-func testReduce(stmts ...handler.Statement) handler.Reduce {
-	return func(event eventstore.EventReader) ([]handler.Statement, error) {
-		return []handler.Statement{
-			NewNoOpStatement(event),
-		}, nil
+func testReduce() handler.Reduce {
+	return func(event eventstore.EventReader) (*handler.Statement, error) {
+		return NewNoOpStatement(event), nil
 	}
 }
 
 func testReduceErr(err error) handler.Reduce {
-	return func(event eventstore.EventReader) ([]handler.Statement, error) {
+	return func(event eventstore.EventReader) (*handler.Statement, error) {
 		return nil, err
 	}
 }
