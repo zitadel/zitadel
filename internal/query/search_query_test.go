@@ -112,7 +112,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			query := sq.Select((&testCol{}).toColumnName()).From("test_table")
 			expectedQuery, _, _ := query.ToSql()
 
-			stmt, args, err := req.ToQuery(query).ToSql()
+			stmt, args, err := req.toQuery(query).ToSql()
 			if len(tt.want.stmtAddition) > 0 {
 				expectedQuery += " " + tt.want.stmtAddition
 			}
@@ -380,7 +380,7 @@ func TestTextQuery_comp(t *testing.T) {
 	}
 }
 
-func TestTextCompareFromMethod(t *testing.T) {
+func TestTextComparisonFromMethod(t *testing.T) {
 	type args struct {
 		m domain.SearchMethod
 	}
@@ -455,7 +455,7 @@ func TestTextCompareFromMethod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := TextCompareFromMethod(tt.args.m); got != tt.want {
+			if got := TextComparisonFromMethod(tt.args.m); got != tt.want {
 				t.Errorf("TextCompareFromMethod() = %v, want %v", got, tt.want)
 			}
 		})

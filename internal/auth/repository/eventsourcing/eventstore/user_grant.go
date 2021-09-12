@@ -208,7 +208,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 	if len(request.Queries) > 0 {
 		for _, q := range request.Queries {
 			if q.Key == grant_model.UserGrantSearchKeyOrgName {
-				nameQuery, err := query.NewOrgNameSearchQuery(query.TextCompareFromMethod(q.Method), q.Value.(string))
+				nameQuery, err := query.NewOrgNameSearchQuery(query.TextComparisonFromMethod(q.Method), q.Value.(string))
 				if err != nil {
 					return nil, err
 				}
@@ -216,11 +216,11 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 			}
 		}
 	}
-	orgs, count, err := repo.Query.SearchOrgs(context.TODO(), &searchRequest)
+	orgs, err := repo.Query.SearchOrgs(context.TODO(), &searchRequest)
 	if err != nil {
 		return nil, err
 	}
-	return orgRespToOrgResp(orgs, count), nil
+	return orgRespToOrgResp(orgs), nil
 }
 
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
@@ -307,12 +307,12 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 	return resp
 }
 
-func orgRespToOrgResp(orgs []*query.Org, count uint64) *grant_model.ProjectOrgSearchResponse {
+func orgRespToOrgResp(orgs *query.Orgs) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
-		TotalResult: count,
+		TotalResult: orgs.Count,
 	}
-	resp.Result = make([]*grant_model.Org, len(orgs))
-	for i, o := range orgs {
+	resp.Result = make([]*grant_model.Org, len(orgs.Orgs))
+	for i, o := range orgs.Orgs {
 		resp.Result[i] = &grant_model.Org{OrgID: o.ID, OrgName: o.Name}
 	}
 	return resp

@@ -17,7 +17,7 @@ type SearchRequest struct {
 
 type Column interface{ toColumnName() string }
 
-func (req *SearchRequest) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Offset > 0 {
 		query = query.Offset(req.Offset)
 	}
@@ -108,7 +108,7 @@ const (
 	textCompareMax
 )
 
-func TextCompareFromMethod(m domain.SearchMethod) TextComparison {
+func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
 	switch m {
 	case domain.SearchMethodEquals:
 		return TextEquals

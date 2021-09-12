@@ -13,119 +13,133 @@ import (
 
 const orgTable = "zitadel.projections.orgs"
 
-var (
-	orgsQuery = sq.Select(
-		OrgColumnID.toColumnName(),
-		OrgColumnCreationDate.toColumnName(),
-		OrgColumnChangeDate.toColumnName(),
-		OrgColumnResourceOwner.toColumnName(),
-		OrgColumnState.toColumnName(),
-		OrgColumnSequence.toColumnName(),
-		OrgColumnName.toColumnName(),
-		OrgColumnDomain.toColumnName(),
-		"COUNT(name) OVER ()").
-		From(orgTable).PlaceholderFormat(sq.Dollar)
+func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+	return sq.Select(
+			OrgColumnID.toColumnName(),
+			OrgColumnCreationDate.toColumnName(),
+			OrgColumnChangeDate.toColumnName(),
+			OrgColumnResourceOwner.toColumnName(),
+			OrgColumnState.toColumnName(),
+			OrgColumnSequence.toColumnName(),
+			OrgColumnName.toColumnName(),
+			OrgColumnDomain.toColumnName()).
+			From(orgTable).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Org, error) {
+			o := new(Org)
+			err := row.Scan(
+				&o.ID,
+				&o.CreationDate,
+				&o.ChangeDate,
+				&o.ResourceOwner,
+				&o.State,
+				&o.Sequence,
+				&o.Name,
+				&o.Domain,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "errors.orgs.not_found")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
+			}
+			return o, nil
+		}
+}
 
-	orgQuery = sq.Select(
-		OrgColumnCreationDate.toColumnName(),
-		OrgColumnChangeDate.toColumnName(),
-		OrgColumnResourceOwner.toColumnName(),
-		OrgColumnState.toColumnName(),
-		OrgColumnSequence.toColumnName(),
-		OrgColumnName.toColumnName(),
-		OrgColumnDomain.toColumnName()).
-		From(orgTable).PlaceholderFormat(sq.Dollar)
+func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
+	return sq.Select(
+			OrgColumnID.toColumnName(),
+			OrgColumnCreationDate.toColumnName(),
+			OrgColumnChangeDate.toColumnName(),
+			OrgColumnResourceOwner.toColumnName(),
+			OrgColumnState.toColumnName(),
+			OrgColumnSequence.toColumnName(),
+			OrgColumnName.toColumnName(),
+			OrgColumnDomain.toColumnName(),
+			"COUNT(name) OVER ()").
+			From(orgTable).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Orgs, error) {
+			orgs := make([]*Org, 0)
+			var count uint64
+			for rows.Next() {
+				org := new(Org)
+				err := rows.Scan(
+					&org.ID,
+					&org.CreationDate,
+					&org.ChangeDate,
+					&org.ResourceOwner,
+					&org.State,
+					&org.Sequence,
+					&org.Name,
+					&org.Domain,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				orgs = append(orgs, org)
+			}
 
-	orgUniqueQuery = sq.Select("COUNT(*) = 0").
-			From(orgTable).PlaceholderFormat(sq.Dollar)
-)
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-QMXJv", "unable to close rows")
+			}
+
+			return &Orgs{
+				Orgs:  orgs,
+				Count: count,
+			}, nil
+		}
+}
+
+func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+	return sq.Select("COUNT(*) = 0").
+			From(orgTable).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (isUnique bool, err error) {
+			err = row.Scan(&isUnique)
+			if err != nil {
+				return false, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
+			}
+			return isUnique, err
+		}
+}
 
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
-	query, args, err := orgQuery.Where(sq.Eq{
+	stmt, scan := prepareOrgQuery()
+	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnID.toColumnName(): id,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-L39bz", "Errors.orgs.invalid.request")
+		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "unable to create sql stmt")
 	}
 
-	org := &Org{ID: id}
 	row := q.client.QueryRowContext(ctx, query, args...)
-	if row.Err() != nil {
-		return nil, errors.ThrowNotFound(row.Err(), "QUERY-P3Cmb", "error.internal")
-	}
-	err = row.Scan(
-		&org.CreationDate,
-		&org.ChangeDate,
-		&org.ResourceOwner,
-		&org.State,
-		&org.Sequence,
-		&org.Name,
-		&org.Domain,
-	)
-
-	if err != nil {
-		if errs.Is(err, sql.ErrNoRows) {
-			return nil, errors.ThrowNotFound(err, "QUERY-VQhIc", "errors.orgs.not_found")
-		}
-		return nil, errors.ThrowInternal(err, "QUERY-yCNV9", "errors.internal")
-	}
-
-	return org, nil
+	return scan(row)
 }
 
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
-	query, args, err := orgQuery.Where(sq.Eq{
+	stmt, scan := prepareOrgQuery()
+	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.toColumnName(): domain,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-Me8DB", "Errors.orgs.invalid.request")
+		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
 	}
 
-	org := new(Org)
 	row := q.client.QueryRowContext(ctx, query, args...)
-	if row.Err() != nil {
-		return nil, errors.ThrowNotFound(row.Err(), "QUERY-5plRd", "error.internal")
-	}
-	err = row.Scan(
-		&org.ID,
-		&org.CreationDate,
-		&org.ChangeDate,
-		&org.ResourceOwner,
-		&org.State,
-		&org.Sequence,
-		&org.Name,
-		&org.Domain,
-	)
-
-	if err != nil {
-		if errs.Is(err, sql.ErrNoRows) {
-			return nil, errors.ThrowNotFound(err, "QUERY-1RBM2", "errors.orgs.not_found")
-		}
-		return nil, errors.ThrowInternal(err, "QUERY-kBjpb", "errors.internal")
-	}
-
-	return org, nil
+	return scan(row)
 }
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
-	query, args, err := orgUniqueQuery.Where(sq.Eq{
-		OrgColumnName.toColumnName():   name,
+	query, scan := q.prepareOrgUniqueQuery()
+	stmt, args, err := query.Where(sq.Eq{
 		OrgColumnDomain.toColumnName(): domain,
 	}).ToSql()
 	if err != nil {
-		return false, errors.ThrowInvalidArgument(err, "QUERY-OrAo1", "Errors.orgs.invalid.request")
+		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	if row.Err() != nil {
-		return false, errors.ThrowNotFound(row.Err(), "QUERY-eAvMO", "error.internal")
-	}
-	err = row.Scan(&isUnique)
-	if err != nil {
-		return false, errors.ThrowInternal(err, "QUERY-uCLym", "errors.internal")
-	}
-
-	return isUnique, nil
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
@@ -133,38 +147,23 @@ func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
 	return err
 }
 
-func (q *Queries) SearchOrgs(ctx context.Context, query *OrgSearchQueries) (orgs []*Org, count uint64, err error) {
-	stmt, args, err := query.ToQuery(orgsQuery).ToSql()
+func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
+	query, scan := q.prepareOrgsQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, 0, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, 0, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
 	}
-	orgs = make([]*Org, 0, query.Limit)
-	for rows.Next() {
-		org := new(Org)
-		rows.Scan(
-			&org.ID,
-			&org.CreationDate,
-			&org.ChangeDate,
-			&org.ResourceOwner,
-			&org.State,
-			&org.Sequence,
-			&org.Name,
-			&org.Domain,
-			&count,
-		)
-		orgs = append(orgs, org)
-	}
+	return scan(rows)
+}
 
-	if err := rows.Err(); err != nil {
-		return nil, 0, errors.ThrowInternal(err, "QUERY-pA0Wj", "Errors.orgs.internal")
-	}
-
-	return orgs, count, nil
+type Orgs struct {
+	Count uint64
+	Orgs  []*Org
 }
 
 type Org struct {
@@ -192,8 +191,8 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(OrgColumnName, value, method)
 }
 
-func (q *OrgSearchQueries) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.ToQuery(query)
+func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
 		query = q.ToQuery(query)
 	}
