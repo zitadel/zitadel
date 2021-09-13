@@ -17,7 +17,6 @@ func GitOpsInstantBackup(
 ) error {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 	return instantBackup(monitor, k8sClient, desired, name)
@@ -30,7 +29,6 @@ func CrdInstantBackup(
 ) error {
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
-		monitor.Error(err)
 		return err
 	}
 	return instantBackup(monitor, k8sClient, desired, name)

@@ -68,7 +68,7 @@ func Adapt(
 			labels.MustForComponent(
 				labels.MustReplaceAPI(
 					labels.GetAPIFromComponent(componentLabels),
-					"BucketBackup",
+					"S3Backup",
 					desiredTree.Common.Version(),
 				),
 				"backup"),
