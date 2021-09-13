@@ -28,7 +28,8 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		config.IDPConfigID,
 		config.JWTEndpoint,
 		config.Issuer,
-		config.KeysEndpoint)
+		config.KeysEndpoint,
+		config.HeaderName)
 	if err != nil {
 		return nil, err
 	}

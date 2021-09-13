@@ -160,6 +160,7 @@ func writeModelToIDPJWTConfig(wm *JWTConfigWriteModel) *domain.JWTIDPConfig {
 		JWTEndpoint:  wm.JWTEndpoint,
 		Issuer:       wm.Issuer,
 		KeysEndpoint: wm.KeysEndpoint,
+		HeaderName:   wm.HeaderName,
 	}
 }
 

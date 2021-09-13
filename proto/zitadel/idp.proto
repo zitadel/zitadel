@@ -187,6 +187,13 @@ message JWTConfig {
             description: "the endpoint to the key (JWK) which are used to sign the JWT with";
         }
     ];
+    string header_name = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+        }
+    ];
 }
 
 message IDPIDQuery {

@@ -32,6 +32,7 @@ type IDPConfigView struct {
 	JWTEndpoint                string
 	JWTIssuer                  string
 	JWTKeysEndpoint            string
+	JWTHeaderName              string
 }
 
 type IDPConfigSearchRequest struct {

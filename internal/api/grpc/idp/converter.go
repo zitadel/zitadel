@@ -162,6 +162,7 @@ func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
 			JwtEndpoint:  config.JWTEndpoint,
 			Issuer:       config.JWTIssuer,
 			KeysEndpoint: config.JWTKeysEndpoint,
+			HeaderName:   config.JWTHeaderName,
 		},
 	}
 }

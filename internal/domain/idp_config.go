@@ -66,6 +66,7 @@ type JWTIDPConfig struct {
 	JWTEndpoint  string
 	Issuer       string
 	KeysEndpoint string
+	HeaderName   string
 }
 
 type IDPConfigType int32

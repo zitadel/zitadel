@@ -24,7 +24,8 @@ func NewIDPJWTConfigAddedEvent(
 	idpConfigID,
 	jwtEndpoint,
 	issuer,
-	keysEndpoint string,
+	keysEndpoint,
+	headerName string,
 ) *IDPJWTConfigAddedEvent {
 
 	return &IDPJWTConfigAddedEvent{
@@ -38,6 +39,7 @@ func NewIDPJWTConfigAddedEvent(
 			jwtEndpoint,
 			issuer,
 			keysEndpoint,
+			headerName,
 		),
 	}
 }
