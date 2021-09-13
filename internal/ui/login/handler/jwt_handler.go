@@ -58,7 +58,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
-	token, err := getToken(r)
+	token, err := getToken(r, idpConfig.JWTHeaderName)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
@@ -188,11 +188,11 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 	return claims, nil
 }
 
-func getToken(r *http.Request) (string, error) {
-	auth := r.Header.Get(http_util.Authorization)
-	if auth == "" {
-		auth = r.Header.Get("x-authorization")
+func getToken(r *http.Request, headerName string) (string, error) {
+	if headerName == "" {
+		headerName = http_util.Authorization
 	}
+	auth := r.Header.Get(headerName)
 	if auth == "" {
 		return "", errors.ThrowInvalidArgument(nil, "LOGIN-adh42", "Errors.AuthRequest.TokenNotFound")
 	}

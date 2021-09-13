@@ -143,6 +143,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 									"name1",
 									domain.IDPConfigTypeOIDC,
 									domain.IDPConfigStylingTypeGoogle,
+									false,
 								),
 							),
 							eventFromEventPusher(
@@ -152,6 +153,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 									"jwt-endpoint",
 									"issuer",
 									"keys-endpoint",
+									"auth",
 								),
 							),
 						},
@@ -169,6 +171,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 						JWTEndpoint:  "jwt-endpoint",
 						Issuer:       "issuer",
 						KeysEndpoint: "keys-endpoint",
+						HeaderName:   "auth",
 					},
 				},
 			},

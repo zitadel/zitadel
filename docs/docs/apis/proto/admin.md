@@ -1201,6 +1201,7 @@ This is an empty request
 | jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | auto_register |  bool | - |  |
 
 
@@ -2914,6 +2915,7 @@ This is an empty request
 | jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 

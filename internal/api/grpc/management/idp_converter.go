@@ -46,6 +46,7 @@ func addJWTIDPRequestToDomainJWTIDPConfig(req *mgmt_pb.AddOrgJWTIDPRequest) *dom
 		JWTEndpoint:  req.JwtEndpoint,
 		Issuer:       req.Issuer,
 		KeysEndpoint: req.KeysEndpoint,
+		HeaderName:   req.HeaderName,
 	}
 }
 
@@ -76,6 +77,7 @@ func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.
 		JWTEndpoint:  req.JwtEndpoint,
 		Issuer:       req.Issuer,
 		KeysEndpoint: req.KeysEndpoint,
+		HeaderName:   req.HeaderName,
 	}
 }
 

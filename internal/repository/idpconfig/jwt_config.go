@@ -21,6 +21,7 @@ type JWTConfigAddedEvent struct {
 	JWTEndpoint  string `json:"jwtEndpoint,omitempty"`
 	Issuer       string `json:"issuer,omitempty"`
 	KeysEndpoint string `json:"keysEndpoint,omitempty"`
+	HeaderName   string `json:"headerName,omitempty"`
 }
 
 func (e *JWTConfigAddedEvent) Data() interface{} {
@@ -36,7 +37,8 @@ func NewJWTConfigAddedEvent(
 	idpConfigID,
 	jwtEndpoint,
 	issuer,
-	keysEndpoint string,
+	keysEndpoint,
+	headerName string,
 ) *JWTConfigAddedEvent {
 	return &JWTConfigAddedEvent{
 		BaseEvent:    *base,
@@ -44,6 +46,7 @@ func NewJWTConfigAddedEvent(
 		JWTEndpoint:  jwtEndpoint,
 		Issuer:       issuer,
 		KeysEndpoint: keysEndpoint,
+		HeaderName:   headerName,
 	}
 }
 
@@ -68,6 +71,7 @@ type JWTConfigChangedEvent struct {
 	JWTEndpoint  *string `json:"jwtEndpoint,omitempty"`
 	Issuer       *string `json:"issuer,omitempty"`
 	KeysEndpoint *string `json:"keysEndpoint,omitempty"`
+	HeaderName   *string `json:"headerName,omitempty"`
 }
 
 func (e *JWTConfigChangedEvent) Data() interface{} {
@@ -113,6 +117,12 @@ func ChangeJWTIssuer(issuer string) func(*JWTConfigChangedEvent) {
 func ChangeKeysEndpoint(keysEndpoint string) func(*JWTConfigChangedEvent) {
 	return func(e *JWTConfigChangedEvent) {
 		e.KeysEndpoint = &keysEndpoint
+	}
+}
+
+func ChangeHeaderName(headerName string) func(*JWTConfigChangedEvent) {
+	return func(e *JWTConfigChangedEvent) {
+		e.HeaderName = &headerName
 	}
 }
 

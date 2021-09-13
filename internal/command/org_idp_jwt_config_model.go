@@ -87,7 +87,8 @@ func (wm *IDPJWTConfigWriteModel) NewChangedEvent(
 	idpConfigID,
 	jwtEndpoint,
 	issuer,
-	keysEndpoint string,
+	keysEndpoint,
+	headerName string,
 ) (*org.IDPJWTConfigChangedEvent, bool, error) {
 
 	changes := make([]idpconfig.JWTConfigChanges, 0)
@@ -99,6 +100,9 @@ func (wm *IDPJWTConfigWriteModel) NewChangedEvent(
 	}
 	if wm.KeysEndpoint != keysEndpoint {
 		changes = append(changes, idpconfig.ChangeKeysEndpoint(keysEndpoint))
+	}
+	if wm.HeaderName != headerName {
+		changes = append(changes, idpconfig.ChangeHeaderName(headerName))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

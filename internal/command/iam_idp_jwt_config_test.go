@@ -84,6 +84,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeJWT,
 								domain.IDPConfigStylingTypeGoogle,
+								false,
 							),
 						),
 						eventFromEventPusher(
@@ -93,6 +94,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
+								"auth",
 							),
 						),
 						eventFromEventPusher(
@@ -128,6 +130,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeJWT,
 								domain.IDPConfigStylingTypeGoogle,
+								false,
 							),
 						),
 						eventFromEventPusher(
@@ -137,6 +140,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
+								"auth",
 							),
 						),
 					),
@@ -150,6 +154,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 					JWTEndpoint:  "jwt-endpoint",
 					Issuer:       "issuer",
 					KeysEndpoint: "keys-endpoint",
+					HeaderName:   "auth",
 				},
 			},
 			res: res{
@@ -169,6 +174,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeJWT,
 								domain.IDPConfigStylingTypeGoogle,
+								false,
 							),
 						),
 						eventFromEventPusher(
@@ -178,6 +184,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 								"jwt-endpoint",
 								"issuer",
 								"keys-endpoint",
+								"auth",
 							),
 						),
 					),
@@ -189,6 +196,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 									"jwt-endpoint-changed",
 									"issuer-changed",
 									"keys-endpoint-changed",
+									"auth-changed",
 								),
 							),
 						},
@@ -203,6 +211,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 					JWTEndpoint:  "jwt-endpoint-changed",
 					Issuer:       "issuer-changed",
 					KeysEndpoint: "keys-endpoint-changed",
+					HeaderName:   "auth-changed",
 				},
 			},
 			res: res{
@@ -215,6 +224,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 					JWTEndpoint:  "jwt-endpoint-changed",
 					Issuer:       "issuer-changed",
 					KeysEndpoint: "keys-endpoint-changed",
+					HeaderName:   "auth-changed",
 				},
 			},
 		},
@@ -239,7 +249,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 	}
 }
 
-func newDefaultIDPJWTConfigChangedEvent(ctx context.Context, configID, jwtEndpoint, issuer, keysEndpoint string) *iam.IDPJWTConfigChangedEvent {
+func newDefaultIDPJWTConfigChangedEvent(ctx context.Context, configID, jwtEndpoint, issuer, keysEndpoint, headerName string) *iam.IDPJWTConfigChangedEvent {
 	event, _ := iam.NewIDPJWTConfigChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		configID,
@@ -247,6 +257,7 @@ func newDefaultIDPJWTConfigChangedEvent(ctx context.Context, configID, jwtEndpoi
 			idpconfig.ChangeJWTEndpoint(jwtEndpoint),
 			idpconfig.ChangeJWTIssuer(issuer),
 			idpconfig.ChangeKeysEndpoint(keysEndpoint),
+			idpconfig.ChangeHeaderName(headerName),
 		},
 	)
 	return event

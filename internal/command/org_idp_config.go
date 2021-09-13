@@ -63,7 +63,9 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			idpConfigID,
 			config.JWTConfig.JWTEndpoint,
 			config.JWTConfig.Issuer,
-			config.JWTConfig.KeysEndpoint))
+			config.JWTConfig.KeysEndpoint,
+			config.JWTConfig.HeaderName,
+		))
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {

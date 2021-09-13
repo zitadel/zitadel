@@ -63,6 +63,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.JWTConfig.JWTEndpoint,
 			config.JWTConfig.Issuer,
 			config.JWTConfig.KeysEndpoint,
+			config.JWTConfig.HeaderName,
 		))
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)

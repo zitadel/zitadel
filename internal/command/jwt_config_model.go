@@ -13,6 +13,7 @@ type JWTConfigWriteModel struct {
 	JWTEndpoint  string
 	Issuer       string
 	KeysEndpoint string
+	HeaderName   string
 	State        domain.IDPConfigState
 }
 
@@ -40,6 +41,7 @@ func (wm *JWTConfigWriteModel) reduceConfigAddedEvent(e *idpconfig.JWTConfigAdde
 	wm.JWTEndpoint = e.JWTEndpoint
 	wm.Issuer = e.Issuer
 	wm.KeysEndpoint = e.KeysEndpoint
+	wm.HeaderName = e.HeaderName
 	wm.State = domain.IDPConfigStateActive
 }
 
@@ -52,5 +54,8 @@ func (wm *JWTConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.JWTConfigCh
 	}
 	if e.KeysEndpoint != nil {
 		wm.KeysEndpoint = *e.KeysEndpoint
+	}
+	if e.HeaderName != nil {
+		wm.HeaderName = *e.HeaderName
 	}
 }

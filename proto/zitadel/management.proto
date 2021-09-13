@@ -4958,7 +4958,15 @@ message AddOrgJWTIDPRequest {
             max_length: 200;
         }
     ];
-    bool auto_register = 6;
+    string header_name = 6 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+    bool auto_register = 7;
 }
 
 message AddOrgJWTIDPResponse {
@@ -5093,6 +5101,14 @@ message UpdateOrgIDPJWTConfigRequest {
             example: "\"https://accounts.google.com/keys\"";
             description: "the endpoint to the key (JWK) which are used to sign the JWT with";
             min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string header_name = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
             max_length: 200;
         }
     ];
