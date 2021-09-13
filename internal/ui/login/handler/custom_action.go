@@ -9,7 +9,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
-func (l *Login) customMapping(user *domain.ExternalUser, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.ExternalUser, error) {
+func (l *Login) customExternalUserMapping(user *domain.ExternalUser, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.ExternalUser, error) {
 	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication)
 	if err != nil {
 		return nil, err
@@ -25,13 +25,12 @@ func (l *Login) customMapping(user *domain.ExternalUser, tokens *oidc.Tokens, re
 	return user, err
 }
 
-func (l *Login) customRegistrationMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.Human, []*domain.Metadata, error) {
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalRegistration, domain.TriggerTypePostAuthentication)
+func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata) (*domain.Human, []*domain.Metadata, error) {
+	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation)
 	if err != nil {
 		return nil, nil, err
 	}
 	ctx := (&actions.Context{}).SetToken(tokens)
-	metadata := make([]*domain.Metadata, 0)
 	api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
 	for _, a := range triggerActions {
 		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)

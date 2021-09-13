@@ -20,7 +20,7 @@ var triggerActionsQuery = squirrel.StatementBuilder.Select("creation_date", "cha
 	From("zitadel.projections.flows_actions_triggers").PlaceholderFormat(squirrel.Dollar)
 
 func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActionSearchQueries) ([]*Action, error) {
-	stmt, args, err := query.ToQuery(triggerActionsQuery).ToSql()
+	stmt, args, err := query.ToQuery(triggerActionsQuery).OrderBy("flow_type", "trigger_type", "trigger_sequence").ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
 	}
@@ -32,18 +32,22 @@ func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActio
 
 	actions := []*Action{}
 	for rows.Next() {
-		org := new(Action)
+		action := new(Action)
+		var triggerType domain.TriggerType
+		var triggerSequence int
 		rows.Scan(
-			&org.CreationDate,
-			&org.ChangeDate,
-			&org.ResourceOwner,
-			&org.Sequence,
-			//&org.State,
-			&org.ID,
-			&org.Name,
-			&org.Script,
+			&action.CreationDate,
+			&action.ChangeDate,
+			&action.ResourceOwner,
+			&action.Sequence,
+			//&action.State,
+			&action.ID,
+			&action.Name,
+			&action.Script,
+			&triggerType,
+			&triggerSequence,
 		)
-		actions = append(actions, org)
+		actions = append(actions, action)
 	}
 
 	if err := rows.Err(); err != nil {

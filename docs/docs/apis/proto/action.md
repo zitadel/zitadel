@@ -169,7 +169,6 @@ FlowTypeQuery is always equals
 | ---- | ------ | ----------- |
 | FLOW_TYPE_UNSPECIFIED | 0 | - |
 | FLOW_TYPE_EXTERNAL_AUTHENTICATION | 1 | - |
-| FLOW_TYPE_EXTERNAL_REGISTRATION | 2 | - |
 
 
 
@@ -181,6 +180,7 @@ FlowTypeQuery is always equals
 | ---- | ------ | ----------- |
 | TRIGGER_TYPE_UNSPECIFIED | 0 | - |
 | TRIGGER_TYPE_POST_AUTHENTICATION | 1 | - |
+| TRIGGER_TYPE_PRE_CREATION | 2 | - |
 
 
 

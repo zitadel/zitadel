@@ -27,7 +27,11 @@ func Run(ctx *Context, api *API, script, name string, timeout time.Duration, all
 		return err
 	}
 	var fn jsAction
-	err = vm.ExportTo(vm.Get(name), &fn)
+	jsFn := vm.Get(name)
+	if jsFn == nil {
+		return errors.New("function not found")
+	}
+	err = vm.ExportTo(jsFn, &fn)
 	if err != nil {
 		return err
 	}

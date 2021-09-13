@@ -118,7 +118,6 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
-	user, _, err = l.customRegistrationMapping(user, tokens, authReq, idpConfig)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

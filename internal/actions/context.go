@@ -13,15 +13,21 @@ func (c Context) set(name string, value interface{}) {
 }
 
 func (c *Context) SetToken(t *oidc.Tokens) *Context {
-	c.set("accessToken", t.AccessToken)
-	c.set("idToken", t.IDToken)
-	c.set("getClaim", func(claim string) interface{} { return t.IDTokenClaims.GetClaim(claim) })
-	c.set("claimsJSON", func() (string, error) {
-		c, err := json.Marshal(t.IDTokenClaims)
-		if err != nil {
-			return "", err
-		}
-		return string(c), nil
-	})
+	if t.Token != nil && t.Token.AccessToken != "" {
+		c.set("accessToken", t.AccessToken)
+	}
+	if t.IDToken != "" {
+		c.set("idToken", t.IDToken)
+	}
+	if t.IDTokenClaims != nil {
+		c.set("getClaim", func(claim string) interface{} { return t.IDTokenClaims.GetClaim(claim) })
+		c.set("claimsJSON", func() (string, error) {
+			c, err := json.Marshal(t.IDTokenClaims)
+			if err != nil {
+				return "", err
+			}
+			return string(c), nil
+		})
+	}
 	return c
 }

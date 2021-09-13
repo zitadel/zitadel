@@ -68,7 +68,14 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		l.renderError(w, r, nil, err)
 		return
 	}
-	externalUser := l.mapTokenToLoginUser(&oidc.Tokens{IDTokenClaims: tokenClaims}, idpConfig)
+	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims}
+	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
+	externalUser, err = l.customExternalUserMapping(externalUser, tokens, authReq, idpConfig)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	metadata := externalUser.Metadatas
 	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -80,19 +87,38 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		}
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, nil, err)
 			return
 		}
 		resourceOwner := l.getOrgID(authReq)
 		orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, nil, err)
 			return
 		}
-		user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-		err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
+		var user *domain.Human
+		var externalIDP *domain.ExternalIDP
+		user, externalIDP, metadata = l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
+		user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, nil, err)
+			return
+		}
+		err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
+		if err != nil {
+			l.renderError(w, r, nil, err)
+			return
+		}
+	}
+	if len(metadata) > 0 {
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
@@ -163,10 +189,6 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		return nil, err
 	}
 
-	if err := oidc.CheckSubject(claims); err != nil {
-		return nil, err
-	}
-
 	if err = oidc.CheckIssuer(claims, config.JWTIssuer); err != nil {
 		return nil, err
 	}
@@ -182,8 +204,10 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		}
 	}
 
-	if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
-		return nil, err
+	if !claims.GetIssuedAt().IsZero() {
+		if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
+			return nil, err
+		}
 	}
 	return claims, nil
 }

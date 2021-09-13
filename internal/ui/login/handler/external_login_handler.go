@@ -184,7 +184,7 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *dom
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err := l.customMapping(externalUser, tokens, authReq, idpConfig)
+	externalUser, err := l.customExternalUserMapping(externalUser, tokens, authReq, idpConfig)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -212,8 +212,10 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 			return
 		}
 		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
-		l.renderError(w, r, authReq, err)
-		return
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 	}
 	l.renderNextStep(w, r, authReq)
 }
@@ -281,8 +283,9 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
-	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, linkingUser.Metadatas, domain.BrowserInfoFromRequest(r))
+	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(user, nil, authReq, idpConfig, metadata)
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
@@ -320,7 +323,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -375,5 +378,5 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 		ExternalUserID: linkingUser.ExternalUserID,
 		DisplayName:    displayName,
 	}
-	return human, externalIDP
+	return human, externalIDP, linkingUser.Metadatas
 }

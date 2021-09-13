@@ -56,3 +56,8 @@ CREATE VIEW zitadel.projections.flows_actions_triggers AS (
     FROM zitadel.projections.flows_triggers t
            JOIN zitadel.projections.flows_actions a ON t.action_id = a.id
       );
+
+ALTER TABLE auth.features ADD COLUMN actions BOOLEAN;
+ALTER TABLE authz.features ADD COLUMN actions BOOLEAN;
+ALTER TABLE adminapi.features ADD COLUMN actions BOOLEAN;
+ALTER TABLE management.features ADD COLUMN actions BOOLEAN;
