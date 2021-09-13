@@ -12,10 +12,11 @@ import (
 
 func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		Name:        req.Name,
-		OIDCConfig:  addOIDCIDPRequestToDomainOIDCIDPConfig(req),
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
-		Type:        domain.IDPConfigTypeOIDC,
+		Name:         req.Name,
+		OIDCConfig:   addOIDCIDPRequestToDomainOIDCIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeOIDC,
+		AutoRegister: req.AutoRegister,
 	}
 }
 
@@ -32,10 +33,11 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *
 
 func addJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		Name:        req.Name,
-		JWTConfig:   addJWTIDPRequestToDomainJWTIDPConfig(req),
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
-		Type:        domain.IDPConfigTypeJWT,
+		Name:         req.Name,
+		JWTConfig:    addJWTIDPRequestToDomainJWTIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeJWT,
+		AutoRegister: req.AutoRegister,
 	}
 }
 
