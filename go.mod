@@ -19,7 +19,6 @@ require (
 	github.com/caos/orbos v1.5.14-0.20210803090517-905668247c09
 	github.com/cockroachdb/cockroach-go/v2 v2.1.1
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
-	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20210429001901-424d2337a529
@@ -37,7 +36,7 @@ require (
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
 	github.com/kevinburke/rest v0.0.0-20210506044642-5611499aa33c // indirect
 	github.com/kevinburke/twilio-go v0.0.0-20210327194925-1623146bcf73
-	github.com/lib/pq v1.10.2
+	github.com/lib/pq v1.10.3
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.1.8 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
@@ -72,7 +71,7 @@ require (
 	golang.org/x/text v0.3.6
 	golang.org/x/tools v0.1.5
 	google.golang.org/api v0.52.0
-	google.golang.org/genproto v0.0.0-20210805201207-89edb61ffb67
+	google.golang.org/genproto v0.0.0-20210805201207-89edb61ffb67 // indirect
 	google.golang.org/grpc v1.39.1
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
