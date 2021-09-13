@@ -4958,6 +4958,7 @@ message AddOrgJWTIDPRequest {
             max_length: 200;
         }
     ];
+    bool auto_register = 6;
 }
 
 message AddOrgJWTIDPResponse {

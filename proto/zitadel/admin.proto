@@ -2559,6 +2559,7 @@ message AddJWTIDPRequest {
             description: "the endpoint to the key (JWK) which are used to sign the JWT with";
         }
     ];
+    bool auto_register = 6;
 }
 
 message AddJWTIDPResponse {

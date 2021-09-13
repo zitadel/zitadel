@@ -33,10 +33,11 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *
 
 func addJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		Name:        req.Name,
-		JWTConfig:   addJWTIDPRequestToDomainJWTIDPConfig(req),
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
-		Type:        domain.IDPConfigTypeJWT,
+		Name:         req.Name,
+		JWTConfig:    addJWTIDPRequestToDomainJWTIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeJWT,
+		AutoRegister: req.AutoRegister,
 	}
 }
 
