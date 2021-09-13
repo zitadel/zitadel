@@ -95,8 +95,6 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       req.setUsernameMapping(this.usernameMapping?.value);
       req.setAutoRegister(this.autoRegister?.value);
 
-      console.log(req.toObject());
-
       this.loading = true;
       (this.service as ManagementService).addOrgOIDCIDP(req).then((idp) => {
         setTimeout(() => {
