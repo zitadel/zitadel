@@ -1,18 +1,16 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { DOCUMENT, ViewportScroller } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { map, take, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
-import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
+import { Org } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
@@ -52,7 +50,6 @@ export class AppComponent implements OnDestroy {
 
   public showProjectSection: boolean = false;
 
-  public filterControl: FormControl = new FormControl('');
   private destroy$: Subject<void> = new Subject();
   public labelpolicy!: LabelPolicy.AsObject;
 
@@ -60,7 +57,6 @@ export class AppComponent implements OnDestroy {
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
   constructor(
-    public viewPortScroller: ViewportScroller,
     @Inject('windowObject') public window: Window,
     public translate: TranslateService,
     public authenticationService: AuthenticationService,
@@ -214,11 +210,7 @@ export class AppComponent implements OnDestroy {
       this.language = language.lang;
     });
 
-    this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe(value => {
-      this.loadOrgs(
-        value.trim().toLowerCase(),
-      );
-    });
+
 
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
 
@@ -292,37 +284,8 @@ export class AppComponent implements OnDestroy {
     });
   }
 
-  public loadOrgs(filter?: string): void {
-    let query;
-    if (filter) {
-      query = new OrgQuery();
-      const orgNameQuery = new OrgNameQuery();
-      orgNameQuery.setName(filter);
-      orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-      query.setNameQuery(orgNameQuery);
-    }
-
-    this.orgLoading$.next(true);
-    this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
-      map(resp => {
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => {
-        this.orgLoading$.next(false);
-        this.focusFilter();
-      }),
-    );
-  }
-
   public prepareRoute(outlet: RouterOutlet): boolean {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
-  }
-
-  public closeAccountCard(): void {
-    if (this.showAccount) {
-      this.showAccount = false;
-    }
   }
 
   public onSetTheme(theme: string): void {
