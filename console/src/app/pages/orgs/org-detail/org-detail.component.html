@@ -1,13 +1,13 @@
 <app-meta-layout>
-    <div class="enlarged-container">
+    <div class="max-width-container">
         <h1 class="h1">{{org?.name}}</h1>
         <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
         <ng-container *ngIf="(['org.write$'] | hasRole) as canwrite$">
             <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
-                <button (click)="loadDomains()" card-actions mat-icon-button>
-                    <mat-icon>refresh</mat-icon>
+                <button class="icon-button" (click)="loadDomains()" card-actions mat-icon-button>
+                    <mat-icon class="icon">refresh</mat-icon>
                 </button>
 
                 <div *ngFor="let domain of domains" class="domain">
@@ -31,8 +31,8 @@
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
 
-                <cnsl-info-section type="WARN" *ngIf="(['custom_domain'] | hasFeature | async) == false" class="custom-domain-deactivated">
-                    {{'ORG.PAGES.CUSTOMDOMAINFEATUREMISSING' | translate}}
+                <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+                  <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
                 </cnsl-info-section>
             
                 <button [disabled]="(canwrite$ | async) == false || (['custom_domain'] | hasFeature | async) == false" matTooltip="Add domain" mat-raised-button

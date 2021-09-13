@@ -19,12 +19,9 @@
     </cnsl-form-field>
     </div>
 
-    <cnsl-info-section class="warn"
-    *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false"
-    type="WARN">
-    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
-    'custom_text.message'})}}
-</cnsl-info-section>
+  <cnsl-info-section *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.message'})"></span>
+  </cnsl-info-section>
 
     <div class="content" >
       <cnsl-edit-text [chips]="chips[currentType]" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(

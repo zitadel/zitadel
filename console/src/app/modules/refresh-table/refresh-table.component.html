@@ -11,8 +11,8 @@
     <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>
     <ng-content select="[actions]"></ng-content>
 
-    <button mat-icon-button (click)="emitRefresh()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
-        <mat-icon>refresh</mat-icon>
+    <button *ngIf="!hideRefresh" mat-icon-button (click)="emitRefresh()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+        <mat-icon class="icon">refresh</mat-icon>
     </button>
 </div>
 <div class="table-wrapper">

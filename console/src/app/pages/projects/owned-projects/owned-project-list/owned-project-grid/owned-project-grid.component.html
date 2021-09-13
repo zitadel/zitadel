@@ -17,7 +17,10 @@
                 {{
                 item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
-            <span class="name" *ngIf="item.name">{{ item.name }}</span>
+            <div class="name-row">
+              <span class="name" *ngIf="item.name">{{ item.name }}</span>
+              <div class="state-dot" [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}"></div>
+            </div>
 
             <span *ngIf="item.details.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
@@ -41,7 +44,10 @@
                 {{
                 item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
-            <span class="name" *ngIf="item.name">{{ item.name }}</span>
+            <div class="name-row">
+              <span class="name" *ngIf="item.name">{{ item.name }}</span>
+              <div class="state-dot" [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}"></div>
+            </div>
 
             <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{

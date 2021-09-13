@@ -90,7 +90,7 @@
     }
 
     .rm {
-      color: #f44336;
+      color: var(--warn);
       position: absolute;
       display: none;
       top: -2px;
