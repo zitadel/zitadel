@@ -1129,7 +1129,7 @@
       "1": "Google"
     },
     "AUTOREGISTER":"Automatische Registrierung",
-    "AUTOREGISTER_DESC":"Wenn aktiviert, wird der Benutzer direkt zum Identitätsanbieter weitergeleitet, um sich zu authentifizieren",
+    "AUTOREGISTER_DESC":"Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
     "ID": "ID",
     "NAME": "Name",

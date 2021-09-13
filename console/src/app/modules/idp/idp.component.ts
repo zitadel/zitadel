@@ -59,7 +59,7 @@ export class IdpComponent implements OnDestroy {
       clientSecret: new FormControl(''),
       issuer: new FormControl('', [Validators.required]),
       scopesList: new FormControl([], []),
-      idpDisplayNameMapping: new FormControl(0),
+      displayNameMapping: new FormControl(0),
       usernameMapping: new FormControl(0),
     });
 
@@ -96,6 +96,8 @@ export class IdpComponent implements OnDestroy {
             (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
               if (resp.idp) {
                 const idpObject = resp.idp;
+                console.log(idpObject);
+
                 this.idpForm.patchValue(idpObject);
                 if (idpObject.oidcConfig) {
                   this.oidcConfigForm.patchValue(idpObject.oidcConfig);
@@ -122,9 +124,11 @@ export class IdpComponent implements OnDestroy {
       if (canWrite) {
         this.idpForm.enable();
         this.oidcConfigForm.enable();
+        this.id?.disable();
       } else {
         this.idpForm.disable();
         this.oidcConfigForm.disable();
+        this.id?.disable();
       }
     });
   }
@@ -176,7 +180,7 @@ export class IdpComponent implements OnDestroy {
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
       req.setUsernameMapping(this.usernameMapping?.value);
-      req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
+      req.setDisplayNameMapping(this.displayNameMapping?.value);
 
       (this.service as ManagementService).updateOrgIDPOIDCConfig(req).then((oidcConfig) => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
@@ -193,7 +197,7 @@ export class IdpComponent implements OnDestroy {
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
       req.setUsernameMapping(this.usernameMapping?.value);
-      req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
+      req.setDisplayNameMapping(this.displayNameMapping?.value);
 
       (this.service as AdminService).updateIDPOIDCConfig(req).then((oidcConfig) => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
@@ -273,8 +277,8 @@ export class IdpComponent implements OnDestroy {
     return this.oidcConfigForm.get('scopesList');
   }
 
-  public get idpDisplayNameMapping(): AbstractControl | null {
-    return this.oidcConfigForm.get('idpDisplayNameMapping');
+  public get displayNameMapping(): AbstractControl | null {
+    return this.oidcConfigForm.get('displayNameMapping');
   }
 
   public get usernameMapping(): AbstractControl | null {

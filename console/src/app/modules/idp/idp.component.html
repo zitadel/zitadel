@@ -20,6 +20,7 @@
                             </mat-option>
                         </mat-select>
                     </cnsl-form-field>
+                    
                     <cnsl-info-section class="auto-reg-info">
                       <div>
                         <p class="auto-reg-desc">{{'IDP.AUTOREGISTER_DESC' | translate}}</p>
@@ -85,7 +86,7 @@
 
                         <cnsl-form-field class="formfield" appearance="outline">
                             <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
-                            <mat-select formControlName="idpDisplayNameMapping">
+                            <mat-select formControlName="displayNameMapping">
                                 <mat-option *ngFor="let field of mappingFields" [value]="field">
                                     {{ 'IDP.MAPPINGFIELD.'+field | translate }}
                                 </mat-option>

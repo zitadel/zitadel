@@ -1131,7 +1131,7 @@
       "1": "Google"
     },
     "AUTOREGISTER":"Auto Register",
-    "AUTOREGISTER_DESC":"if enabled, the user will directly be redirected to the identity provider to authenticate",
+    "AUTOREGISTER_DESC":"If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "ID": "ID",
     "NAME": "Name",
