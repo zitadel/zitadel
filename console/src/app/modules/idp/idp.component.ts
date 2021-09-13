@@ -96,8 +96,6 @@ export class IdpComponent implements OnDestroy {
             (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
               if (resp.idp) {
                 const idpObject = resp.idp;
-                console.log(idpObject);
-
                 this.idpForm.patchValue(idpObject);
                 if (idpObject.oidcConfig) {
                   this.oidcConfigForm.patchValue(idpObject.oidcConfig);
