@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,7 +14,7 @@ import (
 )
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
-	if config.OIDCConfig == nil {
+	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
 	}
 
@@ -22,11 +23,6 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 		return nil, err
 	}
 	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
-
-	clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
-	if err != nil {
-		return nil, err
-	}
 
 	iamAgg := IAMAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.EventPusher{
@@ -39,7 +35,14 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.StylingType,
 			config.AutoRegister,
 		),
-		iam_repo.NewIDPOIDCConfigAddedEvent(
+	}
+	if config.OIDCConfig != nil {
+		clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+		if err != nil {
+			return nil, err
+		}
+
+		events = append(events, iam_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
 			iamAgg,
 			config.OIDCConfig.ClientID,
@@ -51,9 +54,18 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.OIDCConfig.IDPDisplayNameMapping,
 			config.OIDCConfig.UsernameMapping,
 			config.OIDCConfig.Scopes...,
-		),
+		))
+	} else if config.JWTConfig != nil {
+		events = append(events, iam_repo.NewIDPJWTConfigAddedEvent(
+			ctx,
+			iamAgg,
+			idpConfigID,
+			config.JWTConfig.JWTEndpoint,
+			config.JWTConfig.Issuer,
+			config.JWTConfig.KeysEndpoint,
+			config.JWTConfig.HeaderName,
+		))
 	}
-
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err

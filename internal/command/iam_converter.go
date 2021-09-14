@@ -153,6 +153,17 @@ func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *domain.OIDCIDPConfig {
 	}
 }
 
+func writeModelToIDPJWTConfig(wm *JWTConfigWriteModel) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		IDPConfigID:  wm.IDPConfigID,
+		JWTEndpoint:  wm.JWTEndpoint,
+		Issuer:       wm.Issuer,
+		KeysEndpoint: wm.KeysEndpoint,
+		HeaderName:   wm.HeaderName,
+	}
+}
+
 func writeModelToIDPProvider(wm *IdentityProviderWriteModel) *domain.IDPProvider {
 	return &domain.IDPProvider{
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),

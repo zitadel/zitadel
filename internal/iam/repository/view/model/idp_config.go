@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/org"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -44,12 +46,15 @@ type IDPConfigView struct {
 	OIDCUsernameMapping        int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
 	OAuthAuthorizationEndpoint string              `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
 	OAuthTokenEndpoint         string              `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
+	JWTEndpoint                string              `json:"jwtEndpoint" gorm:"jwt_endpoint"`
+	JWTKeysEndpoint            string              `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
+	JWTHeaderName              string              `json:"headerName" gorm:"jwt_header_name"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
 func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
-	return &model.IDPConfigView{
+	view := &model.IDPConfigView{
 		IDPConfigID:                idp.IDPConfigID,
 		AggregateID:                idp.AggregateID,
 		State:                      model.IDPConfigState(idp.IDPState),
@@ -63,13 +68,21 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 		IsOIDC:                     idp.IsOIDC,
 		OIDCClientID:               idp.OIDCClientID,
 		OIDCClientSecret:           idp.OIDCClientSecret,
-		OIDCIssuer:                 idp.OIDCIssuer,
 		OIDCScopes:                 idp.OIDCScopes,
 		OIDCIDPDisplayNameMapping:  model.OIDCMappingField(idp.OIDCIDPDisplayNameMapping),
 		OIDCUsernameMapping:        model.OIDCMappingField(idp.OIDCUsernameMapping),
 		OAuthAuthorizationEndpoint: idp.OAuthAuthorizationEndpoint,
 		OAuthTokenEndpoint:         idp.OAuthTokenEndpoint,
 	}
+	if idp.IsOIDC {
+		view.OIDCIssuer = idp.OIDCIssuer
+		return view
+	}
+	view.JWTEndpoint = idp.JWTEndpoint
+	view.JWTIssuer = idp.OIDCIssuer
+	view.JWTKeysEndpoint = idp.JWTKeysEndpoint
+	view.JWTHeaderName = idp.JWTHeaderName
+	return view
 }
 
 func IdpConfigViewsToModel(idps []*IDPConfigView) []*model.IDPConfigView {
@@ -93,7 +106,9 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 		i.IsOIDC = true
 		err = i.SetData(event)
 	case es_model.OIDCIDPConfigChanged, org_es_model.OIDCIDPConfigChanged,
-		es_model.IDPConfigChanged, org_es_model.IDPConfigChanged:
+		es_model.IDPConfigChanged, org_es_model.IDPConfigChanged,
+		models.EventType(org.IDPJWTConfigAddedEventType), models.EventType(iam.IDPJWTConfigAddedEventType),
+		models.EventType(org.IDPJWTConfigChangedEventType), models.EventType(iam.IDPJWTConfigChangedEventType):
 		err = i.SetData(event)
 	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
 		i.IDPState = int32(model.IDPConfigStateInactive)

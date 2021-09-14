@@ -12,7 +12,7 @@ import (
 
 const (
 	IDPOIDCConfigAddedEventType   eventstore.EventType = "iam.idp." + idpconfig.OIDCConfigAddedEventType
-	IDPOIDCConfigChangedEventType eventstore.EventType = "iam.idp." + idpconfig.ConfigChangedEventType
+	IDPOIDCConfigChangedEventType eventstore.EventType = "iam.idp." + idpconfig.OIDCConfigChangedEventType
 )
 
 type IDPOIDCConfigAddedEvent struct {

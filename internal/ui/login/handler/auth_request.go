@@ -1,14 +1,16 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/domain"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
 const (
 	queryAuthRequestID = "authRequestID"
+	queryUserAgentID   = "userAgentID"
 )
 
 func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {

@@ -12,10 +12,11 @@ import (
 
 func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		Name:        req.Name,
-		OIDCConfig:  addOIDCIDPRequestToDomainOIDCIDPConfig(req),
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
-		Type:        domain.IDPConfigTypeOIDC,
+		Name:         req.Name,
+		OIDCConfig:   addOIDCIDPRequestToDomainOIDCIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeOIDC,
+		AutoRegister: req.AutoRegister,
 	}
 }
 
@@ -27,6 +28,25 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *
 		Scopes:                req.Scopes,
 		IDPDisplayNameMapping: idp_grpc.MappingFieldToDomain(req.DisplayNameMapping),
 		UsernameMapping:       idp_grpc.MappingFieldToDomain(req.UsernameMapping),
+	}
+}
+
+func addJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
+	return &domain.IDPConfig{
+		Name:         req.Name,
+		JWTConfig:    addJWTIDPRequestToDomainJWTIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeJWT,
+		AutoRegister: req.AutoRegister,
+	}
+}
+
+func addJWTIDPRequestToDomainJWTIDPConfig(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		JWTEndpoint:  req.JwtEndpoint,
+		Issuer:       req.Issuer,
+		KeysEndpoint: req.KeysEndpoint,
+		HeaderName:   req.HeaderName,
 	}
 }
 
@@ -48,6 +68,16 @@ func updateOIDCConfigToDomain(req *mgmt_pb.UpdateOrgIDPOIDCConfigRequest) *domai
 		Scopes:                req.Scopes,
 		IDPDisplayNameMapping: idp_grpc.MappingFieldToDomain(req.DisplayNameMapping),
 		UsernameMapping:       idp_grpc.MappingFieldToDomain(req.UsernameMapping),
+	}
+}
+
+func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		IDPConfigID:  req.IdpId,
+		JWTEndpoint:  req.JwtEndpoint,
+		Issuer:       req.Issuer,
+		KeysEndpoint: req.KeysEndpoint,
+		HeaderName:   req.HeaderName,
 	}
 }
 
