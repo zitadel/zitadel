@@ -80,7 +80,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 			err = nil
 		}
 		if !idpConfig.AutoRegister {
-			l.renderError(w, r, authReq, err)
+			l.renderExternalNotFoundOption(w, r, authReq, err)
 			return
 		}
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
