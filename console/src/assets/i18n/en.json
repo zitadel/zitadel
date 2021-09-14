@@ -1169,6 +1169,8 @@
       "0": "No Styling",
       "1": "Google"
     },
+    "AUTOREGISTER":"Auto Register",
+    "AUTOREGISTER_DESC":"If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "ID": "ID",
     "NAME": "Name",
