@@ -100,14 +100,15 @@ func (wm *UserMetadataListWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 type UserMetadataByOrgListWriteModel struct {
 	eventstore.WriteModel
-	resourceOwner string
-	UserMetadata  map[string]map[string][]byte
+	UserMetadata map[string]map[string][]byte
 }
 
 func NewUserMetadataByOrgListWriteModel(resourceOwner string) *UserMetadataByOrgListWriteModel {
 	return &UserMetadataByOrgListWriteModel{
-		resourceOwner: resourceOwner,
-		UserMetadata:  make(map[string]map[string][]byte),
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: resourceOwner,
+		},
+		UserMetadata: make(map[string]map[string][]byte),
 	}
 }
 
