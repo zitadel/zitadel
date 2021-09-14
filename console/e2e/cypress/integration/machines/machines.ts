@@ -1,4 +1,4 @@
-import { sign } from 'jsonwebtoken'
+import { ORG_MANAGER } from "../shared/types"
 
 // NEEDS TO BE DISABLED!!!!!! this is just for testing
 Cypress.on('uncaught:exception', (err, runnable) => {
@@ -9,116 +9,98 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 })
 // ###############################
 
-describe("machines", ()=> {
+describe('machine', () => {
 
-    before(()=> {
-//        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
-    })
+    ;[ORG_MANAGER.org_owner, ORG_MANAGER.org_owner_viewer, ORG_MANAGER.org_project_creator].forEach(user => {
 
-    it('should show machines', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
-        cy.url().should('contain', 'users/list/machines')
-    })
+        describe(`impersonating an organization manager with permission "${user}"`, () => {
 
-    describe('add', () => {
+            beforeEach(()=> {
+                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('domain')}`, Cypress.env(`${user.toLowerCase()}_password`))
+                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
+                // wait until table is loaded
+                cy.contains("tr", "cypress").contains("e2e")
+              })
 
-        it.only('should cleanup', () => {
-            
-            var key = Cypress.env("serviceAccountKey")
+            describe('add', () => {
 
-            var now = new Date().getTime()
-            var iat = Math.floor(now / 1000)
-            var exp = Math.floor(new Date(now + 1000 * 60 * 55).getTime() / 1000) // 55 minutes
-            var bearerToken = sign({
-                iss: key.userId,
-                sub: key.userId,
-                aud: "https://issuer.zitadel.ch",
-                iat: iat,
-                exp: exp
-            }, key.key, {
-                header: {
-                    alg: "RS256", 
-                    kid: key.keyId
-                }
-            })
-
-            cy.request({
-                method: 'POST',
-                url: 'https://api.zitadel.ch/oauth/v2/token',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: {
-                    'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    scope: 'openid urn:zitadel:iam:org:project:id:69234237810729019:aud',
-                    assertion: bearerToken,
-                }
-            }).then(res => {
-                cy.request({
-                    method: 'POST',
-                    url: 'https://api.zitadel.ch/management/v1/users/_search',
-                    headers: {
-                        Authorization: "Bearer " + res.body['access_token']
-                    },
-                    qs: {
-                        'user_name_query': "cypress"
-                    }
-                }).then(res => {
-                    debugger;
-                    cy.log('all users', res)
-                })
-            })
-        })
-
-        before('cleanup', () => {
-            //click on org to clear screen
-/*            cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
-                cy.url().should('contain', '/org');
-            })
-            cy.visit(Cypress.env('consoleUrl') + '/users/list/machines').then(() => {
-                cy.url().should('contain', '/users/list/machines');
-                cy.get('h1')
-                    .contains('Service Users')
-                    .parent()
-                    .find("tr", { timeout: 50 })
-                    .filter(':contains("machineusername")', {timeout: 200 })
-                    .find('button')
-                    //force due to angular hidden buttons
-                    .click({force: true})
-                    .then(() => {
-                        cy.get('span.title')
-                            .contains('Delete User')
-                            .parent()
-                            .find('button')
-                            .contains('Delete')
-                            .click()
-                            .then(() => {
-                                cy.wait(3000)
-                                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
-                                cy.get('[text*=machineusername]').should('not.exist');
-                            })
+                before(`ensure it doesn't exist already`, () => {
+                    cy.apiAuthHeader().then(apiCallProperties => {
+                        cy.request({
+                            method: 'POST',
+                            url: `${apiCallProperties.baseURL}/management/v1/users/_search`,
+                            headers: {
+                                Authorization: apiCallProperties.authHeader
+                            },
+                        }).then(usersRes => {                   
+                            var machineUser = usersRes.body.result.find(user => user.userName === Cypress.env('newMachineUserName'))
+                            if (machineUser) {
+                                cy.request({
+                                    method: 'DELETE',
+                                    url: `https://api.zitadel.ch/management/v1/users/${machineUser.id}`,
+                                    headers: {
+                                        Authorization: apiCallProperties.authHeader
+                                    },
+                                })
+                            }
+                        })
                     })
-            })*/
-        })
+                })
 
-        it('should add a machine', () => {
-            //click on org to clear screen
-            cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
-                cy.url().should('contain', '/org');
+                it('should add a machine', () => {
+                    cy.contains('a', 'New').click()            
+                    cy.url().should('contain', 'users/create-machine')
+                    //force needed due to the prefilled username prefix
+                    cy.get('[formcontrolname^=userName]').type(Cypress.env('newMachineUserName'),{force: true})
+                    cy.get('[formcontrolname^=name]').type(Cypress.env('newMachineName'))
+                    cy.get('[formcontrolname^=description]').type(Cypress.env('newMachineDesription'))
+                    cy.get('button').filter(':contains("Create")').should('be.visible').click()                
+                    cy.contains('User created successfully')
+                    cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
+                    cy.contains("tr", Cypress.env('newMachineUserName'))
+                })        
             })
-            cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
-            cy.url().should('contain', 'users/list/machines')
-            cy.visit(Cypress.env('consoleUrl') + '/users/create-machine')
-            cy.url().should('contain', 'users/create-machine')
-            //force needed due to the prefilled username prefix
-            cy.get('[formcontrolname^=userName]').type(Cypress.env('newMachineUserName'),{force: true})
-            cy.get('[formcontrolname^=name]').type(Cypress.env('newMachineName'))
-            cy.get('[formcontrolname^=description]').type(Cypress.env('newMachineDesription'))
-            cy.get('button').filter(':contains("Create")').should('be.visible').click().then(() => {
-                cy.wait(3000)
-                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
-                cy.get('tr').should('contain.text', "machineusername").and('exist');
-            })
+
+            describe('remove', () => {
+                before('ensure it exists', () => {
+                    cy.apiAuthHeader().then(apiCallProperties => {
+                        cy.request({
+                            method: 'POST',
+                            url: `${apiCallProperties.baseURL}/management/v1/users/machine`,
+                            headers: {
+                                Authorization: apiCallProperties.authHeader
+                            },
+                            body: {
+                                user_name: Cypress.env('newMachineUserName'),
+                                name: Cypress.env('newMachineName'),
+                                description: Cypress.env('newMachineDesription'),
+                            },
+                            failOnStatusCode: false,
+                            followRedirect: false
+                        }).then(res => {
+                            expect(res.status).to.be.oneOf([200,409])
+                        })
+                    })
+                })
+
+                it('should delete a machine', () => {
+                    cy.get('h1')
+                        .contains('Service Users')
+                        .parent()
+                        .contains("tr", Cypress.env('newMachineUserName'), { timeout: 1000 })
+                        .find('button')
+                        //force due to angular hidden buttons
+                        .click({force: true})
+                    cy.get('span.title')
+                        .contains('Delete User')
+                        .parent()
+                        .find('button')
+                        .contains('Delete')
+                        .click()
+                    cy.contains('User deleted successfully')
+                    cy.get(`[text*=${Cypress.env('newMachineUserName')}]`).should('not.exist');
+                })
+            })        
         })
     })
 })
