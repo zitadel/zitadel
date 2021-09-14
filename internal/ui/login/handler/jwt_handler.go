@@ -28,6 +28,10 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
+	if data.AuthRequestID == "" || data.UserAgentID == "" {
+		l.renderError(w, r, nil, errors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters"))
+		return
+	}
 	id, err := base64.RawURLEncoding.DecodeString(data.UserAgentID)
 	if err != nil {
 		l.renderError(w, r, nil, err)
@@ -60,39 +64,40 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
 	token, err := getToken(r, idpConfig.JWTHeaderName)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	tokenClaims, err := validateToken(r.Context(), token, idpConfig)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	externalUser := l.mapTokenToLoginUser(&oidc.Tokens{IDTokenClaims: tokenClaims}, idpConfig)
+	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims}
+	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
 	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil
 		}
 		if !idpConfig.AutoRegister {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		resourceOwner := l.getOrgID(authReq)
 		orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
 		err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
@@ -163,10 +168,6 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		return nil, err
 	}
 
-	if err := oidc.CheckSubject(claims); err != nil {
-		return nil, err
-	}
-
 	if err = oidc.CheckIssuer(claims, config.JWTIssuer); err != nil {
 		return nil, err
 	}
@@ -182,8 +183,10 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		}
 	}
 
-	if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
-		return nil, err
+	if !claims.GetIssuedAt().IsZero() {
+		if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
+			return nil, err
+		}
 	}
 	return claims, nil
 }

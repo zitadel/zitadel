@@ -301,6 +301,7 @@ Errors:
     UserAgentNotFound: User Agent ID nicht gefunden
     TokenNotFound: Token nicht gefunden
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
+    MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     Inactive: Benutzer ist inaktiv
