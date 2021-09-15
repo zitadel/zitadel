@@ -82,7 +82,8 @@ import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
-import { StorageKey, StorageService } from './storage.service';
+import { StorageKey, StorageLocation, StorageService } from './storage.service';
+
 
 
 @Injectable({
@@ -163,7 +164,7 @@ export class GrpcAuthService {
         this.cachedOrgs = orgs;
       }
 
-      const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
+      const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
       if (org && orgs.find(tmp => tmp.id === org.id)) {
         return org;
       }
@@ -186,7 +187,7 @@ export class GrpcAuthService {
   }
 
   public setActiveOrg(org: Org.AsObject): void {
-    this.storage.setItem(StorageKey.organization, org);
+    this.storage.setItem(StorageKey.organization, org, StorageLocation.local);
     this._activeOrgChanged.next(org);
   }
 
