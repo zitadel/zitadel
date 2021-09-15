@@ -1,9 +1,7 @@
 package projection
 
 import (
-	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -12,49 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/org"
 )
-
-type testExecuter struct {
-	expectedStmt string
-	gottenStmt   string
-	shouldExec   bool
-
-	expectedArgs []interface{}
-	gottenArgs   []interface{}
-	gotExecuted  bool
-}
-
-type anyArg struct{}
-
-func (e *testExecuter) Exec(stmt string, args ...interface{}) (sql.Result, error) {
-	e.gottenStmt = stmt
-	e.gottenArgs = args
-	e.gotExecuted = true
-	return nil, nil
-}
-
-func (e *testExecuter) Validate(t *testing.T) {
-	t.Helper()
-	if e.shouldExec != e.gotExecuted {
-		t.Error("expected to be executed")
-		return
-	}
-	if len(e.gottenArgs) != len(e.expectedArgs) {
-		t.Errorf("wrong arg len expected: %d got: %d", len(e.expectedArgs), len(e.gottenArgs))
-	} else {
-		for i := 0; i < len(e.expectedArgs); i++ {
-			if _, ok := e.expectedArgs[i].(anyArg); ok {
-				continue
-			}
-			if e.expectedArgs[i] != e.gottenArgs[i] {
-				t.Errorf("wrong argument at index %d: got: %v want: %v", i, e.gottenArgs[i], e.expectedArgs[i])
-			}
-		}
-	}
-	if e.gottenStmt != e.expectedStmt {
-		t.Errorf("wrong stmt want:\n%s\ngot:\n%s", e.expectedStmt, e.gottenStmt)
-	}
-
-}
 
 func TestOrgProjection_reduces(t *testing.T) {
 	type args struct {
@@ -232,80 +187,4 @@ func TestOrgProjection_reduces(t *testing.T) {
 			assertReduce(t, got, err, tt.want)
 		})
 	}
-}
-
-func testEvent(
-	eventType repository.EventType,
-	aggregateType repository.AggregateType,
-	data []byte,
-) *repository.Event {
-	return &repository.Event{
-		Sequence:                      15,
-		PreviousAggregateSequence:     10,
-		PreviousAggregateTypeSequence: 10,
-		CreationDate:                  time.Now(),
-		Type:                          eventType,
-		AggregateType:                 aggregateType,
-		Data:                          data,
-		Version:                       "v1",
-		AggregateID:                   "agg-id",
-		ResourceOwner:                 "ro-id",
-		ID:                            "event-id",
-		EditorService:                 "editor-svc",
-		EditorUser:                    "editor-user",
-	}
-}
-
-func baseEvent(*testing.T) eventstore.EventReader {
-	return &eventstore.BaseEvent{}
-}
-
-func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstore.EventReader, error)) func(t *testing.T) eventstore.EventReader {
-	return func(t *testing.T) eventstore.EventReader {
-		e, err := mapper(event)
-		if err != nil {
-			t.Fatalf("mapper failed: %v", err)
-		}
-		return e
-	}
-}
-
-type wantReduce struct {
-	aggregateType    eventstore.AggregateType
-	sequence         uint64
-	previousSequence uint64
-	executer         *testExecuter
-	err              func(error) bool
-}
-
-func assertReduce(t *testing.T, stmt *handler.Statement, err error, want wantReduce) {
-	t.Helper()
-	if want.err == nil && err != nil {
-		t.Errorf("unexpected error of type %T: %v", err, err)
-		return
-	}
-	if want.err != nil && want.err(err) {
-		return
-	}
-	if stmt.AggregateType != want.aggregateType {
-		t.Errorf("wront aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
-	}
-
-	if stmt.PreviousSequence != want.previousSequence {
-		t.Errorf("wront previous sequence: want: %d got: %d", want.previousSequence, stmt.PreviousSequence)
-	}
-
-	if stmt.Sequence != want.sequence {
-		t.Errorf("wront sequence: want: %d got: %d", want.sequence, stmt.Sequence)
-	}
-	if stmt.Execute == nil {
-		want.executer.Validate(t)
-		return
-	}
-	err = stmt.Execute(want.executer, orgProjection)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-
-	want.executer.Validate(t)
 }
