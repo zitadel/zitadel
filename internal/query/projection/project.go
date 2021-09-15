@@ -15,7 +15,7 @@ type ProjectProjection struct {
 
 func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
 	p := &ProjectProjection{}
-	config.ProjectionName = "projections.projects"
+	config.ProjectionName = "zitadel.projections.projects"
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p

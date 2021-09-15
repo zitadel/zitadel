@@ -10,6 +10,7 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
@@ -37,9 +38,9 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	return &admin_pb.ListOrgsResponse{
 		Result: org_grpc.OrgViewsToPb(orgs.Orgs),
 		Details: &obj_pb.ListDetails{
-			TotalResult: orgs.Count,
-			// TODO: ProcessedSequence: ,
-			// TODO: ViewTimestamp: ,
+			TotalResult:       orgs.Count,
+			ProcessedSequence: orgs.Sequence,
+			ViewTimestamp:     timestamppb.New(orgs.Timestamp),
 		},
 	}, nil
 }

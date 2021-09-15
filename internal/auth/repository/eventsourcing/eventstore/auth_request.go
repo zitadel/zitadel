@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/caos/logging"
@@ -427,10 +428,12 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*domain.AuthRequest, error) {
 	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	steps, err := repo.nextSteps(ctx, request, checkLoggedIn)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	request.PossibleSteps = steps
