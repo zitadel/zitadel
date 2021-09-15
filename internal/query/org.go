@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -152,24 +151,18 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	query, scan := q.prepareOrgsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		log.Println(err)
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		log.Println(err)
 		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
 	}
 	orgs, err = scan(rows)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	orgs.LatestSequence, err = q.latestSequence(ctx, orgTable)
-	if err != nil {
-		log.Println(err)
-	}
 	return orgs, err
 }
 

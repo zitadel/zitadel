@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -46,7 +45,6 @@ func (q *Queries) latestSequence(ctx context.Context, projection string) (*Lates
 	stmt, args, err := query.Where(sq.Eq{
 		CurrentSequenceColProjectionName.toColumnName(): projection,
 	}).ToSql()
-	log.Println(stmt, args)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "unable to create sql stmt")
 	}
