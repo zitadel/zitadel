@@ -167,15 +167,15 @@ type Orgs struct {
 }
 
 type Org struct {
-	ID            string          `col:"id"`
-	CreationDate  time.Time       `col:"creation_date"`
-	ChangeDate    time.Time       `col:"change_date"`
-	ResourceOwner string          `col:"resource_owner"`
-	State         domain.OrgState `col:"org_state"`
-	Sequence      uint64          `col:"sequence"`
+	ID            string
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	State         domain.OrgState
+	Sequence      uint64
 
-	Name   string `col:"name"`
-	Domain string `col:"domain"`
+	Name   string
+	Domain string
 }
 
 type OrgSearchQueries struct {
@@ -227,7 +227,7 @@ func (c OrgColumn) toColumnName() string {
 	case OrgColumnName:
 		return "name"
 	case OrgColumnDomain:
-		return "domain"
+		return "primary_domain"
 	case OrgColumnID:
 		return "id"
 	default:

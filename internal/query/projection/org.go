@@ -65,7 +65,7 @@ const (
 	orgResourceOwnerCol = "resource_owner"
 	orgStateCol         = "org_state"
 	orgSequenceCol      = "sequence"
-	orgDomainCol        = "domain"
+	orgDomainCol        = "primary_domain"
 	orgNameCol          = "name"
 )
 
