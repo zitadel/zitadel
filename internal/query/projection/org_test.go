@@ -37,7 +37,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				previousSequence: 10,
 				executer: &testExecuter{
 					shouldExec:   true,
-					expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, domain) = ($1, $2, $3) WHERE (id = $4)",
+					expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
 					expectedArgs: []interface{}{
 						anyArg{},
 						uint64(15),
