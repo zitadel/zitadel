@@ -275,7 +275,7 @@
   .show-all {
     $primary: map-get($theme, primary);
     color: mat.get-color-from-palette($primary, 300) !important;
-    border-bottom: 2px solid var(--grey);
+    border-bottom: 1px solid var(--grey);
     margin-bottom: .5rem;
   }
   /* stylelint-enable */

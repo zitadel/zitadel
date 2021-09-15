@@ -1,7 +1,7 @@
 <app-meta-layout>
     <div class="max-width-container">
         <div class="header-row">
-            <div>
+            <div class="text">
                 <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
                 <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
             </div>
@@ -14,18 +14,7 @@
 
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
-        <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
-            description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
-            <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
-                <span>{{login}}</span>
-                <button color="primary" [disabled]="copied == login"
-                    [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
-                    <i *ngIf="copied != login" class="las la-clipboard"></i>
-                    <i *ngIf="copied == login" class="las la-clipboard-check"></i>
-                </button>
-            </div>
-        </app-card>
+        <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
 
         <app-card *ngIf="user && user.human?.profile" class=" app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
             <app-detail-form [showEditImage]="true" [preferredLoginName]="user.preferredLoginName" [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
@@ -35,8 +24,8 @@
 
         <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
-            <button card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
-                <mat-icon>refresh</mat-icon>
+            <button class="icon-button" card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+                <mat-icon class="icon">refresh</mat-icon>
             </button>
             <app-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" canWrite="true"
                 (editType)="openEditDialog($event)" (enteredPhoneCode)="enteredPhoneCode($event)"
@@ -45,10 +34,7 @@
             </app-contact>
         </app-card>
 
-        <app-card *ngIf="user && user.human && user.id" title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}"
-        description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
-          <app-external-idps [userId]="user.id" [service]="userService"></app-external-idps>
-        </app-card>
+        <app-external-idps [userId]="user?.id" [service]="userService"></app-external-idps>
 
         <app-auth-passwordless *ngIf="user" #mfaComponent></app-auth-passwordless>
 
@@ -62,24 +48,35 @@
                 [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
             </app-user-grants>
         </app-card>
+
+        <ng-template appHasFeature [appHasFeature]="['metadata.user']">
+          <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
+        </ng-template>
     </div>
 
     <div *ngIf="user" class="side" metainfo>
-        <div class="meta-details">
-            <div class="meta-row">
-                <span class="first">{{'RESOURCEID' | translate}}:</span>
-                <span *ngIf="user?.id" class="second">{{ user.id }}</span>
+      <div class="meta-details">
+          <div class="meta-row">
+              <span class="first">{{'RESOURCEID' | translate}}:</span>
+              <span *ngIf="user?.id" class="second">{{ user.id }}</span>
+          </div>
+          <div class="meta-row" *ngIf="user?.preferredLoginName">
+              <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
+              <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
+          </div>
+      </div>
+      <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+        <mat-tab label="Details">
+          <div class="side-padding">
+            <ng-template appHasRole [appHasRole]="['user.membership.read']">
+              <app-memberships [auth]="true" [user]="user"></app-memberships>
+            </ng-template>
             </div>
-            <div class="meta-row" *ngIf="user?.preferredLoginName">
-                <span class="first">{{'USER.PREFERRED_LOGINNAME' | translate}}</span>
-                <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
-            </div>
-        </div>
-        <ng-template appHasRole [appHasRole]="['user.membership.read']">
-            <app-memberships [auth]="true" [user]="user"></app-memberships>
-        </ng-template>
-
-        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" [id]="user.id">
-        </app-changes>
+        </mat-tab>
+        <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
+          <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" [id]="user.id">
+          </app-changes>
+        </mat-tab>
+      </mat-tab-group>
     </div>
 </app-meta-layout>

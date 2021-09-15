@@ -242,8 +242,8 @@ export class AppComponent implements OnDestroy {
       const darkPrimary = '#5282c1';
       const lightPrimary = '#5282c1';
 
-      const darkWarn = '#F44336';
-      const lightWarn = '#F44336';
+      const darkWarn = '#cd3d56';
+      const lightWarn = '#cd3d56';
 
       const darkBackground = '#212224';
       const lightBackground = '#fafafa';
@@ -267,8 +267,8 @@ export class AppComponent implements OnDestroy {
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
 
-        const darkWarn = this.labelpolicy?.warnColorDark || '#F44336';
-        const lightWarn = this.labelpolicy?.warnColor || '#F44336';
+        const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
+        const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
         const darkBackground = this.labelpolicy?.backgroundColorDark || '#212224';
         const lightBackground = this.labelpolicy?.backgroundColor || '#fafafa';

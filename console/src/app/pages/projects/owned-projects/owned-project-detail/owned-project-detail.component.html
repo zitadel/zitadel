@@ -5,48 +5,44 @@
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
             <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
-            <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
-                <button matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button (click)="editstate = !editstate"
-                    aria-label="Edit project name" *ngIf="isZitadel === false">
-                    <i *ngIf="!editstate" class="las la-edit"></i>
-                    <mat-icon *ngIf="editstate">close</mat-icon>
-                </button>
-            </ng-template>
-            <ng-template appHasRole [appHasRole]="['project.delete:'+projectId, 'project.delete']">
-                <button matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" mat-icon-button
-                    (click)="deleteProject()" aria-label="Edit project name" *ngIf="isZitadel === false">
-                    <i class="las la-trash"></i>
-                </button>
-            </ng-template>
 
             <span class="fill-space"></span>
 
-            <button mat-stroked-button color="warn"
-                [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
-                (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' |
-                translate}}</button>
-            <button mat-stroked-button color="warn"
-                [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
-                *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
-                (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' |
-                translate}}</button>
+            <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
+              <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
+                <span>{{'ACTIONS.ACTIONS' | translate}}</span>
+                <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+              </button>
+              <mat-menu #actions="matMenu" xPosition="before">
+                <button mat-menu-item (click)="openNameDialog()"
+                    aria-label="Edit project name" *ngIf="isZitadel === false">
+                    {{'ACTIONS.RENAME' | translate}}
+                </button>
+
+                <button mat-menu-item
+                  [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
+                  *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
+                  (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)">
+                  {{'PROJECT.TABLE.DEACTIVATE' | translate}}
+                </button>
+
+                <button mat-menu-item
+                  [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
+                  *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
+                  (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)">
+                  {{'PROJECT.TABLE.ACTIVATE' | translate}}
+                </button>
+
+                <ng-template appHasRole [appHasRole]="['project.delete$', 'project.delete:'+projectId]">
+                  <button mat-menu-item matTooltip="{{'ACTIONS.DELETE' | translate}}"
+                  (click)="deleteProject()" aria-label="Edit project name" *ngIf="isZitadel === false">
+                  <span [style.color]="'var(--warn)'">{{'PROJECT.PAGES.DELETE' | translate}}</span>
+                </button>
+                </ng-template>
+              </mat-menu>
+            </ng-template>
 
             <div class="full-width">
-                <div class="line">
-                    <ng-container *ngIf="editstate">
-                        <cnsl-form-field *ngIf="editstate && project?.name" class="formfield"
-                            hintLabel="The name is required!">
-                            <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
-                            <input cnslInput [(ngModel)]="project.name" name="name" />
-                        </cnsl-form-field>
-                        <button matTooltip="{{'ACTIONS.SAVE' | translate}}" class="icon-button" *ngIf="editstate"
-                            mat-icon-button (click)="updateName()">
-                            <mat-icon>check</mat-icon>
-                        </button>
-                    </ng-container>
-                    <span class="fill-space"></span>
-                </div>
                 <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
                 <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
             </div>

@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
@@ -35,43 +36,44 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
 import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
-    declarations: [
-        OwnedProjectDetailComponent,
-        ApplicationGridComponent,
-        ApplicationsComponent,
-        ProjectGrantsComponent,
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        AppCardModule,
-        OwnedProjectDetailRoutingModule,
-        TranslateModule,
-        ReactiveFormsModule,
-        HasRoleModule,
-        MatButtonModule,
-        MatIconModule,
-        ContributorsModule,
-        MatTabsModule,
-        WarnDialogModule,
-        MatTooltipModule,
-        ProjectRolesModule,
-        HasRolePipeModule,
-        UserGrantsModule,
-        TimestampToDatePipeModule,
-        MatTableModule,
-        InputModule,
-        CardModule,
-        PaginatorModule,
-        MatRippleModule,
-        MatCheckboxModule,
-        MatSelectModule,
-        MatProgressSpinnerModule,
-        ChangesModule,
-        MetaLayoutModule,
-        RefreshTableModule,
-        MemberCreateDialogModule,
-        LocalizedDatePipeModule,
-    ],
+  declarations: [
+    OwnedProjectDetailComponent,
+    ApplicationGridComponent,
+    ApplicationsComponent,
+    ProjectGrantsComponent,
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AppCardModule,
+    OwnedProjectDetailRoutingModule,
+    TranslateModule,
+    ReactiveFormsModule,
+    HasRoleModule,
+    MatButtonModule,
+    MatIconModule,
+    ContributorsModule,
+    MatTabsModule,
+    WarnDialogModule,
+    MatTooltipModule,
+    ProjectRolesModule,
+    HasRolePipeModule,
+    UserGrantsModule,
+    TimestampToDatePipeModule,
+    MatTableModule,
+    InputModule,
+    CardModule,
+    PaginatorModule,
+    MatRippleModule,
+    MatCheckboxModule,
+    MatSelectModule,
+    MatMenuModule,
+    MatProgressSpinnerModule,
+    ChangesModule,
+    MetaLayoutModule,
+    RefreshTableModule,
+    MemberCreateDialogModule,
+    LocalizedDatePipeModule,
+  ],
 })
 export class OwnedProjectDetailModule { }

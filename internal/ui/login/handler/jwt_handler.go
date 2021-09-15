@@ -28,6 +28,10 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
+	if data.AuthRequestID == "" || data.UserAgentID == "" {
+		l.renderError(w, r, nil, errors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters"))
+		return
+	}
 	id, err := base64.RawURLEncoding.DecodeString(data.UserAgentID)
 	if err != nil {
 		l.renderError(w, r, nil, err)
@@ -60,19 +64,19 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
 	token, err := getToken(r, idpConfig.JWTHeaderName)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	tokenClaims, err := validateToken(r.Context(), token, idpConfig)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims}
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
 	externalUser, err = l.customExternalUserMapping(externalUser, tokens, authReq, idpConfig)
 	if err != nil {
-		l.renderError(w, r, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	metadata := externalUser.Metadatas
@@ -87,13 +91,13 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		}
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
-			l.renderError(w, r, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		resourceOwner := l.getOrgID(authReq)
 		orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 		if err != nil {
-			l.renderError(w, r, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		var user *domain.Human
@@ -101,12 +105,12 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		user, externalIDP, metadata = l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
 		user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata)
 		if err != nil {
-			l.renderError(w, r, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
 		if err != nil {
-			l.renderError(w, r, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
