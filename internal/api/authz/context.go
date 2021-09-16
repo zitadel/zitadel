@@ -73,9 +73,13 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	if err != nil {
 		return CtxData{}, err
 	}
-	projectID, origins, err := t.ProjectIDAndOriginsByClientID(ctx, clientID)
-	if err != nil {
-		return CtxData{}, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+	var projectID string
+	var origins []string
+	if clientID != "" {
+		projectID, origins, err = t.ProjectIDAndOriginsByClientID(ctx, clientID)
+		if err != nil {
+			return CtxData{}, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+		}
 	}
 	if err := checkOrigin(ctx, origins); err != nil {
 		return CtxData{}, err
