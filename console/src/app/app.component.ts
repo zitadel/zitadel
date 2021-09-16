@@ -10,7 +10,6 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
-
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
@@ -21,6 +20,7 @@ import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
+
 
 @Component({
   selector: 'app-root',
@@ -307,7 +307,7 @@ export class AppComponent implements OnDestroy {
     this.orgLoading$.next(true);
     this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
       map(resp => {
-        return resp.resultList;
+        return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
       }),
       catchError(() => of([])),
       finalize(() => {
