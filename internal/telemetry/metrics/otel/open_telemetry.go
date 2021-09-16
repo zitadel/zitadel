@@ -75,7 +75,7 @@ func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFu
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
-	sumObserver := metric.Must(m.Meter).NewInt64UpDownSumObserver(
+	sumObserver := metric.Must(m.Meter).NewInt64UpDownCounterObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)
@@ -86,7 +86,7 @@ func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc m
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
-	sumObserver := metric.Must(m.Meter).NewInt64ValueObserver(
+	sumObserver := metric.Must(m.Meter).NewInt64GaugeObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)
