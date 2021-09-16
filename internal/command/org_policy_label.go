@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -124,7 +123,7 @@ func (c *Commands) checkLabelPolicyAllowed(ctx context.Context, resourceOwner st
 	if defaultPolicy.DisableWatermark != policy.DisableWatermark {
 		requiredFeatures = append(requiredFeatures, domain.FeatureLabelPolicyWatermark)
 	}
-	return authz.CheckOrgFeatures(ctx, c.tokenVerifier, resourceOwner, requiredFeatures...)
+	return c.tokenVerifier.CheckOrgFeatures(ctx, resourceOwner, requiredFeatures...)
 }
 
 func (c *Commands) ActivateLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
