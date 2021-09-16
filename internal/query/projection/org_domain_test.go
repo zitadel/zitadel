@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func TestOrgProjection_reduces(t *testing.T) {
+func TestOrgDomainProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.EventReader
 	}
@@ -22,6 +22,97 @@ func TestOrgProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
+			name: "reduceDomainAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgDomainAddedEventType),
+					org.AggregateType,
+					[]byte(`{"domain": "domain.new"}`),
+				), org.DomainAddedEventMapper),
+			},
+			reduce: (&OrgDomainProjection{}).reduceDomainAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.orgs (creation_date, change_date, sequence, domain, org_id, is_verified, is_primary, validation_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"domain.new",
+								"agg-id",
+								false,
+								false,
+								domain.OrgDomainValidationTypeUnspecified,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceDomainVerificationAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgDomainVerificationAddedEventType),
+					org.AggregateType,
+					[]byte(`{"domain": "domain.new", "validationType": 2}`),
+				), org.DomainVerificationAddedEventMapper),
+			},
+			reduce: (&OrgDomainProjection{}).reduceDomainVerificationAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, validation_type) = ($1, $2, $3) WHERE (domain = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.OrgDomainValidationTypeDNS,
+								"domain.new",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceDomainVerified",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgDomainVerifiedEventType),
+					org.AggregateType,
+					[]byte(`{"domain": "domain.new"}`),
+				), org.DomainVerifiedEventMapper),
+			},
+			reduce: (&OrgDomainProjection{}).reduceDomainVerified,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_verified) = ($1, $2, $3) WHERE (domain = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"domain.new",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reducePrimaryDomainSet",
 			args: args{
 				event: getEvent(testEvent(
@@ -30,7 +121,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainPrimarySetEventMapper),
 			},
-			reduce: (&OrgProjection{}).reducePrimaryDomainSet,
+			reduce: (&OrgDomainProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -38,148 +129,48 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_primary) = ($1, $2, $3) WHERE (org_id = $4) AND (is_primary = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								"domain.new",
-								"agg-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOrgReactivated",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgReactivatedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgReactivatedEventMapper),
-			},
-			reduce: (&OrgProjection{}).reduceOrgReactivated,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.OrgStateActive,
-								"agg-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOrgDeactivated",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDeactivatedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgDeactivatedEventMapper),
-			},
-			reduce: (&OrgProjection{}).reduceOrgDeactivated,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.OrgStateInactive,
-								"agg-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOrgChanged",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgChangedEventType),
-					org.AggregateType,
-					[]byte(`{"name": "new name"}`),
-				), org.OrgChangedEventMapper),
-			},
-			reduce: (&OrgProjection{}).reduceOrgChanged,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								"new name",
-								"agg-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOrgChanged no changes",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgChangedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgChangedEventMapper),
-			},
-			reduce: (&OrgProjection{}).reduceOrgChanged,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
-			},
-		},
-		{
-			name: "reduceOrgAdded",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgAddedEventType),
-					org.AggregateType,
-					[]byte(`{"name": "name"}`),
-				), org.OrgAddedEventMapper),
-			},
-			reduce: (&OrgProjection{}).reduceOrgAdded,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "INSERT INTO zitadel.projections.orgs (id, creation_date, change_date, resource_owner, sequence, name, org_state) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-							expectedArgs: []interface{}{
-								"agg-id",
-								anyArg{},
-								anyArg{},
+								false,
 								"ro-id",
+								true,
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_primary) = ($1, $2, $3) WHERE (domain = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
 								uint64(15),
-								"name",
-								domain.OrgStateActive,
+								true,
+								"domain.new",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceDomainRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgDomainRemovedEventType),
+					org.AggregateType,
+					[]byte(`{"domain": "domain.new"}`),
+				), org.DomainRemovedEventMapper),
+			},
+			reduce: (&OrgDomainProjection{}).reduceDomainRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.orgs WHERE (domain = $1)",
+							expectedArgs: []interface{}{
+								"domain.new",
 							},
 						},
 					},

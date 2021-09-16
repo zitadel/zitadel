@@ -46,8 +46,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
 		newOrgMember(
 			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
-		newOrgDomain(
-			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
 		newAuthNKeys(
