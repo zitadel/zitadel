@@ -2,7 +2,6 @@ package actions
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/dop251/goja"
 )
@@ -17,7 +16,6 @@ func appendUserGrant(list *[]UserGrant) func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		userGrantMap := call.Argument(0).Export()
 		userGrant, _ := userGrantFromMap(userGrantMap)
-		fmt.Println(userGrant)
 		*list = append(*list, userGrant)
 		return nil
 	}

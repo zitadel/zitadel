@@ -90,7 +90,7 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
 	events := []eventstore.EventPusher{
-		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
+		action.NewDeactivatedEvent(ctx, actionAgg),
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
@@ -120,7 +120,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
 	events := []eventstore.EventPusher{
-		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
+		action.NewReactivatedEvent(ctx, actionAgg),
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {

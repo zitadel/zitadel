@@ -9,7 +9,7 @@ import (
 )
 
 func FlowTypeToDomain(flowType action_pb.FlowType) domain.FlowType {
-	switch flowType { //TODO: converter
+	switch flowType {
 	case action_pb.FlowType_FLOW_TYPE_EXTERNAL_AUTHENTICATION:
 		return domain.FlowTypeExternalAuthentication
 	default:
@@ -30,10 +30,9 @@ func TriggerTypeToDomain(triggerType action_pb.TriggerType) domain.TriggerType {
 
 func FlowToPb(flow *query.Flow) *action_pb.Flow {
 	return &action_pb.Flow{
-		Type:    0,
-		Details: nil,
-		State:   0,
-		//Triggers: TriggersToPb(flow.TriggerActions),
+		Type:           FlowTypeToPb(flow.Type),
+		Details:        object_grpc.ChangeToDetailsPb(flow.Sequence, flow.ChangeDate, flow.ResourceOwner),
+		State:          0, //TODO: state?
 		TriggerActions: TriggerActionsToPb(flow.TriggerActions),
 	}
 }
@@ -42,6 +41,15 @@ func TriggerActionToPb(trigger domain.TriggerType, actions []*query.Action) *act
 	return &action_pb.TriggerAction{
 		TriggerType: TriggerTypeToPb(trigger),
 		Actions:     ActionsToPb(actions),
+	}
+}
+
+func FlowTypeToPb(flowType domain.FlowType) action_pb.FlowType {
+	switch flowType {
+	case domain.FlowTypeExternalAuthentication:
+		return action_pb.FlowType_FLOW_TYPE_EXTERNAL_AUTHENTICATION
+	default:
+		return action_pb.FlowType_FLOW_TYPE_UNSPECIFIED
 	}
 }
 
@@ -75,12 +83,23 @@ func ActionsToPb(actions []*query.Action) []*action_pb.Action {
 func ActionToPb(action *query.Action) *action_pb.Action {
 	return &action_pb.Action{
 		Id:            action.ID,
-		Details:       nil,
-		State:         0,
+		Details:       object_grpc.ChangeToDetailsPb(action.Sequence, action.ChangeDate, action.ResourceOwner),
+		State:         ActionStateToPb(action.State),
 		Name:          action.Name,
 		Script:        action.Script,
 		Timeout:       durationpb.New(action.Timeout),
 		AllowedToFail: action.AllowedToFail,
+	}
+}
+
+func ActionStateToPb(state domain.ActionState) action_pb.ActionState {
+	switch state {
+	case domain.ActionStateActive:
+		return action_pb.ActionState_ACTION_STATE_ACTIVE
+	case domain.ActionStateInactive:
+		return action_pb.ActionState_ACTION_STATE_INACTIVE
+	default:
+		return action_pb.ActionState_ACTION_STATE_UNSPECIFIED
 	}
 }
 

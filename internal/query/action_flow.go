@@ -40,7 +40,7 @@ func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActio
 			&action.ChangeDate,
 			&action.ResourceOwner,
 			&action.Sequence,
-			//&action.State,
+			//&action.State, //TODO: state?
 			&action.ID,
 			&action.Name,
 			&action.Script,
@@ -104,11 +104,12 @@ func (q *Queries) SearchFlow(ctx context.Context, query *TriggerActionSearchQuer
 }
 
 type Flow struct {
-	ID            string    `col:"id"`
-	CreationDate  time.Time `col:"creation_date"`
-	ChangeDate    time.Time `col:"change_date"`
-	ResourceOwner string    `col:"resource_owner"`
-	Sequence      uint64    `col:"sequence"`
+	ID            string          `col:"id"`
+	CreationDate  time.Time       `col:"creation_date"`
+	ChangeDate    time.Time       `col:"change_date"`
+	ResourceOwner string          `col:"resource_owner"`
+	Sequence      uint64          `col:"sequence"`
+	Type          domain.FlowType `col:"flow_type"`
 
 	TriggerActions map[domain.TriggerType][]*Action
 }

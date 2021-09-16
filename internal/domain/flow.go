@@ -3,19 +3,13 @@ package domain
 type FlowState int32
 
 const (
-	FlowStateUnspecified FlowState = iota
-	FlowStateActive
+	FlowStateActive FlowState = iota
 	FlowStateInactive
-	FlowStateRemoved
 	flowStateCount
 )
 
 func (s FlowState) Valid() bool {
 	return s >= 0 && s < flowStateCount
-}
-
-func (s FlowState) Exists() bool {
-	return s != FlowStateUnspecified && s != FlowStateRemoved
 }
 
 type FlowType int32

@@ -21,7 +21,6 @@ func NewFlowWriteModel(flowType domain.FlowType, resourceOwner string) *FlowWrit
 			ResourceOwner: resourceOwner,
 		},
 		FlowType: flowType,
-		State:    domain.FlowStateActive, //TODO: ?
 		Triggers: make(map[domain.TriggerType][]string),
 	}
 }

@@ -102,7 +102,6 @@ message Flow {
             description: "the state of the flow";
         }
     ];
-    //map<TriggerType, TriggerAction> triggers = 4;
     repeated TriggerAction trigger_actions = 4;
 }
 

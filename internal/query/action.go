@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-var actionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "id", "name", "script", "timeout", "allowed_to_fail").
+var actionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "id", "action_state", "name", "script", "timeout", "allowed_to_fail").
 	From("zitadel.projections.actions").PlaceholderFormat(squirrel.Dollar)
 
 func (q *Queries) GetAction(ctx context.Context, id string, orgID string) (*Action, error) {
@@ -19,7 +19,7 @@ func (q *Queries) GetAction(ctx context.Context, id string, orgID string) (*Acti
 		return nil, err
 	}
 	if len(actions) != 1 {
-
+		return nil, errors.ThrowNotFound(nil, "QUERY-dft2g", "Errors.Action.NotFound")
 	}
 	return actions[0], err
 }
@@ -42,9 +42,9 @@ func (q *Queries) SearchActions(ctx context.Context, query *ActionSearchQueries)
 			&org.CreationDate,
 			&org.ChangeDate,
 			&org.ResourceOwner,
-			//&org.State,
 			&org.Sequence,
 			&org.ID,
+			&org.State,
 			&org.Name,
 			&org.Script,
 			&org.Timeout,
@@ -61,12 +61,12 @@ func (q *Queries) SearchActions(ctx context.Context, query *ActionSearchQueries)
 }
 
 type Action struct {
-	ID            string    `col:"id"`
-	CreationDate  time.Time `col:"creation_date"`
-	ChangeDate    time.Time `col:"change_date"`
-	ResourceOwner string    `col:"resource_owner"`
-	//State         domain.ActionState `col:"action_state"`
-	Sequence uint64 `col:"sequence"`
+	ID            string             `col:"id"`
+	CreationDate  time.Time          `col:"creation_date"`
+	ChangeDate    time.Time          `col:"change_date"`
+	ResourceOwner string             `col:"resource_owner"`
+	State         domain.ActionState `col:"action_state"`
+	Sequence      uint64             `col:"sequence"`
 
 	Name          string        `col:"name"`
 	Script        string        `col:"script"`

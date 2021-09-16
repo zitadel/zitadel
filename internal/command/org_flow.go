@@ -17,8 +17,8 @@ func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, reso
 	if err != nil {
 		return nil, err
 	}
-	if !existingFlow.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-DgGh3", "Errors.Flow.NotFound")
+	if len(existingFlow.Triggers) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-DgGh3", "Errors.Flow.Empty") //TODO: i18n
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
@@ -42,9 +42,6 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 	existingFlow, err := c.getOrgFlowWriteModelByType(ctx, flowType, resourceOwner)
 	if err != nil {
 		return nil, err
-	}
-	if !existingFlow.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgh4h", "Errors.Flow.NotFound")
 	}
 	if reflect.DeepEqual(existingFlow.Triggers[triggerType], actionIDs) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Nfh52", "Errors.Flow.NoChanges")
