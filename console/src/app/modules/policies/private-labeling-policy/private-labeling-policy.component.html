@@ -11,6 +11,10 @@
     <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
     <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
+    <cnsl-info-section *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.private_label'})"></span>
+  </cnsl-info-section>
+
     <div class="spinner-wr">
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
@@ -57,9 +61,10 @@
             </mat-panel-description>
           </mat-expansion-panel-header>
 
-          <p class="description">Your Logo will be used in the Login itself, while the icon is used for smaller UI elements like in the organisation switcher in console</p>
+          <p class="description">{{'POLICY.PRIVATELABELING.USEOFLOGO' | translate}}</p>
           
           <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.MAXSIZE' | translate}}</cnsl-info-section>
+          <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}</cnsl-info-section>
 
           <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           <div class="logo-setup-wrapper">
@@ -242,20 +247,21 @@
 
             <ng-container
         *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false">
-          <cnsl-info-section class="info" type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
-              'label_policy.private_label'})}}
+          <cnsl-info-section [featureLink]="['/org/features']" class="info" type="WARN"
+          >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.private_label'})"></span>
           </cnsl-info-section>
         </ng-container>
 
-        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
+        <mat-slide-toggle class="toggle" color="primary" ngDefaultControl [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) == false"
             [(ngModel)]="previewData.hideLoginNameSuffix" (change)="savePolicy()">
             {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
         </mat-slide-toggle>
 
         <ng-container
         *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) == false">
-          <cnsl-info-section class="info" type="WARN">{{'FEATURES.NOTAVAILABLE' | translate: ({value:
-              'label_policy.watermark'})}}
+          <cnsl-info-section [featureLink]="['/org/features']" class="info" type="WARN">
+              <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.watermark'})"></span>
           </cnsl-info-section>
         </ng-container>
         <mat-slide-toggle class="toggle" color="primary" ngDefaultControl [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) == false"

@@ -1,5 +1,5 @@
 .h1 {
-  margin-top: 0;
+  margin: 0;
 }
 
 h2 {
@@ -17,6 +17,13 @@ h2 {
 .sub {
   color: var(--grey);
   margin-bottom: 2rem;
+  font-size: 14px;
+}
+
+.icon-button {
+  .icon {
+    font-size: 1.2rem;
+  }
 }
 
 .domain {

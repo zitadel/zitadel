@@ -24,6 +24,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { NameDialogModule } from '../../../modules/name-dialog/name-dialog.module';
 import {
   ProjectPrivateLabelingDialogModule,
 } from '../../../modules/project-private-labeling-dialog/project-private-labeling-dialog.module';
@@ -43,6 +44,7 @@ import { OwnedProjectsComponent } from './owned-projects.component';
     OwnedProjectsRoutingModule,
     UserGrantsModule,
     FormsModule,
+    NameDialogModule,
     ReactiveFormsModule,
     TranslateModule,
     AvatarModule,

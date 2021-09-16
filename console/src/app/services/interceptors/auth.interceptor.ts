@@ -17,52 +17,52 @@ const accessTokenStorageKey = 'access_token';
  * Set the authentication token
  */
 export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
-    public triggerDialog: Subject<boolean> = new Subject();
-    constructor(
-        private authenticationService: AuthenticationService,
-        private storageService: StorageService,
-        private dialog: MatDialog,
-    ) {
-        this.triggerDialog.pipe(debounceTime(1000)).subscribe(() => {
-            this.openDialog();
-        });
-    }
+  public triggerDialog: Subject<boolean> = new Subject();
+  constructor(
+    private authenticationService: AuthenticationService,
+    private storageService: StorageService,
+    private dialog: MatDialog,
+  ) {
+    this.triggerDialog.pipe(debounceTime(1000)).subscribe(() => {
+      this.openDialog();
+    });
+  }
 
-    public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
-        await this.authenticationService.authenticationChanged.pipe(
-            filter((authed) => !!authed),
-            first(),
-        ).toPromise();
+  public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
+    await this.authenticationService.authenticationChanged.pipe(
+      filter((authed) => !!authed),
+      first(),
+    ).toPromise();
 
-        const metadata = request.getMetadata();
-        const accessToken = this.storageService.getItem(accessTokenStorageKey);
-        metadata[authorizationKey] = `${bearerPrefix} ${accessToken}`;
+    const metadata = request.getMetadata();
+    const accessToken = this.storageService.getItem(accessTokenStorageKey);
+    metadata[authorizationKey] = `${bearerPrefix} ${accessToken}`;
 
-        return invoker(request).then((response: any) => {
-            return response;
-        }).catch((error: any) => {
-            if (error.code === 16) {
-                this.triggerDialog.next(true);
-            }
-            return Promise.reject(error);
-        });
-    }
+    return invoker(request).then((response: any) => {
+      return response;
+    }).catch((error: any) => {
+      if (error.code === 16) {
+        this.triggerDialog.next(true);
+      }
+      return Promise.reject(error);
+    });
+  }
 
-    private openDialog(): void {
-        const dialogRef = this.dialog.open(WarnDialogComponent, {
-            data: {
-                confirmKey: 'ACTIONS.LOGIN',
-                titleKey: 'ERRORS.TOKENINVALID.TITLE',
-                descriptionKey: 'ERRORS.TOKENINVALID.DESCRIPTION',
-            },
-            disableClose: true,
-            width: '400px',
-        });
+  private openDialog(): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.LOGIN',
+        titleKey: 'ERRORS.TOKENINVALID.TITLE',
+        descriptionKey: 'ERRORS.TOKENINVALID.DESCRIPTION',
+      },
+      disableClose: true,
+      width: '400px',
+    });
 
-        dialogRef.afterClosed().pipe(take(1)).subscribe(resp => {
-            if (resp) {
-                this.authenticationService.authenticate(undefined);
-            }
-        });
-    }
+    dialogRef.afterClosed().pipe(take(1)).subscribe(resp => {
+      if (resp) {
+        this.authenticationService.authenticate(undefined, true);
+      }
+    });
+  }
 }

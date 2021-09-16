@@ -28,6 +28,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 					Scopes:             []string{"email", "profile"},
 					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
 					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					AutoRegister:       true,
 				},
 			},
 		},
@@ -45,6 +46,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 				"OIDCConfig.AuthorizationEndpoint",
 				"OIDCConfig.TokenEndpoint",
 				"Type", //TODO: default (0) is oidc
+				"JWTConfig",
 			)
 		})
 	}
@@ -98,9 +100,10 @@ func Test_updateIDPToDomain(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &admin_pb.UpdateIDPRequest{
-					IdpId:       "13523",
-					Name:        "new name",
-					StylingType: idp.IDPStylingType_STYLING_TYPE_GOOGLE,
+					IdpId:        "13523",
+					Name:         "new name",
+					StylingType:  idp.IDPStylingType_STYLING_TYPE_GOOGLE,
+					AutoRegister: true,
 				},
 			},
 		},
@@ -111,6 +114,7 @@ func Test_updateIDPToDomain(t *testing.T) {
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
 				"OIDCConfig",
+				"JWTConfig",
 				"State",
 				"Type", //TODO: type should not be changeable
 			)

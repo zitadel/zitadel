@@ -299,7 +299,10 @@ Errors:
   AuthRequest:
     NotFound: Could not find authrequest
     UserAgentNotCorresponding: User Agent does not correspond
+    UserAgentNotFound: User Agent ID not found
+    TokenNotFound: Token not found
     RequestTypeNotSupported: Request type is not supported
+    MissingParameters: Required parameters missing
   User:
     NotFound: User could not be found
     Inactive: User is inactive

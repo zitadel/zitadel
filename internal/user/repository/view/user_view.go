@@ -26,7 +26,7 @@ func UserByIDAndResourceOwner(db *gorm.DB, table, userID, resourceOwner string) 
 	user := new(model.UserView)
 	userIDQuery := &model.UserSearchQuery{
 		Key:    usr_model.UserSearchKeyUserID,
-		Method: domain.SearchMethodListContains,
+		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
 	resourceOwnerQuery := &model.UserSearchQuery{

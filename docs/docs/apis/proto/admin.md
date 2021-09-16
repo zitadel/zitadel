@@ -118,6 +118,18 @@ Adds a new oidc identity provider configuration the IAM
     POST: /idps/oidc
 
 
+### AddJWTIDP
+
+> **rpc** AddJWTIDP([AddJWTIDPRequest](#addjwtidprequest))
+[AddJWTIDPResponse](#addjwtidpresponse)
+
+Adds a new jwt identity provider configuration the IAM
+
+
+
+    POST: /idps/jwt
+
+
 ### UpdateIDP
 
 > **rpc** UpdateIDP([UpdateIDPRequest](#updateidprequest))
@@ -180,6 +192,19 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
     PUT: /idps/{idp_id}/oidc_config
+
+
+### UpdateIDPJWTConfig
+
+> **rpc** UpdateIDPJWTConfig([UpdateIDPJWTConfigRequest](#updateidpjwtconfigrequest))
+[UpdateIDPJWTConfigResponse](#updateidpjwtconfigresponse)
+
+Updates the jwt configuration of the specified idp
+all fields are updated. If no value is provided the field will be empty afterwards.
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
 
 
 ### GetDefaultFeatures
@@ -1165,6 +1190,35 @@ This is an empty request
 
 
 
+### AddJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddMultiFactorToLoginPolicyRequest
 
 
@@ -1201,6 +1255,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -2507,6 +2562,7 @@ This is an empty request
 | metadata_user |  bool | - |  |
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2695,6 +2751,7 @@ This is an empty request
 | metadata_user |  bool | - |  |
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2848,6 +2905,32 @@ This is an empty request
 
 
 
+### UpdateIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateIDPOIDCConfigRequest
 
 
@@ -2885,6 +2968,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 

@@ -42,6 +42,21 @@ func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest
 	}, nil
 }
 
+func (s *Server) AddJWTIDP(ctx context.Context, req *admin_pb.AddJWTIDPRequest) (*admin_pb.AddJWTIDPResponse, error) {
+	config, err := s.command.AddDefaultIDPConfig(ctx, addJWTIDPRequestToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddJWTIDPResponse{
+		IdpId: config.IDPConfigID,
+		Details: object_pb.AddToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) (*admin_pb.UpdateIDPResponse, error) {
 	config, err := s.command.ChangeDefaultIDPConfig(ctx, updateIDPToDomain(req))
 	if err != nil {
@@ -94,6 +109,20 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 		return nil, err
 	}
 	return &admin_pb.UpdateIDPOIDCConfigResponse{
+		Details: object_pb.ChangeToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDPJWTConfigRequest) (*admin_pb.UpdateIDPJWTConfigResponse, error) {
+	config, err := s.command.ChangeDefaultIDPJWTConfig(ctx, updateJWTConfigToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateIDPJWTConfigResponse{
 		Details: object_pb.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
