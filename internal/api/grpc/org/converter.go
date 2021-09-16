@@ -4,7 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/query"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	org_pb "github.com/caos/zitadel/pkg/grpc/org"
@@ -135,14 +134,6 @@ func DomainQueryToModel(searchQuery *org_pb.DomainSearchQuery) (query.SearchQuer
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}
-}
-
-func DomainNameQueryToModel(query *org_pb.DomainNameQuery) (*org_model.OrgDomainSearchQuery, error) {
-	return &org_model.OrgDomainSearchQuery{
-		Key:    org_model.OrgDomainSearchKeyDomain,
-		Method: object.TextMethodToModel(query.Method),
-		Value:  query.Name,
-	}, nil
 }
 
 func DomainsToPb(domains []*query.Domain) []*org_pb.Domain {
