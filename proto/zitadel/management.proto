@@ -2712,19 +2712,6 @@ service ManagementService {
         };
     }
 
-    // Change JWT identity provider configuration of the organisation
-    rpc UpdateOrgIDPJWTConfig(UpdateOrgIDPJWTConfigRequest) returns (UpdateOrgIDPJWTConfigResponse) {
-        option (google.api.http) = {
-            put: "/idps/{idp_id}/jwt_config"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
-            feature: "login_policy.idp"
-        };
-    }
-
     rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
         option (google.api.http) = {
             post: "/actions/_search"
