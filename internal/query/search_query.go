@@ -8,6 +8,11 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
+type SearchResponse struct {
+	Count uint64
+	*LatestSequence
+}
+
 type SearchRequest struct {
 	Offset        uint64
 	Limit         uint64

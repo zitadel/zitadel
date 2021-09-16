@@ -85,8 +85,10 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 			}
 
 			return &Orgs{
-				Orgs:  orgs,
-				Count: count,
+				Orgs: orgs,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
 			}, nil
 		}
 }
@@ -167,9 +169,8 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 }
 
 type Orgs struct {
-	Count uint64
-	Orgs  []*Org
-	*LatestSequence
+	SearchResponse
+	Orgs []*Org
 }
 
 type Org struct {
