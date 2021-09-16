@@ -54,13 +54,16 @@ func (p *ProjectProjection) reducers() []handler.AggregateReducer {
 type projectState int8
 
 const (
-	projectIDCol           = "id"
-	projectNameCol         = "name"
-	projectCreationDateCol = "creation_date"
-	projectChangeDateCol   = "change_date"
-	projectOwnerCol        = "owner_id"
-	projectCreatorCol      = "creator_id"
-	projectStateCol        = "state"
+	projectIDCol                   = "id"
+	projectNameCol                 = "name"
+	projectProjectRoleAssertionCol = "project_role_assertion"
+	projectProjectRoleCheckCol     = "project_role_check"
+	projectHasProjectCheckCol      = "has_project_check"
+	projectCreationDateCol         = "creation_date"
+	projectChangeDateCol           = "change_date"
+	projectOwnerCol                = "owner_id"
+	projectCreatorCol              = "creator_id"
+	projectStateCol                = "state"
 
 	projectActive projectState = iota
 	projectInactive
@@ -74,6 +77,9 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) (*h
 		[]handler.Column{
 			handler.NewCol(projectIDCol, e.Aggregate().ID),
 			handler.NewCol(projectNameCol, e.Name),
+			handler.NewCol(projectProjectRoleAssertionCol, e.ProjectRoleAssertion),
+			handler.NewCol(projectProjectRoleCheckCol, e.ProjectRoleCheck),
+			handler.NewCol(projectHasProjectCheckCol, e.HasProjectCheck),
 			handler.NewCol(projectCreationDateCol, e.CreationDate()),
 			handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			handler.NewCol(projectOwnerCol, e.Aggregate().ResourceOwner),
@@ -94,6 +100,9 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 		e,
 		[]handler.Column{
 			handler.NewCol(projectNameCol, e.Name),
+			handler.NewCol(projectProjectRoleAssertionCol, e.ProjectRoleAssertion),
+			handler.NewCol(projectProjectRoleCheckCol, e.ProjectRoleCheck),
+			handler.NewCol(projectHasProjectCheckCol, e.HasProjectCheck),
 			handler.NewCol(projectChangeDateCol, e.CreationDate()),
 		},
 		[]handler.Condition{

@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
 )
@@ -98,17 +99,18 @@ func UpdateProjectMemberRequestToDomain(req *mgmt_pb.UpdateProjectMemberRequest)
 	return domain.NewMember(req.ProjectId, req.UserId, req.Roles...)
 }
 
-func ListProjectsRequestToModel(req *mgmt_pb.ListProjectsRequest) (*proj_model.ProjectViewSearchRequest, error) {
+func listProjectRequestToModel(req *mgmt_pb.ListProjectsRequest) (*query.ProjectSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.ProjectQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectViewSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }

@@ -12,12 +12,12 @@ import (
 )
 
 func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByIDRequest) (*mgmt_pb.GetProjectByIDResponse, error) {
-	project, err := s.project.ProjectByID(ctx, req.Id)
+	project, err := s.query.ProjectByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetProjectByIDResponse{
-		Project: project_grpc.ProjectToPb(project),
+		Project: project_grpc.ProjectViewToPb(project),
 	}, nil
 }
 
@@ -32,19 +32,22 @@ func (s *Server) GetGrantedProjectByID(ctx context.Context, req *mgmt_pb.GetGran
 }
 
 func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequest) (*mgmt_pb.ListProjectsResponse, error) {
-	queries, err := ListProjectsRequestToModel(req)
+	queries, err := listProjectRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
-	projects, err := s.project.SearchProjects(ctx, queries)
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	projects, err := s.query.SearchProjects(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectsResponse{
-		Result: project_grpc.ProjectsToPb(projects.Result),
+		Result: project_grpc.ProjectViewsToPb(projects.Projects),
 		Details: object_grpc.ToListDetails(
-			projects.TotalResult,
+			projects.Count,
 			projects.Sequence,
 			projects.Timestamp,
 		),

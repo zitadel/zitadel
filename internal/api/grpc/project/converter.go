@@ -1,23 +1,53 @@
 package project
 
 import (
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
 )
 
-func ProjectToPb(project *proj_model.ProjectView) *proj_pb.Project {
+func ProjectViewsToPb(projects []*query.Project) []*proj_pb.Project {
+	o := make([]*proj_pb.Project, len(projects))
+	for i, org := range projects {
+		o[i] = ProjectViewToPb(org)
+	}
+	return o
+}
+
+func ProjectViewToPb(project *query.Project) *proj_pb.Project {
 	return &proj_pb.Project{
-		Id:                     project.ProjectID,
-		Details:                object_grpc.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
-		Name:                   project.Name,
-		State:                  projectStateToPb(project.State),
-		ProjectRoleAssertion:   project.ProjectRoleAssertion,
-		ProjectRoleCheck:       project.ProjectRoleCheck,
-		HasProjectCheck:        project.HasProjectCheck,
-		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
+		Id:    project.ID,
+		State: projectStateToPb(project.State),
+		Name:  project.Name,
+		Details: object.ToViewDetailsPb(
+			project.Sequence,
+			project.CreationDate,
+			project.ChangeDate,
+			project.ResourceOwner,
+		),
+	}
+}
+
+func ProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = ProjectQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func ProjectQueryToModel(apiQuery *proj_pb.ProjectQuery) (query.SearchQuery, error) {
+	switch q := apiQuery.Query.(type) {
+	case *proj_pb.ProjectQuery_NameQuery:
+		return query.NewProjectNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -25,7 +55,7 @@ func GrantedProjectToPb(project *proj_model.ProjectGrantView) *proj_pb.GrantedPr
 	return &proj_pb.GrantedProject{
 		GrantId:          project.GrantID,
 		ProjectId:        project.ProjectID,
-		Details:          object_grpc.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
+		Details:          object.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
 		ProjectName:      project.Name,
 		State:            grantedProjectStateToPb(project.State),
 		ProjectOwnerId:   project.ResourceOwner,
@@ -36,14 +66,6 @@ func GrantedProjectToPb(project *proj_model.ProjectGrantView) *proj_pb.GrantedPr
 	}
 }
 
-func ProjectsToPb(projects []*proj_model.ProjectView) []*proj_pb.Project {
-	p := make([]*proj_pb.Project, len(projects))
-	for i, project := range projects {
-		p[i] = ProjectToPb(project)
-	}
-	return p
-}
-
 func GrantedProjectsToPb(projects []*proj_model.ProjectGrantView) []*proj_pb.GrantedProject {
 	p := make([]*proj_pb.GrantedProject, len(projects))
 	for i, project := range projects {
@@ -52,11 +74,11 @@ func GrantedProjectsToPb(projects []*proj_model.ProjectGrantView) []*proj_pb.Gra
 	return p
 }
 
-func projectStateToPb(state proj_model.ProjectState) proj_pb.ProjectState {
+func projectStateToPb(state domain.ProjectState) proj_pb.ProjectState {
 	switch state {
-	case proj_model.ProjectStateActive:
+	case domain.ProjectStateActive:
 		return proj_pb.ProjectState_PROJECT_STATE_ACTIVE
-	case proj_model.ProjectStateInactive:
+	case domain.ProjectStateInactive:
 		return proj_pb.ProjectState_PROJECT_STATE_INACTIVE
 	default:
 		return proj_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
@@ -85,34 +107,6 @@ func grantedProjectStateToPb(state proj_model.ProjectState) proj_pb.ProjectGrant
 	}
 }
 
-func ProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []*proj_model.ProjectViewSearchQuery, err error) {
-	q := make([]*proj_model.ProjectViewSearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = ProjectQueryToModel(query)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return q, nil
-}
-
-func ProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.ProjectViewSearchQuery, error) {
-	switch q := query.Query.(type) {
-	case *proj_pb.ProjectQuery_NameQuery:
-		return ProjectQueryNameToModel(q.NameQuery), nil
-	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
-	}
-}
-
-func ProjectQueryNameToModel(query *proj_pb.ProjectNameQuery) *proj_model.ProjectViewSearchQuery {
-	return &proj_model.ProjectViewSearchQuery{
-		Key:    proj_model.ProjectViewSearchKeyName,
-		Method: object_grpc.TextMethodToModel(query.Method),
-		Value:  query.Name,
-	}
-}
-
 func GrantedProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []*proj_model.ProjectGrantViewSearchQuery, err error) {
 	q := make([]*proj_model.ProjectGrantViewSearchQuery, len(queries))
 	for i, query := range queries {
@@ -136,7 +130,7 @@ func GrantedProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.Projec
 func GrantedProjectQueryNameToModel(query *proj_pb.ProjectNameQuery) *proj_model.ProjectGrantViewSearchQuery {
 	return &proj_model.ProjectGrantViewSearchQuery{
 		Key:    proj_model.GrantedProjectSearchKeyName,
-		Method: object_grpc.TextMethodToModel(query.Method),
+		Method: object.TextMethodToModel(query.Method),
 		Value:  query.Name,
 	}
 }
@@ -166,7 +160,7 @@ func RoleQueryToModel(query *proj_pb.RoleQuery) (*proj_model.ProjectRoleSearchQu
 func RoleQueryKeyToModel(query *proj_pb.RoleKeyQuery) *proj_model.ProjectRoleSearchQuery {
 	return &proj_model.ProjectRoleSearchQuery{
 		Key:    proj_model.ProjectRoleSearchKeyKey,
-		Method: object_grpc.TextMethodToModel(query.Method),
+		Method: object.TextMethodToModel(query.Method),
 		Value:  query.Key,
 	}
 }
@@ -174,7 +168,7 @@ func RoleQueryKeyToModel(query *proj_pb.RoleKeyQuery) *proj_model.ProjectRoleSea
 func RoleQueryDisplayNameToModel(query *proj_pb.RoleDisplayNameQuery) *proj_model.ProjectRoleSearchQuery {
 	return &proj_model.ProjectRoleSearchQuery{
 		Key:    proj_model.ProjectRoleSearchKeyDisplayName,
-		Method: object_grpc.TextMethodToModel(query.Method),
+		Method: object.TextMethodToModel(query.Method),
 		Value:  query.DisplayName,
 	}
 }
@@ -190,7 +184,7 @@ func RolesToPb(roles []*proj_model.ProjectRoleView) []*proj_pb.Role {
 func RoleToPb(role *proj_model.ProjectRoleView) *proj_pb.Role {
 	return &proj_pb.Role{
 		Key:         role.Key,
-		Details:     object_grpc.ToViewDetailsPb(role.Sequence, role.CreationDate, role.ChangeDate, role.ResourceOwner),
+		Details:     object.ToViewDetailsPb(role.Sequence, role.CreationDate, role.ChangeDate, role.ResourceOwner),
 		DisplayName: role.DisplayName,
 		Group:       role.Group,
 	}

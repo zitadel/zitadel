@@ -36,6 +36,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 
 	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
+	NewProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
 	owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
 	return nil
 }
