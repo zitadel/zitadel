@@ -7,7 +7,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -23,7 +22,7 @@ import (
 func TestCommandSide_AddLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore    *eventstore.Eventstore
-		tokenVerifier *authz.TokenVerifier
+		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
 		ctx    context.Context
@@ -260,7 +259,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore    *eventstore.Eventstore
-		tokenVerifier *authz.TokenVerifier
+		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
 		ctx    context.Context
