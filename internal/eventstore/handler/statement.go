@@ -40,8 +40,9 @@ type Executer interface {
 }
 
 type Column struct {
-	Name  string
-	Value interface{}
+	Name         string
+	Value        interface{}
+	ParameterOpt func(string) string
 }
 
 func NewCol(name string, value interface{}) Column {
