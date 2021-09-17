@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -47,6 +48,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "errors.projects.not_found")
 				}
+				fmt.Printf("error: ", err.Error())
 				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "errors.internal")
 			}
 			return p, nil
@@ -230,7 +232,7 @@ func (c ProjectColumn) toColumnName() string {
 	case ProjectColumnResourceOwner:
 		return "resource_owner"
 	case ProjectColumnState:
-		return "project_state"
+		return "state"
 	case ProjectColumnSequence:
 		return "sequence"
 	case ProjectColumnName:

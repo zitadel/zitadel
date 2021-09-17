@@ -59,11 +59,13 @@ const (
 	projectProjectRoleAssertionCol = "project_role_assertion"
 	projectProjectRoleCheckCol     = "project_role_check"
 	projectHasProjectCheckCol      = "has_project_check"
+	projectPrivateLabelingCol      = "private_labeling_setting"
 	projectCreationDateCol         = "creation_date"
 	projectChangeDateCol           = "change_date"
-	projectOwnerCol                = "owner_id"
+	projectOwnerCol                = "resource_owner"
 	projectCreatorCol              = "creator_id"
 	projectStateCol                = "state"
+	projectSequenceCol             = "sequence"
 
 	projectActive projectState = iota
 	projectInactive
@@ -80,11 +82,13 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) (*h
 			handler.NewCol(projectProjectRoleAssertionCol, e.ProjectRoleAssertion),
 			handler.NewCol(projectProjectRoleCheckCol, e.ProjectRoleCheck),
 			handler.NewCol(projectHasProjectCheckCol, e.HasProjectCheck),
+			handler.NewCol(projectPrivateLabelingCol, e.PrivateLabelingSetting),
 			handler.NewCol(projectCreationDateCol, e.CreationDate()),
 			handler.NewCol(projectChangeDateCol, e.CreationDate()),
 			handler.NewCol(projectOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(projectCreatorCol, e.EditorUser()),
 			handler.NewCol(projectStateCol, projectActive),
+			handler.NewCol(projectSequenceCol, e.Sequence()),
 		},
 	), nil
 }
@@ -103,6 +107,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 			handler.NewCol(projectProjectRoleAssertionCol, e.ProjectRoleAssertion),
 			handler.NewCol(projectProjectRoleCheckCol, e.ProjectRoleCheck),
 			handler.NewCol(projectHasProjectCheckCol, e.HasProjectCheck),
+			handler.NewCol(projectPrivateLabelingCol, e.PrivateLabelingSetting),
 			handler.NewCol(projectChangeDateCol, e.CreationDate()),
 		},
 		[]handler.Condition{
