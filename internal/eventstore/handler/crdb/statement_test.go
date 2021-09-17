@@ -1015,3 +1015,46 @@ func Test_columnsToWhere(t *testing.T) {
 		})
 	}
 }
+
+func TestParameterOpts(t *testing.T) {
+	type args struct {
+		column      string
+		value       interface{}
+		placeholder string
+	}
+	tests := []struct {
+		name        string
+		args        args
+		constructor func(column string, value interface{}) handler.Column
+		want        string
+	}{
+		{
+			name: "NewArrayAppendCol",
+			args: args{
+				column:      "testCol",
+				value:       "val",
+				placeholder: "$1",
+			},
+			constructor: NewArrayAppendCol,
+			want:        "array_append(testCol, $1)",
+		},
+		{
+			name: "NewArrayRemoveCol",
+			args: args{
+				column:      "testCol",
+				value:       "val",
+				placeholder: "$1",
+			},
+			constructor: NewArrayRemoveCol,
+			want:        "array_remove(testCol, $1)",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			col := tt.constructor(tt.args.column, tt.args.value)
+			if param := col.ParameterOpt(tt.args.placeholder); param != tt.want {
+				t.Errorf("constructor() = %v, want %v", param, tt.want)
+			}
+		})
+	}
+}
