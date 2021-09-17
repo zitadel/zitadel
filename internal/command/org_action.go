@@ -11,7 +11,7 @@ import (
 
 func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
 	if !addAction.IsValid() {
-		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid") //TODO: i18n
+		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
 	}
 	addAction.AggregateID, err = c.idGenerator.Next()
 	if err != nil {
@@ -40,7 +40,7 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 
 func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action, resourceOwner string) (*domain.ObjectDetails, error) {
 	if !actionChange.IsValid() || actionChange.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Df2f3", "Errors.Action.Invalid") //TODO: i18n
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Df2f3", "Errors.Action.Invalid")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionChange.AggregateID, resourceOwner)
@@ -48,7 +48,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 		return nil, err
 	}
 	if !existingAction.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound") //TODO: i18n
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound")
 	}
 
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
@@ -75,7 +75,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 
 func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-DAhk5", "Errors.Action.ActionIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-DAhk5", "Errors.IDMissing")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
@@ -105,7 +105,7 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 
 func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-BNm56", "Errors.Action.ActionIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-BNm56", "Errors.IDMissing")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
@@ -135,7 +135,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 
 func (c *Commands) DeleteAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.Action.ActionIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
