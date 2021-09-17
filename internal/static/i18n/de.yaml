@@ -365,6 +365,11 @@ Errors:
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig
     KeyNotExisting: Ein oder mehrere Keys existiert nicht
+  Action:
+    Invalid: Action ist ungültig
+    NotFound: Action wurde nicht gefunden
+    NotActive: Action ist nicht aktiv
+    NotInactive: Action ist nicht inaktiv
 EventTypes:
   user:
     added: Benutzer hinzugefügt

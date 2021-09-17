@@ -365,6 +365,11 @@ Errors:
     NoData: Metadata list is empty
     Invalid: Metadata is invalid
     KeyNotExisting: One or more keys do not exist
+  Action:
+    Invalid: Action is invalid
+    NotFound: Action not found
+    NotActive: Action is not active
+    NotInactive: Action is not inactive
 EventTypes:
   user:
     added: User added
