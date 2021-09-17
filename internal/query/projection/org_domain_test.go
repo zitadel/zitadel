@@ -71,12 +71,13 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, validation_type) = ($1, $2, $3) WHERE (domain = $4)",
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, validation_type) = ($1, $2, $3) WHERE (domain = $4) AND (org_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.OrgDomainValidationTypeDNS,
 								"domain.new",
+								"agg-id",
 							},
 						},
 					},
@@ -100,12 +101,13 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_verified) = ($1, $2, $3) WHERE (domain = $4)",
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_verified) = ($1, $2, $3) WHERE (domain = $4) AND (org_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
 								"domain.new",
+								"agg-id",
 							},
 						},
 					},
@@ -134,17 +136,18 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								false,
-								"ro-id",
+								"agg-id",
 								true,
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_primary) = ($1, $2, $3) WHERE (domain = $4)",
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, is_primary) = ($1, $2, $3) WHERE (domain = $4) AND (org_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
 								"domain.new",
+								"agg-id",
 							},
 						},
 					},
@@ -168,9 +171,10 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.orgs WHERE (domain = $1)",
+							expectedStmt: "DELETE FROM zitadel.projections.orgs WHERE (domain = $1) AND (org_id = $2)",
 							expectedArgs: []interface{}{
 								"domain.new",
+								"agg-id",
 							},
 						},
 					},

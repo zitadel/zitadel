@@ -106,6 +106,7 @@ func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 		},
 		[]handler.Condition{
 			handler.NewCond(domainDomainCol, e.Domain),
+			handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -125,6 +126,7 @@ func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.EventReader)
 		},
 		[]handler.Condition{
 			handler.NewCond(domainDomainCol, e.Domain),
+			handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -144,7 +146,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.EventReade
 				handler.NewCol(domainIsPrimaryCol, false),
 			},
 			[]handler.Condition{
-				handler.NewCond(domainOrgIDCol, e.Aggregate().ResourceOwner),
+				handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
 				handler.NewCond(domainIsPrimaryCol, true),
 			},
 		),
@@ -156,6 +158,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.EventReade
 			},
 			[]handler.Condition{
 				handler.NewCond(domainDomainCol, e.Domain),
+				handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
 			},
 		),
 	), nil
@@ -171,6 +174,7 @@ func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.EventReader) 
 		e,
 		[]handler.Condition{
 			handler.NewCond(domainDomainCol, e.Domain),
+			handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
