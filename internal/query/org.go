@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -100,7 +99,6 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
-				log.Println("org2: ", err)
 				return false, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
 			}
 			return isUnique, err

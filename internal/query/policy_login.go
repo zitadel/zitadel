@@ -34,6 +34,16 @@ type LoginPolicy struct {
 	HidePasswordReset     bool
 }
 
+type SecondFactors struct {
+	SearchResponse
+	Factors []domain.SecondFactorType
+}
+
+type MultiFactors struct {
+	SearchResponse
+	Factors []domain.MultiFactorType
+}
+
 const (
 	LoginPolicyColumnOrgID LoginPolicyColumn = iota + 1
 	LoginPolicyColumnCreationDate
@@ -78,6 +88,74 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) 
 	}).OrderBy(LoginPolicyColumnIsDefault.toColumnName()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "unable to create sql stmt")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) SecondFactorsByID(ctx context.Context, orgID string) (*SecondFactors, error) {
+	query, scan := prepareLoginPolicy2FAsQuery()
+	stmt, args, err := query.Where(
+		sq.Or{
+			sq.Eq{
+				LoginPolicyColumnOrgID.toColumnName(): orgID,
+			},
+			sq.Eq{
+				LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+			},
+		}).
+		OrderBy(LoginPolicyColumnIsDefault.toColumnName()).
+		Limit(1).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "unable to create sql stmt")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, error) {
+	query, scan := prepareLoginPolicy2FAsQuery()
+	stmt, args, err := query.Where(sq.Eq{
+		LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+	}).OrderBy(LoginPolicyColumnIsDefault.toColumnName()).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "unable to create sql stmt")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFactors, error) {
+	query, scan := prepareLoginPolicyMFAsQuery()
+	stmt, args, err := query.Where(
+		sq.Or{
+			sq.Eq{
+				LoginPolicyColumnOrgID.toColumnName(): orgID,
+			},
+			sq.Eq{
+				LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+			},
+		}).
+		OrderBy(LoginPolicyColumnIsDefault.toColumnName()).
+		Limit(1).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "unable to create sql stmt")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error) {
+	query, scan := prepareLoginPolicyMFAsQuery()
+	stmt, args, err := query.Where(sq.Eq{
+		LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+	}).OrderBy(LoginPolicyColumnIsDefault.toColumnName()).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "unable to create sql stmt")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -133,6 +211,60 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			p.SecondFactors = make([]domain.SecondFactorType, len(secondFactors))
 			for i, mfa := range secondFactors {
 				p.SecondFactors[i] = domain.SecondFactorType(mfa)
+			}
+			return p, nil
+		}
+}
+
+func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFactors, error)) {
+	return sq.Select(
+			LoginPolicyColumnSequence.toColumnName(),
+			LoginPolicyColumnSecondFactors.toColumnName(),
+		).From(loginPoliciesTable).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*SecondFactors, error) {
+			p := new(SecondFactors)
+			secondFactors := pq.Int32Array{}
+			err := row.Scan(
+				&p.Sequence,
+				&secondFactors,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "errors.login_policy.not_found")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "errors.internal")
+			}
+
+			p.Factors = make([]domain.SecondFactorType, len(secondFactors))
+			for i, mfa := range secondFactors {
+				p.Factors[i] = domain.SecondFactorType(mfa)
+			}
+			return p, nil
+		}
+}
+
+func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFactors, error)) {
+	return sq.Select(
+			LoginPolicyColumnSequence.toColumnName(),
+			LoginPolicyColumnMultiFactors.toColumnName(),
+		).From(loginPoliciesTable).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*MultiFactors, error) {
+			p := new(MultiFactors)
+			multiFactors := pq.Int32Array{}
+			err := row.Scan(
+				&p.Sequence,
+				&multiFactors,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "errors.login_policy.not_found")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "errors.internal")
+			}
+
+			p.Factors = make([]domain.MultiFactorType, len(multiFactors))
+			for i, mfa := range multiFactors {
+				p.Factors[i] = domain.MultiFactorType(mfa)
 			}
 			return p, nil
 		}

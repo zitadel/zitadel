@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/idp"
@@ -109,14 +108,13 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.Remo
 }
 
 func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicySecondFactorsRequest) (*mgmt_pb.ListLoginPolicySecondFactorsResponse, error) {
-	result, err := s.org.SearchSecondFactors(ctx)
+	result, err := s.query.SecondFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListLoginPolicySecondFactorsResponse{
-		//TODO: missing values from res
-		Details: object.ToListDetails(result.TotalResult, 0, time.Time{}),
-		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Result),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Factors),
 	}, nil
 }
 
@@ -141,14 +139,13 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgm
 }
 
 func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicyMultiFactorsRequest) (*mgmt_pb.ListLoginPolicyMultiFactorsResponse, error) {
-	res, err := s.org.SearchMultiFactors(ctx)
+	res, err := s.query.MultiFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListLoginPolicyMultiFactorsResponse{
-		//TODO: additional values
-		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Result),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Factors),
 	}, nil
 }
 

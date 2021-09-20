@@ -167,28 +167,6 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 	return result, nil
 }
 
-func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
-	policy, err := repo.Query.DefaultLoginPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.SecondFactorsSearchResponse{
-		TotalResult: uint64(len(policy.SecondFactors)),
-		Result:      policy.SecondFactors,
-	}, nil
-}
-
-func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
-	policy, err := repo.Query.DefaultLoginPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.MultiFactorsSearchResponse{
-		TotalResult: uint64(len(policy.MultiFactors)),
-		Result:      policy.MultiFactors,
-	}, nil
-}
-
 func (repo *IAMRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
 	policy, viewErr := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {

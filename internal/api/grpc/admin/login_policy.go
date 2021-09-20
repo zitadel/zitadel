@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/api/grpc/user"
 
@@ -75,14 +74,13 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.Rem
 }
 
 func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb.ListLoginPolicySecondFactorsRequest) (*admin_pb.ListLoginPolicySecondFactorsResponse, error) {
-	result, err := s.iam.SearchDefaultSecondFactors(ctx)
+	result, err := s.query.DefaultSecondFactors(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicySecondFactorsResponse{
-		//TODO: missing values from res
-		Details: object.ToListDetails(result.TotalResult, 0, time.Time{}),
-		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Result),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Factors),
 	}, nil
 }
 
@@ -107,14 +105,13 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *adm
 }
 
 func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.ListLoginPolicyMultiFactorsRequest) (*admin_pb.ListLoginPolicyMultiFactorsResponse, error) {
-	res, err := s.iam.SearchDefaultMultiFactors(ctx)
+	res, err := s.query.DefaultMultiFactors(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicyMultiFactorsResponse{
-		//TODO: additional values
-		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Result),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Factors),
 	}, nil
 }
 

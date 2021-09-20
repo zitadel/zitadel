@@ -285,28 +285,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	return result, nil
 }
 
-func (repo *OrgRepository) SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
-	policy, err := repo.Query.LoginPolicyByID(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.SecondFactorsSearchResponse{
-		TotalResult: uint64(len(policy.SecondFactors)),
-		Result:      policy.SecondFactors,
-	}, nil
-}
-
-func (repo *OrgRepository) SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
-	policy, err := repo.Query.LoginPolicyByID(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.MultiFactorsSearchResponse{
-		TotalResult: uint64(len(policy.MultiFactors)),
-		Result:      policy.MultiFactors,
-	}, nil
-}
-
 func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
 	policy, viewErr := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
