@@ -187,7 +187,7 @@ func NewProjectNameSearchQuery(method TextComparison, value string) (SearchQuery
 }
 
 func NewProjectResourceOwnerSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectColumnName, value, method)
+	return NewTextQuery(ProjectColumnResourceOwner, value, method)
 }
 
 func (q *ProjectSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
