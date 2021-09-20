@@ -42,18 +42,6 @@ func (p *LoginPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  org.LoginPolicyChangedEventType,
 					Reduce: p.reduceLoginPolicyChanged,
 				},
-				// {
-				// 	Event:  org.LoginPolicyIDPProviderAddedEventType,
-				// 	Reduce: p.reduceIDPAddedEvent,
-				// },
-				// {
-				// 	Event:  org.LoginPolicyIDPProviderCascadeRemovedEventType,
-				// 	Reduce: p.reduceIDPCascadeRemoved,
-				// },
-				// {
-				// 	Event:  org.LoginPolicyIDPProviderRemovedEventType,
-				// 	Reduce: p.reduceIDPRemoved,
-				// },
 				{
 					Event:  org.LoginPolicyMultiFactorAddedEventType,
 					Reduce: p.reduceMFAAdded,
@@ -87,18 +75,6 @@ func (p *LoginPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  iam.LoginPolicyChangedEventType,
 					Reduce: p.reduceLoginPolicyChanged,
 				},
-				// {
-				// 	Event:  iam.LoginPolicyIDPProviderAddedEventType,
-				// 	Reduce: p.reduceIDPAddedEvent,
-				// },
-				// {
-				// 	Event:  iam.LoginPolicyIDPProviderCascadeRemovedEventType,
-				// 	Reduce: p.reduceIDPCascadeRemoved,
-				// },
-				// {
-				// 	Event:  iam.LoginPolicyIDPProviderRemovedEventType,
-				// 	Reduce: p.reduceIDPRemoved,
-				// },
 				{
 					Event:  iam.LoginPolicyMultiFactorAddedEventType,
 					Reduce: p.reduceMFAAdded,
@@ -205,20 +181,35 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.EventR
 				// handler.NewCond(loginPolicyIsDefaultCol, true),
 			},
 		), nil
-	case *org.OrgIAMPolicyChangedEvent:
-		if e.UserLoginMustBeDomain == nil {
-			return crdb.NewNoOpStatement(e), nil
+	case *org.LoginPolicyChangedEvent:
+		cols := []handler.Column{
+			handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(loginPolicySequenceCol, e.Sequence()),
+		}
+		if e.AllowRegister != nil {
+			cols = append(cols, handler.NewCol(loginPolicyAllowRegisterCol, *e.AllowRegister))
+		}
+		if e.AllowUserNamePassword != nil {
+			cols = append(cols, handler.NewCol(loginPolicyAllowUserNamePasswordCol, *e.AllowUserNamePassword))
+		}
+		if e.AllowExternalIDP != nil {
+			cols = append(cols, handler.NewCol(loginPolicyAllowExternalIDPsCol, *e.AllowExternalIDP))
+		}
+		if e.ForceMFA != nil {
+			cols = append(cols, handler.NewCol(loginPolicyForceMFACol, *e.ForceMFA))
+		}
+		if e.PasswordlessType != nil {
+			cols = append(cols, handler.NewCol(loginPolicyPasswordlessTypeCol, *e.PasswordlessType))
+		}
+		if e.HidePasswordReset != nil {
+			cols = append(cols, handler.NewCol(loginPolicyHidePWResetCol, *e.HidePasswordReset))
 		}
 		return crdb.NewUpdateStatement(
 			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				handler.NewCol(loginPolicyAllowRegisterCol, *e.UserLoginMustBeDomain),
-			},
+			cols,
 			[]handler.Condition{
 				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, false),
+				// handler.NewCond(loginPolicyIsDefaultCol, true),
 			},
 		), nil
 	default:
@@ -226,45 +217,6 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.EventR
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BpaO6", "reduce.wrong.event.type")
 	}
 }
-
-// func (p *LoginPolicyProjection) reduceIDPAddedEvent(event eventstore.EventReader) (*handler.Statement, error) {
-// 	switch e := event.(type) {
-// 	case *iam.IdentityProviderAddedEvent:
-// 		_ = e
-// 		return nil, nil
-// 	case *org.IdentityProviderAddedEvent:
-// 		return nil, nil
-// 	default:
-// 		logging.LogWithFields("HANDL-CtSYI", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, iam.LoginPolicyIDPProviderAddedEventType}).Error("wrong event type")
-// 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DV2XO", "reduce.wrong.event.type")
-// 	}
-// }
-
-// func (p *LoginPolicyProjection) reduceIDPRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-// 	switch e := event.(type) {
-// 	case *iam.IdentityProviderRemovedEvent:
-// 		_ = e
-// 		return nil, nil
-// 	case *org.IdentityProviderRemovedEvent:
-// 		return nil, nil
-// 	default:
-// 		logging.LogWithFields("HANDL-I4RWX", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, iam.LoginPolicyIDPProviderRemovedEventType}).Error("wrong event type")
-// 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-PD2l4", "reduce.wrong.event.type")
-// 	}
-// }
-
-// func (p *LoginPolicyProjection) reduceIDPCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-// 	switch e := event.(type) {
-// 	case *iam.IdentityProviderCascadeRemovedEvent:
-// 		_ = e
-// 		return nil, nil
-// 	case *org.IdentityProviderCascadeRemovedEvent:
-// 		return nil, nil
-// 	default:
-// 		logging.LogWithFields("HANDL-IKmF9", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, iam.LoginPolicyIDPProviderCascadeRemovedEventType}).Error("wrong event type")
-// 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GYuEp", "reduce.wrong.event.type")
-// 	}
-// }
 
 func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	switch e := event.(type) {

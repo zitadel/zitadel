@@ -51,6 +51,7 @@ type wantReduce struct {
 	previousSequence uint64
 	executer         *testExecuter
 	err              func(error) bool
+	projectionName   string
 }
 
 func assertReduce(t *testing.T, stmt *handler.Statement, err error, want wantReduce) {
@@ -63,21 +64,21 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, want wantRed
 		return
 	}
 	if stmt.AggregateType != want.aggregateType {
-		t.Errorf("wront aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
+		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
 	}
 
 	if stmt.PreviousSequence != want.previousSequence {
-		t.Errorf("wront previous sequence: want: %d got: %d", want.previousSequence, stmt.PreviousSequence)
+		t.Errorf("wrong previous sequence: want: %d got: %d", want.previousSequence, stmt.PreviousSequence)
 	}
 
 	if stmt.Sequence != want.sequence {
-		t.Errorf("wront sequence: want: %d got: %d", want.sequence, stmt.Sequence)
+		t.Errorf("wrong sequence: want: %d got: %d", want.sequence, stmt.Sequence)
 	}
 	if stmt.Execute == nil {
 		want.executer.Validate(t)
 		return
 	}
-	err = stmt.Execute(want.executer, orgProjection)
+	err = stmt.Execute(want.executer, want.projectionName)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

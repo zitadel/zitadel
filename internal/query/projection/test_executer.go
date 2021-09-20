@@ -2,6 +2,7 @@ package projection
 
 import (
 	"database/sql"
+	"reflect"
 	"testing"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -46,8 +47,8 @@ func (e *testExecuter) Validate(t *testing.T) {
 				if _, ok := execution.expectedArgs[i].(anyArg); ok {
 					continue
 				}
-				if execution.expectedArgs[i] != execution.gottenArgs[i] {
-					t.Errorf("wrong argument at index %d: got: %v want: %v", i, execution.gottenArgs[i], execution.expectedArgs[i])
+				if !reflect.DeepEqual(execution.expectedArgs[i], execution.gottenArgs[i]) {
+					t.Errorf("wrong argument at index %d: got: %v (%T) want: %v (%T)", i, execution.gottenArgs[i], execution.gottenArgs[i], execution.expectedArgs[i], execution.expectedArgs[i])
 				}
 			}
 		}

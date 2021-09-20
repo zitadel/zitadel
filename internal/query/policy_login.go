@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -122,9 +121,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "errors.orgs.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "errors.login_policy.not_found")
 				}
-				log.Println("pol: ", err)
 				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "errors.internal")
 			}
 

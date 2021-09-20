@@ -35,6 +35,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
+				projectionName:   orgProjection,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -64,6 +65,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
+				projectionName:   orgProjection,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -93,6 +95,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
+				projectionName:   orgProjection,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -122,6 +125,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
+				projectionName:   orgProjection,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -151,6 +155,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
+				projectionName:   orgProjection,
 				executer:         &testExecuter{},
 			},
 		},
@@ -168,6 +173,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
+				projectionName:   orgProjection,
 				executer: &testExecuter{
 					executions: []execution{
 						{
