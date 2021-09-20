@@ -5,15 +5,18 @@ import (
 	"encoding/base64"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/kevinburke/rest/restclient"
 )
 
 type jwtRequest struct {
@@ -185,6 +188,7 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateToken(ctx context.Context, token string, config *iam_model.IDPConfigView) (oidc.IDTokenClaims, error) {
+	logging.Log("LOGIN-ADf42").Info("begin token validation")
 	offset := 3 * time.Second
 	maxAge := time.Hour
 	claims := oidc.EmptyIDTokenClaims()
@@ -197,7 +201,8 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		return nil, err
 	}
 
-	keySet := rp.NewRemoteKeySet(http.DefaultClient, config.JWTKeysEndpoint)
+	logging.Log("LOGIN-dsffg").Info("begin signature check")
+	keySet := rp.NewRemoteKeySet(&httpClient, config.JWTKeysEndpoint)
 	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
 		return nil, err
 	}
@@ -226,3 +231,13 @@ func getToken(r *http.Request, headerName string) (string, error) {
 	}
 	return strings.TrimPrefix(auth, oidc.PrefixBearer), nil
 }
+
+var (
+	httpClient = http.Client{
+		Transport: &restclient.Transport{
+			RoundTripper: http.DefaultTransport,
+			Debug:        true,
+			Output:       os.Stderr,
+		},
+	}
+)
