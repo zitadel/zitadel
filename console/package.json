@@ -19,7 +19,7 @@
     "@angular/material": "^12.2.4",
     "@angular/material-moment-adapter": "^12.2.4",
     "@angular/platform-browser": "~12.2.4",
-    "@angular/platform-browser-dynamic": "~12.2.4",
+    "@angular/platform-browser-dynamic": "~12.2.6",
     "@angular/router": "~12.2.4",
     "@angular/service-worker": "~12.2.4",
     "@grpc/grpc-js": "^1.3.2",
