@@ -172,7 +172,7 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=gha,scope=${{ github.workflow }}
+          #cache-from: type=gha,scope=${{ github.workflow }}
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
 
   zitadel-operator:
@@ -281,7 +281,7 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
           push: true
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          #cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           build-args: |
             OS=${{ matrix.goos }}
             ARCH=${{ matrix.goarch }}
