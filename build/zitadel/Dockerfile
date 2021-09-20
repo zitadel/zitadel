@@ -16,9 +16,9 @@ ENV PROTOC_ARCH x86_64
 ## protoc and protoc-gen-grpc-web for later use
 #######################
 FROM ${BUILDARCH}-base AS base
-ARG PROTOC_VERSION=3.17.3
+ARG PROTOC_VERSION=3.18.0
 ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
-ARG GATEWAY_VERSION=2.5.0
+ARG GATEWAY_VERSION=2.6.0
 ARG VALIDATOR_VERSION=0.6.1
 ARG GRPC_WEB_VERSION=1.2.1
 # no arm specific version available and x86 works fine at the moment:
