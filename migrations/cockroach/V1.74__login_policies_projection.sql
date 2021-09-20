@@ -15,7 +15,6 @@ CREATE TABLE zitadel.projections.login_policies (
     passwordless_type SMALLINT,
     is_default BOOLEAN,
     hide_password_reset BOOLEAN,
-    user_login_must_be_domain BOOLEAN,
 
     PRIMARY KEY (aggregate_id)
 );
