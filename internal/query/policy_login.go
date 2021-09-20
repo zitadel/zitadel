@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -32,7 +33,6 @@ type LoginPolicy struct {
 	PasswordlessType      domain.PasswordlessType
 	IsDefault             bool
 	HidePasswordReset     bool
-	UserLoginMustBeDomain bool
 }
 
 const (
@@ -49,7 +49,6 @@ const (
 	LoginPolicyColumnPasswordlessType
 	LoginPolicyColumnIsDefault
 	LoginPolicyColumnHidePasswordReset
-	LoginPolicyColumnUserLoginMustBeDomain
 )
 
 func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPolicy, error) {
@@ -101,7 +100,6 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			LoginPolicyColumnPasswordlessType.toColumnName(),
 			LoginPolicyColumnIsDefault.toColumnName(),
 			LoginPolicyColumnHidePasswordReset.toColumnName(),
-			LoginPolicyColumnUserLoginMustBeDomain.toColumnName(),
 		).From(loginPoliciesTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
@@ -121,12 +119,12 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				&p.PasswordlessType,
 				&p.IsDefault,
 				&p.HidePasswordReset,
-				&p.UserLoginMustBeDomain,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "errors.orgs.not_found")
 				}
+				log.Println("pol: ", err)
 				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "errors.internal")
 			}
 
@@ -170,8 +168,6 @@ func (c LoginPolicyColumn) toColumnName() string {
 		return "is_default"
 	case LoginPolicyColumnHidePasswordReset:
 		return "hide_password_reset"
-	case LoginPolicyColumnUserLoginMustBeDomain:
-		return "user_login_must_be_domain"
 	default:
 		return ""
 	}

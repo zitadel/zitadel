@@ -134,7 +134,6 @@ const (
 	loginPolicyPasswordlessTypeCol      = "passwordless_type"
 	loginPolicyIsDefaultCol             = "is_default"
 	loginPolicyHidePWResetCol           = "hide_password_reset"
-	loginPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
 )
 
 func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -153,17 +152,22 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.EventRea
 			handler.NewCol(loginPolicyIsDefaultCol, true),
 			handler.NewCol(loginPolicyHidePWResetCol, e.HidePasswordReset),
 		}), nil
-	case *org.OrgIAMPolicyAddedEvent:
+	case *org.LoginPolicyAddedEvent:
 		return crdb.NewCreateStatement(e, []handler.Column{
 			handler.NewCol(loginPolicyIDCol, e.Aggregate().ID),
 			handler.NewCol(loginPolicyCreationDateCol, e.CreationDate()),
 			handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
 			handler.NewCol(loginPolicySequenceCol, e.Sequence()),
+			handler.NewCol(loginPolicyAllowRegisterCol, e.AllowRegister),
+			handler.NewCol(loginPolicyAllowUserNamePasswordCol, e.AllowUserNamePassword),
+			handler.NewCol(loginPolicyAllowExternalIDPsCol, e.AllowExternalIDP),
+			handler.NewCol(loginPolicyForceMFACol, e.ForceMFA),
+			handler.NewCol(loginPolicyPasswordlessTypeCol, e.PasswordlessType),
 			handler.NewCol(loginPolicyIsDefaultCol, false),
-			handler.NewCol(loginPolicyUserLoginMustBeDomainCol, e.UserLoginMustBeDomain),
+			handler.NewCol(loginPolicyHidePWResetCol, e.HidePasswordReset),
 		}), nil
 	default:
-		logging.LogWithFields("HANDL-IW6So", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-IW6So", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
 }

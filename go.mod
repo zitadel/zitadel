@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/Masterminds/squirrel v1.5.0 // indirect
+	github.com/Masterminds/squirrel v1.5.0
 	github.com/VictoriaMetrics/fastcache v1.6.0
 	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75
 	github.com/allegro/bigcache v1.2.1

@@ -2,27 +2,29 @@ package management
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
-	"time"
 
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, req *mgmt_pb.GetLoginPolicyRequest) (*mgmt_pb.GetLoginPolicyResponse, error) {
-	policy, err := s.org.GetLoginPolicy(ctx)
+	policy, err := s.query.LoginPolicyByID(ctx, "")
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy), IsDefault: policy.Default}, nil
+	//TODO: why do we provice IsDefault twice?
+	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetDefaultLoginPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLoginPolicyRequest) (*mgmt_pb.GetDefaultLoginPolicyResponse, error) {
-	policy, err := s.org.GetDefaultLoginPolicy(ctx)
+	policy, err := s.query.DefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}

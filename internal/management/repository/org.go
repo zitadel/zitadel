@@ -25,8 +25,6 @@ type OrgRepository interface {
 
 	GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 
-	GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
-	GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 	SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -40,7 +41,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "errors.orgs.not_found")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-5YLeb", "errors.internal")
 			}
 			return o, nil
 		}
@@ -99,6 +100,7 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
+				log.Println("org2: ", err)
 				return false, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
 			}
 			return isUnique, err
