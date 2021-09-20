@@ -46,6 +46,7 @@ func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstor
 }
 
 type wantReduce struct {
+	projection       string
 	aggregateType    eventstore.AggregateType
 	sequence         uint64
 	previousSequence uint64
@@ -77,7 +78,7 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, want wantRed
 		want.executer.Validate(t)
 		return
 	}
-	err = stmt.Execute(want.executer, orgProjection)
+	err = stmt.Execute(want.executer, want.projection)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
