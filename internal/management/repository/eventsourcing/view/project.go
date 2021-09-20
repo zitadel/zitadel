@@ -3,7 +3,6 @@ package view
 import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -15,10 +14,6 @@ const (
 
 func (v *View) ProjectByID(projectID string) (*model.ProjectView, error) {
 	return view.ProjectByID(v.Db, projectTable, projectID)
-}
-
-func (v *View) SearchProjects(request *proj_model.ProjectViewSearchRequest) ([]*model.ProjectView, uint64, error) {
-	return view.SearchProjects(v.Db, projectTable, request)
 }
 
 func (v *View) PutProject(project *model.ProjectView, event *models.Event) error {

@@ -21,60 +21,60 @@ func TestProjectProjection_reduces(t *testing.T) {
 		reduce func(event eventstore.EventReader) (*handler.Statement, error)
 		want   wantReduce
 	}{
-		//{
-		//	name: "reduceProjectReactivated",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.ProjectReactivatedType),
-		//			project.AggregateType,
-		//			nil,
-		//		), project.ProjectReactivatedEventMapper),
-		//	},
-		//	reduce: (&ProjectProjection{}).reduceProjectReactivated,
-		//	want: wantReduce{
-		//		projection: projectProjection,
-		//		aggregateType:    eventstore.AggregateType("project"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec:   true,
-		//			expectedStmt: "UPDATE zitadel.projections.projects SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
-		//			expectedArgs: []interface{}{
-		//				anyArg{},
-		//				uint64(15),
-		//				domain.ProjectStateActive,
-		//				"agg-id",
-		//			},
-		//		},
-		//	},
-		//},
-		//{
-		//	name: "reduceProjectDeactivated",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.ProjectDeactivatedType),
-		//			project.AggregateType,
-		//			nil,
-		//		), project.ProjectDeactivatedEventMapper),
-		//	},
-		//	reduce: (&ProjectProjection{}).reduceProjectDeactivated,
-		//	want: wantReduce{
-		//		projection: projectProjection,
-		//		aggregateType:    eventstore.AggregateType("project"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec:   true,
-		//			expectedStmt: "UPDATE zitadel.projections.projects SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
-		//			expectedArgs: []interface{}{
-		//				anyArg{},
-		//				uint64(15),
-		//				domain.ProjectStateInactive,
-		//				"agg-id",
-		//			},
-		//		},
-		//	},
-		//},
+		{
+			name: "reduceProjectReactivated",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectReactivatedType),
+					project.AggregateType,
+					nil,
+				), project.ProjectReactivatedEventMapper),
+			},
+			reduce: (&ProjectProjection{}).reduceProjectReactivated,
+			want: wantReduce{
+				projection:       projectProjection,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					shouldExec:   true,
+					expectedStmt: "UPDATE zitadel.projections.projects SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
+					expectedArgs: []interface{}{
+						anyArg{},
+						uint64(15),
+						domain.ProjectStateActive,
+						"agg-id",
+					},
+				},
+			},
+		},
+		{
+			name: "reduceProjectDeactivated",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectDeactivatedType),
+					project.AggregateType,
+					nil,
+				), project.ProjectDeactivatedEventMapper),
+			},
+			reduce: (&ProjectProjection{}).reduceProjectDeactivated,
+			want: wantReduce{
+				projection:       projectProjection,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					shouldExec:   true,
+					expectedStmt: "UPDATE zitadel.projections.projects SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
+					expectedArgs: []interface{}{
+						anyArg{},
+						uint64(15),
+						domain.ProjectStateInactive,
+						"agg-id",
+					},
+				},
+			},
+		},
 		{
 			name: "reduceProjectChanged",
 			args: args{
@@ -126,41 +126,41 @@ func TestProjectProjection_reduces(t *testing.T) {
 				},
 			},
 		},
-		//{
-		//	name: "reduceProjectAdded",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.ProjectAddedType),
-		//			project.AggregateType,
-		//			[]byte(`{"name": "name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
-		//		), project.ProjectAddedEventMapper),
-		//	},
-		//	reduce: (&ProjectProjection{}).reduceProjectAdded,
-		//	want: wantReduce{
-		//		projection: projectProjection,
-		//		aggregateType:    eventstore.AggregateType("project"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec:   true,
-		//			expectedStmt: "INSERT INTO zitadel.projections.projects (id, creation_date, change_date, resource_owner, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
-		//			expectedArgs: []interface{}{
-		//				"agg-id",
-		//				anyArg{},
-		//				anyArg{},
-		//				"ro-id",
-		//				uint64(15),
-		//				"name",
-		//				true,
-		//				true,
-		//				true,
-		//				domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
-		//				domain.ProjectStateActive,
-		//				"editor-user",
-		//			},
-		//		},
-		//	},
-		//},
+		{
+			name: "reduceProjectAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectAddedType),
+					project.AggregateType,
+					[]byte(`{"name": "name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
+				), project.ProjectAddedEventMapper),
+			},
+			reduce: (&ProjectProjection{}).reduceProjectAdded,
+			want: wantReduce{
+				projection:       projectProjection,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					shouldExec:   true,
+					expectedStmt: "INSERT INTO zitadel.projections.projects (id, creation_date, change_date, resource_owner, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+					expectedArgs: []interface{}{
+						"agg-id",
+						anyArg{},
+						anyArg{},
+						"ro-id",
+						uint64(15),
+						"name",
+						true,
+						true,
+						true,
+						domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+						domain.ProjectStateActive,
+						"editor-user",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
