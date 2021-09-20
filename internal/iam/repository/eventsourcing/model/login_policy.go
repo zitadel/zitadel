@@ -70,24 +70,6 @@ func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 	}
 }
 
-func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
-	idps := IDOProvidersFromModel(policy.IDPProviders)
-	secondFactors := SecondFactorsFromModel(policy.SecondFactors)
-	multiFactors := MultiFactorsFromModel(policy.MultiFactors)
-	return &LoginPolicy{
-		ObjectRoot:            policy.ObjectRoot,
-		State:                 int32(policy.State),
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIdp:      policy.AllowExternalIdp,
-		IDPProviders:          idps,
-		ForceMFA:              policy.ForceMFA,
-		SecondFactors:         secondFactors,
-		MultiFactors:          multiFactors,
-		PasswordlessType:      int32(policy.PasswordlessType),
-	}
-}
-
 func IDPProvidersToModel(members []*IDPProvider) []*iam_model.IDPProvider {
 	convertedProviders := make([]*iam_model.IDPProvider, len(members))
 	for i, m := range members {
