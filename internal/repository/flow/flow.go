@@ -10,10 +10,11 @@ import (
 )
 
 const (
-	eventTypePrefix            = eventstore.EventType("flow.")
-	triggerActionsPrefix       = eventTypePrefix + "trigger_actions."
-	TriggerActionsSetEventType = triggerActionsPrefix + "set"
-	FlowClearedEventType       = eventTypePrefix + "cleared"
+	eventTypePrefix                       = eventstore.EventType("flow.")
+	triggerActionsPrefix                  = eventTypePrefix + "trigger_actions."
+	TriggerActionsSetEventType            = triggerActionsPrefix + "set"
+	TriggerActionsCascadeRemovedEventType = triggerActionsPrefix + "cascade.removed"
+	FlowClearedEventType                  = eventTypePrefix + "cleared"
 )
 
 type TriggerActionsSetEvent struct {
@@ -48,6 +49,47 @@ func NewTriggerActionsSetEvent(
 
 func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
 	e := &TriggerActionsSetEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
+	}
+
+	return e, nil
+}
+
+type TriggerActionsCascadeRemovedEvent struct {
+	eventstore.BaseEvent
+
+	FlowType    domain.FlowType
+	TriggerType domain.TriggerType
+	ActionID    string
+}
+
+func (e *TriggerActionsCascadeRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *TriggerActionsCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewTriggerActionsCascadeRemovedEvent(
+	base *eventstore.BaseEvent,
+	flowType domain.FlowType,
+	actionID string,
+) *TriggerActionsCascadeRemovedEvent {
+	return &TriggerActionsCascadeRemovedEvent{
+		BaseEvent: *base,
+		FlowType:  flowType,
+		ActionID:  actionID,
+	}
+}
+
+func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &TriggerActionsCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

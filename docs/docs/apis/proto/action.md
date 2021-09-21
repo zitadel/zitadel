@@ -69,7 +69,7 @@ ActionStateQuery is always equals
 | type |  FlowType | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  FlowState | - |  |
-| trigger_actions | repeated TriggerAction | map<TriggerType, TriggerAction> triggers = 4; |  |
+| trigger_actions | repeated TriggerAction | - |  |
 
 
 

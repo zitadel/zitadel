@@ -85,6 +85,10 @@ func (s *Server) ReactivateAction(ctx context.Context, req *mgmt_pb.ReactivateAc
 }
 
 func (s *Server) DeleteAction(ctx context.Context, req *mgmt_pb.DeleteActionRequest) (*mgmt_pb.DeleteActionResponse, error) {
-	_, err := s.command.DeleteAction(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	flowTypes, err := s.query.GetFlowTypesOfActionID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.command.DeleteAction(ctx, req.Id, authz.GetCtxData(ctx).OrgID, flowTypes...)
 	return &mgmt_pb.DeleteActionResponse{}, err
 }

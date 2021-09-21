@@ -80,5 +80,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(FeaturesSetEventType, FeaturesSetEventMapper).
 		RegisterFilterEventMapper(FeaturesRemovedEventType, FeaturesRemovedEventMapper).
 		RegisterFilterEventMapper(TriggerActionsSetEventType, TriggerActionsSetEventMapper).
+		RegisterFilterEventMapper(TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper)
 }

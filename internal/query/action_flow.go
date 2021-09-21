@@ -103,6 +103,39 @@ func (q *Queries) SearchFlow(ctx context.Context, query *TriggerActionSearchQuer
 	return flow, nil
 }
 
+func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) ([]domain.FlowType, error) {
+	actionIDQuery, _ := NewTriggerActionActionIDSearchQuery(actionID)
+	query := &TriggerActionSearchQueries{Queries: []SearchQuery{actionIDQuery}}
+	stmt, args, err := query.ToQuery(
+		squirrel.StatementBuilder.
+			Select("flow_type").
+			From("zitadel.projections.flows_actions_triggers").
+			PlaceholderFormat(squirrel.Dollar)).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
+	}
+	flowTypes := make([]domain.FlowType, 0)
+	for rows.Next() {
+		var flow_type domain.FlowType
+		rows.Scan(
+			&flow_type,
+		)
+
+		flowTypes = append(flowTypes, flow_type)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-pA0Wj", "Errors.actions.internal")
+	}
+
+	return flowTypes, nil
+}
+
 type Flow struct {
 	ID            string          `col:"id"`
 	CreationDate  time.Time       `col:"creation_date"`
@@ -133,4 +166,8 @@ func NewTriggerActionTriggerTypeSearchQuery(value domain.TriggerType) (SearchQue
 
 func NewTriggerActionFlowTypeSearchQuery(value domain.FlowType) (SearchQuery, error) {
 	return NewIntQuery("flow_type", int(value), IntEquals)
+}
+
+func NewTriggerActionActionIDSearchQuery(actionID string) (SearchQuery, error) {
+	return NewTextQuery("action_id", actionID, TextEquals)
 }

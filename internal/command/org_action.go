@@ -7,6 +7,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/action"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
@@ -133,7 +134,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	return writeModelToObjectDetails(&existingAction.WriteModel), nil
 }
 
-func (c *Commands) DeleteAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner string, flowTypes ...domain.FlowType) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
 	}
@@ -148,6 +149,10 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID string, resourceOw
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
 	events := []eventstore.EventPusher{
 		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
+	}
+	orgAgg := org.NewAggregate(resourceOwner, resourceOwner).Aggregate
+	for _, flowType := range flowTypes {
+		events = append(events, org.NewTriggerActionsCascadeRemovedEvent(ctx, &orgAgg, flowType, actionID))
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {

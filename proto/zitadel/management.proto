@@ -2759,29 +2759,30 @@ service ManagementService {
         };
     }
 
-    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
-        option (google.api.http) = {
-            post: "/actions/{id}/_deactivate"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "org.action.write"
-            feature: "actions"
-        };
-    }
-
-    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
-        option (google.api.http) = {
-            post: "/actions/{id}/_reactivate"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "org.action.write"
-            feature: "actions"
-        };
-    }
+//TODO: enable in next release
+//    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+//        option (google.api.http) = {
+//            post: "/actions/{id}/_deactivate"
+//            body: "*"
+//        };
+//
+//        option (zitadel.v1.auth_option) = {
+//            permission: "org.action.write"
+//            feature: "actions"
+//        };
+//    }
+//
+//    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+//        option (google.api.http) = {
+//            post: "/actions/{id}/_reactivate"
+//            body: "*"
+//        };
+//
+//        option (zitadel.v1.auth_option) = {
+//            permission: "org.action.write"
+//            feature: "actions"
+//        };
+//    }
 
     rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
         option (google.api.http) = {
