@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/policy"
 )
 
 type LoginPolicyProjection struct {
@@ -113,184 +114,133 @@ const (
 )
 
 func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.EventReader) (*handler.Statement, error) {
+	var policyEvent policy.LoginPolicyAddedEvent
+	var isDefault bool
 	switch e := event.(type) {
 	case *iam.LoginPolicyAddedEvent:
-		return crdb.NewCreateStatement(e, []handler.Column{
-			handler.NewCol(loginPolicyIDCol, e.Aggregate().ID),
-			handler.NewCol(loginPolicyCreationDateCol, e.CreationDate()),
-			handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-			handler.NewCol(loginPolicyAllowRegisterCol, e.AllowRegister),
-			handler.NewCol(loginPolicyAllowUserNamePasswordCol, e.AllowUserNamePassword),
-			handler.NewCol(loginPolicyAllowExternalIDPsCol, e.AllowExternalIDP),
-			handler.NewCol(loginPolicyForceMFACol, e.ForceMFA),
-			handler.NewCol(loginPolicyPasswordlessTypeCol, e.PasswordlessType),
-			handler.NewCol(loginPolicyIsDefaultCol, true),
-			handler.NewCol(loginPolicyHidePWResetCol, e.HidePasswordReset),
-		}), nil
+		policyEvent = e.LoginPolicyAddedEvent
+		isDefault = true
 	case *org.LoginPolicyAddedEvent:
-		return crdb.NewCreateStatement(e, []handler.Column{
-			handler.NewCol(loginPolicyIDCol, e.Aggregate().ID),
-			handler.NewCol(loginPolicyCreationDateCol, e.CreationDate()),
-			handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-			handler.NewCol(loginPolicyAllowRegisterCol, e.AllowRegister),
-			handler.NewCol(loginPolicyAllowUserNamePasswordCol, e.AllowUserNamePassword),
-			handler.NewCol(loginPolicyAllowExternalIDPsCol, e.AllowExternalIDP),
-			handler.NewCol(loginPolicyForceMFACol, e.ForceMFA),
-			handler.NewCol(loginPolicyPasswordlessTypeCol, e.PasswordlessType),
-			handler.NewCol(loginPolicyIsDefaultCol, false),
-			handler.NewCol(loginPolicyHidePWResetCol, e.HidePasswordReset),
-		}), nil
+		policyEvent = e.LoginPolicyAddedEvent
+		isDefault = false
 	default:
 		logging.LogWithFields("HANDL-IW6So", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
+
+	return crdb.NewCreateStatement(&policyEvent, []handler.Column{
+		handler.NewCol(loginPolicyIDCol, policyEvent.Aggregate().ID),
+		handler.NewCol(loginPolicyCreationDateCol, policyEvent.CreationDate()),
+		handler.NewCol(loginPolicyChangeDateCol, policyEvent.CreationDate()),
+		handler.NewCol(loginPolicySequenceCol, policyEvent.Sequence()),
+		handler.NewCol(loginPolicyAllowRegisterCol, policyEvent.AllowRegister),
+		handler.NewCol(loginPolicyAllowUserNamePasswordCol, policyEvent.AllowUserNamePassword),
+		handler.NewCol(loginPolicyAllowExternalIDPsCol, policyEvent.AllowExternalIDP),
+		handler.NewCol(loginPolicyForceMFACol, policyEvent.ForceMFA),
+		handler.NewCol(loginPolicyPasswordlessTypeCol, policyEvent.PasswordlessType),
+		handler.NewCol(loginPolicyIsDefaultCol, isDefault),
+		handler.NewCol(loginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
+	}), nil
 }
 
 func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.EventReader) (*handler.Statement, error) {
+	var policyEvent policy.LoginPolicyChangedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyChangedEvent:
-		cols := []handler.Column{
-			handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-		}
-		if e.AllowRegister != nil {
-			cols = append(cols, handler.NewCol(loginPolicyAllowRegisterCol, *e.AllowRegister))
-		}
-		if e.AllowUserNamePassword != nil {
-			cols = append(cols, handler.NewCol(loginPolicyAllowUserNamePasswordCol, *e.AllowUserNamePassword))
-		}
-		if e.AllowExternalIDP != nil {
-			cols = append(cols, handler.NewCol(loginPolicyAllowExternalIDPsCol, *e.AllowExternalIDP))
-		}
-		if e.ForceMFA != nil {
-			cols = append(cols, handler.NewCol(loginPolicyForceMFACol, *e.ForceMFA))
-		}
-		if e.PasswordlessType != nil {
-			cols = append(cols, handler.NewCol(loginPolicyPasswordlessTypeCol, *e.PasswordlessType))
-		}
-		if e.HidePasswordReset != nil {
-			cols = append(cols, handler.NewCol(loginPolicyHidePWResetCol, *e.HidePasswordReset))
-		}
-		return crdb.NewUpdateStatement(
-			e,
-			cols,
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.LoginPolicyChangedEvent
 	case *org.LoginPolicyChangedEvent:
-		cols := []handler.Column{
-			handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-		}
-		if e.AllowRegister != nil {
-			cols = append(cols, handler.NewCol(loginPolicyAllowRegisterCol, *e.AllowRegister))
-		}
-		if e.AllowUserNamePassword != nil {
-			cols = append(cols, handler.NewCol(loginPolicyAllowUserNamePasswordCol, *e.AllowUserNamePassword))
-		}
-		if e.AllowExternalIDP != nil {
-			cols = append(cols, handler.NewCol(loginPolicyAllowExternalIDPsCol, *e.AllowExternalIDP))
-		}
-		if e.ForceMFA != nil {
-			cols = append(cols, handler.NewCol(loginPolicyForceMFACol, *e.ForceMFA))
-		}
-		if e.PasswordlessType != nil {
-			cols = append(cols, handler.NewCol(loginPolicyPasswordlessTypeCol, *e.PasswordlessType))
-		}
-		if e.HidePasswordReset != nil {
-			cols = append(cols, handler.NewCol(loginPolicyHidePWResetCol, *e.HidePasswordReset))
-		}
-		return crdb.NewUpdateStatement(
-			e,
-			cols,
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.LoginPolicyChangedEvent
 	default:
 		logging.LogWithFields("HANDL-NIvFo", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyChangedEventType, iam.LoginPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BpaO6", "reduce.wrong.event.type")
 	}
+
+	cols := []handler.Column{
+		handler.NewCol(loginPolicyChangeDateCol, policyEvent.CreationDate()),
+		handler.NewCol(loginPolicySequenceCol, policyEvent.Sequence()),
+	}
+	if policyEvent.AllowRegister != nil {
+		cols = append(cols, handler.NewCol(loginPolicyAllowRegisterCol, *policyEvent.AllowRegister))
+	}
+	if policyEvent.AllowUserNamePassword != nil {
+		cols = append(cols, handler.NewCol(loginPolicyAllowUserNamePasswordCol, *policyEvent.AllowUserNamePassword))
+	}
+	if policyEvent.AllowExternalIDP != nil {
+		cols = append(cols, handler.NewCol(loginPolicyAllowExternalIDPsCol, *policyEvent.AllowExternalIDP))
+	}
+	if policyEvent.ForceMFA != nil {
+		cols = append(cols, handler.NewCol(loginPolicyForceMFACol, *policyEvent.ForceMFA))
+	}
+	if policyEvent.PasswordlessType != nil {
+		cols = append(cols, handler.NewCol(loginPolicyPasswordlessTypeCol, *policyEvent.PasswordlessType))
+	}
+	if policyEvent.HidePasswordReset != nil {
+		cols = append(cols, handler.NewCol(loginPolicyHidePWResetCol, *policyEvent.HidePasswordReset))
+	}
+	return crdb.NewUpdateStatement(
+		&policyEvent,
+		cols,
+		[]handler.Condition{
+			handler.NewCond(loginPolicyIDCol, policyEvent.Aggregate().ID),
+		},
+	), nil
 }
 
 func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.EventReader) (*handler.Statement, error) {
+	var policyEvent policy.MultiFactorAddedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyMultiFactorAddedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayAppendCol(loginPolicyMFAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.MultiFactorAddedEvent
 	case *org.LoginPolicyMultiFactorAddedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayAppendCol(loginPolicyMFAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, false),
-			},
-		), nil
+		policyEvent = e.MultiFactorAddedEvent
 	default:
 		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, iam.LoginPolicyMultiFactorAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
 	}
+
+	return crdb.NewUpdateStatement(
+		&policyEvent,
+		[]handler.Column{
+			handler.NewCol(loginPolicyChangeDateCol, policyEvent.CreationDate()),
+			handler.NewCol(loginPolicySequenceCol, policyEvent.Sequence()),
+			crdb.NewArrayAppendCol(loginPolicyMFAsCol, policyEvent.MFAType),
+		},
+		[]handler.Condition{
+			handler.NewCond(loginPolicyIDCol, policyEvent.Aggregate().ID),
+		},
+	), nil
 }
 
 func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	var policyEvent policy.MultiFactorRemovedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyMultiFactorRemovedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayRemoveCol(loginPolicyMFAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.MultiFactorRemovedEvent
 	case *org.LoginPolicyMultiFactorRemovedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayRemoveCol(loginPolicyMFAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, false),
-			},
-		), nil
+		policyEvent = e.MultiFactorRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, iam.LoginPolicyMultiFactorRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-vtC31", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, iam.LoginPolicyMultiFactorRemovedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-czU7n", "reduce.wrong.event.type")
 	}
+
+	return crdb.NewUpdateStatement(
+		&policyEvent,
+		[]handler.Column{
+			handler.NewCol(loginPolicyChangeDateCol, policyEvent.CreationDate()),
+			handler.NewCol(loginPolicySequenceCol, policyEvent.Sequence()),
+			crdb.NewArrayRemoveCol(loginPolicyMFAsCol, policyEvent.MFAType),
+		},
+		[]handler.Condition{
+			handler.NewCond(loginPolicyIDCol, policyEvent.Aggregate().ID),
+		},
+	), nil
 }
 
 func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.LoginPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedType", org.LoginPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-gF5q6", "seq", event.Sequence(), "expectedType", org.LoginPolicyRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-oRSvD", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -301,69 +251,51 @@ func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.EventR
 }
 
 func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.EventReader) (*handler.Statement, error) {
+	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicySecondFactorAddedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayAppendCol(loginPolicy2FAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.SecondFactorAddedEvent
 	case *org.LoginPolicySecondFactorAddedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayAppendCol(loginPolicy2FAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, false),
-			},
-		), nil
+		policyEvent = e.SecondFactorAddedEvent
 	default:
-		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, iam.LoginPolicySecondFactorAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-dwadQ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, iam.LoginPolicySecondFactorAddedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-agB2E", "reduce.wrong.event.type")
 	}
+
+	return crdb.NewUpdateStatement(
+		&policyEvent,
+		[]handler.Column{
+			handler.NewCol(loginPolicyChangeDateCol, policyEvent.CreationDate()),
+			handler.NewCol(loginPolicySequenceCol, policyEvent.Sequence()),
+			crdb.NewArrayAppendCol(loginPolicy2FAsCol, policyEvent.MFAType),
+		},
+		[]handler.Condition{
+			handler.NewCond(loginPolicyIDCol, policyEvent.Aggregate().ID),
+		},
+	), nil
 }
 
 func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicySecondFactorRemovedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayRemoveCol(loginPolicy2FAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.SecondFactorRemovedEvent
 	case *org.LoginPolicySecondFactorRemovedEvent:
-		return crdb.NewUpdateStatement(
-			e,
-			[]handler.Column{
-				handler.NewCol(loginPolicyChangeDateCol, e.CreationDate()),
-				handler.NewCol(loginPolicySequenceCol, e.Sequence()),
-				crdb.NewArrayRemoveCol(loginPolicy2FAsCol, e.MFAType),
-			},
-			[]handler.Condition{
-				handler.NewCond(loginPolicyIDCol, e.Aggregate().ID),
-				// handler.NewCond(loginPolicyIsDefaultCol, true),
-			},
-		), nil
+		policyEvent = e.SecondFactorRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, iam.LoginPolicySecondFactorRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-2IE8Y", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, iam.LoginPolicySecondFactorRemovedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-KYJvA", "reduce.wrong.event.type")
 	}
+
+	return crdb.NewUpdateStatement(
+		&policyEvent,
+		[]handler.Column{
+			handler.NewCol(loginPolicyChangeDateCol, policyEvent.CreationDate()),
+			handler.NewCol(loginPolicySequenceCol, policyEvent.Sequence()),
+			crdb.NewArrayRemoveCol(loginPolicy2FAsCol, policyEvent.MFAType),
+		},
+		[]handler.Condition{
+			handler.NewCond(loginPolicyIDCol, policyEvent.Aggregate().ID),
+		},
+	), nil
 }
