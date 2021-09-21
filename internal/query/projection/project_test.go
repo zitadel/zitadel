@@ -32,7 +32,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&ProjectProjection{}).reduceProjectReactivated,
 			want: wantReduce{
-				projection:       projectProjection,
+				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -59,7 +59,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&ProjectProjection{}).reduceProjectDeactivated,
 			want: wantReduce{
-				projection:       projectProjection,
+				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -86,7 +86,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&ProjectProjection{}).reduceProjectChanged,
 			want: wantReduce{
-				projection:       projectProjection,
+				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -117,7 +117,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&ProjectProjection{}).reduceProjectChanged,
 			want: wantReduce{
-				projection:       projectProjection,
+				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -137,7 +137,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&ProjectProjection{}).reduceProjectAdded,
 			want: wantReduce{
-				projection:       projectProjection,
+				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,

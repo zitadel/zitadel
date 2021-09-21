@@ -27,7 +27,7 @@ func TestProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"Role"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"Role"}})},
 				member: &ProjectMemberView{},
 			},
 			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"Role"}},
@@ -35,7 +35,7 @@ func TestProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append changed member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}})},
 				member: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"Role"}},
 			},
 			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}},

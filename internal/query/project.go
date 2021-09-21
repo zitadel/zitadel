@@ -8,12 +8,11 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/query/projection"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 )
-
-const projectTable = "zitadel.projections.projects"
 
 func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
 	return sq.Select(
@@ -28,7 +27,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 			ProjectColumnProjectRoleCheck.toColumnName(),
 			ProjectColumnHasProjectCheck.toColumnName(),
 			ProjectColumnPrivateLabelingSetting.toColumnName()).
-			From(projectTable).PlaceholderFormat(sq.Dollar),
+			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
 			err := row.Scan(
@@ -69,7 +68,7 @@ func (q *Queries) prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Pr
 			ProjectColumnHasProjectCheck.toColumnName(),
 			ProjectColumnPrivateLabelingSetting.toColumnName(),
 			"COUNT(name) OVER ()").
-			From(projectTable).PlaceholderFormat(sq.Dollar),
+			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Projects, error) {
 			projects := make([]*Project, 0)
 			var count uint64
@@ -110,7 +109,7 @@ func (q *Queries) prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Pr
 
 func (q *Queries) prepareProjectUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select("COUNT(*) = 0").
-			From(projectTable).PlaceholderFormat(sq.Dollar),
+			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
@@ -153,7 +152,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectTable)
+	projects.LatestSequence, err = q.latestSequence(ctx, projection.ProjectProjectionTable)
 	return projects, err
 }
 

@@ -31,6 +31,28 @@ func ProjectViewToPb(project *query.Project) *proj_pb.Project {
 	}
 }
 
+func GrantedProjectViewsToPb(projects []*query.ProjectGrant) []*proj_pb.GrantedProject {
+	p := make([]*proj_pb.GrantedProject, len(projects))
+	for i, project := range projects {
+		p[i] = GrantedProjectViewToPb(project)
+	}
+	return p
+}
+
+func GrantedProjectViewToPb(project *query.ProjectGrant) *proj_pb.GrantedProject {
+	return &proj_pb.GrantedProject{
+		ProjectId:        project.ProjectID,
+		GrantId:          project.GrantID,
+		Details:          object.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
+		ProjectName:      project.ProjectName,
+		State:            projectGrantStateToPb(project.State),
+		ProjectOwnerId:   project.ResourceOwner,
+		ProjectOwnerName: project.ResourceOwnerName,
+		GrantedOrgId:     project.GrantedOrgID,
+		GrantedOrgName:   project.OrgName,
+		GrantedRoleKeys:  project.GrantedRoleKeys,
+	}
+}
 func ProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
@@ -51,29 +73,6 @@ func ProjectQueryToModel(apiQuery *proj_pb.ProjectQuery) (query.SearchQuery, err
 	}
 }
 
-func GrantedProjectToPb(project *proj_model.ProjectGrantView) *proj_pb.GrantedProject {
-	return &proj_pb.GrantedProject{
-		GrantId:          project.GrantID,
-		ProjectId:        project.ProjectID,
-		Details:          object.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
-		ProjectName:      project.Name,
-		State:            grantedProjectStateToPb(project.State),
-		ProjectOwnerId:   project.ResourceOwner,
-		ProjectOwnerName: project.ResourceOwnerName,
-		GrantedOrgId:     project.OrgID,
-		GrantedOrgName:   project.OrgName,
-		GrantedRoleKeys:  project.GrantedRoleKeys,
-	}
-}
-
-func GrantedProjectsToPb(projects []*proj_model.ProjectGrantView) []*proj_pb.GrantedProject {
-	p := make([]*proj_pb.GrantedProject, len(projects))
-	for i, project := range projects {
-		p[i] = GrantedProjectToPb(project)
-	}
-	return p
-}
-
 func projectStateToPb(state domain.ProjectState) proj_pb.ProjectState {
 	switch state {
 	case domain.ProjectStateActive:
@@ -82,6 +81,17 @@ func projectStateToPb(state domain.ProjectState) proj_pb.ProjectState {
 		return proj_pb.ProjectState_PROJECT_STATE_INACTIVE
 	default:
 		return proj_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
+	}
+}
+
+func projectGrantStateToPb(state domain.ProjectGrantState) proj_pb.ProjectGrantState {
+	switch state {
+	case domain.ProjectGrantStateActive:
+		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
+	case domain.ProjectGrantStateInactive:
+		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
+	default:
+		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
 	}
 }
 

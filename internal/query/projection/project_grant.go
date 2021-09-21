@@ -3,19 +3,25 @@ package projection
 import (
 	"context"
 
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/lib/pq"
 )
 
 type ProjectGrantProjection struct {
 	crdb.StatementHandler
 }
 
+const ProjectGrantProjectionTable = "zitadel.projections.project_grants"
+
 func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantProjection {
 	p := &ProjectGrantProjection{}
-	config.ProjectionName = "zitadel.projections.project_grants"
+	config.ProjectionName = ProjectGrantProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -55,45 +61,54 @@ func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-type projectGrantState int8
-
 const (
-	projectGrantIDCol           = "grant_id"
-	projectGrantProjectIDCol    = "project_id"
-	projectGrantGrantedOrgIDCol = "granted_org_id"
-	projectGrantRoleKeysCol     = "role_keys"
-	projectGrantCreationDateCol = "creation_date"
-	projectGrantChangeDateCol   = "change_date"
-	projectGrantOwnerCol        = "owner_id"
-	projectGrantCreatorCol      = "creator_id"
-	projectGrantStateCol        = "state"
-
-	projectGrantActive projectGrantState = iota
-	projectGrantInactive
+	ProjectGrantProjectIDCol         = "project_id"
+	ProjectGrantIDCol                = "grant_id"
+	ProjectGrantCreationDateCol      = "creation_date"
+	ProjectGrantChangeDateCol        = "change_date"
+	ProjectGrantResourceOwnerCol     = "resource_owner"
+	ProjectGrantStateCol             = "state"
+	ProjectGrantSequenceCol          = "sequence"
+	ProjectGrantProjectNameCol       = "project_name"
+	ProjectGrantGrantedOrgIDCol      = "granted_org_id"
+	ProjectGrantGrantedOrgNameCol    = "granted_org_name"
+	ProjectGrantRoleKeysCol          = "granted_role_keys"
+	ProjectGrantResourceOwnerNameCol = "resource_owner_name"
+	ProjectGrantCreatorCol           = "creator_id"
 )
 
 func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	e := event.(*project.GrantAddedEvent)
-
+	e, ok := event.(*project.GrantAddedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-Mi4g9", "seq", event.Sequence(), "expectedType", project.GrantAddedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g92Fg", "reduce.wrong.event.type")
+	}
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectGrantProjectIDCol, e.Aggregate().ID),
-			handler.NewCol(projectGrantIDCol, e.GrantID),
-			handler.NewCol(projectGrantGrantedOrgIDCol, e.GrantedOrgID),
-			handler.NewCol(projectGrantRoleKeysCol, e.RoleKeys),
-			handler.NewCol(projectGrantCreationDateCol, e.CreationDate()),
-			handler.NewCol(projectGrantChangeDateCol, e.CreationDate()),
-			handler.NewCol(projectGrantOwnerCol, e.Aggregate().ResourceOwner),
-			handler.NewCol(projectGrantCreatorCol, e.EditorUser()),
-			handler.NewCol(projectGrantStateCol, projectGrantActive),
+			handler.NewCol(ProjectGrantProjectIDCol, e.Aggregate().ID),
+			handler.NewCol(ProjectGrantIDCol, e.GrantID),
+			handler.NewCol(ProjectGrantCreationDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateActive),
+			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectGrantProjectNameCol, ""),
+			handler.NewCol(ProjectGrantGrantedOrgIDCol, e.GrantedOrgID),
+			handler.NewCol(ProjectGrantGrantedOrgNameCol, ""),
+			handler.NewCol(ProjectGrantRoleKeysCol, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantResourceOwnerNameCol, ""),
+			handler.NewCol(ProjectGrantCreatorCol, e.EditorUser()),
 		},
 	), nil
 }
 
 func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.EventReader) (*handler.Statement, error) {
-	e := event.(*project.GrantChangedEvent)
-
+	e, ok := event.(*project.GrantChangedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-M00fH", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g0fg4", "reduce.wrong.event.type")
+	}
 	if e.RoleKeys == nil {
 		return crdb.NewNoOpStatement(e), nil
 	}
@@ -101,19 +116,23 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectGrantRoleKeysCol, e.RoleKeys),
-			handler.NewCol(projectChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantRoleKeysCol, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectGrantIDCol, e.GrantID),
-			handler.NewCond(projectGrantProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantIDCol, e.GrantID),
+			handler.NewCond(ProjectGrantProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
 
 func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.EventReader) (*handler.Statement, error) {
-	e := event.(*project.GrantChangedEvent)
-
+	e, ok := event.(*project.GrantChangedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-K0fwR", "seq", event.Sequence(), "expectedType", project.GrantCascadeChangedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ll9Ts", "reduce.wrong.event.type")
+	}
 	if e.RoleKeys == nil {
 		return crdb.NewNoOpStatement(e), nil
 	}
@@ -121,56 +140,68 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectGrantRoleKeysCol, e.RoleKeys),
-			handler.NewCol(projectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantRoleKeysCol, e.RoleKeys),
+			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectGrantIDCol, e.GrantID),
-			handler.NewCond(projectGrantProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantIDCol, e.GrantID),
+			handler.NewCond(ProjectGrantProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
 
 func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
-	e := event.(*project.GrantDeactivateEvent)
-
+	e, ok := event.(*project.GrantDeactivateEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-Ple9f", "seq", event.Sequence(), "expectedType", project.GrantDeactivatedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-0fj2f", "reduce.wrong.event.type")
+	}
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectGrantStateCol, projectGrantInactive),
-			handler.NewCol(projectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateInactive),
+			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectGrantIDCol, e.GrantID),
-			handler.NewCond(projectGrantProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantIDCol, e.GrantID),
+			handler.NewCond(ProjectGrantProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
 
 func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.EventReader) (*handler.Statement, error) {
-	e := event.(*project.GrantReactivatedEvent)
-
+	e, ok := event.(*project.GrantReactivatedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-Ip0hr", "seq", event.Sequence(), "expectedType", project.GrantReactivatedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-2M0ve", "reduce.wrong.event.type")
+	}
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectGrantStateCol, projectGrantActive),
-			handler.NewCol(projectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateActive),
+			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectGrantIDCol, e.GrantID),
-			handler.NewCond(projectGrantProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantIDCol, e.GrantID),
+			handler.NewCond(ProjectGrantProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
 
 func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	e := event.(*project.GrantRemovedEvent)
-
+	e, ok := event.(*project.GrantRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-M0pfs", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-o0w4f", "reduce.wrong.event.type")
+	}
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
-			handler.NewCond(projectGrantIDCol, e.GrantID),
-			handler.NewCond(projectGrantProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantIDCol, e.GrantID),
+			handler.NewCond(ProjectGrantProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

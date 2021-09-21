@@ -17,12 +17,12 @@ type ProjectProjection struct {
 }
 
 const (
-	projectProjection = "zitadel.projections.projects"
+	ProjectProjectionTable = "zitadel.projections.projects"
 )
 
 func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
 	p := &ProjectProjection{}
-	config.ProjectionName = projectProjection
+	config.ProjectionName = ProjectProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -59,18 +59,18 @@ func (p *ProjectProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
-	projectIDCol                   = "id"
-	projectNameCol                 = "name"
-	projectProjectRoleAssertionCol = "project_role_assertion"
-	projectProjectRoleCheckCol     = "project_role_check"
-	projectHasProjectCheckCol      = "has_project_check"
-	projectPrivateLabelingCol      = "private_labeling_setting"
-	projectCreationDateCol         = "creation_date"
-	projectChangeDateCol           = "change_date"
-	projectOwnerCol                = "resource_owner"
-	projectCreatorCol              = "creator_id"
-	projectStateCol                = "state"
-	projectSequenceCol             = "sequence"
+	ProjectIDCol                   = "id"
+	ProjectNameCol                 = "name"
+	ProjectProjectRoleAssertionCol = "project_role_assertion"
+	ProjectProjectRoleCheckCol     = "project_role_check"
+	ProjectHasProjectCheckCol      = "has_project_check"
+	ProjectPrivateLabelingCol      = "private_labeling_setting"
+	ProjectCreationDateCol         = "creation_date"
+	ProjectChangeDateCol           = "change_date"
+	ProjectOwnerCol                = "resource_owner"
+	ProjectCreatorCol              = "creator_id"
+	ProjectStateCol                = "state"
+	ProjectSequenceCol             = "sequence"
 )
 
 func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -82,18 +82,18 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) (*h
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectIDCol, e.Aggregate().ID),
-			handler.NewCol(projectCreationDateCol, e.CreationDate()),
-			handler.NewCol(projectChangeDateCol, e.CreationDate()),
-			handler.NewCol(projectOwnerCol, e.Aggregate().ResourceOwner),
-			handler.NewCol(projectSequenceCol, e.Sequence()),
-			handler.NewCol(projectNameCol, e.Name),
-			handler.NewCol(projectProjectRoleAssertionCol, e.ProjectRoleAssertion),
-			handler.NewCol(projectProjectRoleCheckCol, e.ProjectRoleCheck),
-			handler.NewCol(projectHasProjectCheckCol, e.HasProjectCheck),
-			handler.NewCol(projectPrivateLabelingCol, e.PrivateLabelingSetting),
-			handler.NewCol(projectStateCol, domain.ProjectStateActive),
-			handler.NewCol(projectCreatorCol, e.EditorUser()),
+			handler.NewCol(ProjectIDCol, e.Aggregate().ID),
+			handler.NewCol(ProjectCreationDateCol, e.CreationDate()),
+			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectNameCol, e.Name),
+			handler.NewCol(ProjectProjectRoleAssertionCol, e.ProjectRoleAssertion),
+			handler.NewCol(ProjectProjectRoleCheckCol, e.ProjectRoleCheck),
+			handler.NewCol(ProjectHasProjectCheckCol, e.HasProjectCheck),
+			handler.NewCol(ProjectPrivateLabelingCol, e.PrivateLabelingSetting),
+			handler.NewCol(ProjectStateCol, domain.ProjectStateActive),
+			handler.NewCol(ProjectCreatorCol, e.EditorUser()),
 		},
 	), nil
 }
@@ -111,16 +111,16 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectChangeDateCol, e.CreationDate()),
-			handler.NewCol(projectSequenceCol, e.Sequence()),
-			handler.NewCol(projectNameCol, *e.Name),
-			handler.NewCol(projectProjectRoleAssertionCol, *e.ProjectRoleAssertion),
-			handler.NewCol(projectProjectRoleCheckCol, *e.ProjectRoleCheck),
-			handler.NewCol(projectHasProjectCheckCol, *e.HasProjectCheck),
-			handler.NewCol(projectPrivateLabelingCol, *e.PrivateLabelingSetting),
+			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectNameCol, *e.Name),
+			handler.NewCol(ProjectProjectRoleAssertionCol, *e.ProjectRoleAssertion),
+			handler.NewCol(ProjectProjectRoleCheckCol, *e.ProjectRoleCheck),
+			handler.NewCol(ProjectHasProjectCheckCol, *e.HasProjectCheck),
+			handler.NewCol(ProjectPrivateLabelingCol, *e.PrivateLabelingSetting),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -134,12 +134,12 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReade
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectChangeDateCol, e.CreationDate()),
-			handler.NewCol(projectSequenceCol, e.Sequence()),
-			handler.NewCol(projectStateCol, domain.ProjectStateInactive),
+			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectStateCol, domain.ProjectStateInactive),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -153,12 +153,12 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReade
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(projectChangeDateCol, e.CreationDate()),
-			handler.NewCol(projectSequenceCol, e.Sequence()),
-			handler.NewCol(projectStateCol, domain.ProjectStateActive),
+			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
+			handler.NewCol(ProjectSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectStateCol, domain.ProjectStateActive),
 		},
 		[]handler.Condition{
-			handler.NewCond(projectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -172,7 +172,7 @@ func (p *ProjectProjection) reduceProjectRemoved(event eventstore.EventReader) (
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
-			handler.NewCond(projectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

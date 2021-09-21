@@ -115,17 +115,18 @@ func listProjectRequestToModel(req *mgmt_pb.ListProjectsRequest) (*query.Project
 	}, nil
 }
 
-func ListGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) (*proj_model.ProjectGrantViewSearchRequest, error) {
+func listGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) (*query.ProjectGrantSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := proj_grpc.GrantedProjectQueriesToModel(req.Queries)
+	queries, err := proj_grpc.ProjectQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
