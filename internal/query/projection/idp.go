@@ -152,10 +152,10 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
-		idpOwnerType = domain.IdentityProviderTypeSystem
+		idpOwnerType = domain.IdentityProviderTypeOrg
 	case *iam.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
-		idpOwnerType = domain.IdentityProviderTypeOrg
+		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
 		logging.LogWithFields("HANDL-hBriG", "seq", e.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigAddedEventType, iam.IDPConfigAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fcUdQ", "reduce.wrong.event.type")
