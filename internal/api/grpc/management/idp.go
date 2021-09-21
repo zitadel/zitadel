@@ -10,20 +10,25 @@ import (
 )
 
 func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRequest) (*mgmt_pb.GetOrgIDPByIDResponse, error) {
-	idp, err := s.org.IDPConfigByID(ctx, req.Id)
+	//TODO: check if allowed
+	idp, err := s.query.IDPByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetOrgIDPByIDResponse{Idp: idp_grpc.ModelIDPViewToPb(idp)}, nil
 }
 func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (*mgmt_pb.ListOrgIDPsResponse, error) {
-	resp, err := s.org.SearchIDPConfigs(ctx, listIDPsToModel(req))
+	queries, err := listIDPsToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.SearchIDPs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgIDPsResponse{
-		Result:  idp_grpc.IDPViewsToPb(resp.Result),
-		Details: object_pb.ToListDetails(resp.TotalResult, resp.Sequence, resp.Timestamp),
+		Result:  idp_grpc.IDPViewsToPb(resp.IDPs),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
 	}, nil
 }
 func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRequest) (*mgmt_pb.AddOrgOIDCIDPResponse, error) {

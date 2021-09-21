@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.DefaultIDPConfigByID(ctx, req.Id)
+	idp, err := s.query.IDPByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -17,13 +17,17 @@ func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest
 }
 
 func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
-	resp, err := s.iam.SearchIDPConfigs(ctx, listIDPsToModel(req))
+	queries, err := listIDPsToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.SearchIDPs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListIDPsResponse{
-		Result:  idp_grpc.IDPViewsToPb(resp.Result),
-		Details: object_pb.ToListDetails(resp.TotalResult, resp.Sequence, resp.Timestamp),
+		Result:  idp_grpc.IDPViewsToPb(resp.IDPs),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
 	}, nil
 }
 
