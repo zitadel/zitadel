@@ -9,9 +9,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query/projection"
 )
-
-const orgTable = "zitadel.projections.orgs"
 
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
@@ -23,7 +22,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 			OrgColumnSequence.toColumnName(),
 			OrgColumnName.toColumnName(),
 			OrgColumnDomain.toColumnName()).
-			From(orgTable).PlaceholderFormat(sq.Dollar),
+			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(
@@ -57,7 +56,7 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 			OrgColumnName.toColumnName(),
 			OrgColumnDomain.toColumnName(),
 			"COUNT(name) OVER ()").
-			From(orgTable).PlaceholderFormat(sq.Dollar),
+			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
 			var count uint64
@@ -95,7 +94,7 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 
 func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select("COUNT(*) = 0").
-			From(orgTable).PlaceholderFormat(sq.Dollar),
+			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
@@ -164,7 +163,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	if err != nil {
 		return nil, err
 	}
-	orgs.LatestSequence, err = q.latestSequence(ctx, orgTable)
+	orgs.LatestSequence, err = q.latestSequence(ctx, projection.OrgProjectionTable)
 	return orgs, err
 }
 
@@ -222,21 +221,21 @@ const (
 func (c OrgColumn) toColumnName() string {
 	switch c {
 	case OrgColumnCreationDate:
-		return "creation_date"
+		return projection.OrgProjectionTable + "." + projection.OrgCreationDateCol
 	case OrgColumnChangeDate:
-		return "change_date"
+		return projection.OrgProjectionTable + "." + projection.OrgChangeDateCol
 	case OrgColumnResourceOwner:
-		return "resource_owner"
+		return projection.OrgProjectionTable + "." + projection.OrgResourceOwnerCol
 	case OrgColumnState:
-		return "org_state"
+		return projection.OrgProjectionTable + "." + projection.OrgStateCol
 	case OrgColumnSequence:
-		return "sequence"
+		return projection.OrgProjectionTable + "." + projection.OrgSequenceCol
 	case OrgColumnName:
-		return "name"
+		return projection.OrgProjectionTable + "." + projection.OrgNameCol
 	case OrgColumnDomain:
-		return "primary_domain"
+		return projection.OrgProjectionTable + "." + projection.OrgPrimaryDomainCol
 	case OrgColumnID:
-		return "id"
+		return projection.OrgProjectionTable + "." + projection.OrgIDCol
 	default:
 		return ""
 	}
