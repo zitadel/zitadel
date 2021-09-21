@@ -225,27 +225,27 @@ const (
 func (c ProjectColumn) toColumnName() string {
 	switch c {
 	case ProjectColumnCreationDate:
-		return "creation_date"
+		return projection.ProjectProjectionTable + "." + projection.ProjectCreationDateCol
 	case ProjectColumnChangeDate:
-		return "change_date"
+		return projection.ProjectProjectionTable + "." + projection.ProjectChangeDateCol
 	case ProjectColumnResourceOwner:
-		return "resource_owner"
+		return projection.ProjectProjectionTable + "." + projection.ProjectOwnerCol
 	case ProjectColumnState:
-		return "state"
+		return projection.ProjectProjectionTable + "." + projection.ProjectStateCol
 	case ProjectColumnSequence:
-		return "sequence"
+		return projection.ProjectProjectionTable + "." + projection.ProjectSequenceCol
 	case ProjectColumnName:
-		return "name"
+		return projection.ProjectProjectionTable + "." + projection.ProjectNameCol
 	case ProjectColumnProjectRoleAssertion:
-		return "project_role_assertion"
+		return projection.ProjectProjectionTable + "." + projection.ProjectProjectRoleAssertionCol
 	case ProjectColumnProjectRoleCheck:
-		return "project_role_check"
+		return projection.ProjectProjectionTable + "." + projection.ProjectProjectRoleCheckCol
 	case ProjectColumnHasProjectCheck:
-		return "has_project_check"
+		return projection.ProjectProjectionTable + "." + projection.ProjectHasProjectCheckCol
 	case ProjectColumnPrivateLabelingSetting:
-		return "private_labeling_setting"
+		return projection.ProjectProjectionTable + "." + projection.ProjectPrivateLabelingCol
 	case ProjectColumnID:
-		return "id"
+		return projection.ProjectProjectionTable + "." + projection.ProjectIDCol
 	default:
 		return ""
 	}
