@@ -38,7 +38,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				previousSequence: 10,
 				executer: &testExecuter{
 					shouldExec:   true,
-					expectedStmt: "DELETE FROM zitadel.projections.projects WHERE (id = $4)",
+					expectedStmt: "DELETE FROM zitadel.projections.projects WHERE (id = $1)",
 					expectedArgs: []interface{}{
 						"agg-id",
 					},

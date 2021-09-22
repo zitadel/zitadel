@@ -116,9 +116,9 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectGrantRoleKeysCol, pq.StringArray(e.RoleKeys)),
 			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
 			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectGrantRoleKeysCol, pq.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantIDCol, e.GrantID),
@@ -140,9 +140,9 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectGrantRoleKeysCol, e.RoleKeys),
 			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
 			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectGrantRoleKeysCol, e.RoleKeys),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantIDCol, e.GrantID),
@@ -160,9 +160,9 @@ func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateInactive),
 			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
 			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateInactive),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantIDCol, e.GrantID),
@@ -180,9 +180,9 @@ func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
 			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
+			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateActive),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantIDCol, e.GrantID),
