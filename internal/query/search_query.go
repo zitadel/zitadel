@@ -20,7 +20,10 @@ type SearchRequest struct {
 	Asc           bool
 }
 
-type Column interface{ toColumnName() string }
+type Column interface {
+	toFullColumnName() string
+	toColumnName() string
+}
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Offset > 0 {
@@ -35,7 +38,7 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query = query.OrderByClause(clause, req.SortingColumn.toColumnName())
+		query = query.OrderByClause(clause, req.SortingColumn.toFullColumnName())
 	}
 
 	return query
@@ -62,7 +65,7 @@ func NewTextQuery(column Column, value string, compare TextComparison) (*TextQue
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
 	}
-	if column == nil || column.toColumnName() == "" {
+	if column == nil || column.toFullColumnName() == "" {
 		return nil, ErrMissingColumn
 	}
 	return &TextQuery{
@@ -79,21 +82,21 @@ func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *TextQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.toColumnName(): s.Text}
+		return sq.Eq{s.Column.toFullColumnName(): s.Text}
 	case TextEqualsIgnoreCase:
-		return sq.Eq{"LOWER(" + s.Column.toColumnName() + ")": strings.ToLower(s.Text)}
+		return sq.Eq{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text)}
 	case TextStartsWith:
-		return sq.Like{s.Column.toColumnName(): s.Text + "%"}
+		return sq.Like{s.Column.toFullColumnName(): s.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": strings.ToLower(s.Text) + "%"}
+		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text) + "%"}
 	case TextEndsWith:
-		return sq.Like{s.Column.toColumnName(): "%" + s.Text}
+		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": "%" + strings.ToLower(s.Text)}
+		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text)}
 	case TextContains:
-		return sq.Like{s.Column.toColumnName(): "%" + s.Text + "%"}
+		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}
+		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}
 	}
 	return nil
 }
