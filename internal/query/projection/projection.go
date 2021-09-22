@@ -37,6 +37,7 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 		BulkLimit:         config.BulkLimit,
 	}
 
+	// turned off for this release
 	//NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	//NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	//owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))

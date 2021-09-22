@@ -60,23 +60,18 @@ func (p *FlowProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
-	triggerTableSuffix   = "triggers"
-	flowTypeCol          = "flow_type"
-	flowTriggerTypeCol   = "trigger_type"
-	flowChangeDateCol    = "change_date"
-	flowResourceOwnerCol = "resource_owner"
-	flowStateCol         = "flow_state"
-	//flowSequenceCol      = "sequence"
+	triggerTableSuffix           = "triggers"
+	flowTypeCol                  = "flow_type"
+	flowTriggerTypeCol           = "trigger_type"
+	flowResourceOwnerCol         = "resource_owner"
 	flowActionTriggerSequenceCol = "trigger_sequence"
 	flowActionIDCol              = "action_id"
 
-	actionTableSuffix = "actions"
-	//actionFlowTypeCol      = "flow_type"
+	actionTableSuffix      = "actions"
 	actionIDCol            = "id"
 	actionCreationDateCol  = "creation_date"
 	actionChangeDateCol    = "change_date"
 	actionResourceOwnerCol = "resource_owner"
-	actionStateCol         = "flow_state"
 	actionSequenceCol      = "sequence"
 	actionNameCol          = "name"
 	actionScriptCol        = "script"
@@ -100,7 +95,6 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 		stmts[i+1] = crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(flowResourceOwnerCol, e.Aggregate().ResourceOwner),
-				//handler.NewCol(flowSequenceCol, e.Sequence()),
 				handler.NewCol(flowTypeCol, e.FlowType),
 				handler.NewCol(flowTriggerTypeCol, e.TriggerType),
 				handler.NewCol(flowActionIDCol, id),

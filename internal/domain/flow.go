@@ -21,7 +21,7 @@ const (
 )
 
 func (s FlowType) Valid() bool {
-	return s >= 0 && s < flowTypeCount
+	return s > 0 && s < flowTypeCount
 }
 
 func (s FlowType) HasTrigger(triggerType TriggerType) bool {

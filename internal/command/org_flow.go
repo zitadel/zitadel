@@ -18,7 +18,7 @@ func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, reso
 		return nil, err
 	}
 	if len(existingFlow.Triggers) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-DgGh3", "Errors.Flow.Empty") //TODO: i18n
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty") //TODO: i18n
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))

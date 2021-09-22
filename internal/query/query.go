@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	sq "github.com/Masterminds/squirrel"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
@@ -39,14 +38,11 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		return nil, err
 	}
 
-	sq.StatementBuilder = sq.StatementBuilder.PlaceholderFormat(sq.Dollar) //TODO: ?
-
 	repo = &Queries{
 		iamID:       defaults.IamID,
 		eventstore:  es,
 		idGenerator: id.SonyFlakeGenerator,
 		client:      sqlClient,
-		//querier: querier,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -59,7 +55,6 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		return nil, err
 	}
 
-	// turned off for this release
 	err = projection.Start(ctx, es, projections)
 	if err != nil {
 		return nil, err

@@ -40,7 +40,7 @@ func (q *Queries) SearchActionsFromFlow(ctx context.Context, query *TriggerActio
 			&action.ChangeDate,
 			&action.ResourceOwner,
 			&action.Sequence,
-			//&action.State, //TODO: state?
+			//&action.State, //TODO: state in next release
 			&action.ID,
 			&action.Name,
 			&action.Script,
@@ -85,7 +85,7 @@ func (q *Queries) SearchFlow(ctx context.Context, query *TriggerActionSearchQuer
 			&action.ChangeDate,
 			&action.ResourceOwner,
 			&action.Sequence,
-			//&action.State,
+			//&action.State, //TODO: state in next release
 			&action.ID,
 			&action.Name,
 			&action.Script,
