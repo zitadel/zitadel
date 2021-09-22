@@ -98,3 +98,8 @@ func (a *API) SetMetadata(metadata *[]*domain.Metadata) *API {
 	a.set("metadata", metadata)
 	return a
 }
+
+func (a *API) SetUserGrants(usergrants *[]UserGrant) *API {
+	a.set("userGrants", usergrants)
+	return a
+}

@@ -30,6 +30,8 @@ func (s FlowType) HasTrigger(triggerType TriggerType) bool {
 		return s == FlowTypeExternalAuthentication
 	case TriggerTypePreCreation:
 		return s == FlowTypeExternalAuthentication
+	case TriggerTypePostCreation:
+		return s == FlowTypeExternalAuthentication
 	default:
 		return false
 	}
@@ -41,6 +43,7 @@ const (
 	TriggerTypeUnspecified TriggerType = iota
 	TriggerTypePostAuthentication
 	TriggerTypePreCreation
+	TriggerTypePostCreation
 	triggerTypeCount
 )
 

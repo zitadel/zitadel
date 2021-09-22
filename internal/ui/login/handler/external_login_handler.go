@@ -290,6 +290,21 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderExternalNotFoundOption(w, r, authReq, err)
 		return
 	}
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	userGrants, err := l.customGrants(authReq.UserID, nil, authReq, idpConfig)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	l.renderNextStep(w, r, authReq)
 }
 

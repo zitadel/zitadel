@@ -21,6 +21,9 @@ func (s *Server) GetFlow(ctx context.Context, req *mgmt_pb.GetFlowRequest) (*mgm
 
 func (s *Server) ClearFlow(ctx context.Context, req *mgmt_pb.ClearFlowRequest) (*mgmt_pb.ClearFlowResponse, error) {
 	details, err := s.command.ClearFlow(ctx, action_grpc.FlowTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.ClearFlowResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(details),
 	}, err

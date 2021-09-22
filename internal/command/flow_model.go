@@ -33,9 +33,20 @@ func (wm *FlowWriteModel) Reduce() error {
 				wm.Triggers = make(map[domain.TriggerType][]string)
 			}
 			wm.Triggers[e.TriggerType] = e.ActionIDs
+		case *flow.TriggerActionsCascadeRemovedEvent:
+			remove(wm.Triggers[e.TriggerType], e.ActionID)
 		case *flow.FlowClearedEvent:
 			wm.Triggers = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func remove(ids []string, id string) {
+	for i := 0; i < len(ids); i++ {
+		if ids[i] == id {
+			ids = append(ids[:i], ids[i+1:]...)
+			break
+		}
+	}
 }

@@ -23,6 +23,8 @@ func TriggerTypeToDomain(triggerType action_pb.TriggerType) domain.TriggerType {
 		return domain.TriggerTypePostAuthentication
 	case action_pb.TriggerType_TRIGGER_TYPE_PRE_CREATION:
 		return domain.TriggerTypePreCreation
+	case action_pb.TriggerType_TRIGGER_TYPE_POST_CREATION:
+		return domain.TriggerTypePostCreation
 	default:
 		return domain.TriggerTypeUnspecified
 	}
@@ -59,6 +61,8 @@ func TriggerTypeToPb(triggerType domain.TriggerType) action_pb.TriggerType {
 		return action_pb.TriggerType_TRIGGER_TYPE_POST_AUTHENTICATION
 	case domain.TriggerTypePreCreation:
 		return action_pb.TriggerType_TRIGGER_TYPE_PRE_CREATION
+	case domain.TriggerTypePostCreation:
+		return action_pb.TriggerType_TRIGGER_TYPE_POST_CREATION
 	default:
 		return action_pb.TriggerType_TRIGGER_TYPE_UNSPECIFIED
 	}

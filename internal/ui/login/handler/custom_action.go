@@ -41,29 +41,35 @@ func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens 
 	return user, metadata, err
 }
 
-//func (l *Login) preRedirectAction(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView) error {
-//	triggerActions, err := l.query.GetActionsByTriggerType(ctx, domain.TriggerTypePreRedirect)
-//	if err != nil {
-//		return err
-//	}
-//	c := &actions.Context{User: user}
-//	list := make([]actions.UserGrant, 0)
-//	for _, a := range triggerActions {
-//		err = actions.Run(c, a.Script, a.Name, a.Timeout, a.AllowedToFail, actions.SetUser(user), actions.Appender(&list))
-//		if err != nil {
-//			return err
-//		}
-//	}
-//	for _, grant := range list {
-//		_, err = l.command.AddUserGrant(ctx, &domain.UserGrant{
-//			UserID:         request.UserID,
-//			ProjectID:      grant.ProjectID,
-//			ProjectGrantID: grant.ProjectGrantID,
-//			RoleKeys:       grant.Roles,
-//		}, request.UserOrgID)
-//		if err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
+func (l *Login) customGrants(userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) ([]*domain.UserGrant, error) {
+	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation)
+	if err != nil {
+		return nil, err
+	}
+	ctx := (&actions.Context{}).SetToken(tokens)
+	actionUserGrants := make([]actions.UserGrant, 0)
+	api := (&actions.API{}).SetUserGrants(&actionUserGrants)
+	for _, a := range triggerActions {
+		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return actionUserGrantsToDomain(userID, actionUserGrants), err
+}
+
+func actionUserGrantsToDomain(userID string, actionUserGrants []actions.UserGrant) []*domain.UserGrant {
+	if actionUserGrants == nil {
+		return nil
+	}
+	userGrants := make([]*domain.UserGrant, len(actionUserGrants))
+	for i, grant := range actionUserGrants {
+		userGrants[i] = &domain.UserGrant{
+			UserID:         userID,
+			ProjectID:      grant.ProjectID,
+			ProjectGrantID: grant.ProjectGrantID,
+			RoleKeys:       grant.Roles,
+		}
+	}
+	return userGrants
+}

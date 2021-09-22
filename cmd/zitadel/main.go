@@ -141,14 +141,14 @@ func main() {
 }
 
 func startZitadel(configPaths []string) {
-	logging.LogWithFields("MAIN-dsfg2",
-		"HTTP_PROXY", os.Getenv("HTTP_PROXY"),
-		"HTTPS_PROXY", os.Getenv("HTTPS_PROXY"),
-		"NO_PROXY", os.Getenv("NO_PROXY")).Info("proxy settings")
-
 	conf := new(Config)
 	err := config.Read(conf, configPaths...)
 	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
+
+	logging.LogWithFields("MAIN-dsfg2",
+		"HTTP_PROXY", os.Getenv("HTTP_PROXY") != "",
+		"HTTPS_PROXY", os.Getenv("HTTPS_PROXY") != "",
+		"NO_PROXY", os.Getenv("NO_PROXY")).Info("http proxy settings")
 
 	ctx := context.Background()
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
