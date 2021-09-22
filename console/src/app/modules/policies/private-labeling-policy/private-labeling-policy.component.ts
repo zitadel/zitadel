@@ -629,8 +629,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
     const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
 
-    const darkWarn = labelpolicy?.warnColorDark || '#F44336';
-    const lightWarn = labelpolicy?.warnColor || '#F44336';
+    const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
+    const lightWarn = labelpolicy?.warnColor || '#cd3d56';
 
     const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
     const lightBackground = labelpolicy?.backgroundColor || '#fafafa';

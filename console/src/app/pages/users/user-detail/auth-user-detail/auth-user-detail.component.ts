@@ -24,8 +24,6 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public loading: boolean = false;
 
-  public copied: string = '';
-
   public ChangeType: any = ChangeType;
   public userLoginMustBeDomain: boolean = false;
   public UserState: any = UserState;

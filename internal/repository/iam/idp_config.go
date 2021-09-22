@@ -28,6 +28,7 @@ func NewIDPConfigAddedEvent(
 	name string,
 	configType domain.IDPConfigType,
 	stylingType domain.IDPConfigStylingType,
+	autoRegister bool,
 ) *IDPConfigAddedEvent {
 
 	return &IDPConfigAddedEvent{
@@ -41,6 +42,7 @@ func NewIDPConfigAddedEvent(
 			name,
 			configType,
 			stylingType,
+			autoRegister,
 		),
 	}
 }

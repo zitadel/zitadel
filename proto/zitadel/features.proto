@@ -29,6 +29,7 @@ message Features {
   bool metadata_user = 18;
   bool custom_text_message = 19;
   bool custom_text_login = 20;
+  bool lockout_policy = 21;
 }
 
 message FeatureTier {

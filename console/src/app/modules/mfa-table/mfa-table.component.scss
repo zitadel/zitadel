@@ -32,7 +32,7 @@
       left: -2px;
       transform: translateX(-50%) translateY(-50%);
       cursor: pointer;
-      color: #f44336;
+      color: var(--warn);
       transition: all .2s ease;
 
       &[disabled] {

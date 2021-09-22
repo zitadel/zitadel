@@ -24,10 +24,12 @@ import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module';
+import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { LinksModule } from 'src/app/modules/links/links.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { NameDialogModule } from 'src/app/modules/name-dialog/name-dialog.module';
 import { OriginPipeModule } from 'src/app/pipes/origin-pipe/origin-pipe.module';
 import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
 
@@ -39,49 +41,52 @@ import { AppsRoutingModule } from './apps-routing.module';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 
 @NgModule({
-    declarations: [
-        AppCreateComponent,
-        AppDetailComponent,
-        AppSecretDialogComponent,
-        RedirectUrisComponent,
-        AdditionalOriginsComponent,
-    ],
-    imports: [
-        CommonModule,
-        A11yModule,
-        RedirectPipeModule,
-        LinksModule,
-        AppRadioModule,
-        AppsRoutingModule,
-        FormsModule,
-        TranslateModule,
-        OriginPipeModule,
-        ReactiveFormsModule,
-        HasRoleModule,
-        MatMenuModule,
-        MatChipsModule,
-        ClientKeysModule,
-        MatIconModule,
-        MatSelectModule,
-        MatButtonToggleModule,
-        MatButtonModule,
-        MatProgressSpinnerModule,
-        MatProgressBarModule,
-        MatDialogModule,
-        MatCheckboxModule,
-        CardModule,
-        MatTooltipModule,
-        TranslateModule,
-        MatStepperModule,
-        MatRadioModule,
-        CopyToClipboardModule,
-        MatSlideToggleModule,
-        InputModule,
-        MetaLayoutModule,
-        MatSliderModule,
-        ChangesModule,
-        InfoSectionModule,
-    ],
-    exports: [TranslateModule],
+  declarations: [
+    AppCreateComponent,
+    AppDetailComponent,
+    AppSecretDialogComponent,
+    RedirectUrisComponent,
+    AdditionalOriginsComponent,
+  ],
+  imports: [
+    CommonModule,
+    A11yModule,
+    RedirectPipeModule,
+    LinksModule,
+    NameDialogModule,
+    AppRadioModule,
+    AppsRoutingModule,
+    FormsModule,
+    InfoRowModule,
+    TranslateModule,
+    OriginPipeModule,
+    MatMenuModule,
+    ReactiveFormsModule,
+    HasRoleModule,
+    MatMenuModule,
+    MatChipsModule,
+    ClientKeysModule,
+    MatIconModule,
+    MatSelectModule,
+    MatButtonToggleModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatDialogModule,
+    MatCheckboxModule,
+    CardModule,
+    MatTooltipModule,
+    TranslateModule,
+    MatStepperModule,
+    MatRadioModule,
+    CopyToClipboardModule,
+    MatSlideToggleModule,
+    InputModule,
+    MetaLayoutModule,
+    MatSliderModule,
+    ChangesModule,
+    InfoSectionModule,
+  ],
+  exports: [TranslateModule],
 })
 export class AppsModule { }

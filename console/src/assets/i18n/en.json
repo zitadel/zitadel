@@ -106,7 +106,11 @@
     }
   },
   "ACTIONS": {
+    "ACTIONS":"Aktionen",
+    "RENAME":"Rename",
     "SET":"Set",
+    "COPY":"Copy to Clipboard",
+    "COPIED":"Copied to clipboard.",
     "RESETDEFAULT":"Reset to Default",
     "RESETTO":"Reset to: ",
     "RESETCURRENT":"Reset to current",
@@ -141,7 +145,8 @@
     "SEND": "Send",
     "NEWVALUE": "New Value",
     "RESTORE":"Restore",
-    "CONTINUEWITHOUTSAVE":"Continue without saving"
+    "CONTINUEWITHOUTSAVE":"Continue without saving",
+    "GOTOFEATURES":"Go to features"
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
@@ -168,15 +173,18 @@
       "MY": "My Informations",
       "LOGINNAMES": "Loginnames",
       "LOGINNAMESDESC": "These are your login names:",
-      "COPY": "Copy to Clipboard",
-      "COPIED": "Copied to clipboard.",
       "NOUSER": "No associated users.",
       "REACTIVATE": "Reactivate",
       "DEACTIVATE": "Deactivate",
       "FILTER": "Filter",
+      "STATE":"Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
       "LOCKEDDESCRIPTION":"This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
+    },
+    "DETAILS": {
+      "DATECREATED":"Created",
+      "DATECHANGED":"Changed"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
@@ -243,6 +251,17 @@
         "NEW":"Add New"
       }
     },
+    "METADATA": {
+      "TITLE":"Metadata",
+      "DESCRIPTION":"",
+      "KEY":"Key",
+      "VALUE":"Value",
+      "ADD":"New Entry",
+      "SAVE":"Save",
+      "EMPTY":"Keine Metadaten",
+      "SETSUCCESS":"Element saved successfully",
+      "REMOVESUCCESS":"Element deleted successfully"
+    },
     "MFA": {
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
@@ -287,8 +306,8 @@
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
       "DIALOG": {
-        "REMOVE_TITLE": "Remove IDP",
-        "REMOVE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        "DELETE_TITLE": "Remove IDP",
+        "DELETE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
       }
     },
     "CREATE": {
@@ -562,7 +581,6 @@
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
-      "CUSTOMDOMAINFEATUREMISSING":"The Feature custom-domain is not active on your organization!",
       "ORGDOMAIN": {
         "TITLE": "Organisation Domain Ownership Verification",
         "VERIFICATION": "Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
@@ -623,6 +641,8 @@
     "TITLE": "Features",
     "DESCRIPTION": "Here you can see your ZITADEL Features based on your Tier.",
     "BTN-EDIT": "Display Featureset",
+    "AVAILABLE":"unlocked",
+    "UNAVAILABLE":"locked",
     "TIER": {
       "NAME": "Tier Name",
       "DETAILS": "Billing Details",
@@ -639,20 +659,31 @@
       "QUESTIONS": "For questions regarding payments contact our support ",
       "BTN": "Change Tier"
     },
+    "HEADERS": {
+      "LOGINPOLICY":"Login Policy",
+      "PASSWORD":"Password",
+      "LABELPOLICY":"Privatelabelling",
+      "DOMAIN":"Organization Domain",
+      "TEXTSANDLINKS":"Texts and Links",
+      "METADATA":"Metadata"
+    },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
-      "LOGINPOLICYUSERNAMELOGIN": "Login Policy: Allow login with Username - custom",
-      "LOGINPOLICYPASSWORDRESET": "Login Policy: Hide reset password link - custom",
-      "LOGINPOLICYREGISTRATION": "Login Policy: Allow self registration - custom",
-      "LOGINPOLICYIDP": "Login Policy: Identity Provider - custom",
-      "LOGINPOLICYFACTORS": "Login Policy: Multifactors - custom",
-      "LOGINPOLICYPASSWORDLESS": "Login Policy: Passwordless Authentication - custom",
-      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy - custom",
-      "LABELPOLICYPRIVATELABEL": "Label Policy - custom",
-      "LABELPOLICYWATERMARK": "Label Policy - watermark",
-      "CUSTOMDOMAIN": "Domain Verification - available",
-      "CUSTOMTEXT": "Custom texts",
-      "PRIVACYPOLICY":"Privacy Policy and TOS - custom"
+      "LOGINPOLICYUSERNAMELOGIN": "Allow login with Username",
+      "LOGINPOLICYPASSWORDRESET": "Hide reset password link",
+      "LOGINPOLICYREGISTRATION": "Allow self registration",
+      "LOGINPOLICYIDP": "Identity Providers",
+      "LOGINPOLICYFACTORS": "Multifactors",
+      "LOGINPOLICYPASSWORDLESS": "Passwordless Authentication",
+      "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy",
+      "LOCKOUTPOLICY":"Lockout Policy",
+      "LABELPOLICYPRIVATELABEL": "Colors, Logo, Icon, Textappearance",
+      "LABELPOLICYWATERMARK": "Remove ZITADEL watermark",
+      "CUSTOMDOMAIN": "Organization domain verification",
+      "CUSTOMTEXTLOGIN": "Custom login interface texts",
+      "CUSTOMTEXTMESSAGE":"Custom notification mail texts",
+      "PRIVACYPOLICY":"Custom Privacy Policy and TOS Links",
+      "METADATAUSER":"User Metadata"
     },
     "TIERSTATES": {
       "0": "Active",
@@ -660,7 +691,7 @@
       "2": "Cancelled",
       "3": "Grandfathered"
     },
-    "NOTAVAILABLE": "Feature {{value}} is missing on your organization.",
+    "NOTAVAILABLE": "Feature <strong>{{value}}</strong> is missing on your organization.",
     "RETENTIONDAYS": "Days"
   },
   "POLICY": {
@@ -692,7 +723,9 @@
       "RELEASE":"Release",
       "DROPFONT":"Drop fontfile here",
       "RELEASEFONT":"Release",
+      "USEOFLOGO":"Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organisation switcher in console",
       "MAXSIZE":"The maximum size is limited to 524kB",
+      "EMAILNOSVG":"The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED":"Maximum size of 524kB exceeded.",
       "FONTINLOGINONLY":"The font is currently only displayed in the login interface.",
       "PREVIEW": {
@@ -900,6 +933,7 @@
     "PAGES": {
       "TITLE": "Project",
       "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
+      "DELETE":"Delete Project",
       "LIST": "Projects",
       "LISTDESCRIPTION": "Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
       "DETAIL": "Detail",
@@ -964,6 +998,11 @@
       "2": "Granted"
     },
     "NAME": "Name",
+    "NAMEDIALOG": {
+      "TITLE":"Rename Project",
+      "DESCRIPTION":"Enter the new name for your project",
+      "NAME":"New Name"
+    },
     "MEMBER": {
       "TITLE": "Managers",
       "TITLEDESC": "Managers can make changes to this project based on their role.",
@@ -1130,6 +1169,8 @@
       "0": "No Styling",
       "1": "Google"
     },
+    "AUTOREGISTER":"Auto Register",
+    "AUTOREGISTER_DESC":"If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "ID": "ID",
     "NAME": "Name",
@@ -1216,6 +1257,11 @@
       "CREATE_OIDC": "OIDC Application",
       "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "STATE":"State",
+      "DATECREATED":"Created",
+      "DATECHANGED":"Changed",
+      "URLS":"Urls",
+      "DELETE":"Delete App",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -1245,6 +1291,11 @@
           "DESC": "Read our documentation on creating applications or contact our support"
         }
       }
+    },
+    "NAMEDIALOG": {
+      "TITLE":"Rename App",
+      "DESCRIPTION":"Enter the new name for your app",
+      "NAME":"New Name"
     },
     "NAME": "Name",
     "TYPE": "Application Type",

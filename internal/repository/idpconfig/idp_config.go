@@ -29,10 +29,11 @@ func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string)
 type IDPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID    string                      `json:"idpConfigId"`
-	Name        string                      `json:"name,omitempty"`
-	Typ         domain.IDPConfigType        `json:"idpType,omitempty"`
-	StylingType domain.IDPConfigStylingType `json:"stylingType,omitempty"`
+	ConfigID     string                      `json:"idpConfigId"`
+	Name         string                      `json:"name,omitempty"`
+	Typ          domain.IDPConfigType        `json:"idpType,omitempty"`
+	StylingType  domain.IDPConfigStylingType `json:"stylingType,omitempty"`
+	AutoRegister bool                        `json:"autoRegister,omitempty"`
 }
 
 func NewIDPConfigAddedEvent(
@@ -41,13 +42,15 @@ func NewIDPConfigAddedEvent(
 	name string,
 	configType domain.IDPConfigType,
 	stylingType domain.IDPConfigStylingType,
+	autoRegister bool,
 ) *IDPConfigAddedEvent {
 	return &IDPConfigAddedEvent{
-		BaseEvent:   *base,
-		ConfigID:    configID,
-		Name:        name,
-		StylingType: stylingType,
-		Typ:         configType,
+		BaseEvent:    *base,
+		ConfigID:     configID,
+		Name:         name,
+		StylingType:  stylingType,
+		Typ:          configType,
+		AutoRegister: autoRegister,
 	}
 }
 
@@ -75,10 +78,11 @@ func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 type IDPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID    string                       `json:"idpConfigId"`
-	Name        *string                      `json:"name,omitempty"`
-	StylingType *domain.IDPConfigStylingType `json:"stylingType,omitempty"`
-	oldName     string                       `json:"-"`
+	ConfigID     string                       `json:"idpConfigId"`
+	Name         *string                      `json:"name,omitempty"`
+	StylingType  *domain.IDPConfigStylingType `json:"stylingType,omitempty"`
+	AutoRegister *bool                        `json:"autoRegister,omitempty"`
+	oldName      string                       `json:"-"`
 }
 
 func (e *IDPConfigChangedEvent) Data() interface{} {
@@ -126,6 +130,12 @@ func ChangeName(name string) func(*IDPConfigChangedEvent) {
 func ChangeStyleType(styleType domain.IDPConfigStylingType) func(*IDPConfigChangedEvent) {
 	return func(e *IDPConfigChangedEvent) {
 		e.StylingType = &styleType
+	}
+}
+
+func ChangeAutoRegister(autoRegister bool) func(*IDPConfigChangedEvent) {
+	return func(e *IDPConfigChangedEvent) {
+		e.AutoRegister = &autoRegister
 	}
 }
 
