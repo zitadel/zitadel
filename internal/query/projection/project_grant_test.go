@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func TestProjectProjection_reduces(t *testing.T) {
+func TestProjectGrantProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.EventReader
 	}
@@ -22,31 +22,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "reduceProjectRemoved",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectRemovedEventMapper),
-			},
-			reduce: (&ProjectProjection{}).reduceProjectRemoved,
-			want: wantReduce{
-				projection:       ProjectProjectionTable,
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "DELETE FROM zitadel.projections.projects WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						"agg-id",
-					},
-				},
-			},
-		},
-		{
-			name: "reduceProjectReactivated",
+			name: "reduceProjectGrantReactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ProjectReactivatedType),
