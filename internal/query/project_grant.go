@@ -16,11 +16,6 @@ import (
 )
 
 func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
-	joins := []JoinData{
-		{
-			projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName(),
-		},
-	}
 	return sq.Select(
 			ProjectGrantColumnProjectID.toColumnName(),
 			ProjectGrantColumnGrantID.toColumnName(),
@@ -31,11 +26,13 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			ProjectGrantColumnSequence.toColumnName(),
 			ProjectColumnName.toColumnName(),
 			ProjectGrantColumnOrgID.toColumnName(),
-			"granted_org_name",
+			"o."+ProjectGrantColumnOrgName.toColumnName(),
 			ProjectGrantColumnGrantedRoleKeys.toColumnName(),
-			"resource_owner_name").
+			"r."+ProjectGrantColumnResourceOwnerName.toColumnName()).
 			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(joins)),
+			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName())).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" r", ProjectGrantColumnResourceOwner.toColumnName(), "r.id")).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" o", ProjectGrantColumnOrgID.toColumnName(), "o.id")),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			p := new(ProjectGrant)
 			err := row.Scan(
@@ -64,11 +61,6 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 }
 
 func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
-	joins := []JoinData{
-		{
-			projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName(),
-		},
-	}
 	return sq.Select(
 			ProjectGrantColumnProjectID.toColumnName(),
 			ProjectGrantColumnGrantID.toColumnName(),
@@ -81,10 +73,11 @@ func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows)
 			ProjectGrantColumnOrgID.toColumnName(),
 			"granted_org_name",
 			ProjectGrantColumnGrantedRoleKeys.toColumnName(),
-			"resource_owner_name",
+			OrgColumnName.toColumnName(),
 			"COUNT(grant_id) OVER ()").
 			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(joins)),
+			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName())).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable, OrgColumnResourceOwner.toColumnName(), OrgColumnID.toColumnName())),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var count uint64
@@ -272,6 +265,10 @@ func (c ProjectGrantColumn) toColumnName() string {
 		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantRoleKeysCol
 	case ProjectGrantColumnCreatorName:
 		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantCreatorCol
+	case ProjectGrantColumnOrgName:
+		return projection.OrgNameCol
+	case ProjectGrantColumnResourceOwnerName:
+		return projection.OrgNameCol
 	default:
 		return ""
 	}

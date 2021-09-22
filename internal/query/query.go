@@ -89,13 +89,6 @@ type JoinData struct {
 	JoinField string
 }
 
-func GenerateJoinQuery(joinData []JoinData) string {
-	joins := ""
-	for _, data := range joinData {
-		if joins != "" {
-			joins += " "
-		}
-		joins += data.JoinTable + " ON " + data.MainField + " = " + data.JoinField
-	}
-	return joins
+func GenerateJoinQuery(joinTable, mainField, joinField string) string {
+	return joinTable + " ON " + mainField + " = " + joinField
 }
