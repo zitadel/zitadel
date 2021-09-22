@@ -17,22 +17,22 @@ import (
 
 func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
 	return sq.Select(
-			ProjectGrantColumnProjectID.toColumnName(),
-			ProjectGrantColumnGrantID.toColumnName(),
-			ProjectGrantColumnCreationDate.toColumnName(),
-			ProjectGrantColumnChangeDate.toColumnName(),
-			ProjectGrantColumnResourceOwner.toColumnName(),
-			ProjectGrantColumnState.toColumnName(),
-			ProjectGrantColumnSequence.toColumnName(),
-			ProjectColumnName.toColumnName(),
-			ProjectGrantColumnOrgID.toColumnName(),
-			"o."+ProjectGrantColumnOrgName.toColumnName(),
-			ProjectGrantColumnGrantedRoleKeys.toColumnName(),
-			"r."+ProjectGrantColumnResourceOwnerName.toColumnName()).
+			ProjectGrantColumnProjectID.toFullColumnName(),
+			ProjectGrantColumnGrantID.toFullColumnName(),
+			ProjectGrantColumnCreationDate.toFullColumnName(),
+			ProjectGrantColumnChangeDate.toFullColumnName(),
+			ProjectGrantColumnResourceOwner.toFullColumnName(),
+			ProjectGrantColumnState.toFullColumnName(),
+			ProjectGrantColumnSequence.toFullColumnName(),
+			"p."+ProjectColumnName.toColumnName(),
+			ProjectGrantColumnOrgID.toFullColumnName(),
+			"o."+OrgColumnName.toColumnName(),
+			ProjectGrantColumnGrantedRoleKeys.toFullColumnName(),
+			"r."+OrgColumnName.toColumnName()).
 			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName())).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" r", ProjectGrantColumnResourceOwner.toColumnName(), "r.id")).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" o", ProjectGrantColumnOrgID.toColumnName(), "o.id")),
+			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable+" p", ProjectGrantColumnProjectID.toFullColumnName(), "p."+ProjectColumnID.toColumnName())).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" r", ProjectGrantColumnResourceOwner.toFullColumnName(), "r."+OrgColumnID.toColumnName())).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" o", ProjectGrantColumnOrgID.toFullColumnName(), "o."+OrgColumnID.toColumnName())),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			p := new(ProjectGrant)
 			err := row.Scan(
@@ -62,22 +62,23 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 
 func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
 	return sq.Select(
-			ProjectGrantColumnProjectID.toColumnName(),
-			ProjectGrantColumnGrantID.toColumnName(),
-			ProjectGrantColumnCreationDate.toColumnName(),
-			ProjectGrantColumnChangeDate.toColumnName(),
-			ProjectGrantColumnResourceOwner.toColumnName(),
-			ProjectGrantColumnState.toColumnName(),
-			ProjectGrantColumnSequence.toColumnName(),
-			ProjectColumnName.toColumnName(),
-			ProjectGrantColumnOrgID.toColumnName(),
-			"granted_org_name",
-			ProjectGrantColumnGrantedRoleKeys.toColumnName(),
-			OrgColumnName.toColumnName(),
-			"COUNT(grant_id) OVER ()").
+			ProjectGrantColumnProjectID.toFullColumnName(),
+			ProjectGrantColumnGrantID.toFullColumnName(),
+			ProjectGrantColumnCreationDate.toFullColumnName(),
+			ProjectGrantColumnChangeDate.toFullColumnName(),
+			ProjectGrantColumnResourceOwner.toFullColumnName(),
+			ProjectGrantColumnState.toFullColumnName(),
+			ProjectGrantColumnSequence.toFullColumnName(),
+			"p."+ProjectColumnName.toColumnName(),
+			ProjectGrantColumnOrgID.toFullColumnName(),
+			"o."+OrgColumnName.toColumnName(),
+			ProjectGrantColumnGrantedRoleKeys.toFullColumnName(),
+			"r."+OrgColumnName.toColumnName(),
+			"COUNT("+ProjectGrantColumnGrantID.toColumnName()+") OVER ()").
 			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName())).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable, OrgColumnResourceOwner.toColumnName(), OrgColumnID.toColumnName())),
+			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable+" p", ProjectGrantColumnProjectID.toFullColumnName(), "p."+ProjectColumnID.toColumnName())).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" r", ProjectGrantColumnResourceOwner.toFullColumnName(), "r."+OrgColumnID.toColumnName())).
+			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" o", ProjectGrantColumnOrgID.toFullColumnName(), "o."+OrgColumnID.toColumnName())),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var count uint64
@@ -197,7 +198,7 @@ func NewProjectGrantProjectIDSearchQuery(method TextComparison, value string) (S
 }
 
 func NewProjectGrantProjectNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectGrantColumnProjectName, value, method)
+	return NewTextQuery(ProjectColumnName, value, method)
 }
 
 func NewProjectGrantRoleKeySearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -234,42 +235,39 @@ const (
 	ProjectGrantColumnState
 	ProjectGrantColumnSequence
 	ProjectGrantColumnProjectID
-	ProjectGrantColumnProjectName
 	ProjectGrantColumnOrgID
-	ProjectGrantColumnOrgName
 	ProjectGrantColumnGrantID
 	ProjectGrantColumnGrantedRoleKeys
-	ProjectGrantColumnResourceOwnerName
 	ProjectGrantColumnCreatorName
 )
 
 func (c ProjectGrantColumn) toColumnName() string {
 	switch c {
 	case ProjectGrantColumnProjectID:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantProjectIDCol
+		return projection.ProjectGrantProjectIDCol
 	case ProjectGrantColumnGrantID:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantIDCol
+		return projection.ProjectGrantIDCol
 	case ProjectGrantColumnCreationDate:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantCreationDateCol
+		return projection.ProjectGrantCreationDateCol
 	case ProjectGrantColumnChangeDate:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantChangeDateCol
+		return projection.ProjectGrantChangeDateCol
 	case ProjectGrantColumnResourceOwner:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantResourceOwnerCol
+		return projection.ProjectGrantResourceOwnerCol
 	case ProjectGrantColumnState:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantStateCol
+		return projection.ProjectGrantStateCol
 	case ProjectGrantColumnSequence:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantSequenceCol
+		return projection.ProjectGrantSequenceCol
 	case ProjectGrantColumnOrgID:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantGrantedOrgIDCol
+		return projection.ProjectGrantGrantedOrgIDCol
 	case ProjectGrantColumnGrantedRoleKeys:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantRoleKeysCol
+		return projection.ProjectGrantRoleKeysCol
 	case ProjectGrantColumnCreatorName:
-		return projection.ProjectGrantProjectionTable + "." + projection.ProjectGrantCreatorCol
-	case ProjectGrantColumnOrgName:
-		return projection.OrgNameCol
-	case ProjectGrantColumnResourceOwnerName:
-		return projection.OrgNameCol
+		return projection.ProjectGrantCreatorCol
 	default:
 		return ""
 	}
+}
+
+func (c ProjectGrantColumn) toFullColumnName() string {
+	return projection.ProjectGrantProjectionTable + "." + c.toColumnName()
 }
