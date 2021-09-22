@@ -2,9 +2,6 @@
 title: API Endpoint Rate Limits
 ---
 
-:::caution
-This is subject to change
-:::
 
 ## api.zitadel.ch
 

@@ -2,9 +2,6 @@
 title: Login Rate Limits
 ---
 
-:::caution
-This is subject to change
-:::
 
 ## accounts.zitadel.ch
 
