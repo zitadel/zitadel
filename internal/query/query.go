@@ -83,6 +83,19 @@ func (r *Queries) iamByID(ctx context.Context, id string) (_ *ReadModel, err err
 	return readModel, nil
 }
 
-func GenerateJoinQuery(joinTable, mainField, joinField string) string {
-	return joinTable + " ON " + mainField + " = " + joinField
+type JoinData struct {
+	JoinTable string
+	MainField string
+	JoinField string
+}
+
+func GenerateJoinQuery(joinData []JoinData) string {
+	joins := ""
+	for _, data := range joinData {
+		if joins != "" {
+			joins += " "
+		}
+		joins += data.JoinTable + " ON " + data.MainField + " = " + data.JoinField
+	}
+	return joins
 }

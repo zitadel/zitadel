@@ -16,6 +16,11 @@ import (
 )
 
 func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+	joins := []JoinData{
+		{
+			projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName(),
+		},
+	}
 	return sq.Select(
 			ProjectGrantColumnProjectID.toColumnName(),
 			ProjectGrantColumnGrantID.toColumnName(),
@@ -30,7 +35,7 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			ProjectGrantColumnGrantedRoleKeys.toColumnName(),
 			"resource_owner_name").
 			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName())),
+			LeftJoin(GenerateJoinQuery(joins)),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			p := new(ProjectGrant)
 			err := row.Scan(
@@ -59,6 +64,11 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 }
 
 func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+	joins := []JoinData{
+		{
+			projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName(),
+		},
+	}
 	return sq.Select(
 			ProjectGrantColumnProjectID.toColumnName(),
 			ProjectGrantColumnGrantID.toColumnName(),
@@ -74,7 +84,7 @@ func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows)
 			"resource_owner_name",
 			"COUNT(grant_id) OVER ()").
 			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable, ProjectGrantColumnProjectID.toColumnName(), ProjectColumnID.toColumnName())),
+			LeftJoin(GenerateJoinQuery(joins)),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var count uint64
