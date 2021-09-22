@@ -16,17 +16,17 @@ import (
 
 func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
 	return sq.Select(
-			ProjectColumnID.toColumnName(),
-			ProjectColumnCreationDate.toColumnName(),
-			ProjectColumnChangeDate.toColumnName(),
-			ProjectColumnResourceOwner.toColumnName(),
-			ProjectColumnState.toColumnName(),
-			ProjectColumnSequence.toColumnName(),
-			ProjectColumnName.toColumnName(),
-			ProjectColumnProjectRoleAssertion.toColumnName(),
-			ProjectColumnProjectRoleCheck.toColumnName(),
-			ProjectColumnHasProjectCheck.toColumnName(),
-			ProjectColumnPrivateLabelingSetting.toColumnName()).
+			ProjectColumnID.toFullColumnName(),
+			ProjectColumnCreationDate.toFullColumnName(),
+			ProjectColumnChangeDate.toFullColumnName(),
+			ProjectColumnResourceOwner.toFullColumnName(),
+			ProjectColumnState.toFullColumnName(),
+			ProjectColumnSequence.toFullColumnName(),
+			ProjectColumnName.toFullColumnName(),
+			ProjectColumnProjectRoleAssertion.toFullColumnName(),
+			ProjectColumnProjectRoleCheck.toFullColumnName(),
+			ProjectColumnHasProjectCheck.toFullColumnName(),
+			ProjectColumnPrivateLabelingSetting.toFullColumnName()).
 			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -56,17 +56,17 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 
 func (q *Queries) prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
 	return sq.Select(
-			ProjectColumnID.toColumnName(),
-			ProjectColumnCreationDate.toColumnName(),
-			ProjectColumnChangeDate.toColumnName(),
-			ProjectColumnResourceOwner.toColumnName(),
-			ProjectColumnState.toColumnName(),
-			ProjectColumnSequence.toColumnName(),
-			ProjectColumnName.toColumnName(),
-			ProjectColumnProjectRoleAssertion.toColumnName(),
-			ProjectColumnProjectRoleCheck.toColumnName(),
-			ProjectColumnHasProjectCheck.toColumnName(),
-			ProjectColumnPrivateLabelingSetting.toColumnName(),
+			ProjectColumnID.toFullColumnName(),
+			ProjectColumnCreationDate.toFullColumnName(),
+			ProjectColumnChangeDate.toFullColumnName(),
+			ProjectColumnResourceOwner.toFullColumnName(),
+			ProjectColumnState.toFullColumnName(),
+			ProjectColumnSequence.toFullColumnName(),
+			ProjectColumnName.toFullColumnName(),
+			ProjectColumnProjectRoleAssertion.toFullColumnName(),
+			ProjectColumnProjectRoleCheck.toFullColumnName(),
+			ProjectColumnHasProjectCheck.toFullColumnName(),
+			ProjectColumnPrivateLabelingSetting.toFullColumnName(),
 			"COUNT(name) OVER ()").
 			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Projects, error) {
