@@ -15,11 +15,8 @@ CREATE TABLE zitadel.projections.project_grants (
       state INT2,
       sequence BIGINT,
 
-      project_name TEXT,
       granted_org_id TEXT,
-      granted_org_name TEXT,
       granted_role_keys TEXT Array,
-      resource_owner_name TEXT,
       creator_id TEXT,
 
       PRIMARY KEY (grant_id)
