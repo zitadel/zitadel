@@ -34,7 +34,7 @@ func FlowToPb(flow *query.Flow) *action_pb.Flow {
 	return &action_pb.Flow{
 		Type:           FlowTypeToPb(flow.Type),
 		Details:        object_grpc.ChangeToDetailsPb(flow.Sequence, flow.ChangeDate, flow.ResourceOwner),
-		State:          0, //TODO: state?
+		State:          action_pb.FlowState_FLOW_STATE_ACTIVE, //TODO: state in next release
 		TriggerActions: TriggerActionsToPb(flow.TriggerActions),
 	}
 }
