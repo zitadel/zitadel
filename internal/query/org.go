@@ -14,14 +14,14 @@ import (
 
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
-			OrgColumnID.toColumnName(),
-			OrgColumnCreationDate.toColumnName(),
-			OrgColumnChangeDate.toColumnName(),
-			OrgColumnResourceOwner.toColumnName(),
-			OrgColumnState.toColumnName(),
-			OrgColumnSequence.toColumnName(),
-			OrgColumnName.toColumnName(),
-			OrgColumnDomain.toColumnName()).
+			OrgColumnID.toFullColumnName(),
+			OrgColumnCreationDate.toFullColumnName(),
+			OrgColumnChangeDate.toFullColumnName(),
+			OrgColumnResourceOwner.toFullColumnName(),
+			OrgColumnState.toFullColumnName(),
+			OrgColumnSequence.toFullColumnName(),
+			OrgColumnName.toFullColumnName(),
+			OrgColumnDomain.toFullColumnName()).
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
@@ -47,14 +47,14 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 
 func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
-			OrgColumnID.toColumnName(),
-			OrgColumnCreationDate.toColumnName(),
-			OrgColumnChangeDate.toColumnName(),
-			OrgColumnResourceOwner.toColumnName(),
-			OrgColumnState.toColumnName(),
-			OrgColumnSequence.toColumnName(),
-			OrgColumnName.toColumnName(),
-			OrgColumnDomain.toColumnName(),
+			OrgColumnID.toFullColumnName(),
+			OrgColumnCreationDate.toFullColumnName(),
+			OrgColumnChangeDate.toFullColumnName(),
+			OrgColumnResourceOwner.toFullColumnName(),
+			OrgColumnState.toFullColumnName(),
+			OrgColumnSequence.toFullColumnName(),
+			OrgColumnName.toFullColumnName(),
+			OrgColumnDomain.toFullColumnName(),
 			"COUNT(name) OVER ()").
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
@@ -107,7 +107,7 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.toColumnName(): id,
+		OrgColumnID.toFullColumnName(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "unable to create sql stmt")
@@ -120,7 +120,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnDomain.toColumnName(): domain,
+		OrgColumnDomain.toFullColumnName(): domain,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -133,7 +133,7 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := q.prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		OrgColumnDomain.toColumnName(): domain,
+		OrgColumnDomain.toFullColumnName(): domain,
 	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -221,22 +221,26 @@ const (
 func (c OrgColumn) toColumnName() string {
 	switch c {
 	case OrgColumnCreationDate:
-		return projection.OrgProjectionTable + "." + projection.OrgCreationDateCol
+		return projection.OrgCreationDateCol
 	case OrgColumnChangeDate:
-		return projection.OrgProjectionTable + "." + projection.OrgChangeDateCol
+		return projection.OrgChangeDateCol
 	case OrgColumnResourceOwner:
-		return projection.OrgProjectionTable + "." + projection.OrgResourceOwnerCol
+		return projection.OrgResourceOwnerCol
 	case OrgColumnState:
-		return projection.OrgProjectionTable + "." + projection.OrgStateCol
+		return projection.OrgStateCol
 	case OrgColumnSequence:
-		return projection.OrgProjectionTable + "." + projection.OrgSequenceCol
+		return projection.OrgSequenceCol
 	case OrgColumnName:
-		return projection.OrgProjectionTable + "." + projection.OrgNameCol
+		return projection.OrgNameCol
 	case OrgColumnDomain:
-		return projection.OrgProjectionTable + "." + projection.OrgPrimaryDomainCol
+		return projection.OrgPrimaryDomainCol
 	case OrgColumnID:
-		return projection.OrgProjectionTable + "." + projection.OrgIDCol
+		return projection.OrgIDCol
 	default:
 		return ""
 	}
+}
+
+func (c OrgColumn) toFullColumnName() string {
+	return projection.OrgProjectionTable + "." + c.toColumnName()
 }

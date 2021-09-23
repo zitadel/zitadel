@@ -21,8 +21,8 @@ type LatestSequence struct {
 
 func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
 	return sq.Select(
-			CurrentSequenceColCurrentSequence.toColumnName(),
-			CurrentSequenceColTimestamp.toColumnName()).
+			CurrentSequenceColCurrentSequence.toFullColumnName(),
+			CurrentSequenceColTimestamp.toFullColumnName()).
 			From(currentSequencesTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
 			seq := new(LatestSequence)
@@ -43,7 +43,7 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 func (q *Queries) latestSequence(ctx context.Context, projection string) (*LatestSequence, error) {
 	query, scan := prepareLatestSequence()
 	stmt, args, err := query.Where(sq.Eq{
-		CurrentSequenceColProjectionName.toColumnName(): projection,
+		CurrentSequenceColProjectionName.toFullColumnName(): projection,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "unable to create sql stmt")
@@ -62,7 +62,7 @@ const (
 	CurrentSequenceColTimestamp
 )
 
-func (c CurrentSequenceColumn) toColumnName() string {
+func (c CurrentSequenceColumn) toFullColumnName() string {
 	switch c {
 	case CurrentSequenceColProjectionName:
 		return "projection_name"

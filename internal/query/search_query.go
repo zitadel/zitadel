@@ -2,10 +2,12 @@ package query
 
 import (
 	"errors"
-	"strings"
+	"log"
+	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/lib/pq"
 )
 
 type SearchResponse struct {
@@ -20,7 +22,10 @@ type SearchRequest struct {
 	Asc           bool
 }
 
-type Column interface{ toColumnName() string }
+type Column interface {
+	toFullColumnName() string
+	toColumnName() string
+}
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Offset > 0 {
@@ -35,7 +40,7 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query = query.OrderByClause(clause, req.SortingColumn.toColumnName())
+		query = query.OrderByClause(clause, req.SortingColumn.toFullColumnName())
 	}
 
 	return query
@@ -56,13 +61,14 @@ type TextQuery struct {
 var (
 	ErrInvalidCompare = errors.New("invalid compare")
 	ErrMissingColumn  = errors.New("missing column")
+	ErrInvalidNumber  = errors.New("value is no number")
 )
 
 func NewTextQuery(column Column, value string, compare TextComparison) (*TextQuery, error) {
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
 	}
-	if column == nil || column.toColumnName() == "" {
+	if column == nil || column.toFullColumnName() == "" {
 		return nil, ErrMissingColumn
 	}
 	return &TextQuery{
@@ -73,29 +79,32 @@ func NewTextQuery(column Column, value string, compare TextComparison) (*TextQue
 }
 
 func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	return query.Where(q.comp())
+	where, args := q.comp()
+	return query.Where(where, args...)
 }
 
-func (s *TextQuery) comp() sq.Sqlizer {
+func (s *TextQuery) comp() (comparison interface{}, args []interface{}) {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.toColumnName(): s.Text}
+		return sq.Eq{s.Column.toFullColumnName(): s.Text}, nil
 	case TextEqualsIgnoreCase:
-		return sq.Eq{"LOWER(" + s.Column.toColumnName() + ")": strings.ToLower(s.Text)}
+		return sq.ILike{s.Column.toFullColumnName(): s.Text}, nil
 	case TextStartsWith:
-		return sq.Like{s.Column.toColumnName(): s.Text + "%"}
+		return sq.Like{s.Column.toFullColumnName(): s.Text + "%"}, nil
 	case TextStartsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": strings.ToLower(s.Text) + "%"}
+		return sq.ILike{s.Column.toFullColumnName(): s.Text + "%"}, nil
 	case TextEndsWith:
-		return sq.Like{s.Column.toColumnName(): "%" + s.Text}
+		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text}, nil
 	case TextEndsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": "%" + strings.ToLower(s.Text)}
+		return sq.ILike{s.Column.toFullColumnName(): "%" + s.Text}, nil
 	case TextContains:
-		return sq.Like{s.Column.toColumnName(): "%" + s.Text + "%"}
+		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
 	case TextContainsIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}
+		return sq.ILike{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
+	case TextListContains:
+		return s.Column.toFullColumnName() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
 	}
-	return nil
+	return nil, nil
 }
 
 type TextComparison int
@@ -109,6 +118,7 @@ const (
 	TextEndsWithIgnoreCase
 	TextContains
 	TextContainsIgnoreCase
+	TextListContains
 
 	textCompareMax
 )
@@ -131,7 +141,86 @@ func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
 		return TextEndsWith
 	case domain.SearchMethodEndsWithIgnoreCase:
 		return TextEndsWithIgnoreCase
+	case domain.SearchMethodListContains:
+		return TextListContains
 	default:
 		return textCompareMax
+	}
+}
+
+type NumberQuery struct {
+	Column  Column
+	Number  interface{}
+	Compare NumberComparison
+}
+
+func NewNumberQuery(column Column, value interface{}, compare NumberComparison) (*NumberQuery, error) {
+	if compare < 0 || compare >= numberCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if column == nil || column.toFullColumnName() == "" {
+		return nil, ErrMissingColumn
+	}
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
+		//everything fine
+	default:
+		log.Println(reflect.TypeOf(value).Kind())
+		return nil, ErrInvalidNumber
+	}
+	return &NumberQuery{
+		Column:  column,
+		Number:  value,
+		Compare: compare,
+	}, nil
+}
+
+func (q *NumberQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	where, args := q.comp()
+	return query.Where(where, args...)
+}
+
+func (s *NumberQuery) comp() (comparison interface{}, args []interface{}) {
+	switch s.Compare {
+	case NumberEquals:
+		return sq.Eq{s.Column.toFullColumnName(): s.Number}, nil
+	case NumberNotEquals:
+		return sq.NotEq{s.Column.toFullColumnName(): s.Number}, nil
+	case NumberLess:
+		return sq.Lt{s.Column.toFullColumnName(): s.Number}, nil
+	case NumberGreater:
+		return sq.Gt{s.Column.toFullColumnName(): s.Number}, nil
+	case NumberListContains:
+		return s.Column.toFullColumnName() + " @> ? ", []interface{}{pq.Array(s.Number)}
+	}
+	return nil, nil
+}
+
+type NumberComparison int
+
+const (
+	NumberEquals NumberComparison = iota
+	NumberNotEquals
+	NumberLess
+	NumberGreater
+	NumberListContains
+
+	numberCompareMax
+)
+
+func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
+	switch m {
+	case domain.SearchMethodEquals:
+		return NumberEquals
+	case domain.SearchMethodNotEquals:
+		return NumberNotEquals
+	case domain.SearchMethodGreaterThan:
+		return NumberGreater
+	case domain.SearchMethodLessThan:
+		return NumberLess
+	case domain.SearchMethodListContains:
+		return NumberListContains
+	default:
+		return numberCompareMax
 	}
 }
