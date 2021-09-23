@@ -145,8 +145,8 @@ func GrantedProjectQueryNameToModel(query *proj_pb.ProjectNameQuery) *proj_model
 	}
 }
 
-func RoleQueriesToModel(queries []*proj_pb.RoleQuery) (_ []*proj_model.ProjectRoleSearchQuery, err error) {
-	q := make([]*proj_model.ProjectRoleSearchQuery, len(queries))
+func RoleQueriesToModel(queries []*proj_pb.RoleQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = RoleQueryToModel(query)
 		if err != nil {
@@ -156,30 +156,37 @@ func RoleQueriesToModel(queries []*proj_pb.RoleQuery) (_ []*proj_model.ProjectRo
 	return q, nil
 }
 
-func RoleQueryToModel(query *proj_pb.RoleQuery) (*proj_model.ProjectRoleSearchQuery, error) {
-	switch q := query.Query.(type) {
+func RoleQueryToModel(apiQuery *proj_pb.RoleQuery) (query.SearchQuery, error) {
+	switch q := apiQuery.Query.(type) {
 	case *proj_pb.RoleQuery_KeyQuery:
-		return RoleQueryKeyToModel(q.KeyQuery), nil
+		return query.NewProjectRoleKeySearchQuery(object.TextMethodToQuery(q.KeyQuery.Method), q.KeyQuery.Key)
 	case *proj_pb.RoleQuery_DisplayNameQuery:
-		return RoleQueryDisplayNameToModel(q.DisplayNameQuery), nil
+		return query.NewProjectRoleDisplayNameSearchQuery(object.TextMethodToQuery(q.DisplayNameQuery.Method), q.DisplayNameQuery.DisplayName)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
 	}
 }
 
-func RoleQueryKeyToModel(query *proj_pb.RoleKeyQuery) *proj_model.ProjectRoleSearchQuery {
-	return &proj_model.ProjectRoleSearchQuery{
-		Key:    proj_model.ProjectRoleSearchKeyKey,
-		Method: object.TextMethodToModel(query.Method),
-		Value:  query.Key,
+func RoleViewsToPb(roles []*query.ProjectRole) []*proj_pb.Role {
+	o := make([]*proj_pb.Role, len(roles))
+	for i, org := range roles {
+		o[i] = RoleViewToPb(org)
 	}
+	return o
 }
 
-func RoleQueryDisplayNameToModel(query *proj_pb.RoleDisplayNameQuery) *proj_model.ProjectRoleSearchQuery {
-	return &proj_model.ProjectRoleSearchQuery{
-		Key:    proj_model.ProjectRoleSearchKeyDisplayName,
-		Method: object.TextMethodToModel(query.Method),
-		Value:  query.DisplayName,
+func RoleViewToPb(role *query.ProjectRole) *proj_pb.Role {
+	return &proj_pb.Role{
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+		Details: object.ToViewDetailsPb(
+
+			role.Sequence,
+			role.CreationDate,
+			role.ChangeDate,
+			role.ResourceOwner,
+		),
 	}
 }
 

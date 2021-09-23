@@ -185,19 +185,26 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 }
 
 func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectRolesRequest) (*mgmt_pb.ListProjectRolesResponse, error) {
-	queries, err := ListProjectRolesRequestToModel(req)
+	queries, err := listProjectRolesRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
-	roles, err := s.project.SearchProjectRoles(ctx, req.ProjectId, queries)
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendProjectIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	roles, err := s.query.SearchProjectRoles(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectRolesResponse{
-		Result: project_grpc.RolesToPb(roles.Result),
+		Result: project_grpc.RoleViewsToPb(roles.ProjectRoles),
 		Details: object_grpc.ToListDetails(
-			roles.TotalResult,
+			roles.Count,
 			roles.Sequence,
 			roles.Timestamp,
 		),

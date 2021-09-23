@@ -15,7 +15,6 @@ type ProjectRepository interface {
 	SearchProjectMembers(ctx context.Context, request *model.ProjectMemberSearchRequest) (*model.ProjectMemberSearchResponse, error)
 	GetProjectMemberRoles(ctx context.Context) ([]string, error)
 
-	SearchProjectRoles(ctx context.Context, projectId string, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.ProjectChanges, error)
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.ApplicationView, error)

@@ -70,32 +70,6 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 	return result, nil
 }
 
-func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID string, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.AppendProjectQuery(projectID)
-	sequence, sequenceErr := repo.View.GetLatestProjectRoleSequence()
-	logging.Log("LSp0d-47suf").OnError(sequenceErr).Warn("could not read latest project role sequence")
-	roles, count, err := repo.View.SearchProjectRoles(request)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &proj_model.ProjectRoleSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.ProjectRolesToModel(roles),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ProjectChanges, error) {
 	changes, err := repo.getProjectChanges(ctx, id, lastSequence, limit, sortAscending, retention)
 	if err != nil {

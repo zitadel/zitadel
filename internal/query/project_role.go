@@ -172,12 +172,33 @@ func NewProjectRoleResourceOwnerSearchQuery(method TextComparison, value string)
 	return NewTextQuery(ProjectRoleColumnResourceOwner, value, method)
 }
 
+func NewProjectRoleKeySearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectRoleColumnKey, value, method)
+}
+
+func NewProjectRoleDisplayNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectRoleColumnDisplayName, value, method)
+}
+
+func NewProjectRoleGroupSearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectRoleColumnGroupName, value, method)
+}
+
 func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
 		query = q.ToQuery(query)
 	}
 	return query
+}
+
+func (r *ProjectRoleSearchQueries) AppendProjectIDQuery(projectID string) error {
+	query, err := NewProjectRoleProjectIDSearchQuery(TextEquals, projectID)
+	if err != nil {
+		return err
+	}
+	r.Queries = append(r.Queries, query)
+	return nil
 }
 
 func (r *ProjectRoleSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
