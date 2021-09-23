@@ -2,6 +2,7 @@ package projection
 
 import (
 	"database/sql"
+	"reflect"
 	"testing"
 )
 
@@ -37,7 +38,7 @@ func (e *testExecuter) Validate(t *testing.T) {
 			if _, ok := e.expectedArgs[i].(anyArg); ok {
 				continue
 			}
-			if e.expectedArgs[i] != e.gottenArgs[i] {
+			if !reflect.DeepEqual(e.expectedArgs[i], e.gottenArgs[i]) {
 				t.Errorf("wrong argument at index %d: got: %v want: %v", i, e.gottenArgs[i], e.expectedArgs[i])
 			}
 		}

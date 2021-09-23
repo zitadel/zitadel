@@ -62,19 +62,16 @@ func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
-	ProjectGrantProjectIDCol         = "project_id"
-	ProjectGrantIDCol                = "grant_id"
-	ProjectGrantCreationDateCol      = "creation_date"
-	ProjectGrantChangeDateCol        = "change_date"
-	ProjectGrantResourceOwnerCol     = "resource_owner"
-	ProjectGrantStateCol             = "state"
-	ProjectGrantSequenceCol          = "sequence"
-	ProjectGrantProjectNameCol       = "project_name"
-	ProjectGrantGrantedOrgIDCol      = "granted_org_id"
-	ProjectGrantGrantedOrgNameCol    = "granted_org_name"
-	ProjectGrantRoleKeysCol          = "granted_role_keys"
-	ProjectGrantResourceOwnerNameCol = "resource_owner_name"
-	ProjectGrantCreatorCol           = "creator_id"
+	ProjectGrantProjectIDCol     = "project_id"
+	ProjectGrantIDCol            = "grant_id"
+	ProjectGrantCreationDateCol  = "creation_date"
+	ProjectGrantChangeDateCol    = "change_date"
+	ProjectGrantResourceOwnerCol = "resource_owner"
+	ProjectGrantStateCol         = "state"
+	ProjectGrantSequenceCol      = "sequence"
+	ProjectGrantGrantedOrgIDCol  = "granted_org_id"
+	ProjectGrantRoleKeysCol      = "granted_role_keys"
+	ProjectGrantCreatorCol       = "creator_id"
 )
 
 func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -86,18 +83,15 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.EventR
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectGrantProjectIDCol, e.Aggregate().ID),
 			handler.NewCol(ProjectGrantIDCol, e.GrantID),
+			handler.NewCol(ProjectGrantProjectIDCol, e.Aggregate().ID),
 			handler.NewCol(ProjectGrantCreationDateCol, e.CreationDate()),
 			handler.NewCol(ProjectGrantChangeDateCol, e.CreationDate()),
 			handler.NewCol(ProjectGrantResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(ProjectGrantStateCol, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantSequenceCol, e.Sequence()),
-			handler.NewCol(ProjectGrantProjectNameCol, ""),
 			handler.NewCol(ProjectGrantGrantedOrgIDCol, e.GrantedOrgID),
-			handler.NewCol(ProjectGrantGrantedOrgNameCol, ""),
 			handler.NewCol(ProjectGrantRoleKeysCol, pq.StringArray(e.RoleKeys)),
-			handler.NewCol(ProjectGrantResourceOwnerNameCol, ""),
 			handler.NewCol(ProjectGrantCreatorCol, e.EditorUser()),
 		},
 	), nil

@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/lib/pq"
 )
 
 func TestProjectGrantProjection_reduces(t *testing.T) {
@@ -102,89 +103,87 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				},
 			},
 		},
-		//{
-		//	name: "reduceProjectGrantChanged",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.GrantChangedType),
-		//			project.AggregateType,
-		//			[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
-		//		), project.GrantChangedEventMapper),
-		//	},
-		//	reduce: (&ProjectGrantProjection{}).reduceProjectGrantChanged,
-		//	want: wantReduce{
-		//		projection:       ProjectGrantProjectionTable,
-		//		aggregateType:    eventstore.AggregateType("project"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec:   true,
-		//			expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
-		//			expectedArgs: []interface{}{
-		//				anyArg{},
-		//				uint64(15),
-		//				pq.StringArray{"admin", "user"},
-		//				"grant-id",
-		//				"agg-id",
-		//			},
-		//		},
-		//	},
-		//},
-		//{
-		//	name: "reduceProjectGrantChanged no changes",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.ProjectChangedType),
-		//			project.AggregateType,
-		//			[]byte(`{}`),
-		//		), project.GrantChangedEventMapper),
-		//	},
-		//	reduce: (&ProjectGrantProjection{}).reduceProjectGrantChanged,
-		//	want: wantReduce{
-		//		projection:       ProjectGrantProjectionTable,
-		//		aggregateType:    eventstore.AggregateType("project"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec: false,
-		//		},
-		//	},
-		//},
-		//{
-		//	name: "reduceProjectGrantAdded",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.GrantAddedType),
-		//			project.AggregateType,
-		//			[]byte(`{"name": "name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
-		//		), project.ProjectAddedEventMapper),
-		//	},
-		//	reduce: (&ProjectGrantProjection{}).reduceProjectGrantAdded,
-		//	want: wantReduce{
-		//		projection:       ProjectGrantProjectionTable,
-		//		aggregateType:    eventstore.AggregateType("project"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec:   true,
-		//			expectedStmt: "INSERT INTO zitadel.projections.project_grants (id, creation_date, change_date, resource_owner, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
-		//			expectedArgs: []interface{}{
-		//				"agg-id",
-		//				anyArg{},
-		//				anyArg{},
-		//				"ro-id",
-		//				uint64(15),
-		//				"name",
-		//				true,
-		//				true,
-		//				true,
-		//				domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
-		//				domain.ProjectStateActive,
-		//				"editor-user",
-		//			},
-		//		},
-		//	},
-		//},
+		{
+			name: "reduceProjectGrantChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantChangedType),
+					project.AggregateType,
+					[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
+				), project.GrantChangedEventMapper),
+			},
+			reduce: (&ProjectGrantProjection{}).reduceProjectGrantChanged,
+			want: wantReduce{
+				projection:       ProjectGrantProjectionTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					shouldExec:   true,
+					expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+					expectedArgs: []interface{}{
+						anyArg{},
+						uint64(15),
+						pq.StringArray{"admin", "user"},
+						"grant-id",
+						"agg-id",
+					},
+				},
+			},
+		},
+		{
+			name: "reduceProjectGrantChanged no changes",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantChangedType),
+					project.AggregateType,
+					[]byte(`{}`),
+				), project.GrantChangedEventMapper),
+			},
+			reduce: (&ProjectGrantProjection{}).reduceProjectGrantChanged,
+			want: wantReduce{
+				projection:       ProjectGrantProjectionTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					shouldExec: false,
+				},
+			},
+		},
+		{
+			name: "reduceProjectGrantAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantAddedType),
+					project.AggregateType,
+					[]byte(`{"grantId": "grant-id", "grantedOrgId": "granted-org-id", "roleKeys": ["admin", "user"] }`),
+				), project.GrantAddedEventMapper),
+			},
+			reduce: (&ProjectGrantProjection{}).reduceProjectGrantAdded,
+			want: wantReduce{
+				projection:       ProjectGrantProjectionTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					shouldExec:   true,
+					expectedStmt: "INSERT INTO zitadel.projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+					expectedArgs: []interface{}{
+						"grant-id",
+						"agg-id",
+						anyArg{},
+						anyArg{},
+						"ro-id",
+						domain.ProjectGrantStateActive,
+						uint64(15),
+						"granted-org-id",
+						pq.StringArray{"admin", "user"},
+						"editor-user",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
