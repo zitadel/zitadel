@@ -48,7 +48,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "errors.projects.not_found")
 				}
-				fmt.Printf("error: ", err.Error())
+				fmt.Printf("error: %v", err.Error())
 				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "errors.internal")
 			}
 			return p, nil

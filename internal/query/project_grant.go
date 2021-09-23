@@ -61,7 +61,7 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-n98GGs", "errors.project_grants.not_found")
 				}
-				fmt.Printf("error: ", err.Error())
+				fmt.Printf("error: %v", err.Error())
 				return nil, errors.ThrowInternal(err, "QUERY-M00sf", "errors.internal")
 			}
 			return p, nil
