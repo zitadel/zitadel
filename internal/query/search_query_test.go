@@ -487,3 +487,286 @@ func TestTextComparisonFromMethod(t *testing.T) {
 		})
 	}
 }
+
+func TestNewNumberQuery(t *testing.T) {
+	type args struct {
+		column  Column
+		value   interface{}
+		compare NumberComparison
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *NumberQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "too low compare",
+			args: args{
+				column:  &testCol{},
+				value:   "hurst",
+				compare: -1,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrInvalidCompare)
+			},
+		},
+		{
+			name: "too high compare",
+			args: args{
+				column:  &testCol{},
+				value:   "hurst",
+				compare: numberCompareMax,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrInvalidCompare)
+			},
+		},
+		{
+			name: "no column",
+			args: args{
+				column:  nil,
+				value:   "hurst",
+				compare: NumberEquals,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "no column name",
+			args: args{
+				column:  &testNoCol{},
+				value:   "hurst",
+				compare: NumberEquals,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "no number",
+			args: args{
+				column:  &testCol{},
+				value:   "hurst",
+				compare: NumberEquals,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrInvalidNumber)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				column:  &testCol{},
+				value:   5,
+				compare: NumberEquals,
+			},
+			want: &NumberQuery{
+				Column:  &testCol{},
+				Number:  5,
+				Compare: NumberEquals,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewNumberQuery(tt.args.column, tt.args.value, tt.args.compare)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewNumberQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewNumberQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewNumberQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNumberQuery_comp(t *testing.T) {
+	type fields struct {
+		Column  Column
+		Number  interface{}
+		Compare NumberComparison
+	}
+	type want struct {
+		query interface{}
+		args  []interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "equals",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: NumberEquals,
+			},
+			want: want{
+				query: sq.Eq{"test": 42},
+				args:  nil,
+			},
+		},
+		{
+			name: "not equals",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: NumberNotEquals,
+			},
+			want: want{
+				query: sq.NotEq{"test": 42},
+				args:  nil,
+			},
+		},
+		{
+			name: "less",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: NumberLess,
+			},
+			want: want{
+				query: sq.Lt{"test": 42},
+				args:  nil,
+			},
+		},
+		{
+			name: "greater",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: NumberGreater,
+			},
+			want: want{
+				query: sq.Gt{"test": 42},
+				args:  nil,
+			},
+		},
+		{
+			name: "list containts",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: NumberListContains,
+			},
+			want: want{
+				query: "test @> ? ",
+				args:  []interface{}{pq.Array(42)},
+			},
+		},
+		{
+			name: "too high comparison",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: numberCompareMax,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
+			name: "too low comparison",
+			fields: fields{
+				Column:  &testCol{},
+				Number:  42,
+				Compare: -1,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &NumberQuery{
+				Column:  tt.fields.Column,
+				Number:  tt.fields.Number,
+				Compare: tt.fields.Compare,
+			}
+			query, args := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+
+			if !reflect.DeepEqual(args, tt.want.args) {
+				t.Errorf("wrong args: want: %v, (%T), got: %v (%T)", tt.want.args, tt.want.args, args, args)
+			}
+		})
+	}
+}
+
+func TestNumberComparisonFromMethod(t *testing.T) {
+	type args struct {
+		m domain.SearchMethod
+	}
+	tests := []struct {
+		name string
+		args args
+		want NumberComparison
+	}{
+		{
+			name: "equals",
+			args: args{
+				m: domain.SearchMethodEquals,
+			},
+			want: NumberEquals,
+		},
+		{
+			name: "not equals",
+			args: args{
+				m: domain.SearchMethodNotEquals,
+			},
+			want: NumberNotEquals,
+		},
+		{
+			name: "less than",
+			args: args{
+				m: domain.SearchMethodLessThan,
+			},
+			want: NumberLess,
+		},
+		{
+			name: "greater than",
+			args: args{
+				m: domain.SearchMethodGreaterThan,
+			},
+			want: NumberGreater,
+		},
+		{
+			name: "list contains",
+			args: args{
+				m: domain.SearchMethodListContains,
+			},
+			want: NumberListContains,
+		},
+		{
+			name: "invalid search method",
+			args: args{
+				m: -1,
+			},
+			want: numberCompareMax,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NumberComparisonFromMethod(tt.args.m); got != tt.want {
+				t.Errorf("TextCompareFromMethod() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
