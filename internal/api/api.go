@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/grpc"
 
@@ -185,9 +186,9 @@ func (a *API) registerSpoolerDivCounters() {
 		metrics.SpoolerDivCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {
 			for _, view := range views {
-				labels := map[string]interface{}{
-					metrics.Database: view.Database,
-					metrics.ViewName: view.ViewName,
+				labels := map[string]attribute.Value{
+					metrics.Database: attribute.StringValue(view.Database),
+					metrics.ViewName: attribute.StringValue(view.ViewName),
 				}
 				result.Observe(
 					a.admin.GetSpoolerDiv(view.Database, view.ViewName),
