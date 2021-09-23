@@ -12,21 +12,21 @@ import (
 
 type testCol struct{}
 
-func (col *testCol) toFullColumnName() string {
+func (col *testCol) FullColumnName() string {
 	return "test"
 }
 
-func (col *testCol) toColumnName() string {
+func (col *testCol) ColumnName() string {
 	return "test"
 }
 
 type testNoCol struct{}
 
-func (col *testNoCol) toFullColumnName() string {
+func (col *testNoCol) FullColumnName() string {
 	return ""
 }
 
-func (col *testNoCol) toColumnName() string {
+func (col *testNoCol) ColumnName() string {
 	return ""
 }
 
@@ -118,7 +118,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           tt.fields.Asc,
 			}
 
-			query := sq.Select((&testCol{}).toFullColumnName()).From("test_table")
+			query := sq.Select((&testCol{}).FullColumnName()).From("test_table")
 			expectedQuery, _, _ := query.ToSql()
 
 			stmt, args, err := req.toQuery(query).ToSql()

@@ -14,14 +14,14 @@ import (
 
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
-			OrgColumnID.toFullColumnName(),
-			OrgColumnCreationDate.toFullColumnName(),
-			OrgColumnChangeDate.toFullColumnName(),
-			OrgColumnResourceOwner.toFullColumnName(),
-			OrgColumnState.toFullColumnName(),
-			OrgColumnSequence.toFullColumnName(),
-			OrgColumnName.toFullColumnName(),
-			OrgColumnDomain.toFullColumnName()).
+			projection.OrgColumnID.FullColumnName(),
+			projection.OrgColumnCreationDate.FullColumnName(),
+			projection.OrgColumnChangeDate.FullColumnName(),
+			projection.OrgColumnResourceOwner.FullColumnName(),
+			projection.OrgColumnState.FullColumnName(),
+			projection.OrgColumnSequence.FullColumnName(),
+			projection.OrgColumnName.FullColumnName(),
+			projection.OrgColumnDomain.FullColumnName()).
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
@@ -47,14 +47,14 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 
 func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
-			OrgColumnID.toFullColumnName(),
-			OrgColumnCreationDate.toFullColumnName(),
-			OrgColumnChangeDate.toFullColumnName(),
-			OrgColumnResourceOwner.toFullColumnName(),
-			OrgColumnState.toFullColumnName(),
-			OrgColumnSequence.toFullColumnName(),
-			OrgColumnName.toFullColumnName(),
-			OrgColumnDomain.toFullColumnName(),
+			projection.OrgColumnID.FullColumnName(),
+			projection.OrgColumnCreationDate.FullColumnName(),
+			projection.OrgColumnChangeDate.FullColumnName(),
+			projection.OrgColumnResourceOwner.FullColumnName(),
+			projection.OrgColumnState.FullColumnName(),
+			projection.OrgColumnSequence.FullColumnName(),
+			projection.OrgColumnName.FullColumnName(),
+			projection.OrgColumnDomain.FullColumnName(),
 			"COUNT(name) OVER ()").
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
@@ -107,7 +107,7 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.toFullColumnName(): id,
+		projection.OrgColumnID.FullColumnName(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "unable to create sql stmt")
@@ -120,7 +120,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnDomain.toFullColumnName(): domain,
+		projection.OrgColumnDomain.FullColumnName(): domain,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -133,7 +133,7 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := q.prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		OrgColumnDomain.toFullColumnName(): domain,
+		projection.OrgColumnDomain.FullColumnName(): domain,
 	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -190,11 +190,11 @@ type OrgSearchQueries struct {
 }
 
 func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(OrgColumnDomain, value, method)
+	return NewTextQuery(projection.OrgColumnDomain, value, method)
 }
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(OrgColumnName, value, method)
+	return NewTextQuery(projection.OrgColumnName, value, method)
 }
 
 func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -203,44 +203,4 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		query = q.ToQuery(query)
 	}
 	return query
-}
-
-type OrgColumn int32
-
-const (
-	OrgColumnCreationDate OrgColumn = iota + 1
-	OrgColumnChangeDate
-	OrgColumnResourceOwner
-	OrgColumnState
-	OrgColumnSequence
-	OrgColumnName
-	OrgColumnDomain
-	OrgColumnID
-)
-
-func (c OrgColumn) toColumnName() string {
-	switch c {
-	case OrgColumnCreationDate:
-		return projection.OrgCreationDateCol
-	case OrgColumnChangeDate:
-		return projection.OrgChangeDateCol
-	case OrgColumnResourceOwner:
-		return projection.OrgResourceOwnerCol
-	case OrgColumnState:
-		return projection.OrgStateCol
-	case OrgColumnSequence:
-		return projection.OrgSequenceCol
-	case OrgColumnName:
-		return projection.OrgNameCol
-	case OrgColumnDomain:
-		return projection.OrgPrimaryDomainCol
-	case OrgColumnID:
-		return projection.OrgIDCol
-	default:
-		return ""
-	}
-}
-
-func (c OrgColumn) toFullColumnName() string {
-	return projection.OrgProjectionTable + "." + c.toColumnName()
 }

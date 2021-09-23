@@ -23,8 +23,8 @@ type SearchRequest struct {
 }
 
 type Column interface {
-	toFullColumnName() string
-	toColumnName() string
+	FullColumnName() string
+	ColumnName() string
 }
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -40,7 +40,7 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query = query.OrderByClause(clause, req.SortingColumn.toFullColumnName())
+		query = query.OrderByClause(clause, req.SortingColumn.FullColumnName())
 	}
 
 	return query
@@ -68,7 +68,7 @@ func NewTextQuery(column Column, value string, compare TextComparison) (*TextQue
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
 	}
-	if column == nil || column.toFullColumnName() == "" {
+	if column == nil || column.FullColumnName() == "" {
 		return nil, ErrMissingColumn
 	}
 	return &TextQuery{
@@ -86,23 +86,23 @@ func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *TextQuery) comp() (comparison interface{}, args []interface{}) {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.toFullColumnName(): s.Text}, nil
+		return sq.Eq{s.Column.FullColumnName(): s.Text}, nil
 	case TextEqualsIgnoreCase:
-		return sq.ILike{s.Column.toFullColumnName(): s.Text}, nil
+		return sq.ILike{s.Column.FullColumnName(): s.Text}, nil
 	case TextStartsWith:
-		return sq.Like{s.Column.toFullColumnName(): s.Text + "%"}, nil
+		return sq.Like{s.Column.FullColumnName(): s.Text + "%"}, nil
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{s.Column.toFullColumnName(): s.Text + "%"}, nil
+		return sq.ILike{s.Column.FullColumnName(): s.Text + "%"}, nil
 	case TextEndsWith:
-		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text}, nil
+		return sq.Like{s.Column.FullColumnName(): "%" + s.Text}, nil
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{s.Column.toFullColumnName(): "%" + s.Text}, nil
+		return sq.ILike{s.Column.FullColumnName(): "%" + s.Text}, nil
 	case TextContains:
-		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
+		return sq.Like{s.Column.FullColumnName(): "%" + s.Text + "%"}, nil
 	case TextContainsIgnoreCase:
-		return sq.ILike{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
+		return sq.ILike{s.Column.FullColumnName(): "%" + s.Text + "%"}, nil
 	case TextListContains:
-		return s.Column.toFullColumnName() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
+		return s.Column.FullColumnName() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
 	}
 	return nil, nil
 }
@@ -158,7 +158,7 @@ func NewNumberQuery(column Column, value interface{}, compare NumberComparison) 
 	if compare < 0 || compare >= numberCompareMax {
 		return nil, ErrInvalidCompare
 	}
-	if column == nil || column.toFullColumnName() == "" {
+	if column == nil || column.FullColumnName() == "" {
 		return nil, ErrMissingColumn
 	}
 	switch reflect.TypeOf(value).Kind() {
@@ -183,15 +183,15 @@ func (q *NumberQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *NumberQuery) comp() (comparison interface{}, args []interface{}) {
 	switch s.Compare {
 	case NumberEquals:
-		return sq.Eq{s.Column.toFullColumnName(): s.Number}, nil
+		return sq.Eq{s.Column.FullColumnName(): s.Number}, nil
 	case NumberNotEquals:
-		return sq.NotEq{s.Column.toFullColumnName(): s.Number}, nil
+		return sq.NotEq{s.Column.FullColumnName(): s.Number}, nil
 	case NumberLess:
-		return sq.Lt{s.Column.toFullColumnName(): s.Number}, nil
+		return sq.Lt{s.Column.FullColumnName(): s.Number}, nil
 	case NumberGreater:
-		return sq.Gt{s.Column.toFullColumnName(): s.Number}, nil
+		return sq.Gt{s.Column.FullColumnName(): s.Number}, nil
 	case NumberListContains:
-		return s.Column.toFullColumnName() + " @> ? ", []interface{}{pq.Array(s.Number)}
+		return s.Column.FullColumnName() + " @> ? ", []interface{}{pq.Array(s.Number)}
 	}
 	return nil, nil
 }
