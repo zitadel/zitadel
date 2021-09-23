@@ -5,10 +5,11 @@ import (
 	"strings"
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
-	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type Config struct {
@@ -27,7 +28,7 @@ func (c *Config) NewTracer() error {
 	}
 
 	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
-	exporter, err := texporter.NewExporter(texporter.WithProjectID(c.ProjectID))
+	exporter, err := texporter.New(texporter.WithProjectID(c.ProjectID))
 	if err != nil {
 		return err
 	}

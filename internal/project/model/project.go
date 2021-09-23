@@ -3,20 +3,23 @@ package model
 import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 
+	"github.com/caos/zitadel/internal/domain"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Project struct {
 	es_models.ObjectRoot
 
-	State                ProjectState
-	Name                 string
-	Members              []*ProjectMember
-	Roles                []*ProjectRole
-	Applications         []*Application
-	Grants               []*ProjectGrant
-	ProjectRoleAssertion bool
-	ProjectRoleCheck     bool
+	State                  ProjectState
+	Name                   string
+	Members                []*ProjectMember
+	Roles                  []*ProjectRole
+	Applications           []*Application
+	Grants                 []*ProjectGrant
+	ProjectRoleAssertion   bool
+	ProjectRoleCheck       bool
+	HasProjectCheck        bool
+	PrivateLabelingSetting domain.PrivateLabelingSetting
 }
 type ProjectChanges struct {
 	Changes      []*ProjectChange
@@ -52,15 +55,6 @@ func (p *Project) IsActive() bool {
 
 func (p *Project) IsValid() bool {
 	return p.Name != ""
-}
-
-func (p *Project) GetMember(userID string) (int, *ProjectMember) {
-	for i, m := range p.Members {
-		if m.UserID == userID {
-			return i, m
-		}
-	}
-	return -1, nil
 }
 
 func (p *Project) ContainsRole(role *ProjectRole) bool {

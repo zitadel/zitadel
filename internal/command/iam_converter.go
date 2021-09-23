@@ -112,10 +112,10 @@ func writeModelToPasswordComplexityPolicy(wm *PasswordComplexityPolicyWriteModel
 	}
 }
 
-func writeModelToPasswordLockoutPolicy(wm *PasswordLockoutPolicyWriteModel) *domain.PasswordLockoutPolicy {
-	return &domain.PasswordLockoutPolicy{
+func writeModelToLockoutPolicy(wm *LockoutPolicyWriteModel) *domain.LockoutPolicy {
+	return &domain.LockoutPolicy{
 		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
-		MaxAttempts:         wm.MaxAttempts,
+		MaxPasswordAttempts: wm.MaxPasswordAttempts,
 		ShowLockOutFailures: wm.ShowLockOutFailures,
 	}
 }
@@ -130,11 +130,12 @@ func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolic
 
 func writeModelToIDPConfig(wm *IDPConfigWriteModel) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
-		IDPConfigID: wm.ConfigID,
-		Name:        wm.Name,
-		State:       wm.State,
-		StylingType: wm.StylingType,
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		IDPConfigID:  wm.ConfigID,
+		Name:         wm.Name,
+		State:        wm.State,
+		StylingType:  wm.StylingType,
+		AutoRegister: wm.AutoRegister,
 	}
 }
 
@@ -149,6 +150,17 @@ func writeModelToIDPOIDCConfig(wm *OIDCConfigWriteModel) *domain.OIDCIDPConfig {
 		TokenEndpoint:         wm.TokenEndpoint,
 		Scopes:                wm.Scopes,
 		UsernameMapping:       wm.UserNameMapping,
+	}
+}
+
+func writeModelToIDPJWTConfig(wm *JWTConfigWriteModel) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		IDPConfigID:  wm.IDPConfigID,
+		JWTEndpoint:  wm.JWTEndpoint,
+		Issuer:       wm.Issuer,
+		KeysEndpoint: wm.KeysEndpoint,
+		HeaderName:   wm.HeaderName,
 	}
 }
 

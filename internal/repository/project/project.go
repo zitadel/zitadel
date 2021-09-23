@@ -3,6 +3,8 @@ package project
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -35,9 +37,11 @@ func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *ev
 type ProjectAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name                 string `json:"name,omitempty"`
-	ProjectRoleAssertion bool   `json:"projectRoleAssertion,omitempty"`
-	ProjectRoleCheck     bool   `json:"projectRoleCheck,omitempty"`
+	Name                   string                        `json:"name,omitempty"`
+	ProjectRoleAssertion   bool                          `json:"projectRoleAssertion,omitempty"`
+	ProjectRoleCheck       bool                          `json:"projectRoleCheck,omitempty"`
+	HasProjectCheck        bool                          `json:"hasProjectCheck,omitempty"`
+	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
 }
 
 func (e *ProjectAddedEvent) Data() interface{} {
@@ -52,6 +56,10 @@ func NewProjectAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
+	projectRoleAssertion,
+	projectRoleCheck,
+	hasProjectCheck bool,
+	privateLabelingSetting domain.PrivateLabelingSetting,
 ) *ProjectAddedEvent {
 	return &ProjectAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -59,7 +67,11 @@ func NewProjectAddedEvent(
 			aggregate,
 			ProjectAddedType,
 		),
-		Name: name,
+		Name:                   name,
+		ProjectRoleAssertion:   projectRoleAssertion,
+		ProjectRoleCheck:       projectRoleCheck,
+		HasProjectCheck:        hasProjectCheck,
+		PrivateLabelingSetting: privateLabelingSetting,
 	}
 }
 
@@ -79,10 +91,12 @@ func ProjectAddedEventMapper(event *repository.Event) (eventstore.EventReader, e
 type ProjectChangeEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name                 *string `json:"name,omitempty"`
-	ProjectRoleAssertion *bool   `json:"projectRoleAssertion,omitempty"`
-	ProjectRoleCheck     *bool   `json:"projectRoleCheck,omitempty"`
-	oldName              string
+	Name                   *string                        `json:"name,omitempty"`
+	ProjectRoleAssertion   *bool                          `json:"projectRoleAssertion,omitempty"`
+	ProjectRoleCheck       *bool                          `json:"projectRoleCheck,omitempty"`
+	HasProjectCheck        *bool                          `json:"hasProjectCheck,omitempty"`
+	PrivateLabelingSetting *domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
+	oldName                string
 }
 
 func (e *ProjectChangeEvent) Data() interface{} {
@@ -139,6 +153,18 @@ func ChangeProjectRoleAssertion(projectRoleAssertion bool) func(event *ProjectCh
 func ChangeProjectRoleCheck(projectRoleCheck bool) func(event *ProjectChangeEvent) {
 	return func(e *ProjectChangeEvent) {
 		e.ProjectRoleCheck = &projectRoleCheck
+	}
+}
+
+func ChangeHasProjectCheck(ChangeHasProjectCheck bool) func(event *ProjectChangeEvent) {
+	return func(e *ProjectChangeEvent) {
+		e.HasProjectCheck = &ChangeHasProjectCheck
+	}
+}
+
+func ChangePrivateLabelingSetting(ChangePrivateLabelingSetting domain.PrivateLabelingSetting) func(event *ProjectChangeEvent) {
+	return func(e *ProjectChangeEvent) {
+		e.PrivateLabelingSetting = &ChangePrivateLabelingSetting
 	}
 }
 

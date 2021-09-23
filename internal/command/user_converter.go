@@ -143,3 +143,22 @@ func authRequestDomainToAuthRequestInfo(authRequest *domain.AuthRequest) *user.A
 	}
 	return info
 }
+
+func writeModelToPasswordlessInitCode(initCodeModel *HumanPasswordlessInitCodeWriteModel, code string) *domain.PasswordlessInitCode {
+	return &domain.PasswordlessInitCode{
+		ObjectRoot: writeModelToObjectRoot(initCodeModel.WriteModel),
+		CodeID:     initCodeModel.CodeID,
+		Code:       code,
+		Expiration: initCodeModel.Expiration,
+		State:      initCodeModel.State,
+	}
+}
+
+func writeModelToUserMetadata(wm *UserMetadataWriteModel) *domain.Metadata {
+	return &domain.Metadata{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Key:        wm.Key,
+		Value:      wm.Value,
+		State:      wm.State,
+	}
+}

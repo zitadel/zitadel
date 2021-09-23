@@ -92,6 +92,7 @@ Errors:
       NotAllowed: External IDP not allowed on this organisation
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
+      NotFound: External IDP not found
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
@@ -115,7 +116,7 @@ Errors:
       Invalid: Refresh Token is invalid
       NotFound: Refresh Token not found
   Org:
-    AlreadyExist: Organisationname already taken
+    AlreadyExists: Organisationname already taken
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
     AlreadyActive: Organisation is already ative
@@ -359,6 +360,11 @@ Errors:
     ReadError: Error in reading translation file
     MergeError: Translation file could not be merged with custom translations
     NotFound: Translation file doesn't exist
+  MetaData:
+    NotFound: Metadata not found
+    NoData: Metadata list is empty
+    Invalid: Metadata is invalid
+    KeyNotExisting: One or more keys do not exist
 EventTypes:
   user:
     added: User added
@@ -478,6 +484,14 @@ EventTypes:
             failed: Passwordless Login check failed
           signcount:
             changed: Checksum of the Passwordless Login Token has been changed
+        initialization:
+          code:
+            added: Passwordless initialisation code added
+            sent: Passwordless initialisation code sent
+            requested: Passwordless initialisation code requested
+            check:
+              succeeded: Passwordless initialisation code successfuly checked
+              failed: Passwordless initialisation code check failed
       signed:
         out: User signed out
       refresh:

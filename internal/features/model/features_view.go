@@ -28,8 +28,11 @@ type FeaturesView struct {
 	LabelPolicyPrivateLabel  bool
 	LabelPolicyWatermark     bool
 	CustomDomain             bool
-	CustomText               bool
 	PrivacyPolicy            bool
+	MetadataUser             bool
+	CustomTextMessage        bool
+	CustomTextLogin          bool
+	LockoutPolicy            bool
 }
 
 func (f *FeaturesView) FeatureList() []string {
@@ -64,11 +67,20 @@ func (f *FeaturesView) FeatureList() []string {
 	if f.CustomDomain {
 		list = append(list, domain.FeatureCustomDomain)
 	}
-	if f.CustomText {
-		list = append(list, domain.FeatureCustomText)
-	}
 	if f.PrivacyPolicy {
 		list = append(list, domain.FeaturePrivacyPolicy)
+	}
+	if f.MetadataUser {
+		list = append(list, domain.FeatureMetadataUser)
+	}
+	if f.CustomTextMessage {
+		list = append(list, domain.FeatureCustomTextMessage)
+	}
+	if f.CustomTextLogin {
+		list = append(list, domain.FeatureCustomTextLogin)
+	}
+	if f.LockoutPolicy {
+		list = append(list, domain.FeatureLockoutPolicy)
 	}
 	return list
 }

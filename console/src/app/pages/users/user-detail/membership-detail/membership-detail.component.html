@@ -1,6 +1,11 @@
 <app-detail-layout [backRouterLink]="[ '/users', user?.id]"
     title="{{user?.human?.displayName}} {{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
     description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
+    <cnsl-info-section class="context-wrapper">
+      <span *ngIf="isMe">{{'USER.MEMBERSHIPS.USERCONTEXT' | translate}}</span>
+      <span *ngIf="!isMe">{{'USER.MEMBERSHIPS.ORGCONTEXT' | translate}}</span>
+    </cnsl-info-section>
+
     <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 

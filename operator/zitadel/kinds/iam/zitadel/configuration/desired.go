@@ -19,7 +19,7 @@ type Configuration struct {
 	DNS                 *DNS           `yaml:"dns"`
 	ClusterDNS          string         `yaml:"clusterdns"`
 	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
-	Sentry              *Sentry        `yaml:"sentry,omitempty"`
+	Proxy               *Proxy         `yaml:"proxy,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
@@ -144,10 +144,10 @@ type Cache struct {
 	ShortSharedMaxAge string `yaml:"shortSharedMaxAge,omitempty"`
 }
 
-type Sentry struct {
-	SentryDSN         *secret.Secret   `yaml:"sentryDSN,omitempty"`
-	ExistingSentryDSN *secret.Existing `yaml:"existingSentryDSN,omitempty"`
-	Environment       string           `yaml:"environment,omitempty"`
-	Version           string           `yaml:"version,omitempty"`
-	Usage             string           `yaml:"usage,omitempty"`
+type Proxy struct {
+	NoProxy       []string         `yaml:"noProxy,omitempty"`
+	HTTP          *secret.Secret   `yaml:"http,omitempty"`
+	HTTPS         *secret.Secret   `yaml:"https,omitempty"`
+	ExistingHTTP  *secret.Existing `yaml:"existingHTTP,omitempty"`
+	ExistingHTTPS *secret.Existing `yaml:"existingHTTPS,omitempty"`
 }

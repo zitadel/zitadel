@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -16,6 +18,7 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -139,7 +142,9 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		es_model.HumanPasswordlessTokenAdded,
 		es_model.HumanPasswordlessTokenVerified,
 		es_model.HumanPasswordlessTokenRemoved,
-		es_model.MachineChanged:
+		es_model.MachineChanged,
+		es_models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
+		es_models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err

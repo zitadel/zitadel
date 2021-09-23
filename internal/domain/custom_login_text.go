@@ -159,6 +159,28 @@ const (
 	LoginKeyPasswordlessNotSupported            = LoginKeyPasswordless + "NotSupported"
 	LoginKeyPasswordlessErrorRetry              = LoginKeyPasswordless + "ErrorRetry"
 
+	LoginKeyPasswordlessPrompt                       = "PasswordlessPrompt."
+	LoginKeyPasswordlessPromptTitle                  = LoginKeyPasswordlessPrompt + "Title"
+	LoginKeyPasswordlessPromptDescription            = LoginKeyPasswordlessPrompt + "Description"
+	LoginKeyPasswordlessPromptDescriptionInit        = LoginKeyPasswordlessPrompt + "DescriptionInit"
+	LoginKeyPasswordlessPromptPasswordlessButtonText = LoginKeyPasswordlessPrompt + "PasswordlessButtonText"
+	LoginKeyPasswordlessPromptNextButtonText         = LoginKeyPasswordlessPrompt + "NextButtonText"
+	LoginKeyPasswordlessPromptSkipButtonText         = LoginKeyPasswordlessPrompt + "SkipButtonText"
+
+	LoginKeyPasswordlessRegistration                        = "PasswordlessRegistration."
+	LoginKeyPasswordlessRegistrationTitle                   = LoginKeyPasswordlessRegistration + "Title"
+	LoginKeyPasswordlessRegistrationDescription             = LoginKeyPasswordlessRegistration + "Description"
+	LoginKeyPasswordlessRegistrationRegisterTokenButtonText = LoginKeyPasswordlessRegistration + "RegisterTokenButtonText"
+	LoginKeyPasswordlessRegistrationTokenNameLabel          = LoginKeyPasswordlessRegistration + "TokenNameLabel"
+	LoginKeyPasswordlessRegistrationNotSupported            = LoginKeyPasswordlessRegistration + "NotSupported"
+	LoginKeyPasswordlessRegistrationErrorRetry              = LoginKeyPasswordlessRegistration + "ErrorRetry"
+
+	LoginKeyPasswordlessRegistrationDone                 = "PasswordlessRegistrationDone."
+	LoginKeyPasswordlessRegistrationDoneTitle            = LoginKeyPasswordlessRegistrationDone + "Title"
+	LoginKeyPasswordlessRegistrationDoneDescription      = LoginKeyPasswordlessRegistrationDone + "Description"
+	LoginKeyPasswordlessRegistrationDoneNextButtonText   = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
+	LoginKeyPasswordlessRegistrationDoneCancelButtonText = LoginKeyPasswordlessRegistrationDone + "CancelButtonText"
+
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
@@ -204,6 +226,24 @@ const (
 	LoginKeyRegistrationUserNextButtonText         = LoginKeyRegistrationUser + "NextButtonText"
 	LoginKeyRegistrationUserBackButtonText         = LoginKeyRegistrationUser + "BackButtonText"
 
+	LoginKeyExternalRegistrationUserOverview                   = "ExternalRegistrationUserOverview."
+	LoginKeyExternalRegistrationUserOverviewTitle              = LoginKeyExternalRegistrationUserOverview + "Title"
+	LoginKeyExternalRegistrationUserOverviewDescription        = LoginKeyExternalRegistrationUserOverview + "Description"
+	LoginKeyExternalRegistrationUserOverviewEmailLabel         = LoginKeyExternalRegistrationUserOverview + "EmailLabel"
+	LoginKeyExternalRegistrationUserOverviewUsernameLabel      = LoginKeyExternalRegistrationUserOverview + "UsernameLabel"
+	LoginKeyExternalRegistrationUserOverviewFirstnameLabel     = LoginKeyExternalRegistrationUserOverview + "FirstnameLabel"
+	LoginKeyExternalRegistrationUserOverviewLastnameLabel      = LoginKeyExternalRegistrationUserOverview + "LastnameLabel"
+	LoginKeyExternalRegistrationUserOverviewNicknameLabel      = LoginKeyExternalRegistrationUserOverview + "NicknameLabel"
+	LoginKeyExternalRegistrationUserOverviewPhoneLabel         = LoginKeyExternalRegistrationUserOverview + "PhoneLabel"
+	LoginKeyExternalRegistrationUserOverviewLanguageLabel      = LoginKeyExternalRegistrationUserOverview + "LanguageLabel"
+	LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel = LoginKeyExternalRegistrationUserOverview + "TosAndPrivacyLabel"
+	LoginKeyExternalRegistrationUserOverviewTOSConfirm         = LoginKeyExternalRegistrationUserOverview + "TosConfirm"
+	LoginKeyExternalRegistrationUserOverviewTOSLinkText        = LoginKeyExternalRegistrationUserOverview + "TosLinkText"
+	LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd      = LoginKeyExternalRegistrationUserOverview + "TosConfirmAnd"
+	LoginKeyExternalRegistrationUserOverviewPrivacyLinkText    = LoginKeyExternalRegistrationUserOverview + "PrivacyLinkText"
+	LoginKeyExternalRegistrationUserOverviewBackButtonText     = LoginKeyExternalRegistrationUserOverview + "BackButtonText"
+	LoginKeyExternalRegistrationUserOverviewNextButtonText     = LoginKeyExternalRegistrationUserOverview + "NextButtonText"
+
 	LoginKeyRegistrationOrg                 = "RegistrationOrg."
 	LoginKeyRegisterOrgTitle                = LoginKeyRegistrationOrg + "Title"
 	LoginKeyRegisterOrgDescription          = LoginKeyRegistrationOrg + "Description"
@@ -232,6 +272,11 @@ const (
 	LoginKeyExternalNotFoundDescription            = LoginKeyExternalNotFound + "Description"
 	LoginKeyExternalNotFoundLinkButtonText         = LoginKeyExternalNotFound + "LinkButtonText"
 	LoginKeyExternalNotFoundAutoRegisterButtonText = LoginKeyExternalNotFound + "AutoRegisterButtonText"
+	LoginKeyExternalNotFoundTOSAndPrivacyLabel     = LoginKeyExternalNotFound + "TosAndPrivacyLabel"
+	LoginKeyExternalNotFoundTOSConfirm             = LoginKeyExternalNotFound + "TosConfirm"
+	LoginKeyExternalNotFoundTOSLinkText            = LoginKeyExternalNotFound + "TosLinkText"
+	LoginKeyExternalNotFoundTOSConfirmAnd          = LoginKeyExternalNotFound + "TosConfirmAnd"
+	LoginKeyExternalNotFoundPrivacyLinkText        = LoginKeyExternalNotFound + "PrivacyLinkText"
 
 	LoginKeySuccessLogin                        = "LoginSuccess."
 	LoginKeySuccessLoginTitle                   = LoginKeySuccessLogin + "Title"
@@ -258,36 +303,40 @@ type CustomLoginText struct {
 	Default  bool
 	Language language.Tag
 
-	SelectAccount          SelectAccountScreenText
-	Login                  LoginScreenText
-	Password               PasswordScreenText
-	UsernameChange         UsernameChangeScreenText
-	UsernameChangeDone     UsernameChangeDoneScreenText
-	InitPassword           InitPasswordScreenText
-	InitPasswordDone       InitPasswordDoneScreenText
-	EmailVerification      EmailVerificationScreenText
-	EmailVerificationDone  EmailVerificationDoneScreenText
-	InitUser               InitializeUserScreenText
-	InitUserDone           InitializeUserDoneScreenText
-	InitMFAPrompt          InitMFAPromptScreenText
-	InitMFAOTP             InitMFAOTPScreenText
-	InitMFAU2F             InitMFAU2FScreenText
-	InitMFADone            InitMFADoneScreenText
-	MFAProvider            MFAProvidersText
-	VerifyMFAOTP           VerifyMFAOTPScreenText
-	VerifyMFAU2F           VerifyMFAU2FScreenText
-	Passwordless           PasswordlessScreenText
-	PasswordChange         PasswordChangeScreenText
-	PasswordChangeDone     PasswordChangeDoneScreenText
-	PasswordResetDone      PasswordResetDoneScreenText
-	RegisterOption         RegistrationOptionScreenText
-	RegistrationUser       RegistrationUserScreenText
-	RegistrationOrg        RegistrationOrgScreenText
-	LinkingUsersDone       LinkingUserDoneScreenText
-	ExternalNotFoundOption ExternalUserNotFoundScreenText
-	LoginSuccess           SuccessLoginScreenText
-	LogoutDone             LogoutDoneScreenText
-	Footer                 FooterText
+	SelectAccount                    SelectAccountScreenText
+	Login                            LoginScreenText
+	Password                         PasswordScreenText
+	UsernameChange                   UsernameChangeScreenText
+	UsernameChangeDone               UsernameChangeDoneScreenText
+	InitPassword                     InitPasswordScreenText
+	InitPasswordDone                 InitPasswordDoneScreenText
+	EmailVerification                EmailVerificationScreenText
+	EmailVerificationDone            EmailVerificationDoneScreenText
+	InitUser                         InitializeUserScreenText
+	InitUserDone                     InitializeUserDoneScreenText
+	InitMFAPrompt                    InitMFAPromptScreenText
+	InitMFAOTP                       InitMFAOTPScreenText
+	InitMFAU2F                       InitMFAU2FScreenText
+	InitMFADone                      InitMFADoneScreenText
+	MFAProvider                      MFAProvidersText
+	VerifyMFAOTP                     VerifyMFAOTPScreenText
+	VerifyMFAU2F                     VerifyMFAU2FScreenText
+	Passwordless                     PasswordlessScreenText
+	PasswordlessPrompt               PasswordlessPromptScreenText
+	PasswordlessRegistration         PasswordlessRegistrationScreenText
+	PasswordlessRegistrationDone     PasswordlessRegistrationDoneScreenText
+	PasswordChange                   PasswordChangeScreenText
+	PasswordChangeDone               PasswordChangeDoneScreenText
+	PasswordResetDone                PasswordResetDoneScreenText
+	RegisterOption                   RegistrationOptionScreenText
+	RegistrationUser                 RegistrationUserScreenText
+	ExternalRegistrationUserOverview ExternalRegistrationUserOverviewScreenText
+	RegistrationOrg                  RegistrationOrgScreenText
+	LinkingUsersDone                 LinkingUserDoneScreenText
+	ExternalNotFoundOption           ExternalUserNotFoundScreenText
+	LoginSuccess                     SuccessLoginScreenText
+	LogoutDone                       LogoutDoneScreenText
+	Footer                           FooterText
 }
 
 func (m *CustomLoginText) IsValid() bool {
@@ -513,6 +562,25 @@ type RegistrationUserScreenText struct {
 	BackButtonText         string
 }
 
+type ExternalRegistrationUserOverviewScreenText struct {
+	Title              string
+	Description        string
+	EmailLabel         string
+	UsernameLabel      string
+	FirstnameLabel     string
+	LastnameLabel      string
+	NicknameLabel      string
+	LanguageLabel      string
+	PhoneLabel         string
+	TOSAndPrivacyLabel string
+	TOSConfirm         string
+	TOSLinkText        string
+	TOSConfirmAnd      string
+	PrivacyLinkText    string
+	BackButtonText     string
+	NextButtonText     string
+}
+
 type RegistrationOrgScreenText struct {
 	Title                string
 	Description          string
@@ -543,6 +611,11 @@ type ExternalUserNotFoundScreenText struct {
 	Description            string
 	LinkButtonText         string
 	AutoRegisterButtonText string
+	TOSAndPrivacyLabel     string
+	TOSConfirm             string
+	TOSLinkText            string
+	TOSConfirmAnd          string
+	PrivacyLinkText        string
 }
 
 type SuccessLoginScreenText struct {
@@ -563,4 +636,29 @@ type FooterText struct {
 	PrivacyPolicy string
 	Help          string
 	HelpLink      string
+}
+
+type PasswordlessPromptScreenText struct {
+	Title                  string
+	Description            string
+	DescriptionInit        string
+	PasswordlessButtonText string
+	NextButtonText         string
+	SkipButtonText         string
+}
+
+type PasswordlessRegistrationScreenText struct {
+	Title                   string
+	Description             string
+	RegisterTokenButtonText string
+	TokenNameLabel          string
+	NotSupported            string
+	ErrorRetry              string
+}
+
+type PasswordlessRegistrationDoneScreenText struct {
+	Title            string
+	Description      string
+	NextButtonText   string
+	CancelButtonText string
 }

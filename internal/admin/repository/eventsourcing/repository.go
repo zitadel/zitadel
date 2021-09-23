@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore/v1"
@@ -34,7 +35,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -48,7 +49,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, s
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, static, localDevMode)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, command, static, localDevMode)
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
 	statikLoginFS, err := fs.NewWithNamespace("login")

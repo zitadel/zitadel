@@ -118,6 +118,18 @@ Adds a new oidc identity provider configuration the IAM
     POST: /idps/oidc
 
 
+### AddJWTIDP
+
+> **rpc** AddJWTIDP([AddJWTIDPRequest](#addjwtidprequest))
+[AddJWTIDPResponse](#addjwtidpresponse)
+
+Adds a new jwt identity provider configuration the IAM
+
+
+
+    POST: /idps/jwt
+
+
 ### UpdateIDP
 
 > **rpc** UpdateIDP([UpdateIDPRequest](#updateidprequest))
@@ -180,6 +192,19 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
     PUT: /idps/{idp_id}/oidc_config
+
+
+### UpdateIDPJWTConfig
+
+> **rpc** UpdateIDPJWTConfig([UpdateIDPJWTConfigRequest](#updateidpjwtconfigrequest))
+[UpdateIDPJWTConfigResponse](#updateidpjwtconfigresponse)
+
+Updates the jwt configuration of the specified idp
+all fields are updated. If no value is provided the field will be empty afterwards.
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
 
 
 ### GetDefaultFeatures
@@ -615,24 +640,24 @@ it impacts all organisations without a customised policy
     PUT: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
-Returns the password lockout policy defined by the administrators of ZITADEL
-
-
-
-    GET: /policies/password/lockout
+Returns the lockout policy defined by the administrators of ZITADEL
 
 
-### UpdatePasswordLockoutPolicy
 
-> **rpc** UpdatePasswordLockoutPolicy([UpdatePasswordLockoutPolicyRequest](#updatepasswordlockoutpolicyrequest))
-[UpdatePasswordLockoutPolicyResponse](#updatepasswordlockoutpolicyresponse)
+    GET: /policies/lockout
 
-Updates the default password lockout policy of ZITADEL
+
+### UpdateLockoutPolicy
+
+> **rpc** UpdateLockoutPolicy([UpdateLockoutPolicyRequest](#updatelockoutpolicyrequest))
+[UpdateLockoutPolicyResponse](#updatelockoutpolicyresponse)
+
+Updates the default lockout policy of ZITADEL
 it impacts all organisations without a customised policy
 
 
@@ -851,13 +876,52 @@ Returns the custom text for domain claimed message (overwritten in eventstore)
 [SetDefaultDomainClaimedMessageTextResponse](#setdefaultdomainclaimedmessagetextresponse)
 
 Sets the default custom text for domain claimed phone message
-it impacts all organisations without customized verify phone message text
+it impacts all organisations without customized domain claimed message text
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
 
 
-    PUT: /text/message/verifyphone/{language}
+    PUT: /text/message/domainclaimed/{language}
+
+
+### GetDefaultPasswordlessRegistrationMessageText
+
+> **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
+[GetDefaultPasswordlessRegistrationMessageTextResponse](#getdefaultpasswordlessregistrationmessagetextresponse)
+
+Returns the default text for passwordless registration message (translation file)
+
+
+
+    GET: /text/default/message/passwordless_registration/{language}
+
+
+### GetCustomPasswordlessRegistrationMessageText
+
+> **rpc** GetCustomPasswordlessRegistrationMessageText([GetCustomPasswordlessRegistrationMessageTextRequest](#getcustompasswordlessregistrationmessagetextrequest))
+[GetCustomPasswordlessRegistrationMessageTextResponse](#getcustompasswordlessregistrationmessagetextresponse)
+
+Returns the custom text for passwordless registration message (overwritten in eventstore)
+
+
+
+    GET: /text/message/passwordless_registration/{language}
+
+
+### SetDefaultPasswordlessRegistrationMessageText
+
+> **rpc** SetDefaultPasswordlessRegistrationMessageText([SetDefaultPasswordlessRegistrationMessageTextRequest](#setdefaultpasswordlessregistrationmessagetextrequest))
+[SetDefaultPasswordlessRegistrationMessageTextResponse](#setdefaultpasswordlessregistrationmessagetextresponse)
+
+Sets the default custom text for passwordless registration message
+it impacts all organisations without customized passwordless registration message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+    PUT: /text/message/passwordless_registration/{language}
 
 
 ### GetDefaultLoginTexts
@@ -1126,6 +1190,35 @@ This is an empty request
 
 
 
+### AddJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddMultiFactorToLoginPolicyRequest
 
 
@@ -1162,6 +1255,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -1366,6 +1460,28 @@ This is an empty response
 
 
 
+### GetCustomPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordlessRegistrationMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomVerifyEmailMessageTextRequest
 
 
@@ -1515,6 +1631,28 @@ This is an empty response
 
 
 
+### GetDefaultPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetDefaultVerifyEmailMessageTextRequest
 
 
@@ -1594,6 +1732,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
 
 
 
@@ -1706,23 +1861,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-
-
-
-
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
@@ -2351,6 +2489,10 @@ This is an empty request
 | success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 | logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
 | footer_text |  zitadel.text.v1.FooterText | - |  |
+| passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
+| passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -2417,6 +2559,10 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
+| custom_text_message |  bool | - |  |
+| custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2480,6 +2626,35 @@ This is an empty request
 
 
 ### SetDefaultPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultPasswordlessRegistrationMessageTextResponse
 
 
 
@@ -2573,6 +2748,10 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
+| custom_text_message |  bool | - |  |
+| custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
 
 
 
@@ -2726,6 +2905,32 @@ This is an empty request
 
 
 
+### UpdateIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateIDPOIDCConfigRequest
 
 
@@ -2763,6 +2968,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -2799,6 +3005,28 @@ This is an empty request
 
 
 ### UpdateLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | failed attempts until a user gets locked |  |
+
+
+
+
+### UpdateLockoutPolicyResponse
 
 
 
@@ -2897,29 +3125,6 @@ This is an empty request
 
 
 ### UpdatePasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdatePasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | failed attempts until a user gets locked |  |
-| show_lockout_failure |  bool | If an error should be displayed during a lockout or not |  |
-
-
-
-
-### UpdatePasswordLockoutPolicyResponse
 
 
 

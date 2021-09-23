@@ -236,6 +236,78 @@ Changes the username
     GET: /users/{user_id}/username
 
 
+### SetUserMetadata
+
+> **rpc** SetUserMetadata([SetUserMetadataRequest](#setusermetadatarequest))
+[SetUserMetadataResponse](#setusermetadataresponse)
+
+Sets a user metadata by key
+
+
+
+    POST: /users/{id}/metadata/{key}
+
+
+### BulkSetUserMetadata
+
+> **rpc** BulkSetUserMetadata([BulkSetUserMetadataRequest](#bulksetusermetadatarequest))
+[BulkSetUserMetadataResponse](#bulksetusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    POST: /users/{id}/metadata/_bulk
+
+
+### ListUserMetadata
+
+> **rpc** ListUserMetadata([ListUserMetadataRequest](#listusermetadatarequest))
+[ListUserMetadataResponse](#listusermetadataresponse)
+
+Returns the user metadata
+
+
+
+    POST: /users/{id}/metadata/_search
+
+
+### GetUserMetadata
+
+> **rpc** GetUserMetadata([GetUserMetadataRequest](#getusermetadatarequest))
+[GetUserMetadataResponse](#getusermetadataresponse)
+
+Returns the user metadata by key
+
+
+
+    GET: /users/{id}/metadata/{key}
+
+
+### RemoveUserMetadata
+
+> **rpc** RemoveUserMetadata([RemoveUserMetadataRequest](#removeusermetadatarequest))
+[RemoveUserMetadataResponse](#removeusermetadataresponse)
+
+Removes a user metadata by key
+
+
+
+    DELETE: /users/{id}/metadata/{key}
+
+
+### BulkRemoveUserMetadata
+
+> **rpc** BulkRemoveUserMetadata([BulkRemoveUserMetadataRequest](#bulkremoveusermetadatarequest))
+[BulkRemoveUserMetadataResponse](#bulkremoveusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    DELETE: /users/{id}/metadata/_bulk
+
+
 ### GetHumanProfile
 
 > **rpc** GetHumanProfile([GetHumanProfileRequest](#gethumanprofilerequest))
@@ -450,11 +522,25 @@ The u2f (universial second factor) will be removed from the user
 > **rpc** ListHumanPasswordless([ListHumanPasswordlessRequest](#listhumanpasswordlessrequest))
 [ListHumanPasswordlessResponse](#listhumanpasswordlessresponse)
 
-Returns all configured passwordless authentications
+Returns all configured passwordless authenticators
 
 
 
     POST: /users/{user_id}/passwordless/_search
+
+
+### SendPasswordlessRegistration
+
+> **rpc** SendPasswordlessRegistration([SendPasswordlessRegistrationRequest](#sendpasswordlessregistrationrequest))
+[SendPasswordlessRegistrationResponse](#sendpasswordlessregistrationresponse)
+
+Adds a new passwordless authenticator link to the user and sends it to the registered email address
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/{user_id}/passwordless/_send_link
 
 
 ### RemoveHumanPasswordless
@@ -462,7 +548,7 @@ Returns all configured passwordless authentications
 > **rpc** RemoveHumanPasswordless([RemoveHumanPasswordlessRequest](#removehumanpasswordlessrequest))
 [RemoveHumanPasswordlessResponse](#removehumanpasswordlessresponse)
 
-Removed a configured passwordless authentication
+Removed a configured passwordless authenticator
 
 
 
@@ -1840,64 +1926,64 @@ The password age policy is not used at the moment
     DELETE: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
 
 
-    GET: /policies/password/lockout
 
 
-### GetDefaultPasswordLockoutPolicy
-
-> **rpc** GetDefaultPasswordLockoutPolicy([GetDefaultPasswordLockoutPolicyRequest](#getdefaultpasswordlockoutpolicyrequest))
-[GetDefaultPasswordLockoutPolicyResponse](#getdefaultpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/lockout
 
 
+### GetDefaultLockoutPolicy
 
-    GET: /policies/default/password/lockout
-
-
-### AddCustomPasswordLockoutPolicy
-
-> **rpc** AddCustomPasswordLockoutPolicy([AddCustomPasswordLockoutPolicyRequest](#addcustompasswordlockoutpolicyrequest))
-[AddCustomPasswordLockoutPolicyResponse](#addcustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetDefaultLockoutPolicy([GetDefaultLockoutPolicyRequest](#getdefaultlockoutpolicyrequest))
+[GetDefaultLockoutPolicyResponse](#getdefaultlockoutpolicyresponse)
 
 
 
-    POST: /policies/password/lockout
 
 
-### UpdateCustomPasswordLockoutPolicy
-
-> **rpc** UpdateCustomPasswordLockoutPolicy([UpdateCustomPasswordLockoutPolicyRequest](#updatecustompasswordlockoutpolicyrequest))
-[UpdateCustomPasswordLockoutPolicyResponse](#updatecustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/default/lockout
 
 
+### AddCustomLockoutPolicy
 
-    PUT: /policies/password/lockout
-
-
-### ResetPasswordLockoutPolicyToDefault
-
-> **rpc** ResetPasswordLockoutPolicyToDefault([ResetPasswordLockoutPolicyToDefaultRequest](#resetpasswordlockoutpolicytodefaultrequest))
-[ResetPasswordLockoutPolicyToDefaultResponse](#resetpasswordlockoutpolicytodefaultresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** AddCustomLockoutPolicy([AddCustomLockoutPolicyRequest](#addcustomlockoutpolicyrequest))
+[AddCustomLockoutPolicyResponse](#addcustomlockoutpolicyresponse)
 
 
 
-    DELETE: /policies/password/lockout
+
+
+    POST: /policies/lockout
+
+
+### UpdateCustomLockoutPolicy
+
+> **rpc** UpdateCustomLockoutPolicy([UpdateCustomLockoutPolicyRequest](#updatecustomlockoutpolicyrequest))
+[UpdateCustomLockoutPolicyResponse](#updatecustomlockoutpolicyresponse)
+
+
+
+
+
+    PUT: /policies/lockout
+
+
+### ResetLockoutPolicyToDefault
+
+> **rpc** ResetLockoutPolicyToDefault([ResetLockoutPolicyToDefaultRequest](#resetlockoutpolicytodefaultrequest))
+[ResetLockoutPolicyToDefaultResponse](#resetlockoutpolicytodefaultresponse)
+
+
+
+
+
+    DELETE: /policies/lockout
 
 
 ### GetPrivacyPolicy
@@ -2144,8 +2230,7 @@ Returns the default text for initial message
 > **rpc** SetCustomInitMessageText([SetCustomInitMessageTextRequest](#setcustominitmessagetextrequest))
 [SetCustomInitMessageTextResponse](#setcustominitmessagetextresponse)
 
-Sets the default custom text for initial message
-it impacts all organisations without customized initial message text
+Sets the custom text for initial message
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2196,8 +2281,7 @@ Returns the default text for password reset message
 > **rpc** SetCustomPasswordResetMessageText([SetCustomPasswordResetMessageTextRequest](#setcustompasswordresetmessagetextrequest))
 [SetCustomPasswordResetMessageTextResponse](#setcustompasswordresetmessagetextresponse)
 
-Sets the default custom text for password reset message
-it impacts all organisations without customized password reset message text
+Sets the custom text for password reset message
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2248,8 +2332,7 @@ Returns the default text for verify email message
 > **rpc** SetCustomVerifyEmailMessageText([SetCustomVerifyEmailMessageTextRequest](#setcustomverifyemailmessagetextrequest))
 [SetCustomVerifyEmailMessageTextResponse](#setcustomverifyemailmessagetextresponse)
 
-Sets the default custom text for verify email message
-it impacts all organisations without customized verify email message text
+Sets the custom text for verify email message
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2301,7 +2384,6 @@ Returns the custom text for verify email message
 [SetCustomVerifyPhoneMessageTextResponse](#setcustomverifyphonemessagetextresponse)
 
 Sets the default custom text for verify email message
-it impacts all organisations without customized verify email message text
 The Following Variables can be used:
 {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2352,8 +2434,7 @@ Returns the custom text for domain claimed message
 > **rpc** SetCustomDomainClaimedMessageCustomText([SetCustomDomainClaimedMessageTextRequest](#setcustomdomainclaimedmessagetextrequest))
 [SetCustomDomainClaimedMessageTextResponse](#setcustomdomainclaimedmessagetextresponse)
 
-Sets the default custom text for domain claimed message
-it impacts all organisations without customized domain claimed message text
+Sets the custom text for domain claimed message
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
 
@@ -2367,12 +2448,63 @@ The Following Variables can be used:
 > **rpc** ResetCustomDomainClaimedMessageTextToDefault([ResetCustomDomainClaimedMessageTextToDefaultRequest](#resetcustomdomainclaimedmessagetexttodefaultrequest))
 [ResetCustomDomainClaimedMessageTextToDefaultResponse](#resetcustomdomainclaimedmessagetexttodefaultresponse)
 
-Removes the custom init message text of the organisation
+Removes the custom domain claimed message text of the organisation
 The default text of the IAM will trigger after
 
 
 
     DELETE: /text/message/domainclaimed/{language}
+
+
+### GetCustomPasswordlessRegistrationMessageText
+
+> **rpc** GetCustomPasswordlessRegistrationMessageText([GetCustomPasswordlessRegistrationMessageTextRequest](#getcustompasswordlessregistrationmessagetextrequest))
+[GetCustomPasswordlessRegistrationMessageTextResponse](#getcustompasswordlessregistrationmessagetextresponse)
+
+Returns the custom text for passwordless link message
+
+
+
+    GET: /text/message/passwordless_registration/{language}
+
+
+### GetDefaultPasswordlessRegistrationMessageText
+
+> **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
+[GetDefaultPasswordlessRegistrationMessageTextResponse](#getdefaultpasswordlessregistrationmessagetextresponse)
+
+Returns the custom text for passwordless link message
+
+
+
+    GET: /text/default/message/passwordless_registration/{language}
+
+
+### SetCustomPasswordlessRegistrationMessageCustomText
+
+> **rpc** SetCustomPasswordlessRegistrationMessageCustomText([SetCustomPasswordlessRegistrationMessageTextRequest](#setcustompasswordlessregistrationmessagetextrequest))
+[SetCustomPasswordlessRegistrationMessageTextResponse](#setcustompasswordlessregistrationmessagetextresponse)
+
+Sets the custom text for passwordless link message
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+    PUT: /text/message/passwordless_registration/{language}
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefault
+
+> **rpc** ResetCustomPasswordlessRegistrationMessageTextToDefault([ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest](#resetcustompasswordlessregistrationmessagetexttodefaultrequest))
+[ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse](#resetcustompasswordlessregistrationmessagetexttodefaultresponse)
+
+Removes the custom passwordless link message text of the organisation
+The default text of the IAM will trigger after
+
+
+
+    DELETE: /text/message/passwordless_registration/{language}
 
 
 ### GetCustomLoginTexts
@@ -2463,6 +2595,18 @@ Provider must be OIDC compliant
     POST: /idps/oidc
 
 
+### AddOrgJWTIDP
+
+> **rpc** AddOrgJWTIDP([AddOrgJWTIDPRequest](#addorgjwtidprequest))
+[AddOrgJWTIDPResponse](#addorgjwtidpresponse)
+
+Add a new jwt identity provider configuration in the organisation
+
+
+
+    POST: /idps/jwt
+
+
 ### DeactivateOrgIDP
 
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
@@ -2525,6 +2669,18 @@ Change OIDC identity provider configuration of the organisation
 
 
     PUT: /idps/{idp_id}/oidc_config
+
+
+### UpdateOrgIDPJWTConfig
+
+> **rpc** UpdateOrgIDPJWTConfig([UpdateOrgIDPJWTConfigRequest](#updateorgidpjwtconfigrequest))
+[UpdateOrgIDPJWTConfigResponse](#updateorgidpjwtconfigresponse)
+
+Change JWT identity provider configuration of the organisation
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
 
 
 
@@ -2637,6 +2793,28 @@ This is an empty request
 
 
 
+### AddCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+
+
+
+
+### AddCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomLoginPolicyRequest
 
 
@@ -2703,29 +2881,6 @@ This is an empty request
 
 
 ### AddCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyResponse
 
 
 
@@ -2986,6 +3141,35 @@ This is an empty request
 
 
 
+### AddOrgJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddOrgJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddOrgMemberRequest
 
 
@@ -3023,6 +3207,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -3145,6 +3330,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
+| has_project_check |  bool | - |  |
+| private_labeling_setting |  zitadel.project.v1.PrivateLabelingSetting | - | enum.defined_only: true<br />  |
 
 
 
@@ -3283,6 +3470,64 @@ This is an empty request
 
 ### BulkRemoveUserGrantResponse
 
+
+
+
+
+### BulkRemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| metadata | repeated BulkSetUserMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -3598,6 +3843,28 @@ This is an empty request
 
 
 
+### GetCustomPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordlessRegistrationMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomVerifyEmailMessageTextRequest
 
 
@@ -3703,6 +3970,23 @@ This is an empty request
 
 
 
+### GetDefaultLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
 ### GetDefaultLoginPolicyRequest
 
 
@@ -3776,23 +4060,6 @@ This is an empty request
 
 
 
-### GetDefaultPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetDefaultPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
-
-
-
-
 ### GetDefaultPasswordResetMessageTextRequest
 
 
@@ -3805,6 +4072,28 @@ This is an empty request
 
 
 ### GetDefaultPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordlessRegistrationMessageTextResponse
 
 
 
@@ -4021,6 +4310,24 @@ This is an empty request
 
 
 
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 
 
@@ -4194,24 +4501,6 @@ This is an empty request
 
 
 
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
-| is_default |  bool | - |  |
-
-
-
-
 ### GetPreviewLabelPolicyRequest
 This is an empty request
 
@@ -4376,6 +4665,29 @@ This is an empty request
 
 
 
+### GetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### HealthzRequest
 This is an empty request
 
@@ -4413,6 +4725,7 @@ This is an empty response
 | phone |  ImportHumanUserRequest.Phone | - |  |
 | password |  string | - |  |
 | password_change_required |  bool | - |  |
+| request_passwordless_registration |  bool | - |  |
 
 
 
@@ -4465,6 +4778,19 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
+| passwordless_registration |  ImportHumanUserResponse.PasswordlessRegistration | - |  |
+
+
+
+
+### ImportHumanUserResponse.PasswordlessRegistration
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| link |  string | - |  |
+| lifetime |  google.protobuf.Duration | - |  |
 
 
 
@@ -5142,6 +5468,31 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.user.v1.Membership | - |  |
+
+
+
+
+### ListUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -5950,6 +6301,29 @@ This is an empty response
 
 
 
+### RemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveUserRequest
 
 
@@ -6127,6 +6501,28 @@ This is an empty request
 
 
 
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomVerifyEmailMessageTextToDefaultRequest
 
 
@@ -6188,6 +6584,23 @@ This is an empty request
 
 
 
+### ResetLockoutPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetLockoutPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetLoginPolicyToDefaultRequest
 
 
@@ -6239,23 +6652,6 @@ This is an empty request
 
 
 
-### ResetPasswordLockoutPolicyToDefaultRequest
-This is an empty request
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### ResetPrivacyPolicyToDefaultRequest
 This is an empty request
 
@@ -6286,6 +6682,28 @@ This is an empty request
 
 
 ### SendHumanResetPasswordNotificationResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SendPasswordlessRegistrationRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SendPasswordlessRegistrationResponse
 
 
 
@@ -6391,6 +6809,10 @@ This is an empty request
 | success_login_text |  zitadel.text.v1.SuccessLoginScreenText | - |  |
 | logout_text |  zitadel.text.v1.LogoutDoneScreenText | - |  |
 | footer_text |  zitadel.text.v1.FooterText | - |  |
+| passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
+| passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
+| passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -6425,6 +6847,35 @@ This is an empty request
 
 
 ### SetCustomPasswordResetMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetCustomPasswordlessRegistrationMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetCustomPasswordlessRegistrationMessageTextResponse
 
 
 
@@ -6562,6 +7013,31 @@ This is an empty request
 
 
 
+### SetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UnlockUserRequest
 
 
@@ -6663,6 +7139,28 @@ This is an empty request
 
 
 
+### UpdateCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+
+
+
+
+### UpdateCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateCustomLoginPolicyRequest
 
 
@@ -6729,29 +7227,6 @@ This is an empty request
 
 
 ### UpdateCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyResponse
 
 
 
@@ -6921,6 +7396,32 @@ This is an empty request
 
 
 
+### UpdateOrgIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateOrgIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateOrgIDPOIDCConfigRequest
 
 
@@ -6958,6 +7459,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -7101,6 +7603,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
+| has_project_check |  bool | - |  |
+| private_labeling_setting |  zitadel.project.v1.PrivateLabelingSetting | - | enum.defined_only: true<br />  |
 
 
 

@@ -3,7 +3,6 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
-import { GetDefaultDomainClaimedMessageTextRequest } from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -17,14 +16,14 @@ import {
   AddAppKeyResponse,
   AddCustomLabelPolicyRequest,
   AddCustomLabelPolicyResponse,
+  AddCustomLockoutPolicyRequest,
+  AddCustomLockoutPolicyResponse,
   AddCustomLoginPolicyRequest,
   AddCustomLoginPolicyResponse,
   AddCustomPasswordAgePolicyRequest,
   AddCustomPasswordAgePolicyResponse,
   AddCustomPasswordComplexityPolicyRequest,
   AddCustomPasswordComplexityPolicyResponse,
-  AddCustomPasswordLockoutPolicyRequest,
-  AddCustomPasswordLockoutPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
   AddHumanUserRequest,
@@ -65,6 +64,8 @@ import {
   BulkAddProjectRolesResponse,
   BulkRemoveUserGrantRequest,
   BulkRemoveUserGrantResponse,
+  BulkSetUserMetadataRequest,
+  BulkSetUserMetadataResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -87,12 +88,15 @@ import {
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
   GetCustomLoginTextsResponse,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyEmailMessageTextResponse,
   GetCustomVerifyPhoneMessageTextRequest,
   GetCustomVerifyPhoneMessageTextResponse,
+  GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultDomainClaimedMessageTextResponse,
   GetDefaultInitMessageTextRequest,
   GetDefaultInitMessageTextResponse,
@@ -102,6 +106,8 @@ import {
   GetDefaultLoginTextsResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -122,6 +128,8 @@ import {
   GetIAMResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
+  GetLockoutPolicyRequest,
+  GetLockoutPolicyResponse,
   GetLoginPolicyRequest,
   GetLoginPolicyResponse,
   GetMyOrgRequest,
@@ -138,8 +146,6 @@ import {
   GetPasswordAgePolicyResponse,
   GetPasswordComplexityPolicyRequest,
   GetPasswordComplexityPolicyResponse,
-  GetPasswordLockoutPolicyRequest,
-  GetPasswordLockoutPolicyResponse,
   GetPreviewLabelPolicyRequest,
   GetPreviewLabelPolicyResponse,
   GetPrivacyPolicyRequest,
@@ -156,6 +162,8 @@ import {
   GetUserByLoginNameGlobalResponse,
   GetUserGrantByIDRequest,
   GetUserGrantByIDResponse,
+  GetUserMetadataRequest,
+  GetUserMetadataResponse,
   IDPQuery,
   ListAppChangesRequest,
   ListAppChangesResponse,
@@ -210,6 +218,8 @@ import {
   ListUserGrantResponse,
   ListUserMembershipsRequest,
   ListUserMembershipsResponse,
+  ListUserMetadataRequest,
+  ListUserMetadataResponse,
   ListUsersRequest,
   ListUsersResponse,
   ReactivateAppRequest,
@@ -278,6 +288,8 @@ import {
   RemoveSecondFactorFromLoginPolicyResponse,
   RemoveUserGrantRequest,
   RemoveUserGrantResponse,
+  RemoveUserMetadataRequest,
+  RemoveUserMetadataResponse,
   RemoveUserRequest,
   RemoveUserResponse,
   ResendHumanEmailVerificationRequest,
@@ -290,6 +302,8 @@ import {
   ResetCustomInitMessageTextToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
+  ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
   ResetCustomPasswordResetMessageTextToDefaultResponse,
   ResetCustomVerifyEmailMessageTextToDefaultRequest,
@@ -298,23 +312,27 @@ import {
   ResetCustomVerifyPhoneMessageTextToDefaultResponse,
   ResetLabelPolicyToDefaultRequest,
   ResetLabelPolicyToDefaultResponse,
+  ResetLockoutPolicyToDefaultRequest,
+  ResetLockoutPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
   ResetLoginPolicyToDefaultResponse,
   ResetPasswordAgePolicyToDefaultRequest,
   ResetPasswordAgePolicyToDefaultResponse,
   ResetPasswordComplexityPolicyToDefaultRequest,
   ResetPasswordComplexityPolicyToDefaultResponse,
-  ResetPasswordLockoutPolicyToDefaultRequest,
-  ResetPasswordLockoutPolicyToDefaultResponse,
   ResetPrivacyPolicyToDefaultRequest,
   ResetPrivacyPolicyToDefaultResponse,
   SendHumanResetPasswordNotificationRequest,
+  SendPasswordlessRegistrationRequest,
+  SendPasswordlessRegistrationResponse,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomDomainClaimedMessageTextResponse,
   SetCustomInitMessageTextRequest,
   SetCustomInitMessageTextResponse,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
+  SetCustomPasswordlessRegistrationMessageTextRequest,
+  SetCustomPasswordlessRegistrationMessageTextResponse,
   SetCustomPasswordResetMessageTextRequest,
   SetCustomPasswordResetMessageTextResponse,
   SetCustomVerifyEmailMessageTextRequest,
@@ -324,20 +342,24 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  SetUserMetadataRequest,
+  SetUserMetadataResponse,
+  UnlockUserRequest,
+  UnlockUserResponse,
   UpdateAPIAppConfigRequest,
   UpdateAPIAppConfigResponse,
   UpdateAppRequest,
   UpdateAppResponse,
   UpdateCustomLabelPolicyRequest,
   UpdateCustomLabelPolicyResponse,
+  UpdateCustomLockoutPolicyRequest,
+  UpdateCustomLockoutPolicyResponse,
   UpdateCustomLoginPolicyRequest,
   UpdateCustomLoginPolicyResponse,
   UpdateCustomPasswordAgePolicyRequest,
   UpdateCustomPasswordAgePolicyResponse,
   UpdateCustomPasswordComplexityPolicyRequest,
   UpdateCustomPasswordComplexityPolicyResponse,
-  UpdateCustomPasswordLockoutPolicyRequest,
-  UpdateCustomPasswordLockoutPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
   UpdateHumanEmailRequest,
@@ -372,6 +394,7 @@ import {
   ValidateOrgDomainResponse,
 } from '../proto/generated/zitadel/management_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
+import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
@@ -536,6 +559,30 @@ export class ManagementService {
     return this.grpcService.mgmt.resetCustomDomainClaimedMessageTextToDefault(req, null).then(resp => resp.toObject());
   }
 
+
+  public getDefaultPasswordlessRegistrationMessageText(req: GetDefaultPasswordlessRegistrationMessageTextRequest):
+    Promise<GetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomPasswordlessRegistrationMessageText(req: GetCustomPasswordlessRegistrationMessageTextRequest):
+    Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setCustomPasswordlessRegistrationMessageCustomText(req: SetCustomPasswordlessRegistrationMessageTextRequest):
+    Promise<SetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomPasswordlessRegistrationMessageCustomText(req, null).then(resp => resp.toObject());
+  }
+
+  public resetCustomPasswordlessRegistrationMessageTextToDefault(lang: string):
+    Promise<ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomPasswordlessRegistrationMessageTextToDefault(req, null)
+      .then(resp => resp.toObject());
+  }
+
   public listOrgIDPs(
     limit?: number,
     offset?: number,
@@ -554,6 +601,11 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.mgmt.listOrgIDPs(req, null).then(resp => resp.toObject());
+  }
+
+  public unlockUser(req: UnlockUserRequest):
+    Promise<UnlockUserResponse.AsObject> {
+    return this.grpcService.mgmt.unlockUser(req, null).then(resp => resp.toObject());
   }
 
   public getPrivacyPolicy():
@@ -589,6 +641,12 @@ export class ManagementService {
     req.setTokenId(tokenId);
     req.setUserId(userId);
     return this.grpcService.mgmt.removeHumanPasswordless(req, null).then(resp => resp.toObject());
+  }
+
+  public sendPasswordlessRegistration(userId: string): Promise<SendPasswordlessRegistrationResponse.AsObject> {
+    const req = new SendPasswordlessRegistrationRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.sendPasswordlessRegistration(req, null).then(resp => resp.toObject());
   }
 
   public listLoginPolicyMultiFactors(): Promise<ListLoginPolicyMultiFactorsResponse.AsObject> {
@@ -788,11 +846,10 @@ export class ManagementService {
 
   public removeHumanLinkedIDP(
     idpId: string,
-    userId: string,
     linkedUserId: string,
+    userId: string,
   ): Promise<RemoveHumanLinkedIDPResponse.AsObject> {
     const req = new RemoveHumanLinkedIDPRequest();
-    req.setUserId(userId);
     req.setIdpId(idpId);
     req.setUserId(userId);
     req.setLinkedUserId(linkedUserId);
@@ -1105,36 +1162,32 @@ export class ManagementService {
     return this.grpcService.mgmt.updateCustomPasswordComplexityPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse.AsObject> {
-    const req = new GetPasswordLockoutPolicyRequest();
-
-    return this.grpcService.mgmt.getPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+  public getLockoutPolicy(): Promise<GetLockoutPolicyResponse.AsObject> {
+    const req = new GetLockoutPolicyRequest();
+    return this.grpcService.mgmt.getLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public addCustomPasswordLockoutPolicy(
+  public addCustomLockoutPolicy(
     maxAttempts: number,
-    showLockoutFailures: boolean,
-  ): Promise<AddCustomPasswordLockoutPolicyResponse.AsObject> {
-    const req = new AddCustomPasswordLockoutPolicyRequest();
-    req.setMaxAttempts(maxAttempts);
-    req.setShowLockoutFailure(showLockoutFailures);
+  ): Promise<AddCustomLockoutPolicyResponse.AsObject> {
+    const req = new AddCustomLockoutPolicyRequest();
+    req.setMaxPasswordAttempts(maxAttempts);
 
-    return this.grpcService.mgmt.addCustomPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.addCustomLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public resetPasswordLockoutPolicyToDefault(): Promise<ResetPasswordLockoutPolicyToDefaultResponse.AsObject> {
-    const req = new ResetPasswordLockoutPolicyToDefaultRequest();
-    return this.grpcService.mgmt.resetPasswordLockoutPolicyToDefault(req, null).then(resp => resp.toObject());
+  public resetLockoutPolicyToDefault(): Promise<ResetLockoutPolicyToDefaultResponse.AsObject> {
+    const req = new ResetLockoutPolicyToDefaultRequest();
+    return this.grpcService.mgmt.resetLockoutPolicyToDefault(req, null).then(resp => resp.toObject());
   }
 
-  public updateCustomPasswordLockoutPolicy(
+  public updateCustomLockoutPolicy(
     maxAttempts: number,
-    showLockoutFailures: boolean,
-  ): Promise<UpdateCustomPasswordLockoutPolicyResponse.AsObject> {
-    const req = new UpdateCustomPasswordLockoutPolicyRequest();
-    req.setMaxAttempts(maxAttempts);
-    req.setShowLockoutFailure(showLockoutFailures);
-    return this.grpcService.mgmt.updateCustomPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+  ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
+    const req = new UpdateCustomLockoutPolicyRequest();
+    req.setMaxPasswordAttempts(maxAttempts);
+
+    return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
   public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
@@ -1153,6 +1206,54 @@ export class ManagementService {
     const req = new GetUserByIDRequest();
     req.setId(id);
     return this.grpcService.mgmt.getUserByID(req, null).then(resp => resp.toObject());
+  }
+
+  public listUserMetadata(userId: string, offset?: number, limit?: number, queryList?: MetadataQuery[]):
+    Promise<ListUserMetadataResponse.AsObject> {
+    const req = new ListUserMetadataRequest();
+
+    req.setId(userId);
+    const metadata = new ListQuery();
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.mgmt.listUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public getUserMetadata(userId: string, key: string): Promise<GetUserMetadataResponse.AsObject> {
+    const req = new GetUserMetadataRequest();
+    req.setId(userId);
+    req.setKey(key);
+    return this.grpcService.mgmt.getUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public setUserMetadata(key: string, value: string, userId: string): Promise<SetUserMetadataResponse.AsObject> {
+    const req = new SetUserMetadataRequest();
+    req.setKey(key);
+    req.setValue(value);
+    req.setId(userId);
+    return this.grpcService.mgmt.setUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public bulkSetUserMetadata(list: BulkSetUserMetadataRequest.Metadata[], userId: string):
+    Promise<BulkSetUserMetadataResponse.AsObject> {
+    const req = new BulkSetUserMetadataRequest();
+    req.setMetadataList(list);
+    req.setId(userId);
+    return this.grpcService.mgmt.bulkSetUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public removeUserMetadata(key: string, userId: string): Promise<RemoveUserMetadataResponse.AsObject> {
+    const req = new RemoveUserMetadataRequest();
+    req.setKey(key);
+    req.setId(userId);
+    return this.grpcService.mgmt.removeUserMetadata(req, null).then(resp => resp.toObject());
   }
 
   public removeUser(id: string): Promise<RemoveUserResponse.AsObject> {

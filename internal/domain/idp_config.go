@@ -9,12 +9,14 @@ import (
 
 type IDPConfig struct {
 	es_models.ObjectRoot
-	IDPConfigID string
-	Type        IDPConfigType
-	Name        string
-	StylingType IDPConfigStylingType
-	State       IDPConfigState
-	OIDCConfig  *OIDCIDPConfig
+	IDPConfigID  string
+	Type         IDPConfigType
+	Name         string
+	StylingType  IDPConfigStylingType
+	State        IDPConfigState
+	OIDCConfig   *OIDCIDPConfig
+	JWTConfig    *JWTIDPConfig
+	AutoRegister bool
 }
 
 type IDPConfigView struct {
@@ -27,6 +29,7 @@ type IDPConfigView struct {
 	ChangeDate      time.Time
 	Sequence        uint64
 	IDPProviderType IdentityProviderType
+	AutoRegister    bool
 
 	IsOIDC                     bool
 	OIDCClientID               string
@@ -37,6 +40,10 @@ type IDPConfigView struct {
 	OIDCUsernameMapping        OIDCMappingField
 	OAuthAuthorizationEndpoint string
 	OAuthTokenEndpoint         string
+
+	JWTEndpoint     string
+	JWTIssuer       string
+	JWTKeysEndpoint string
 }
 
 type OIDCIDPConfig struct {
@@ -53,11 +60,21 @@ type OIDCIDPConfig struct {
 	UsernameMapping       OIDCMappingField
 }
 
+type JWTIDPConfig struct {
+	es_models.ObjectRoot
+	IDPConfigID  string
+	JWTEndpoint  string
+	Issuer       string
+	KeysEndpoint string
+	HeaderName   string
+}
+
 type IDPConfigType int32
 
 const (
 	IDPConfigTypeOIDC IDPConfigType = iota
 	IDPConfigTypeSAML
+	IDPConfigTypeJWT
 
 	//count is for validation
 	idpConfigTypeCount

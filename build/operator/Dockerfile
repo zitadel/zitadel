@@ -6,7 +6,7 @@ ARG ENV=prod
 ## Go base build
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
-FROM golang:1.15 as go-base
+FROM golang:1.16 as go-base
 
 WORKDIR src/github.com/caos/zitadel/
 COPY go.mod go.sum ./
@@ -49,11 +49,15 @@ RUN adduser -D zitadel
 
 ARG ARCH=amd64
 ARG OS=linux
+
+RUN apk add -U --no-cache ca-certificates
+
 COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl /app/zitadelctl
 RUN chmod a+x /app/zitadelctl
 
 ## Scratch Image
 FROM scratch as final
+COPY --from=artifact /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /app /
 USER zitadel

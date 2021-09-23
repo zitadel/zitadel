@@ -2,13 +2,19 @@ package otel
 
 import (
 	"context"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"go.opentelemetry.io/otel/api/metric"
-	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/label"
 	"net/http"
 	"sync"
+
+	label "go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/metric"
+	export "go.opentelemetry.io/otel/sdk/export/metric"
+	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
+	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
+	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 )
 
 type Metrics struct {
@@ -20,8 +26,15 @@ type Metrics struct {
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
-	exporter, err := prometheus.NewExportPipeline(
+	exporter, err := prometheus.New(
 		prometheus.Config{},
+		controller.New(
+			processor.New(
+				selector.NewWithHistogramDistribution(),
+				export.CumulativeExportKindSelector(),
+				processor.WithMemory(true),
+			),
+		),
 	)
 	if err != nil {
 		return &Metrics{}, err
@@ -62,7 +75,7 @@ func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFu
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
-	sumObserver := metric.Must(m.Meter).NewInt64UpDownSumObserver(
+	sumObserver := metric.Must(m.Meter).NewInt64UpDownCounterObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)
@@ -73,7 +86,7 @@ func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc m
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
-	sumObserver := metric.Must(m.Meter).NewInt64ValueObserver(
+	sumObserver := metric.Must(m.Meter).NewInt64GaugeObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)

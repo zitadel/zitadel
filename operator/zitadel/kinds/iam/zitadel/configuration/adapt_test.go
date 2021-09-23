@@ -34,7 +34,7 @@ func SetConfigMap(
 			Name:      cmName,
 			Labels:    labels,
 		},
-		Data: literalsConfigMap(desired, users, certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath, version, queried),
+		Data: literalsConfigMap(desired, users, certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath, queried),
 	})
 }
 
@@ -215,7 +215,6 @@ func TestConfiguration_Adapt(t *testing.T) {
 		certPath,
 		secretName,
 		secretPath,
-		&version,
 		consoleCMName,
 		secretVarsName,
 		secretPasswordName,
@@ -325,7 +324,6 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 		certPath,
 		secretName,
 		secretPath,
-		&version,
 		consoleCMName,
 		secretVarsName,
 		secretPasswordName,

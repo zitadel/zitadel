@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -30,6 +32,7 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/setup"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
@@ -40,6 +43,9 @@ import (
 	"github.com/caos/zitadel/internal/ui/login"
 	"github.com/caos/zitadel/openapi"
 )
+
+// build argument
+var version = "dev"
 
 type Config struct {
 	Log            logging.Config
@@ -52,6 +58,7 @@ type Config struct {
 	EventstoreBase types.SQLBase
 	Commands       command.Config
 	Queries        query.Config
+	Projections    projection.Config
 
 	AuthZ authz.Config
 	Auth  auth_es.Config
@@ -94,8 +101,16 @@ const (
 
 func main() {
 	enableSentry, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE"))
+
 	if enableSentry {
-		err := sentry.Init(sentry.ClientOptions{})
+		sentryVersion := version
+		if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(version)) {
+			sentryVersion = "dev"
+		}
+		err := sentry.Init(sentry.ClientOptions{
+			Environment: os.Getenv("SENTRY_ENVIRONMENT"),
+			Release:     fmt.Sprintf("zitadel-%s", sentryVersion),
+		})
 		if err != nil {
 			logging.Log("MAIN-Gnzjw").WithError(err).Fatal("sentry init failed")
 		}
@@ -135,17 +150,16 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
-	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
-	if err != nil {
-		logging.Log("ZITAD-WpeJY").OnError(err).Fatal("cannot start queries")
-	}
+
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
+	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
+
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
-	verifier := internal_authz.Start(authZRepo)
+
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
-	if err != nil {
-		logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
-	}
+	logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
+
 	store, err := conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
@@ -153,12 +167,14 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
 	}
+
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
 		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
+	verifier := internal_authz.Start(authZRepo)
 	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store)
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
@@ -189,7 +205,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
-	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, static, roles, *localDevMode)
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, roles, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
 	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
@@ -203,7 +219,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo))
+		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
 	}
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)

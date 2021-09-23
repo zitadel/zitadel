@@ -44,6 +44,13 @@ SystemDefaults:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
+    PasswordlessInitCode:
+      Length: 12
+      Expiry: '1h'
+      IncludeLowerLetters: true
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
     MachineKeySize: 2048
     ApplicationKeySize: 2048
   Multifactors:
@@ -74,6 +81,7 @@ SystemDefaults:
       PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
       VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
       DomainClaimed: '$ZITADEL_ACCOUNTS/login'
+      PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
     Providers:
       Chat:
         Url: $CHAT_URL

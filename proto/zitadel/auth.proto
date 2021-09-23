@@ -7,8 +7,10 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/policy.proto";
 import "zitadel/idp.proto";
+import "zitadel/metadata.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -75,8 +77,9 @@ service AuthService {
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/me/changes/_search"
+            body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
@@ -86,6 +89,30 @@ service AuthService {
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
             post: "/users/me/sessions/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user metadata of the authorized user
+    rpc ListMyMetadata(ListMyMetadataRequest) returns (ListMyMetadataResponse) {
+        option (google.api.http) = {
+            post: "/users/me/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the user metadata by key of the authorized user
+    rpc GetMyMetadata(GetMyMetadataRequest) returns (GetMyMetadataResponse) {
+        option (google.api.http) = {
+            get: "/users/me/metadata/{key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -97,6 +124,7 @@ service AuthService {
     rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_search"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -119,6 +147,7 @@ service AuthService {
     rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
         option (google.api.http) = {
             post: "/users/me/tokens/refresh/_revoke_all"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -132,7 +161,7 @@ service AuthService {
             put: "/users/me/username"
             body: "*"
         };
-    
+
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
@@ -407,7 +436,7 @@ service AuthService {
         };
     }
 
-    // Returns all configured passwordless authentications of the authorized user
+    // Returns all configured passwordless authenticators of the authorized user
     rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless/_search"
@@ -417,11 +446,37 @@ service AuthService {
         };
     }
 
-    // Adds a new passwordless authentications to the authorized user
+    // Adds a new passwordless authenticator to the authorized user
     // Multiple passwordless authentications can be configured
     rpc AddMyPasswordless(AddMyPasswordlessRequest) returns (AddMyPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/me/passwordless"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Adds a new passwordless authenticator link to the authorized user and returns it directly
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc AddMyPasswordlessLink(AddMyPasswordlessLinkRequest) returns (AddMyPasswordlessLinkResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_link"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Adds a new passwordless authenticator link to the authorized user and sends it to the registered email address
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc SendMyPasswordlessLink(SendMyPasswordlessLinkRequest) returns (SendMyPasswordlessLinkResponse) {
+        option (google.api.http) = {
+            post: "/users/me/passwordless/_send_link"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -507,6 +562,19 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    // Show all the permissions my user has in ZITADEL (ZITADEL Manager)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse) {
+        option (google.api.http) = {
+            post: "/memberships/me/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //This is an empty request
@@ -550,6 +618,61 @@ message ListMyUserSessionsRequest {}
 
 message ListMyUserSessionsResponse {
     repeated zitadel.user.v1.Session result = 1;
+}
+
+message ListMyMetadataRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 2;
+}
+
+message ListMyMetadataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.Metadata result = 2;
+}
+
+message GetMyMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetMyMetadataResponse {
+    zitadel.metadata.v1.Metadata metadata = 1;
+}
+
+message SetMyMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkSetMyMetadataRequest {
+    message Metadata {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    }
+    repeated Metadata metadata = 1;
+}
+
+message BulkSetMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveMyMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveMyMetadataRequest {
+    repeated string keys = 1 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message BulkRemoveMyMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 //This is an empty request
@@ -775,7 +898,7 @@ message RemoveMyAuthFactorU2FResponse {
 message ListMyPasswordlessRequest {}
 
 message ListMyPasswordlessResponse {
-    repeated zitadel.user.v1.WebAuthNToken result = 1; 
+    repeated zitadel.user.v1.WebAuthNToken result = 1;
 }
 
 //This is an empty request
@@ -784,6 +907,22 @@ message AddMyPasswordlessRequest {}
 message AddMyPasswordlessResponse {
     zitadel.user.v1.WebAuthNKey key = 1;
     zitadel.v1.ObjectDetails details = 2;
+}
+
+//This is an empty request
+message AddMyPasswordlessLinkRequest {}
+
+message AddMyPasswordlessLinkResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
+}
+
+//This is an empty request
+message SendMyPasswordlessLinkRequest {}
+
+message SendMyPasswordlessLinkResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message VerifyMyPasswordlessRequest {
@@ -852,4 +991,16 @@ message ListMyProjectPermissionsRequest {}
 
 message ListMyProjectPermissionsResponse {
     repeated string result = 1;
+}
+
+message ListMyMembershipsRequest {
+    //the field the result is sorted
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.user.v1.MembershipQuery queries = 2;
+}
+
+message ListMyMembershipsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.Membership result = 2;
 }

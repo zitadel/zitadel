@@ -74,10 +74,7 @@ func TestManaged_Adapt1(t *testing.T) {
 	queried := map[string]interface{}{}
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,
@@ -195,10 +192,7 @@ func TestManaged_Adapt2(t *testing.T) {
 	queried := map[string]interface{}{}
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,

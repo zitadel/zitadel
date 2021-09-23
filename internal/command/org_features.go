@@ -40,8 +40,11 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.LabelPolicyPrivateLabel,
 		features.LabelPolicyWatermark,
 		features.CustomDomain,
-		features.CustomText,
 		features.PrivacyPolicy,
+		features.MetadataUser,
+		features.CustomTextMessage,
+		features.CustomTextLogin,
+		features.LockoutPolicy,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -128,13 +131,22 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeCustomDomainsEvents...)
 		}
 	}
-	if !features.CustomText {
-		removeCustomTextEvents, err := c.removeOrgMessageTextsIfExists(ctx, orgID)
+	if !features.CustomTextMessage {
+		removeCustomMessageTextEvents, err := c.removeOrgMessageTextsIfExists(ctx, orgID)
 		if err != nil {
 			return nil, err
 		}
-		if removeCustomTextEvents != nil {
-			events = append(events, removeCustomTextEvents...)
+		if removeCustomMessageTextEvents != nil {
+			events = append(events, removeCustomMessageTextEvents...)
+		}
+	}
+	if !features.CustomTextLogin {
+		removeCustomLoginTextEvents, err := c.removeOrgLoginTextsIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removeCustomLoginTextEvents != nil {
+			events = append(events, removeCustomLoginTextEvents...)
 		}
 	}
 	if !features.PrivacyPolicy {
@@ -144,6 +156,24 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 		}
 		if removePrivacyPolicyEvent != nil {
 			events = append(events, removePrivacyPolicyEvent)
+		}
+	}
+	if !features.LockoutPolicy {
+		removeLockoutPolicyEvent, err := c.removeLockoutPolicyIfExists(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if removeLockoutPolicyEvent != nil {
+			events = append(events, removeLockoutPolicyEvent)
+		}
+	}
+	if !features.MetadataUser {
+		removeOrgUserMetadatas, err := c.removeUserMetadataFromOrg(ctx, orgID)
+		if err != nil {
+			return nil, err
+		}
+		if len(removeOrgUserMetadatas) > 0 {
+			events = append(events, removeOrgUserMetadatas...)
 		}
 	}
 	return events, nil

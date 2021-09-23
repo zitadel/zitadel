@@ -3,20 +3,24 @@ package management
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
+	"github.com/caos/zitadel/internal/api/grpc/metadata"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
-	user, err := s.user.UserByID(ctx, req.Id)
+	user, err := s.user.UserByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +80,79 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 	}, nil
 }
 
+func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMetadataRequest) (*mgmt_pb.ListUserMetadataResponse, error) {
+	res, err := s.user.SearchMetadata(ctx, req.Id, authz.GetCtxData(ctx).OrgID, ListUserMetadataToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListUserMetadataResponse{
+		Result: metadata.MetadataListToPb(res.Result),
+		Details: obj_grpc.ToListDetails(
+			res.TotalResult,
+			res.Sequence,
+			res.Timestamp,
+		),
+	}, nil
+}
+
+func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetadataRequest) (*mgmt_pb.GetUserMetadataResponse, error) {
+	data, err := s.user.GetMetadataByKey(ctx, req.Id, authz.GetCtxData(ctx).OrgID, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetUserMetadataResponse{
+		Metadata: metadata.DomainMetadataToPb(data),
+	}, nil
+}
+
+func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetadataRequest) (*mgmt_pb.SetUserMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetUserMetadataResponse{
+		Details: obj_grpc.AddToDetailsPb(
+			result.Sequence,
+			result.ChangeDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUserMetadataRequest) (*mgmt_pb.BulkSetUserMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetMetadataToDomain(req)...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkSetUserMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUserMetadataRequest) (*mgmt_pb.RemoveUserMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveUserMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetadataRequest) (*mgmt_pb.BulkRemoveUserMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, req.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkRemoveUserMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
 	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req))
 	if err != nil {
@@ -92,18 +169,26 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 }
 
 func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
-	human, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, ImportHumanUserRequestToDomain(req))
+	human, passwordless := ImportHumanUserRequestToDomain(req)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ImportHumanUserResponse{
-		UserId: human.AggregateID,
+	resp := &mgmt_pb.ImportHumanUserResponse{
+		UserId: addedHuman.AggregateID,
 		Details: obj_grpc.AddToDetailsPb(
-			human.Sequence,
-			human.ChangeDate,
-			human.ResourceOwner,
+			addedHuman.Sequence,
+			addedHuman.ChangeDate,
+			addedHuman.ResourceOwner,
 		),
-	}, nil
+	}
+	if code != nil {
+		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
+			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Lifetime: durationpb.New(code.Expiration),
+		}
+	}
+	return resp, nil
 }
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
@@ -405,6 +490,17 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}
 	return &mgmt_pb.ListHumanPasswordlessResponse{
 		Result: user.WebAuthNTokensViewToPb(tokens),
+	}, nil
+}
+
+func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SendPasswordlessRegistrationResponse{
+		Details: object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 

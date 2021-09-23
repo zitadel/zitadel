@@ -89,9 +89,9 @@ const (
 	PasswordAgePolicyChanged models.EventType = "org.policy.password.age.changed"
 	PasswordAgePolicyRemoved models.EventType = "org.policy.password.age.removed"
 
-	PasswordLockoutPolicyAdded   models.EventType = "org.policy.password.lockout.added"
-	PasswordLockoutPolicyChanged models.EventType = "org.policy.password.lockout.changed"
-	PasswordLockoutPolicyRemoved models.EventType = "org.policy.password.lockout.removed"
+	LockoutPolicyAdded   models.EventType = "org.policy.lockout.added"
+	LockoutPolicyChanged models.EventType = "org.policy.lockout.changed"
+	LockoutPolicyRemoved models.EventType = "org.policy.lockout.removed"
 
 	PrivacyPolicyAdded   models.EventType = "org.policy.privacy.added"
 	PrivacyPolicyChanged models.EventType = "org.policy.privacy.changed"

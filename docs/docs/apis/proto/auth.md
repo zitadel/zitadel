@@ -67,6 +67,30 @@ Returns the user sessions of the authorized user of the current useragent
     POST: /users/me/sessions/_search
 
 
+### ListMyMetadata
+
+> **rpc** ListMyMetadata([ListMyMetadataRequest](#listmymetadatarequest))
+[ListMyMetadataResponse](#listmymetadataresponse)
+
+Returns the user metadata of the authorized user
+
+
+
+    POST: /users/me/metadata/_search
+
+
+### GetMyMetadata
+
+> **rpc** GetMyMetadata([GetMyMetadataRequest](#getmymetadatarequest))
+[GetMyMetadataResponse](#getmymetadataresponse)
+
+Returns the user metadata by key of the authorized user
+
+
+
+    GET: /users/me/metadata/{key}
+
+
 ### ListMyRefreshTokens
 
 > **rpc** ListMyRefreshTokens([ListMyRefreshTokensRequest](#listmyrefreshtokensrequest))
@@ -401,7 +425,7 @@ Removes the U2F Authentication from the authorized user
 > **rpc** ListMyPasswordless([ListMyPasswordlessRequest](#listmypasswordlessrequest))
 [ListMyPasswordlessResponse](#listmypasswordlessresponse)
 
-Returns all configured passwordless authentications of the authorized user
+Returns all configured passwordless authenticators of the authorized user
 
 
 
@@ -413,12 +437,40 @@ Returns all configured passwordless authentications of the authorized user
 > **rpc** AddMyPasswordless([AddMyPasswordlessRequest](#addmypasswordlessrequest))
 [AddMyPasswordlessResponse](#addmypasswordlessresponse)
 
-Adds a new passwordless authentications to the authorized user
+Adds a new passwordless authenticator to the authorized user
 Multiple passwordless authentications can be configured
 
 
 
     POST: /users/me/passwordless
+
+
+### AddMyPasswordlessLink
+
+> **rpc** AddMyPasswordlessLink([AddMyPasswordlessLinkRequest](#addmypasswordlesslinkrequest))
+[AddMyPasswordlessLinkResponse](#addmypasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the authorized user and returns it directly
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/me/passwordless/_link
+
+
+### SendMyPasswordlessLink
+
+> **rpc** SendMyPasswordlessLink([SendMyPasswordlessLinkRequest](#sendmypasswordlesslinkrequest))
+[SendMyPasswordlessLinkResponse](#sendmypasswordlesslinkresponse)
+
+Adds a new passwordless authenticator link to the authorized user and sends it to the registered email address
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/me/passwordless/_send_link
 
 
 ### VerifyMyPasswordless
@@ -505,6 +557,19 @@ Returns a list of roles for the authorized user and project
     POST: /permissions/me/_search
 
 
+### ListMyMemberships
+
+> **rpc** ListMyMemberships([ListMyMembershipsRequest](#listmymembershipsrequest))
+[ListMyMembershipsResponse](#listmymembershipsresponse)
+
+Show all the permissions my user has in ZITADEL (ZITADEL Manager)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /memberships/me/_search
+
+
 
 
 
@@ -550,6 +615,25 @@ This is an empty request
 
 
 
+### AddMyPasswordlessLinkRequest
+This is an empty request
+
+
+
+
+### AddMyPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
+
+
+
+
 ### AddMyPasswordlessRequest
 This is an empty request
 
@@ -563,6 +647,62 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | key |  zitadel.user.v1.WebAuthNKey | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkRemoveMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata | repeated BulkSetMyMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetMyMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -582,6 +722,28 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | email |  zitadel.user.v1.Email | - |  |
+
+
+
+
+### GetMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -723,6 +885,54 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.idp.v1.IDPUserLink | - |  |
+
+
+
+
+### ListMyMembershipsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | the field the result is sorted |  |
+| queries | repeated zitadel.user.v1.MembershipQuery | criterias the client is looking for |  |
+
+
+
+
+### ListMyMembershipsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.Membership | - |  |
+
+
+
+
+### ListMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -979,6 +1189,28 @@ This is an empty request
 
 
 
+### RemoveMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMyMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveMyPasswordlessRequest
 
 
@@ -1086,6 +1318,23 @@ This is an empty response
 
 
 
+### SendMyPasswordlessLinkRequest
+This is an empty request
+
+
+
+
+### SendMyPasswordlessLinkResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetMyEmailRequest
 
 
@@ -1098,6 +1347,29 @@ This is an empty response
 
 
 ### SetMyEmailResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetMyMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetMyMetadataResponse
 
 
 

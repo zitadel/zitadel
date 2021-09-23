@@ -10,6 +10,25 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+type CustomLoginTextsReadModel struct {
+	eventstore.WriteModel
+	CustomLoginTexts map[string]*CustomText
+}
+
+func (wm *CustomLoginTextsReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *policy.CustomTextSetEvent:
+			wm.CustomLoginTexts[e.Template+e.Language.String()] = &CustomText{Language: e.Language, Template: e.Template}
+		case *policy.CustomTextTemplateRemovedEvent:
+			if _, ok := wm.CustomLoginTexts[e.Template+e.Language.String()]; ok {
+				delete(wm.CustomLoginTexts, e.Template)
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
 type CustomLoginTextReadModel struct {
 	eventstore.WriteModel
 
@@ -147,6 +166,25 @@ type CustomLoginTextReadModel struct {
 	PasswordlessNotSupported            string
 	PasswordlessErrorRetry              string
 
+	PasswordlessPromptTitle                  string
+	PasswordlessPromptDescription            string
+	PasswordlessPromptDescriptionInit        string
+	PasswordlessPromptPasswordlessButtonText string
+	PasswordlessPromptNextButtonText         string
+	PasswordlessPromptSkipButtonText         string
+
+	PasswordlessRegistrationTitle                   string
+	PasswordlessRegistrationDescription             string
+	PasswordlessRegistrationRegisterTokenButtonText string
+	PasswordlessRegistrationTokenNameLabel          string
+	PasswordlessRegistrationNotSupported            string
+	PasswordlessRegistrationErrorRetry              string
+
+	PasswordlessRegistrationDoneTitle            string
+	PasswordlessRegistrationDoneDescription      string
+	PasswordlessRegistrationDoneNextButtonText   string
+	PasswordlessRegistrationDoneCancelButtonText string
+
 	PasswordChangeTitle                   string
 	PasswordChangeDescription             string
 	PasswordChangeOldPasswordLabel        string
@@ -189,6 +227,25 @@ type CustomLoginTextReadModel struct {
 	RegistrationUserNextButtonText         string
 	RegistrationUserBackButtonText         string
 
+	ExternalRegistrationUserOverviewTitle              string
+	ExternalRegistrationUserOverviewDescription        string
+	ExternalRegistrationUserOverviewEmailLabel         string
+	ExternalRegistrationUserOverviewUsernameLabel      string
+	ExternalRegistrationUserOverviewFirstnameLabel     string
+	ExternalRegistrationUserOverviewLastnameLabel      string
+	ExternalRegistrationUserOverviewNicknameLabel      string
+	ExternalRegistrationUserOverviewLanguageLabel      string
+	ExternalRegistrationUserOverviewPhoneLabel         string
+	ExternalRegistrationUserOverviewTOSAndPrivacyLabel string
+	ExternalRegistrationUserOverviewTOSConfirm         string
+	ExternalRegistrationUserOverviewTOSLink            string
+	ExternalRegistrationUserOverviewTOSLinkText        string
+	ExternalRegistrationUserOverviewTOSConfirmAnd      string
+	ExternalRegistrationUserOverviewPrivacyLink        string
+	ExternalRegistrationUserOverviewPrivacyLinkText    string
+	ExternalRegistrationUserOverviewBackButtonText     string
+	ExternalRegistrationUserOverviewNextButtonText     string
+
 	RegisterOrgTitle                string
 	RegisterOrgDescription          string
 	RegisterOrgOrgNameLabel         string
@@ -214,6 +271,11 @@ type CustomLoginTextReadModel struct {
 	ExternalUserNotFoundDescription            string
 	ExternalUserNotFoundLinkButtonText         string
 	ExternalUserNotFoundAutoRegisterButtonText string
+	ExternalUserNotFoundTOSAndPrivacyLabel     string
+	ExternalUserNotFoundTOSConfirm             string
+	ExternalUserNotFoundTOSLinkText            string
+	ExternalUserNotFoundTOSConfirmAnd          string
+	ExternalUserNotFoundPrivacyLinkText        string
 
 	SuccessLoginTitle                   string
 	SuccessLoginAutoRedirectDescription string
@@ -314,6 +376,18 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordlessScreenSetEvent(e)
 				continue
 			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessPrompt) {
+				wm.handlePasswordlessPromptScreenSetEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistration) {
+				wm.handlePasswordlessRegistrationScreenSetEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+				wm.handlePasswordlessRegistrationDoneScreenSetEvent(e)
+				continue
+			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordChange) {
 				wm.handlePasswordChangeScreenSetEvent(e)
 				continue
@@ -332,6 +406,10 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyRegistrationUser) {
 				wm.handleRegistrationUserScreenSetEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyExternalRegistrationUserOverview) {
+				wm.handleExternalRegistrationUserOverviewScreenSetEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyRegistrationOrg) {
@@ -438,6 +516,18 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handlePasswordlessScreenRemoveEvent(e)
 				continue
 			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessPrompt) {
+				wm.handlePasswordlessPromptScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistration) {
+				wm.handlePasswordlessRegistrationScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordlessRegistrationDone) {
+				wm.handlePasswordlessRegistrationDoneScreenRemoveEvent(e)
+				continue
+			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyPasswordChange) {
 				wm.handlePasswordChangeScreenRemoveEvent(e)
 				continue
@@ -456,6 +546,10 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyRegistrationUser) {
 				wm.handleRegistrationUserScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyExternalRegistrationUserOverview) {
+				wm.handleExternalRegistrationUserOverviewScreenRemoveEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyRegistrationOrg) {
@@ -483,6 +577,9 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				continue
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
+			if e.Template != domain.LoginCustomText {
+				continue
+			}
 			wm.State = domain.PolicyStateRemoved
 		}
 	}
@@ -1489,6 +1586,152 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessScreenRemoveEvent(e *polic
 	}
 }
 
+func (wm *CustomLoginTextReadModel) handlePasswordlessPromptScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessPromptTitle {
+		wm.PasswordlessPromptTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescription {
+		wm.PasswordlessPromptDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescriptionInit {
+		wm.PasswordlessPromptDescriptionInit = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptPasswordlessButtonText {
+		wm.PasswordlessPromptPasswordlessButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptNextButtonText {
+		wm.PasswordlessPromptNextButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptSkipButtonText {
+		wm.PasswordlessPromptSkipButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessPromptScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessPromptTitle {
+		wm.PasswordlessPromptTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescription {
+		wm.PasswordlessPromptDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptDescriptionInit {
+		wm.PasswordlessPromptDescriptionInit = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptPasswordlessButtonText {
+		wm.PasswordlessPromptPasswordlessButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptNextButtonText {
+		wm.PasswordlessPromptNextButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessPromptSkipButtonText {
+		wm.PasswordlessPromptSkipButtonText = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		wm.PasswordlessRegistrationTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		wm.PasswordlessRegistrationDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		wm.PasswordlessRegistrationRegisterTokenButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		wm.PasswordlessRegistrationTokenNameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		wm.PasswordlessRegistrationNotSupported = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		wm.PasswordlessRegistrationErrorRetry = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTitle {
+		wm.PasswordlessRegistrationTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDescription {
+		wm.PasswordlessRegistrationDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText {
+		wm.PasswordlessRegistrationRegisterTokenButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationTokenNameLabel {
+		wm.PasswordlessRegistrationTokenNameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationNotSupported {
+		wm.PasswordlessRegistrationNotSupported = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationErrorRetry {
+		wm.PasswordlessRegistrationErrorRetry = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		wm.PasswordlessRegistrationDoneTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		wm.PasswordlessRegistrationDoneDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		wm.PasswordlessRegistrationDoneNextButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText {
+		wm.PasswordlessRegistrationDoneCancelButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
+		wm.PasswordlessRegistrationDoneTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
+		wm.PasswordlessRegistrationDoneDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
+		wm.PasswordlessRegistrationDoneNextButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText {
+		wm.PasswordlessRegistrationDoneCancelButtonText = ""
+		return
+	}
+}
+
 func (wm *CustomLoginTextReadModel) handlePasswordChangeScreenSetEvent(e *policy.CustomTextSetEvent) {
 	if e.Key == domain.LoginKeyPasswordChangeTitle {
 		wm.PasswordChangeTitle = e.Text
@@ -1724,6 +1967,73 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenSetEvent(e *poli
 	}
 }
 
+func (wm *CustomLoginTextReadModel) handleExternalRegistrationUserOverviewScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTitle {
+		wm.ExternalRegistrationUserOverviewTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewDescription {
+		wm.ExternalRegistrationUserOverviewDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewEmailLabel {
+		wm.ExternalRegistrationUserOverviewEmailLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel {
+		wm.ExternalRegistrationUserOverviewUsernameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel {
+		wm.ExternalRegistrationUserOverviewFirstnameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel {
+		wm.ExternalRegistrationUserOverviewLastnameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel {
+		wm.ExternalRegistrationUserOverviewNicknameLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel {
+		wm.ExternalRegistrationUserOverviewLanguageLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel {
+		wm.ExternalRegistrationUserOverviewPhoneLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel {
+		wm.ExternalRegistrationUserOverviewTOSAndPrivacyLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm {
+		wm.ExternalRegistrationUserOverviewTOSConfirm = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText {
+		wm.ExternalRegistrationUserOverviewTOSLinkText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd {
+		wm.ExternalRegistrationUserOverviewTOSConfirmAnd = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText {
+		wm.ExternalRegistrationUserOverviewPrivacyLinkText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewBackButtonText {
+		wm.ExternalRegistrationUserOverviewBackButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewNextButtonText {
+		wm.ExternalRegistrationUserOverviewNextButtonText = e.Text
+		return
+	}
+}
+
 func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
 	if e.Key == domain.LoginKeyRegistrationUserTitle {
 		wm.RegistrationUserTitle = ""
@@ -1795,6 +2105,73 @@ func (wm *CustomLoginTextReadModel) handleRegistrationUserScreenRemoveEvent(e *p
 	}
 	if e.Key == domain.LoginKeyRegistrationUserBackButtonText {
 		wm.RegistrationUserBackButtonText = ""
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handleExternalRegistrationUserOverviewScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTitle {
+		wm.ExternalRegistrationUserOverviewTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewDescription {
+		wm.ExternalRegistrationUserOverviewDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewEmailLabel {
+		wm.ExternalRegistrationUserOverviewEmailLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel {
+		wm.ExternalRegistrationUserOverviewUsernameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel {
+		wm.ExternalRegistrationUserOverviewFirstnameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel {
+		wm.ExternalRegistrationUserOverviewLastnameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel {
+		wm.ExternalRegistrationUserOverviewNicknameLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel {
+		wm.ExternalRegistrationUserOverviewLanguageLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel {
+		wm.ExternalRegistrationUserOverviewPhoneLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel {
+		wm.ExternalRegistrationUserOverviewTOSAndPrivacyLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm {
+		wm.ExternalRegistrationUserOverviewTOSConfirm = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText {
+		wm.ExternalRegistrationUserOverviewTOSLinkText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd {
+		wm.ExternalRegistrationUserOverviewTOSConfirmAnd = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText {
+		wm.ExternalRegistrationUserOverviewPrivacyLinkText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewBackButtonText {
+		wm.ExternalRegistrationUserOverviewBackButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalRegistrationUserOverviewNextButtonText {
+		wm.ExternalRegistrationUserOverviewNextButtonText = ""
 		return
 	}
 }
@@ -1980,6 +2357,26 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenSetEvent(e *
 		wm.ExternalUserNotFoundAutoRegisterButtonText = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
+		wm.ExternalUserNotFoundTOSAndPrivacyLabel = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
+		wm.ExternalUserNotFoundTOSConfirm = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
+		wm.ExternalUserNotFoundTOSLinkText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
+		wm.ExternalUserNotFoundTOSConfirmAnd = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
+		wm.ExternalUserNotFoundPrivacyLinkText = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -1997,6 +2394,26 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenRemoveEvent(
 	}
 	if e.Key == domain.LoginKeyExternalNotFoundAutoRegisterButtonText {
 		wm.ExternalUserNotFoundAutoRegisterButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
+		wm.ExternalUserNotFoundTOSAndPrivacyLabel = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
+		wm.ExternalUserNotFoundTOSLinkText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
+		wm.ExternalUserNotFoundTOSConfirm = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
+		wm.ExternalUserNotFoundTOSConfirmAnd = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
+		wm.ExternalUserNotFoundPrivacyLinkText = ""
 		return
 	}
 }

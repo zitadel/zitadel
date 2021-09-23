@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -88,7 +89,16 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-9nf88", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
-	_, err := c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
+	existingPolicy := NewIAMLoginPolicyWriteModel()
+	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
+	}
+
+	_, err = c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-m8fsd", "Errors.IDPConfig.NotExisting")
 	}
@@ -117,8 +127,17 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-66m9s", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
+	existingPolicy := NewIAMLoginPolicyWriteModel()
+	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-Dfg4t", "Errors.IAM.LoginPolicy.NotFound")
+	}
+
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ type Org struct {
 	LabelPolicy              *LabelPolicy
 	PasswordComplexityPolicy *PasswordComplexityPolicy
 	PasswordAgePolicy        *PasswordAgePolicy
-	PasswordLockoutPolicy    *PasswordLockoutPolicy
+	PasswordLockoutPolicy    *LockoutPolicy
 	IDPs                     []*IDPConfig
 }
 

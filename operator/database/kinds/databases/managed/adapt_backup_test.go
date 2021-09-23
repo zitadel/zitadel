@@ -21,10 +21,7 @@ import (
 func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backupName string) *tree.Tree {
 
 	bucketDesired := getDesiredTree(t, masterkey, &bucket.DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &bucket.Spec{
 			Verbose: true,
 			Cron:    "testCron",
@@ -39,10 +36,7 @@ func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backu
 	bucketDesired.Parsed = bucketDesiredKind
 
 	return getDesiredTree(t, masterkey, &DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/CockroachDB",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
 		Spec: Spec{
 			Verbose:         false,
 			ReplicaCount:    1,

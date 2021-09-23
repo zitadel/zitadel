@@ -5,9 +5,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { QRCodeModule } from 'angularx-qrcode';
@@ -17,6 +19,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
@@ -30,8 +33,13 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { HasFeatureModule } from '../../../directives/has-feature/has-feature.module';
+import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
+import {
+  DialogPasswordlessComponent,
+} from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
@@ -44,6 +52,8 @@ import { DetailFormMachineModule } from './detail-form-machine/detail-form-machi
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
 import { MembershipsComponent } from './memberships/memberships.component';
+import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
+import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
@@ -67,12 +77,16 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ContactComponent,
     ResendEmailDialogComponent,
     DialogU2FComponent,
+    DialogPasswordlessComponent,
     AuthFactorDialogComponent,
+    MetadataDialogComponent,
+    MetadataComponent,
   ],
   imports: [
     UserDetailRoutingModule,
     ChangesModule,
     CommonModule,
+    MatTabsModule,
     FormsModule,
     ReactiveFormsModule,
     DetailFormModule,
@@ -89,11 +103,14 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     CardModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    HasFeatureModule,
     MatTooltipModule,
     HasRoleModule,
     TranslateModule,
     MatTableModule,
+    InfoRowModule,
     PaginatorModule,
+    MatMenuModule,
     SharedModule,
     RefreshTableModule,
     CopyToClipboardModule,
@@ -104,6 +121,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     LocalizedDatePipeModule,
     InputModule,
     MachineKeysModule,
+    InfoSectionModule,
   ],
 })
 export class UserDetailModule { }

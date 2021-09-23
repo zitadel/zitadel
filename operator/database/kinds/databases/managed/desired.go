@@ -1,10 +1,13 @@
 package managed
 
 import (
+	"fmt"
+
+	corev1 "k8s.io/api/core/v1"
+
+	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 )
 
 type DesiredV0 struct {
@@ -32,7 +35,7 @@ func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
 	}
 
 	if err := desiredTree.Original.Decode(desiredKind); err != nil {
-		return nil, errors.Wrap(err, "parsing desired state failed")
+		return nil, mntr.ToUserError(fmt.Errorf("parsing desired state failed"))
 	}
 
 	return desiredKind, nil

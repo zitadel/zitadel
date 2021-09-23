@@ -100,6 +100,8 @@ func idpConfigTypeToDomain(idpType IdpConfigType) domain.IDPConfigType {
 		return domain.IDPConfigTypeOIDC
 	case IDPConfigTypeSAML:
 		return domain.IDPConfigTypeSAML
+	case IDPConfigTypeJWT:
+		return domain.IDPConfigTypeJWT
 	default:
 		return domain.IDPConfigTypeOIDC
 	}

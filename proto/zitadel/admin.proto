@@ -401,6 +401,41 @@ service AdminService {
         };
     }
 
+    // Adds a new jwt identity provider configuration the IAM
+    rpc AddJWTIDP(AddJWTIDPRequest) returns (AddJWTIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/jwt";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "identity provider";
+            tags: "jwt";
+
+            responses: {
+                key: "200";
+                value: {
+                    description: "idp created";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Updates the specified idp
     // all fields are updated. If no value is provided the field will be empty afterwards.
     rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
@@ -598,7 +633,53 @@ service AdminService {
             };
         };
     }
-    
+
+    //Updates the jwt configuration of the specified idp
+    // all fields are updated. If no value is provided the field will be empty afterwards.
+    rpc UpdateIDPJWTConfig(UpdateIDPJWTConfigRequest) returns (UpdateIDPJWTConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/jwt_config";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "identity provider";
+            tags: "jwt";
+            responses: {
+                key: "200";
+                value: {
+                    description: "jwt config updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+            responses: {
+                key: "409";
+                value: {
+                    description: "precondition failed";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     rpc GetDefaultFeatures(GetDefaultFeaturesRequest) returns (GetDefaultFeaturesResponse) {
         option(google.api.http) = {
             get: "/features"
@@ -1425,10 +1506,10 @@ service AdminService {
         };
     }
 
-    //Returns the password lockout policy defined by the administrators of ZITADEL
-    rpc GetPasswordLockoutPolicy(GetPasswordLockoutPolicyRequest) returns (GetPasswordLockoutPolicyResponse) {
+    //Returns the lockout policy defined by the administrators of ZITADEL
+    rpc GetLockoutPolicy(GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/password/lockout";
+            get: "/policies/lockout";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1437,20 +1518,19 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "policy";
-            tags: "password policy";
-            tags: "password lockout policy";
+            tags: "lockout policy";
             responses: {
                 key: "200";
                 value: {
-                    description: "default password lockout policy";
+                    description: "default lockout policy";
                 };
             };
         };
     }
     
-    //Updates the default password lockout policy of ZITADEL
+    //Updates the default lockout policy of ZITADEL
     // it impacts all organisations without a customised policy
-    rpc UpdatePasswordLockoutPolicy(UpdatePasswordLockoutPolicyRequest) returns (UpdatePasswordLockoutPolicyResponse) {
+    rpc UpdateLockoutPolicy(UpdateLockoutPolicyRequest) returns (UpdateLockoutPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/lockout";
             body: "*";
@@ -1692,12 +1772,49 @@ service AdminService {
     }
 
     //Sets the default custom text for domain claimed phone message
-    // it impacts all organisations without customized verify phone message text
+    // it impacts all organisations without customized domain claimed message text
     // The Following Variables can be used:
     // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
-            put: "/text/message/verifyphone/{language}";
+            put: "/text/message/domainclaimed/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    //Returns the default text for passwordless registration message (translation file)
+    rpc GetDefaultPasswordlessRegistrationMessageText(GetDefaultPasswordlessRegistrationMessageTextRequest) returns (GetDefaultPasswordlessRegistrationMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/passwordless_registration/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for passwordless registration message (overwritten in eventstore)
+    rpc GetCustomPasswordlessRegistrationMessageText(GetCustomPasswordlessRegistrationMessageTextRequest) returns (GetCustomPasswordlessRegistrationMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/passwordless_registration/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for passwordless registration message
+    // it impacts all organisations without customized passwordless registration message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    rpc SetDefaultPasswordlessRegistrationMessageText(SetDefaultPasswordlessRegistrationMessageTextRequest) returns (SetDefaultPasswordlessRegistrationMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/passwordless_registration/{language}";
             body: "*";
         };
 
@@ -2392,9 +2509,68 @@ message AddOIDCIDPRequest {
             description: "definition which field is mapped to the email of the user";
         }
     ];
+    bool auto_register = 9;
 }
 
 message AddOIDCIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
+message AddJWTIDPRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["name", "issuer", "keys_endpoint"]
+        };
+    };
+
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
+    string jwt_endpoint = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://custom.com/auth/jwt\"";
+            description: "the endpoint where the jwt can be extracted";
+        }
+    ];
+    string issuer = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.custom.com\"";
+            description: "the issuer of the jwt (for validation)";
+        }
+    ];
+    string keys_endpoint = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.custom.com/keys\"";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+        }
+    ];
+    string header_name = 6 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+    bool auto_register = 7;
+}
+
+message AddJWTIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
     string idp_id = 2;
 }
@@ -2422,6 +2598,7 @@ message UpdateIDPRequest {
             description: "some identity providers specify the styling of the button to their login";
         }
     ];
+    bool auto_register = 4;
 }
 
 message UpdateIDPResponse {
@@ -2552,6 +2729,62 @@ message UpdateIDPOIDCConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message UpdateIDPJWTConfigRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["idp_id", "issuer", "keys_endpoint"]
+        };
+    };
+
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string jwt_endpoint = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://custom.com/auth/jwt\"";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string issuer = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.custom.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.custom.com/keys\"";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string header_name = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateIDPJWTConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultFeaturesRequest {}
 
 message GetDefaultFeaturesResponse {
@@ -2576,6 +2809,10 @@ message SetDefaultFeaturesRequest {
     bool label_policy_watermark = 16;
     bool custom_text = 17;
     bool privacy_policy = 18;
+    bool metadata_user = 19;
+    bool custom_text_message = 20;
+    bool custom_text_login = 21;
+    bool lockout_policy = 22;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2611,6 +2848,10 @@ message SetOrgFeaturesRequest {
     bool label_policy_watermark = 17;
     bool custom_text = 18;
     bool privacy_policy = 19;
+    bool metadata_user = 20;
+    bool custom_text_message = 21;
+    bool custom_text_login = 22;
+    bool lockout_policy = 23;
 }
 
 message SetOrgFeaturesResponse {
@@ -3049,25 +3290,23 @@ message UpdatePasswordAgePolicyResponse {
 }
 
 //This is an empty request
-message GetPasswordLockoutPolicyRequest {}
+message GetLockoutPolicyRequest {}
 
-message GetPasswordLockoutPolicyResponse {
-    zitadel.policy.v1.PasswordLockoutPolicy policy = 1;
+message GetLockoutPolicyResponse {
+    zitadel.policy.v1.LockoutPolicy policy = 1;
 }
 
-message UpdatePasswordLockoutPolicyRequest {
+message UpdateLockoutPolicyRequest {
     // failed attempts until a user gets locked
-    uint32 max_attempts = 1 [
+    uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
             example: "\"10\""
         }
     ];
-    // If an error should be displayed during a lockout or not
-    bool show_lockout_failure = 2;
 }
 
-message UpdatePasswordLockoutPolicyResponse {
+message UpdateLockoutPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3267,6 +3506,42 @@ message SetDefaultDomainClaimedMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetDefaultPasswordlessRegistrationMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultPasswordlessRegistrationMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomPasswordlessRegistrationMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomPasswordlessRegistrationMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultPasswordlessRegistrationMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultPasswordlessRegistrationMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultLoginTextsRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3320,6 +3595,10 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.SuccessLoginScreenText success_login_text = 29;
     zitadel.text.v1.LogoutDoneScreenText logout_text = 30;
     zitadel.text.v1.FooterText footer_text = 31;
+    zitadel.text.v1.PasswordlessPromptScreenText passwordless_prompt_text = 32;
+    zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
+    zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
+    zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
 }
 
 message SetCustomLoginTextsResponse {

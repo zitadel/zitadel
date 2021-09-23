@@ -18,29 +18,31 @@ func IDPViewsToPb(idps []*iam_model.IDPConfigView) []*idp_pb.IDP {
 
 func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
 	return &idp_pb.IDP{
-		Id:          idp.IDPConfigID,
-		State:       ModelIDPStateToPb(idp.State),
-		Name:        idp.Name,
-		StylingType: ModelIDPStylingTypeToPb(idp.StylingType),
-		Owner:       ModelIDPProviderTypeToPb(idp.IDPProviderType),
-		Config:      ModelIDPViewToConfigPb(idp),
+		Id:           idp.IDPConfigID,
+		State:        ModelIDPStateToPb(idp.State),
+		Name:         idp.Name,
+		StylingType:  ModelIDPStylingTypeToPb(idp.StylingType),
+		AutoRegister: idp.AutoRegister,
+		Owner:        ModelIDPProviderTypeToPb(idp.IDPProviderType),
+		Config:       ModelIDPViewToConfigPb(idp),
 		Details: obj_grpc.ToViewDetailsPb(
 			idp.Sequence,
 			idp.CreationDate,
 			idp.ChangeDate,
-			"", //TODO: backend
+			idp.AggregateID,
 		),
 	}
 }
 
 func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
-		Id:          idp.AggregateID,
-		State:       IDPStateToPb(idp.State),
-		Name:        idp.Name,
-		StylingType: IDPStylingTypeToPb(idp.StylingType),
-		Config:      IDPViewToConfigPb(idp),
-		Details:     obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, ""), //TODO: resource owner in view
+		Id:           idp.AggregateID,
+		State:        IDPStateToPb(idp.State),
+		Name:         idp.Name,
+		StylingType:  IDPStylingTypeToPb(idp.StylingType),
+		AutoRegister: idp.AutoRegister,
+		Config:       IDPViewToConfigPb(idp),
+		Details:      obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, idp.AggregateID),
 	}
 	return mapped
 }
@@ -57,7 +59,7 @@ func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb
 	return &idp_pb.IDPLoginPolicyLink{
 		IdpId:   link.IDPConfigID,
 		IdpName: link.Name,
-		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+		IdpType: IDPTypeToPb(link.IDPConfigType),
 	}
 }
 
@@ -77,7 +79,20 @@ func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUs
 		ProvidedUserId:   link.ExternalUserID,
 		ProvidedUserName: link.UserDisplayName,
 		//TODO: as soon as saml is implemented we need to switch here
-		IdpType: idp_pb.IDPType_IDP_TYPE_OIDC,
+		//IdpType: IDPTypeToPb(link.Type),
+	}
+}
+
+func IDPTypeToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
+	switch idpType {
+	case iam_model.IDPConfigTypeOIDC:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
+	case iam_model.IDPConfigTypeSAML:
+		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
+	case iam_model.IDPConfigTypeJWT:
+		return idp_pb.IDPType_IDP_TYPE_JWT
+	default:
+		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	}
 }
 
@@ -130,26 +145,45 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 	}
 }
 
-func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
+	if config.IsOIDC {
+		return &idp_pb.IDP_OidcConfig{
+			OidcConfig: &idp_pb.OIDCConfig{
+				ClientId:           config.OIDCClientID,
+				Issuer:             config.OIDCIssuer,
+				Scopes:             config.OIDCScopes,
+				DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+				UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+			},
+		}
+	}
+	return &idp_pb.IDP_JwtConfig{
+		JwtConfig: &idp_pb.JWTConfig{
+			JwtEndpoint:  config.JWTEndpoint,
+			Issuer:       config.JWTIssuer,
+			KeysEndpoint: config.JWTKeysEndpoint,
+			HeaderName:   config.JWTHeaderName,
 		},
 	}
 }
 
-func IDPViewToConfigPb(config *domain.IDPConfigView) *idp_pb.IDP_OidcConfig {
-	return &idp_pb.IDP_OidcConfig{
-		OidcConfig: &idp_pb.OIDCConfig{
-			ClientId:           config.OIDCClientID,
-			Issuer:             config.OIDCIssuer,
-			Scopes:             config.OIDCScopes,
-			DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-			UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
+func IDPViewToConfigPb(config *domain.IDPConfigView) idp_pb.IDPConfig {
+	if config.IsOIDC {
+		return &idp_pb.IDP_OidcConfig{
+			OidcConfig: &idp_pb.OIDCConfig{
+				ClientId:           config.OIDCClientID,
+				Issuer:             config.OIDCIssuer,
+				Scopes:             config.OIDCScopes,
+				DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
+				UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
+			},
+		}
+	}
+	return &idp_pb.IDP_JwtConfig{
+		JwtConfig: &idp_pb.JWTConfig{
+			JwtEndpoint:  config.JWTEndpoint,
+			Issuer:       config.JWTIssuer,
+			KeysEndpoint: config.JWTKeysEndpoint,
 		},
 	}
 }

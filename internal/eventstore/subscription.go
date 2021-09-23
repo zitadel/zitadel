@@ -13,25 +13,44 @@ var (
 )
 
 type Subscription struct {
-	Events     chan EventReader
-	aggregates []AggregateType
+	Events chan EventReader
+	types  map[AggregateType][]EventType
 }
 
-func Subscribe(aggregates ...AggregateType) *Subscription {
-	events := make(chan EventReader, 100)
+//SubscribeAggregates subscribes for all events on the given aggregates
+func SubscribeAggregates(eventQueue chan EventReader, aggregates ...AggregateType) *Subscription {
+	types := make(map[AggregateType][]EventType, len(aggregates))
+	for _, aggregate := range aggregates {
+		types[aggregate] = nil
+	}
 	sub := &Subscription{
-		Events:     events,
-		aggregates: aggregates,
+		Events: eventQueue,
+		types:  types,
 	}
 
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 
 	for _, aggregate := range aggregates {
-		_, ok := subscriptions[aggregate]
-		if !ok {
-			subscriptions[aggregate] = make([]*Subscription, 0, 1)
-		}
+		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
+	}
+
+	return sub
+}
+
+//SubscribeEventTypes subscribes for the given event types
+// if no event types are provided the subscription is for all events of the aggregate
+func SubscribeEventTypes(eventQueue chan EventReader, types map[AggregateType][]EventType) *Subscription {
+	aggregates := make([]AggregateType, len(types))
+	sub := &Subscription{
+		Events: eventQueue,
+		types:  types,
+	}
+
+	subsMutext.Lock()
+	defer subsMutext.Unlock()
+
+	for _, aggregate := range aggregates {
 		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
 	}
 
@@ -43,12 +62,24 @@ func notify(events []EventReader) {
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 	for _, event := range events {
-		subs, ok := subscriptions[event.Aggregate().Typ]
+		subs, ok := subscriptions[event.Aggregate().Type]
 		if !ok {
 			continue
 		}
 		for _, sub := range subs {
-			sub.Events <- event
+			eventTypes := sub.types[event.Aggregate().Type]
+			//subscription for all events
+			if len(eventTypes) == 0 {
+				sub.Events <- event
+				continue
+			}
+			//subscription for certain events
+			for _, eventType := range eventTypes {
+				if event.Type() == eventType {
+					sub.Events <- event
+					break
+				}
+			}
 		}
 	}
 }
@@ -56,7 +87,7 @@ func notify(events []EventReader) {
 func (s *Subscription) Unsubscribe() {
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
-	for _, aggregate := range s.aggregates {
+	for aggregate := range s.types {
 		subs, ok := subscriptions[aggregate]
 		if !ok {
 			continue
@@ -88,7 +119,7 @@ func mapEventToV1Event(event EventReader) *models.Event {
 		Sequence:      event.Sequence(),
 		CreationDate:  event.CreationDate(),
 		Type:          models.EventType(event.Type()),
-		AggregateType: models.AggregateType(event.Aggregate().Typ),
+		AggregateType: models.AggregateType(event.Aggregate().Type),
 		AggregateID:   event.Aggregate().ID,
 		ResourceOwner: event.Aggregate().ResourceOwner,
 		EditorService: event.EditorService(),

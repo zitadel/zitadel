@@ -80,6 +80,11 @@ var (
 			Location:                "",
 			BucketPrefix:            "",
 		},
+		Proxy: &Proxy{
+			NoProxy: nil,
+			HTTP:    &secret.Secret{Value: ""},
+			HTTPS:   &secret.Secret{Value: ""},
+		},
 		ClusterDNS: "",
 	}
 
@@ -148,6 +153,14 @@ var (
 			Location:        "location",
 			BucketPrefix:    "bucketprefix",
 		},
+		Proxy: &Proxy{
+			NoProxy: []string{
+				"test.com",
+				"10.0.0.0/16",
+			},
+			HTTP:  &secret.Secret{Value: "http://username:passwor@proxy:80"},
+			HTTPS: &secret.Secret{Value: "https://username:passwor@proxy:443"},
+		},
 	}
 	desiredFullExisting = &Configuration{
 		Tracing: &Tracing{
@@ -214,6 +227,14 @@ var (
 			Location:                "location",
 			BucketPrefix:            "bucketprefix",
 		},
+		Proxy: &Proxy{
+			NoProxy: []string{
+				"test.com",
+				"10.0.0.0/16",
+			},
+			ExistingHTTP:  &secret.Existing{"httpproxy", "httpproxy", "httpproxy"},
+			ExistingHTTPS: &secret.Existing{"httpsproxy", "httpsproxy", "httpsproxy"},
+		},
 	}
 )
 
@@ -222,7 +243,6 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 	secretPath := "test"
 	googleSA := "test"
 	zitadelKeyPath := "test"
-	version := "test"
 	users := map[string]string{
 		"migration":    "migration",
 		"management":   "management",
@@ -296,9 +316,12 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_LOCATION":      "",
 		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "",
 		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
+		"NO_PROXY":                            "",
+		"SENTRY_ENVIRONMENT":                  "",
+		"SENTRY_USAGE":                        "false",
 	}
 
-	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, &version, queried)
+	literals := literalsConfigMap(desiredEmpty, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
 
 	assert.Equal(t, equals, literals)
 }
@@ -308,7 +331,6 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 	secretPath := "test"
 	googleSA := "test"
 	zitadelKeyPath := "test"
-	version := "test"
 	users := map[string]string{
 		"migration":    "migration2",
 		"management":   "management2",
@@ -382,8 +404,11 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_ASSET_STORAGE_LOCATION":      "location",
 		"ZITADEL_ASSET_STORAGE_BUCKET_PREFIX": "bucketprefix",
 		"ZITADEL_ASSET_STORAGE_MULTI_DELETE":  "false",
+		"NO_PROXY":                            "test.com,10.0.0.0/16",
+		"SENTRY_ENVIRONMENT":                  "",
+		"SENTRY_USAGE":                        "false",
 	}
-	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, &version, queried)
+	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)
 
 	assert.EqualValues(t, equals, literals)
 }
@@ -461,6 +486,9 @@ func TestConfiguration_LiteralsSecretVars(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      "",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "",
+		"HTTPS_PROXY":                             "",
+		"HTTP_PROXY":                              "",
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredEmpty)
 	assert.NoError(t, err)
@@ -477,6 +505,9 @@ func TestConfiguration_LiteralsSecretVarsFull(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      "sid",
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     "accesskeyid",
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": "secretaccesskey",
+		"HTTP_PROXY":                              "http://username:passwor@proxy:80",
+		"HTTPS_PROXY":                             "https://username:passwor@proxy:443",
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 
@@ -493,6 +524,8 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 	sid := "sid"
 	akid := "accesskeyid"
 	sak := "secretaccesskey"
+	httpProxy := "http://username:passwor@proxy:80"
+	httpsProxy := "https://username:passwor@proxy:443"
 	/* TODO: incomment!!!
 	client.EXPECT().GetSecret(namespace, desiredFullExisting.Notifications.Email.ExistingAppKey.Name).Return(&corev1.Secret{
 			StringData: map[string]string{
@@ -534,6 +567,9 @@ func TestConfiguration_LiteralsSecretVarsExisting(t *testing.T) {
 		"ZITADEL_TWILIO_SID":                      sid,
 		"ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID":     akid,
 		"ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY": sak,
+		"HTTP_PROXY":                              httpProxy,
+		"HTTPS_PROXY":                             httpsProxy,
+		"SENTRY_DSN":                              "",
 	}
 	literals, err := literalsSecretVars(client, desiredFull)
 

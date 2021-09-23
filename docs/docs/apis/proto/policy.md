@@ -17,7 +17,7 @@ title: zitadel/policy.proto
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | primary_color |  string | hex value for primary color |  |
-| is_default |  bool | defines if the organisation's admin changed the policy |  |
+| is_default |  bool | defines if the organization's admin changed the policy |  |
 | hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
 | warn_color |  string | hex value for secondary color |  |
 | background_color |  string | hex value for background color |  |
@@ -32,6 +32,19 @@ title: zitadel/policy.proto
 | logo_url_dark |  string | - |  |
 | icon_url_dark |  string | - |  |
 | font_url |  string | - |  |
+
+
+
+
+### LockoutPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| max_password_attempts |  uint64 | - |  |
+| is_default |  bool | - |  |
 
 
 
@@ -93,20 +106,6 @@ title: zitadel/policy.proto
 | has_lowercase |  bool | - |  |
 | has_number |  bool | - |  |
 | has_symbol |  bool | - |  |
-| is_default |  bool | - |  |
-
-
-
-
-### PasswordLockoutPolicy
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| max_attempts |  uint64 | - |  |
-| show_lockout_failure |  bool | - |  |
 | is_default |  bool | - |  |
 
 

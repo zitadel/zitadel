@@ -20,7 +20,7 @@ type TokenVerifier struct {
 }
 
 type authZRepo interface {
-	VerifyAccessToken(ctx context.Context, token, clientID string) (userID, agentID, prefLang, resourceOwner string, err error)
+	VerifyAccessToken(ctx context.Context, token, verifierClientID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID string, err error)
 	SearchMyMemberships(ctx context.Context) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
@@ -33,11 +33,11 @@ func Start(authZRepo authZRepo) (v *TokenVerifier) {
 }
 
 func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, err error) {
-	clientID, err = v.clientIDFromMethod(ctx, method)
+	verifierClientID, err := v.clientIDFromMethod(ctx, method)
 	if err != nil {
 		return "", "", "", "", "", err
 	}
-	userID, agentID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, clientID)
+	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, verifierClientID)
 	return userID, clientID, agentID, prefLang, resourceOwner, err
 }
 

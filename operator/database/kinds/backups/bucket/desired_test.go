@@ -1,11 +1,12 @@
 package bucket
 
 import (
+	"testing"
+
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
-	"testing"
 )
 
 const (
@@ -38,10 +39,7 @@ version: v0`
 
 var (
 	desired = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -54,10 +52,7 @@ var (
 		},
 	}
 	desiredWithoutSecret = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -65,10 +60,7 @@ var (
 		},
 	}
 	desiredEmpty = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
 			Verbose: false,
 			Cron:    "",
@@ -80,10 +72,7 @@ var (
 	}
 
 	desiredNil = DesiredV0{
-		Common: &tree.Common{
-			Kind:    "databases.caos.ch/BucketBackup",
-			Version: "v0",
-		},
+		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 	}
 )
 
@@ -106,7 +95,9 @@ func getDesiredTree(t *testing.T, masterkey string, desired *DesiredV0) *tree.Tr
 }
 
 func TestBucket_DesiredParse(t *testing.T) {
-	assert.Equal(t, yamlFileWithoutSecret, string(marshalYaml(t, masterkey, &desiredWithoutSecret)))
+
+	result := string(marshalYaml(t, masterkey, &desiredWithoutSecret))
+	assert.Equal(t, yamlFileWithoutSecret, result)
 
 	desiredTree := unmarshalYaml(t, masterkey, []byte(yamlFile))
 	desiredKind, err := ParseDesiredV0(desiredTree)
