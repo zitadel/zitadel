@@ -11,8 +11,6 @@ import (
 )
 
 type ProjectRepository interface {
-	ProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) ([]*model.ProjectGrantView, error)
-
 	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMemberView, error)
 	SearchProjectMembers(ctx context.Context, request *model.ProjectMemberSearchRequest) (*model.ProjectMemberSearchResponse, error)
 	GetProjectMemberRoles(ctx context.Context) ([]string, error)

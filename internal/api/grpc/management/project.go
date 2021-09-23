@@ -247,7 +247,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	if err != nil {
 		return nil, err
 	}
-	projectGrants, err := s.project.ProjectGrantsByProjectIDAndRoleKey(ctx, req.ProjectId, req.RoleKey)
+	projectGrants, err := s.query.SearchProjectGrantsByProjectIDAndRoleKey(ctx, req.ProjectId, req.RoleKey)
 	if err != nil {
 		return nil, err
 	}

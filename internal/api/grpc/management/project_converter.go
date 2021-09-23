@@ -83,9 +83,9 @@ func UpdateProjectRoleRequestToDomain(req *mgmt_pb.UpdateProjectRoleRequest) *do
 	}
 }
 
-func ProjectGrantsToIDs(projectGrants []*proj_model.ProjectGrantView) []string {
-	converted := make([]string, len(projectGrants))
-	for i, grant := range projectGrants {
+func ProjectGrantsToIDs(projectGrants *query.ProjectGrants) []string {
+	converted := make([]string, len(projectGrants.ProjectGrants))
+	for i, grant := range projectGrants.ProjectGrants {
 		converted[i] = grant.GrantID
 	}
 	return converted

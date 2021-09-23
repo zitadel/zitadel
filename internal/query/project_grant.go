@@ -175,6 +175,24 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	return projects, err
 }
 
+func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) (projects *ProjectGrants, err error) {
+	searchQuery := &ProjectGrantSearchQueries{
+		SearchRequest: SearchRequest{},
+		Queries:       make([]SearchQuery, 2),
+	}
+	projectIDQuery, err := NewProjectGrantProjectIDSearchQuery(TextEquals, projectID)
+	if err != nil {
+		return nil, err
+	}
+	roleKeyQuery, err := NewProjectGrantRoleKeySearchQuery(roleKey)
+	if err != nil {
+		return nil, err
+	}
+	searchQuery.Queries[0] = projectIDQuery
+	searchQuery.Queries[1] = roleKeyQuery
+	return q.SearchProjectGrants(ctx, searchQuery)
+}
+
 type ProjectGrants struct {
 	SearchResponse
 	ProjectGrants []*ProjectGrant
