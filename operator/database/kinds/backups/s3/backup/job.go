@@ -89,7 +89,7 @@ func getJobSpecDef(
 						SubPath:   sessionTokenKey,
 						MountPath: sessionTokenPath,
 					}},
-					ImagePullPolicy: corev1.PullAlways,
+					ImagePullPolicy: corev1.PullIfNotPresent,
 				}},
 				Volumes: []corev1.Volume{{
 					Name: internalSecretName,

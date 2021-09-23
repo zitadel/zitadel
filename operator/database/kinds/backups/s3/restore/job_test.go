@@ -72,7 +72,7 @@ func TestBackup_Job1(t *testing.T) {
 								SubPath:   sessionTokenKey,
 								MountPath: sessionTokenPath,
 							}},
-							ImagePullPolicy: corev1.PullAlways,
+							ImagePullPolicy: corev1.PullIfNotPresent,
 						}},
 						Volumes: []corev1.Volume{{
 							Name: internalSecretName,
@@ -187,7 +187,7 @@ func TestBackup_Job2(t *testing.T) {
 								SubPath:   sessionTokenKey,
 								MountPath: sessionTokenPath,
 							}},
-							ImagePullPolicy: corev1.PullAlways,
+							ImagePullPolicy: corev1.PullIfNotPresent,
 						}},
 						Volumes: []corev1.Volume{{
 							Name: internalSecretName,
