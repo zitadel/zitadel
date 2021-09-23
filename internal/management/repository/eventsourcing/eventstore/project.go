@@ -38,14 +38,6 @@ type ProjectRepo struct {
 	PrefixAvatarURL string
 }
 
-func (repo *ProjectRepo) ProjectGrantViewByID(ctx context.Context, grantID string) (project *proj_model.ProjectGrantView, err error) {
-	p, err := repo.View.ProjectGrantByID(grantID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ProjectGrantToModel(p), nil
-}
-
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectMemberView, error) {
 	member, err := repo.View.ProjectMemberByIDs(projectID, userID)
 	if err != nil {

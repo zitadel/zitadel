@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/lib/pq"
 )
 
 type SearchResponse struct {
@@ -76,29 +77,34 @@ func NewTextQuery(column Column, value string, compare TextComparison) (*TextQue
 }
 
 func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	return query.Where(q.comp())
+	where, args := q.comp()
+	return query.Where(where, args...)
 }
 
-func (s *TextQuery) comp() sq.Sqlizer {
+func (s *TextQuery) comp() (interface{}, []interface{}) {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.toFullColumnName(): s.Text}
+		return sq.Eq{s.Column.toFullColumnName(): s.Text}, nil
 	case TextEqualsIgnoreCase:
-		return sq.Eq{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text)}
+		return sq.Eq{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text)}, nil
 	case TextStartsWith:
-		return sq.Like{s.Column.toFullColumnName(): s.Text + "%"}
+		return sq.Like{s.Column.toFullColumnName(): s.Text + "%"}, nil
 	case TextStartsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text) + "%"}
+		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text) + "%"}, nil
 	case TextEndsWith:
-		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text}
+		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text}, nil
 	case TextEndsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text)}
+		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text)}, nil
 	case TextContains:
-		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text + "%"}
+		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
 	case TextContainsIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}
+		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}, nil
+	case TextListContains:
+		args := make([]interface{}, 1)
+		args[0] = pq.Array([]string{s.Text})
+		return "? <@ " + s.Column.toFullColumnName(), args
 	}
-	return nil
+	return nil, nil
 }
 
 type TextComparison int
@@ -112,6 +118,7 @@ const (
 	TextEndsWithIgnoreCase
 	TextContains
 	TextContainsIgnoreCase
+	TextListContains
 
 	textCompareMax
 )

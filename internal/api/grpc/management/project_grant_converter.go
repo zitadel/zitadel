@@ -44,7 +44,7 @@ func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.Search
 	case *proj_pb.ProjectGrantQuery_ProjectNameQuery:
 		return query.NewProjectGrantProjectNameSearchQuery(object.TextMethodToQuery(q.ProjectNameQuery.Method), q.ProjectNameQuery.Name)
 	case *proj_pb.ProjectGrantQuery_RoleKeyQuery:
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-9j3fg", "Errors.NotImplemented")
+		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyQuery.RoleKey)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
