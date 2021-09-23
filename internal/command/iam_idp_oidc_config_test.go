@@ -84,6 +84,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeGoogle,
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -138,6 +139,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeGoogle,
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -193,6 +195,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeGoogle,
+								true,
 							),
 						),
 						eventFromEventPusher(

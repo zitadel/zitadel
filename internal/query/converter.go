@@ -48,6 +48,11 @@ func readModelToIDPConfigView(rm *IAMIDPConfigReadModel) *domain.IDPConfigView {
 		converted.OAuthAuthorizationEndpoint = rm.OIDCConfig.AuthorizationEndpoint
 		converted.OAuthTokenEndpoint = rm.OIDCConfig.TokenEndpoint
 	}
+	if rm.JWTConfig != nil {
+		converted.JWTEndpoint = rm.JWTConfig.JWTEndpoint
+		converted.JWTIssuer = rm.JWTConfig.Issuer
+		converted.JWTKeysEndpoint = rm.JWTConfig.KeysEndpoint
+	}
 	return converted
 }
 
@@ -138,14 +143,20 @@ func readModelToIDPConfigs(rm *IAMIDPConfigsReadModel) []*model.IDPConfig {
 }
 
 func readModelToIDPConfig(rm *IAMIDPConfigReadModel) *model.IDPConfig {
-	return &model.IDPConfig{
+	config := &model.IDPConfig{
 		ObjectRoot:  readModelToObjectRoot(rm.ReadModel),
-		OIDCConfig:  readModelToIDPOIDCConfig(rm.OIDCConfig),
 		IDPConfigID: rm.ConfigID,
 		Name:        rm.Name,
 		State:       model.IDPConfigState(rm.State),
 		StylingType: model.IDPStylingType(rm.StylingType),
 	}
+	if rm.OIDCConfig != nil {
+		config.OIDCConfig = readModelToIDPOIDCConfig(rm.OIDCConfig)
+	}
+	if rm.JWTConfig != nil {
+		config.JWTIDPConfig = readModelToIDPJWTConfig(rm.JWTConfig)
+	}
+	return config
 }
 
 func readModelToIDPOIDCConfig(rm *OIDCConfigReadModel) *model.OIDCIDPConfig {
@@ -159,6 +170,16 @@ func readModelToIDPOIDCConfig(rm *OIDCConfigReadModel) *model.OIDCIDPConfig {
 		Issuer:                rm.Issuer,
 		Scopes:                rm.Scopes,
 		UsernameMapping:       model.OIDCMappingField(rm.UserNameMapping),
+	}
+}
+
+func readModelToIDPJWTConfig(rm *JWTConfigReadModel) *model.JWTIDPConfig {
+	return &model.JWTIDPConfig{
+		ObjectRoot:   readModelToObjectRoot(rm.ReadModel),
+		IDPConfigID:  rm.IDPConfigID,
+		JWTEndpoint:  rm.JWTEndpoint,
+		Issuer:       rm.Issuer,
+		KeysEndpoint: rm.KeysEndpoint,
 	}
 }
 

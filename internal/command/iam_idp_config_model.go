@@ -100,6 +100,7 @@ func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
 	configID,
 	name string,
 	stylingType domain.IDPConfigStylingType,
+	autoRegister bool,
 ) (*iam.IDPConfigChangedEvent, bool) {
 
 	changes := make([]idpconfig.IDPConfigChanges, 0)
@@ -110,6 +111,9 @@ func (wm *IAMIDPConfigWriteModel) NewChangedEvent(
 	}
 	if stylingType.Valid() && wm.StylingType != stylingType {
 		changes = append(changes, idpconfig.ChangeStyleType(stylingType))
+	}
+	if wm.AutoRegister != autoRegister {
+		changes = append(changes, idpconfig.ChangeAutoRegister(autoRegister))
 	}
 	if len(changes) == 0 {
 		return nil, false

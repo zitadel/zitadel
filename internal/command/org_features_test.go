@@ -244,11 +244,33 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
 							),
 						),
 					),
@@ -280,9 +302,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyPrivateLabel:  false,
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
-					CustomText:               false,
+					CustomTextMessage:        false,
+					CustomTextLogin:          false,
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -417,11 +441,33 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
 							),
 						),
 					),
@@ -461,6 +507,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -602,11 +650,33 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
 							),
 						),
 					),
@@ -649,6 +719,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -797,11 +869,33 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
 							),
 						),
 					),
@@ -847,6 +941,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -1047,11 +1143,33 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							org.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								5,
+								false,
 							),
 						),
 					),
@@ -1080,7 +1198,13 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.InitCodeMessageType, language.English),
 							),
 							eventFromEventPusher(
+								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, language.English),
+							),
+							eventFromEventPusher(
 								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
+								org.NewLockoutPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -1108,6 +1232,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -1221,11 +1347,33 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
 							),
 						),
 					),
@@ -1269,9 +1417,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyPrivateLabel:  false,
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
-					CustomText:               false,
+					CustomTextMessage:        false,
+					CustomTextLogin:          false,
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
+					LockoutPolicy:            false,
 				},
 			},
 			res: res{
@@ -1454,11 +1604,33 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								domain.LoginCustomText,
+								domain.LoginKeyExternalRegistrationUserOverviewTitle,
+								"text",
+								language.English,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewPrivacyPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
 							),
 						),
 					),

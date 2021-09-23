@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -65,7 +66,7 @@ type HumanOTPVerifiedEvent struct {
 }
 
 func (e *HumanOTPVerifiedEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanOTPVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {

@@ -5,41 +5,22 @@
   margin-bottom: 2rem;
   flex-wrap: wrap;
 
-  .h1 {
-    margin-top: 0;
-  }
+  .text {
+    flex: 1;
 
-  .sub {
-    color: var(--grey);
-    max-width: 500px;
+    .h1 {
+      margin: 0;
+    }
+
+    .sub {
+      color: var(--grey);
+      max-width: 500px;
+      font-size: 14px;
+    }
   }
 
   .theme {
     min-width: 250px;
-  }
-}
-
-.login-name-row {
-  display: flex;
-  align-items: center;
-
-  button {
-    transition: opacity .15s ease-in-out;
-    visibility: hidden;
-    opacity: 0;
-
-    &[disabled] {
-      visibility: visible;
-      color: white;
-      opacity: 1;
-    }
-  }
-
-  &:hover {
-    button {
-      visibility: visible;
-      opacity: 1;
-    }
   }
 }
 
@@ -66,6 +47,16 @@
   }
 }
 
+.icon-button {
+  .icon {
+    font-size: 1.2rem;
+  }
+}
+
 .resendemail {
   margin-right: 1rem;
+}
+
+.side-padding {
+  padding-top: 1rem;
 }

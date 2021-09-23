@@ -21,6 +21,8 @@ func (wm *SecondFactorWriteModel) Reduce() error {
 		case *policy.SecondFactorRemovedEvent:
 			wm.MFAType = e.MFAType
 			wm.State = domain.FactorStateRemoved
+		case *policy.LoginPolicyRemovedEvent:
+			wm.State = domain.FactorStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -40,6 +42,8 @@ func (wm *MultiFactorWriteModel) Reduce() error {
 			wm.State = domain.FactorStateActive
 		case *policy.MultiFactorRemovedEvent:
 			wm.MFAType = e.MFAType
+			wm.State = domain.FactorStateRemoved
+		case *policy.LoginPolicyRemovedEvent:
 			wm.State = domain.FactorStateRemoved
 		}
 	}

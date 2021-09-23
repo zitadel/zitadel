@@ -44,6 +44,7 @@ type AuthRequestRepo struct {
 	LockoutPolicyViewProvider lockoutPolicyViewProvider
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
+	ProjectProvider           projectProvider
 
 	IdGenerator id.Generator
 
@@ -96,6 +97,11 @@ type userGrantProvider interface {
 	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
 }
 
+type projectProvider interface {
+	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
+	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
+}
+
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 	return repo.AuthRequests.Health(ctx)
 }
@@ -118,6 +124,8 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	request.Audience = appIDs
 	request.AppendAudIfNotExisting(app.ProjectID)
+	request.ApplicationResourceOwner = app.ResourceOwner
+	request.PrivateLabelingSetting = app.PrivateLabelingSetting
 	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
@@ -125,6 +133,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
 	}
+
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
@@ -215,7 +224,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	if err != nil {
 		return err
 	}
-	err = repo.checkExternalUserLogin(request, externalUser.IDPConfigID, externalUser.ExternalUserID)
+	err = repo.checkExternalUserLogin(ctx, request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
@@ -504,7 +513,19 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	labelPolicy, err := repo.getLabelPolicy(ctx, orgID)
+	privateLabelingOrgID := domain.IAMID
+	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
+		privateLabelingOrgID = request.ApplicationResourceOwner
+	}
+	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || request.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
+		if request.UserOrgID != "" {
+			privateLabelingOrgID = request.UserOrgID
+		}
+	}
+	if request.RequestedOrgID != "" {
+		privateLabelingOrgID = request.RequestedOrgID
+	}
+	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
 		return err
 	}
@@ -578,7 +599,7 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 	return errors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
 }
 
-func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
+func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
 	externalIDP := new(user_view_model.ExternalIDPView)
 	if request.RequestedOrgID != "" {
 		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID)
@@ -588,7 +609,15 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(request *domain.AuthRequest,
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(externalIDP.UserID, "", "", "", "", externalIDP.ResourceOwner)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID)
+	if err != nil {
+		return err
+	}
+	username := user.UserName
+	if request.RequestedOrgID == "" {
+		username = user.PreferredLoginName
+	}
+	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
 	return nil
 }
 
@@ -614,7 +643,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			if err != nil {
 				return nil, err
 			}
-			if len(users) > 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+			if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+				steps = append(steps, &domain.SelectUserStep{Users: users})
+			}
+			if request.SelectedIDPConfigID != "" {
+				steps = append(steps, &domain.RedirectToExternalIDPStep{})
+			}
+			if len(request.Prompt) == 0 && len(users) > 0 {
 				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
 		}
@@ -672,7 +707,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	//PLANNED: consent step
 
-	missing, err := userGrantRequired(ctx, request, user, repo.UserGrantProvider)
+	missing, err := projectRequired(ctx, request, repo.ProjectProvider)
+	if err != nil {
+		return nil, err
+	}
+	if missing {
+		return append(steps, &domain.ProjectRequiredStep{}), nil
+	}
+
+	missing, err = userGrantRequired(ctx, request, user, repo.UserGrantProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -832,10 +875,25 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 	policy, err := repo.View.LockoutPolicyByAggregateID(orgID)
 	if errors.IsNotFound(err) {
 		policy, err = repo.View.LockoutPolicyByAggregateID(repo.IAMID)
-		if err != nil {
+		if err != nil && !errors.IsNotFound(err) {
 			return nil, err
 		}
+		if err == nil {
+			return policy.ToDomain(), nil
+		}
+		policy = &iam_view_model.LockoutPolicyView{}
+		events, err := repo.Eventstore.FilterEvents(ctx, es_models.NewSearchQuery().
+			AggregateIDFilter(repo.IAMID).
+			AggregateTypeFilter(iam.AggregateType).
+			EventTypesFilter(es_models.EventType(iam.LockoutPolicyAddedEventType), es_models.EventType(iam.LockoutPolicyChangedEventType)))
+		if err != nil || len(events) == 0 {
+			return nil, errors.ThrowNotFound(err, "EVENT-Gfgr2", "IAM.LockoutPolicy.NotExisting")
+		}
 		policy.Default = true
+		for _, event := range events {
+			policy.AppendEvent(event)
+		}
+		return policy.ToDomain(), nil
 	}
 	if err != nil {
 		return nil, err
@@ -1058,6 +1116,7 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 	}
 	return true
 }
+
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var app *project_view_model.ApplicationView
 	switch request.Request.Type() {
@@ -1077,4 +1136,28 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 		return false, err
 	}
 	return len(grants) == 0, nil
+}
+
+func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
+	var app *project_view_model.ApplicationView
+	switch request.Request.Type() {
+	case domain.AuthRequestTypeOIDC:
+		app, err = projectProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+	default:
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+	}
+	if !app.HasProjectCheck {
+		return false, nil
+	}
+	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, app.ProjectID)
+	if errors.IsNotFound(err) {
+		return true, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return false, nil
 }

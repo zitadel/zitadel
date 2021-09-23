@@ -74,6 +74,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 		newLockoutPolicy(handler{view, bulkLimit, configs.cycleDuration("LockoutPolicy"), errorCount, es}),
+		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
 }
 

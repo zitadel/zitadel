@@ -1,5 +1,10 @@
-let button1 = document.getElementById("link-button");
-disableSubmit(undefined, button1);
+let buttons1 = document.getElementsByName("linkbutton");
 
-let button2 = document.getElementById("auto-register-button");
-disableSubmit(undefined, button2);
+for (let i = 0; i < buttons1.length; i++) {
+    disableSubmit(undefined, buttons1[i]);
+}
+
+let buttons2 = document.getElementsByName("autoregisterbutton");
+for (let i = 0; i < buttons2.length; i++) {
+    disableSubmit(undefined, buttons2[i]);
+}

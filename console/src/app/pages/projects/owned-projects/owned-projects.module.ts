@@ -24,45 +24,51 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { NameDialogModule } from '../../../modules/name-dialog/name-dialog.module';
+import {
+  ProjectPrivateLabelingDialogModule,
+} from '../../../modules/project-private-labeling-dialog/project-private-labeling-dialog.module';
 import { OwnedProjectGridComponent } from './owned-project-list/owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
 import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
 import { OwnedProjectsComponent } from './owned-projects.component';
 
 @NgModule({
-    declarations: [
-        OwnedProjectsComponent,
-        OwnedProjectListComponent,
-        OwnedProjectGridComponent,
-    ],
-    imports: [
-        CommonModule,
-        OwnedProjectsRoutingModule,
-        UserGrantsModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TranslateModule,
-        AvatarModule,
-        ReactiveFormsModule,
-        HasRoleModule,
-        MatTableModule,
-        PaginatorModule,
-        InputModule,
-        MatChipsModule,
-        MatIconModule,
-        WarnDialogModule,
-        MatButtonModule,
-        MatProgressSpinnerModule,
-        MatProgressBarModule,
-        MatCheckboxModule,
-        CardModule,
-        MatTooltipModule,
-        MatSortModule,
-        HasRolePipeModule,
-        TimestampToDatePipeModule,
-        LocalizedDatePipeModule,
-        SharedModule,
-        RefreshTableModule,
-    ],
+  declarations: [
+    OwnedProjectsComponent,
+    OwnedProjectListComponent,
+    OwnedProjectGridComponent,
+  ],
+  imports: [
+    CommonModule,
+    OwnedProjectsRoutingModule,
+    UserGrantsModule,
+    FormsModule,
+    NameDialogModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    AvatarModule,
+    ReactiveFormsModule,
+    HasRoleModule,
+    MatTableModule,
+    PaginatorModule,
+    ProjectPrivateLabelingDialogModule,
+    InputModule,
+    MatChipsModule,
+    MatIconModule,
+    WarnDialogModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatCheckboxModule,
+    CardModule,
+    MatTooltipModule,
+    MatSortModule,
+    HasRolePipeModule,
+    TimestampToDatePipeModule,
+    LocalizedDatePipeModule,
+    SharedModule,
+    RefreshTableModule,
+  ],
 })
 export class OwnedProjectsModule { }

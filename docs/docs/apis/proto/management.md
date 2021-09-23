@@ -2595,6 +2595,18 @@ Provider must be OIDC compliant
     POST: /idps/oidc
 
 
+### AddOrgJWTIDP
+
+> **rpc** AddOrgJWTIDP([AddOrgJWTIDPRequest](#addorgjwtidprequest))
+[AddOrgJWTIDPResponse](#addorgjwtidpresponse)
+
+Add a new jwt identity provider configuration in the organisation
+
+
+
+    POST: /idps/jwt
+
+
 ### DeactivateOrgIDP
 
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
@@ -2657,6 +2669,18 @@ Change OIDC identity provider configuration of the organisation
 
 
     PUT: /idps/{idp_id}/oidc_config
+
+
+### UpdateOrgIDPJWTConfig
+
+> **rpc** UpdateOrgIDPJWTConfig([UpdateOrgIDPJWTConfigRequest](#updateorgidpjwtconfigrequest))
+[UpdateOrgIDPJWTConfigResponse](#updateorgidpjwtconfigresponse)
+
+Change JWT identity provider configuration of the organisation
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
 
 
 
@@ -3117,6 +3141,35 @@ This is an empty request
 
 
 
+### AddOrgJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddOrgJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddOrgMemberRequest
 
 
@@ -3154,6 +3207,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -3276,6 +3330,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
+| has_project_check |  bool | - |  |
+| private_labeling_setting |  zitadel.project.v1.PrivateLabelingSetting | - | enum.defined_only: true<br />  |
 
 
 
@@ -7340,6 +7396,32 @@ This is an empty request
 
 
 
+### UpdateOrgIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateOrgIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateOrgIDPOIDCConfigRequest
 
 
@@ -7377,6 +7459,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -7520,6 +7603,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
+| has_project_check |  bool | - |  |
+| private_labeling_setting |  zitadel.project.v1.PrivateLabelingSetting | - | enum.defined_only: true<br />  |
 
 
 

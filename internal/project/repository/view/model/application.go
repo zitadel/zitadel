@@ -8,6 +8,7 @@ import (
 	"github.com/lib/pq"
 
 	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
@@ -23,14 +24,17 @@ const (
 )
 
 type ApplicationView struct {
-	ID                   string    `json:"appId" gorm:"column:id;primary_key"`
-	ProjectID            string    `json:"-" gorm:"column:project_id"`
-	Name                 string    `json:"name" gorm:"column:app_name"`
-	CreationDate         time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate           time.Time `json:"-" gorm:"column:change_date"`
-	State                int32     `json:"-" gorm:"column:app_state"`
-	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
-	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
+	ID                     string                        `json:"appId" gorm:"column:id;primary_key"`
+	ProjectID              string                        `json:"-" gorm:"column:project_id"`
+	Name                   string                        `json:"name" gorm:"column:app_name"`
+	CreationDate           time.Time                     `json:"-" gorm:"column:creation_date"`
+	ChangeDate             time.Time                     `json:"-" gorm:"column:change_date"`
+	State                  int32                         `json:"-" gorm:"column:app_state"`
+	ResourceOwner          string                        `json:"-" gorm:"column:resource_owner"`
+	ProjectRoleAssertion   bool                          `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
+	ProjectRoleCheck       bool                          `json:"projectRoleCheck" gorm:"column:project_role_check"`
+	HasProjectCheck        bool                          `json:"hasProjectCheck" gorm:"column:has_project_check"`
+	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting" gorm:"column:private_labeling_setting"`
 
 	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
 	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
@@ -57,15 +61,18 @@ type ApplicationView struct {
 
 func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 	return &model.ApplicationView{
-		ID:                   app.ID,
-		ProjectID:            app.ProjectID,
-		Name:                 app.Name,
-		State:                model.AppState(app.State),
-		Sequence:             app.Sequence,
-		CreationDate:         app.CreationDate,
-		ChangeDate:           app.ChangeDate,
-		ProjectRoleAssertion: app.ProjectRoleAssertion,
-		ProjectRoleCheck:     app.ProjectRoleCheck,
+		ID:                     app.ID,
+		ProjectID:              app.ProjectID,
+		Name:                   app.Name,
+		State:                  model.AppState(app.State),
+		Sequence:               app.Sequence,
+		CreationDate:           app.CreationDate,
+		ChangeDate:             app.ChangeDate,
+		ResourceOwner:          app.ResourceOwner,
+		ProjectRoleAssertion:   app.ProjectRoleAssertion,
+		ProjectRoleCheck:       app.ProjectRoleCheck,
+		HasProjectCheck:        app.HasProjectCheck,
+		PrivateLabelingSetting: app.PrivateLabelingSetting,
 
 		IsOIDC:                     app.IsOIDC,
 		OIDCVersion:                model.OIDCVersion(app.OIDCVersion),
@@ -157,6 +164,7 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	case es_model.ApplicationAdded:
 		a.setRootData(event)
 		a.CreationDate = event.CreationDate
+		a.ResourceOwner = event.ResourceOwner
 		err = a.SetData(event)
 	case es_model.OIDCConfigAdded:
 		a.IsOIDC = true
@@ -232,8 +240,10 @@ func (a *ApplicationView) setCompliance() {
 
 func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	changes := struct {
-		ProjectRoleAssertion *bool `json:"projectRoleAssertion,omitempty"`
-		ProjectRoleCheck     *bool `json:"projectRoleCheck,omitempty"`
+		ProjectRoleAssertion   *bool                          `json:"projectRoleAssertion,omitempty"`
+		ProjectRoleCheck       *bool                          `json:"projectRoleCheck,omitempty"`
+		HasProjectCheck        *bool                          `json:"hasProjectCheck,omitempty"`
+		PrivateLabelingSetting *domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
 	}{}
 	if err := json.Unmarshal(event.Data, &changes); err != nil {
 		logging.Log("EVEN-DFbfg").WithError(err).Error("could not unmarshal event data")
@@ -244,6 +254,12 @@ func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	}
 	if changes.ProjectRoleCheck != nil {
 		a.ProjectRoleCheck = *changes.ProjectRoleCheck
+	}
+	if changes.HasProjectCheck != nil {
+		a.HasProjectCheck = *changes.HasProjectCheck
+	}
+	if changes.PrivateLabelingSetting != nil {
+		a.PrivateLabelingSetting = *changes.PrivateLabelingSetting
 	}
 	return nil
 }

@@ -2271,7 +2271,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2319,7 +2319,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2368,7 +2368,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2417,7 +2417,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2466,7 +2466,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2515,7 +2515,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.message"
         };
     }
 
@@ -2563,7 +2563,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text"
+            feature: "custom_text.login"
         };
     }
 
@@ -2608,6 +2608,19 @@ service ManagementService {
     rpc AddOrgOIDCIDP(AddOrgOIDCIDPRequest) returns (AddOrgOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+            feature: "login_policy.idp"
+        };
+    }
+
+    // Add a new jwt identity provider configuration in the organisation
+    rpc AddOrgJWTIDP(AddOrgJWTIDPRequest) returns (AddOrgJWTIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/jwt"
             body: "*"
         };
 
@@ -2676,6 +2689,19 @@ service ManagementService {
     rpc UpdateOrgIDPOIDCConfig(UpdateOrgIDPOIDCConfigRequest) returns (UpdateOrgIDPOIDCConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/oidc_config"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+            feature: "login_policy.idp"
+        };
+    }
+
+    // Change JWT identity provider configuration of the organisation
+    rpc UpdateOrgIDPJWTConfig(UpdateOrgIDPJWTConfigRequest) returns (UpdateOrgIDPJWTConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/jwt_config"
             body: "*"
         };
 
@@ -3452,6 +3478,8 @@ message AddProjectRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 2;
     bool project_role_check = 3;
+    bool has_project_check = 4;
+    zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 5 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddProjectResponse {
@@ -3464,6 +3492,8 @@ message UpdateProjectRequest {
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool project_role_assertion = 3;
     bool project_role_check = 4;
+    bool has_project_check = 5;
+    zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 6 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateProjectResponse {
@@ -4880,9 +4910,66 @@ message AddOrgOIDCIDPRequest {
             description: "definition which field is mapped to the email of the user";
         }
     ];
+    bool auto_register = 9;
 }
 
 message AddOrgOIDCIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
+message AddOrgJWTIDPRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
+    string jwt_endpoint = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string issuer = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/keys\"";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string header_name = 6 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+    bool auto_register = 7;
+}
+
+message AddOrgJWTIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
     string idp_id = 2;
 }
@@ -4924,6 +5011,7 @@ message UpdateOrgIDPRequest {
             description: "some identity providers specify the styling of the button to their login";
         }
     ];
+    bool auto_register = 4;
 }
 
 message UpdateOrgIDPResponse {
@@ -4978,5 +5066,54 @@ message UpdateOrgIDPOIDCConfigRequest {
 }
 
 message UpdateOrgIDPOIDCConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+
+message UpdateOrgIDPJWTConfigRequest {
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string jwt_endpoint = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string issuer = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/keys\"";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string header_name = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateOrgIDPJWTConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }

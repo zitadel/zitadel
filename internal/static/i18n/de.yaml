@@ -92,6 +92,7 @@ Errors:
       NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
       AlreadyExists: External IDP ist bereits vergeben
+      NotFound: Externe IDP nicht gefunden
     MFA:
       OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
@@ -115,7 +116,7 @@ Errors:
       Invalid: Refresh Token ist ungültig
       NotFound: Refresh Token nicht gefunden
   Org:
-    AlreadyExist: Organisationsname existiert bereits
+    AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv

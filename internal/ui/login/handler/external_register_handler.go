@@ -10,7 +10,6 @@ import (
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
@@ -73,7 +72,7 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !idpConfig.IsOIDC {
-		l.renderError(w, r, authReq, caos_errors.ThrowInternal(nil, "LOGIN-Rio9s", "Errors.User.ExternalIDP.IDPTypeNotImplemented"))
+		l.handleJWTAuthorize(w, r, authReq, idpConfig)
 		return
 	}
 	l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalRegisterCallback)
@@ -119,7 +118,27 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
-	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
+	if !idpConfig.AutoRegister {
+		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
+		return
+	}
+	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
+}
+
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.ExternalIDP) {
+	resourceOwner := iam.GlobalOrgID
+	memberRoles := []string{domain.RoleOrgProjectCreator}
+
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
+		memberRoles = nil
+		resourceOwner = authReq.RequestedOrgID
+	}
+	_, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	l.renderNextStep(w, r, authReq)
 }
 
 func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *iam_model.OrgIAMPolicyView, human *domain.Human, idp *domain.ExternalIDP, err error) {

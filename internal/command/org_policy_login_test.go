@@ -626,10 +626,44 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+					Name:        "name",
+					Type:        domain.IdentityProviderTypeOrg,
+				},
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
 			name: "config not existing, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
 					expectFilter(),
 				),
 			},
@@ -653,17 +687,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								"config1",
-								"name",
-								domain.IDPConfigTypeOIDC,
-								domain.IDPConfigStylingTypeUnspecified,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
@@ -674,6 +697,20 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								true,
+							),
+						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "or1").Aggregate,
@@ -704,12 +741,26 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeUnspecified,
+								true,
 							),
 						),
 					),
@@ -822,10 +873,42 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "login policy not exist, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+				},
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
 			name: "provider not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
 					expectFilter(),
 				),
 			},
@@ -859,6 +942,8 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -903,6 +988,8 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -954,6 +1041,8 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -1013,6 +1102,8 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,

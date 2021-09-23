@@ -49,6 +49,7 @@ export enum ColorType {
 }
 
 const ORG_STORAGE_KEY = 'organization';
+const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 
 @Component({
   selector: 'app-private-labeling-policy',
@@ -139,25 +140,28 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const file = filelist.item(0);
     if (file) {
 
-      const formData = new FormData();
-      formData.append('file', file);
-      if (theme === Theme.DARK) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
-          case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData, this.org.id));
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (theme === Theme.DARK) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
+            case PolicyComponentServiceType.ADMIN:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData, this.org.id));
+          }
+        }
+        if (theme === Theme.LIGHT) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
+            case PolicyComponentServiceType.ADMIN:
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData, this.org.id));
+          }
         }
       }
-      if (theme === Theme.LIGHT) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
-          case PolicyComponentServiceType.ADMIN:
-            return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData, this.org.id));
-        }
-      }
-
     }
   }
 
@@ -262,26 +266,30 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const file = filelist.item(0);
     if (file) {
 
-      const formData = new FormData();
-      formData.append('file', file);
-      if (theme === Theme.DARK) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
-            break;
-          case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData, this.org.id));
-            break;
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (theme === Theme.DARK) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData, this.org.id));
+              break;
+          }
         }
-      }
-      if (theme === Theme.LIGHT) {
-        switch (this.serviceType) {
-          case PolicyComponentServiceType.MGMT:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
-            break;
-          case PolicyComponentServiceType.ADMIN:
-            this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData, this.org.id));
-            break;
+        if (theme === Theme.LIGHT) {
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData, this.org.id));
+              break;
+          }
         }
       }
     }
@@ -621,8 +629,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
     const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
 
-    const darkWarn = labelpolicy?.warnColorDark || '#F44336';
-    const lightWarn = labelpolicy?.warnColor || '#F44336';
+    const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
+    const lightWarn = labelpolicy?.warnColor || '#cd3d56';
 
     const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
     const lightBackground = labelpolicy?.backgroundColor || '#fafafa';

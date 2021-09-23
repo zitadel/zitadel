@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
@@ -19,42 +20,32 @@ const (
 )
 
 type ProjectView struct {
-	ProjectID            string    `json:"-" gorm:"column:project_id;primary_key"`
-	Name                 string    `json:"name" gorm:"column:project_name"`
-	CreationDate         time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate           time.Time `json:"-" gorm:"column:change_date"`
-	State                int32     `json:"-" gorm:"column:project_state"`
-	ResourceOwner        string    `json:"-" gorm:"column:resource_owner"`
-	ProjectRoleAssertion bool      `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
-	ProjectRoleCheck     bool      `json:"projectRoleCheck" gorm:"column:project_role_check"`
-	Sequence             uint64    `json:"-" gorm:"column:sequence"`
-}
-
-func ProjectFromModel(project *model.ProjectView) *ProjectView {
-	return &ProjectView{
-		ProjectID:            project.ProjectID,
-		Name:                 project.Name,
-		ChangeDate:           project.ChangeDate,
-		CreationDate:         project.CreationDate,
-		State:                int32(project.State),
-		ResourceOwner:        project.ResourceOwner,
-		ProjectRoleAssertion: project.ProjectRoleAssertion,
-		ProjectRoleCheck:     project.ProjectRoleCheck,
-		Sequence:             project.Sequence,
-	}
+	ProjectID              string                        `json:"-" gorm:"column:project_id;primary_key"`
+	Name                   string                        `json:"name" gorm:"column:project_name"`
+	CreationDate           time.Time                     `json:"-" gorm:"column:creation_date"`
+	ChangeDate             time.Time                     `json:"-" gorm:"column:change_date"`
+	State                  int32                         `json:"-" gorm:"column:project_state"`
+	ResourceOwner          string                        `json:"-" gorm:"column:resource_owner"`
+	ProjectRoleAssertion   bool                          `json:"projectRoleAssertion" gorm:"column:project_role_assertion"`
+	ProjectRoleCheck       bool                          `json:"projectRoleCheck" gorm:"column:project_role_check"`
+	HasProjectCheck        bool                          `json:"hasProjectCheck" gorm:"column:has_project_check"`
+	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting" gorm:"column:private_labeling_setting"`
+	Sequence               uint64                        `json:"-" gorm:"column:sequence"`
 }
 
 func ProjectToModel(project *ProjectView) *model.ProjectView {
 	return &model.ProjectView{
-		ProjectID:            project.ProjectID,
-		Name:                 project.Name,
-		ChangeDate:           project.ChangeDate,
-		CreationDate:         project.CreationDate,
-		State:                model.ProjectState(project.State),
-		ResourceOwner:        project.ResourceOwner,
-		ProjectRoleAssertion: project.ProjectRoleAssertion,
-		ProjectRoleCheck:     project.ProjectRoleCheck,
-		Sequence:             project.Sequence,
+		ProjectID:              project.ProjectID,
+		Name:                   project.Name,
+		ChangeDate:             project.ChangeDate,
+		CreationDate:           project.CreationDate,
+		State:                  model.ProjectState(project.State),
+		ResourceOwner:          project.ResourceOwner,
+		ProjectRoleAssertion:   project.ProjectRoleAssertion,
+		ProjectRoleCheck:       project.ProjectRoleCheck,
+		HasProjectCheck:        project.HasProjectCheck,
+		PrivateLabelingSetting: project.PrivateLabelingSetting,
+		Sequence:               project.Sequence,
 	}
 }
 
