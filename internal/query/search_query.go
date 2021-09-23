@@ -123,6 +123,7 @@ const (
 	textCompareMax
 )
 
+//Deprecated: Use TextComparison, will be removed as soon as all calls are changed to query
 func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
 	switch m {
 	case domain.SearchMethodEquals:
@@ -208,6 +209,7 @@ const (
 	numberCompareMax
 )
 
+//Deprecated: Use NumberComparison, will be removed as soon as all calls are changed to query
 func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	switch m {
 	case domain.SearchMethodEquals:
