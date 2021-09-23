@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/lib/pq"
 )
 
 type testCol struct{}
@@ -233,7 +234,7 @@ func TestTextQuery_comp(t *testing.T) {
 		Compare TextComparison
 	}
 	type want struct {
-		stmt  string
+		query interface{}
 		args  []interface{}
 		isNil bool
 	}
@@ -250,8 +251,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEquals,
 			},
 			want: want{
-				stmt: "test = ?",
-				args: []interface{}{"Hurst"},
+				query: sq.Eq{"test": "Hurst"},
+				args:  nil,
 			},
 		},
 		{
@@ -262,8 +263,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEqualsIgnoreCase,
 			},
 			want: want{
-				stmt: "LOWER(test) = ?",
-				args: []interface{}{"hurst"},
+				query: sq.ILike{"test": "Hurst"},
+				args:  nil,
 			},
 		},
 		{
@@ -274,8 +275,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextStartsWith,
 			},
 			want: want{
-				stmt: "test LIKE ?",
-				args: []interface{}{"Hurst%"},
+				query: sq.Like{"test": "Hurst%"},
+				args:  nil,
 			},
 		},
 		{
@@ -286,8 +287,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextStartsWithIgnoreCase,
 			},
 			want: want{
-				stmt: "LOWER(test) LIKE ?",
-				args: []interface{}{"hurst%"},
+				query: sq.ILike{"test": "Hurst%"},
+				args:  nil,
 			},
 		},
 		{
@@ -298,8 +299,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEndsWith,
 			},
 			want: want{
-				stmt: "test LIKE ?",
-				args: []interface{}{"%Hurst"},
+				query: sq.Like{"test": "%Hurst"},
+				args:  nil,
 			},
 		},
 		{
@@ -310,8 +311,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEndsWithIgnoreCase,
 			},
 			want: want{
-				stmt: "LOWER(test) LIKE ?",
-				args: []interface{}{"%hurst"},
+				query: sq.ILike{"test": "%Hurst"},
+				args:  nil,
 			},
 		},
 		{
@@ -322,8 +323,8 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextContains,
 			},
 			want: want{
-				stmt: "test LIKE ?",
-				args: []interface{}{"%Hurst%"},
+				query: sq.Like{"test": "%Hurst%"},
+				args:  nil,
 			},
 		},
 		{
@@ -334,8 +335,20 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextContainsIgnoreCase,
 			},
 			want: want{
-				stmt: "LOWER(test) LIKE ?",
-				args: []interface{}{"%hurst%"},
+				query: sq.ILike{"test": "%Hurst%"},
+				args:  nil,
+			},
+		},
+		{
+			name: "list containts",
+			fields: fields{
+				Column:  &testCol{},
+				Text:    "Hurst",
+				Compare: TextListContains,
+			},
+			want: want{
+				query: "test @> ? ",
+				args:  []interface{}{pq.StringArray{"Hurst"}},
 			},
 		},
 		{
@@ -368,21 +381,19 @@ func TestTextQuery_comp(t *testing.T) {
 				Text:    tt.fields.Text,
 				Compare: tt.fields.Compare,
 			}
-			query := s.comp()
+			query, args := s.comp()
 			if query == nil && tt.want.isNil {
 				return
 			} else if tt.want.isNil && query != nil {
 				t.Error("query should not be nil")
 			}
-			stmt, args, err := query.ToSql()
-			if err != nil {
-				t.Errorf("no err expected: %v", err)
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
 			}
-			if stmt != tt.want.stmt {
-				t.Errorf("stmt = %v, want %v", stmt, tt.want.stmt)
-			}
+
 			if !reflect.DeepEqual(args, tt.want.args) {
-				t.Errorf("args = %v, want %v", args, tt.want.args)
+				t.Errorf("wrong args: want: %v, (%T), got: %v (%T)", tt.want.args, tt.want.args, args, args)
 			}
 		})
 	}
@@ -445,6 +456,13 @@ func TestTextComparisonFromMethod(t *testing.T) {
 				m: domain.SearchMethodContains,
 			},
 			want: TextContains,
+		},
+		{
+			name: "list contains",
+			args: args{
+				m: domain.SearchMethodListContains,
+			},
+			want: TextListContains,
 		},
 		{
 			name: "containts ignore case",

@@ -2,7 +2,6 @@ package query
 
 import (
 	"errors"
-	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
@@ -81,28 +80,26 @@ func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(where, args...)
 }
 
-func (s *TextQuery) comp() (interface{}, []interface{}) {
+func (s *TextQuery) comp() (comparison interface{}, args []interface{}) {
 	switch s.Compare {
 	case TextEquals:
 		return sq.Eq{s.Column.toFullColumnName(): s.Text}, nil
 	case TextEqualsIgnoreCase:
-		return sq.Eq{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text)}, nil
+		return sq.ILike{s.Column.toFullColumnName(): s.Text}, nil
 	case TextStartsWith:
 		return sq.Like{s.Column.toFullColumnName(): s.Text + "%"}, nil
 	case TextStartsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": strings.ToLower(s.Text) + "%"}, nil
+		return sq.ILike{s.Column.toFullColumnName(): s.Text + "%"}, nil
 	case TextEndsWith:
 		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text}, nil
 	case TextEndsWithIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text)}, nil
+		return sq.ILike{s.Column.toFullColumnName(): "%" + s.Text}, nil
 	case TextContains:
 		return sq.Like{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
 	case TextContainsIgnoreCase:
-		return sq.Like{"LOWER(" + s.Column.toFullColumnName() + ")": "%" + strings.ToLower(s.Text) + "%"}, nil
+		return sq.ILike{s.Column.toFullColumnName(): "%" + s.Text + "%"}, nil
 	case TextListContains:
-		args := make([]interface{}, 1)
-		args[0] = pq.Array([]string{s.Text})
-		return "? <@ " + s.Column.toFullColumnName(), args
+		return s.Column.toFullColumnName() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
 	}
 	return nil, nil
 }
@@ -141,6 +138,8 @@ func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
 		return TextEndsWith
 	case domain.SearchMethodEndsWithIgnoreCase:
 		return TextEndsWithIgnoreCase
+	case domain.SearchMethodListContains:
+		return TextListContains
 	default:
 		return textCompareMax
 	}
