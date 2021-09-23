@@ -22,6 +22,7 @@
   --ifm-hero-text-color: var(--ifm-font-color-base-inverse);
   --get-started: #FF2069;
   --get-started-bg-hover: var(--ifm-hero-background-color);
+  --ifm-color-info: #4cb3d4;
 }
 
 :root[data-theme="dark"] {
@@ -29,6 +30,11 @@
   --ifm-hero-background-color: #0F1022;
   --ifm-hero-text-color: var(--ifm-font-color-base);
   --get-started-bg: --ifm-font-color-base;
+}
+
+.menu li li a {
+  font-size: 14px;
+  padding: 2px 14px;
 }
 
 .docusaurus-highlight-code-line {

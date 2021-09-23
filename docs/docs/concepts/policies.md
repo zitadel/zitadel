@@ -7,14 +7,14 @@ The default configuration can be overridden for each organization.
 
 ## General
 
-You can find these settings in the menu organisation in the section polcies.
-Each policy can be overriden and resetted to the default.
+You can find these settings in the menu organization in the section polcies.
+Each policy can be overridden and reset to the default.
 
 ## Password Complexity
 
 With the password complexity policy you can define the requirements for a users password.
 
-The following properties can be set: 
+The following properties can be set:
 - Minimum Length
 - Has Uppercase
 - Has Lowercase
@@ -37,23 +37,13 @@ The Login Policy defines how the login process should look like and which authen
 
 ![Login Policy](/img/manuals/policies/console_org_login.png)
 
-## Lockout Policy
-
-Define when a user should be blocked.
-
-The following properties are possible:
-- Maximum Password Attempts: When the user has reached the maximum password attempts the user will be locked
-
-If a user is locked, an administrator has to unlock it in the ZITADEL console
-
-
 ### Multifactors / Second Factors
 
 In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
-Multifactors: 
+Multifactors:
 - U2F (Universal Second Factor) with PIN
 
-Secondfactors: 
+Secondfactors:
 - OTP (One Time Password)
 - U2F (Universal Second Factor)
 
@@ -65,7 +55,17 @@ You can configure all kinds of external identity providers for identity brokerin
 Create a new identity provider configuration and enable it in the list afterwards.
 
 For a detailed guide about how to configure a new identity provider for identity brokering have a look at our guide:
-[Identity Brokering](../guides/usage/identity-brokering)
+[Identity Brokering](../guides/authentication/identity-brokering)
+
+## Lockout Policy
+
+Define when an account should be locked.
+
+The following settings are available:
+- Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked
+
+If an account is locked, the administrator has to unlock it in the ZITADEL console
+
 
 ## Private Labeling / Branding
 

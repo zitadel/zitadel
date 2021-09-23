@@ -21,8 +21,8 @@ title: Access ZITADEL APIs
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/usage/oauth-recommended-flows">Recommended Authorization Flows</a></li>
-                <li>Knowledge of <a href="/docs/guides/usage/serviceusers">Service Users</a></li>
+                <li>Knowledge of <a href="/docs/guides/authorization/oauth-recommended-flows">Recommended Authorization Flows</a></li>
+                <li>Knowledge of <a href="/docs/guides/authentication/serviceusers">Service Users</a></li>
             </ul>
         </td>
     </tr>
@@ -33,18 +33,18 @@ title: Access ZITADEL APIs
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers. 
 
 - **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole IAM. 
-- **Org Managers**: Managers in the Organisation Level are able to manage everything within the granted Organisation.
+- **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
 - **Project Mangers**: In this level the user is able to manage a project.
-- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organisation.
+- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
-On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../manuals/admin-managers)
+On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../concepts/managers)
 
 
 ## Exercise: Add ORG_OWNER to Service User
 
-Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](serviceusers))
+Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](../authentication/serviceusers))
 
-1. Navigate to Organisation Detail
+1. Navigate to Organization Detail
 2. Click the **+** button in the right part of console, in the managers part of details
 3. Search the user and select it
 4. Choose the role ORG_OWNER
@@ -54,7 +54,7 @@ Make sure you have a Service User with a Key. (For more detailed informations ab
 ## Authenticating a service user
 
 In ZITADEL we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
-This is already described in the [Service User](serviceusers), so make sure you follow this guide.
+This is already described in the [Service User](../authentication/serviceusers), so make sure you follow this guide.
 
 ### Request an OAuth token, with audience for ZITADEL
 

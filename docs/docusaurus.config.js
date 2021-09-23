@@ -19,20 +19,14 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          docId: 'manuals/introduction',
-          label: 'Manuals',
+          label: 'Guides',
+          docId: 'guides/introduction',
           position: 'left',
         },
         {
           type: 'doc',
           label: 'Quickstarts',
           docId: 'quickstarts/introduction',
-          position: 'left',
-        },
-        {
-          type: 'doc',
-          label: 'Guides',
-          docId: 'guides/introduction',
           position: 'left',
         },
         {
@@ -45,6 +39,12 @@ module.exports = {
           type: 'doc',
           docId: 'concepts/introduction',
           label: 'Concepts',
+          position: 'left',
+        },
+        {
+          type: 'doc',
+          docId: 'manuals/introduction',
+          label: 'Help',
           position: 'left',
         },
         {
@@ -131,6 +131,7 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/caos/zitadel/edit/main/docs/',
+          remarkPlugins: [require('mdx-mermaid')],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
