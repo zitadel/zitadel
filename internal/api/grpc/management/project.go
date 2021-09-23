@@ -40,6 +40,10 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	if err != nil {
 		return nil, err
 	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
 	projects, err := s.query.SearchProjects(ctx, queries)
 	if err != nil {
 		return nil, err
@@ -59,7 +63,14 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
 	projects, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err

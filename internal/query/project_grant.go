@@ -8,6 +8,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/lib/pq"
 
@@ -204,6 +205,13 @@ func NewProjectGrantProjectIDSearchQuery(method TextComparison, value string) (S
 	return NewTextQuery(ProjectGrantColumnProjectID, value, method)
 }
 
+func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
+	list := make([]interface{}, len(values))
+	for i, value := range values {
+		list[i] = value
+	}
+	return NewListQuery(ProjectGrantColumnGrantID, list, ListIn)
+}
 func NewProjectGrantProjectNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnProjectName, value, method)
 }
@@ -230,6 +238,18 @@ func (r *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) err
 		return err
 	}
 	r.Queries = append(r.Queries, query)
+	return nil
+}
+
+func (r ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetAllPermissionCtxIDs(permissions)
+		query, err := NewProjectGrantIDsSearchQuery(ids)
+		if err != nil {
+			return err
+		}
+		r.Queries = append(r.Queries, query)
+	}
 	return nil
 }
 

@@ -145,3 +145,53 @@ func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
 		return textCompareMax
 	}
 }
+
+type ListQuery struct {
+	Column  Column
+	List    []interface{}
+	Compare ListComparison
+}
+
+func NewListQuery(column Column, value []interface{}, compare ListComparison) (*ListQuery, error) {
+	if compare < 0 || compare >= listCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if column == nil || column.toFullColumnName() == "" {
+		return nil, ErrMissingColumn
+	}
+	return &ListQuery{
+		Column:  column,
+		List:    value,
+		Compare: compare,
+	}, nil
+}
+
+func (q *ListQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	where, args := q.comp()
+	return query.Where(where, args...)
+}
+
+func (s *ListQuery) comp() (interface{}, []interface{}) {
+	switch s.Compare {
+	case ListIn:
+		return sq.Eq{s.Column.toFullColumnName(): s.List}, nil
+	}
+	return nil, nil
+}
+
+type ListComparison int
+
+const (
+	ListIn ListComparison = iota
+
+	listCompareMax
+)
+
+func ListComparisonFromMethod(m domain.SearchMethod) ListComparison {
+	switch m {
+	case domain.SearchMethodEquals:
+		return ListIn
+	default:
+		return listCompareMax
+	}
+}
