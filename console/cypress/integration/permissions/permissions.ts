@@ -1,3 +1,5 @@
+import { ORG_MANAGER } from "../shared/types"
+
 // NEEDS TO BE DISABLED!!!!!! this is just for testing
 Cypress.on('uncaught:exception', (err, runnable) => {
     // returning false here prevents Cypress from
@@ -6,6 +8,23 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     }
 })
 // ###############################
+
+describe('permissions', () => {
+
+    ;[ORG_MANAGER.org_owner].forEach(user => {
+
+        describe(`impersonating an organization manager with permission "${user}"`, () => {
+
+            before(()=> {
+                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('domain')}`, Cypress.env(`${user.toLowerCase()}_password`))
+                cy.visit(Cypress.env('consoleUrl') + '/projects')
+                // wait until table is loaded
+                cy.contains("tr", "cypress").contains("e2e")
+            })
+        })
+    })
+})
+
 
 describe('permissions', () => {
 

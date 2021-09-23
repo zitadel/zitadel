@@ -10,7 +10,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 describe("projects", ()=> {
 
     before(()=> {
-        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
+        cy.consolelogin(Cypress.env('username'), Cypress.env('password'))
     })
 
     it('should show projects', () => {

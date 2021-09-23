@@ -1,4 +1,4 @@
-/*
+
 
 // NEEDS TO BE DISABLED!!!!!! this is just for testing
 Cypress.on('uncaught:exception', (err, runnable) => {
@@ -85,4 +85,3 @@ describe('CLEANUP: delete Project ', () => {
     })
 })
 
-*/
