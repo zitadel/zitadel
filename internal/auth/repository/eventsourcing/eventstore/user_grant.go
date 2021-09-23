@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/projection"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -201,7 +202,7 @@ func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]st
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := query.OrgSearchQueries{
 		SearchRequest: query.SearchRequest{
-			SortingColumn: query.OrgColumnName,
+			SortingColumn: projection.OrgColumnName,
 			Asc:           true,
 		},
 	}
