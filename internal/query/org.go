@@ -12,17 +12,60 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
+var (
+	orgsTable = table{
+		name: "zitadel.projections.orgs",
+	}
+	OrgColumnID = Column{
+		name:  projection.OrgColumnID,
+		table: orgsTable,
+	}
+	OrgColumnCreationDate = Column{
+		name:  projection.OrgColumnCreationDate,
+		table: orgsTable,
+	}
+	OrgColumnChangeDate = Column{
+		name:  projection.OrgColumnChangeDate,
+		table: orgsTable,
+	}
+	OrgColumnResourceOwner = Column{
+		name:  projection.OrgColumnResourceOwner,
+		table: orgsTable,
+	}
+	OrgColumnState = Column{
+		name:  projection.OrgColumnState,
+		table: orgsTable,
+	}
+	OrgColumnSequence = Column{
+		name:  projection.OrgColumnSequence,
+		table: orgsTable,
+	}
+	OrgColumnName = Column{
+		name:  projection.OrgColumnName,
+		table: orgsTable,
+	}
+	OrgColumnDomain = Column{
+		name:  projection.OrgColumnDomain,
+		table: orgsTable,
+	}
+	OrgsColumnCount = Column{
+		name:  "COUNT(*) OVER ()",
+		table: orgsTable,
+	}
+)
+
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
-			projection.OrgColumnID.FullColumnName(),
-			projection.OrgColumnCreationDate.FullColumnName(),
-			projection.OrgColumnChangeDate.FullColumnName(),
-			projection.OrgColumnResourceOwner.FullColumnName(),
-			projection.OrgColumnState.FullColumnName(),
-			projection.OrgColumnSequence.FullColumnName(),
-			projection.OrgColumnName.FullColumnName(),
-			projection.OrgColumnDomain.FullColumnName()).
-			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
+			OrgColumnID.sql(),
+			OrgColumnCreationDate.sql(),
+			OrgColumnChangeDate.sql(),
+			OrgColumnResourceOwner.sql(),
+			OrgColumnState.sql(),
+			OrgColumnSequence.sql(),
+			OrgColumnName.sql(),
+			OrgColumnDomain.sql(),
+		).
+			From(orgsTable.sql()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(
@@ -47,15 +90,15 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 
 func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
-			projection.OrgColumnID.FullColumnName(),
-			projection.OrgColumnCreationDate.FullColumnName(),
-			projection.OrgColumnChangeDate.FullColumnName(),
-			projection.OrgColumnResourceOwner.FullColumnName(),
-			projection.OrgColumnState.FullColumnName(),
-			projection.OrgColumnSequence.FullColumnName(),
-			projection.OrgColumnName.FullColumnName(),
-			projection.OrgColumnDomain.FullColumnName(),
-			"COUNT(name) OVER ()").
+			OrgColumnID.sql(),
+			OrgColumnCreationDate.sql(),
+			OrgColumnChangeDate.sql(),
+			OrgColumnResourceOwner.sql(),
+			OrgColumnState.sql(),
+			OrgColumnSequence.sql(),
+			OrgColumnName.sql(),
+			OrgColumnDomain.sql(),
+			OrgsColumnCount.sql()).
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
@@ -94,11 +137,11 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 
 func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select("COUNT(*) = 0").
-			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.sql()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
-				return false, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
+				return false, errors.ThrowInternal(err, "QUERY-e6EiG", "errors.internal")
 			}
 			return isUnique, err
 		}
@@ -107,7 +150,7 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		projection.OrgColumnID.FullColumnName(): id,
+		OrgColumnID.sql(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "unable to create sql stmt")
@@ -120,7 +163,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		projection.OrgColumnDomain.FullColumnName(): domain,
+		OrgColumnDomain.sql(): domain,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -133,7 +176,7 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := q.prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		projection.OrgColumnDomain.FullColumnName(): domain,
+		OrgColumnDomain.sql(): domain,
 	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -190,11 +233,11 @@ type OrgSearchQueries struct {
 }
 
 func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(projection.OrgColumnDomain, value, method)
+	return NewTextQuery(OrgColumnDomain, value, method)
 }
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(projection.OrgColumnName, value, method)
+	return NewTextQuery(OrgColumnName, value, method)
 }
 
 func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {

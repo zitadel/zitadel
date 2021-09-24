@@ -5,7 +5,6 @@ import (
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/caos/zitadel/pkg/grpc/org"
 )
@@ -30,9 +29,9 @@ func listOrgRequestToModel(req *admin.ListOrgsRequest) (*query.OrgSearchQueries,
 func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.Column {
 	switch fieldName {
 	case org.OrgFieldName_ORG_FIELD_NAME_NAME:
-		return projection.OrgColumnName
+		return query.OrgColumnName
 	default:
-		return nil
+		return query.Column{}
 	}
 }
 
