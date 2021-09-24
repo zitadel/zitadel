@@ -37,7 +37,8 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
-	NewPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexities"]))
+	NewPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexity_policy"]))
+	NewPasswordAgeProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_age_policy"]))
 	return nil
 }
 
