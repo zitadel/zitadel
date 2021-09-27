@@ -203,7 +203,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			JWTIDPColKeysEndpoint.identifier(),
 			JWTIDPColHeaderName.identifier(),
 			JWTIDPColEndpoint.identifier(),
-			IDPCountCol.identifier(),
+			countColumn.identifier(),
 		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
 			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
@@ -290,10 +290,6 @@ var (
 	}
 	IDPAutoRegisterCol = Column{
 		name:  projection.IDPAutoRegisterCol,
-		table: idpTable,
-	}
-	IDPCountCol = Column{
-		name:  "COUNT(*) OVER ()",
 		table: idpTable,
 	}
 )
