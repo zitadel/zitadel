@@ -71,18 +71,6 @@ const (
 	OrgColumnDomain        = "primary_domain"
 )
 
-func (c OrgColumn) ColumnName() string {
-	switch c {
-
-	default:
-		return ""
-	}
-}
-
-func (c OrgColumn) FullColumnName() string {
-	return OrgProjectionTable + "." + c.ColumnName()
-}
-
 func (p *OrgProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
