@@ -17,7 +17,7 @@ type OrgProjection struct {
 }
 
 const (
-	OrgProjectionTable = "zitadel.projections.orgs"
+	OrgProjectionTable = projectionSchema + ".orgs"
 )
 
 func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgProjection {

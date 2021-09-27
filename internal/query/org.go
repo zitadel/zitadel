@@ -14,7 +14,7 @@ import (
 
 var (
 	orgsTable = table{
-		name: "zitadel.projections.orgs",
+		name: projection.OrgProjectionTable,
 	}
 	OrgColumnID = Column{
 		name:  projection.OrgColumnID,

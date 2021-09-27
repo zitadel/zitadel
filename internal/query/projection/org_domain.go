@@ -18,12 +18,12 @@ type OrgDomainProjection struct {
 }
 
 const (
-	orgDomainProjection = "zitadel.projections.org_domains"
+	OrgDomainTable = projectionSchema + ".org_domains"
 )
 
 func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgDomainProjection {
 	p := &OrgDomainProjection{}
-	config.ProjectionName = orgDomainProjection
+	config.ProjectionName = OrgDomainTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -60,14 +60,14 @@ func (p *OrgDomainProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
-	domainCreationDateCol   = "creation_date"
-	domainChangeDateCol     = "change_date"
-	domainSequenceCol       = "sequence"
-	domainDomainCol         = "domain"
-	domainOrgIDCol          = "org_id"
-	domainIsVerifiedCol     = "is_verified"
-	domainIsPrimaryCol      = "is_primary"
-	domainValidationTypeCol = "validation_type"
+	OrgDomainCreationDateCol   = "creation_date"
+	OrgDomainChangeDateCol     = "change_date"
+	OrgDomainSequenceCol       = "sequence"
+	OrgDomainDomainCol         = "domain"
+	OrgDomainOrgIDCol          = "org_id"
+	OrgDomainIsVerifiedCol     = "is_verified"
+	OrgDomainIsPrimaryCol      = "is_primary"
+	OrgDomainValidationTypeCol = "validation_type"
 )
 
 func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -79,14 +79,14 @@ func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.EventReader) (*
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(domainCreationDateCol, e.CreationDate()),
-			handler.NewCol(domainChangeDateCol, e.CreationDate()),
-			handler.NewCol(domainSequenceCol, e.Sequence()),
-			handler.NewCol(domainDomainCol, e.Domain),
-			handler.NewCol(domainOrgIDCol, e.Aggregate().ID),
-			handler.NewCol(domainIsVerifiedCol, false),
-			handler.NewCol(domainIsPrimaryCol, false),
-			handler.NewCol(domainValidationTypeCol, domain.OrgDomainValidationTypeUnspecified),
+			handler.NewCol(OrgDomainCreationDateCol, e.CreationDate()),
+			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
+			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
+			handler.NewCol(OrgDomainDomainCol, e.Domain),
+			handler.NewCol(OrgDomainOrgIDCol, e.Aggregate().ID),
+			handler.NewCol(OrgDomainIsVerifiedCol, false),
+			handler.NewCol(OrgDomainIsPrimaryCol, false),
+			handler.NewCol(OrgDomainValidationTypeCol, domain.OrgDomainValidationTypeUnspecified),
 		},
 	), nil
 }
@@ -100,13 +100,13 @@ func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(domainChangeDateCol, e.CreationDate()),
-			handler.NewCol(domainSequenceCol, e.Sequence()),
-			handler.NewCol(domainValidationTypeCol, e.ValidationType),
+			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
+			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
+			handler.NewCol(OrgDomainValidationTypeCol, e.ValidationType),
 		},
 		[]handler.Condition{
-			handler.NewCond(domainDomainCol, e.Domain),
-			handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
+			handler.NewCond(OrgDomainDomainCol, e.Domain),
+			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -120,13 +120,13 @@ func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.EventReader)
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(domainChangeDateCol, e.CreationDate()),
-			handler.NewCol(domainSequenceCol, e.Sequence()),
-			handler.NewCol(domainIsVerifiedCol, true),
+			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
+			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
+			handler.NewCol(OrgDomainIsVerifiedCol, true),
 		},
 		[]handler.Condition{
-			handler.NewCond(domainDomainCol, e.Domain),
-			handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
+			handler.NewCond(OrgDomainDomainCol, e.Domain),
+			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -141,24 +141,24 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.EventReade
 		e,
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(domainChangeDateCol, e.CreationDate()),
-				handler.NewCol(domainSequenceCol, e.Sequence()),
-				handler.NewCol(domainIsPrimaryCol, false),
+				handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
+				handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
+				handler.NewCol(OrgDomainIsPrimaryCol, false),
 			},
 			[]handler.Condition{
-				handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
-				handler.NewCond(domainIsPrimaryCol, true),
+				handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
+				handler.NewCond(OrgDomainIsPrimaryCol, true),
 			},
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(domainChangeDateCol, e.CreationDate()),
-				handler.NewCol(domainSequenceCol, e.Sequence()),
-				handler.NewCol(domainIsPrimaryCol, true),
+				handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
+				handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
+				handler.NewCol(OrgDomainIsPrimaryCol, true),
 			},
 			[]handler.Condition{
-				handler.NewCond(domainDomainCol, e.Domain),
-				handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
+				handler.NewCond(OrgDomainDomainCol, e.Domain),
+				handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
 			},
 		),
 	), nil
@@ -173,8 +173,8 @@ func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.EventReader) 
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
-			handler.NewCond(domainDomainCol, e.Domain),
-			handler.NewCond(domainOrgIDCol, e.Aggregate().ID),
+			handler.NewCond(OrgDomainDomainCol, e.Domain),
+			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
