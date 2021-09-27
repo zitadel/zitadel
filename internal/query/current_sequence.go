@@ -40,10 +40,10 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 		}
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projection string) (*LatestSequence, error) {
+func (q *Queries) latestSequence(ctx context.Context, projection table) (*LatestSequence, error) {
 	query, scan := prepareLatestSequence()
 	stmt, args, err := query.Where(sq.Eq{
-		CurrentSequenceColProjectionName.toFullColumnName(): projection,
+		CurrentSequenceColProjectionName.toFullColumnName(): projection.identifier(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "unable to create sql stmt")

@@ -11,12 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-)
-
-const (
-	idpTable           = "zitadel.projections.idps"
-	idpOIDCConfigTable = "zitadel.projections.idps_oidc_config"
-	idpJWTConfigTable  = "zitadel.projections.idps_jwt_config"
+	"github.com/caos/zitadel/internal/query/projection"
 )
 
 type IDP struct {
@@ -62,7 +57,7 @@ type JWTIDP struct {
 func (q *Queries) IDPByID(ctx context.Context, id string) (*IDP, error) {
 	stmt, scan := prepareIDPByIDQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		IDPIDCol.toColumnName(): id,
+		IDPIDCol.identifier(): id,
 	}, id).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "unable to create sql stmt")
@@ -119,29 +114,29 @@ func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 	return sq.Select(
-			IDPIDCol.toColumnName(),
-			IDPStateCol.toColumnName(),
-			IDPNameCol.toColumnName(),
-			IDPStylingTypeCol.toColumnName(),
-			IDPOwnerCol.toColumnName(),
-			IDPAutoRegisterCol.toColumnName(),
-			oidcIDPIDPIDCol.toColumnName(),
-			oidcIDPClientIDCol.toColumnName(),
-			oidcIDPClientSecretCol.toColumnName(),
-			oidcIDPIssuerCol.toColumnName(),
-			oidcIDPScopesCol.toColumnName(),
-			oidcIDPDisplayNameMappingCol.toColumnName(),
-			oidcIDPUsernameMappingCol.toColumnName(),
-			oidcIDPAuthorizationEndpointCol.toColumnName(),
-			oidcIDPTokenEndpointCol.toColumnName(),
-			jwtIDPIDPIDCol.toColumnName(),
-			jwtIDPIssuerCol.toColumnName(),
-			jwtIDPKeysEndpointCol.toColumnName(),
-			jwtIDPHeaderNameCol.toColumnName(),
-			jwtIDPEndpointCol.toColumnName(),
-		).From(idpTable).
-			LeftJoin(idpOIDCConfigTable + " ON " + idpTable + "." + IDPIDCol.toColumnName() + " = " + idpOIDCConfigTable + "." + oidcIDPIDPIDCol.toColumnName()).
-			LeftJoin(idpOIDCConfigTable + " ON " + idpTable + "." + IDPIDCol.toColumnName() + " = " + idpJWTConfigTable + "." + jwtIDPIDPIDCol.toColumnName()).
+			IDPIDCol.identifier(),
+			IDPStateCol.identifier(),
+			IDPNameCol.identifier(),
+			IDPStylingTypeCol.identifier(),
+			IDPOwnerCol.identifier(),
+			IDPAutoRegisterCol.identifier(),
+			OIDCIDPColIDPID.identifier(),
+			OIDCIDPColClientID.identifier(),
+			OIDCIDPColClientSecret.identifier(),
+			OIDCIDPColIssuer.identifier(),
+			OIDCIDPColScopes.identifier(),
+			OIDCIDPColDisplayNameMapping.identifier(),
+			OIDCIDPColUsernameMapping.identifier(),
+			OIDCIDPColAuthorizationEndpoint.identifier(),
+			OIDCIDPColTokenEndpoint.identifier(),
+			JWTIDPColIDPID.identifier(),
+			JWTIDPColIssuer.identifier(),
+			JWTIDPColKeysEndpoint.identifier(),
+			JWTIDPColHeaderName.identifier(),
+			JWTIDPColEndpoint.identifier(),
+		).From(idpTable.identifier()).
+			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDP, error) {
 			idp := new(IDP)
@@ -188,30 +183,30 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 
 func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 	return sq.Select(
-			IDPIDCol.toColumnName(),
-			IDPStateCol.toColumnName(),
-			IDPNameCol.toColumnName(),
-			IDPStylingTypeCol.toColumnName(),
-			IDPOwnerCol.toColumnName(),
-			IDPAutoRegisterCol.toColumnName(),
-			oidcIDPIDPIDCol.toColumnName(),
-			oidcIDPClientIDCol.toColumnName(),
-			oidcIDPClientSecretCol.toColumnName(),
-			oidcIDPIssuerCol.toColumnName(),
-			oidcIDPScopesCol.toColumnName(),
-			oidcIDPDisplayNameMappingCol.toColumnName(),
-			oidcIDPUsernameMappingCol.toColumnName(),
-			oidcIDPAuthorizationEndpointCol.toColumnName(),
-			oidcIDPTokenEndpointCol.toColumnName(),
-			jwtIDPIDPIDCol.toColumnName(),
-			jwtIDPIssuerCol.toColumnName(),
-			jwtIDPKeysEndpointCol.toColumnName(),
-			jwtIDPHeaderNameCol.toColumnName(),
-			jwtIDPEndpointCol.toColumnName(),
-			"COUNT(name) OVER ()").
-			From(idpTable).
-			LeftJoin(idpOIDCConfigTable + " ON " + idpTable + "." + IDPIDCol.toColumnName() + " = " + idpOIDCConfigTable + "." + oidcIDPIDPIDCol.toColumnName()).
-			LeftJoin(idpOIDCConfigTable + " ON " + idpTable + "." + IDPIDCol.toColumnName() + " = " + idpJWTConfigTable + "." + jwtIDPIDPIDCol.toColumnName()).
+			IDPIDCol.identifier(),
+			IDPStateCol.identifier(),
+			IDPNameCol.identifier(),
+			IDPStylingTypeCol.identifier(),
+			IDPOwnerCol.identifier(),
+			IDPAutoRegisterCol.identifier(),
+			OIDCIDPColIDPID.identifier(),
+			OIDCIDPColClientID.identifier(),
+			OIDCIDPColClientSecret.identifier(),
+			OIDCIDPColIssuer.identifier(),
+			OIDCIDPColScopes.identifier(),
+			OIDCIDPColDisplayNameMapping.identifier(),
+			OIDCIDPColUsernameMapping.identifier(),
+			OIDCIDPColAuthorizationEndpoint.identifier(),
+			OIDCIDPColTokenEndpoint.identifier(),
+			JWTIDPColIDPID.identifier(),
+			JWTIDPColIssuer.identifier(),
+			JWTIDPColKeysEndpoint.identifier(),
+			JWTIDPColHeaderName.identifier(),
+			JWTIDPColEndpoint.identifier(),
+			IDPCountCol.identifier(),
+		).From(idpTable.identifier()).
+			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPs, error) {
 			idps := make([]*IDP, 0)
@@ -269,98 +264,104 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 		}
 }
 
-type idpColumn int32
-
-const (
-	IDPIDCol idpColumn = iota + 1
-	IDPStateCol
-	IDPNameCol
-	IDPStylingTypeCol
-	IDPOwnerCol
-	IDPAutoRegisterCol
+var (
+	idpTable = table{
+		name: projection.IDPTable,
+	}
+	IDPIDCol = Column{
+		name:  projection.IDPIDCol,
+		table: idpTable,
+	}
+	IDPStateCol = Column{
+		name:  projection.IDPStateCol,
+		table: idpTable,
+	}
+	IDPNameCol = Column{
+		name:  projection.IDPNameCol,
+		table: idpTable,
+	}
+	IDPStylingTypeCol = Column{
+		name:  projection.IDPStylingTypeCol,
+		table: idpTable,
+	}
+	IDPOwnerCol = Column{
+		name:  projection.IDPOwnerCol,
+		table: idpTable,
+	}
+	IDPAutoRegisterCol = Column{
+		name:  projection.IDPAutoRegisterCol,
+		table: idpTable,
+	}
+	IDPCountCol = Column{
+		name:  "COUNT(*) OVER ()",
+		table: idpTable,
+	}
 )
 
-func (c idpColumn) toColumnName() string {
-	switch c {
-	case IDPIDCol:
-		return "id"
-	case IDPStateCol:
-		return "state"
-	case IDPNameCol:
-		return "name"
-	case IDPStylingTypeCol:
-		return "styling_type"
-	case IDPOwnerCol:
-		return "owner"
-	case IDPAutoRegisterCol:
-		return "auto_register"
-	default:
-		return ""
+var (
+	oidcIDPTable = table{
+		name: projection.IDPOIDCTable,
 	}
-}
-
-type oidcIDPColumn int32
-
-const (
-	oidcIDPIDPIDCol oidcIDPColumn = iota + 1
-	oidcIDPClientIDCol
-	oidcIDPClientSecretCol
-	oidcIDPIssuerCol
-	oidcIDPScopesCol
-	oidcIDPDisplayNameMappingCol
-	oidcIDPUsernameMappingCol
-	oidcIDPAuthorizationEndpointCol
-	oidcIDPTokenEndpointCol
+	OIDCIDPColIDPID = Column{
+		name:  projection.OIDCConfigIDPIDCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColClientID = Column{
+		name:  projection.OIDCConfigClientIDCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColClientSecret = Column{
+		name:  projection.OIDCConfigClientSecretCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColIssuer = Column{
+		name:  projection.OIDCConfigIssuerCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColScopes = Column{
+		name:  projection.OIDCConfigScopesCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColDisplayNameMapping = Column{
+		name:  projection.OIDCConfigDisplayNameMappingCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColUsernameMapping = Column{
+		name:  projection.OIDCConfigUsernameMappingCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColAuthorizationEndpoint = Column{
+		name:  projection.OIDCConfigAuthorizationEndpointCol,
+		table: oidcIDPTable,
+	}
+	OIDCIDPColTokenEndpoint = Column{
+		name:  projection.OIDCConfigTokenEndpointCol,
+		table: oidcIDPTable,
+	}
 )
 
-func (c oidcIDPColumn) toColumnName() string {
-	switch c {
-	case oidcIDPIDPIDCol:
-		return "idp_id"
-	case oidcIDPClientIDCol:
-		return "client_id"
-	case oidcIDPClientSecretCol:
-		return "client_secret"
-	case oidcIDPIssuerCol:
-		return "issuer"
-	case oidcIDPScopesCol:
-		return "scopes"
-	case oidcIDPDisplayNameMappingCol:
-		return "display_name_mapping"
-	case oidcIDPUsernameMappingCol:
-		return "username_mapping"
-	case oidcIDPAuthorizationEndpointCol:
-		return "authorization_endpoint"
-	case oidcIDPTokenEndpointCol:
-		return "token_endpoint"
-	default:
-		return ""
+var (
+	jwtIDPTable = table{
+		name: projection.IDPJWTTable,
 	}
-}
-
-type jwtIDPColumn int32
-
-const (
-	jwtIDPIDPIDCol jwtIDPColumn = iota + 1
-	jwtIDPIssuerCol
-	jwtIDPKeysEndpointCol
-	jwtIDPHeaderNameCol
-	jwtIDPEndpointCol
+	JWTIDPColIDPID = Column{
+		name:  projection.JWTConfigIDPIDCol,
+		table: jwtIDPTable,
+	}
+	JWTIDPColIssuer = Column{
+		name:  projection.JWTConfigIssuerCol,
+		table: jwtIDPTable,
+	}
+	JWTIDPColKeysEndpoint = Column{
+		name:  projection.JWTConfigKeysEndpointCol,
+		table: jwtIDPTable,
+	}
+	JWTIDPColHeaderName = Column{
+		name:  projection.JWTConfigHeaderNameCol,
+		table: jwtIDPTable,
+	}
+	JWTIDPColEndpoint = Column{
+		name:  projection.JWTConfigEndpointCol,
+		table: jwtIDPTable,
+	}
 )
-
-func (c jwtIDPColumn) toColumnName() string {
-	switch c {
-	case jwtIDPIDPIDCol:
-		return "idp_id"
-	case jwtIDPIssuerCol:
-		return "issuer"
-	case jwtIDPKeysEndpointCol:
-		return "keys_endpoint"
-	case jwtIDPHeaderNameCol:
-		return "header_name"
-	case jwtIDPEndpointCol:
-		return "endpoint"
-	default:
-		return ""
-	}
-}

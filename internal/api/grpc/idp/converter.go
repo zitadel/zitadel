@@ -196,7 +196,7 @@ func FieldNameToModel(fieldName idp_pb.IDPFieldName) query.Column {
 	case idp_pb.IDPFieldName_IDP_FIELD_NAME_NAME:
 		return query.IDPNameCol
 	default:
-		return nil
+		return query.Column{}
 	}
 }
 

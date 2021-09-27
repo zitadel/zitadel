@@ -20,12 +20,14 @@ type IDPProjection struct {
 }
 
 const (
-	idpProjection = "zitadel.projections.idps"
+	IDPTable     = projectionSchema + ".idps"
+	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
+	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
 )
 
 func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPProjection {
 	p := &IDPProjection{}
-	config.ProjectionName = idpProjection
+	config.ProjectionName = IDPTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -119,31 +121,31 @@ func (p *IDPProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
-	idpOIDCSuffix = "oidc_config"
-	idpJWTSuffix  = "jwt_config"
+	IDPOIDCSuffix = "oidc_config"
+	IDPJWTSuffix  = "jwt_config"
 
-	idpIDCol           = "id"
-	idpStateCol        = "state"
-	idpNameCol         = "name"
-	idpStylingTypeCol  = "styling_type"
-	idpOwnerCol        = "owner"
-	idpAutoRegisterCol = "auto_register"
+	IDPIDCol           = "id"
+	IDPStateCol        = "state"
+	IDPNameCol         = "name"
+	IDPStylingTypeCol  = "styling_type"
+	IDPOwnerCol        = "owner"
+	IDPAutoRegisterCol = "auto_register"
 
-	oidcConfigIDPIDCol                 = "idp_id"
-	oidcConfigClientIDCol              = "client_id"
-	oidcConfigClientSecretCol          = "client_secret"
-	oidcConfigIssuerCol                = "issuer"
-	oidcConfigScopesCol                = "scopes"
-	oidcConfigDisplayNameMappingCol    = "display_name_mapping"
-	oidcConfigUsernameMappingCol       = "username_mapping"
-	oidcConfigAuthorizationEndpointCol = "authorization_endpoint"
-	oidcConfigTokenEndpointCol         = "token_endpoint"
+	OIDCConfigIDPIDCol                 = "idp_id"
+	OIDCConfigClientIDCol              = "client_id"
+	OIDCConfigClientSecretCol          = "client_secret"
+	OIDCConfigIssuerCol                = "issuer"
+	OIDCConfigScopesCol                = "scopes"
+	OIDCConfigDisplayNameMappingCol    = "display_name_mapping"
+	OIDCConfigUsernameMappingCol       = "username_mapping"
+	OIDCConfigAuthorizationEndpointCol = "authorization_endpoint"
+	OIDCConfigTokenEndpointCol         = "token_endpoint"
 
-	jwtConfigIDPIDCol        = "idp_id"
-	jwtConfigIssuerCol       = "issuer"
-	jwtConfigKeysEndpointCol = "keys_endpoint"
-	jwtConfigHeaderNameCol   = "header_name"
-	jwtConfigEndpointCol     = "endpoint"
+	JWTConfigIDPIDCol        = "idp_id"
+	JWTConfigIssuerCol       = "issuer"
+	JWTConfigKeysEndpointCol = "keys_endpoint"
+	JWTConfigHeaderNameCol   = "header_name"
+	JWTConfigEndpointCol     = "endpoint"
 )
 
 func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -164,12 +166,12 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.S
 	return crdb.NewCreateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(idpIDCol, idpEvent.ConfigID),
-			handler.NewCol(idpStateCol, domain.IDPConfigStateActive),
-			handler.NewCol(idpNameCol, idpEvent.Name),
-			handler.NewCol(idpStylingTypeCol, idpEvent.StylingType),
-			handler.NewCol(idpAutoRegisterCol, idpEvent.AutoRegister),
-			handler.NewCol(idpOwnerCol, idpOwnerType),
+			handler.NewCol(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
+			handler.NewCol(IDPNameCol, idpEvent.Name),
+			handler.NewCol(IDPStylingTypeCol, idpEvent.StylingType),
+			handler.NewCol(IDPAutoRegisterCol, idpEvent.AutoRegister),
+			handler.NewCol(IDPOwnerCol, idpOwnerType),
 		},
 	), nil
 }
@@ -188,13 +190,13 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.EventReader) (*handler
 
 	cols := make([]handler.Column, 0, 3)
 	if idpEvent.Name != nil {
-		cols = append(cols, handler.NewCol(idpNameCol, *idpEvent.Name))
+		cols = append(cols, handler.NewCol(IDPNameCol, *idpEvent.Name))
 	}
 	if idpEvent.StylingType != nil {
-		cols = append(cols, handler.NewCol(idpStylingTypeCol, *idpEvent.StylingType))
+		cols = append(cols, handler.NewCol(IDPStylingTypeCol, *idpEvent.StylingType))
 	}
 	if idpEvent.AutoRegister != nil {
-		cols = append(cols, handler.NewCol(idpAutoRegisterCol, *idpEvent.AutoRegister))
+		cols = append(cols, handler.NewCol(IDPAutoRegisterCol, *idpEvent.AutoRegister))
 	}
 	if len(cols) == 0 {
 		return crdb.NewNoOpStatement(&idpEvent), nil
@@ -204,7 +206,7 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.EventReader) (*handler
 		&idpEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(idpIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 		},
 	), nil
 }
@@ -224,10 +226,10 @@ func (p *IDPProjection) reduceIDPDeactivated(event eventstore.EventReader) (*han
 	return crdb.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(idpStateCol, domain.IDPConfigStateInactive),
+			handler.NewCol(IDPStateCol, domain.IDPConfigStateInactive),
 		},
 		[]handler.Condition{
-			handler.NewCond(idpIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 		},
 	), nil
 }
@@ -247,10 +249,10 @@ func (p *IDPProjection) reduceIDPReactivated(event eventstore.EventReader) (*han
 	return crdb.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(idpStateCol, domain.IDPConfigStateActive),
+			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
 		},
 		[]handler.Condition{
-			handler.NewCond(idpIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 		},
 	), nil
 }
@@ -270,7 +272,7 @@ func (p *IDPProjection) reduceIDPRemoved(event eventstore.EventReader) (*handler
 	return crdb.NewDeleteStatement(
 		&idpEvent,
 		[]handler.Condition{
-			handler.NewCond(idpIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 		},
 	), nil
 }
@@ -290,17 +292,17 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*ha
 	return crdb.NewCreateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(oidcConfigIDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCol(oidcConfigClientIDCol, idpEvent.ClientID),
-			handler.NewCol(oidcConfigClientSecretCol, idpEvent.ClientSecret),
-			handler.NewCol(oidcConfigIssuerCol, idpEvent.Issuer),
-			handler.NewCol(oidcConfigScopesCol, pq.StringArray(idpEvent.Scopes)),
-			handler.NewCol(oidcConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
-			handler.NewCol(oidcConfigUsernameMappingCol, idpEvent.UserNameMapping),
-			handler.NewCol(oidcConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
-			handler.NewCol(oidcConfigTokenEndpointCol, idpEvent.TokenEndpoint),
+			handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
+			handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
+			handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
+			handler.NewCol(OIDCConfigScopesCol, pq.StringArray(idpEvent.Scopes)),
+			handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
+			handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
+			handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
+			handler.NewCol(OIDCConfigTokenEndpointCol, idpEvent.TokenEndpoint),
 		},
-		crdb.WithTableSuffix(idpOIDCSuffix),
+		crdb.WithTableSuffix(IDPOIDCSuffix),
 	), nil
 }
 
@@ -319,28 +321,28 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 	cols := make([]handler.Column, 0, 8)
 
 	if idpEvent.ClientID != nil {
-		cols = append(cols, handler.NewCol(oidcConfigClientIDCol, *idpEvent.ClientID))
+		cols = append(cols, handler.NewCol(OIDCConfigClientIDCol, *idpEvent.ClientID))
 	}
 	if idpEvent.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(oidcConfigClientSecretCol, *idpEvent.ClientSecret))
+		cols = append(cols, handler.NewCol(OIDCConfigClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Issuer != nil {
-		cols = append(cols, handler.NewCol(oidcConfigIssuerCol, *idpEvent.Issuer))
+		cols = append(cols, handler.NewCol(OIDCConfigIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.AuthorizationEndpoint != nil {
-		cols = append(cols, handler.NewCol(oidcConfigAuthorizationEndpointCol, *idpEvent.AuthorizationEndpoint))
+		cols = append(cols, handler.NewCol(OIDCConfigAuthorizationEndpointCol, *idpEvent.AuthorizationEndpoint))
 	}
 	if idpEvent.TokenEndpoint != nil {
-		cols = append(cols, handler.NewCol(oidcConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
+		cols = append(cols, handler.NewCol(OIDCConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		cols = append(cols, handler.NewCol(oidcConfigScopesCol, idpEvent.Scopes))
+		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, idpEvent.Scopes))
 	}
 	if idpEvent.IDPDisplayNameMapping != nil {
-		cols = append(cols, handler.NewCol(oidcConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))
+		cols = append(cols, handler.NewCol(OIDCConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))
 	}
 	if idpEvent.UserNameMapping != nil {
-		cols = append(cols, handler.NewCol(oidcConfigUsernameMappingCol, *idpEvent.UserNameMapping))
+		cols = append(cols, handler.NewCol(OIDCConfigUsernameMappingCol, *idpEvent.UserNameMapping))
 	}
 
 	if len(cols) == 0 {
@@ -351,9 +353,9 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 		&idpEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(oidcConfigIDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
 		},
-		crdb.WithTableSuffix(idpOIDCSuffix),
+		crdb.WithTableSuffix(IDPOIDCSuffix),
 	), nil
 }
 
@@ -372,13 +374,13 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.EventReader) (*han
 	return crdb.NewCreateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(oidcConfigIDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCol(jwtConfigEndpointCol, idpEvent.JWTEndpoint),
-			handler.NewCol(jwtConfigIssuerCol, idpEvent.Issuer),
-			handler.NewCol(jwtConfigKeysEndpointCol, idpEvent.KeysEndpoint),
-			handler.NewCol(jwtConfigHeaderNameCol, idpEvent.HeaderName),
+			handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCol(JWTConfigEndpointCol, idpEvent.JWTEndpoint),
+			handler.NewCol(JWTConfigIssuerCol, idpEvent.Issuer),
+			handler.NewCol(JWTConfigKeysEndpointCol, idpEvent.KeysEndpoint),
+			handler.NewCol(JWTConfigHeaderNameCol, idpEvent.HeaderName),
 		},
-		crdb.WithTableSuffix(idpJWTSuffix),
+		crdb.WithTableSuffix(IDPJWTSuffix),
 	), nil
 }
 
@@ -397,16 +399,16 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.EventReader) (*h
 	cols := make([]handler.Column, 0, 4)
 
 	if idpEvent.JWTEndpoint != nil {
-		cols = append(cols, handler.NewCol(jwtConfigEndpointCol, *idpEvent.JWTEndpoint))
+		cols = append(cols, handler.NewCol(JWTConfigEndpointCol, *idpEvent.JWTEndpoint))
 	}
 	if idpEvent.Issuer != nil {
-		cols = append(cols, handler.NewCol(jwtConfigIssuerCol, *idpEvent.Issuer))
+		cols = append(cols, handler.NewCol(JWTConfigIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.KeysEndpoint != nil {
-		cols = append(cols, handler.NewCol(jwtConfigKeysEndpointCol, *idpEvent.Issuer))
+		cols = append(cols, handler.NewCol(JWTConfigKeysEndpointCol, *idpEvent.Issuer))
 	}
 	if idpEvent.HeaderName != nil {
-		cols = append(cols, handler.NewCol(jwtConfigHeaderNameCol, *idpEvent.HeaderName))
+		cols = append(cols, handler.NewCol(JWTConfigHeaderNameCol, *idpEvent.HeaderName))
 	}
 
 	if len(cols) == 0 {
@@ -417,8 +419,8 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.EventReader) (*h
 		&idpEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(oidcConfigIDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
 		},
-		crdb.WithTableSuffix(idpJWTSuffix),
+		crdb.WithTableSuffix(IDPJWTSuffix),
 	), nil
 }
