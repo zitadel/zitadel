@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetPrivacyPolicyRequest) (*mgmt_pb.GetPrivacyPolicyResponse, error) {
-	policy, err := s.org.GetPrivacyPolicy(ctx)
+	policy, err := s.query.MyPrivacyPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetPrivacyPoli
 }
 
 func (s *Server) GetDefaultPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetDefaultPrivacyPolicyRequest) (*mgmt_pb.GetDefaultPrivacyPolicyResponse, error) {
-	policy, err := s.org.GetDefaultPrivacyPolicy(ctx)
+	policy, err := s.query.DefaultPrivacyPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -34,9 +34,6 @@ type OrgRepository interface {
 	SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
 	SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
 
-	GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
-	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
-
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 

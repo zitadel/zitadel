@@ -39,7 +39,5 @@ type IAMRepository interface {
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 
-	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
-
 	GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 }

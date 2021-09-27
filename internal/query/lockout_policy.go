@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -17,6 +18,7 @@ type LockoutPolicy struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
+	State         domain.PolicyState
 
 	MaxPasswordAttempts uint64
 	ShowFailures        bool
@@ -88,6 +90,9 @@ var (
 	LockoutColIsDefault = Column{
 		name: projection.LockoutPolicyIsDefaultCol,
 	}
+	LockoutColState = Column{
+		name: projection.LockoutPolicyStateCol,
+	}
 )
 
 func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
@@ -100,6 +105,7 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			LockoutColShowFailures.identifier(),
 			LockoutColMaxPasswordAttempts.identifier(),
 			LockoutColIsDefault.identifier(),
+			LockoutColState.identifier(),
 		).
 			From(lockoutTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LockoutPolicy, error) {
@@ -113,6 +119,7 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 				&policy.ShowFailures,
 				&policy.MaxPasswordAttempts,
 				&policy.IsDefault,
+				&policy.State,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

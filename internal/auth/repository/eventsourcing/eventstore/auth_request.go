@@ -20,7 +20,6 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -41,6 +40,7 @@ type AuthRequestRepo struct {
 	OrgViewProvider           orgViewProvider
 	LoginPolicyViewProvider   loginPolicyViewProvider
 	LockoutPolicyViewProvider lockoutPolicyViewProvider
+	PrivacyPolicyProvider     privacyPolicyProvider
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
@@ -54,6 +54,10 @@ type AuthRequestRepo struct {
 	MultiFactorCheckLifeTime   time.Duration
 
 	IAMID string
+}
+
+type privacyPolicyProvider interface {
+	MyPrivacyPolicy(context.Context, string) (*query.PrivacyPolicy, error)
 }
 
 type userSessionViewProvider interface {
@@ -856,33 +860,27 @@ func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (
 }
 
 func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
-	policy, err := repo.View.PrivacyPolicyByAggregateID(orgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.PrivacyPolicyByAggregateID(repo.IAMID)
-		if err != nil && !errors.IsNotFound(err) {
-			return nil, err
-		}
-		if err == nil {
-			return policy.ToDomain(), nil
-		}
-		policy = &iam_view_model.PrivacyPolicyView{}
-		events, err := repo.Eventstore.FilterEvents(ctx, es_models.NewSearchQuery().
-			AggregateIDFilter(repo.IAMID).
-			AggregateTypeFilter(iam.AggregateType).
-			EventTypesFilter(es_models.EventType(iam.PrivacyPolicyAddedEventType), es_models.EventType(iam.PrivacyPolicyChangedEventType)))
-		if err != nil || len(events) == 0 {
-			return nil, errors.ThrowNotFound(err, "EVENT-GSRqg", "IAM.PrivacyPolicy.NotExisting")
-		}
-		policy.Default = true
-		for _, event := range events {
-			policy.AppendEvent(event)
-		}
-		return policy.ToDomain(), nil
-	}
+	policy, err := repo.PrivacyPolicyProvider.MyPrivacyPolicy(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	return policy.ToDomain(), err
+	return privacyPolicyToDomain(policy), err
+}
+
+func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:   p.ID,
+			Sequence:      p.Sequence,
+			ResourceOwner: p.ResourceOwner,
+			CreationDate:  p.CreationDate,
+			ChangeDate:    p.ChangeDate,
+		},
+		State:       p.State,
+		Default:     p.IsDefault,
+		TOSLink:     p.TOSLink,
+		PrivacyLink: p.PrivacyLink,
+	}
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
