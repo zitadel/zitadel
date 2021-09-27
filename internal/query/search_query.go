@@ -29,12 +29,12 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		query = query.Limit(req.Limit)
 	}
 
-	if req.SortingColumn.valid() {
+	if !req.SortingColumn.isZero() {
 		clause := "LOWER(" + sqlPlaceholder + ")"
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query = query.OrderByClause(clause, req.SortingColumn.sql())
+		query = query.OrderByClause(clause, req.SortingColumn.identifier())
 	}
 
 	return query
@@ -62,7 +62,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
 	}
-	if !col.valid() {
+	if col.isZero() {
 		return nil, ErrMissingColumn
 	}
 	return &TextQuery{
@@ -80,23 +80,23 @@ func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *TextQuery) comp() (comparison interface{}, args []interface{}) {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.sql(): s.Text}, nil
+		return sq.Eq{s.Column.identifier(): s.Text}, nil
 	case TextEqualsIgnoreCase:
-		return sq.ILike{s.Column.sql(): s.Text}, nil
+		return sq.ILike{s.Column.identifier(): s.Text}, nil
 	case TextStartsWith:
-		return sq.Like{s.Column.sql(): s.Text + "%"}, nil
+		return sq.Like{s.Column.identifier(): s.Text + "%"}, nil
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{s.Column.sql(): s.Text + "%"}, nil
+		return sq.ILike{s.Column.identifier(): s.Text + "%"}, nil
 	case TextEndsWith:
-		return sq.Like{s.Column.sql(): "%" + s.Text}, nil
+		return sq.Like{s.Column.identifier(): "%" + s.Text}, nil
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{s.Column.sql(): "%" + s.Text}, nil
+		return sq.ILike{s.Column.identifier(): "%" + s.Text}, nil
 	case TextContains:
-		return sq.Like{s.Column.sql(): "%" + s.Text + "%"}, nil
+		return sq.Like{s.Column.identifier(): "%" + s.Text + "%"}, nil
 	case TextContainsIgnoreCase:
-		return sq.ILike{s.Column.sql(): "%" + s.Text + "%"}, nil
+		return sq.ILike{s.Column.identifier(): "%" + s.Text + "%"}, nil
 	case TextListContains:
-		return s.Column.sql() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
+		return s.Column.identifier() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
 	}
 	return nil, nil
 }
@@ -152,7 +152,7 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 	if compare < 0 || compare >= numberCompareMax {
 		return nil, ErrInvalidCompare
 	}
-	if !c.valid() {
+	if c.isZero() {
 		return nil, ErrMissingColumn
 	}
 	switch reflect.TypeOf(value).Kind() {
@@ -176,15 +176,15 @@ func (q *NumberQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *NumberQuery) comp() (comparison interface{}, args []interface{}) {
 	switch s.Compare {
 	case NumberEquals:
-		return sq.Eq{s.Column.sql(): s.Number}, nil
+		return sq.Eq{s.Column.identifier(): s.Number}, nil
 	case NumberNotEquals:
-		return sq.NotEq{s.Column.sql(): s.Number}, nil
+		return sq.NotEq{s.Column.identifier(): s.Number}, nil
 	case NumberLess:
-		return sq.Lt{s.Column.sql(): s.Number}, nil
+		return sq.Lt{s.Column.identifier(): s.Number}, nil
 	case NumberGreater:
-		return sq.Gt{s.Column.sql(): s.Number}, nil
+		return sq.Gt{s.Column.identifier(): s.Number}, nil
 	case NumberListContains:
-		return s.Column.sql() + " @> ? ", []interface{}{pq.Array(s.Number)}
+		return s.Column.identifier() + " @> ? ", []interface{}{pq.Array(s.Number)}
 	}
 	return nil, nil
 }
@@ -223,20 +223,20 @@ type table struct {
 	alias string
 }
 
-func (t table) aliased(a string) table {
+func (t table) setAlias(a string) table {
 	t.alias = a
 	return t
 }
 
-func (t table) sql() string {
+func (t table) identifier() string {
 	if t.alias == "" {
 		return t.name
 	}
 	return t.name + " as " + t.alias
 }
 
-func (t table) valid() bool {
-	return t.name != ""
+func (t table) isZero() bool {
+	return t.name == ""
 }
 
 type Column struct {
@@ -244,22 +244,22 @@ type Column struct {
 	table table
 }
 
-func (c Column) sql() string {
+func (c Column) identifier() string {
 	if c.table.alias == "" {
 		return c.name
 	}
 	return c.table.alias + "." + c.name
 }
 
-func (c Column) aliased(t table) Column {
+func (c Column) setTable(t table) Column {
 	c.table = t
 	return c
 }
 
-func (c Column) valid() bool {
-	return c.table.valid() && c.name != ""
+func (c Column) isZero() bool {
+	return c.table.isZero() || c.name == ""
 }
 
 func join(join, from Column) string {
-	return join.table.sql() + " ON " + from.sql() + " = " + join.sql()
+	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
 }

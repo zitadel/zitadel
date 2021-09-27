@@ -113,7 +113,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           tt.fields.Asc,
 			}
 
-			query := sq.Select((testCol).sql()).From(testTable.sql())
+			query := sq.Select((testCol).identifier()).From(testTable.identifier())
 			expectedQuery, _, _ := query.ToSql()
 
 			stmt, args, err := req.toQuery(query).ToSql()

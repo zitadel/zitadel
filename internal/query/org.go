@@ -56,16 +56,16 @@ var (
 
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
-			OrgColumnID.sql(),
-			OrgColumnCreationDate.sql(),
-			OrgColumnChangeDate.sql(),
-			OrgColumnResourceOwner.sql(),
-			OrgColumnState.sql(),
-			OrgColumnSequence.sql(),
-			OrgColumnName.sql(),
-			OrgColumnDomain.sql(),
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
 		).
-			From(orgsTable.sql()).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(
@@ -90,15 +90,15 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 
 func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
-			OrgColumnID.sql(),
-			OrgColumnCreationDate.sql(),
-			OrgColumnChangeDate.sql(),
-			OrgColumnResourceOwner.sql(),
-			OrgColumnState.sql(),
-			OrgColumnSequence.sql(),
-			OrgColumnName.sql(),
-			OrgColumnDomain.sql(),
-			OrgsColumnCount.sql()).
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
+			OrgsColumnCount.identifier()).
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
@@ -137,7 +137,7 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 
 func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select("COUNT(*) = 0").
-			From(orgsTable.sql()).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
@@ -150,7 +150,7 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.sql(): id,
+		OrgColumnID.identifier(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "unable to create sql stmt")
@@ -163,7 +163,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnDomain.sql(): domain,
+		OrgColumnDomain.identifier(): domain,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -176,7 +176,7 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := q.prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		OrgColumnDomain.sql(): domain,
+		OrgColumnDomain.identifier(): domain,
 	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
