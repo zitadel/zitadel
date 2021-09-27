@@ -8,10 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-)
-
-const (
-	domainTable = "zitadel.projections.org_domains"
+	"github.com/caos/zitadel/internal/query/projection"
 )
 
 type Domain struct {
@@ -36,25 +33,12 @@ type OrgDomainSearchQueries struct {
 }
 
 func NewOrgDomainDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(OrgDomainColumnDomain, value, method)
+	return NewTextQuery(OrgDomainDomainCol, value, method)
 }
 
 func NewOrgDomainOrgIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(OrgDomainColumnDomain, value, TextEquals)
+	return NewTextQuery(OrgDomainOrgIDCol, value, TextEquals)
 }
-
-type OrgDomainColumn int8
-
-const (
-	OrgDomainColumnCreationDate OrgDomainColumn = iota + 1
-	OrgDomainColumnChangeDate
-	OrgDomainColumnSequence
-	OrgDomainColumnDomain
-	OrgDomainColumnOrgID
-	OrgDomainColumnIsVerified
-	OrgDomainColumnPrimary
-	OrgDomainColumnValidationType
-)
 
 func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries) (domains *Domains, err error) {
 	query, scan := prepareDomainsQuery()
@@ -71,22 +55,22 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	if err != nil {
 		return nil, err
 	}
-	domains.LatestSequence, err = q.latestSequence(ctx, domainTable)
+	domains.LatestSequence, err = q.latestSequence(ctx, orgDomainsTable.identifier())
 	return domains, err
 }
 
 func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error)) {
 	return sq.Select(
-			OrgDomainColumnCreationDate.toColumnName(),
-			OrgDomainColumnChangeDate.toColumnName(),
-			OrgDomainColumnSequence.toColumnName(),
-			OrgDomainColumnDomain.toColumnName(),
-			OrgDomainColumnOrgID.toColumnName(),
-			OrgDomainColumnIsVerified.toColumnName(),
-			OrgDomainColumnPrimary.toColumnName(),
-			OrgDomainColumnValidationType.toColumnName(),
-			"COUNT(*) OVER ()",
-		).From(domainTable).PlaceholderFormat(sq.Dollar),
+			OrgDomainCreationDateCol.identifier(),
+			OrgDomainChangeDateCol.identifier(),
+			OrgDomainSequenceCol.identifier(),
+			OrgDomainDomainCol.identifier(),
+			OrgDomainOrgIDCol.identifier(),
+			OrgDomainIsVerifiedCol.identifier(),
+			OrgDomainIsPrimaryCol.identifier(),
+			OrgDomainValidationTypeCol.identifier(),
+			OrgDomainColumnCount.identifier(),
+		).From(orgDomainsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Domains, error) {
 			domains := make([]*Domain, 0)
 			var count uint64
@@ -122,25 +106,45 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 		}
 }
 
-func (c OrgDomainColumn) toColumnName() string {
-	switch c {
-	case OrgDomainColumnCreationDate:
-		return "creation_date"
-	case OrgDomainColumnChangeDate:
-		return "change_date"
-	case OrgDomainColumnSequence:
-		return "sequence"
-	case OrgDomainColumnDomain:
-		return "domain"
-	case OrgDomainColumnOrgID:
-		return "org_id"
-	case OrgDomainColumnIsVerified:
-		return "is_verified"
-	case OrgDomainColumnPrimary:
-		return "is_primary"
-	case OrgDomainColumnValidationType:
-		return "validation_type"
-	default:
-		return ""
+var (
+	orgDomainsTable = table{
+		name: projection.OrgDomainTable,
 	}
-}
+
+	OrgDomainCreationDateCol = Column{
+		name:  projection.OrgDomainCreationDateCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainChangeDateCol = Column{
+		name:  projection.OrgDomainChangeDateCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainSequenceCol = Column{
+		name:  projection.OrgDomainSequenceCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainDomainCol = Column{
+		name:  projection.OrgDomainDomainCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainOrgIDCol = Column{
+		name:  projection.OrgDomainOrgIDCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainIsVerifiedCol = Column{
+		name:  projection.OrgDomainIsVerifiedCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainIsPrimaryCol = Column{
+		name:  projection.OrgDomainIsPrimaryCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainValidationTypeCol = Column{
+		name:  projection.OrgDomainValidationTypeCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainColumnCount = Column{
+		name:  "COUNT(*) OVER ()",
+		table: orgDomainsTable,
+	}
+)

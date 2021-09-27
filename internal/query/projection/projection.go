@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	currentSeqTable   = "projections.current_sequences"
-	locksTable        = "projections.locks"
-	failedEventsTable = "projections.failed_events"
+	currentSeqTable   = projectionSchema + ".current_sequences"
+	locksTable        = projectionSchema + ".locks"
+	failedEventsTable = projectionSchema + ".failed_events"
+	projectionSchema  = "zitadel.projections"
 )
 
 func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config) error {
