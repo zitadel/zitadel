@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 )
 
@@ -31,6 +32,6 @@ type AuthRequestRepository interface {
 	VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) error
 
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *domain.BrowserInfo) error
-	AutoRegisterExternalUser(ctx context.Context, user *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, info *domain.BrowserInfo) error
+	AutoRegisterExternalUser(ctx context.Context, user *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) error
 	ResetLinkingUsers(ctx context.Context, authReqID, userAgentID string) error
 }
