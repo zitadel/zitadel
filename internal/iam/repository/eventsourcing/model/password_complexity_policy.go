@@ -31,27 +31,6 @@ func PasswordComplexityPolicyToModel(policy *PasswordComplexityPolicy) *iam_mode
 	}
 }
 
-func (p *PasswordComplexityPolicy) Changes(changed *PasswordComplexityPolicy) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-
-	if p.MinLength != changed.MinLength {
-		changes["minLength"] = changed.MinLength
-	}
-	if p.HasLowercase != changed.HasLowercase {
-		changes["hasLowercase"] = changed.HasLowercase
-	}
-	if p.HasUppercase != changed.HasUppercase {
-		changes["hasUppercase"] = changed.HasUppercase
-	}
-	if p.HasNumber != changed.HasNumber {
-		changes["hasNumber"] = changed.HasNumber
-	}
-	if p.HasSymbol != changed.HasSymbol {
-		changes["hasSymbol"] = changed.HasSymbol
-	}
-	return changes
-}
-
 func (i *IAM) appendAddPasswordComplexityPolicyEvent(event *es_models.Event) error {
 	i.DefaultPasswordComplexityPolicy = new(PasswordComplexityPolicy)
 	err := i.DefaultPasswordComplexityPolicy.SetData(event)
