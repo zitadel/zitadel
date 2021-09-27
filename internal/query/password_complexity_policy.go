@@ -116,21 +116,21 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			PasswordComplexityColHasSymbol.identifier(),
 			PasswordComplexityColIsDefault.identifier(),
 		).
-			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(passwordComplexityTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PasswordComplexityPolicy, error) {
 			policy := new(PasswordComplexityPolicy)
 			err := row.Scan(
-				policy.ID,
-				policy.Sequence,
-				policy.CreationDate,
-				policy.ChangeDate,
-				policy.ResourceOwner,
-				policy.MinLength,
-				policy.HasLowercase,
-				policy.HasUppercase,
-				policy.HasNumber,
-				policy.HasSymbol,
-				policy.IsDefault,
+				&policy.ID,
+				&policy.Sequence,
+				&policy.CreationDate,
+				&policy.ChangeDate,
+				&policy.ResourceOwner,
+				&policy.MinLength,
+				&policy.HasLowercase,
+				&policy.HasUppercase,
+				&policy.HasNumber,
+				&policy.HasSymbol,
+				&policy.IsDefault,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
