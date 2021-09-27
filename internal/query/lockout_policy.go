@@ -18,8 +18,8 @@ type LockoutPolicy struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 
-	ExpireWarnDays uint64
-	MaxAgeDays     uint64
+	MaxPasswordAttempts uint64
+	ShowFailures        bool
 
 	IsDefault bool
 }
@@ -110,8 +110,8 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.ResourceOwner,
-				&policy.ExpireWarnDays,
-				&policy.MaxAgeDays,
+				&policy.ShowFailures,
+				&policy.MaxPasswordAttempts,
 				&policy.IsDefault,
 			)
 			if err != nil {
