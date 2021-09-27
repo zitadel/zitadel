@@ -19,12 +19,12 @@ type PasswordAgeProjection struct {
 }
 
 const (
-	PasswordAgeProjectionTable = "zitadel.projections.password_age_policies"
+	PasswordAgeTable = "zitadel.projections.password_age_policies"
 )
 
 func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordAgeProjection {
 	p := &PasswordAgeProjection{}
-	config.ProjectionName = PasswordAgeProjectionTable
+	config.ProjectionName = PasswordAgeTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -67,11 +67,14 @@ func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
 
 func (p *PasswordAgeProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyAddedEvent
+	var isDefault bool
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyAddedEvent:
 		policyEvent = e.PasswordAgePolicyAddedEvent
+		isDefault = false
 	case *iam.PasswordAgePolicyAddedEvent:
 		policyEvent = e.PasswordAgePolicyAddedEvent
+		isDefault = true
 	default:
 		logging.LogWithFields("PROJE-stxcL", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType}).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-CJqF0", "reduce.wrong.event.type")
@@ -86,6 +89,8 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.EventReader) (*hand
 			handler.NewCol(AgePolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(AgePolicyExpireWarnDaysCol, policyEvent.ExpireWarnDays),
 			handler.NewCol(AgePolicyMaxAgeDaysCol, policyEvent.MaxAgeDays),
+			handler.NewCol(AgePolicyIsDefaultCol, isDefault),
+			handler.NewCol(AgePolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 		}), nil
 }
 
@@ -139,4 +144,6 @@ const (
 	AgePolicyStateCol          = "state"
 	AgePolicyExpireWarnDaysCol = "expire_warn_days"
 	AgePolicyMaxAgeDaysCol     = "max_age_days"
+	AgePolicyIsDefaultCol      = "is_default"
+	AgePolicyResourceOwnerCol  = "resource_owner"
 )

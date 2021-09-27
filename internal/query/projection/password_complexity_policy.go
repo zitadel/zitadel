@@ -159,7 +159,6 @@ const (
 	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
 	ComplexityPolicyHasSymbolCol     = "has_symbol"
 	ComplexityPolicyHasNumberCol     = "has_number"
-	ComplexityPolicyIsDefaultCol     = "is_default"     //TODO
-	ComplexityPolicyResourceOwnerCol = "resource_owner" //TODO
-
+	ComplexityPolicyIsDefaultCol     = "is_default"
+	ComplexityPolicyResourceOwnerCol = "resource_owner"
 )

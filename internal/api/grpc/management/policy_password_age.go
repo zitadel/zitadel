@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
@@ -9,18 +10,18 @@ import (
 )
 
 func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetPasswordAgePolicyRequest) (*mgmt_pb.GetPasswordAgePolicyResponse, error) {
-	policy, err := s.org.GetPasswordAgePolicy(ctx)
+	policy, err := s.query.MyPasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetPasswordAgePolicyResponse{
 		Policy:    policy_grpc.ModelPasswordAgePolicyToPb(policy),
-		IsDefault: policy.Default,
+		IsDefault: policy.IsDefault,
 	}, nil
 }
 
 func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetDefaultPasswordAgePolicyRequest) (*mgmt_pb.GetDefaultPasswordAgePolicyResponse, error) {
-	policy, err := s.org.GetDefaultPasswordAgePolicy(ctx)
+	policy, err := s.query.DefaultPasswordAgePolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
