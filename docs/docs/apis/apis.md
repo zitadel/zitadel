@@ -29,8 +29,8 @@ The user id is taken from the sub claim in the token.
 
 ## Management API
 
-The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.
-To identify the current organisation you can send a header `x-zitadel-orgid` or if no header is set, the organisation of the authenticated user is set.
+The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights.
+To identify the current organization you can send a header `x-zitadel-orgid` or if no header is set, the organization of the authenticated user is set.
 
 | Service | URI                                                                                                                                                 |
 |:--------|:----------------------------------------------------------------------------------------------------------------------------------------------------|

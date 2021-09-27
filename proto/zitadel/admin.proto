@@ -2813,6 +2813,7 @@ message SetDefaultFeaturesRequest {
     bool custom_text_message = 20;
     bool custom_text_login = 21;
     bool lockout_policy = 22;
+    bool actions = 23;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2852,6 +2853,7 @@ message SetOrgFeaturesRequest {
     bool custom_text_message = 21;
     bool custom_text_login = 22;
     bool lockout_policy = 23;
+    bool actions = 24;
 }
 
 message SetOrgFeaturesResponse {

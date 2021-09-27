@@ -2,11 +2,30 @@
 title: Recommended authorization flows
 ---
 
-| | |
-| --- | --- |
-| Description | Learn about the different authentication flows and which flow we recommend you should use for your application. |
-| Learning Outcomes | In this module you will: <ul><li>Learn the basics of federated identities</li><li>Understand the basics of OAuth 2.x client profiles and their importance for authorization flows</li><li>Get a recommended flow for Web, Native, User-Agent, and API</li></ul> |
-| Prerequisites | Basic knowledge about federated identities. |
+<table class="table-wrapper">
+    <tr>
+        <td>Description</td>
+        <td>Learn about the different authentication flows and which flow we recommend you should use for your application.</td>
+    </tr>
+    <tr>
+        <td>Learning Outcomes</td>
+        <td>
+            In this module you will:
+            <ul>
+              <li>Learn the basics of federated identities</li>
+              <li>Understand the basics of OAuth 2.x client profiles and their importance for authorization flows</li>
+              <li>Get a recommended flow for Web, Native, User-Agent, and API</li>
+            </ul>
+        </td>
+    </tr>
+     <tr>
+        <td>Prerequisites</td>
+        <td>
+            Basic knowledge about federated identities
+        </td>
+    </tr>
+</table>
+
 
 ## Introduction
 
