@@ -9,14 +9,9 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/lib/pq"
 )
-
-const (
-	loginPoliciesTable = "zitadel.projections.login_policies"
-)
-
-type LoginPolicyColumn int8
 
 type LoginPolicy struct {
 	OrgID                 string
@@ -44,20 +39,49 @@ type MultiFactors struct {
 	Factors []domain.MultiFactorType
 }
 
-const (
-	LoginPolicyColumnOrgID LoginPolicyColumn = iota + 1
-	LoginPolicyColumnCreationDate
-	LoginPolicyColumnChangeDate
-	LoginPolicyColumnSequence
-	LoginPolicyColumnAllowRegister
-	LoginPolicyColumnAllowUsernamePassword
-	LoginPolicyColumnAllowExternalIDPs
-	LoginPolicyColumnForceMFA
-	LoginPolicyColumnSecondFactors
-	LoginPolicyColumnMultiFactors
-	LoginPolicyColumnPasswordlessType
-	LoginPolicyColumnIsDefault
-	LoginPolicyColumnHidePasswordReset
+var (
+	loginPolicyTable = table{
+		name: projection.LoginPolicyTable,
+	}
+	LoginPolicyColumnOrgID = Column{
+		name: projection.LoginPolicyIDCol,
+	}
+	LoginPolicyColumnCreationDate = Column{
+		name: projection.LoginPolicyCreationDateCol,
+	}
+	LoginPolicyColumnChangeDate = Column{
+		name: projection.LoginPolicyChangeDateCol,
+	}
+	LoginPolicyColumnSequence = Column{
+		name: projection.LoginPolicySequenceCol,
+	}
+	LoginPolicyColumnAllowRegister = Column{
+		name: projection.LoginPolicyAllowRegisterCol,
+	}
+	LoginPolicyColumnAllowUsernamePassword = Column{
+		name: projection.LoginPolicyAllowUsernamePasswordCol,
+	}
+	LoginPolicyColumnAllowExternalIDPs = Column{
+		name: projection.LoginPolicyAllowExternalIDPsCol,
+	}
+	LoginPolicyColumnForceMFA = Column{
+		name: projection.LoginPolicyForceMFACol,
+	}
+	LoginPolicyColumnSecondFactors = Column{
+		name: projection.LoginPolicy2FAsCol,
+	}
+	LoginPolicyColumnMultiFactors = Column{
+		name: projection.LoginPolicyMFAsCol,
+	}
+	LoginPolicyColumnPasswordlessType = Column{
+		name: projection.LoginPolicyPasswordlessTypeCol,
+	}
+	LoginPolicyColumnIsDefault = Column{
+		name: projection.LoginPolicyIsDefaultCol,
+	}
+	LoginPolicyColumnHidePasswordReset = Column{
+		name: projection.LoginPolicyHidePWResetCol,
+	}
 )
 
 func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPolicy, error) {
@@ -65,13 +89,13 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPoli
 	stmt, args, err := query.Where(
 		sq.Or{
 			sq.Eq{
-				LoginPolicyColumnOrgID.toColumnName(): orgID,
+				LoginPolicyColumnOrgID.identifier(): orgID,
 			},
 			sq.Eq{
-				LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+				LoginPolicyColumnOrgID.identifier(): domain.IAMID,
 			},
 		}).
-		OrderBy(LoginPolicyColumnIsDefault.toColumnName()).
+		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "unable to create sql stmt")
@@ -84,8 +108,8 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPoli
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) {
 	query, scan := prepareLoginPolicyQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
-	}).OrderBy(LoginPolicyColumnIsDefault.toColumnName()).ToSql()
+		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "unable to create sql stmt")
 	}
@@ -99,13 +123,13 @@ func (q *Queries) SecondFactorsByID(ctx context.Context, orgID string) (*SecondF
 	stmt, args, err := query.Where(
 		sq.Or{
 			sq.Eq{
-				LoginPolicyColumnOrgID.toColumnName(): orgID,
+				LoginPolicyColumnOrgID.identifier(): orgID,
 			},
 			sq.Eq{
-				LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+				LoginPolicyColumnOrgID.identifier(): domain.IAMID,
 			},
 		}).
-		OrderBy(LoginPolicyColumnIsDefault.toColumnName()).
+		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "unable to create sql stmt")
@@ -118,8 +142,8 @@ func (q *Queries) SecondFactorsByID(ctx context.Context, orgID string) (*SecondF
 func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, error) {
 	query, scan := prepareLoginPolicy2FAsQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
-	}).OrderBy(LoginPolicyColumnIsDefault.toColumnName()).ToSql()
+		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "unable to create sql stmt")
 	}
@@ -133,13 +157,13 @@ func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFac
 	stmt, args, err := query.Where(
 		sq.Or{
 			sq.Eq{
-				LoginPolicyColumnOrgID.toColumnName(): orgID,
+				LoginPolicyColumnOrgID.identifier(): orgID,
 			},
 			sq.Eq{
-				LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
+				LoginPolicyColumnOrgID.identifier(): domain.IAMID,
 			},
 		}).
-		OrderBy(LoginPolicyColumnIsDefault.toColumnName()).
+		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "unable to create sql stmt")
@@ -152,8 +176,8 @@ func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFac
 func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error) {
 	query, scan := prepareLoginPolicyMFAsQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.toColumnName(): domain.IAMID,
-	}).OrderBy(LoginPolicyColumnIsDefault.toColumnName()).ToSql()
+		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "unable to create sql stmt")
 	}
@@ -164,20 +188,20 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error
 
 func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, error)) {
 	return sq.Select(
-			LoginPolicyColumnOrgID.toColumnName(),
-			LoginPolicyColumnCreationDate.toColumnName(),
-			LoginPolicyColumnChangeDate.toColumnName(),
-			LoginPolicyColumnSequence.toColumnName(),
-			LoginPolicyColumnAllowRegister.toColumnName(),
-			LoginPolicyColumnAllowUsernamePassword.toColumnName(),
-			LoginPolicyColumnAllowExternalIDPs.toColumnName(),
-			LoginPolicyColumnForceMFA.toColumnName(),
-			LoginPolicyColumnSecondFactors.toColumnName(),
-			LoginPolicyColumnMultiFactors.toColumnName(),
-			LoginPolicyColumnPasswordlessType.toColumnName(),
-			LoginPolicyColumnIsDefault.toColumnName(),
-			LoginPolicyColumnHidePasswordReset.toColumnName(),
-		).From(loginPoliciesTable).PlaceholderFormat(sq.Dollar),
+			LoginPolicyColumnOrgID.identifier(),
+			LoginPolicyColumnCreationDate.identifier(),
+			LoginPolicyColumnChangeDate.identifier(),
+			LoginPolicyColumnSequence.identifier(),
+			LoginPolicyColumnAllowRegister.identifier(),
+			LoginPolicyColumnAllowUsernamePassword.identifier(),
+			LoginPolicyColumnAllowExternalIDPs.identifier(),
+			LoginPolicyColumnForceMFA.identifier(),
+			LoginPolicyColumnSecondFactors.identifier(),
+			LoginPolicyColumnMultiFactors.identifier(),
+			LoginPolicyColumnPasswordlessType.identifier(),
+			LoginPolicyColumnIsDefault.identifier(),
+			LoginPolicyColumnHidePasswordReset.identifier(),
+		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
 			secondFactors := pq.Int32Array{}
@@ -218,9 +242,9 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 
 func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFactors, error)) {
 	return sq.Select(
-			LoginPolicyColumnSequence.toColumnName(),
-			LoginPolicyColumnSecondFactors.toColumnName(),
-		).From(loginPoliciesTable).PlaceholderFormat(sq.Dollar),
+			LoginPolicyColumnSequence.identifier(),
+			LoginPolicyColumnSecondFactors.identifier(),
+		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
 			secondFactors := pq.Int32Array{}
@@ -245,9 +269,9 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 
 func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFactors, error)) {
 	return sq.Select(
-			LoginPolicyColumnSequence.toColumnName(),
-			LoginPolicyColumnMultiFactors.toColumnName(),
-		).From(loginPoliciesTable).PlaceholderFormat(sq.Dollar),
+			LoginPolicyColumnSequence.identifier(),
+			LoginPolicyColumnMultiFactors.identifier(),
+		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
 			multiFactors := pq.Int32Array{}
@@ -268,37 +292,4 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 			}
 			return p, nil
 		}
-}
-
-func (c LoginPolicyColumn) toColumnName() string {
-	switch c {
-	case LoginPolicyColumnOrgID:
-		return "aggregate_id"
-	case LoginPolicyColumnCreationDate:
-		return "creation_date"
-	case LoginPolicyColumnChangeDate:
-		return "change_date"
-	case LoginPolicyColumnSequence:
-		return "sequence"
-	case LoginPolicyColumnAllowRegister:
-		return "allow_register"
-	case LoginPolicyColumnAllowUsernamePassword:
-		return "allow_username_password"
-	case LoginPolicyColumnAllowExternalIDPs:
-		return "allow_external_idps"
-	case LoginPolicyColumnForceMFA:
-		return "force_mfa"
-	case LoginPolicyColumnSecondFactors:
-		return "second_factors"
-	case LoginPolicyColumnMultiFactors:
-		return "multi_factors"
-	case LoginPolicyColumnPasswordlessType:
-		return "passwordless_type"
-	case LoginPolicyColumnIsDefault:
-		return "is_default"
-	case LoginPolicyColumnHidePasswordReset:
-		return "hide_password_reset"
-	default:
-		return ""
-	}
 }

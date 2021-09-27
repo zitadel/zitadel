@@ -12,17 +12,60 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
+var (
+	orgsTable = table{
+		name: projection.OrgProjectionTable,
+	}
+	OrgColumnID = Column{
+		name:  projection.OrgColumnID,
+		table: orgsTable,
+	}
+	OrgColumnCreationDate = Column{
+		name:  projection.OrgColumnCreationDate,
+		table: orgsTable,
+	}
+	OrgColumnChangeDate = Column{
+		name:  projection.OrgColumnChangeDate,
+		table: orgsTable,
+	}
+	OrgColumnResourceOwner = Column{
+		name:  projection.OrgColumnResourceOwner,
+		table: orgsTable,
+	}
+	OrgColumnState = Column{
+		name:  projection.OrgColumnState,
+		table: orgsTable,
+	}
+	OrgColumnSequence = Column{
+		name:  projection.OrgColumnSequence,
+		table: orgsTable,
+	}
+	OrgColumnName = Column{
+		name:  projection.OrgColumnName,
+		table: orgsTable,
+	}
+	OrgColumnDomain = Column{
+		name:  projection.OrgColumnDomain,
+		table: orgsTable,
+	}
+	OrgsColumnCount = Column{
+		name:  "COUNT(*) OVER ()",
+		table: orgsTable,
+	}
+)
+
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
-			OrgColumnID.toColumnName(),
-			OrgColumnCreationDate.toColumnName(),
-			OrgColumnChangeDate.toColumnName(),
-			OrgColumnResourceOwner.toColumnName(),
-			OrgColumnState.toColumnName(),
-			OrgColumnSequence.toColumnName(),
-			OrgColumnName.toColumnName(),
-			OrgColumnDomain.toColumnName()).
-			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
+		).
+			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(
@@ -47,15 +90,15 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 
 func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
-			OrgColumnID.toColumnName(),
-			OrgColumnCreationDate.toColumnName(),
-			OrgColumnChangeDate.toColumnName(),
-			OrgColumnResourceOwner.toColumnName(),
-			OrgColumnState.toColumnName(),
-			OrgColumnSequence.toColumnName(),
-			OrgColumnName.toColumnName(),
-			OrgColumnDomain.toColumnName(),
-			"COUNT(name) OVER ()").
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
+			OrgsColumnCount.identifier()).
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
@@ -94,11 +137,11 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 
 func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select("COUNT(*) = 0").
-			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
-				return false, errors.ThrowInternal(err, "QUERY-pWS5H", "errors.internal")
+				return false, errors.ThrowInternal(err, "QUERY-e6EiG", "errors.internal")
 			}
 			return isUnique, err
 		}
@@ -107,7 +150,7 @@ func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (boo
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.toColumnName(): id,
+		OrgColumnID.identifier(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "unable to create sql stmt")
@@ -120,7 +163,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnDomain.toColumnName(): domain,
+		OrgColumnDomain.identifier(): domain,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -133,7 +176,7 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := q.prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		OrgColumnDomain.toColumnName(): domain,
+		OrgColumnDomain.identifier(): domain,
 	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
@@ -203,40 +246,4 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		query = q.ToQuery(query)
 	}
 	return query
-}
-
-type OrgColumn int32
-
-const (
-	OrgColumnCreationDate OrgColumn = iota + 1
-	OrgColumnChangeDate
-	OrgColumnResourceOwner
-	OrgColumnState
-	OrgColumnSequence
-	OrgColumnName
-	OrgColumnDomain
-	OrgColumnID
-)
-
-func (c OrgColumn) toColumnName() string {
-	switch c {
-	case OrgColumnCreationDate:
-		return projection.OrgProjectionTable + "." + projection.OrgCreationDateCol
-	case OrgColumnChangeDate:
-		return projection.OrgProjectionTable + "." + projection.OrgChangeDateCol
-	case OrgColumnResourceOwner:
-		return projection.OrgProjectionTable + "." + projection.OrgResourceOwnerCol
-	case OrgColumnState:
-		return projection.OrgProjectionTable + "." + projection.OrgStateCol
-	case OrgColumnSequence:
-		return projection.OrgProjectionTable + "." + projection.OrgSequenceCol
-	case OrgColumnName:
-		return projection.OrgProjectionTable + "." + projection.OrgNameCol
-	case OrgColumnDomain:
-		return projection.OrgProjectionTable + "." + projection.OrgPrimaryDomainCol
-	case OrgColumnID:
-		return projection.OrgProjectionTable + "." + projection.OrgIDCol
-	default:
-		return ""
-	}
 }

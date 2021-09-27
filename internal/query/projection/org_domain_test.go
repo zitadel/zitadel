@@ -35,7 +35,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   orgDomainProjection,
+				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -69,7 +69,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   orgDomainProjection,
+				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -100,7 +100,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   orgDomainProjection,
+				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -131,7 +131,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   orgDomainProjection,
+				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -172,7 +172,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   orgDomainProjection,
+				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{

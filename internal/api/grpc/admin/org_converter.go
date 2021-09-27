@@ -31,7 +31,7 @@ func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.Column {
 	case org.OrgFieldName_ORG_FIELD_NAME_NAME:
 		return query.OrgColumnName
 	default:
-		return nil
+		return query.Column{}
 	}
 }
 
