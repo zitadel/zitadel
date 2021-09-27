@@ -109,7 +109,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			UserEventProvider:          &userRepo,
 			IDPProviderViewProvider:    view,
 			LoginPolicyViewProvider:    view,
-			LockoutPolicyViewProvider:  view,
+			LockoutPolicyViewProvider:  queries,
 			UserGrantProvider:          view,
 			ProjectProvider:            view,
 			IdGenerator:                idGenerator,

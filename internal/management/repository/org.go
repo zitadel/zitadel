@@ -34,9 +34,6 @@ type OrgRepository interface {
 	SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
 	SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
 
-	GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
-	GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
-
 	GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
 	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
 
