@@ -55,7 +55,7 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	if err != nil {
 		return nil, err
 	}
-	domains.LatestSequence, err = q.latestSequence(ctx, orgDomainsTable.identifier())
+	domains.LatestSequence, err = q.latestSequence(ctx, orgDomainsTable)
 	return domains, err
 }
 
