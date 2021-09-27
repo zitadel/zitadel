@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
@@ -27,6 +28,7 @@ type OrgRepository struct {
 	Eventstore     eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
+	Query          query.Queries
 }
 
 func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
@@ -59,14 +61,7 @@ func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID str
 }
 
 func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
-	policy, err := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
+	policy, err := repo.Query.MyPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

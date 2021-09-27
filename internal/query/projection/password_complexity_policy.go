@@ -19,12 +19,12 @@ type PasswordComplexityProjection struct {
 }
 
 const (
-	PasswordComplexityProjectionTable = "zitadel.projections.password_complexity_policies"
+	PasswordComplexityTable = "zitadel.projections.password_complexity_policies"
 )
 
 func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordComplexityProjection {
 	p := &PasswordComplexityProjection{}
-	config.ProjectionName = PasswordComplexityProjectionTable
+	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -67,11 +67,14 @@ func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
 
 func (p *PasswordComplexityProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
+	var isDefault bool
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
+		isDefault = false
 	case *iam.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
+		isDefault = true
 	default:
 		logging.LogWithFields("PROJE-mP8AR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventType}).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KTHmJ", "reduce.wrong.event.type")
@@ -89,6 +92,8 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.EventReader)
 			handler.NewCol(ComplexityPolicyHasUppercaseCol, policyEvent.HasUppercase),
 			handler.NewCol(ComplexityPolicyHasSymbolCol, policyEvent.HasSymbol),
 			handler.NewCol(ComplexityPolicyHasNumberCol, policyEvent.HasNumber),
+			handler.NewCol(ComplexityPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(ComplexityPolicyIsDefaultCol, isDefault),
 		}), nil
 }
 
@@ -144,14 +149,16 @@ func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.EventReade
 }
 
 const (
-	ComplexityPolicyCreationDateCol = "creation_date"
-	ComplexityPolicyChangeDateCol   = "change_date"
-	ComplexityPolicySequenceCol     = "sequence"
-	ComplexityPolicyIDCol           = "id"
-	ComplexityPolicyStateCol        = "state"
-	ComplexityPolicyMinLengthCol    = "min_length"
-	ComplexityPolicyHasLowercaseCol = "has_lowercase"
-	ComplexityPolicyHasUppercaseCol = "has_uppercase"
-	ComplexityPolicyHasSymbolCol    = "has_symbol"
-	ComplexityPolicyHasNumberCol    = "has_number"
+	ComplexityPolicyCreationDateCol  = "creation_date"
+	ComplexityPolicyChangeDateCol    = "change_date"
+	ComplexityPolicySequenceCol      = "sequence"
+	ComplexityPolicyIDCol            = "id"
+	ComplexityPolicyStateCol         = "state"
+	ComplexityPolicyMinLengthCol     = "min_length"
+	ComplexityPolicyHasLowercaseCol  = "has_lowercase"
+	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
+	ComplexityPolicyHasSymbolCol     = "has_symbol"
+	ComplexityPolicyHasNumberCol     = "has_number"
+	ComplexityPolicyIsDefaultCol     = "is_default"
+	ComplexityPolicyResourceOwnerCol = "resource_owner"
 )

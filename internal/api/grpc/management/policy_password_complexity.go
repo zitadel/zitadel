@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
@@ -9,15 +10,15 @@ import (
 )
 
 func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, req *mgmt_pb.GetPasswordComplexityPolicyRequest) (*mgmt_pb.GetPasswordComplexityPolicyResponse, error) {
-	policy, err := s.org.GetPasswordComplexityPolicy(ctx)
+	policy, err := s.query.MyPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetPasswordComplexityPolicyResponse{Policy: policy_grpc.ModelPasswordComplexityPolicyToPb(policy), IsDefault: policy.Default}, nil
+	return &mgmt_pb.GetPasswordComplexityPolicyResponse{Policy: policy_grpc.ModelPasswordComplexityPolicyToPb(policy), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetDefaultPasswordComplexityPolicy(ctx context.Context, req *mgmt_pb.GetDefaultPasswordComplexityPolicyRequest) (*mgmt_pb.GetDefaultPasswordComplexityPolicyResponse, error) {
-	policy, err := s.org.GetDefaultPasswordComplexityPolicy(ctx)
+	policy, err := s.query.DefaultPasswordComplexityPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}

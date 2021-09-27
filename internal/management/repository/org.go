@@ -34,12 +34,6 @@ type OrgRepository interface {
 	SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
 	SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
 
-	GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
-	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
-
-	GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
-	GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
-
 	GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
 	GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
 
