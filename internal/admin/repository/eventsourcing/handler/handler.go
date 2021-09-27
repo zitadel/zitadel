@@ -49,8 +49,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			defaults),
 		newPasswordComplexityPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
-		newPasswordAgePolicy(
-			handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount, es}),
 		newLockoutPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LockoutPolicy"), errorCount, es}),
 		newOrgIAMPolicy(

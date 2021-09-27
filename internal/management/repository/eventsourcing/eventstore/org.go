@@ -382,57 +382,6 @@ func (repo *OrgRepository) SearchMultiFactors(ctx context.Context) (*iam_model.M
 	}, nil
 }
 
-func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
-	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.PasswordAgePolicyView)
-	}
-	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return repo.GetDefaultPasswordAgePolicy(ctx)
-	}
-	if esErr != nil {
-		logging.Log("EVENT-5Mx7s").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.PasswordAgeViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.PasswordAgeViewToModel(policy), nil
-		}
-	}
-	return iam_view_model.PasswordAgeViewToModel(policy), nil
-}
-
-func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
-	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.PasswordAgePolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordAgePolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-3I90s").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.PasswordAgeViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.PasswordAgeViewToModel(policy), nil
-		}
-	}
-	policy.Default = true
-	return iam_view_model.PasswordAgeViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
 	policy, viewErr := repo.View.LockoutPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
