@@ -86,19 +86,22 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 }
 
 func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListGrantedProjectRolesRequest) (*mgmt_pb.ListGrantedProjectRolesResponse, error) {
-	queries, err := ListGrantedProjectRolesRequestToModel(req)
+	queries, err := listGrantedProjectRolesRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
-	roles, err := s.project.SearchProjectGrantRoles(ctx, req.ProjectId, req.GrantId, queries)
+	err = queries.AppendProjectIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	roles, err := s.query.SearchGrantedProjectRoles(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListGrantedProjectRolesResponse{
-		Result: project_grpc.RolesToPb(roles.Result),
+		Result: project_grpc.RoleViewsToPb(roles.ProjectRoles),
 		Details: object_grpc.ToListDetails(
-			roles.TotalResult,
+			roles.Count,
 			roles.Sequence,
 			roles.Timestamp,
 		),

@@ -151,6 +151,21 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGran
 	return scan(row)
 }
 
+func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string) (*ProjectGrant, error) {
+	stmt, scan := prepareProjectGrantQuery()
+	query, args, err := stmt.Where(sq.Eq{
+		ProjectGrantColumnGrantID.toColumnName(): id,
+	}).Where(sq.Eq{
+		ProjectGrantColumnOrgID.toColumnName(): grantedOrg,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "unable to create sql stmt")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
 func (q *Queries) ExistsProjectGrant(ctx context.Context, id string) (err error) {
 	_, err = q.ProjectGrantByID(ctx, id)
 	return err

@@ -147,17 +147,18 @@ func listProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*quer
 	}, nil
 }
 
-func ListGrantedProjectRolesRequestToModel(req *mgmt_pb.ListGrantedProjectRolesRequest) (*proj_model.ProjectRoleSearchRequest, error) {
+func listGrantedProjectRolesRequestToModel(req *mgmt_pb.ListGrantedProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.RoleQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectRoleSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectRoleSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
