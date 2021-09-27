@@ -12,16 +12,58 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
+var (
+	projectRolesTable = table{
+		name: projection.ProjectRoleProjectionTable,
+	}
+	ProjectRoleColumnCreationDate = Column{
+		name:  projection.ProjectRoleColumnCreationDate,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnChangeDate = Column{
+		name:  projection.ProjectRoleColumnChangeDate,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnResourceOwner = Column{
+		name:  projection.ProjectRoleColumnResourceOwner,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnSequence = Column{
+		name:  projection.ProjectRoleColumnSequence,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnProjectID = Column{
+		name:  projection.ProjectRoleColumnProjectID,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnKey = Column{
+		name:  projection.ProjectRoleColumnKey,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnDisplayName = Column{
+		name:  projection.ProjectRoleColumnDisplayName,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnGroupName = Column{
+		name:  projection.ProjectRoleColumnGroupName,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnCreator = Column{
+		name:  projection.ProjectRoleColumnCreator,
+		table: projectRolesTable,
+	}
+)
+
 func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, error)) {
 	return sq.Select(
-			ProjectRoleColumnProjectID.toFullColumnName(),
-			ProjectRoleColumnCreationDate.toFullColumnName(),
-			ProjectRoleColumnChangeDate.toFullColumnName(),
-			ProjectRoleColumnResourceOwner.toFullColumnName(),
-			ProjectRoleColumnSequence.toFullColumnName(),
-			ProjectRoleColumnKey.toFullColumnName(),
-			ProjectRoleColumnDisplayName.toFullColumnName(),
-			ProjectRoleColumnGroupName.toFullColumnName()).
+			ProjectRoleColumnProjectID.identifier(),
+			ProjectRoleColumnCreationDate.identifier(),
+			ProjectRoleColumnChangeDate.identifier(),
+			ProjectRoleColumnResourceOwner.identifier(),
+			ProjectRoleColumnSequence.identifier(),
+			ProjectRoleColumnKey.identifier(),
+			ProjectRoleColumnDisplayName.identifier(),
+			ProjectRoleColumnGroupName.identifier()).
 			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*ProjectRole, error) {
 			p := new(ProjectRole)
@@ -48,14 +90,14 @@ func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, 
 
 func (q *Queries) prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
 	return sq.Select(
-			ProjectRoleColumnProjectID.toFullColumnName(),
-			ProjectRoleColumnCreationDate.toFullColumnName(),
-			ProjectRoleColumnChangeDate.toFullColumnName(),
-			ProjectRoleColumnResourceOwner.toFullColumnName(),
-			ProjectRoleColumnSequence.toFullColumnName(),
-			ProjectRoleColumnKey.toFullColumnName(),
-			ProjectRoleColumnDisplayName.toFullColumnName(),
-			ProjectRoleColumnGroupName.toFullColumnName(),
+			ProjectRoleColumnProjectID.identifier(),
+			ProjectRoleColumnCreationDate.identifier(),
+			ProjectRoleColumnChangeDate.identifier(),
+			ProjectRoleColumnResourceOwner.identifier(),
+			ProjectRoleColumnSequence.identifier(),
+			ProjectRoleColumnKey.identifier(),
+			ProjectRoleColumnDisplayName.identifier(),
+			ProjectRoleColumnGroupName.identifier(),
 			"COUNT(*) OVER ()").
 			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*ProjectRoles, error) {
@@ -108,8 +150,8 @@ func (q *Queries) prepareProjectRoleUniqueQuery() (sq.SelectBuilder, func(*sql.R
 func (q *Queries) ProjectRoleByID(ctx context.Context, projectID, key string) (*ProjectRole, error) {
 	stmt, scan := prepareProjectRoleQuery()
 	query, args, err := stmt.
-		Where(sq.Eq{ProjectRoleColumnProjectID.toColumnName(): projectID}).
-		Where(sq.Eq{ProjectRoleColumnKey.toColumnName(): key}).ToSql()
+		Where(sq.Eq{ProjectRoleColumnProjectID.identifier(): projectID}).
+		Where(sq.Eq{ProjectRoleColumnKey.identifier(): key}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "unable to create sql stmt")
 	}
@@ -138,7 +180,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, queries *ProjectRoleSe
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projection.ProjectRoleProjectionTable)
+	projects.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
 	return projects, err
 }
 
@@ -165,7 +207,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projection.ProjectRoleProjectionTable)
+	projects.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
 	return projects, err
 }
 
@@ -252,47 +294,4 @@ func (r *ProjectRoleSearchQueries) AppendRoleKeysQuery(keys []string) error {
 	}
 	r.Queries = append(r.Queries, query)
 	return nil
-}
-
-type ProjectRoleColumn int32
-
-const (
-	ProjectRoleColumnCreationDate ProjectRoleColumn = iota + 1
-	ProjectRoleColumnChangeDate
-	ProjectRoleColumnResourceOwner
-	ProjectRoleColumnSequence
-	ProjectRoleColumnProjectID
-	ProjectRoleColumnKey
-	ProjectRoleColumnDisplayName
-	ProjectRoleColumnGroupName
-	ProjectRoleColumnCreatorName
-)
-
-func (c ProjectRoleColumn) toColumnName() string {
-	switch c {
-	case ProjectRoleColumnProjectID:
-		return projection.ProjectRoleProjectIDCol
-	case ProjectRoleColumnCreationDate:
-		return projection.ProjectRoleCreationDateCol
-	case ProjectRoleColumnChangeDate:
-		return projection.ProjectRoleChangeDateCol
-	case ProjectRoleColumnResourceOwner:
-		return projection.ProjectRoleResourceOwnerCol
-	case ProjectRoleColumnSequence:
-		return projection.ProjectRoleSequenceCol
-	case ProjectRoleColumnKey:
-		return projection.ProjectRoleKeyCol
-	case ProjectRoleColumnDisplayName:
-		return projection.ProjectRoleDisplayNameCol
-	case ProjectRoleColumnGroupName:
-		return projection.ProjectRoleGroupNameCol
-	case ProjectRoleColumnCreatorName:
-		return projection.ProjectRoleCreatorCol
-	default:
-		return ""
-	}
-}
-
-func (c ProjectRoleColumn) toFullColumnName() string {
-	return c.toColumnName()
 }

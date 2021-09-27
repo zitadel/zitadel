@@ -298,7 +298,7 @@ type Column struct {
 
 func (c Column) identifier() string {
 	if c.table.alias == "" {
-		return c.name
+		return c.table.name + "." + c.name
 	}
 	return c.table.alias + "." + c.name
 }

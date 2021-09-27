@@ -17,30 +17,86 @@ import (
 )
 
 const (
-	ProjectGrantTableAlias              = "pg"
-	ProjectGrantProjectTableAlias       = "p"
 	ProjectGrantGrantedOrgTableAlias    = "o"
 	ProjectGrantResourceOwnerTableAlias = "r"
 )
 
+var (
+	projectGrantsTable = table{
+		name: projection.ProjectGrantProjectionTable,
+	}
+	ProjectGrantColumnCreationDate = Column{
+		name:  projection.ProjectGrantColumnCreationDate,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnChangeDate = Column{
+		name:  projection.ProjectGrantColumnChangeDate,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnResourceOwner = Column{
+		name:  projection.ProjectGrantColumnResourceOwner,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnState = Column{
+		name:  projection.ProjectGrantColumnState,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnSequence = Column{
+		name:  projection.ProjectGrantColumnSequence,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnProjectID = Column{
+		name:  projection.ProjectGrantColumnProjectID,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnGrantedOrgID = Column{
+		name:  projection.ProjectGrantColumnGrantedOrgID,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnGrantID = Column{
+		name:  projection.ProjectGrantColumnGrantID,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnGrantedRoleKeys = Column{
+		name:  projection.ProjectGrantColumnRoleKeys,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnCreator = Column{
+		name:  projection.ProjectGrantColumnCreator,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnGrantedOrgName = Column{
+		name:  projection.OrgColumnName,
+		table: orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias),
+	}
+	ProjectGrantColumnResourceOwnerName = Column{
+		name:  projection.OrgColumnName,
+		table: orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias),
+	}
+)
+
 func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
+	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
+	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
+	grantedOrgIDColumn := OrgColumnID.setTable(grantedOrgTable)
 	return sq.Select(
-			ProjectGrantColumnProjectID.toFullColumnName(),
-			ProjectGrantColumnGrantID.toFullColumnName(),
-			ProjectGrantColumnCreationDate.toFullColumnName(),
-			ProjectGrantColumnChangeDate.toFullColumnName(),
-			ProjectGrantColumnResourceOwner.toFullColumnName(),
-			ProjectGrantColumnState.toFullColumnName(),
-			ProjectGrantColumnSequence.toFullColumnName(),
-			ProjectGrantColumnProjectName.toFullColumnName(),
-			ProjectGrantColumnOrgID.toFullColumnName(),
-			ProjectGrantColumnGrantedOrgName.toFullColumnName(),
-			ProjectGrantColumnGrantedRoleKeys.toFullColumnName(),
-			ProjectGrantColumnResourceOwnerName.toFullColumnName()).
-			From(projection.ProjectGrantProjectionTable + " " + ProjectGrantTableAlias).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable+" "+ProjectGrantProjectTableAlias, ProjectGrantColumnProjectID.toFullColumnName(), ProjectGrantProjectTableAlias+"."+ProjectColumnID.toColumnName())).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" "+ProjectGrantResourceOwnerTableAlias, ProjectGrantColumnResourceOwner.toFullColumnName(), ProjectGrantResourceOwnerTableAlias+"."+OrgColumnID.toColumnName())).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" "+ProjectGrantGrantedOrgTableAlias, ProjectGrantColumnOrgID.toFullColumnName(), ProjectGrantGrantedOrgTableAlias+"."+OrgColumnID.toColumnName())),
+			ProjectGrantColumnProjectID.identifier(),
+			ProjectGrantColumnGrantID.identifier(),
+			ProjectGrantColumnCreationDate.identifier(),
+			ProjectGrantColumnChangeDate.identifier(),
+			ProjectGrantColumnResourceOwner.identifier(),
+			ProjectGrantColumnState.identifier(),
+			ProjectGrantColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectGrantColumnGrantedOrgID.identifier(),
+			ProjectGrantColumnGrantedOrgName.identifier(),
+			ProjectGrantColumnGrantedRoleKeys.identifier(),
+			ProjectGrantColumnResourceOwnerName.identifier()).
+			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
+			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
+			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			p := new(ProjectGrant)
 			err := row.Scan(
@@ -62,32 +118,35 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 					return nil, errors.ThrowNotFound(err, "QUERY-n98GGs", "errors.project_grants.not_found")
 				}
 				fmt.Printf("error: %v", err.Error())
-				return nil, errors.ThrowInternal(err, "QUERY-M00sf", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-w9fsH", "errors.internal")
 			}
 			return p, nil
 		}
 }
 
 func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
+	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
+	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
+	grantedOrgIDColumn := OrgColumnID.setTable(grantedOrgTable)
 	return sq.Select(
-			ProjectGrantColumnProjectID.toFullColumnName(),
-			ProjectGrantColumnGrantID.toFullColumnName(),
-			ProjectGrantColumnCreationDate.toFullColumnName(),
-			ProjectGrantColumnChangeDate.toFullColumnName(),
-			ProjectGrantColumnResourceOwner.toFullColumnName(),
-			ProjectGrantColumnState.toFullColumnName(),
-			ProjectGrantColumnSequence.toFullColumnName(),
-			ProjectGrantColumnProjectName.toFullColumnName(),
-			ProjectGrantColumnOrgID.toFullColumnName(),
-			ProjectGrantColumnGrantedOrgName.toFullColumnName(),
-			ProjectGrantColumnGrantedRoleKeys.toFullColumnName(),
-			ProjectGrantColumnResourceOwnerName.toFullColumnName(),
-			"COUNT("+ProjectGrantColumnGrantID.toColumnName()+") OVER ()").
-			From(projection.ProjectGrantProjectionTable + " " + ProjectGrantTableAlias).PlaceholderFormat(sq.Dollar).
-			LeftJoin(GenerateJoinQuery(projection.ProjectProjectionTable+" "+ProjectGrantProjectTableAlias, ProjectGrantColumnProjectID.toFullColumnName(), ProjectGrantProjectTableAlias+"."+ProjectColumnID.toColumnName())).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" "+ProjectGrantResourceOwnerTableAlias, ProjectGrantColumnResourceOwner.toFullColumnName(), ProjectGrantResourceOwnerTableAlias+"."+OrgColumnID.toColumnName())).
-			LeftJoin(GenerateJoinQuery(projection.OrgProjectionTable+" "+ProjectGrantGrantedOrgTableAlias, ProjectGrantColumnOrgID.toFullColumnName(), ProjectGrantGrantedOrgTableAlias+"."+OrgColumnID.toColumnName())),
-		func(rows *sql.Rows) (*ProjectGrants, error) {
+			ProjectGrantColumnProjectID.identifier(),
+			ProjectGrantColumnGrantID.identifier(),
+			ProjectGrantColumnCreationDate.identifier(),
+			ProjectGrantColumnChangeDate.identifier(),
+			ProjectGrantColumnResourceOwner.identifier(),
+			ProjectGrantColumnState.identifier(),
+			ProjectGrantColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectGrantColumnGrantedOrgID.identifier(),
+			ProjectGrantColumnGrantedOrgName.identifier(),
+			ProjectGrantColumnGrantedRoleKeys.identifier(),
+			ProjectGrantColumnResourceOwnerName.identifier(),
+			"COUNT(*) OVER ()").
+			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
+			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
+			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)), func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var count uint64
 			for rows.Next() {
@@ -141,7 +200,7 @@ func (q *Queries) prepareProjectGrantUniqueQuery() (sq.SelectBuilder, func(*sql.
 func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGrant, error) {
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		ProjectGrantColumnGrantID.toColumnName(): id,
+		ProjectGrantColumnGrantID.identifier(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "unable to create sql stmt")
@@ -154,9 +213,9 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGran
 func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string) (*ProjectGrant, error) {
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		ProjectGrantColumnGrantID.toColumnName(): id,
+		ProjectGrantColumnGrantID.identifier(): id,
 	}).Where(sq.Eq{
-		ProjectGrantColumnOrgID.toColumnName(): grantedOrg,
+		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "unable to create sql stmt")
@@ -186,7 +245,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projection.ProjectGrantProjectionTable)
+	projects.LatestSequence, err = q.latestSequence(ctx, projectGrantsTable)
 	return projects, err
 }
 
@@ -246,7 +305,7 @@ func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewListQuery(ProjectGrantColumnGrantID, list, ListIn)
 }
 func NewProjectGrantProjectNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectGrantColumnProjectName, value, method)
+	return NewTextQuery(ProjectColumnName, value, method)
 }
 
 func NewProjectGrantRoleKeySearchQuery(value string) (SearchQuery, error) {
@@ -284,62 +343,4 @@ func (r ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string)
 		r.Queries = append(r.Queries, query)
 	}
 	return nil
-}
-
-type ProjectGrantColumn int32
-
-const (
-	ProjectGrantColumnCreationDate ProjectGrantColumn = iota + 1
-	ProjectGrantColumnChangeDate
-	ProjectGrantColumnResourceOwner
-	ProjectGrantColumnState
-	ProjectGrantColumnSequence
-	ProjectGrantColumnProjectID
-	ProjectGrantColumnOrgID
-	ProjectGrantColumnGrantID
-	ProjectGrantColumnGrantedRoleKeys
-	ProjectGrantColumnCreatorName
-	ProjectGrantColumnProjectName
-	ProjectGrantColumnGrantedOrgName
-	ProjectGrantColumnResourceOwnerName
-)
-
-func (c ProjectGrantColumn) toColumnName() string {
-	switch c {
-	case ProjectGrantColumnProjectID:
-		return projection.ProjectGrantProjectIDCol
-	case ProjectGrantColumnGrantID:
-		return projection.ProjectGrantIDCol
-	case ProjectGrantColumnCreationDate:
-		return projection.ProjectGrantCreationDateCol
-	case ProjectGrantColumnChangeDate:
-		return projection.ProjectGrantChangeDateCol
-	case ProjectGrantColumnResourceOwner:
-		return projection.ProjectGrantResourceOwnerCol
-	case ProjectGrantColumnState:
-		return projection.ProjectGrantStateCol
-	case ProjectGrantColumnSequence:
-		return projection.ProjectGrantSequenceCol
-	case ProjectGrantColumnOrgID:
-		return projection.ProjectGrantGrantedOrgIDCol
-	case ProjectGrantColumnGrantedRoleKeys:
-		return projection.ProjectGrantRoleKeysCol
-	case ProjectGrantColumnCreatorName:
-		return projection.ProjectGrantCreatorCol
-	default:
-		return ""
-	}
-}
-
-func (c ProjectGrantColumn) toFullColumnName() string {
-	switch c {
-	case ProjectGrantColumnProjectName:
-		return ProjectGrantProjectTableAlias + "." + projection.ProjectNameCol
-	case ProjectGrantColumnGrantedOrgName:
-		return ProjectGrantGrantedOrgTableAlias + "." + projection.OrgNameCol
-	case ProjectGrantColumnResourceOwnerName:
-		return ProjectGrantResourceOwnerTableAlias + "." + projection.OrgNameCol
-	default:
-		return ProjectGrantTableAlias + "." + c.toColumnName()
-	}
 }

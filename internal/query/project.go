@@ -15,19 +15,73 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
+var (
+	projectsTable = table{
+		name: projection.ProjectProjectionTable,
+	}
+	ProjectColumnID = Column{
+		name:  projection.ProjectColumnID,
+		table: projectsTable,
+	}
+	ProjectColumnName = Column{
+		name:  projection.ProjectColumnName,
+		table: projectsTable,
+	}
+	ProjectColumnProjectRoleAssertion = Column{
+		name:  projection.ProjectColumnProjectRoleAssertion,
+		table: projectsTable,
+	}
+	ProjectColumnProjectRoleCheck = Column{
+		name:  projection.ProjectColumnProjectRoleCheck,
+		table: projectsTable,
+	}
+	ProjectColumnHasProjectCheck = Column{
+		name:  projection.ProjectColumnHasProjectCheck,
+		table: projectsTable,
+	}
+	ProjectColumnPrivateLabelingSetting = Column{
+		name:  projection.ProjectColumnPrivateLabelingSetting,
+		table: projectsTable,
+	}
+	ProjectColumnCreationDate = Column{
+		name:  projection.ProjectColumnCreationDate,
+		table: projectsTable,
+	}
+	ProjectColumnChangeDate = Column{
+		name:  projection.ProjectColumnChangeDate,
+		table: projectsTable,
+	}
+	ProjectColumnResourceOwner = Column{
+		name:  projection.ProjectColumnResourceOwner,
+		table: projectsTable,
+	}
+	ProjectColumnCreator = Column{
+		name:  projection.ProjectColumnCreator,
+		table: projectsTable,
+	}
+	ProjectColumnSequence = Column{
+		name:  projection.ProjectColumnSequence,
+		table: projectsTable,
+	}
+	ProjectColumnState = Column{
+		name:  projection.ProjectColumnState,
+		table: projectsTable,
+	}
+)
+
 func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
 	return sq.Select(
-			ProjectColumnID.toFullColumnName(),
-			ProjectColumnCreationDate.toFullColumnName(),
-			ProjectColumnChangeDate.toFullColumnName(),
-			ProjectColumnResourceOwner.toFullColumnName(),
-			ProjectColumnState.toFullColumnName(),
-			ProjectColumnSequence.toFullColumnName(),
-			ProjectColumnName.toFullColumnName(),
-			ProjectColumnProjectRoleAssertion.toFullColumnName(),
-			ProjectColumnProjectRoleCheck.toFullColumnName(),
-			ProjectColumnHasProjectCheck.toFullColumnName(),
-			ProjectColumnPrivateLabelingSetting.toFullColumnName()).
+			ProjectColumnID.identifier(),
+			ProjectColumnCreationDate.identifier(),
+			ProjectColumnChangeDate.identifier(),
+			ProjectColumnResourceOwner.identifier(),
+			ProjectColumnState.identifier(),
+			ProjectColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectColumnProjectRoleAssertion.identifier(),
+			ProjectColumnProjectRoleCheck.identifier(),
+			ProjectColumnHasProjectCheck.identifier(),
+			ProjectColumnPrivateLabelingSetting.identifier()).
 			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -57,18 +111,18 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 
 func (q *Queries) prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
 	return sq.Select(
-			ProjectColumnID.toFullColumnName(),
-			ProjectColumnCreationDate.toFullColumnName(),
-			ProjectColumnChangeDate.toFullColumnName(),
-			ProjectColumnResourceOwner.toFullColumnName(),
-			ProjectColumnState.toFullColumnName(),
-			ProjectColumnSequence.toFullColumnName(),
-			ProjectColumnName.toFullColumnName(),
-			ProjectColumnProjectRoleAssertion.toFullColumnName(),
-			ProjectColumnProjectRoleCheck.toFullColumnName(),
-			ProjectColumnHasProjectCheck.toFullColumnName(),
-			ProjectColumnPrivateLabelingSetting.toFullColumnName(),
-			"COUNT(name) OVER ()").
+			ProjectColumnID.identifier(),
+			ProjectColumnCreationDate.identifier(),
+			ProjectColumnChangeDate.identifier(),
+			ProjectColumnResourceOwner.identifier(),
+			ProjectColumnState.identifier(),
+			ProjectColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectColumnProjectRoleAssertion.identifier(),
+			ProjectColumnProjectRoleCheck.identifier(),
+			ProjectColumnHasProjectCheck.identifier(),
+			ProjectColumnPrivateLabelingSetting.identifier(),
+			"COUNT(*) OVER ()").
 			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Projects, error) {
 			projects := make([]*Project, 0)
@@ -123,7 +177,7 @@ func (q *Queries) prepareProjectUniqueQuery() (sq.SelectBuilder, func(*sql.Row) 
 func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) {
 	stmt, scan := prepareProjectQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		ProjectColumnID.toColumnName(): id,
+		ProjectColumnID.identifier(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "unable to create sql stmt")
@@ -153,7 +207,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projection.ProjectProjectionTable)
+	projects.LatestSequence, err = q.latestSequence(ctx, projectsTable)
 	return projects, err
 }
 
@@ -225,53 +279,4 @@ func (r ProjectSearchQueries) AppendPermissionQueries(permissions []string) erro
 		r.Queries = append(r.Queries, query)
 	}
 	return nil
-}
-
-type ProjectColumn int32
-
-const (
-	ProjectColumnCreationDate ProjectColumn = iota + 1
-	ProjectColumnChangeDate
-	ProjectColumnResourceOwner
-	ProjectColumnState
-	ProjectColumnSequence
-	ProjectColumnName
-	ProjectColumnProjectRoleAssertion
-	ProjectColumnProjectRoleCheck
-	ProjectColumnHasProjectCheck
-	ProjectColumnPrivateLabelingSetting
-	ProjectColumnID
-)
-
-func (c ProjectColumn) toColumnName() string {
-	switch c {
-	case ProjectColumnCreationDate:
-		return projection.ProjectCreationDateCol
-	case ProjectColumnChangeDate:
-		return projection.ProjectChangeDateCol
-	case ProjectColumnResourceOwner:
-		return projection.ProjectOwnerCol
-	case ProjectColumnState:
-		return projection.ProjectStateCol
-	case ProjectColumnSequence:
-		return projection.ProjectSequenceCol
-	case ProjectColumnName:
-		return projection.ProjectNameCol
-	case ProjectColumnProjectRoleAssertion:
-		return projection.ProjectProjectRoleAssertionCol
-	case ProjectColumnProjectRoleCheck:
-		return projection.ProjectProjectRoleCheckCol
-	case ProjectColumnHasProjectCheck:
-		return projection.ProjectHasProjectCheckCol
-	case ProjectColumnPrivateLabelingSetting:
-		return projection.ProjectPrivateLabelingCol
-	case ProjectColumnID:
-		return projection.ProjectIDCol
-	default:
-		return ""
-	}
-}
-
-func (c ProjectColumn) toFullColumnName() string {
-	return projection.ProjectProjectionTable + "." + c.toColumnName()
 }

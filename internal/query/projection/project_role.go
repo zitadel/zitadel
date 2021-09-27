@@ -48,15 +48,15 @@ func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
-	ProjectRoleProjectIDCol     = "project_id"
-	ProjectRoleKeyCol           = "role_key"
-	ProjectRoleCreationDateCol  = "creation_date"
-	ProjectRoleChangeDateCol    = "change_date"
-	ProjectRoleResourceOwnerCol = "resource_owner"
-	ProjectRoleSequenceCol      = "sequence"
-	ProjectRoleDisplayNameCol   = "display_name"
-	ProjectRoleGroupNameCol     = "group_name"
-	ProjectRoleCreatorCol       = "creator_id"
+	ProjectRoleColumnProjectID     = "project_id"
+	ProjectRoleColumnKey           = "role_key"
+	ProjectRoleColumnCreationDate  = "creation_date"
+	ProjectRoleColumnChangeDate    = "change_date"
+	ProjectRoleColumnResourceOwner = "resource_owner"
+	ProjectRoleColumnSequence      = "sequence"
+	ProjectRoleColumnDisplayName   = "display_name"
+	ProjectRoleColumnGroupName     = "group_name"
+	ProjectRoleColumnCreator       = "creator_id"
 )
 
 func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -68,15 +68,15 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventRea
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectRoleKeyCol, e.Key),
-			handler.NewCol(ProjectRoleProjectIDCol, e.Aggregate().ID),
-			handler.NewCol(ProjectRoleCreationDateCol, e.CreationDate()),
-			handler.NewCol(ProjectRoleChangeDateCol, e.CreationDate()),
-			handler.NewCol(ProjectRoleResourceOwnerCol, e.Aggregate().ResourceOwner),
-			handler.NewCol(ProjectRoleSequenceCol, e.Sequence()),
-			handler.NewCol(ProjectRoleDisplayNameCol, e.DisplayName),
-			handler.NewCol(ProjectRoleGroupNameCol, e.Group),
-			handler.NewCol(ProjectRoleCreatorCol, e.EditorUser()),
+			handler.NewCol(ProjectRoleColumnKey, e.Key),
+			handler.NewCol(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCol(ProjectRoleColumnCreationDate, e.CreationDate()),
+			handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectRoleColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
+			handler.NewCol(ProjectRoleColumnDisplayName, e.DisplayName),
+			handler.NewCol(ProjectRoleColumnGroupName, e.Group),
+			handler.NewCol(ProjectRoleColumnCreator, e.EditorUser()),
 		},
 	), nil
 }
@@ -90,14 +90,14 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ProjectChangeDateCol, e.CreationDate()),
-			handler.NewCol(ProjectRoleSequenceCol, e.Sequence()),
-			handler.NewCol(ProjectRoleDisplayNameCol, e.DisplayName),
-			handler.NewCol(ProjectRoleGroupNameCol, e.Group),
+			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
+			handler.NewCol(ProjectRoleColumnDisplayName, e.DisplayName),
+			handler.NewCol(ProjectRoleColumnGroupName, e.Group),
 		},
 		[]handler.Condition{
-			handler.NewCond(ProjectRoleKeyCol, e.Key),
-			handler.NewCond(ProjectRoleProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnKey, e.Key),
+			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -111,8 +111,8 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventR
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
-			handler.NewCond(ProjectRoleKeyCol, e.Key),
-			handler.NewCond(ProjectRoleProjectIDCol, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnKey, e.Key),
+			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
 		},
 	), nil
 }
