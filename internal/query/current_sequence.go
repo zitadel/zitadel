@@ -28,7 +28,7 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-gmd9o", "errors.orgs.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-gmd9o", "errors.current_sequence.not_found")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "errors.internal")
 			}
