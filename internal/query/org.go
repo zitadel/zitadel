@@ -206,7 +206,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	if err != nil {
 		return nil, err
 	}
-	orgs.LatestSequence, err = q.latestSequence(ctx, projection.OrgProjectionTable)
+	orgs.LatestSequence, err = q.latestSequence(ctx, orgsTable)
 	return orgs, err
 }
 
