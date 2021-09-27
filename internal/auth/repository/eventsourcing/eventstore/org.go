@@ -29,27 +29,6 @@ type OrgRepository struct {
 	Query          query.Queries
 }
 
-func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	policy := iam_view_model.OrgIAMViewToModel(orgPolicy)
-	policy.IAMDomain = repo.SystemDefaults.Domain
-	return policy, err
-}
-
-func (repo *OrgRepository) GetOrgIAMPolicy(ctx context.Context, orgID string) (*iam_model.OrgIAMPolicyView, error) {
-	orgPolicy, err := repo.View.OrgIAMPolicyByAggregateID(orgID)
-	if errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.OrgIAMViewToModel(orgPolicy), nil
-}
-
 func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
 	idpConfig, err := repo.View.IDPConfigByID(idpConfigID)
 	if err != nil {

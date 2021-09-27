@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolicyRequest) (*admin_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.iam.GetDefaultOrgIAMPolicy(ctx)
+	policy, err := s.query.DefaultOrgIAMPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolic
 }
 
 func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCustomOrgIAMPolicyRequest) (*admin_pb.GetCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.org.GetOrgIAMPolicyByID(ctx, req.OrgId)
+	policy, err := s.query.MyOrgIAMPolicy(ctx, req.OrgId)
 	if err != nil {
 		return nil, err
 	}

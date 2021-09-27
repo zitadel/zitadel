@@ -230,32 +230,6 @@ func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_
 	}, nil
 }
 
-func (repo *IAMRepository) GetOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
-	policy, viewErr := repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.OrgIAMPolicyView)
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-MkoL0", "Errors.IAM.OrgIAMPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.OrgIAMViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.OrgIAMViewToModel(policy), nil
-		}
-	}
-	return iam_es_model.OrgIAMViewToModel(policy), nil
-}
-
 func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	policy, err := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
 	if err != nil {

@@ -38,6 +38,4 @@ type IAMRepository interface {
 	GetCustomMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
-
-	GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 }

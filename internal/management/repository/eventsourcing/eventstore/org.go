@@ -64,21 +64,6 @@ func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error
 	return repo.supportedLangs, nil
 }
 
-func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
-	policy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.OrgIAMPolicyByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.OrgIAMViewToModel(policy), err
-}
-
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	err := request.EnsureLimit(repo.SearchLimit)
 	if err != nil {
