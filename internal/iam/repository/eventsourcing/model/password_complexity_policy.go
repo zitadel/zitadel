@@ -19,18 +19,6 @@ type PasswordComplexityPolicy struct {
 	HasSymbol    bool   `json:"hasSymbol"`
 }
 
-func PasswordComplexityPolicyFromModel(policy *iam_model.PasswordComplexityPolicy) *PasswordComplexityPolicy {
-	return &PasswordComplexityPolicy{
-		ObjectRoot:   policy.ObjectRoot,
-		State:        int32(policy.State),
-		MinLength:    policy.MinLength,
-		HasLowercase: policy.HasLowercase,
-		HasUppercase: policy.HasUppercase,
-		HasNumber:    policy.HasNumber,
-		HasSymbol:    policy.HasSymbol,
-	}
-}
-
 func PasswordComplexityPolicyToModel(policy *PasswordComplexityPolicy) *iam_model.PasswordComplexityPolicy {
 	return &iam_model.PasswordComplexityPolicy{
 		ObjectRoot:   policy.ObjectRoot,
