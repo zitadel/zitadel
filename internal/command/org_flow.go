@@ -11,14 +11,14 @@ import (
 
 func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, resourceOwner string) (*domain.ObjectDetails, error) {
 	if !flowType.Valid() || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfw2h", "Errors.Action.FlowTypeMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfw2h", "Errors.Flow.FlowTypeMissing")
 	}
 	existingFlow, err := c.getOrgFlowWriteModelByType(ctx, flowType, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if len(existingFlow.Triggers) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty") //TODO: i18n
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
