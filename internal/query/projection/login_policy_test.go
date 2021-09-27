@@ -43,7 +43,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -87,7 +87,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -124,7 +124,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -156,7 +156,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -186,7 +186,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -215,7 +215,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -247,7 +247,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -284,7 +284,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -328,7 +328,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -365,7 +365,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -397,7 +397,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -429,7 +429,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -461,7 +461,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   loginPolicyProjection,
+				projectionName:   LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
