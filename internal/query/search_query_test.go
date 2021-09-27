@@ -10,25 +10,20 @@ import (
 	"github.com/lib/pq"
 )
 
-type testCol struct{}
-
-func (col *testCol) toFullColumnName() string {
-	return "test"
-}
-
-func (col *testCol) toColumnName() string {
-	return "test"
-}
-
-type testNoCol struct{}
-
-func (col *testNoCol) toFullColumnName() string {
-	return ""
-}
-
-func (col *testNoCol) toColumnName() string {
-	return ""
-}
+var (
+	testTable = table{
+		name:  "test_table",
+		alias: "test_table",
+	}
+	testCol = Column{
+		name:  "test_col",
+		table: testTable,
+	}
+	testNoCol = Column{
+		name:  "",
+		table: testTable,
+	}
+)
 
 func TestSearchRequest_ToQuery(t *testing.T) {
 	type fields struct {
@@ -77,22 +72,22 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 		{
 			name: "sort asc",
 			fields: fields{
-				SortingColumn: &testCol{},
+				SortingColumn: testCol,
 				Asc:           true,
 			},
 			want: want{
 				stmtAddition: "ORDER BY LOWER(?)",
-				args:         []interface{}{"test"},
+				args:         []interface{}{"test_table.test_col"},
 			},
 		},
 		{
 			name: "sort desc",
 			fields: fields{
-				SortingColumn: &testCol{},
+				SortingColumn: testCol,
 			},
 			want: want{
 				stmtAddition: "ORDER BY LOWER(?) DESC",
-				args:         []interface{}{"test"},
+				args:         []interface{}{"test_table.test_col"},
 			},
 		},
 		{
@@ -100,12 +95,12 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			fields: fields{
 				Offset:        5,
 				Limit:         10,
-				SortingColumn: &testCol{},
+				SortingColumn: testCol,
 				Asc:           true,
 			},
 			want: want{
 				stmtAddition: "ORDER BY LOWER(?) LIMIT 10 OFFSET 5",
-				args:         []interface{}{"test"},
+				args:         []interface{}{"test_table.test_col"},
 			},
 		},
 	}
@@ -118,7 +113,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           tt.fields.Asc,
 			}
 
-			query := sq.Select((&testCol{}).toFullColumnName()).From("test_table")
+			query := sq.Select((testCol).identifier()).From(testTable.identifier())
 			expectedQuery, _, _ := query.ToSql()
 
 			stmt, args, err := req.toQuery(query).ToSql()
@@ -155,7 +150,7 @@ func TestNewTextQuery(t *testing.T) {
 		{
 			name: "too low compare",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   "hurst",
 				compare: -1,
 			},
@@ -166,7 +161,7 @@ func TestNewTextQuery(t *testing.T) {
 		{
 			name: "too high compare",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   "hurst",
 				compare: textCompareMax,
 			},
@@ -177,7 +172,7 @@ func TestNewTextQuery(t *testing.T) {
 		{
 			name: "no column",
 			args: args{
-				column:  nil,
+				column:  Column{},
 				value:   "hurst",
 				compare: TextEquals,
 			},
@@ -188,7 +183,7 @@ func TestNewTextQuery(t *testing.T) {
 		{
 			name: "no column name",
 			args: args{
-				column:  &testNoCol{},
+				column:  testNoCol,
 				value:   "hurst",
 				compare: TextEquals,
 			},
@@ -199,12 +194,12 @@ func TestNewTextQuery(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   "hurst",
 				compare: TextEquals,
 			},
 			want: &TextQuery{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "hurst",
 				Compare: TextEquals,
 			},
@@ -246,115 +241,115 @@ func TestTextQuery_comp(t *testing.T) {
 		{
 			name: "equals",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextEquals,
 			},
 			want: want{
-				query: sq.Eq{"test": "Hurst"},
+				query: sq.Eq{"test_table.test_col": "Hurst"},
 				args:  nil,
 			},
 		},
 		{
 			name: "equals ignore case",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test": "Hurst"},
+				query: sq.ILike{"test_table.test_col": "Hurst"},
 				args:  nil,
 			},
 		},
 		{
 			name: "starts with",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextStartsWith,
 			},
 			want: want{
-				query: sq.Like{"test": "Hurst%"},
+				query: sq.Like{"test_table.test_col": "Hurst%"},
 				args:  nil,
 			},
 		},
 		{
 			name: "starts with ignore case",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextStartsWithIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test": "Hurst%"},
+				query: sq.ILike{"test_table.test_col": "Hurst%"},
 				args:  nil,
 			},
 		},
 		{
 			name: "ends with",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextEndsWith,
 			},
 			want: want{
-				query: sq.Like{"test": "%Hurst"},
+				query: sq.Like{"test_table.test_col": "%Hurst"},
 				args:  nil,
 			},
 		},
 		{
 			name: "ends with ignore case",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextEndsWithIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test": "%Hurst"},
+				query: sq.ILike{"test_table.test_col": "%Hurst"},
 				args:  nil,
 			},
 		},
 		{
 			name: "contains",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextContains,
 			},
 			want: want{
-				query: sq.Like{"test": "%Hurst%"},
+				query: sq.Like{"test_table.test_col": "%Hurst%"},
 				args:  nil,
 			},
 		},
 		{
 			name: "containts ignore case",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextContainsIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test": "%Hurst%"},
+				query: sq.ILike{"test_table.test_col": "%Hurst%"},
 				args:  nil,
 			},
 		},
 		{
 			name: "list containts",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextListContains,
 			},
 			want: want{
-				query: "test @> ? ",
+				query: "test_table.test_col @> ? ",
 				args:  []interface{}{pq.StringArray{"Hurst"}},
 			},
 		},
 		{
 			name: "too high comparison",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: textCompareMax,
 			},
@@ -365,7 +360,7 @@ func TestTextQuery_comp(t *testing.T) {
 		{
 			name: "too low comparison",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Text:    "Hurst",
 				Compare: -1,
 			},
@@ -503,7 +498,7 @@ func TestNewNumberQuery(t *testing.T) {
 		{
 			name: "too low compare",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   "hurst",
 				compare: -1,
 			},
@@ -514,7 +509,7 @@ func TestNewNumberQuery(t *testing.T) {
 		{
 			name: "too high compare",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   "hurst",
 				compare: numberCompareMax,
 			},
@@ -525,7 +520,7 @@ func TestNewNumberQuery(t *testing.T) {
 		{
 			name: "no column",
 			args: args{
-				column:  nil,
+				column:  Column{},
 				value:   "hurst",
 				compare: NumberEquals,
 			},
@@ -536,7 +531,7 @@ func TestNewNumberQuery(t *testing.T) {
 		{
 			name: "no column name",
 			args: args{
-				column:  &testNoCol{},
+				column:  testNoCol,
 				value:   "hurst",
 				compare: NumberEquals,
 			},
@@ -547,7 +542,7 @@ func TestNewNumberQuery(t *testing.T) {
 		{
 			name: "no number",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   "hurst",
 				compare: NumberEquals,
 			},
@@ -558,12 +553,12 @@ func TestNewNumberQuery(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				column:  &testCol{},
+				column:  testCol,
 				value:   5,
 				compare: NumberEquals,
 			},
 			want: &NumberQuery{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  5,
 				Compare: NumberEquals,
 			},
@@ -605,67 +600,67 @@ func TestNumberQuery_comp(t *testing.T) {
 		{
 			name: "equals",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: NumberEquals,
 			},
 			want: want{
-				query: sq.Eq{"test": 42},
+				query: sq.Eq{"test_table.test_col": 42},
 				args:  nil,
 			},
 		},
 		{
 			name: "not equals",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: NumberNotEquals,
 			},
 			want: want{
-				query: sq.NotEq{"test": 42},
+				query: sq.NotEq{"test_table.test_col": 42},
 				args:  nil,
 			},
 		},
 		{
 			name: "less",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: NumberLess,
 			},
 			want: want{
-				query: sq.Lt{"test": 42},
+				query: sq.Lt{"test_table.test_col": 42},
 				args:  nil,
 			},
 		},
 		{
 			name: "greater",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: NumberGreater,
 			},
 			want: want{
-				query: sq.Gt{"test": 42},
+				query: sq.Gt{"test_table.test_col": 42},
 				args:  nil,
 			},
 		},
 		{
 			name: "list containts",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: NumberListContains,
 			},
 			want: want{
-				query: "test @> ? ",
+				query: "test_table.test_col @> ? ",
 				args:  []interface{}{pq.Array(42)},
 			},
 		},
 		{
 			name: "too high comparison",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: numberCompareMax,
 			},
@@ -676,7 +671,7 @@ func TestNumberQuery_comp(t *testing.T) {
 		{
 			name: "too low comparison",
 			fields: fields{
-				Column:  &testCol{},
+				Column:  testCol,
 				Number:  42,
 				Compare: -1,
 			},
