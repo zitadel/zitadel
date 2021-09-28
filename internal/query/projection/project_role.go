@@ -87,13 +87,16 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sM0f", "reduce.wrong.event.type")
 	}
+	if e.DisplayName == nil && e.Group == nil {
+		return crdb.NewNoOpStatement(e), nil
+	}
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectRoleColumnDisplayName, e.DisplayName),
-			handler.NewCol(ProjectRoleColumnGroupName, e.Group),
+			handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName),
+			handler.NewCol(ProjectRoleColumnGroupName, *e.Group),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),

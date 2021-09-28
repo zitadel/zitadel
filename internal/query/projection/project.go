@@ -104,7 +104,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 		logging.LogWithFields("HANDL-dk2iF", "seq", event.Sequence(), "expected", project.ProjectChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-s00Fs", "reduce.wrong.event.type")
 	}
-	if e.Name == nil {
+	if e.Name == nil && e.HasProjectCheck == nil && e.ProjectRoleAssertion == nil && e.ProjectRoleCheck == nil && e.PrivateLabelingSetting == nil {
 		return crdb.NewNoOpStatement(e), nil
 	}
 
