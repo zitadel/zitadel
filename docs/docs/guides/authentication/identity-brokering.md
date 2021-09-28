@@ -41,7 +41,7 @@ If Google is configured as identity provider on your organization, the user will
 ZITADEL will redirect the user to the login screen of Google where he as to authenticated himself (2) and is sent back after he has finished that (3).
 Because Google is registered as trusted identity provider the user will be able to login in with the Google account after he linked an existing ZITADEL Account or just registered a new one with the claims provided by Google (4)(5).
 
-![Identity Brokering](/img/zitadel_identity_brokering.png)
+![Identity Brokering](/img/guides/identity_brokering.png)
 
 ## Exercise: Register an external identity provider
 
