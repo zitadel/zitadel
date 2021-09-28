@@ -48,10 +48,6 @@ var (
 		name:  projection.OrgColumnDomain,
 		table: orgsTable,
 	}
-	OrgsColumnCount = Column{
-		name:  "COUNT(*) OVER ()",
-		table: orgsTable,
-	}
 )
 
 func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
@@ -98,7 +94,7 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 			OrgColumnSequence.identifier(),
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
-			OrgsColumnCount.identifier()).
+			countColumn.identifier()).
 			From(projection.OrgProjectionTable).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
@@ -136,7 +132,7 @@ func (q *Queries) prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, 
 }
 
 func (q *Queries) prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
-	return sq.Select("COUNT(*) = 0").
+	return sq.Select(uniqueColumn.identifier()).
 			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
@@ -175,9 +171,15 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := q.prepareOrgUniqueQuery()
-	stmt, args, err := query.Where(sq.Eq{
-		OrgColumnDomain.identifier(): domain,
-	}).ToSql()
+	stmt, args, err := query.Where(
+		sq.Or{
+			sq.Eq{
+				OrgColumnDomain.identifier(): domain,
+			},
+			sq.Eq{
+				OrgColumnName.identifier(): name,
+			},
+		}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-TYUCE", "unable to create sql stmt")
 	}
@@ -206,7 +208,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	if err != nil {
 		return nil, err
 	}
-	orgs.LatestSequence, err = q.latestSequence(ctx, projection.OrgProjectionTable)
+	orgs.LatestSequence, err = q.latestSequence(ctx, orgsTable)
 	return orgs, err
 }
 

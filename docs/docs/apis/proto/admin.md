@@ -32,18 +32,6 @@ Returns the default languages
     GET: /languages
 
 
-### IsOrgUnique
-
-> **rpc** IsOrgUnique([IsOrgUniqueRequest](#isorguniquerequest))
-[IsOrgUniqueResponse](#isorguniqueresponse)
-
-Checks whether an organisation exists by the given parameters
-
-
-
-    GET: /orgs/_is_unique
-
-
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -54,6 +42,18 @@ Returns an organisation by id
 
 
     GET: /orgs/{id}
+
+
+### IsOrgUnique
+
+> **rpc** IsOrgUnique([IsOrgUniqueRequest](#isorguniquerequest))
+[IsOrgUniqueResponse](#isorguniqueresponse)
+
+Checks whether an organisation exists by the given parameters
+
+
+
+    GET: /orgs/_is_unique
 
 
 ### ListOrgs
