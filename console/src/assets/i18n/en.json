@@ -676,6 +676,7 @@
       "LOGINPOLICYFACTORS": "Multifactors",
       "LOGINPOLICYPASSWORDLESS": "Passwordless Authentication",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Password Complexity Policy",
+      "LOCKOUTPOLICY":"Lockout Policy",
       "LABELPOLICYPRIVATELABEL": "Colors, Logo, Icon, Textappearance",
       "LABELPOLICYWATERMARK": "Remove ZITADEL watermark",
       "CUSTOMDOMAIN": "Organization domain verification",
@@ -722,7 +723,9 @@
       "RELEASE":"Release",
       "DROPFONT":"Drop fontfile here",
       "RELEASEFONT":"Release",
+      "USEOFLOGO":"Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organisation switcher in console",
       "MAXSIZE":"The maximum size is limited to 524kB",
+      "EMAILNOSVG":"The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED":"Maximum size of 524kB exceeded.",
       "FONTINLOGINONLY":"The font is currently only displayed in the login interface.",
       "PREVIEW": {
@@ -1166,6 +1169,8 @@
       "0": "No Styling",
       "1": "Google"
     },
+    "AUTOREGISTER":"Auto Register",
+    "AUTOREGISTER_DESC":"If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "ID": "ID",
     "NAME": "Name",

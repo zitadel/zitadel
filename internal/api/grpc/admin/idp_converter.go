@@ -12,10 +12,11 @@ import (
 
 func addOIDCIDPRequestToDomain(req *admin_pb.AddOIDCIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		Name:        req.Name,
-		OIDCConfig:  addOIDCIDPRequestToDomainOIDCIDPConfig(req),
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
-		Type:        domain.IDPConfigTypeOIDC,
+		Name:         req.Name,
+		OIDCConfig:   addOIDCIDPRequestToDomainOIDCIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeOIDC,
+		AutoRegister: req.AutoRegister,
 	}
 }
 
@@ -30,11 +31,31 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *admin_pb.AddOIDCIDPRequest) *do
 	}
 }
 
+func addJWTIDPRequestToDomain(req *admin_pb.AddJWTIDPRequest) *domain.IDPConfig {
+	return &domain.IDPConfig{
+		Name:         req.Name,
+		JWTConfig:    addJWTIDPRequestToDomainJWTIDPConfig(req),
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		Type:         domain.IDPConfigTypeJWT,
+		AutoRegister: req.AutoRegister,
+	}
+}
+
+func addJWTIDPRequestToDomainJWTIDPConfig(req *admin_pb.AddJWTIDPRequest) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		JWTEndpoint:  req.JwtEndpoint,
+		Issuer:       req.Issuer,
+		KeysEndpoint: req.KeysEndpoint,
+		HeaderName:   req.HeaderName,
+	}
+}
+
 func updateIDPToDomain(req *admin_pb.UpdateIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
-		IDPConfigID: req.IdpId,
-		Name:        req.Name,
-		StylingType: idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		IDPConfigID:  req.IdpId,
+		Name:         req.Name,
+		StylingType:  idp_grpc.IDPStylingTypeToDomain(req.StylingType),
+		AutoRegister: req.AutoRegister,
 	}
 }
 
@@ -47,6 +68,16 @@ func updateOIDCConfigToDomain(req *admin_pb.UpdateIDPOIDCConfigRequest) *domain.
 		Scopes:                req.Scopes,
 		IDPDisplayNameMapping: idp_grpc.MappingFieldToDomain(req.DisplayNameMapping),
 		UsernameMapping:       idp_grpc.MappingFieldToDomain(req.UsernameMapping),
+	}
+}
+
+func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JWTIDPConfig {
+	return &domain.JWTIDPConfig{
+		IDPConfigID:  req.IdpId,
+		JWTEndpoint:  req.JwtEndpoint,
+		Issuer:       req.Issuer,
+		KeysEndpoint: req.KeysEndpoint,
+		HeaderName:   req.HeaderName,
 	}
 }
 

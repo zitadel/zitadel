@@ -169,8 +169,20 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
+		if requiredFeature == domain.FeatureLockoutPolicy {
+			if !features.LockoutPolicy {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
 		if requiredFeature == domain.FeatureMetadataUser {
 			if !features.MetadataUser {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
+		if requiredFeature == domain.FeatureActions {
+			if !features.Actions {
 				return MissingFeatureErr(requiredFeature)
 			}
 			continue

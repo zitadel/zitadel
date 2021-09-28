@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -24,6 +25,10 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LabelPolicy.AlreadyExists")
 	}
 
+	err = c.checkLabelPolicyAllowed(ctx, resourceOwner, policy)
+	if err != nil {
+		return nil, err
+	}
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLabelPolicyAddedEvent(
 		ctx,
@@ -65,6 +70,11 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowNotFound(nil, "Org-0K9dq", "Errors.Org.LabelPolicy.NotFound")
 	}
 
+	err = c.checkLabelPolicyAllowed(ctx, resourceOwner, policy)
+	if err != nil {
+		return nil, err
+	}
+
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
 		ctx,
@@ -93,6 +103,28 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		return nil, err
 	}
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
+}
+
+func (c *Commands) checkLabelPolicyAllowed(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) error {
+	defaultPolicy, err := c.getDefaultLabelPolicy(ctx)
+	if err != nil {
+		return err
+	}
+	requiredFeatures := make([]string, 0)
+	if defaultPolicy.PrimaryColor != policy.PrimaryColor || defaultPolicy.PrimaryColorDark != policy.PrimaryColorDark ||
+		defaultPolicy.FontColor != policy.FontColor || defaultPolicy.FontColorDark != policy.FontColorDark ||
+		defaultPolicy.BackgroundColor != policy.BackgroundColor || defaultPolicy.BackgroundColorDark != policy.BackgroundColorDark ||
+		defaultPolicy.WarnColor != defaultPolicy.WarnColor || defaultPolicy.WarnColorDark != defaultPolicy.WarnColorDark ||
+		defaultPolicy.LogoURL != policy.LogoURL || defaultPolicy.LogoDarkURL != policy.LogoDarkURL ||
+		defaultPolicy.IconURL != policy.IconURL || defaultPolicy.IconDarkURL != policy.IconDarkURL ||
+		defaultPolicy.Font != policy.Font ||
+		defaultPolicy.HideLoginNameSuffix != policy.HideLoginNameSuffix {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLabelPolicyPrivateLabel)
+	}
+	if defaultPolicy.DisableWatermark != policy.DisableWatermark {
+		requiredFeatures = append(requiredFeatures, domain.FeatureLabelPolicyWatermark)
+	}
+	return authz.CheckOrgFeatures(ctx, c.tokenVerifier, resourceOwner, requiredFeatures...)
 }
 
 func (c *Commands) ActivateLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {

@@ -25,8 +25,17 @@
                     <input cnslInput formControlName="issuer" />
                 </cnsl-form-field>
             </div>
+
+            <cnsl-info-section class="auto-reg-info">
+              <div>
+                <p class="auto-reg-desc">{{'IDP.AUTOREGISTER_DESC' | translate}}</p>
+                <mat-checkbox formControlName="autoRegister">
+                  {{'IDP.AUTOREGISTER' | translate}}
+                </mat-checkbox>
+              </div>
+            </cnsl-info-section>
+
             <div class="content">
-                <p class="desc">Client Id / Client Secret</p>
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
                     <input cnslInput formControlName="clientId" />

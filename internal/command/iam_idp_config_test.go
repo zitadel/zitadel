@@ -68,6 +68,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 									"name1",
 									domain.IDPConfigTypeOIDC,
 									domain.IDPConfigStylingTypeGoogle,
+									true,
 								),
 							),
 							eventFromEventPusher(
@@ -99,8 +100,9 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.IDPConfig{
-					Name:        "name1",
-					StylingType: domain.IDPConfigStylingTypeGoogle,
+					Name:         "name1",
+					StylingType:  domain.IDPConfigStylingTypeGoogle,
+					AutoRegister: true,
 					OIDCConfig: &domain.OIDCIDPConfig{
 						ClientID:              "clientid1",
 						Issuer:                "issuer",
@@ -110,6 +112,66 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 						Scopes:                []string{"scope"},
 						IDPDisplayNameMapping: domain.OIDCMappingFieldEmail,
 						UsernameMapping:       domain.OIDCMappingFieldEmail,
+					},
+				},
+			},
+			res: res{
+				want: &domain.IDPConfig{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "IAM",
+						ResourceOwner: "IAM",
+					},
+					IDPConfigID:  "config1",
+					Name:         "name1",
+					StylingType:  domain.IDPConfigStylingTypeGoogle,
+					State:        domain.IDPConfigStateActive,
+					AutoRegister: true,
+				},
+			},
+		},
+		{
+			name: "idp config jwt add, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								iam.NewIDPConfigAddedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate,
+									"config1",
+									"name1",
+									domain.IDPConfigTypeOIDC,
+									domain.IDPConfigStylingTypeGoogle,
+									false,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewIDPJWTConfigAddedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate,
+									"config1",
+									"jwt-endpoint",
+									"issuer",
+									"keys-endpoint",
+									"auth",
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "IAM")),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "config1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				config: &domain.IDPConfig{
+					Name:        "name1",
+					StylingType: domain.IDPConfigStylingTypeGoogle,
+					JWTConfig: &domain.JWTIDPConfig{
+						JWTEndpoint:  "jwt-endpoint",
+						Issuer:       "issuer",
+						KeysEndpoint: "keys-endpoint",
+						HeaderName:   "auth",
 					},
 				},
 			},
@@ -212,6 +274,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 								"name1",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeGoogle,
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -237,7 +300,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultIDPConfigChangedEvent(context.Background(), "config1", "name1", "name2", domain.IDPConfigStylingTypeUnspecified),
+								newDefaultIDPConfigChangedEvent(context.Background(), "config1", "name1", "name2", domain.IDPConfigStylingTypeUnspecified, false),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "IAM")),
@@ -248,9 +311,10 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.IDPConfig{
-					IDPConfigID: "config1",
-					Name:        "name2",
-					StylingType: domain.IDPConfigStylingTypeUnspecified,
+					IDPConfigID:  "config1",
+					Name:         "name2",
+					StylingType:  domain.IDPConfigStylingTypeUnspecified,
+					AutoRegister: false,
 				},
 			},
 			res: res{
@@ -259,10 +323,11 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 						AggregateID:   "IAM",
 						ResourceOwner: "IAM",
 					},
-					IDPConfigID: "config1",
-					Name:        "name2",
-					StylingType: domain.IDPConfigStylingTypeUnspecified,
-					State:       domain.IDPConfigStateActive,
+					IDPConfigID:  "config1",
+					Name:         "name2",
+					StylingType:  domain.IDPConfigStylingTypeUnspecified,
+					State:        domain.IDPConfigStateActive,
+					AutoRegister: false,
 				},
 			},
 		},
@@ -286,7 +351,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 	}
 }
 
-func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, newName string, stylingType domain.IDPConfigStylingType) *iam.IDPConfigChangedEvent {
+func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, newName string, stylingType domain.IDPConfigStylingType, autoRegister bool) *iam.IDPConfigChangedEvent {
 	event, _ := iam.NewIDPConfigChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		configID,
@@ -294,6 +359,7 @@ func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, new
 		[]idpconfig.IDPConfigChanges{
 			idpconfig.ChangeName(newName),
 			idpconfig.ChangeStyleType(stylingType),
+			idpconfig.ChangeAutoRegister(autoRegister),
 		},
 	)
 	return event

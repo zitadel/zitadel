@@ -106,7 +106,7 @@ func (g *GatewayHandler) Serve(ctx context.Context) {
 func createGateway(ctx context.Context, g Gateway, port string, customHeaders ...string) http.Handler {
 	mux := createMux(g, customHeaders...)
 	opts := createDialOptions(g)
-	err := g.RegisterGateway()(ctx, mux, http_util.Endpoint(port), opts)
+	err := g.RegisterGateway()(ctx, mux, "localhost"+http_util.Endpoint(port), opts)
 	logging.Log("SERVE-7B7G0E").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("failed to register grpc gateway")
 	return addInterceptors(mux, g)
 }

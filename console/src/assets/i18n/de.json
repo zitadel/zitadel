@@ -676,6 +676,7 @@
       "LOGINPOLICYFACTORS": "Multifaktoren",
       "LOGINPOLICYPASSWORDLESS": "Passwortlose Authentifizierung",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie",
+      "LOCKOUTPOLICY":"Passwortsperre",
       "LABELPOLICYPRIVATELABEL": "Farben, Logo, Icon und Texterscheinungsbild",
       "LABELPOLICYWATERMARK": "ZITADEL Wasserzeichen entfernen",
       "CUSTOMDOMAIN": "Domänverifikation",
@@ -722,7 +723,9 @@
       "RELEASE":"Jetzt loslassen",
       "DROPFONT":"Fontdatei hier ablegen",
       "RELEASEFONT":"Jetzt loslassen",
+      "USEOFLOGO":"Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Konsole verwendet wird",
       "MAXSIZE":"Die maximale Grösse von Uploads ist mit 524kB begrenzt",
+      "EMAILNOSVG":"Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED":"Maximale Grösse von 524kB überschritten",
       "FONTINLOGINONLY":"Die Schriftart wird momentan nur im Login interface angezeigt.",
       "PREVIEW": {
@@ -1164,6 +1167,8 @@
       "0": "kein Styling",
       "1": "Google"
     },
+    "AUTOREGISTER":"Automatische Registrierung",
+    "AUTOREGISTER_DESC":"Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
     "ID": "ID",
     "NAME": "Name",

@@ -19,6 +19,7 @@ import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

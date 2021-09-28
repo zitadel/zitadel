@@ -28,6 +28,16 @@
   }
 }
 
+.auto-reg-info {
+  margin: 0 .5rem 1rem .5rem;
+  display: block;
+  width: 100%;
+
+  .auto-reg-desc {
+    margin: 0 0 1rem 0;
+  }
+}
+
 .content {
   display: flex;
   margin: 0 -.5rem;

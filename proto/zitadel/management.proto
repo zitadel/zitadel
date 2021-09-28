@@ -15,6 +15,7 @@ import "zitadel/change.proto";
 import "zitadel/auth_n_key.proto";
 import "zitadel/features.proto";
 import "zitadel/metadata.proto";
+import "zitadel/action.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -2617,6 +2618,19 @@ service ManagementService {
         };
     }
 
+    // Add a new jwt identity provider configuration in the organisation
+    rpc AddOrgJWTIDP(AddOrgJWTIDPRequest) returns (AddOrgJWTIDPResponse) {
+        option (google.api.http) = {
+            post: "/idps/jwt"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+            feature: "login_policy.idp"
+        };
+    }
+
     // Deactivate identity provider configuration
     // Users will not be able to use this provider for login (e.g Google, Microsoft, AD, etc)
     // Returns error if already deactivated
@@ -2682,6 +2696,137 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
             feature: "login_policy.idp"
+        };
+    }
+
+    // Change JWT identity provider configuration of the organisation
+    rpc UpdateOrgIDPJWTConfig(UpdateOrgIDPJWTConfigRequest) returns (UpdateOrgIDPJWTConfigResponse) {
+        option (google.api.http) = {
+            put: "/idps/{idp_id}/jwt_config"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+            feature: "login_policy.idp"
+        };
+    }
+
+    rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
+        option (google.api.http) = {
+            post: "/actions/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.read"
+            feature: "actions"
+        };
+    }
+
+    rpc GetAction(GetActionRequest) returns (GetActionResponse) {
+        option (google.api.http) = {
+            get: "/actions/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.read"
+            feature: "actions"
+        };
+    }
+
+    rpc CreateAction(CreateActionRequest) returns (CreateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
+
+    rpc UpdateAction(UpdateActionRequest) returns (UpdateActionResponse) {
+        option (google.api.http) = {
+            put: "/actions/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
+
+//TODO: enable in next release
+//    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+//        option (google.api.http) = {
+//            post: "/actions/{id}/_deactivate"
+//            body: "*"
+//        };
+//
+//        option (zitadel.v1.auth_option) = {
+//            permission: "org.action.write"
+//            feature: "actions"
+//        };
+//    }
+//
+//    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+//        option (google.api.http) = {
+//            post: "/actions/{id}/_reactivate"
+//            body: "*"
+//        };
+//
+//        option (zitadel.v1.auth_option) = {
+//            permission: "org.action.write"
+//            feature: "actions"
+//        };
+//    }
+
+    rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
+        option (google.api.http) = {
+            delete: "/actions/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.delete"
+            feature: "actions"
+        };
+    }
+
+    rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
+        option (google.api.http) = {
+            get: "/flows/{type}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
+            feature: "actions"
+        };
+    }
+
+    rpc ClearFlow(ClearFlowRequest) returns (ClearFlowResponse) {
+        option (google.api.http) = {
+            post: "/flows/{type}/_clear"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.delete"
+            feature: "actions"
+        };
+    }
+
+    rpc SetTriggerActions(SetTriggerActionsRequest) returns (SetTriggerActionsResponse) {
+        option (google.api.http) = {
+            post: "/flows/{flow_type}/trigger/{trigger_type}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.write"
+            feature: "actions"
         };
     }
 }
@@ -4884,9 +5029,66 @@ message AddOrgOIDCIDPRequest {
             description: "definition which field is mapped to the email of the user";
         }
     ];
+    bool auto_register = 9;
 }
 
 message AddOrgOIDCIDPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string idp_id = 2;
+}
+
+message AddOrgJWTIDPRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"google\"";
+        }
+    ];
+    zitadel.idp.v1.IDPStylingType styling_type = 2 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "some identity providers specify the styling of the button to their login";
+        }
+    ];
+    string jwt_endpoint = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string issuer = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/keys\"";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string header_name = 6 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+    bool auto_register = 7;
+}
+
+message AddOrgJWTIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
     string idp_id = 2;
 }
@@ -4928,6 +5130,7 @@ message UpdateOrgIDPRequest {
             description: "some identity providers specify the styling of the button to their login";
         }
     ];
+    bool auto_register = 4;
 }
 
 message UpdateOrgIDPResponse {
@@ -4982,5 +5185,202 @@ message UpdateOrgIDPOIDCConfigRequest {
 }
 
 message UpdateOrgIDPOIDCConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+
+message UpdateOrgIDPJWTConfigRequest {
+    string idp_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string jwt_endpoint = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the endpoint where the jwt can be extracted";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string issuer = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com\"";
+            description: "the issuer of the jwt (for validation)";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string keys_endpoint = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/keys\"";
+            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string header_name = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"x-auth-token\"";
+            description: "the name of the header where the JWT is sent in, default is authorization";
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateOrgIDPJWTConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListActionsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //the field the result is sorted
+    zitadel.action.v1.ActionFieldName sorting_column = 2;
+    //criteria the client is looking for
+    repeated ActionQuery queries = 3;
+}
+
+message ActionQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        zitadel.action.v1.ActionIDQuery action_id_query = 1;
+        zitadel.action.v1.ActionNameQuery action_name_query = 2;
+        zitadel.action.v1.ActionStateQuery action_state_query = 3;
+    }
+}
+
+message ListActionsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.action.v1.ActionFieldName sorting_column = 2;
+    repeated zitadel.action.v1.Action result = 3;
+}
+
+message CreateActionRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"log context\"";
+        }
+    ];
+    string script = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 2000},
+         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+             example: "\"function log(context, calls){console.log(context)}\"";
+         }
+    ];
+    google.protobuf.Duration timeout = 3 [
+        (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "after which time the action will be terminated if not finished";
+        }
+    ];
+    bool allowed_to_fail = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "when true, the next action will be called even if this action fails";
+        }
+    ];
+}
+
+message CreateActionResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message GetActionRequest {
+    string id = 1;
+}
+
+message GetActionResponse {
+    zitadel.action.v1.Action action = 1;
+}
+
+message UpdateActionRequest {
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"log context\"";
+        }
+    ];
+    string script = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 2000},
+         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+             example: "\"function log(context, calls){console.log(context)}\"";
+         }
+    ];
+    google.protobuf.Duration timeout = 4 [
+        (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "after which time the action will be terminated if not finished";
+        }
+    ];
+    bool allowed_to_fail = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "when true, the next action will be called even if this action fails";
+        }
+    ];
+}
+
+message UpdateActionResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeleteActionRequest {
+    string id = 1;
+}
+
+message DeleteActionResponse {}
+
+message DeactivateActionRequest {
+    string id = 1;
+}
+
+message DeactivateActionResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ReactivateActionRequest {
+    string id = 1;
+}
+
+message ReactivateActionResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetFlowRequest {
+    zitadel.action.v1.FlowType type = 1;
+}
+
+message GetFlowResponse {
+    zitadel.action.v1.Flow flow = 1;
+}
+
+message ClearFlowRequest {
+    zitadel.action.v1.FlowType type = 1;
+}
+
+message ClearFlowResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message SetTriggerActionsRequest {
+    zitadel.action.v1.FlowType flow_type = 1;
+    zitadel.action.v1.TriggerType trigger_type = 2;
+    repeated string action_ids = 3;
+}
+
+message SetTriggerActionsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
