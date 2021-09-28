@@ -151,7 +151,7 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 			ActionColumnScript.identifier(),
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
-			"COUNT(*) OVER ()", //TODO: count column,
+			countColumn.identifier(),
 		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Actions, error) {
 			actions := make([]*Action, 0)

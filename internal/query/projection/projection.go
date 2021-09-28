@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	currentSeqTable   = "projections.current_sequences"
+	CurrentSeqTable   = "projections.current_sequences"
 	locksTable        = "projections.locks"
 	failedEventsTable = "projections.failed_events"
 )
@@ -26,7 +26,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 			RetryFailedAfter: config.RetryFailedAfter.Duration,
 		},
 		Client:            sqlClient,
-		SequenceTable:     currentSeqTable,
+		SequenceTable:     CurrentSeqTable,
 		LockTable:         locksTable,
 		FailedEventsTable: failedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
