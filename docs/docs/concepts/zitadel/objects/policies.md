@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Policies
+title: Policies
 ---
 
 Policies are configurations of all the different parts of the IAM. For all parts we have a suitable default in the IAM.
@@ -83,3 +83,8 @@ Make sure you click the "Set preview as current configuration" button after you 
 | Disable Watermark | If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
 ![Private Labeling](/img/manuals/policies/console_org_private_labeling.png)
+
+## Privacy Policy and TOS
+
+Each organization is able to configure its own privacy policy and terms of service.
+A link to the current policies can be provided. On register each user has to accept these policies.

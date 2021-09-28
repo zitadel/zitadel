@@ -9,20 +9,9 @@ title: Projects
 | Learning Outcomes | In this module you will: <ul><li>Learn about projects and granted projects</li><li>Create a new project</li><li>Creating simple roles and authorizations</li><li>Create an organization grant for your project</li></ul> |
 | Prerequisites     | <ul><li>ZITADEL organizations</li><li>Role Based Access Management (RBAC)</li></ul>                                                                                                                                      |
 
-## What is a project?
+import ProjectDescription from '../../concepts/zitadel/objects/_project_description.mdx';
 
-The idea of projects is to have a vessel for all components who are closely related to each other. Multiple projects can exist within an organization.
-
-![Organization grant](/img/zitadel_organization_grant.png)
-
-All applications within a project share the same roles, grants, and authorizations:
-
-* **Applications** is your software that initiates the authorization flow. This could be a web app and a mobile app that share the same roles.
-* **Roles** are a means of managing user access rights for a project.
-* **Authorizations** define which users have which roles. Authorizations are also called “user grants”.
-* **Granted Organizations** can manage selected roles for your project on their own.
-
-![Organization grant](/img/console_projects_overview.png)
+<ProjectDescription name="ProjectDescription" />
 
 The goal of this module is to give you an overview, but not dive too deep into details around managing access rights and delegating management of roles to third parties. So let’s create a straightforward example project first.
 
@@ -64,25 +53,9 @@ You can verify the role grant on the user. Select Users from the navigation menu
 
 Now create another project (eg. “My second project”) and verify that there are no roles or authorizations on your second project.
 
-## What is a granted project?
+import GrantedProjectDescription from '../../concepts/zitadel/objects/_granted_project_description.mdx';
 
-![Organization Grant](/img/zitadel_organization_grant.png)
-
-With ZITADEL you can grant selected roles within your project to an organization. The receiving organization can then create authorizations for their users on their own (self-service).
-
-An example could be a service provider that offers a SaaS solution that has different permissions for employees working in Sales and Accounting. As soon as a new client purchases the service, the provider could grant the roles ‘sales’ and ‘accounting’ to that organization, allowing them to self-manage how they want to allocate the roles to their users.
-
-The process of assigning certain roles by default or according to rules can be further automated by utilizing Service Users in the service provider’s business process.
-
-Obviously, your organization can grant projects and receive projects. When you are granting, then the receiving organization will be displayed in the section GRANTED ORGANIZATIONS of your project.
-
-![Project granted to organization](/img/console_projects_granted.png)
-
-A granted project, on the other hand, belongs to a third party, granting you some rights to manage certain roles of their project. ZITADEL Console shows granted projects in a dedicated navigation menu, to clearly separate from your organization’s projects.
-
-![Granted Projects Overview](/img/console_granted_projects_overview.png)
-
-Please note that you can also grant selected roles of a project to an individual user, instead of an organization. We will discuss this in more detail in a later section.
+<GrantedProjectDescription name="GrantedProjectDescription" />
 
 ## Exercise - Grant a project
 
