@@ -8,7 +8,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
@@ -34,11 +34,11 @@ export class OrgIamPolicyComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
-    private sessionStorage: StorageService,
+    private storage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
   ) {
-    const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
+    const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.local) as Org.AsObject;
     if (temporg) {
       this.org = temporg;
     }

@@ -188,7 +188,6 @@ export class GrpcAuthService {
 
   public setActiveOrg(org: Org.AsObject): void {
     this.storage.setItem(StorageKey.organization, org, StorageLocation.local);
-    this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
     this._activeOrgChanged.next(org);
   }
 
