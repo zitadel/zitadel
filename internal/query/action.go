@@ -106,7 +106,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	if err != nil {
 		return nil, err
 	}
-	actions.LatestSequence, err = q.latestSequence(ctx, actionTable.name)
+	actions.LatestSequence, err = q.latestSequence(ctx, actionTable)
 	return actions, err
 }
 
