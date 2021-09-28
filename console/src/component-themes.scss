@@ -3,7 +3,6 @@
 @import './styles/input.scss';
 @import './styles/error.scss';
 @import './styles/link.scss';
-@import './styles/sidenav-list';
 @import 'src/app/modules/avatar/avatar.component';
 @import 'src/app/modules/app-radio/app-type-radio/app-type-radio.component';
 @import 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
@@ -11,6 +10,7 @@
 @import 'src/app/modules/info-section/info-section.component';
 @import 'src/app/modules/detail-layout/detail-layout.component';
 @import 'src/app/modules/app-card/app-card.component';
+@import 'src/app/modules/nav/nav.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
@@ -26,12 +26,12 @@
 
 @mixin component-themes($theme) {
   @include avatar-theme($theme);
+  @include nav-theme($theme);
   @include app-type-radio-theme($theme);
   @include app-auth-method-radio-theme($theme);
   @include card-theme($theme);
   @include table-theme($theme);
   @include detail-layout-theme($theme);
-  @include sidenav-list-theme($theme);
   @include app-card-theme($theme);
   @include membership-theme($theme);
   @include changes-theme($theme);

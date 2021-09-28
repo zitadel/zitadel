@@ -1,176 +1,154 @@
-<div class="header-content">
-  <ng-container *ngIf="labelpolicy && !labelpolicy?.disableWatermark">
-    <a  class="title" [routerLink]="['/']">
-        <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
-            src="../assets/images/zitadel-logo-solo-light.svg" />
-        <ng-template #lighttheme>
-            <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
-        </ng-template>
-    </a>
+<ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
+  <mat-toolbar class="nav-col" [ngClass]="{'is-admin': (iamuser$ | async)}">
+    <div class="header-content">
+      <ng-container *ngIf="labelpolicy && !labelpolicy?.disableWatermark">
+        <a  class="title" [routerLink]="['/']">
+            <img class="logo" alt="zitadel logo" *ngIf="isDarkTheme; else lighttheme"
+                src="../assets/images/zitadel-logo-solo-light.svg" />
+            <ng-template #lighttheme>
+                <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
+            </ng-template>
+        </a>
 
-    <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-        stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
-        <path d="M16.88 3.549L7.12 20.451"></path>
-    </svg>
-  </ng-container>
+        <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+            stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
+            <path d="M16.88 3.549L7.12 20.451"></path>
+        </svg>
+      </ng-container>
 
-  <button class="org-button" (click)="loadOrgs()" *ngIf="user && org" mat-button [matMenuTriggerFor]="menu"
-      (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
-      <mat-icon>
-          arrow_drop_down</mat-icon>
-  </button>
+      <button class="org-button" (click)="loadOrgs()" *ngIf="user && org" mat-button [matMenuTriggerFor]="menu"
+          (menuOpened)="focusFilter()">{{org?.name ? org.name : 'NO NAME'}}
+          <mat-icon>
+              arrow_drop_down</mat-icon>
+      </button>
 
-  <mat-menu class="menu" #menu="matMenu">
-      <div class="spinner-w">
-          <mat-spinner diameter="20" *ngIf="orgLoading$ | async" color="accent">
-          </mat-spinner>
+      <mat-menu class="menu" #menu="matMenu">
+          <div class="spinner-w">
+              <mat-spinner diameter="20" *ngIf="orgLoading$ | async" color="accent">
+              </mat-spinner>
+          </div>
+
+          <div class="filter-wrapper">
+              <input cnslInput class="filter-input" [formControl]="filterControl" autocomplete="off"
+                  (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+                  #input>
+          </div>
+
+          <div class="org-wrapper">
+              <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
+                  *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">
+                  {{temporg?.name ? temporg.name : 'NO NAME'}}
+              </button>
+          </div>
+
+          <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
+              translate}}</button>
+
+          <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
+              <button mat-menu-item [routerLink]="[ '/org/create' ]">
+                  <mat-icon class="avatar">add</mat-icon>
+                  {{'MENU.NEWORG' | translate}}
+              </button>
+          </ng-template>
+      </mat-menu>
+      <span class="fill-space"></span>
+
+      <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button target="_blank">
+        {{'MENU.DOCUMENTATION' | translate}}
+      </a>
+
+      <div (clickOutside)="closeAccountCard()" class="icon-container">
+          <app-avatar
+              *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
+              class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"  [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName"
+              [name]="user.human?.profile?.displayName ? user.human?.profile.displayName : (user.human?.profile.firstName + ' '+ user.human?.profile.lastName)"
+              [size]="38">
+          </app-avatar>
+          <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
+              (close)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
+          </app-accounts-card>
       </div>
-
-      <div class="filter-wrapper">
-          <input cnslInput class="filter-input" [formControl]="filterControl" autocomplete="off"
-              (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
-              #input>
-      </div>
-
-      <div class="org-wrapper">
-          <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
-              *ngFor="let temporg of orgs$ | async" mat-menu-item (click)="setActiveOrg(temporg)">
-              {{temporg?.name ? temporg.name : 'NO NAME'}}
-          </button>
-      </div>
-
-      <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
-          translate}}</button>
-
-      <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
-          <button mat-menu-item [routerLink]="[ '/org/create' ]">
-              <mat-icon class="avatar">add</mat-icon>
-              {{'MENU.NEWORG' | translate}}
-          </button>
-      </ng-template>
-  </mat-menu>
-  <span class="fill-space"></span>
-
-  <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button target="_blank">{{'MENU.DOCUMENTATION'
-      | translate}}</a>
-  <div (clickOutside)="closeAccountCard()" class="icon-container">
-      <app-avatar
-          *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-          class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"  [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName"
-          [name]="user.human.profile.displayName ? user.human.profile.displayName : (user.human.profile.firstName + ' '+ user.human.profile.lastName)"
-          [size]="38">
-      </app-avatar>
-      <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
-          (close)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
-      </app-accounts-card>
-  </div>
-
-<div class="nav-row">
-  
-  <div class="left-list">
+    </div>
+    <div class="nav-row">
       <a @navitem class="nav-item" [routerLinkActive]="['active']"
           [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/']">
-          <i class="icon las la-home"></i>
+          <!-- <i class="icon las la-home"></i> -->
           <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
       </a>
 
-      <ng-container *ngIf="authenticationService.authenticationChanged | async">
+      <!-- <ng-container *ngIf="authenticationService.authenticationChanged | async">
           <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
               [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
               [routerLink]="['/users/me']">
-              <i class="icon las la-user-circle"></i>
               <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
           </a>
+      </ng-container> -->
+
+      <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
+        <ng-template appHasRole [appHasRole]="['org.read']">
+            <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
+                [routerLinkActive]="['active']" [routerLink]="[ '/org']">
+                <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
+            </a>
+        </ng-template>
+
+        <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
+            <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
+                [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
+
+                <div class="c_label">
+                    <span> {{'MENU.PROJECT' | translate}} </span>
+                    <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
+                        class="count">{{(mgmtService?.ownedProjectsCount | async)}}</span>
+                </div>
+            </a>
+
+            <!-- <a @navitem matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
+                *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
+                class="nav-item" [routerLinkActive]="['active']"
+                [routerLink]="[ '/granted-projects']">
+                <div class="c_label">
+                    <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
+                    <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
+                </div>
+            </a> -->
+        </ng-template>
+
+        <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+          <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
+              [routerLinkActive]="['active']" [routerLink]="[ '/users/list/humans']"
+              [routerLinkActiveOptions]="{ exact: true }">
+              <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
+          </a>
+            <!-- <a @navitem matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
+                [routerLinkActive]="['active']" [routerLink]="[ '/users/list/machines']"
+                [routerLinkActiveOptions]="{ exact: true }">
+                <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
+            </a> -->
+        </ng-template>
+
+        <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
+          <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item"
+              [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
+              [routerLinkActiveOptions]="{ exact: true }">
+              <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
+          </a>
+        </ng-template>
       </ng-container>
-
-      <div *ngIf="org" [@navAnimation]="org">
-          <ng-template appHasRole
-              [appHasRole]="['org.read']">
-              <div @navitem class="divider">
-                  <div class="line"></div>
-                  <span>{{org?.name ? org.name : ('MENU.ORGSECTION' | translate)}}</span>
-                  <div class="hiddenline"></div>
-              </div>
-          </ng-template>
-
-          <ng-template appHasRole [appHasRole]="['org.read']">
-              <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
-                  [routerLinkActive]="['active']" [routerLink]="[ '/org']">
-                  <i class="icon las la-cog"></i>
-                  <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
-              </a>
-          </ng-template>
-
-          <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
-              <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
-                  [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
-                  <i class="icon las la-layer-group"></i>
-
-                  <div class="c_label">
-                      <span> {{'MENU.PROJECT' | translate}} </span>
-                      <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
-                          class="count">{{mgmtService?.ownedProjectsCount | async}}</span>
-                  </div>
-              </a>
-
-              <a @navitem matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
-                  *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
-                  class="nav-item" [routerLinkActive]="['active']"
-                  [routerLink]="[ '/granted-projects']">
-                  <i class="icon las la-layer-group"></i>
-                  <div class="c_label">
-                      <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
-                      <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
-                  </div>
-              </a>
-          </ng-template>
-
-          <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
-              <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
-                  [routerLinkActive]="['active']" [routerLink]="[ '/users/list/humans']"
-                  [routerLinkActiveOptions]="{ exact: true }">
-                  <i class="icon las la-user-friends"></i>
-                  <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
-              </a>
-
-              <a @navitem matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
-                  [routerLinkActive]="['active']" [routerLink]="[ '/users/list/machines']"
-                  [routerLinkActiveOptions]="{ exact: true }">
-                  <i class="icon las la-users-cog"></i>
-                  <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
-              </a>
-          </ng-template>
-
-          <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
-              <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item"
-                  [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
-                  [routerLinkActiveOptions]="{ exact: true }">
-                  <i class="icon las la-shield-alt"></i>
-                  <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
-              </a>
-          </ng-template>
-      </div>
+      
+      <span class="fill-space"></span>
 
       <ng-container *ngIf="iamuser$ | async">
-          <div @navitem class="divider">
-              <div class="line"></div>
-              <span>{{'MENU.ADMINSECTION' | translate}}</span>
-              <div class="hiddenline"></div>
-          </div>
-          <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMPOLICIES' | translate}}" class="nav-item"
-              [routerLinkActive]="['active']" [routerLink]="[ '/iam','policies']">
-              <i class="icon las la-cog"></i>
-              <span class="label">{{'MENU.IAMPOLICIES' | translate}}</span>
-          </a>
+        <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMPOLICIES' | translate}}" class="nav-item"
+            [routerLinkActive]="['active']" [routerLink]="[ '/iam','policies']">
+            <span class="label">{{'MENU.IAMPOLICIES' | translate}}</span>
+        </a>
 
-          <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMEVENTSTORE' | translate}}" class="nav-item"
-              [routerLinkActive]="['active']" [routerLink]="[ '/iam', 'eventstore']">
-              <i class="icon las la-database"></i>
-              <span class="label">{{'MENU.IAMEVENTSTORE' | translate}}</span>
-          </a>
+        <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMEVENTSTORE' | translate}}" class="nav-item"
+            [routerLinkActive]="['active']" [routerLink]="[ '/iam', 'eventstore']">
+            <span class="label">{{'MENU.IAMEVENTSTORE' | translate}}</span>
+        </a>
       </ng-container>
-
-      <span class="fill-space"></span>
 
       <!-- <div class="toc-line" *ngIf="privacyPolicy">
           <a class="toc" [href]="privacyPolicy.tosLink" alt="Terms and Conditions"
@@ -182,7 +160,10 @@
               | translate}}</a>
           <span>&nbsp;&nbsp;&nbsp;</span>
       </div> -->
-  </div>
-  <span class="fill-space"></span>
-  <div></div>
-</div>
+    </div>
+  </mat-toolbar>
+  <!-- <div @adminline *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
+      matTooltip="IAM Administrator">
+      <span>{{'MENU.IAMADMIN' | translate}}</span>
+  </div> -->
+</ng-container>

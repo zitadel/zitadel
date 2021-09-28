@@ -1,9 +1,6 @@
 <ng-container *ngIf="(authService.user | async) || {} as user">
     <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
-        <mat-toolbar class="root-header">
-          
-          <cnsl-nav></cnsl-nav>
-        </mat-toolbar>
+        <cnsl-nav [org]="org" [user]="user" [isDarkTheme]="componentCssClass == 'dark-theme'" [labelpolicy]="labelpolicy" (changedActiveOrg)="changedOrg($event)"></cnsl-nav>
         <mat-drawer-container class="main-container">
             <mat-drawer-content class="content">
                 <div class="router" [@routeAnimations]="prepareRoute(outlet)">
@@ -11,13 +8,5 @@
                 </div>
             </mat-drawer-content>
         </mat-drawer-container>
-        <div @adminline *ngIf="iamuser$ | async" class="admin-line" [ngClass]="{'expanded': !hideAdminWarn}"
-            matTooltip="IAM Administrator">
-            <button [matTooltip]="!hideAdminWarn ? 'Unpin': 'Pin'" (click)="toggleAdminHide()" mat-icon-button>
-                <mat-icon *ngIf="!hideAdminWarn" svgIcon="mdi_pin"></mat-icon>
-                <mat-icon *ngIf="hideAdminWarn" svgIcon="mdi_pin_outline"></mat-icon>
-            </button>
-            <span>{{'MENU.IAMADMIN' | translate}}</span>
-        </div>
     </ng-container>
 </ng-container>

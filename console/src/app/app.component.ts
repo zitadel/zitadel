@@ -1,12 +1,12 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT } from '@angular/common';
-import { Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, HostBinding, Inject, OnDestroy } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { map, take, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
@@ -33,7 +33,6 @@ import { UpdateService } from './services/update.service';
   ],
 })
 export class AppComponent implements OnDestroy {
-  @ViewChild('input', { static: false }) input!: ElementRef;
   public isHandset$: Observable<boolean> = this.breakpointObserver
     .observe('(max-width: 599px)')
     .pipe(map(result => {
@@ -41,20 +40,15 @@ export class AppComponent implements OnDestroy {
     }));
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
-  public showAccount: boolean = false;
   public org!: Org.AsObject;
-  public orgs$: Observable<Org.AsObject[]> = of([]);
   public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
-
-  public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
 
   public showProjectSection: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
   public labelpolicy!: LabelPolicy.AsObject;
 
-  public hideAdminWarn: boolean = true;
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
   constructor(
@@ -213,19 +207,12 @@ export class AppComponent implements OnDestroy {
 
 
 
-    this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
-
     this.loadPolicies();
   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  public toggleAdminHide(): void {
-    this.hideAdminWarn = !this.hideAdminWarn;
-    localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
   }
 
   public loadPrivateLabelling(): void {
@@ -295,6 +282,13 @@ export class AppComponent implements OnDestroy {
     this.componentCssClass = theme;
   }
 
+  public changedOrg(org: Org.AsObject): void {
+    this.loadPrivateLabelling();
+    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+      this.router.navigate(['/']);
+    });
+  }
+
   private setLanguage(): void {
     this.translate.addLangs(['en', 'de']);
     this.translate.setDefaultLang('en');
@@ -316,15 +310,6 @@ export class AppComponent implements OnDestroy {
     });
   }
 
-  public setActiveOrg(org: Org.AsObject): void {
-    this.org = org;
-    this.authService.setActiveOrg(org);
-    this.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/']);
-    });
-  }
-
   private getProjectCount(): void {
     this.authService.isAllowed(['project.read']).subscribe((allowed) => {
       if (allowed) {
@@ -332,12 +317,6 @@ export class AppComponent implements OnDestroy {
         this.mgmtService.listGrantedProjects(0, 0);
       }
     });
-  }
-
-  focusFilter(): void {
-    setTimeout(() => {
-      this.input.nativeElement.focus();
-    }, 0);
   }
 }
 
