@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/query/projection/flow"
 )
 
 const (
@@ -39,7 +38,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	//NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	//owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
 	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
-	flow.NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
+	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	return nil
 }
 

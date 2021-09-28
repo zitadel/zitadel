@@ -30,10 +30,10 @@ func updateActionRequestToDomain(req *mgmt_pb.UpdateActionRequest) *domain.Actio
 	}
 }
 
-func listActionsToQuery(id string, req *mgmt_pb.ListActionsRequest) (_ *query.ActionSearchQueries, err error) {
+func listActionsToQuery(orgID string, req *mgmt_pb.ListActionsRequest) (_ *query.ActionSearchQueries, err error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries := make([]query.SearchQuery, len(req.Queries)+1)
-	queries[0], err = query.NewActionResourceOwnerQuery(id)
+	queries[0], err = query.NewActionResourceOwnerQuery(orgID)
 	if err != nil {
 		return nil, err
 	}
