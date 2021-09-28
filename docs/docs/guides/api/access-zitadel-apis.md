@@ -37,7 +37,7 @@ ZITADEL Managers are Users who have permission to manage ZITADEL itself. There a
 - **Project Mangers**: In this level the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
-On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../concepts/zitadel/managers.md)
+On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](../../concepts/zitadel/objects/managers.md)
 
 
 ## Exercise: Add ORG_OWNER to Service User

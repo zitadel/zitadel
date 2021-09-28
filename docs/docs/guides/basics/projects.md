@@ -9,6 +9,8 @@ title: Projects
 | Learning Outcomes | In this module you will: <ul><li>Learn about projects and granted projects</li><li>Create a new project</li><li>Creating simple roles and authorizations</li><li>Create an organization grant for your project</li></ul> |
 | Prerequisites     | <ul><li>ZITADEL organizations</li><li>Role Based Access Management (RBAC)</li></ul>                                                                                                                                      |
 
+## What is a project?
+
 import ProjectDescription from '../../concepts/zitadel/objects/_project_description.mdx';
 
 <ProjectDescription name="ProjectDescription" />
@@ -52,6 +54,8 @@ You can verify the role grant on the user. Select Users from the navigation menu
 ![Organization grant](/img/console_projects_authorization_created.png)
 
 Now create another project (eg. “My second project”) and verify that there are no roles or authorizations on your second project.
+
+## What is a granted project?
 
 import GrantedProjectDescription from '../../concepts/zitadel/objects/_granted_project_description.mdx';
 

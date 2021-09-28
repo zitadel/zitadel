@@ -9,6 +9,7 @@ title: Organizations
 | Learning Outcomes | In this module you will: <ul><li>Learn about organizations</li><li>Create a new organization</li><li>Verify your domain name </li></ul> |
 |Prerequisites|None|
 
+## What is an organization?
 
 import OrgDescription from '../../concepts/zitadel/objects/_org_description.mdx';
 

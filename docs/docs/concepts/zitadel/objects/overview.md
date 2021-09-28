@@ -11,3 +11,6 @@ More details on the specific objets:
 - [Organizations](./organizations)
 - [Policies](./policies)
 - [Projects](./projects)
+- [Granted Projects](./granted_projects)
+- [Users](./users)
+- [Managers](./managers)
