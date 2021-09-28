@@ -33,8 +33,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		BulkLimit:         config.BulkLimit,
 	}
 
-	// turned off for this release
-	//NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
+	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	//NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	//owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
 	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
