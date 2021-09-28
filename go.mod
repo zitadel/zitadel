@@ -20,6 +20,8 @@ require (
 	github.com/caos/oidc v0.15.10
 	github.com/caos/orbos v1.5.14-0.20210803090517-905668247c09
 	github.com/cockroachdb/cockroach-go/v2 v2.1.1
+	github.com/dop251/goja v0.0.0-20210817151038-07a7fd9355b4
+	github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
 	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/getsentry/sentry-go v0.11.0

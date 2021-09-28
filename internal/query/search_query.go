@@ -5,8 +5,9 @@ import (
 	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type SearchResponse struct {
@@ -259,7 +260,7 @@ type Column struct {
 
 func (c Column) identifier() string {
 	if c.table.alias == "" {
-		return c.name
+		return c.table.name + "." + c.name
 	}
 	return c.table.alias + "." + c.name
 }
