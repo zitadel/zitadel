@@ -1,5 +1,5 @@
 <app-meta-layout *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
-    <div class="max-width-container">
+    <div class="enlarged-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>

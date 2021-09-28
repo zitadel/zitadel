@@ -137,7 +137,6 @@
         align-items: center;
         font-size: 14px;
         line-height: 14px;
-        border-radius: 50vw;
         padding: .4rem 1rem;
         color: mat.get-color-from-palette($foreground, text) !important;
         transition: all .2s ease;
@@ -209,11 +208,9 @@
   .admin-line {
     display: flex;
     align-items: center;
-    right: calc(100vw - 280px);
     // border: 1px solid $warn-color;
     // border-top: none;
     color: $warn-color;
-    z-index: 1;
     font-size: 13px;
     padding: .5rem 2rem;
     // transform: translateY(75%);

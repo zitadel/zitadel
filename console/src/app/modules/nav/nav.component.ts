@@ -14,7 +14,7 @@ import { ThemeService } from 'src/app/services/theme.service';
 @Component({
   selector: 'cnsl-nav',
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss']
+  styleUrls: ['./nav.component.scss'],
 })
 export class NavComponent {
   @ViewChild('input', { static: false }) input!: ElementRef;

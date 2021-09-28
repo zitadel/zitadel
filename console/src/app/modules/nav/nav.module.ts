@@ -20,7 +20,7 @@ import { NavComponent } from './nav.component';
 
 @NgModule({
   declarations: [
-    NavComponent
+    NavComponent,
   ],
   imports: [
     CommonModule,
@@ -43,6 +43,6 @@ import { NavComponent } from './nav.component';
   ],
   exports: [
     NavComponent,
-  ]
+  ],
 })
 export class NavModule { }

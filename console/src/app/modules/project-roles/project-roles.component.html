@@ -38,7 +38,7 @@
             <ng-container matColumnDef="group">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.GROUP' | translate }} </th>
                 <td mat-cell *matCellDef="let role">
-                    <span class="role app-label" *ngIf="role.group" (click)="selectAllOfGroup(role.group)"
+                    <span class="role state" *ngIf="role.group" (click)="selectAllOfGroup(role.group)"
                         [matTooltip]="'PROJECT.ROLE.SELECTGROUPTOOLTIP' | translate: role">{{role.group}}</span>
                 </td>
             </ng-container>

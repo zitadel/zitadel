@@ -15,15 +15,6 @@
   }
   /* stylelint-enable */
 
-  .app-label {
-    font-size: 12px;
-    border-radius: 1rem;
-    color: mat.get-color-from-palette($foreground, text);
-    white-space: nowrap;
-    background-color: var(--grey);
-    padding: 3px 1rem;
-  }
-
   th {
     text-transform: uppercase;
     letter-spacing: .05em;
