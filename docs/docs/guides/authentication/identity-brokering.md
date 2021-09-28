@@ -22,7 +22,7 @@ title: Identity Brokering
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/usage/organizations">Organizations</a></li>
+                <li>Knowledge of <a href="/docs/guides/basics/organizations">Organizations</a></li>
             </ul>
         </td>
     </tr>
@@ -66,9 +66,9 @@ Google Example:
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
 
-### 2. Add custom login policy on your organisation
+### 2. Add custom login policy on your organization
 
-1. Go to your organisation settings by clicking on "Organisation" in the menu or using the following link: <https://console.zitadel.ch/org>
+1. Go to your organization settings by clicking on "Organization" in the menu or using the following link: <https://console.zitadel.ch/org>
 2. Modify your login policy
 3. As long as you have the default policy, you can't change the policy. Click create custom policy to set your on settings.
 
@@ -83,7 +83,7 @@ Google Example:
    - You can choose what fields you like to map as the display name and as username. The fields you can choose are preferred_username and email
      (Example: For Google you should choose email for both fields)
 3. Save your configuration
-4. Link your new configuration to your login policy. By searching in the organisation category you will get you own configuration. If you choose system you can link all predefined providers.
+4. Link your new configuration to your login policy. By searching in the organization category you will get you own configuration. If you choose system you can link all predefined providers.
 
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 

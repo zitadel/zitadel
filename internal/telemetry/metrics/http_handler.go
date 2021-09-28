@@ -3,6 +3,8 @@ package metrics
 import (
 	"net/http"
 	"strings"
+
+	"go.opentelemetry.io/otel/attribute"
 )
 
 const (
@@ -93,9 +95,9 @@ func (h *Handler) containsMetricsMethod(method MetricType) bool {
 }
 
 func RegisterRequestCounter(r *http.Request) {
-	var labels = map[string]interface{}{
-		URI:    strings.Split(r.RequestURI, "?")[0],
-		Method: r.Method,
+	var labels = map[string]attribute.Value{
+		URI:    attribute.StringValue(strings.Split(r.RequestURI, "?")[0]),
+		Method: attribute.StringValue(r.Method),
 	}
 	RegisterCounter(RequestCounter, RequestCountDescription)
 	AddCount(r.Context(), RequestCounter, 1, labels)
@@ -107,10 +109,10 @@ func RegisterTotalRequestCounter(r *http.Request) {
 }
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
-	var labels = map[string]interface{}{
-		URI:        strings.Split(r.RequestURI, "?")[0],
-		Method:     r.Method,
-		ReturnCode: recorder.Status,
+	var labels = map[string]attribute.Value{
+		URI:        attribute.StringValue(strings.Split(r.RequestURI, "?")[0]),
+		Method:     attribute.StringValue(r.Method),
+		ReturnCode: attribute.IntValue(recorder.Status),
 	}
 	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
 	AddCount(r.Context(), ReturnCodeCounter, 1, labels)
