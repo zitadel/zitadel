@@ -3,6 +3,11 @@ on:
   push:
     branches-ignore:
       - master
+env:
+  E2E_ORG_OWNER_PW: ${{ secrets.E2E_ORG_OWNER_PW }}
+  E2E_ORG_OWNER_VIEWER_PW: ${{ secrets.E2E_ORG_OWNER_VIEWER_PW }}
+  E2E_ORG_PROJECT_CREATOR_PW: ${{ secrets.E2E_ORG_PROJECT_CREATOR_PW }}
+  E2E_SERVICEACCOUNT_KEY: ${{ secrets.E2E_SERVICEACCOUNT_KEY }}
 jobs:
   dev-release:
     name: Dev-Release ORBOS
