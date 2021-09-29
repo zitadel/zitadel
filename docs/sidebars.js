@@ -204,6 +204,7 @@ module.exports = {
                         'concepts/zitadel/objects/organizations',
                         'concepts/zitadel/objects/policies',
                         'concepts/zitadel/objects/projects',
+                        'concepts/zitadel/objects/applications',
                         'concepts/zitadel/objects/granted_projects',
                         'concepts/zitadel/objects/users',
                         'concepts/zitadel/objects/managers',
