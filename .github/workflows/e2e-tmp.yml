@@ -1,0 +1,25 @@
+name: e2e tmp
+on:
+  push:
+    branches-ignore:
+      - master
+jobs:
+  dev-release:
+    name: Dev-Release ORBOS
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install operating system dependencies
+      run: npx playwright install-deps
+      working-directory: ./console
+    - name: Run your tests
+      run: ./playwright.sh ./ci.env
+      working-directory: ./console
+    - uses: actions/upload-artifact@v1
+      if: ${{ always() }}
+      with:
+        name: e2e-test-results
+        path: console/tests/e2e/results

@@ -22,7 +22,10 @@ test.describe('machine', () => {
                 test.beforeAll(async ({browser}) => {
                     const context = await browser.newContext({
                         recordVideo: {
-                            dir: "./tests/e2e/videos/machine"
+                            dir: './tests/e2e/results/machine'
+                        },
+                        recordHar: {
+                            path: './tests/e2e/results/machine'
                         }
                     })
                     page = await context.newPage()

@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { API_CALLS_DOMAIN, CONSOLE_URL } from '../models/env'
+import { API_CALLS_DOMAIN, CONSOLE_URL } from '../playwright.config'
 import { User } from '../models/users';
 
 export async function login(page: Page, user: User) {

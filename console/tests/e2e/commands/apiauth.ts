@@ -1,7 +1,6 @@
-import { API_CALLS_DOMAIN, SERVICEACCOUNT_KEY, ZITADEL_PROJECT_RESOURCE_ID } from "../models/env"
+import { API_CALLS_DOMAIN, SERVICEACCOUNT_KEY, ZITADEL_PROJECT_RESOURCE_ID } from "../playwright.config"
 import { sign } from 'jsonwebtoken'
 import fetch from 'node-fetch'
-import FormData from 'form-data';
 import { checkStatus } from "../fetch/status";
 
 export interface APICallProperties {
@@ -13,9 +12,9 @@ export async function prepareAPICalls(): Promise<APICallProperties> {
 
     const apiBaseURL = `https://api.${API_CALLS_DOMAIN}`
 
-    // TODO: Why can't I just receive the correct value with Cypress.env('zitadelProjectResourceId')???
+    // TODO: Why can't I just receive the correct value with process.env.ZITADEL_PROJECT_RESOURCE_ID
+    // zitadelProjectResourceID = ZITADEL_PROJECT_RESOURCE_ID
     var zitadelProjectResourceID = API_CALLS_DOMAIN == 'zitadel.ch' ? '69234237810729019' : '70669147545070419'
-//    zitadelProjectResourceID = ZITADEL_PROJECT_RESOURCE_ID
 
     var key = JSON.parse(SERVICEACCOUNT_KEY)
 

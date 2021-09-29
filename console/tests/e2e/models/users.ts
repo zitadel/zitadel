@@ -3,7 +3,7 @@ import {
     ORG_OWNER_PW,
     ORG_OWNER_VIEWER_PW,
     ORG_PROJECT_CREATOR_PW,
-} from "./env";
+} from "../playwright.config";
 
 export interface User {
     username: string
