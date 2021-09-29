@@ -757,6 +757,7 @@
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+      "ADVANCED":"Erweitert",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
@@ -1130,8 +1131,9 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+      "TITLE": "Verfügbare Identitäts Provider",
+      "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können.",
+      "ACTIVETITLE":"Aktive Identitäts Provider"
     },
     "CREATE": {
       "TITLE": "Neuer Identitäts Provider",
@@ -1167,9 +1169,11 @@
       "0": "kein Styling",
       "1": "Google"
     },
+    "ADD":"Identity Provider hinzufügen",
     "AUTOREGISTER":"Automatische Registrierung",
     "AUTOREGISTER_DESC":"Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
+    "OWNER":"Besitzer",
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Konfiguration",
@@ -1180,6 +1184,7 @@
     "CLIENTSECRET": "Client Secret",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
+    "DATES":"Datum",
     "CREATIONDATE": "Erstelldatum",
     "CHANGEDATE": "Letzte Änderung",
     "DEACTIVATE": "Deaktivieren",

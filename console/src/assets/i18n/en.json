@@ -759,6 +759,7 @@
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+      "ADVANCED":"Advanced",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -1132,8 +1133,9 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identity Providers",
-      "DESCRIPTION": "Define additional Identity Providers, which can be used to authenticate in your organisations."
+      "TITLE": "Available Identity Providers",
+      "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Policy.",
+      "ACTIVETITLE":"Active Identity Providers"
     },
     "CREATE": {
       "TITLE": "New Identity Provider",
@@ -1169,9 +1171,11 @@
       "0": "No Styling",
       "1": "Google"
     },
+    "ADD":"Add Identity Provider",
     "AUTOREGISTER":"Auto Register",
     "AUTOREGISTER_DESC":"If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
+    "OWNER":"Owner",
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Configuration",
@@ -1182,6 +1186,7 @@
     "CLIENTSECRET": "Client Secret",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
+    "DATES":"Dates",
     "CREATIONDATE": "Created At",
     "CHANGEDATE": "Last Modified",
     "DEACTIVATE": "Deactivate",
