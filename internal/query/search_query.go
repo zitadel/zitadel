@@ -270,6 +270,17 @@ func ListComparisonFromMethod(m domain.SearchMethod) ListComparison {
 	}
 }
 
+var (
+	//countColumn represents the default counter for search responses
+	countColumn = Column{
+		name: "COUNT(*) OVER ()",
+	}
+	//uniqueColumn shows if there are any results
+	uniqueColumn = Column{
+		name: "COUNT(*) = 0",
+	}
+)
+
 type table struct {
 	name  string
 	alias string

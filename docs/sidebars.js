@@ -1,43 +1,29 @@
 module.exports = {
-  manuals: [
-    'manuals/introduction',
-    {
-      type: 'category',
-      label: 'User',
-      items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
-      collapsed: false,
-    },
-    {
-      type: 'category',
-      label: 'Administrator',
-      items: ['manuals/admin-managers', 'manuals/admin-policies'],
-      collapsed: false,
-    },
-  ],
   quickstarts: [
     'quickstarts/introduction',
     {
       type: 'category',
-      label: 'Single Page Applications',
-      items: ['quickstarts/angular', 'quickstarts/react'],
+      label: 'Integrate ZITADEL Login in your App',
+      items: ['quickstarts/login/angular', 'quickstarts/login/react', 'quickstarts/login/flutter', 'quickstarts/login/nextjs'],
       collapsed: false,
     },
     {
       type: 'category',
-      label: 'Backends',
-      items: ['quickstarts/go', 'quickstarts/dot-net'],
+      label: 'Secure your API',
+      items: ['quickstarts/secure-api/go', 'quickstarts/secure-api/dot-net'],
       collapsed: false,
     },
     {
       type: 'category',
-      label: 'Frameworks',
-      items: ['quickstarts/flutter', 'quickstarts/nextjs'],
+      label: 'Call the ZITADEL API',
+      items: ['quickstarts/call-zitadel-api/go', 'quickstarts/call-zitadel-api/dot-net'],
       collapsed: false,
     },
+    'quickstarts/libs',
     {
       type: 'category',
       label: 'Identity Aware Proxy',
-      items: ['quickstarts/oauth2-proxy'],
+      items: ['quickstarts/identity-proxy/oauth2-proxy'],
       collapsed: false,
     }
   ],
@@ -48,13 +34,44 @@ module.exports = {
       label: 'Get to know ZITADEL',
       collapsed: false,
       items: [
-        'guides/usage/get-started',
-        'guides/usage/organizations',
-        'guides/usage/projects',
-        'guides/usage/oauth-recommended-flows',
-        'guides/usage/serviceusers',
-        'guides/usage/access-zitadel-apis',
-        'guides/usage/identity-brokering',
+        'guides/basics/get-started',
+        'guides/basics/organizations',
+        'guides/basics/projects',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Authentication',
+      collapsed: false,
+      items: [
+        'guides/authentication/login-users',
+        'guides/authentication/identity-brokering',
+        'guides/authentication/serviceusers',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Authorization',
+      collapsed: false,
+      items: [
+        'guides/authorization/oauth-recommended-flows',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'API',
+      collapsed: false,
+      items: [
+        'guides/api/access-zitadel-apis'
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Customization',
+      collapsed: false,
+      items: [
+        'guides/customization/branding',
+        'guides/customization/texts',
       ],
     },
     {
@@ -173,8 +190,27 @@ module.exports = {
   concepts: [
     'concepts/introduction',
     'concepts/architecture',
+    'concepts/policies',
+    'concepts/managers',
     'concepts/principles',
     'concepts/eventstore',
+    {
+      type: 'category',
+      label: 'Use Cases',
+      collapsed: true,
+      items: [
+        'concepts/usecases/saas'
+      ],
+    },
+  ],
+  manuals: [
+    'manuals/introduction',
+    {
+      type: 'category',
+      label: 'User',
+      items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
+      collapsed: false,
+    },
   ],
   legal: [
     'legal/introduction',

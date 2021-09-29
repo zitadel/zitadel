@@ -8,11 +8,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/query/projection/org/owner"
 )
 
 const (
-	currentSeqTable   = "projections.current_sequences"
+	CurrentSeqTable   = "projections.current_sequences"
 	locksTable        = "projections.locks"
 	failedEventsTable = "projections.failed_events"
 )
@@ -27,7 +26,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 			RetryFailedAfter: config.RetryFailedAfter.Duration,
 		},
 		Client:            sqlClient,
-		SequenceTable:     currentSeqTable,
+		SequenceTable:     CurrentSeqTable,
 		LockTable:         locksTable,
 		FailedEventsTable: failedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
@@ -35,7 +34,8 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	}
 
 	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
-	owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
+	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
+	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	NewProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
 	NewProjectRoleProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles"]))
