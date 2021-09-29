@@ -298,7 +298,10 @@ Errors:
   AuthRequest:
     NotFound: AuthRequest konnte nicht gefunden werden
     UserAgentNotCorresponding: User Agent stimmt nicht überein
+    UserAgentNotFound: User Agent ID nicht gefunden
+    TokenNotFound: Token nicht gefunden
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
+    MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     Inactive: Benutzer ist inaktiv

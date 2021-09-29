@@ -79,21 +79,54 @@ $lgn-alternative-light-brand: (
     )
 );
   
-$lgn-alternative-warn: (
-    50: #ffebee,
-    100: #ffcdd2,
-    200: #ef9a9a,
-    300: #e57373,
-    400: #ef5350,
-    500: #f44336,
-    600: #e53935,
-    700: #d32f2f,
-    800: #c62828,
-    900: #b71c1c,
-    A100: #ff8a80,
-    A200: #ff5252,
-    A400: #ff1744,
-    A700: #d50000,
+$lgn-alternative-light-warn: (
+    50: #F9E8EB,
+    100: #F0C5CC,
+    200: #E69EAB,
+    300: #DC7789,
+    400: #D55A6F,
+    500: #CD3D56,
+    600: #C8374F,
+    700: #C12F45,
+    800: #BA273C,
+    900: #AE1A2B,
+    A100: #FFE4E6,
+    A200: #FFB1B9,
+    A400: #FF7E8B,
+    A700: #FF6474,
+    contrast: (
+        50: $dark-text,
+        100: $dark-text,
+        200: $dark-text,
+        300: $dark-text,
+        400: $dark-text,
+        500: $light-text,
+        600: $light-text,
+        700: $light-text,
+        800: $light-text,
+        900: $light-text,
+        A100: $dark-text,
+        A200: $light-text,
+        A400: $light-text,
+        A700: $light-text,
+    )
+);
+
+$lgn-alternative-dark-warn: (
+    50: #FFE7EB,
+    100: #FFC4CE,
+    200: #FF9DAD,
+    300: #FF768C,
+    400: #FF5874,
+    500: #FF3B5B,
+    600: #FF3553,
+    700: #FF2D49,
+    800: #FF2640,
+    900: #FF192F,
+    A100: #FFFFFF,
+    A200: #FFFDFD,
+    A400: #FFCACE,
+    A700: #FFB1B7,
     contrast: (
         50: $dark-text,
         100: $dark-text,
@@ -114,11 +147,11 @@ $lgn-alternative-warn: (
 
 $light-primary: lgn-palette($lgn-alternative-light-brand);
 $light-accent: lgn-palette($lgn-alternative-light-brand);
-$light-warn: lgn-palette($lgn-alternative-warn);
+$light-warn: lgn-palette($lgn-alternative-light-warn);
 
 $dark-primary: lgn-palette($lgn-alternative-dark-brand);
 $dark-accent: lgn-palette($lgn-alternative-dark-brand);
-$dark-warn: lgn-palette($lgn-alternative-warn);
+$dark-warn: lgn-palette($lgn-alternative-dark-warn);
 
 $light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
 $dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);

@@ -10,7 +10,6 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
-
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
@@ -21,6 +20,7 @@ import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
+
 
 @Component({
   selector: 'app-root',
@@ -242,8 +242,8 @@ export class AppComponent implements OnDestroy {
       const darkPrimary = '#5282c1';
       const lightPrimary = '#5282c1';
 
-      const darkWarn = '#F44336';
-      const lightWarn = '#F44336';
+      const darkWarn = '#cd3d56';
+      const lightWarn = '#cd3d56';
 
       const darkBackground = '#212224';
       const lightBackground = '#fafafa';
@@ -267,8 +267,8 @@ export class AppComponent implements OnDestroy {
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
 
-        const darkWarn = this.labelpolicy?.warnColorDark || '#F44336';
-        const lightWarn = this.labelpolicy?.warnColor || '#F44336';
+        const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
+        const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
         const darkBackground = this.labelpolicy?.backgroundColorDark || '#212224';
         const lightBackground = this.labelpolicy?.backgroundColor || '#fafafa';
@@ -307,7 +307,7 @@ export class AppComponent implements OnDestroy {
     this.orgLoading$.next(true);
     this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
       map(resp => {
-        return resp.resultList;
+        return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
       }),
       catchError(() => of([])),
       finalize(() => {

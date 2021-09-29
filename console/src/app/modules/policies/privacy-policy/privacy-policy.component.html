@@ -4,11 +4,8 @@
 
   <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
-  <cnsl-info-section class="warn"
-    *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) == false"
-    type="WARN">
-    {{'FEATURES.NOTAVAILABLE' | translate: ({value:
-    'privacy_policy'})}}
+  <cnsl-info-section *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'privacy_policy'})"></span>
   </cnsl-info-section>
 
   <div class="divider"></div>

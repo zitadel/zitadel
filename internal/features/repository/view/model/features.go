@@ -46,6 +46,8 @@ type FeaturesView struct {
 	MetadataUser             bool          `json:"metadataUser" gorm:"column:metadata_user"`
 	CustomTextMessage        bool          `json:"customTextMessage" gorm:"column:custom_text_message"`
 	CustomTextLogin          bool          `json:"customTextLogin" gorm:"column:custom_text_login"`
+	LockoutPolicy            bool          `json:"lockoutPolicy" gorm:"column:lockout_policy"`
+	Actions                  bool          `json:"actions" gorm:"column:actions"`
 }
 
 func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
@@ -74,6 +76,8 @@ func FeaturesToModel(features *FeaturesView) *features_model.FeaturesView {
 		MetadataUser:             features.MetadataUser,
 		CustomTextMessage:        features.CustomTextMessage,
 		CustomTextLogin:          features.CustomTextLogin,
+		LockoutPolicy:            features.LockoutPolicy,
+		Actions:                  features.Actions,
 	}
 }
 

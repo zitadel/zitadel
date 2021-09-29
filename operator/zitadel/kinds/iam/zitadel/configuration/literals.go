@@ -111,6 +111,9 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_MULTI_DELETE"] = strconv.FormatBool(desired.AssetStorage.MultiDelete)
 		}
+		if desired.Proxy != nil {
+			literalsConfigMap["NO_PROXY"] = strings.Join(desired.Proxy.NoProxy, ",")
+		}
 	}
 
 	sentryEnv, _, doIngest := mntr.Environment()
@@ -180,6 +183,8 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 				literalsSecretVars["ZITADEL_TWILIO_SID"] = value
 			}
 		}
+		literalsSecretVars["ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID"] = ""
+		literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = ""
 		if desired.AssetStorage != nil {
 			as := desired.AssetStorage
 			if as.AccessKeyID != nil || as.ExistingAccessKeyID != nil {
@@ -195,6 +200,24 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 					return nil, err
 				}
 				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
+			}
+		}
+		literalsSecretVars["HTTP_PROXY"] = ""
+		literalsSecretVars["HTTPS_PROXY"] = ""
+		if desired.Proxy != nil {
+			if desired.Proxy.HTTP != nil || desired.Proxy.ExistingHTTP != nil {
+				value, err := read.GetSecretValue(k8sClient, desired.Proxy.HTTP, desired.Proxy.ExistingHTTP)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["HTTP_PROXY"] = value
+			}
+			if desired.Proxy.HTTPS != nil || desired.Proxy.ExistingHTTPS != nil {
+				value, err := read.GetSecretValue(k8sClient, desired.Proxy.HTTPS, desired.Proxy.ExistingHTTPS)
+				if err != nil {
+					return nil, err
+				}
+				literalsSecretVars["HTTPS_PROXY"] = value
 			}
 		}
 

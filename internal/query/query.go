@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"database/sql"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -10,6 +11,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/caos/zitadel/internal/repository/action"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
@@ -22,6 +24,8 @@ type Queries struct {
 	eventstore   *eventstore.Eventstore
 	idGenerator  id.Generator
 	secretCrypto crypto.Crypto
+
+	client *sql.DB
 }
 
 type Config struct {
@@ -29,26 +33,32 @@ type Config struct {
 }
 
 func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
+	sqlClient, err := projections.CRDB.Start()
+	if err != nil {
+		return nil, err
+	}
+
 	repo = &Queries{
 		iamID:       defaults.IamID,
 		eventstore:  es,
 		idGenerator: id.SonyFlakeGenerator,
+		client:      sqlClient,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
 	project.RegisterEventMappers(repo.eventstore)
+	action.RegisterEventMappers(repo.eventstore)
 
 	repo.secretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, err
 	}
 
-	// turned off for this release
-	// err = projection.Start(ctx, es, projections)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err = projection.Start(ctx, es, projections)
+	if err != nil {
+		return nil, err
+	}
 
 	return repo, nil
 }

@@ -23,6 +23,7 @@ const (
 	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
 	AudSuffix             = ":aud"
+	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
 )
 
 type AuthRequestOIDC struct {

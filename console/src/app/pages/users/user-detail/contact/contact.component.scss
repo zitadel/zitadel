@@ -36,7 +36,7 @@
         }
 
         &.notverified {
-          color: #ff4436;
+          color: var(--warn);
           margin-right: 1rem;
         }
       }

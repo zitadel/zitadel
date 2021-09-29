@@ -3,8 +3,28 @@
 
   .meta-details {
     margin-bottom: 1rem;
-    border-bottom: 1px solid #81868a40;
     padding-bottom: 1rem;
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      margin: .5rem 0;
+
+      .title {
+        font-size: 14px;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      .edit {
+        font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+    }
 
     .meta-row {
       display: flex;

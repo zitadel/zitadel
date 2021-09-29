@@ -23,7 +23,6 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
   @Input() public service!: ManagementService | AdminService;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-
   public lockoutForm!: FormGroup;
   public lockoutData!: LockoutPolicy.AsObject;
   private sub: Subscription = new Subscription();

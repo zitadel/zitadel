@@ -264,6 +264,17 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
@@ -296,6 +307,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					CustomTextLogin:          false,
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
+					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -450,6 +463,17 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
@@ -486,6 +510,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -647,6 +674,17 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
@@ -686,6 +724,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -854,6 +895,17 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
@@ -896,6 +948,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -1116,6 +1171,17 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
@@ -1147,6 +1213,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
 							),
 							eventFromEventPusher(
+								org.NewLockoutPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
 							),
 						},
@@ -1172,6 +1241,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					LabelPolicyWatermark:     false,
 					CustomDomain:             false,
 					MetadataUser:             false,
+					PrivacyPolicy:            false,
+					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -1307,6 +1379,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							user.NewMetadataSetEvent(
 								context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
@@ -1315,6 +1397,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1349,6 +1432,8 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					CustomTextLogin:          false,
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
+					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -1551,6 +1636,17 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLockoutPolicyAddedEvent(
+								context.Background(),
+								&iam.NewAggregate().Aggregate,
+								5,
+								false,
+							),
+						),
+					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
