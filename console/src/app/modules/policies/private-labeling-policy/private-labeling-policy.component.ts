@@ -98,7 +98,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private storage: StorageService,
     private themeService: ThemeService,
   ) {
-    const org: Org.AsObject | null = (this.storage.getItem(StorageKey.organization, StorageLocation.local));
+    const org: Org.AsObject | null = (this.storage.getItem(StorageKey.organization, StorageLocation.session));
 
     if (org) {
       this.org = org;

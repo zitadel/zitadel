@@ -55,7 +55,7 @@ export class FeaturesComponent implements OnDestroy {
     private subService: SubscriptionService,
     private dialog: MatDialog,
   ) {
-    const temporg: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.local);
+    const temporg: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
 
     if (temporg) {
       this.org = temporg;

@@ -105,12 +105,12 @@ export class OwnedProjectGridComponent implements OnChanges {
   }
 
   private async getPrefixedItem(key: string): Promise<string | null> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local) as Org.AsObject;
+    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     return localStorage.getItem(`${org.id}:${key}`);
   }
 
   private async setPrefixedItem(key: string, value: any): Promise<void> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local) as Org.AsObject;
+    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     return localStorage.setItem(`${org.id}:${key}`, value);
   }
 

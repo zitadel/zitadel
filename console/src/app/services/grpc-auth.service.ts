@@ -187,7 +187,9 @@ export class GrpcAuthService {
   }
 
   public setActiveOrg(org: Org.AsObject): void {
+    // Set organization in localstorage to get the last used organization in a new tab
     this.storage.setItem(StorageKey.organization, org, StorageLocation.local);
+    this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
     this._activeOrgChanged.next(org);
   }
 

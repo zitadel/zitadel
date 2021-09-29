@@ -38,7 +38,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     private injector: Injector,
     private adminService: AdminService,
   ) {
-    const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.local) as Org.AsObject;
+    const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     if (temporg) {
       this.org = temporg;
     }

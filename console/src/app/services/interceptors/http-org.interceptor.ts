@@ -17,7 +17,7 @@ export abstract class HttpOrgInterceptor implements HttpInterceptor {
     private storageService: StorageService,
     protected oauthModuleConfig: OAuthModuleConfig,
   ) {
-    const org: Org.AsObject | null = (this.storageService.getItem(StorageKey.organization, StorageLocation.local));
+    const org: Org.AsObject | null = (this.storageService.getItem(StorageKey.organization, StorageLocation.session));
 
     if (org) {
       this.org = org;

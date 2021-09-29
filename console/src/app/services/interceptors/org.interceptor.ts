@@ -13,7 +13,7 @@ export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInt
   public intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
     const metadata = request.getMetadata();
 
-    const org: Org.AsObject | null = (this.storageService.getItem(StorageKey.organization, StorageLocation.local));
+    const org: Org.AsObject | null = (this.storageService.getItem(StorageKey.organization, StorageLocation.session));
 
     if (org) {
       metadata[ORG_HEADER_KEY] = `${org.id}`;
@@ -23,7 +23,7 @@ export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInt
       return response;
     }).catch((error: any) => {
       if (error.code === 7 && error.message.startsWith('Organisation doesn\'t exist')) {
-        this.storageService.removeItem(StorageKey.organization);
+        this.storageService.removeItem(StorageKey.organization, StorageLocation.session);
       }
       return Promise.reject(error);
     });

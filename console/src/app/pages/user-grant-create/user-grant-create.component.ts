@@ -94,7 +94,7 @@ export class UserGrantCreateComponent implements OnDestroy {
       }
     });
 
-    const temporg = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
+    const temporg = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session);
     if (temporg) {
       this.org = temporg;
     }
