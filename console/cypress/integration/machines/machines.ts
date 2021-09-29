@@ -18,9 +18,14 @@ describe('machine', () => {
         describe(`impersonating an organization manager with permission "${user}"`, () => {
 
             before(()=> {
-                cy.ssoLogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`, Cypress.env(`${user.toLowerCase()}_password`))
-                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
-                cy.get("app-refresh-table")
+                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`, Cypress.env(`${user.toLowerCase()}_password`))
+//                cy.ssoLogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`, Cypress.env(`${user.toLowerCase()}_password`))
+//                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
+//                cy.get("app-refresh-table")
+            })
+
+            it.only('debug', () => {
+
             })
 
             describe(`as user ${user}`, () => {

@@ -49,6 +49,8 @@ async function login(loginUrl: string, callbackUrl: string, username: string, pa
       throw new Error(`'Login with user ${username} failed, error ${response.status()}`);
     }
 
+    console.log(response.url())
+
     // Redirected to MFA/consent/... which is not implemented yet.
     const url = response.url();
     if (url.indexOf(callbackUrl) !== 0) {
