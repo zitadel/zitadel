@@ -1,0 +1,22 @@
+kind: databases.caos.ch/Orb
+version: v0
+spec:
+  verbose: false
+  version: SHA-2be0fa2cf208
+  selfReconciling: true
+database:
+  kind: databases.caos.ch/CockroachDB
+  version: v0
+  spec:
+    verbose: true
+    replicaCount: 1
+    storageCapacity: 50Gi
+    storageClass: fast
+    clusterDNS: cluster.dev
+    resources:
+      limits:
+        cpu: 1400m
+        memory: 6Gi
+      requests:
+        cpu: 1400m
+        memory: 6Gi

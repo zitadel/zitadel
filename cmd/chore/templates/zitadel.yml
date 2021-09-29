@@ -1,0 +1,109 @@
+kind: zitadel.caos.ch/Orb
+version: v0
+spec:
+  verbose: false
+  version: SHA-e64b280faa17
+  selfReconciling: true
+iam:
+  kind: zitadel.caos.ch/ZITADEL
+  version: v0
+  spec:
+    verbose: false
+    force: false
+    replicaCount: 1
+    configuration:
+      tracing:
+        serviceAccountJSON: null
+        projectID: zitadel-dev
+        fraction: "0.1"
+      cache:
+        maxAge: 12h
+        sharedMaxAge: 168h
+        shortMaxAge: 5m
+        shortSharedMaxAge: 15m
+      secrets:
+        keys: null
+        userVerificationID: UserVerificationKey_1
+        otpVerificationID: OTPVerificationKey_1
+        oidcKeysID: OIDCKey_1
+        cookieID: CookieKey_1
+        csrfID: CookieKey_1
+        domainVerificationID: DomainVerificationKey_1
+        idpConfigVerificationID: IdpConfigVerificationKey_1
+      notifications:
+        googleChatURL: null
+        email:
+          smtpHost: smtp.gmail.com:465
+          smtpUser: zitadel@caos.ch
+          senderAddress: noreply@caos.ch
+          senderName: CAOS AG
+          tls: true
+          appKey: null
+        twilio:
+          senderName: CAOS AG
+          authToken: null
+          sid: null
+      debugMode: false
+      logLevel: info
+      migrateEventstoreV1: false
+      dns:
+        domain: orbos.io
+        tlsSecret: tls-cert-wildcard
+        acmeAuthority: ""
+        subdomains:
+          accounts: accounts
+          api: api
+          console: console
+          issuer: issuer
+          subscription: ""
+      clusterdns: cluster.dev
+      assetStorage:
+        type: s3
+        endpoint: minio.caos-zitadel:80
+        accessKeyID: null
+        secretAccessKey: null
+        location: us-east-1
+        bucketPrefix: zitadel-dev-assets
+        ssl: false
+      sentry: {}
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - ZITADEL
+            topologyKey: kubernetes.io/hostname
+    backups:
+      s3bucket:
+        kind: zitadel.caos.ch/S3Backup
+        version: v0
+        spec:
+          verbose: true
+          cron: 0 * * * *
+         bucket: zitadel-dev-backups
+          endpoint: minio.caos-zitadel:80
+          region: europe-west6
+          accessKeyID: null
+          secretAccessKey: null
+      bucket:
+        kind: zitadel.caos.ch/BucketBackup
+        version: v0
+        spec:
+          verbose: true
+          cron: 0 0 0 1 1 ? 2200
+          bucket: caos-backups-test
+         serviceAccountJSON: null
+      csbucket:
+        kind: zitadel.caos.ch/S3Backup
+        version: v0
+        spec:
+          verbose: true
+          cron: 0 * * * *
+          bucket: backup-stefan-orbos-gce
+          endpoint: https://objects.lpg.cloudscale.ch
+          region: LPG
+          accessKeyID: null
+          secretAccessKey: null

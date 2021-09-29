@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 )
 
-func BuildExecutables(debug, hostBinsOnly bool) error {
+func BuildExecutables(debug bool) error {
 
 	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
 	outBuf := new(bytes.Buffer)
@@ -28,42 +27,25 @@ func BuildExecutables(debug, hostBinsOnly bool) error {
 		return err
 	}
 
-	commit := strings.TrimSpace(outBuf.String())
-
-	files, err := filepath.Glob("./cmd/chore/gen-executables/*.go")
-	if err != nil {
-		panic(err)
-	}
-	args := []string{"run", "-race"}
-	args = append(args, files...)
+	args := []string{"build", "-a"}
 	args = append(args,
-		"--version", version,
-		"--commit", commit,
-		"--githubclientid", os.Getenv("GITHUBOAUTHCLIENTID"),
-		"--githubclientsecret", os.Getenv("GITHUBOAUTHCLIENTSECRET"),
-		"--orbctl", "./artifacts",
-		"--dev",
+		"-installsuffix cgo",
+		"-ldflags \"-extldflags -static -X main.Version="+version+" -X main.githubClientID="+os.Getenv("GITHUBOAUTHCLIENTID")+" -X main.githubClientSecret="+os.Getenv("GITHUBOAUTHCLIENTSECRET")+"}\"",
+		"-o", "./artifacts/zitadelctl",
+		"./cmd/zitadelctl/main.go",
 	)
 	if debug {
 		args = append(args, "--debug")
 	}
-	if hostBinsOnly {
-		args = append(args, "--host-bins-only")
-	}
+
 	cmd = exec.Command("go", args...)
 	cmd.Stdout = os.Stderr
 	// gen-executables
-	if err := run(cmd); err != nil || hostBinsOnly {
+	if err := run(cmd); err != nil {
 		// error contains --githubclientid and --githubclientsecret values
 		return errors.New("building executables failed")
 	}
 
-	files, err = filepath.Glob("./cmd/chore/gen-charts/*.go")
-	if err != nil {
-		panic(err)
-	}
-	args = []string{"build", "-o", "./artifacts/gen-charts"}
-	args = append(args, files...)
 	cmd = exec.Command("go", args...)
 	cmd.Stdout = os.Stderr
 	cmd.Env = []string{"CGO_ENABLED=0", "GOOS=linux"}
