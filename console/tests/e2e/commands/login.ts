@@ -1,11 +1,11 @@
 import { expect, Page } from '@playwright/test';
-import { API_CALLS_DOMAIN, CONSOLE_URL } from '../playwright.config'
+import { E2E_API_CALLS_DOMAIN, E2E_CONSOLE_URL } from '../playwright.config'
 import { User } from '../models/users';
 
 export async function login(page: Page, user: User) {
 
   // Open login page
-  await page.goto(CONSOLE_URL);
+  await page.goto(E2E_CONSOLE_URL);
 
   // Fill username field
   await page.fill('[placeholder="username@domain"]', user.username);
@@ -16,7 +16,7 @@ export async function login(page: Page, user: User) {
     page.click('text=next'),
   ])
 
-  await expect(page).toHaveURL(`https://accounts.${API_CALLS_DOMAIN}/loginname`);
+  await expect(page).toHaveURL(`https://accounts.${E2E_API_CALLS_DOMAIN}/loginname`);
 
   // Fill password field
   await page.fill('input[name="password"]', user.password);

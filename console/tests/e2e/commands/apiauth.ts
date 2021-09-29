@@ -1,4 +1,4 @@
-import { API_CALLS_DOMAIN, SERVICEACCOUNT_KEY, ZITADEL_PROJECT_RESOURCE_ID } from "../playwright.config"
+import { E2E_API_CALLS_DOMAIN, E2E_SERVICEACCOUNT_KEY } from "../playwright.config"
 import { sign } from 'jsonwebtoken'
 import fetch from 'node-fetch'
 import { checkStatus } from "../fetch/status";
@@ -10,13 +10,13 @@ export interface APICallProperties {
 
 export async function prepareAPICalls(): Promise<APICallProperties> {
 
-    const apiBaseURL = `https://api.${API_CALLS_DOMAIN}`
+    const apiBaseURL = `https://api.${E2E_API_CALLS_DOMAIN}`
 
     // TODO: Why can't I just receive the correct value with process.env.ZITADEL_PROJECT_RESOURCE_ID
     // zitadelProjectResourceID = ZITADEL_PROJECT_RESOURCE_ID
-    var zitadelProjectResourceID = API_CALLS_DOMAIN == 'zitadel.ch' ? '69234237810729019' : '70669147545070419'
+    var zitadelProjectResourceID = E2E_API_CALLS_DOMAIN == 'zitadel.ch' ? '69234237810729019' : '70669147545070419'
 
-    var key = JSON.parse(SERVICEACCOUNT_KEY)
+    var key = JSON.parse(E2E_SERVICEACCOUNT_KEY)
 
     var now = new Date().getTime()
     var iat = Math.floor(now / 1000)
@@ -24,7 +24,7 @@ export async function prepareAPICalls(): Promise<APICallProperties> {
     var bearerToken = sign({
         iss: key.userId,
         sub: key.userId,
-        aud: `https://issuer.${API_CALLS_DOMAIN}`,
+        aud: `https://issuer.${E2E_API_CALLS_DOMAIN}`,
         iat: iat,
         exp: exp
     }, key.key, {
