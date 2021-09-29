@@ -11,7 +11,7 @@ import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component
 @Component({
   selector: 'cnsl-login-policy-idps',
   templateUrl: './login-policy-idps.component.html',
-  styleUrls: ['./login-policy-idps.component.scss']
+  styleUrls: ['./login-policy-idps.component.scss'],
 })
 export class LoginPolicyIdpsComponent implements OnInit {
   @Input() public disabled: boolean = true;

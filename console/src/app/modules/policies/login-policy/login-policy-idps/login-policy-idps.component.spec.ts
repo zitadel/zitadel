@@ -8,9 +8,9 @@ describe('LoginPolicyIdpsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LoginPolicyIdpsComponent ]
+      declarations: [LoginPolicyIdpsComponent],
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
