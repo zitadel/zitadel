@@ -1,0 +1,94 @@
+package chore_test
+
+import "gopkg.in/yaml.v3"
+
+type pods struct {
+	Items []struct {
+		Metadata struct {
+			Name string
+		}
+		Status struct {
+			Conditions []struct {
+				Type   string
+				Status string
+			}
+		}
+	}
+}
+
+func countCompletedPods(kubectl kubectlCmd, selector string) (readyPodsCount int8) {
+	pods, err := getPodsWithSelector(kubectl, selector)
+	if err != nil {
+		return -1
+	}
+	return countReady(pods)
+}
+
+func countReadyPods(kubectl kubectlCmd, selector string) (readyPodsCount int8) {
+	pods, err := getPodsWithSelector(kubectl, selector)
+	if err != nil {
+		return -1
+	}
+	return countReady(pods)
+}
+
+func getPodsWithSelector(kubectl kubectlCmd, selector string) (pods, error) {
+	pods := pods{}
+	args := []string{
+		"get", "pods",
+		"--namespace", "caos-system",
+		"--output", "yaml",
+	}
+
+	if selector != "" {
+		args = append(args, "--selector", selector)
+	}
+
+	cmd := kubectl(args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return pods, err
+	}
+
+	if err := yaml.Unmarshal(out, &pods); err != nil {
+		return pods, err
+	}
+	return pods, nil
+}
+
+func countReady(pods pods) int8 {
+	readyPodsCount := int8(0)
+	for i := range pods.Items {
+		pod := pods.Items[i]
+		for j := range pod.Status.Conditions {
+			condition := pod.Status.Conditions[j]
+			if condition.Type != "Ready" {
+				continue
+			}
+			if condition.Status == "True" {
+				readyPodsCount++
+				break
+			}
+		}
+	}
+
+	return readyPodsCount
+}
+
+func countCompleted(pods pods) int8 {
+	completedPodsCount := int8(0)
+	for i := range pods.Items {
+		pod := pods.Items[i]
+		for j := range pod.Status.Conditions {
+			condition := pod.Status.Conditions[j]
+			if condition.Type != "Completed" {
+				continue
+			}
+			if condition.Status == "True" {
+				completedPodsCount++
+				break
+			}
+		}
+	}
+	return completedPodsCount
+}

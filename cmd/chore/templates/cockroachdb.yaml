@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cockroachdb-connect
+  namespace: caos-zitadel
+  labels:
+    app.kubernetes.io/name: cockroach-connect
+spec:
+  backoffLimit: 3
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+        - command:
+            - /bin/bash
+            - -c
+            - |-
+              cockroach sql --certs-dir=/cockroach/cockroach-certs --host=cockroachdb-public --port=26257 -e "SHOW DATABASES;"
+          image: ghcr.io/caos/zitadel-crbackup:%s
+          imagePullPolicy: Always
+          name: bucket
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /cockroach/cockroach-certs
+              name: client-certs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: client-certs
+          secret:
+            defaultMode: 256
+            secretName: cockroachdb.client.root

@@ -10,7 +10,7 @@ database:
   spec:
     verbose: true
     replicaCount: 1
-    storageCapacity: 50Gi
+    storageCapacity: 5Gi
     storageClass: fast
     clusterDNS: cluster.dev
     resources:
