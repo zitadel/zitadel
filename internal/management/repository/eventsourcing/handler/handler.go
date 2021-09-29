@@ -44,8 +44,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			defaults.IamID),
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
-		newOrg(
-			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newOrgMember(
 			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
 		newOrgDomain(

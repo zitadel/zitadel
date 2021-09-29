@@ -12,12 +12,11 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
-	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -306,18 +305,6 @@ func (repo *UserRepo) GetMyMetadataByKey(ctx context.Context, key string) (*doma
 		return nil, err
 	}
 	return iam_model.MetadataViewToDomain(data), nil
-}
-
-func (repo *UserRepo) OrgByUserID(ctx context.Context, userID string) (*domain.Org, error) {
-	user, err := repo.View.UserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-	org, err := repo.View.OrgByID(user.ResourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	return org_model.OrgToDomain(org), nil
 }
 
 func (repo *UserRepo) SearchUserMetadata(ctx context.Context, userID string) (*domain.MetadataSearchResponse, error) {

@@ -376,6 +376,10 @@ Errors:
     WrongTriggerType: TriggerType is invalid
     NoChanges: No Changes
     ActionIDsNotExist: ActionIDs do not exist
+  Query:
+    CloseRows: SQL Statement could not be finished
+    SQLStatement: SQL Statement coud not be created
+    InvalidRequest: Request is invalid
 EventTypes:
   user:
     added: User added

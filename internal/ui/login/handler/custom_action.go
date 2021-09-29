@@ -4,20 +4,32 @@ import (
 	"context"
 
 	"github.com/caos/oidc/pkg/oidc"
+
 	"github.com/caos/zitadel/internal/actions"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
-func (l *Login) customExternalUserMapping(user *domain.ExternalUser, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.ExternalUser, error) {
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication)
+func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.ExternalUser, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.ExternalUser, error) {
+	resourceOwner := req.RequestedOrgID
+	if resourceOwner == "" {
+		resourceOwner = config.AggregateID
+	}
+	if resourceOwner == domain.IAMID {
+		iam, err := l.authRepo.GetIAM(ctx)
+		if err != nil {
+			return nil, err
+		}
+		resourceOwner = iam.GlobalOrgID
+	}
+	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	ctx := (&actions.Context{}).SetToken(tokens)
+	actionCtx := (&actions.Context{}).SetToken(tokens)
 	api := (&actions.API{}).SetExternalUser(user).SetMetadata(&user.Metadatas)
 	for _, a := range triggerActions {
-		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
 		if err != nil {
 			return nil, err
 		}
@@ -25,15 +37,15 @@ func (l *Login) customExternalUserMapping(user *domain.ExternalUser, tokens *oid
 	return user, err
 }
 
-func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata) (*domain.Human, []*domain.Metadata, error) {
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation)
+func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata, resourceOwner string) (*domain.Human, []*domain.Metadata, error) {
+	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
-	ctx := (&actions.Context{}).SetToken(tokens)
+	actionCtx := (&actions.Context{}).SetToken(tokens)
 	api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
 	for _, a := range triggerActions {
-		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -41,16 +53,16 @@ func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens 
 	return user, metadata, err
 }
 
-func (l *Login) customGrants(userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) ([]*domain.UserGrant, error) {
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation)
+func (l *Login) customGrants(userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, resourceOwner string) ([]*domain.UserGrant, error) {
+	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	ctx := (&actions.Context{}).SetToken(tokens)
+	actionCtx := (&actions.Context{}).SetToken(tokens)
 	actionUserGrants := make([]actions.UserGrant, 0)
 	api := (&actions.API{}).SetUserGrants(&actionUserGrants)
 	for _, a := range triggerActions {
-		err = actions.Run(ctx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
 		if err != nil {
 			return nil, err
 		}

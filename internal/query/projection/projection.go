@@ -2,25 +2,21 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/query/projection/flow"
 )
 
 const (
-	currentSeqTable   = "projections.current_sequences"
+	CurrentSeqTable   = "projections.current_sequences"
 	locksTable        = "projections.locks"
 	failedEventsTable = "projections.failed_events"
 )
 
-func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error {
-	sqlClient, err := config.CRDB.Start()
-	if err != nil {
-		return err
-	}
-
+func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config) error {
 	projectionConfig := crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
@@ -30,19 +26,18 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 			RetryFailedAfter: config.RetryFailedAfter.Duration,
 		},
 		Client:            sqlClient,
-		SequenceTable:     currentSeqTable,
+		SequenceTable:     CurrentSeqTable,
 		LockTable:         locksTable,
 		FailedEventsTable: failedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
 		BulkLimit:         config.BulkLimit,
 	}
 
-	// turned off for this release
-	//NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
+	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	//NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
 	//owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
 	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
-	flow.NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
+	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	return nil
 }
 
@@ -61,4 +56,21 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	}
 
 	return config
+}
+
+func iteratorPool(workerCount int) chan func() {
+	if workerCount <= 0 {
+		return nil
+	}
+
+	queue := make(chan func())
+	for i := 0; i < workerCount; i++ {
+		go func() {
+			for iteration := range queue {
+				iteration()
+				time.Sleep(2 * time.Second)
+			}
+		}()
+	}
+	return queue
 }

@@ -25,7 +25,6 @@ import (
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -65,22 +64,6 @@ func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error
 	return repo.supportedLangs, nil
 }
 
-func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
-	org, err := repo.View.OrgByID(id)
-	if err != nil {
-		return nil, err
-	}
-	return model.OrgToModel(org), nil
-}
-
-func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
-	verifiedDomain, err := repo.View.VerifiedOrgDomain(domain)
-	if err != nil {
-		return nil, err
-	}
-	return repo.OrgByID(ctx, verifiedDomain.OrgID)
-}
-
 func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
 	policy, err := repo.View.OrgIAMPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
@@ -93,7 +76,7 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.Or
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.OrgIAMViewToModel(policy), err
+	return iam_view_model.OrgIAMViewToModel(policy), err
 }
 
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
@@ -233,7 +216,7 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.Label
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+	return iam_view_model.LabelPolicyViewToModel(policy), err
 }
 
 func (repo *OrgRepository) GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
@@ -248,7 +231,7 @@ func (repo *OrgRepository) GetPreviewLabelPolicy(ctx context.Context) (*iam_mode
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+	return iam_view_model.LabelPolicyViewToModel(policy), err
 }
 
 func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
@@ -265,7 +248,7 @@ func (repo *OrgRepository) getDefaultLabelPolicy(ctx context.Context, state doma
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LabelPolicyView)
+		policy = new(iam_view_model.LabelPolicyView)
 	}
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -273,16 +256,16 @@ func (repo *OrgRepository) getDefaultLabelPolicy(ctx context.Context, state doma
 	}
 	if esErr != nil {
 		logging.Log("EVENT-28uLp").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LabelPolicyViewToModel(policy), nil
+		return iam_view_model.LabelPolicyViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LabelPolicyViewToModel(policy), nil
+			return iam_view_model.LabelPolicyViewToModel(policy), nil
 		}
 	}
 	policy.Default = true
-	return iam_es_model.LabelPolicyViewToModel(policy), nil
+	return iam_view_model.LabelPolicyViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
@@ -291,7 +274,7 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LoginPolicyView)
+		policy = new(iam_view_model.LoginPolicyView)
 	}
 	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -299,15 +282,15 @@ func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.Login
 	}
 	if esErr != nil {
 		logging.Log("EVENT-38iTr").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LoginPolicyViewToModel(policy), nil
+		return iam_view_model.LoginPolicyViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LoginPolicyViewToModel(policy), nil
+			return iam_view_model.LoginPolicyViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.LoginPolicyViewToModel(policy), nil
+	return iam_view_model.LoginPolicyViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
@@ -324,7 +307,7 @@ func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LoginPolicyView)
+		policy = new(iam_view_model.LoginPolicyView)
 	}
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -332,16 +315,16 @@ func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_mode
 	}
 	if esErr != nil {
 		logging.Log("EVENT-28uLp").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LoginPolicyViewToModel(policy), nil
+		return iam_view_model.LoginPolicyViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LoginPolicyViewToModel(policy), nil
+			return iam_view_model.LoginPolicyViewToModel(policy), nil
 		}
 	}
 	policy.Default = true
-	return iam_es_model.LoginPolicyViewToModel(policy), nil
+	return iam_view_model.LoginPolicyViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
@@ -368,7 +351,7 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Result:      iam_es_model.IDPProviderViewsToModel(providers),
+		Result:      iam_view_model.IDPProviderViewsToModel(providers),
 	}
 	if sequenceErr == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -405,7 +388,7 @@ func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*ia
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordComplexityPolicyView)
+		policy = new(iam_view_model.PasswordComplexityPolicyView)
 	}
 	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -413,15 +396,15 @@ func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*ia
 	}
 	if esErr != nil {
 		logging.Log("EVENT-1Bx8s").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordComplexityViewToModel(policy), nil
+		return iam_view_model.PasswordComplexityViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordComplexityViewToModel(policy), nil
+			return iam_view_model.PasswordComplexityViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.PasswordComplexityViewToModel(policy), nil
+	return iam_view_model.PasswordComplexityViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
@@ -430,7 +413,7 @@ func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordComplexityPolicyView)
+		policy = new(iam_view_model.PasswordComplexityPolicyView)
 	}
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -438,16 +421,16 @@ func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Contex
 	}
 	if esErr != nil {
 		logging.Log("EVENT-pL9sw").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordComplexityViewToModel(policy), nil
+		return iam_view_model.PasswordComplexityViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordComplexityViewToModel(policy), nil
+			return iam_view_model.PasswordComplexityViewToModel(policy), nil
 		}
 	}
 	policy.Default = true
-	return iam_es_model.PasswordComplexityViewToModel(policy), nil
+	return iam_view_model.PasswordComplexityViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
@@ -456,7 +439,7 @@ func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordAgePolicyView)
+		policy = new(iam_view_model.PasswordAgePolicyView)
 	}
 	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -464,15 +447,15 @@ func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model
 	}
 	if esErr != nil {
 		logging.Log("EVENT-5Mx7s").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordAgeViewToModel(policy), nil
+		return iam_view_model.PasswordAgeViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordAgeViewToModel(policy), nil
+			return iam_view_model.PasswordAgeViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.PasswordAgeViewToModel(policy), nil
+	return iam_view_model.PasswordAgeViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
@@ -481,7 +464,7 @@ func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordAgePolicyView)
+		policy = new(iam_view_model.PasswordAgePolicyView)
 	}
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -489,16 +472,16 @@ func (repo *OrgRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*ia
 	}
 	if esErr != nil {
 		logging.Log("EVENT-3I90s").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordAgeViewToModel(policy), nil
+		return iam_view_model.PasswordAgeViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordAgeViewToModel(policy), nil
+			return iam_view_model.PasswordAgeViewToModel(policy), nil
 		}
 	}
 	policy.Default = true
-	return iam_es_model.PasswordAgeViewToModel(policy), nil
+	return iam_view_model.PasswordAgeViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
@@ -507,7 +490,7 @@ func (repo *OrgRepository) GetLockoutPolicy(ctx context.Context) (*iam_model.Loc
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LockoutPolicyView)
+		policy = new(iam_view_model.LockoutPolicyView)
 	}
 	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -515,15 +498,15 @@ func (repo *OrgRepository) GetLockoutPolicy(ctx context.Context) (*iam_model.Loc
 	}
 	if esErr != nil {
 		logging.Log("EVENT-mS9od").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LockoutViewToModel(policy), nil
+		return iam_view_model.LockoutViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LockoutViewToModel(policy), nil
+			return iam_view_model.LockoutViewToModel(policy), nil
 		}
 	}
-	return iam_es_model.LockoutViewToModel(policy), nil
+	return iam_view_model.LockoutViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
@@ -532,7 +515,7 @@ func (repo *OrgRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_mo
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LockoutPolicyView)
+		policy = new(iam_view_model.LockoutPolicyView)
 	}
 	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
@@ -540,16 +523,16 @@ func (repo *OrgRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_mo
 	}
 	if esErr != nil {
 		logging.Log("EVENT-2Ms9f").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LockoutViewToModel(policy), nil
+		return iam_view_model.LockoutViewToModel(policy), nil
 	}
 	policyCopy := *policy
 	for _, event := range events {
 		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LockoutViewToModel(policy), nil
+			return iam_view_model.LockoutViewToModel(policy), nil
 		}
 	}
 	policy.Default = true
-	return iam_es_model.LockoutViewToModel(policy), nil
+	return iam_view_model.LockoutViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
@@ -557,7 +540,7 @@ func (repo *OrgRepository) GetPrivacyPolicy(ctx context.Context) (*iam_model.Pri
 	if errors.IsNotFound(err) {
 		return repo.GetDefaultPrivacyPolicy(ctx)
 	}
-	return iam_es_model.PrivacyViewToModel(policy), nil
+	return iam_view_model.PrivacyViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
@@ -566,7 +549,7 @@ func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_mo
 		return nil, err
 	}
 	policy.Default = true
-	return iam_es_model.PrivacyViewToModel(policy), nil
+	return iam_view_model.PrivacyViewToModel(policy), nil
 }
 
 func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
@@ -575,7 +558,7 @@ func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_mod
 		return nil, err
 	}
 	template.Default = true
-	return iam_es_model.MailTemplateViewToModel(template), err
+	return iam_view_model.MailTemplateViewToModel(template), err
 }
 
 func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
@@ -590,7 +573,7 @@ func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.Mail
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTemplateViewToModel(template), err
+	return iam_view_model.MailTemplateViewToModel(template), err
 }
 
 func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
@@ -644,7 +627,7 @@ func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, 
 	if len(texts) == 0 {
 		return repo.GetDefaultMessageText(ctx, textType, lang)
 	}
-	return iam_es_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts), err
+	return iam_view_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
 func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
@@ -694,7 +677,7 @@ func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, lang string
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
+	return iam_view_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {

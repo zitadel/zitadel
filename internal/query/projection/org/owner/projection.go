@@ -16,15 +16,15 @@ import (
 )
 
 type OrgOwner struct {
-	OrgID             string        `col:"org_id"`
-	OrgName           string        `col:"org_name"`
-	OrgCreationDate   time.Time     `col:"org_creation_date"`
-	OwnerID           string        `col:"owner_id"`
-	OwnerLanguage     *language.Tag `col:"owner_language"`
-	OwnerEmailAddress string        `col:"owner_email"`
-	OwnerFirstName    string        `col:"owner_first_name"`
-	OwnerLastName     string        `col:"owner_last_name"`
-	OwnerGender       domain.Gender `col:"owner_gender"`
+	OrgID             string
+	OrgName           string
+	OrgCreationDate   time.Time
+	OwnerID           string
+	OwnerLanguage     *language.Tag
+	OwnerEmailAddress string
+	OwnerFirstName    string
+	OwnerLastName     string
+	OwnerGender       domain.Gender
 }
 
 type OrgOwnerProjection struct {
@@ -49,7 +49,7 @@ const (
 
 func NewOrgOwnerProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgOwnerProjection {
 	p := &OrgOwnerProjection{}
-	config.ProjectionName = "projections.org_owners"
+	config.ProjectionName = "zitadel.projections.org_owners"
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
