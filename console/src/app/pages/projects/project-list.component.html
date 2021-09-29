@@ -1,4 +1,9 @@
 <div class="enlarged-container" [ngSwitch]="type">
+    <h1>{{ 'PROJECT.PAGES.LIST' | translate }}</h1>
+    <p class="sub">{{ 'PROJECT.PAGES.LISTDESCRIPTION' | translate }}</p>
+
+    <h2>{{'PROJECT.PAGES.TYPE.GRANTED' | translate}}</h2>
+    
   <ng-container *ngSwitchCase="Type.TYPE_HUMAN">
       <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
       <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>

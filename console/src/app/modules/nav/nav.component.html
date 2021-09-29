@@ -103,7 +103,7 @@
                 </div>
             </a>
 
-            <!-- <a @navitem matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
+            <a @navitem matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
                 *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
                 class="nav-item" [routerLinkActive]="['active']"
                 [routerLink]="[ '/granted-projects']">
@@ -111,7 +111,7 @@
                     <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
                     <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
                 </div>
-            </a> -->
+            </a>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
@@ -120,11 +120,11 @@
               [routerLinkActiveOptions]="{ exact: true }">
               <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
           </a>
-            <!-- <a @navitem matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
+            <a @navitem matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
                 [routerLinkActive]="['active']" [routerLink]="[ '/users/list/machines']"
                 [routerLinkActiveOptions]="{ exact: true }">
                 <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
-            </a> -->
+            </a>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">

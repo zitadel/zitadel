@@ -126,7 +126,8 @@
       padding: 0 2rem;
       display: flex;
       align-items: center;
-      height: 40px;
+      flex-wrap: wrap;
+      min-height: 40px;
 
       .fill-space {
         flex: 1;
@@ -143,6 +144,7 @@
         text-decoration: none;
         border-radius: 50vw;
         font-weight: 500;
+        margin: .25rem 0;
 
         // i {
         //   opacity: .6;
@@ -161,8 +163,7 @@
 
         .c_label {
           .count {
-            padding: 3px 6px;
-            border-radius: 50vw;
+            margin-left: 6px;
           }
         }
       }
