@@ -33,7 +33,7 @@ Go to [Applications](./applications) for more details.
 To enable another organization to use a project, the organization needs a grant to the project.
 Only the selected roles will be available to the granted organization.
 
-The granted organization will be able to manage the authorization to his users for the granted project by himself in his own organization.
+The granted organization will be able to manage the authorizations of his users for the granted project by himself in his own organization.
 
 More about granted projects: [Granted Projects](./granted_projects)
 
