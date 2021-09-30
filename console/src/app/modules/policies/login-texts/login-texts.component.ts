@@ -59,6 +59,7 @@ const KeyNamesArray = [
   'passwordlessRegistrationDoneText',
   'passwordlessRegistrationText',
   'passwordlessText',
+  'externalRegistrationUserOverviewText'
 ];
 // tslint:enable
 

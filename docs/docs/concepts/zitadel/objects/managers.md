@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Managers
+title: Managers
 ---
 
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers.

@@ -38,11 +38,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "DELETE FROM zitadel.projections.project_grants WHERE (grant_id = $1) AND (project_id = $2)",
-					expectedArgs: []interface{}{
-						"grant-id",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_grants WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedArgs: []interface{}{
+								"grant-id",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -63,14 +66,17 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						domain.ProjectGrantStateActive,
-						"grant-id",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.ProjectGrantStateActive,
+								"grant-id",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -91,14 +97,17 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						domain.ProjectGrantStateInactive,
-						"grant-id",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.ProjectGrantStateInactive,
+								"grant-id",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -119,14 +128,17 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						pq.StringArray{"admin", "user"},
-						"grant-id",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								pq.StringArray{"admin", "user"},
+								"grant-id",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -146,9 +158,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				executer: &testExecuter{
-					shouldExec: false,
-				},
+				executer:         &testExecuter{},
 			},
 		},
 		{
@@ -167,19 +177,22 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "INSERT INTO zitadel.projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-					expectedArgs: []interface{}{
-						"grant-id",
-						"agg-id",
-						anyArg{},
-						anyArg{},
-						"ro-id",
-						domain.ProjectGrantStateActive,
-						uint64(15),
-						"granted-org-id",
-						pq.StringArray{"admin", "user"},
-						"editor-user",
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedArgs: []interface{}{
+								"grant-id",
+								"agg-id",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								domain.ProjectGrantStateActive,
+								uint64(15),
+								"granted-org-id",
+								pq.StringArray{"admin", "user"},
+								"editor-user",
+							},
+						},
 					},
 				},
 			},
