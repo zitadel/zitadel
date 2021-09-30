@@ -25,7 +25,7 @@ With the private labeling setting it is possible to choose which settings should
 ## Applications
 
 Applications define the different clients, that share the same roles. 
-For the moment only OIDC clients are supported. Soon JWT and SAML will follow.
+At the moment we support OIDC and almost every OAuth2 client. We'll be expanding this with SAML shortly.
 Go to [Applications](./applications) for more details.
 
 ## Granted Organizations
