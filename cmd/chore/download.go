@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 )
 
 func downloadZitadelctl(zitadelctlPath, tag string) error {
@@ -30,12 +28,13 @@ func downloadZitadelctl(zitadelctlPath, tag string) error {
 	url := fmt.Sprintf("https://github.com/caos/zitadel/releases/latest/download/%s", orbctlBase)
 
 	if tag != "" {
-		/* TODO: Why are dev artifacts released with points??? */
-		if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(tag)) {
-			orbctlBase = strings.ReplaceAll(orbctlBase, "-", ".")
-		}
+		/*
+			// TODO: Why are dev artifacts released with points???
+			if !regexp.MustCompile("^v?[0-9]+.[0-9]+.[0-9]$").Match([]byte(tag)) {
+				orbctlBase = strings.ReplaceAll(orbctlBase, "-", ".")
+			}*/
 
-		url = fmt.Sprintf("https://github.com/caos/zitadel/releases/download/%s/%s", tag, orbctlBase)
+		url = fmt.Sprintf("https://github.com/caos/zitadel/releases/download/%s-dev/%s", tag, orbctlBase)
 	}
 
 	resp, err := http.Get(url)

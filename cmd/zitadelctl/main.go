@@ -39,6 +39,7 @@ func main() {
 		cmds.StartDatabase(rootValues),
 		cmds.ConfigCommand(rootValues, githubClientID, githubClientSecret),
 		cmds.TeardownCommand(rootValues),
+		cmds.FileCommand(rootValues),
 	)
 
 	if err := rootCmd.Execute(); err != nil {

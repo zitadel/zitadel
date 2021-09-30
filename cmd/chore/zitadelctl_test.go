@@ -28,6 +28,7 @@ var _ = Describe("orbctl", func() {
 		kubectl                    kubectlCmd
 		zitadelctlGitops           zitadelctlGitopsCmd
 		AwaitCompletedPodFromJob   awaitCompletedPodFromJob
+		AwaitReadyPods             awaitReadyPods
 	)
 	BeforeSuite(func() {
 		workfolder = "./artifacts"
@@ -53,7 +54,7 @@ var _ = Describe("orbctl", func() {
 				session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 				Expect(err).ToNot(HaveOccurred())
 				Eventually(session, 2*time.Minute, 1*time.Second).Should(gexec.Exit(0))
-				Eventually(session, 2*time.Minute, 1*time.Second).Should(gbytes.Say(regexp.QuoteMeta(tag)))
+				Eventually(session, 2*time.Minute, 1*time.Second).Should(gbytes.Say(regexp.QuoteMeta(fmt.Sprintf("zitadelctl version %s", tag))))
 			})
 		})
 	})
@@ -84,7 +85,8 @@ var _ = Describe("orbctl", func() {
 				session, err := gexec.Start(zitadelctlGitops("takeoff"), os.Stdout, GinkgoWriter)
 				Expect(err).ToNot(HaveOccurred())
 
-				Eventually(session, 5*time.Minute, 5*time.Second).Should(gexec.Exit(0))
+				Eventually(session, 1*time.Minute, 5*time.Second).Should(gexec.Exit(0))
+				AwaitReadyPods("app.kubernetes.io/name=cockroachdb", 1)
 			})
 			It("deploys job to test cockroach", func() {
 				bytes, err := ioutil.ReadFile("./templates/cockroachdb.yml")
@@ -92,8 +94,13 @@ var _ = Describe("orbctl", func() {
 
 				AwaitCompletedPodFromJob(bytes, "app.kubernetes.io/name=cockroach-connect", 5*time.Minute)
 			})
-			/*It("scale cockroachdb to 2 nodes", func() {
-			})*/
+			It("scale cockroachdb to 3 nodes", func() {
+				session, err := gexec.Start(zitadelctlGitops("file", "patch", "orbiter.yml", "database.spec.replicaCount", "--exact", "--value", "3"), GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute).Should(gexec.Exit(0))
+
+				AwaitReadyPods("app.kubernetes.io/name=cockroachdb", 3)
+			})
 		})
 	})
 })

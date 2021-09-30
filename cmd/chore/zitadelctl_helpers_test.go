@@ -14,7 +14,7 @@ import (
 )
 
 func prefixedEnv(env string) string {
-	return os.Getenv("ORBOS_E2E_" + env)
+	return os.Getenv("ZITADEL_E2E_" + env)
 }
 
 type zitadelctlGitopsCmd func(args ...string) *exec.Cmd
@@ -67,5 +67,13 @@ func awaitCompletedPodFromJobFunc(kubectl kubectlCmd) awaitCompletedPodFromJob {
 		sessionDel, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Eventually(sessionDel, 1*time.Minute).Should(gexec.Exit(0))
+	}
+}
+
+type awaitReadyPods func(selector string, timeout time.Duration)
+
+func awaitReadyPodsFunc(kubectl kubectlCmd) awaitReadyPods {
+	return func(selector string, timeout time.Duration) {
+		Eventually(countCompletedPods(kubectl, selector), timeout).Should(Equal(int8(1)))
 	}
 }

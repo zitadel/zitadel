@@ -6,5 +6,5 @@ import (
 )
 
 func TestChore_Download(t *testing.T) {
-	assert.NoError(t, downloadZitadelctl("./artifacts/zitadelctl-darwin-amd64", "v1.42.2"))
+	assert.NoError(t, downloadZitadelctl("./artifacts/zitadelctl-darwin-amd64", "operator-e2e"))
 }
