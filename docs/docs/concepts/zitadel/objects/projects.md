@@ -39,7 +39,7 @@ More about granted projects: [Granted Projects](./granted_projects)
 
 ## Roles
 
-A role consists of different attributes. For the authorization only the key is relevant, which must therefore be unique.
+A role consists of different attributes. Only the key is relevant to the authorization and must therefore be unique.
 The display name is only to provide a human-readable name if needed. 
 And the group should enable a better handling in ZITADEL console, like give a user all the roles of a specific group. (Not implemented yet)
 
