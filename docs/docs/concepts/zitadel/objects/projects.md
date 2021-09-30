@@ -11,7 +11,7 @@ import ProjectDescription from './_project_description.mdx';
 ## Project Settings
 
 On default the login screen will be shown in the private labeling settings of the system (e.g zitadel.ch).
-With the scope primary domain [scope](../../../apis/openidoauth/scopes#reserves-scopes) it is possible to trigger the setting of the given organization. 
+With the [primary domain scope](../../../apis/openidoauth/scopes#reserves-scopes) it is possible to trigger the setting of the given organization. 
 But this will also restrict, the login to user of the given organization.  
 
 With the private labeling setting it is possible to choose which settings should trigger.
