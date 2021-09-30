@@ -12,136 +12,133 @@ test.describe('machine', () => {
 
     ;[ORG_OWNER].forEach(user => {
 
-        test.describe(`impersonating an organization manager with permission "${user}"`, () => {
+        test.describe(`as user ${user.username}`, () => {
 
-            test.describe(`as user ${user}`, () => {
+            var page: Page
+            var api: APICallProperties
 
-                var page: Page
-                var api: APICallProperties
+            test.beforeAll(async ({browser}) => {
+                const context = await browser.newContext({
+                    recordVideo: {
+                        dir: './tests/e2e/results/machine'
+                    },
+                    recordHar: {
+                        path: './tests/e2e/results/machine'
+                    }
+                })
+                page = await context.newPage()
+                const res = await Promise.all([login(page, user), prepareAPICalls()])
+                api = res[1]
+            })
 
-                test.beforeAll(async ({browser}) => {
-                    const context = await browser.newContext({
-                        recordVideo: {
-                            dir: './tests/e2e/results/machine'
-                        },
-                        recordHar: {
-                            path: './tests/e2e/results/machine'
-                        }
+            test.beforeEach(async () => {
+                // Navigate to machines list
+                await page.click('a:has-text("Service Users")');
+                await expect(page).toHaveURL(MACHINES_URL);                
+            })
+
+            test.describe('add', () => {
+
+                test.beforeAll(async () => {
+
+                    const usersResp = await fetch(`${api.baseURL}/management/v1/users/_search`, {
+                        method: 'POST',
+                        headers: { Authorization: api.authHeader },
                     })
-                    page = await context.newPage()
-                    const res = await Promise.all([login(page, user), prepareAPICalls()])
-                    api = res[1]
-                })
 
-                test.beforeEach(async () => {
-                    // Navigate to machines list
-                    await page.click('a:has-text("Service Users")');
-                    await expect(page).toHaveURL(MACHINES_URL);                
-                })
+                    checkStatus(usersResp)
 
-                test.describe('add', () => {
+                    const users = await usersResp.json() as {result: [{userName: string, id: string}]}
 
-                    test.beforeAll(async () => {
-
-                        const usersResp = await fetch(`${api.baseURL}/management/v1/users/_search`, {
-                            method: 'POST',
+                    var machineUser = users.result.find(user => user.userName === TEST_MACHINE_USERNAME)
+                    if (machineUser) {
+                        const delResp = await fetch(`${api.baseURL}/management/v1/users/${machineUser.id}`, {
+                            method: 'DELETE',
                             headers: { Authorization: api.authHeader },
                         })
-
-                        checkStatus(usersResp)
-
-                        const users = await usersResp.json() as {result: [{userName: string, id: string}]}
-
-                        var machineUser = users.result.find(user => user.userName === TEST_MACHINE_USERNAME)
-                        if (machineUser) {
-                            const delResp = await fetch(`${api.baseURL}/management/v1/users/${machineUser.id}`, {
-                                method: 'DELETE',
-                                headers: { Authorization: api.authHeader },
-                            })
-                            checkStatus(delResp)
-                        }
-                    })
-
-                    test('should add a machine', async () => {
-                        
-                        // Click new button
-                        await Promise.all([
-                            page.waitForNavigation(),
-                            page.click('a:has-text("New")')
-                        ]);
-                        
-                        // Fill username
-                        await page.fill('input', TEST_MACHINE_USERNAME);
-                        
-                        // Fill name
-                        await page.fill('text=Name* The input field is empty. >> input', 'name');
-                        
-                        // Fill description
-                        await page.fill('#cnsl-input-3', 'description');
-                        
-                        // Submit
-                        await Promise.all([
-                            page.waitForNavigation(),
-                            page.click('button:has-text("Create")')
-                        ]);
-                        
-                        // Navigate to machines list
-                        await page.click('a:has-text("Service Users")');
-                        await expect(page).toHaveURL(MACHINES_URL);
-                        
-                        await page.waitForSelector(`table:has-text("${TEST_MACHINE_USERNAME}")`, { strict: true, state: 'attached' })                      
-
-        /*                        cy.contains('a', 'New').click()
-                        cy.url().should('contain', 'users/create-machine')
-                        //force needed due to the prefilled username prefix
-                        cy.get('[formcontrolname^=userName]').type(Cypress.env('newMachineUserName'),{force: true})
-                        cy.get('[formcontrolname^=name]').type(Cypress.env('newMachineName'))
-                        cy.get('[formcontrolname^=description]').type(Cypress.env('newMachineDesription'))
-                        cy.get('button').filter(':contains("Create")').should('be.visible').click()
-                        cy.contains('User created successfully')
-                        cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
-                        cy.contains("tr", Cypress.env('newMachineUserName'))*/
-                    })
+                        checkStatus(delResp)
+                    }
                 })
 
-                test.describe('remove', () => {
+                test('should add a machine', async () => {
+                    
+                    // Click new button
+                    await Promise.all([
+                        page.waitForNavigation(),
+                        page.click('a:has-text("New")')
+                    ]);
+                    
+                    // Fill username
+                    await page.fill('input', TEST_MACHINE_USERNAME);
+                    
+                    // Fill name
+                    await page.fill('text=Name* The input field is empty. >> input', 'name');
+                    
+                    // Fill description
+                    await page.fill('#cnsl-input-3', 'description');
+                    
+                    // Submit
+                    await Promise.all([
+                        page.waitForNavigation(),
+                        page.click('button:has-text("Create")')
+                    ]);
+                    
+                    // Navigate to machines list
+                    await page.click('a:has-text("Service Users")');
+                    await expect(page).toHaveURL(MACHINES_URL);
+                    
+                    await page.waitForSelector(`table:has-text("${TEST_MACHINE_USERNAME}")`, { strict: true, state: 'attached' })                      
 
-                    test.beforeAll(async () => {
-                        const resp = await fetch(`${api.baseURL}/management/v1/users/machine`, {
-                            method: 'POST',
-                            headers: {
-                                Authorization: api.authHeader,
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                'user_name': TEST_MACHINE_USERNAME,
-                                name: 'test',
-                                description: 'e2e delete user test',
-                            }),                            
-                        })
+    /*                        cy.contains('a', 'New').click()
+                    cy.url().should('contain', 'users/create-machine')
+                    //force needed due to the prefilled username prefix
+                    cy.get('[formcontrolname^=userName]').type(Cypress.env('newMachineUserName'),{force: true})
+                    cy.get('[formcontrolname^=name]').type(Cypress.env('newMachineName'))
+                    cy.get('[formcontrolname^=description]').type(Cypress.env('newMachineDesription'))
+                    cy.get('button').filter(':contains("Create")').should('be.visible').click()
+                    cy.contains('User created successfully')
+                    cy.visit(Cypress.env('consoleUrl') + '/users/list/machines');
+                    cy.contains("tr", Cypress.env('newMachineUserName'))*/
+                })
+            })
 
-                        // 409 = does not exist
-                        if (resp.status != 409) {
-                            checkStatus(resp)
-                        }
+            test.describe('remove', () => {
+
+                test.beforeAll(async () => {
+                    const resp = await fetch(`${api.baseURL}/management/v1/users/machine`, {
+                        method: 'POST',
+                        headers: {
+                            Authorization: api.authHeader,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            'user_name': TEST_MACHINE_USERNAME,
+                            name: 'test',
+                            description: 'e2e delete user test',
+                        }),                            
                     })
 
-                    test('should delete a machine', async () => {
+                    // 409 = does not exist
+                    if (resp.status != 409) {
+                        checkStatus(resp)
+                    }
+                })
 
-                        // Hover over the service account so the delete button appears
-                        await page.hover(`text=${TEST_MACHINE_USERNAME}`)
+                test('should delete a machine', async () => {
 
-                        // Click the delete button
-                        await page.click(`tr:has-text("${TEST_MACHINE_USERNAME}") >> button`);
+                    // Hover over the service account so the delete button appears
+                    await page.hover(`text=${TEST_MACHINE_USERNAME}`)
 
-                        // Confirm deletion
-                        await page.click('button:has-text("Delete")');
+                    // Click the delete button
+                    await page.click(`tr:has-text("${TEST_MACHINE_USERNAME}") >> button`);
 
-                        // User message appears
-                        // await expect(page.locator('div:has-text=User deleted successfully')).toBeVisible()
+                    // Confirm deletion
+                    await page.click('button:has-text("Delete")');
 
-                        await page.waitForSelector(`table:has-text("${TEST_MACHINE_USERNAME}")`, { strict: true, state: 'detached' })
-                    })
+                    // User message appears
+                    // await expect(page.locator('div:has-text=User deleted successfully')).toBeVisible()
+
+                    await page.waitForSelector(`table:has-text("${TEST_MACHINE_USERNAME}")`, { strict: true, state: 'detached' })
                 })
             })
         })
