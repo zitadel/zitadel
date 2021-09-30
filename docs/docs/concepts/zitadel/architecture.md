@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Architecture
+title: Architecture
 ---
 
 ## Software Architecture

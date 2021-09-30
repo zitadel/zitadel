@@ -1,5 +1,5 @@
 ---
-title: ZITADEL Policies
+title: Policies
 ---
 
 Policies are configurations of all the different parts of the IAM. For all parts we have a suitable default in the IAM.
@@ -55,7 +55,7 @@ You can configure all kinds of external identity providers for identity brokerin
 Create a new identity provider configuration and enable it in the list afterwards.
 
 For a detailed guide about how to configure a new identity provider for identity brokering have a look at our guide:
-[Identity Brokering](../guides/authentication/identity-brokering)
+[Identity Brokering](../../../guides/authentication/identity-brokering)
 
 ## Lockout Policy
 
@@ -83,3 +83,8 @@ Make sure you click the "Set preview as current configuration" button after you 
 | Disable Watermark | If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
 ![Private Labeling](/img/manuals/policies/console_org_private_labeling.png)
+
+## Privacy Policy and TOS
+
+Each organization is able to configure its own privacy policy and terms of service.
+A link to the current policies can be provided. On register each user has to accept these policies.

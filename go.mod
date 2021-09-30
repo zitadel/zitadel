@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go/storage v1.16.1
-	cloud.google.com/go/trace v0.1.0 // indirect
+	cloud.google.com/go/trace v1.0.0 // indirect
 	github.com/BurntSushi/toml v0.4.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
