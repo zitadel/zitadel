@@ -131,7 +131,7 @@ FROM go-base as go-test
 
 # Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik \
-    && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
+    && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/ | grep -v /cmd/chore)
 
 #######################
 ## Go test results
