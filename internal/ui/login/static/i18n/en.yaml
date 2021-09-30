@@ -103,7 +103,7 @@ InitMFAU2F:
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: Multifcator Verification done
+  Title: Multifactor Verification done
   Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
   NextButtonText: next
   CancelButtonText: cancel
@@ -114,7 +114,7 @@ MFAProvider:
   ChooseOther: or choose an other option
 
 VerifyMFAOTP:
-  Title: Verify Multificator
+  Title: Verify Multifactor
   Description: Verify your multifactor
   CodeLabel: Code
   NextButtonText: next
@@ -122,8 +122,8 @@ VerifyMFAOTP:
 VerifyMFAU2F:
   Title: Multifactor Verification
   Description: Verify your multifactor U2F / WebAuthN token
-  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
+  NotSupported: WebAuthN is not supported by your browser. Make sure you are using the newest version or change your browser to a supported one (Chrome, Safari, Firefox)
+  ErrorRetry: Retry, create a new request or choose a other method.
   ValidateTokenButtonText: Validate Token
 
 Passwordless:
@@ -172,7 +172,7 @@ PasswordChangeDone:
 
 PasswordResetDone:
   Title: Reset link set
-  Description: Check your email to to reset your password.
+  Description: Check your email to reset your password.
   NextButtonText: next
 
 EmailVerification:

@@ -41,7 +41,7 @@ UsernameChange:
   Title: Cambia nome utente
   Description: Imposta il tuo nuovo nome utente
   UsernameLabel: Nome utente
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
   NextButtonText: Avanti
 
 UsernameChangeDone:
@@ -64,7 +64,7 @@ InitPasswordDone:
   Title: Set di password
   Description: Password impostata con successo
   NextButtonText: Avanti
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
 
 InitUser:
   Title: Attivare l'utente
@@ -81,7 +81,7 @@ InitUserDone:
   Title: Utente attivato
   Description: Email verificata e password impostata con successo
   NextButtonText: Avanti
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
 
 InitMFAPrompt:
   Title: Configurazione a più fattori
@@ -96,52 +96,51 @@ InitMFAOTP:
   Description: Verifica il tuo multifattore.
   OTPDescription: >-
     Scannerizza il codice con la tua app di autenticazione (ad esempio Google
-    Authenticator) o copia il segreto e inserisci il codice generato qui sotto.
-  SecretLabel: Segreto
+    Authenticator) o copia la chiave segreta e inserisci il codice generato nel campo sottostante.
+  SecretLabel: Chiave
   CodeLabel: Codice
   NextButtonText: Avanti
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
 
 InitMFAU2F:
   Title: Configurazione a più fattori U2F / WebAuthN
   Description: >-
-    Aggiungi il tuo Token fornendo un nome e poi cliccando sul pulsante
-    'Register Token' qui sotto.
-  TokenNameLabel: Nome del token / macchina
+    Aggiungi il tuo Token fornendo un nome e cliccando sul pulsante
+    'Registra'.
+  TokenNameLabel: Nome del token / dispositivo
   NotSupported: >-
     WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o
     usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registra il gettone
-  ErrorRetry: 'Riprova, crea una nuova sfida o scegli un metodo diverso.'
+  RegisterTokenButtonText: Registra
+  ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 InitMFADone:
-  Title: Verifica del Multifcator fatta
+  Title: Verificazione a più fattori effettuata
   Description: >-
-    Verifica del multifattore eseguita con successo. Il multifattore deve essere
-    inserito ad ogni login.
+    La verificazione del multifattore eseguita con successo. Il multifattore è richiesto ad ogni login.
   NextButtonText: Avanti
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
 
 MFAProvider:
   Provider0: OTP (One Time Password)
   Provider1: U2F (2° fattore universale)
-  ChooseOther: o scegliere un'altra opzione
+  ChooseOther: o scegli un'altra opzione
 
 VerifyMFAOTP:
-  Title: Verificare Multificator
+  Title: Verificazione del Multificator
   Description: Verifica il tuo multifattore
   CodeLabel: Codice
   NextButtonText: Avanti
 
 VerifyMFAU2F:
-  Title: Verifica a più fattori
-  Description: Verifica il tuo token U2F / WebAuthN multifattoriale
+  Title: Verificazione a più fattori
+  Description: Verifica il tuo token U2F / WebAuthN
   NotSupported: >-
     WebAuthN non è supportato dal tuo browser. Assicurati di avere l'ultima
     versione installata o usane una diversa (per esempio Chrome, Safari,
     Firefox).
-  ErrorRetry: 'Prova di nuovo, crea una nuova query o scegli un metodo diverso.'
-  ValidateTokenButtonText: Convalidare il token
+  ErrorRetry: Prova di nuovo, crea una nuova richiesta o scegli un metodo diverso.
+  ValidateTokenButtonText: Verifica
 
 Passwordless:
   Title: Accesso senza password
@@ -149,70 +148,71 @@ Passwordless:
   NotSupported: >-
     WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o
     usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  ErrorRetry: 'Riprova, crea una nuova sfida o scegli un metodo diverso.'
+  ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
   LoginWithPwButtonText: Accesso con password
-  ValidateTokenButtonText: Convalidare il token
+  ValidateTokenButtonText: Verifica
 
 PasswordlessPrompt:
-  Title: Impostazione senza password
+  Title: Autenticazione passwordless
   Description: Vuoi impostare il login senza password?
   DescriptionInit: >-
-    Devi impostare il login senza password. Usa il link che ti è stato dato per
+    Devi impostare il login senza password. Usa il link che ti è stato inviato per
     registrare il tuo dispositivo.
-  PasswordlessButtonText: Vai senza password
+  PasswordlessButtonText: Continua
   NextButtonText: Avanti
   SkipButtonText: salta
 
 PasswordlessRegistration:
-  Title: Impostazione senza password
+  Title: Configurazione dell'autenticazione senza password
   Description: >-
     Aggiungi il tuo Token fornendo un nome e poi cliccando sul pulsante
-    'Register Token' qui sotto.
-  TokenNameLabel: Nome del token / macchina
+    'Registra'.
+  TokenNameLabel: Nome del token / dispositivo
   NotSupported: >-
     WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o
     usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registra il gettone
-  ErrorRetry: 'Riprova, crea una nuova sfida o scegli un metodo diverso.'
+  RegisterTokenButtonText: Registra
+  ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 PasswordlessRegistrationDone:
-  Title: Impostazione senza password
-  Description: Token per il senza password aggiunto con successo.
+  Title: Configurazione dell'autenticazione senza password
+  Description: Token per lautenticazione passwordless aggiunto con successo.
   NextButtonText: Avanti
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
 
 PasswordChange:
-  Title: Cambiare la password
-  Description: Cambia la tua password. Inserisci la tua vecchia e nuova password.
+  Title: Reimposta password
+  Description: Cambia la tua password. Inserisci la tua vecchia e la nuova password.
   OldPasswordLabel: Vecchia password
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma della password
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
   NextButtonText: Avanti
 
 PasswordChangeDone:
-  Title: Cambiare la password
+  Title: Reimposta password
   Description: La tua password è stata cambiata con successo.
   NextButtonText: Avanti
+
 PasswordResetDone:
-  Title: Reset link set
+  Title: Link per il cambiamento inviato
   Description: Controlla la tua email per reimpostare la tua password.
   NextButtonText: Avanti
 
 EmailVerification:
-  Title: E-Mail Verification
+  Title: Verifica email
   Description: >-
     Ti abbiamo inviato un'e-mail per verificare il tuo indirizzo. Inserisci il
-    codice nel modulo sottostante.
+    codice nel campo sottostante.
   CodeLabel: Codice
   NextButtonText: Avanti
   ResendButtonText: rispedisci
 
 EmailVerificationDone:
-  Title: E-Mail Verification
-  Description: Il tuo indirizzo email è stato verificato con successo.
+  Title: Verificazione email effettuata
+  Description: La tua email è stata verificata con successo.
   NextButtonText: Avanti
-  CancelButtonText: cancellare
+  CancelButtonText: annulla
   LoginButtonText: login
 RegisterOption:
   Title: Opzioni di registrazione
@@ -223,10 +223,10 @@ RegisterOption:
 RegistrationUser:
   Title: Registrazione
   Description: >-
-    Inserisci i tuoi dati utente. Il tuo indirizzo email sarà usato come nome di
+    Inserisci i tuoi dati utente. La tua email sarà usata come nome di
     accesso.
   DescriptionOrgRegister: Inserisci i tuoi dati utente.
-  EmailLabel: E-mail
+  EmailLabel: email
   UsernameLabel: Nome utente
   FirstnameLabel: Nome
   LastnameLabel: Cognome
@@ -235,16 +235,16 @@ RegistrationUser:
   English: Inglese
   GenderLabel: Genere
   Female: Femminile
-  Male: Maschio
-  Diverse: vario / X
+  Male: Maschile
+  Diverse: diverso / X
   PasswordLabel: Password
   PasswordConfirmLabel: Conferma della password
   TosAndPrivacyLabel: Termini e condizioni
-  TosConfirm: Accetto il
-  TosLinkText: TOS
-  TosConfirmAnd: e il
-  PrivacyLinkText: informativa sulla privacy
-  ExternalLogin: o registrarsi con un utente esterno
+  TosConfirm: Accetto i
+  TosLinkText: Termini e condizioni
+  TosConfirmAnd: e 
+  PrivacyLinkText: l'informativa sulla privacy
+  ExternalLogin: o registrati con un utente esterno
   BackButtonText: indietro
   NextButtonText: Avanti
 
@@ -263,11 +263,11 @@ ExternalRegistrationUserOverview:
   German: Tedesco
   English: Inglese
   TosAndPrivacyLabel: Termini e condizioni
-  TosConfirm: Accetto il
-  TosLinkText: TOS
-  TosConfirmAnd: e il
-  PrivacyLinkText: informativa sulla privacy
-  ExternalLogin: o registrarsi con un utente esterno
+  TosConfirm: Accetto i
+  TosLinkText: Termini e condizioni
+  TosConfirmAnd: e
+  PrivacyLinkText: l'informativa sulla privacy
+  ExternalLogin: o registrati con un utente esterno
   BackButtonText: indietro
   NextButtonText: salva
 
@@ -282,29 +282,29 @@ RegistrationOrg:
   PasswordLabel: Password
   PasswordConfirmLabel: Conferma della password
   TosAndPrivacyLabel: Termini e condizioni
-  TosConfirm: Accetto il
-  TosLinkText: TOS
-  TosConfirmAnd: e il
-  PrivacyLinkText: informativa sulla privacy
-  SaveButtonText: salva
+  TosConfirm: Accetto i
+  TosLinkText: Termini e condizioni
+  TosConfirmAnd: e
+  PrivacyLinkText: l'informativa sulla privacy
+  SaveButtonText: Salva
 
 LoginSuccess:
   Title: Accesso riuscito
   AutoRedirectDescription: >-
     Sarai reindirizzato automaticamente alla tua applicazione. In caso
-    contrario, clicca sul pulsante qui sotto. Dopo puoi chiudere la finestra.
-  RedirectedDescription: Ora potete chiudere questa finestra.
+    contrario, clicca sul pulsante sottostante. Dopo puoi chiudere la finestra.
+  RedirectedDescription: Ora puoi chiudere la finestra.
   NextButtonText: Avanti
 
 LogoutDone:
   Title: Disconnesso
   Description: Ti sei disconnesso con successo.
-  LoginButtonText: login
+  LoginButtonText: Login
 
 LinkingUsersDone:
-  Title: Userlinking
-  Description: Collegamento utente fatto.
-  CancelButtonText: cancellare
+  Title: Collegamento utente
+  Description: Collegamento fatto.
+  CancelButtonText: annulla
   NextButtonText: Avanti
 
 ExternalNotFoundOption:
@@ -313,17 +313,17 @@ ExternalNotFoundOption:
     Utente esterno non trovato. Vuoi collegare il tuo utente o registrarne uno
     nuovo automaticamente.
   LinkButtonText: Link
-  AutoRegisterButtonText: Auto register
+  AutoRegisterButtonText: Registra automaticamente
   TosAndPrivacyLabel: Termini e condizioni
-  TosConfirm: Accetto il
-  TosLinkText: TOS
-  TosConfirmAnd: e il
-  PrivacyLinkText: informativa sulla privacy
+  TosConfirm: Accetto i
+  TosLinkText: Termini e condizioni
+  TosConfirmAnd: e
+  PrivacyLinkText: l'informativa sulla privacy
 
 Footer:
   PoweredBy: Alimentato da
-  Tos: TOS
-  PrivacyPolicy: Politica sulla privacy
+  Tos: Termini e condizioni
+  PrivacyPolicy: l'informativa sulla privacy
   Help: Aiuto
   HelpLink: 'https://docs.zitadel.ch/docs/manuals/user-login'
 
@@ -331,8 +331,8 @@ Errors:
   Internal: Si è verificato un errore interno
   AuthRequest:
     NotFound: Impossibile trovare authrequest
-    UserAgentNotCorresponding: L'agente utente non corrisponde
-    UserAgentNotFound: ID agente utente non trovato
+    UserAgentNotCorresponding: User Agent non corrisponde
+    UserAgentNotFound: User Agent ID non trovato
     TokenNotFound: Token non trovato
     RequestTypeNotSupported: Il tipo di richiesta non è supportato
     MissingParameters: Mancano i parametri richiesti
@@ -341,9 +341,9 @@ Errors:
     Inactive: L'utente è inattivo
     NotFoundOnOrg: L'utente non è stato trovato nell'organizzazione scelta
     NotAllowedOrg: L'utente non è membro dell'organizzazione richiesta
-    NotMatchingUserID: Utente e utente in authrequest non corrispondono
+    NotMatchingUserID: Utente e authrequest non corrispondono
     UserIDMissing: UserID è vuoto
-    Invalid: Dati utente non validi
+    Invalid: I dati del utente non sono validi
     DomainNotAllowedAsUsername: Il dominio è già riservato e non può essere utilizzato
     NotAllowedToLink: L'utente non è autorizzato a collegarsi con un provider di accesso esterno
     Password:
@@ -356,7 +356,7 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Politica della password non trovata
       MinLength: La password è troppo corta
-      HasLower: La password deve contenere una lettera inferiore
+      HasLower: La password deve contenere una lettera minuscola
       HasUpper: La password deve contenere la lettera maiuscola
       HasNumber: La password deve contenere un numero
       HasSymbol: La password deve contenere il simbolo
@@ -364,7 +364,7 @@ Errors:
       Expired: Il codice è scaduto
       Invalid: Il codice non è valido
       Empty: Il codice è vuoto
-      CryptoCodeNil: Il codice criptato è nullo
+      CryptoCodeNil: Il codice criptato è null
       NotFound: Impossibile trovare il codice
       GeneratorAlgNotSupported: Algoritmo generatore non supportato
     EmailVerify:
