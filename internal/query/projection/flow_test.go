@@ -21,7 +21,6 @@ func TestFlowProjection_reduces(t *testing.T) {
 		reduce func(event eventstore.EventReader) (*handler.Statement, error)
 		want   wantReduce
 	}{
-		//TODO: multi stmt tests
 		{
 			name: "reduceTriggerActionsSetEventType",
 			args: args{
