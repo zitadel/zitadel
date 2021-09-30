@@ -7,11 +7,11 @@ Login:
     utente ZITADEL.
   LoginNameLabel: Nome di accesso
   UsernamePlaceHolder: nome utente
-  LoginnamePlaceHolder: nome utente@dominio
+  LoginnamePlaceHolder: nomeutente@dominio
   ExternalUserDescription: Accedi con un utente esterno.
   MustBeMemberOfOrg: 'L''utente deve essere membro dell''organizzazione {{.OrgName}}.'
   RegisterButtonText: registrare
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 SelectAccount:
   Title: Seleziona l'account
@@ -28,26 +28,26 @@ Password:
   Description: Inserisci i tuoi dati di accesso.
   PasswordLabel: Password
   MinLength: Lunghezza minima
-  HasUppercase: Uppercase letter
+  HasUppercase: Lettera maiuscola
   HasLowercase: Lettera minuscola
   HasNumber: Numero
   HasSymbol: Simbolo
-  Confirmation: Conferma partita
-  ResetLinkText: reimpostare la password
+  Confirmation: Conferma password
+  ResetLinkText: Password dimenticata?
   BackButtonText: indietro
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 UsernameChange:
   Title: Cambia nome utente
   Description: Imposta il tuo nuovo nome utente
   UsernameLabel: Nome utente
   CancelButtonText: cancellare
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 UsernameChangeDone:
   Title: Nome utente cambiato
   Description: Il tuo nome utente è stato cambiato con successo.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 InitPassword:
   Title: Impostare la password
@@ -58,12 +58,12 @@ InitPassword:
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma la password
   ResendButtonText: rispedisci
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 InitPasswordDone:
   Title: Set di password
   Description: Password impostata con successo
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   CancelButtonText: cancellare
 
 InitUser:
@@ -74,13 +74,13 @@ InitUser:
   CodeLabel: Codice
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma la password
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   ResendButtonText: rispedisci
 
 InitUserDone:
   Title: Utente attivato
   Description: Email verificata e password impostata con successo
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   CancelButtonText: cancellare
 
 InitMFAPrompt:
@@ -88,7 +88,7 @@ InitMFAPrompt:
   Description: Vuoi impostare l'autenticazione a più fattori?
   Provider0: OTP (One Time Password)
   Provider1: U2F (2° fattore universale)
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   SkipButtonText: salta
 
 InitMFAOTP:
@@ -99,7 +99,7 @@ InitMFAOTP:
     Authenticator) o copia il segreto e inserisci il codice generato qui sotto.
   SecretLabel: Segreto
   CodeLabel: Codice
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   CancelButtonText: cancellare
 
 InitMFAU2F:
@@ -119,7 +119,7 @@ InitMFADone:
   Description: >-
     Verifica del multifattore eseguita con successo. Il multifattore deve essere
     inserito ad ogni login.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   CancelButtonText: cancellare
 
 MFAProvider:
@@ -131,7 +131,7 @@ VerifyMFAOTP:
   Title: Verificare Multificator
   Description: Verifica il tuo multifattore
   CodeLabel: Codice
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 VerifyMFAU2F:
   Title: Verifica a più fattori
@@ -160,7 +160,7 @@ PasswordlessPrompt:
     Devi impostare il login senza password. Usa il link che ti è stato dato per
     registrare il tuo dispositivo.
   PasswordlessButtonText: Vai senza password
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   SkipButtonText: salta
 
 PasswordlessRegistration:
@@ -178,7 +178,7 @@ PasswordlessRegistration:
 PasswordlessRegistrationDone:
   Title: Impostazione senza password
   Description: Token per il senza password aggiunto con successo.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   CancelButtonText: cancellare
 
 PasswordChange:
@@ -188,16 +188,16 @@ PasswordChange:
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma della password
   CancelButtonText: cancellare
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 PasswordChangeDone:
   Title: Cambiare la password
   Description: La tua password è stata cambiata con successo.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 PasswordResetDone:
   Title: Reset link set
   Description: Controlla la tua email per reimpostare la tua password.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 EmailVerification:
   Title: E-Mail Verification
@@ -205,13 +205,13 @@ EmailVerification:
     Ti abbiamo inviato un'e-mail per verificare il tuo indirizzo. Inserisci il
     codice nel modulo sottostante.
   CodeLabel: Codice
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   ResendButtonText: rispedisci
 
 EmailVerificationDone:
   Title: E-Mail Verification
   Description: Il tuo indirizzo email è stato verificato con successo.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
   CancelButtonText: cancellare
   LoginButtonText: login
 RegisterOption:
@@ -246,7 +246,7 @@ RegistrationUser:
   PrivacyLinkText: informativa sulla privacy
   ExternalLogin: o registrarsi con un utente esterno
   BackButtonText: indietro
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 ExternalRegistrationUserOverview:
   Title: Registrazione utente esterno
@@ -294,7 +294,7 @@ LoginSuccess:
     Sarai reindirizzato automaticamente alla tua applicazione. In caso
     contrario, clicca sul pulsante qui sotto. Dopo puoi chiudere la finestra.
   RedirectedDescription: Ora potete chiudere questa finestra.
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 LogoutDone:
   Title: Disconnesso
@@ -305,7 +305,7 @@ LinkingUsersDone:
   Title: Userlinking
   Description: Collegamento utente fatto.
   CancelButtonText: cancellare
-  NextButtonText: prossimo
+  NextButtonText: Avanti
 
 ExternalNotFoundOption:
   Title: Utente esterno
@@ -398,5 +398,5 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Politica di blocco non esistente
-      
+
 optional: (opzionale)
