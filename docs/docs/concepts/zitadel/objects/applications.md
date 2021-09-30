@@ -2,16 +2,20 @@
 title: Applications
 ---
 
-# Application Types 
 
-OAuth and therefore OIDC know three different client types, these types are all for user interaction. 
-As a further option, we know a classic API.
+# Applications
+
+Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your API, maybe without even knowing. All applications share the roles and authorizations of their project.
+
+## Application Types 
+
+At the moment ZITADEL differs between three client types (with user interaction):
 - Web (Server-side web applications such as java, .net, ...)
 - Native (native, mobile or desktop applications)
 - User Agent (single page applications / SPA, generally JavaScript executed in the browser)
-- API (OAuth Resource Server)
 
-Depending on the app type you're trying to register, there are small differences.
-But regardless of the app type we recommend using Proof Key for Code Exchange (PKCE).
+As a fourth option there's the API (OAuth Resource Server), which generally has no direct user-interaction.
 
-Please read the following guide about the [different-client-profiles](../../../guides/authorization/oauth-recommended-flows#different-client-profiles) and why to use PKCE.
+Depending on the app type registered, there are small differences in the possible settings.
+
+Please read the following guide about the [different-client-profiles](../../../guides/authorization/oauth-recommended-flows#different-client-profiles).
