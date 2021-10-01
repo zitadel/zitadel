@@ -259,10 +259,13 @@ type Column struct {
 }
 
 func (c Column) identifier() string {
-	if c.table.alias == "" {
+	if c.table.alias != "" {
+		return c.table.alias + "." + c.name
+	}
+	if c.table.name != "" {
 		return c.table.name + "." + c.name
 	}
-	return c.table.alias + "." + c.name
+	return c.name
 }
 
 func (c Column) setTable(t table) Column {
