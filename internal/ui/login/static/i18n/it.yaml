@@ -239,9 +239,9 @@ RegistrationUser:
   Diverse: diverso / X
   PasswordLabel: Password
   PasswordConfirmLabel: Conferma della password
-  TosAndPrivacyLabel: Termini e condizioni
+  TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
-  TosLinkText: Termini e condizioni
+  TosLinkText: Termini di servizio
   TosConfirmAnd: e 
   PrivacyLinkText: l'informativa sulla privacy
   ExternalLogin: o registrati con un utente esterno
@@ -262,9 +262,9 @@ ExternalRegistrationUserOverview:
   LanguageLabel: Lingua
   German: Tedesco
   English: Inglese
-  TosAndPrivacyLabel: Termini e condizioni
+  TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
-  TosLinkText: Termini e condizioni
+  TosLinkText: Termini di servizio
   TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
   ExternalLogin: o registrati con un utente esterno
@@ -281,9 +281,9 @@ RegistrationOrg:
   LastnameLabel: Cognome
   PasswordLabel: Password
   PasswordConfirmLabel: Conferma della password
-  TosAndPrivacyLabel: Termini e condizioni
+  TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
-  TosLinkText: Termini e condizioni
+  TosLinkText: Termini di servizio
   TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
   SaveButtonText: Salva
@@ -314,15 +314,15 @@ ExternalNotFoundOption:
     nuovo automaticamente.
   LinkButtonText: Link
   AutoRegisterButtonText: Registra automaticamente
-  TosAndPrivacyLabel: Termini e condizioni
+  TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
-  TosLinkText: Termini e condizioni
+  TosLinkText: Termini di servizio
   TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
 
 Footer:
   PoweredBy: Alimentato da
-  Tos: Termini e condizioni
+  Tos: Termini di servizio
   PrivacyPolicy: l'informativa sulla privacy
   Help: Aiuto
   HelpLink: 'https://docs.zitadel.ch/docs/manuals/user-login'

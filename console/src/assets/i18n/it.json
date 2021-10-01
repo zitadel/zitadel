@@ -2,14 +2,14 @@
   "APP_NAME": "ZITADEL",
   "PAGINATOR": {
     "PREVIOUS": "Precedente",
-    "NEXT": "Prossimo",
+    "NEXT": "Avanti",
     "COUNT": "Risultati totali"
   },
   "ONBOARDING": {
     "HEADER": "Primi passi",
     "TITLE": "Imparare ad usare ZITADEL",
     "LOGINDESC": "\u00c8 necessario effettuare il login per controllare le impostazioni di ZITADEL.",
-    "LOGIN": "Accesso",
+    "LOGIN": "Accedi",
     "DESCRIPTION": "Noi di ZITADEL teniamo molto alla sicurezza e alle prestazioni. Eseguite i seguenti passi e adattate ZITADEL in modo ottimale alle vostre esigenze.",
     "STEPS_TITLE": "Completa i seguenti passi nell'ordine che vuoi:",
     "STEPS": {
@@ -19,50 +19,50 @@
       },
       "2": {
         "TITLE": "Creare un'applicazione",
-        "DESC": "Crea un'applicazione all'interno del tuo progetto e definisci le sue propriet\u00e0."
+        "DESC": "Crea un'applicazione per il tuo progetto e definisci le sue propriet\u00e0."
       },
       "3": {
         "TITLE": "Migliorare la sicurezza",
-        "DESC": "Estendete le politiche di accesso e quindi aumentate la sicurezza dei vostri utenti."
+        "DESC": "Estendete le politiche di accesso e aumentate la sicurezza dei vostri utenti."
       }
     },
-    "START": "Iniziare",
+    "START": "Inizia",
     "DOCS": "Docs"
   },
   "HOME": {
     "TITLE": "ZITADEL",
     "SECURITYANDPRIVACY": "Protezione dei dati e personalizzazione",
     "SECURITYANDPRIVACY_DESC": "Gestisci le tue informazioni e le impostazioni di sicurezza",
-    "SECURITYANDPRIVACY_BUTTON": "Personalizzare le informazioni e la sicurezza",
-    "CHANGE_PWD": "Cambiare la password",
-    "PROTECTION": "Politiche organizzative",
-    "PROTECTION_DESC": "Gestisci le tue linee guida organizzative. Esplora alcune soluzioni preconfezionate che ti fanno risparmiare tempo e garantiscono la sicurezza.",
+    "SECURITYANDPRIVACY_BUTTON": "Personalizza",
+    "CHANGE_PWD": "Ripristina password",
+    "PROTECTION": "Impostazioni organizzative",
+    "PROTECTION_DESC": "Gestisci le tue impostazioni organizzative. Esplora soluzioni che ti fanno risparmiare tempo e garantiscono la sicurezza.",
     "PROTECTION_BUTTON": "Esplora",
     "PROJECTS": "Crea e gestisci le tue applicazioni e progetti",
-    "PROJECTS_DESC": "Autorizza altri ad usare i tuoi progetti o a definire ruoli personalizzati su progetti idonei.",
+    "PROJECTS_DESC": "Autorizza altri ad usare i tuoi progetti o a definire ruoli personalizzati.",
     "PROJECTS_BUTTON": "Panoramica del progetto",
-    "PROJECTS_NEW_LINK": "Creare un nuovo progetto",
-    "ORG_POLICY_COMPLEXITY": "Impostazioni di complessit\u00e0 della password",
-    "ORG_POLICY_IAM": "Propriet\u00e0 di accesso dell'organizzazione",
-    "ORG_POLICY_LOGIN": "Politica di accesso",
-    "ORG_POLICY_LABEL": "Politica del marchio privato",
-    "IAM_CREATE_ORG": "Creare un'organizzazione",
-    "IAM_POLICY_COMPLEXITY": "Impostazioni di complessit\u00e0 della password di sistema",
-    "IAM_POLICY_IAM": "Propriet\u00e0 di accesso al sistema",
-    "IAM_POLICY_LOGIN": "Politica di accesso al sistema",
-    "IAM_POLICY_LABEL": "Politica del marchio privato del sistema",
+    "PROJECTS_NEW_LINK": "Crea un nuovo progetto",
+    "ORG_POLICY_COMPLEXITY": "Impostazioni complessit\u00e0 password",
+    "ORG_POLICY_IAM": "Impostazioni Org IAM",
+    "ORG_POLICY_LOGIN": "Impostazioni di accesso",
+    "ORG_POLICY_LABEL": "Impostazioni Private Labelling",
+    "IAM_CREATE_ORG": "Crea un'organizzazione",
+    "IAM_POLICY_COMPLEXITY": "Impostazioni complessit\u00e0 password di sistema",
+    "IAM_POLICY_IAM": "Impostazioni di sistema",
+    "IAM_POLICY_LOGIN": "Impostazioni di accesso di sistema",
+    "IAM_POLICY_LABEL": "Impostazioni Private Labelling di sistema",
     "USERS": "Crea e gestisci i tuoi utenti",
     "USERS_DESC": "Controlla il tuo concetto di ruolo in tempo reale. Prendere azioni immediate.",
     "USERS_HUMANS": "Mostra gli utenti umani",
-    "USERS_MACHINES": "Mostra gli utenti della macchina",
+    "USERS_MACHINES": "Mostra gli utenti di servizio",
     "USERS_CREATE": "Crea utente",
     "USERS_BUTTON": "Mostra utenti",
-    "IAM": "Gestione dell'identit\u00e0 e degli accessi",
+    "IAM": "Identity and Access Management",
     "IAM_DESC": "Gestisci le tue organizzazioni e i tuoi amministratori.",
     "IAM_BUTTON": "Gestire ZITADEL",
     "WELCOME": "Iniziare con ZITADEL",
-    "WELCOMESENTENCE": "Qui puoi trovare le azioni raccomandate in base alle tue ultime autorizzazioni acquisite. Nota che potresti dover selezionare la tua organizzazione nell'intestazione qui sopra.",
-    "DISCLAIMER": "Puoi vedere solo le impostazioni della tua attuale organizzazione specificate nell'intestazione. ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
+    "WELCOMESENTENCE": "Qui puoi trovare le azioni raccomandate in base alle tue ultime autorizzazioni acquisite.",
+    "DISCLAIMER": "Puoi vedere solo le impostazioni della tua attuale organizzazione specificata nel navbar. ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
     "DISCLAIMERLINK": "Ulteriori informazioni",
     "QUICKSTARTS": {
       "LABEL": "Primi passi",
@@ -75,7 +75,7 @@
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
     "IAMPOLICIES": "IAM",
-    "IAMEVENTSTORE": "Stoccaggio",
+    "IAMEVENTSTORE": "Storage",
     "ORGANIZATION": "Organizzazione",
     "ADMINSECTION": "Amministrazione di ZITADEL",
     "ORGSECTION": "Organizzazione",
@@ -84,79 +84,79 @@
     "GRANTEDPROJECT": "Progetti concessi",
     "USERSECTION": "Sezione utente",
     "HUMANUSERS": "Utenti",
-    "MACHINEUSERS": "Utenti del servizio",
-    "LOGOUT": "Disconnetti tutti gli utenti",
+    "MACHINEUSERS": "Utenti di servizio",
+    "LOGOUT": "Esci con tutti gli utenti",
     "NEWORG": "Nuova organizzazione",
     "IAMADMIN": "Sei un amministratore IAM. Nota che hai autorizzazioni estese.",
     "SHOWORGS": "Mostra tutte le organizzazioni",
     "GRANTSECTION": "Sezione di autorizzazione",
     "GRANTS": "Autorizzazioni",
-    "PRIVACY": "Privacy",
+    "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
     "TOOLTIP": {
-      "PERSONAL": "Mostra il tuo account personale, i tuoi IDP, i metodi di accesso, i fattori e le autorizzazioni",
-      "IAMPOLICIES": "Gestire le politiche globali di accesso di ZITADEL ed eleggere i manager di ZITADEL",
-      "IAMEVENTSTORE": "Visualizzazioni chiare ed eventi falliti",
-      "ORG": "Mostra le politiche di accesso delle tue organizzazioni e gestisci i tuoi nomi di dominio",
+      "PERSONAL": "Mostra il tuo account personale, i tuoi IDP, i metodi di accesso e le autorizzazioni.",
+      "IAMPOLICIES": "Gestisci le impostazioni globali di accesso e modifica i manager di ZITADEL",
+      "IAMEVENTSTORE": "Ripristina views ed eventi falliti di ZITADEL",
+      "ORG": "Mostra le impostazioni di accesso delle tue organizzazioni e gestisci i tuoi nomi di dominio",
       "SELFPROJECTS": "Mostra i progetti della tua organizzazione",
-      "GRANTEDPROJECTS": "Mostra i progetti a cui la tua organizzazione ha avuto accesso",
+      "GRANTEDPROJECTS": "Mostra i progetti a cui la tua organizzazione ha accesso",
       "HUMANUSERS": "Mostra tutti gli utenti umani registrati nella tua organizzazione",
-      "MACHINEUSERS": "Mostra agli utenti dei servizi della tua organizzazione",
+      "MACHINEUSERS": "Mostra tutti gli utenti di servizio della tua organizzazione",
       "AUTHZ": "Mostra le autorizzazioni disponibili per gli utenti della tua organizzazione"
     }
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",
-    "RENAME": "Rinominare",
-    "SET": "Imposta",
+    "RENAME": "Rinomina",
+    "SET": "Salva",
     "COPY": "Copia negli appunti",
     "COPIED": "Copiato negli appunti.",
     "RESETDEFAULT": "Ripristino delle impostazioni predefinite",
     "RESETTO": "Resettare a:",
-    "RESETCURRENT": "Ripristinare la corrente",
+    "RESETCURRENT": "Ripristina",
     "SHOW": "Mostra",
     "HIDE": "Nascondi",
     "SAVE": "Salva",
     "SAVENOW": "Salva ora",
     "NEW": "Nuovo",
     "ADD": "Aggiungi",
-    "CREATE": "Creare",
+    "CREATE": "Crea",
     "CONTINUE": "Continua",
     "BACK": "Indietro",
-    "CLOSE": "Chiudere",
+    "CLOSE": "chiudi",
     "CLEAR": "Chiaro",
-    "CANCEL": "Cancella",
+    "CANCEL": "cancella",
     "INFO": "Info",
     "OK": "OK",
     "VIEW": "Mostra",
-    "SELECTIONDELETE": "Cancellare la selezione",
-    "DELETE": "Cancellare",
+    "SELECTIONDELETE": "Elimina selezione",
+    "DELETE": "Elimina",
     "REMOVE": "Rimuovi",
     "VERIFY": "Verifica",
-    "FINISH": "Finitura",
+    "FINISH": "Crea",
     "CHANGE": "Cambia",
-    "REACTIVATE": "Riattivare",
-    "DEACTIVATE": "Disattivare",
+    "REACTIVATE": "Riattiva",
+    "DEACTIVATE": "Disattiva",
     "REFRESH": "Aggiorna",
-    "LOGIN": "Accesso",
+    "LOGIN": "Accedi",
     "EDIT": "Modifica",
     "PIN": "Pin / Unpin",
     "CONFIGURE": "Configurare",
     "SEND": "Invia",
     "NEWVALUE": "Nuovo valore",
-    "RESTORE": "Restore",
-    "CONTINUEWITHOUTSAVE": "Continuare senza salvare",
+    "RESTORE": "Ripristina",
+    "CONTINUEWITHOUTSAVE": "Continua senza salvare",
     "GOTOFEATURES": "Vai alle caratteristiche"
   },
-  "RESOURCEID": "Id della risorsa",
+  "RESOURCEID": "Resource ID",
   "TABLE": {
-    "NOROWS": "Nessuna data"
+    "NOROWS": "Nessun dato"
   },
   "ERRORS": {
     "REQUIRED": "Mancano alcuni campi obbligatori.",
     "TOKENINVALID": {
-      "TITLE": "Il tuo token di autorizzazione \u00e8 scaduto.",
-      "DESCRIPTION": "Clicca il pulsante qui sotto per accedere di nuovo."
+      "TITLE": "Il tuo Access Token \u00e8 scaduto.",
+      "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
     }
   },
   "USER": {
@@ -166,16 +166,16 @@
       "LIST": "Utenti",
       "TITLE": "Utente",
       "DESCRIPTION": "Crea nuovi utenti nella tua organizzazione e gestisci quelli esistenti.",
-      "LISTMACHINE": "Utenti del servizio",
-      "DESCRIPTIONMACHINE": "Creare e gestire gli utenti del servizio della tua organizzazione",
-      "DETAIL": "Dettaglio",
-      "CREATE": "Creare",
+      "LISTMACHINE": "Utenti di servizio",
+      "DESCRIPTIONMACHINE": "Creare e gestire gli utenti di servizio della tua organizzazione",
+      "DETAIL": "Dettagli",
+      "CREATE": "Crea",
       "MY": "Le mie informazioni",
       "LOGINNAMES": "Loginnames",
-      "LOGINNAMESDESC": "Questi sono i vostri nomi di accesso:",
+      "LOGINNAMESDESC": "Questi sono i nomi di accesso:",
       "NOUSER": "Nessun utente associato.",
-      "REACTIVATE": "Riattivare",
-      "DEACTIVATE": "Disattivare",
+      "REACTIVATE": "Riattiva",
+      "DEACTIVATE": "Disattiva",
       "FILTER": "Filtro",
       "STATE": "Stato",
       "DELETE": "Elimina utente",
@@ -188,7 +188,7 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Elimina utente",
-      "DELETE_DESCRIPTION": "Stai per cancellare definitivamente un utente. Sei sicuro?"
+      "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un utente. Sei sicuro?"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Invia una notifica via e-mail",
@@ -196,17 +196,17 @@
       "NEWEMAIL": "Nuovo indirizzo e-mail"
     },
     "TABLE": {
-      "DEACTIVATE": "Disattivare",
-      "ACTIVATE": "Attivare",
+      "DEACTIVATE": "Disattiva",
+      "ACTIVATE": "Attiva",
       "FILTER": {
         "0": "Filtro per DisplayName",
-        "1": "Filtro per il nome utente",
+        "1": "Filtro per nome utente",
         "2": "filtro per DisplayName",
-        "3": "filtro per il nome utente",
-        "4": "filtro per la posta elettronica",
+        "3": "filtro per nome utente",
+        "4": "filtro per email",
         "5": "filtro per DisplayName",
-        "10": "filtro per il nome dell'organizzazione",
-        "12": "filtro per il nome del progetto"
+        "10": "filtro per il nome organizzazione",
+        "12": "filtro per il nome progetto"
       },
       "EMPTY": "Nessuna voce"
     },
@@ -216,13 +216,13 @@
       "TABLESTATE": "Stato",
       "NAME": "Nome",
       "TABLEACTIONS": "Azioni",
-      "TITLE": "Autenticazione senza password",
+      "TITLE": "Autenticazione passwordless",
       "DESCRIPTION": "Aggiungi i metodi di autenticazione basati su WebAuthn per accedere a ZITADEL senza password.",
-      "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
-      "U2F": "Aggiungere l'autenticatore",
-      "U2F_DIALOG_TITLE": "Verificare l'autenticatore",
-      "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo Login senza password usato",
-      "U2F_SUCCESS": "Autorizzazione senza password creata con successo!",
+      "MANAGE_DESCRIPTION": "Gestisci i metodi del secondo fattore dei vostri utenti.",
+      "U2F": "Aggiungi autenticatore",
+      "U2F_DIALOG_TITLE": "Verifica autenticatore",
+      "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo authenticatore o dispositivo usato.",
+      "U2F_SUCCESS": "Autorizzazione passwordless creata con successo!",
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione di U2F!",
       "U2F_NAME": "Nome dell'autenticatore",
       "TYPE": {
@@ -237,10 +237,10 @@
         "3": "Cancellato"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Rimuovere il metodo di autenticazione senza password",
-        "DELETE_DESCRIPTION": "Stai per cancellare un metodo di autenticazione senza password. Sei sicuro?",
-        "ADD_TITLE": "Autenticazione senza password",
-        "ADD_DESCRIPTION": "Seleziona una delle opzioni disponibili per creare un metodo di autenticazione senza password.",
+        "DELETE_TITLE": "Rimuovere l'autenticazione passwordless",
+        "DELETE_DESCRIPTION": "Stai per rimuovere un metodo di autenticazione passwordless. Sei sicuro?",
+        "ADD_TITLE": "Autenticazione passwordless",
+        "ADD_DESCRIPTION": "Seleziona una delle opzioni disponibili per creare un metodo di autenticazione passwordless.",
         "SEND_DESCRIPTION": "Inviati un link di registrazione al tuo indirizzo e-mail.",
         "SEND": "Invia il link di registrazione",
         "SENT": "L'e-mail \u00e8 stata consegnata con successo. Controlla la tua casella di posta per continuare con la configurazione.",
@@ -259,8 +259,8 @@
       "ADD": "Nuova voce",
       "SAVE": "Salva",
       "EMPTY": "Nessun metadato",
-      "SETSUCCESS": "Elemento salvato con successo",
-      "REMOVESUCCESS": "Elemento cancellato con successo"
+      "SETSUCCESS": "Salvato con successo",
+      "REMOVESUCCESS": "Rimosso con successo"
     },
     "MFA": {
       "TABLETYPE": "Tipo",
@@ -270,18 +270,18 @@
       "TITLE": "Autenticazione a pi\u00f9 fattori",
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
-      "ADD": "Aggiungi AuthFactor",
+      "ADD": "Aggiungi fattore",
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi OTP",
-      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice qui sotto per verificare e attivare il metodo OTP.",
-      "U2F": "U2F (2\u00b0 fattore universale)",
+      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
+      "U2F": "U2F (Universal 2nd Factor)",
       "U2F_DIALOG_TITLE": "Verifica U2F",
-      "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo Multifactor universale usato.",
+      "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo methodo o dispositivo.",
       "U2F_SUCCESS": "U2F creato con successo!",
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione di U2F!",
       "U2F_NAME": "Nome U2F",
       "TYPE": {
-        "0": "Nessun MFA definito",
+        "0": "Nessun altro fattore definito",
         "1": "OTP",
         "2": "U2F"
       },
@@ -292,27 +292,27 @@
         "3": "Cancellato"
       },
       "DIALOG": {
-        "MFA_DELETE_TITLE": "Rimuovere Secondfactor",
-        "MFA_DELETE_DESCRIPTION": "Stai per cancellare un secondo fattore. Sei sicuro?",
-        "ADD_MFA_TITLE": "Aggiungere il secondo fattore",
+        "MFA_DELETE_TITLE": "Rimuovi metodo a due fattori",
+        "MFA_DELETE_DESCRIPTION": "Stai per rimuovere un metodo a due fattori. Sei sicuro?",
+        "ADD_MFA_TITLE": "Aggiungere un metodo a due fattori?",
         "ADD_MFA_DESCRIPTION": "Selezionare una delle seguenti opzioni."
       }
     },
     "EXTERNALIDP": {
-      "TITLE": "Fornitori di identit\u00e0 esterni",
+      "TITLE": "IDP esterno",
       "DESC": "",
-      "IDPCONFIGID": "Idp Config ID",
+      "IDPCONFIGID": "IDP Config ID",
       "IDPNAME": "Nome Idp",
       "USERDISPLAYNAME": "Nome esterno",
       "EXTERNALUSERID": "ID utente esterno",
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere l'IDP",
-        "DELETE_DESCRIPTION": "Stai per eliminare un Identity Provider da un utente. Vuoi davvero continuare?"
+        "DELETE_DESCRIPTION": "Stai per eliminare un Identity Provider da un utente. Vuoi continuare?"
       }
     },
     "CREATE": {
-      "TITLE": "Creare un nuovo utente",
-      "DESCRIPTION": "Si prega di fornire le informazioni necessarie.",
+      "TITLE": "Crea un nuovo utente",
+      "DESCRIPTION": "Si prega di fornirsi delle informazioni necessarie.",
       "NAMEANDEMAILSECTION": "Nome ed e-mail",
       "GENDERLANGSECTION": "Genere e linguaggio",
       "PHONESECTION": "Phonenumbers",
@@ -331,7 +331,7 @@
       "STATE2": "Inattivo",
       "STATE3": "Cancellato",
       "STATE4": "Bloccato",
-      "STATE5": "Supend",
+      "STATE5": "sospeso",
       "STATE6": "Iniziale"
     },
     "PROFILE": {
@@ -340,20 +340,20 @@
       "PHONE": "Numero di telefono",
       "USERNAME": "Nome utente",
       "FIRSTNAME": "Nome",
-      "LASTNAME": "Nome",
+      "LASTNAME": "Cognome",
       "NICKNAME": "Soprannome",
-      "DISPLAYNAME": "Nome del display",
+      "DISPLAYNAME": "DisplayName",
       "PREFERRED_LANGUAGE": "Lingua",
       "GENDER": "Genere",
       "PASSWORD": "Password",
       "AVATAR": {
         "UPLOADTITLE": "Carica la tua immagine del profilo",
-        "UPLOADBTN": "Scegliere il file",
+        "UPLOADBTN": "Scegli tra i file",
         "UPLOAD": "Carica",
-        "CURRENT": "Immagine corrente",
+        "CURRENT": "Immagine attuale",
         "PREVIEW": "Anteprima",
-        "DELETESUCCESS": "Cancellato con successo!",
-        "CROPPERERROR": "Un errore durante il caricamento del tuo file non \u00e8 riuscito. Prova un formato e una dimensione diversi, se necessario."
+        "DELETESUCCESS": "Rimosso con successo!",
+        "CROPPERERROR": "È successo un errore durante il caricamento del tuo file. Prova un formato e una dimensione diversi, se necessario."
       }
     },
     "MACHINE": {
@@ -366,7 +366,7 @@
       "ID": "ID chiave",
       "TYPE": "Tipo",
       "EXPIRATIONDATE": "Data di scadenza",
-      "CHOOSEDATEAFTER": "Inserisci una scadenza valida dopo",
+      "CHOOSEDATEAFTER": "Inserisci una scadenza valida",
       "CHOOSEEXPIRY": "Seleziona una data di scadenza",
       "CREATIONDATE": "Data di creazione",
       "KEYDETAILS": "Dettagli chiave",
@@ -384,11 +384,11 @@
     },
     "PASSWORD": {
       "TITLE": "Password",
-      "DESCRIPTION": "Inserisci la nuova password secondo la politica qui sotto.",
-      "OLD": "Password corrente",
+      "DESCRIPTION": "Inserisci la nuova password secondo i requisiti.",
+      "OLD": "Password attuale",
       "NEW": "Nuova password",
       "CONFIRM": "Conferma la nuova password",
-      "RESET": "Ripristina la password corrente",
+      "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
@@ -415,21 +415,21 @@
       "PHONE": {
         "TITLE": "Telefono",
         "VALID": "convalidato",
-        "RESEND": "Reinvia il messaggio di testo di verifica",
+        "RESEND": "Reinvia il messaggio per la verifica",
         "EDITTITLE": "Cambiare il numero",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
-        "DELETETITLE": "Cancellare il numero di telefono",
-        "DELETEDESC": "Vuoi davvero cancellare il numero di telefono"
+        "DELETETITLE": "Rimuovi il numero di telefono",
+        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"
       },
-      "RESENDCODE": "Invia di nuovo il codice",
+      "RESENDCODE": "Reinvia il codice",
       "ENTERCODE": "Verifica",
-      "ENTERCODE_DESC": "Verificare il codice"
+      "ENTERCODE_DESC": "Verifica il codice"
     },
     "GRANTS": {
-      "TITLE": "Borse di studio per gli utenti",
+      "TITLE": "User Grants",
       "DESCRIPTION": "Concedere a questo utente l'accesso a certi progetti",
       "CREATE": {
-        "TITLE": "Creare la concessione dell'utente",
+        "TITLE": "Crea User Grant",
         "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli di progetto corrispondenti."
       },
       "FILTER": {
@@ -460,7 +460,7 @@
       "FOUND": "Trovato"
     },
     "TARGET": {
-      "SELF": "Se volete concedere l'accesso a un utente di un'altra organizzazione",
+      "SELF": "Se vuoi concedere l'accesso a un utente di un'altra organizzazione",
       "EXTERNAL": "Per concedere l'accesso a un utente della tua organizzazione",
       "CLICKHERE": "clicca qui"
     },
@@ -474,7 +474,7 @@
       "CREATED": "Utente creato con successo.",
       "SAVED": "Profilo salvato con successo.",
       "EMAILSAVED": "E-mail salvata con successo.",
-      "INITEMAILSENT": "Inizializzazione della posta inviata.",
+      "INITEMAILSENT": "Email di inizializzazione inviata.",
       "PHONESAVED": "Telefono salvato con successo.",
       "PHONEREMOVED": "Il telefono \u00e8 stato rimosso.",
       "PHONEVERIFIED": "Telefono verificato con successo.",
@@ -492,19 +492,19 @@
       "SELECTEDDEACTIVATED": "Utenti selezionati disattivati.",
       "SELECTEDKEYSDELETED": "Tasti selezionati cancellati.",
       "KEYADDED": "Chiave aggiunta!",
-      "MACHINEADDED": "Utente del servizio creato!",
+      "MACHINEADDED": "Utente di servizio creato!",
       "DELETED": "Utente cancellato con successo!",
       "UNLOCKED": "Utente sbloccato con successo!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link di registrazione inviato con successo."
+      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo."
     },
     "MEMBERSHIPS": {
-      "TITLE": "Ruoli del manager di ZITADEL",
-      "DESCRIPTION": "Queste sono tutte le sovvenzioni dei membri dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o di IAM.",
+      "TITLE": "Memberships di ZITADEL",
+      "DESCRIPTION": "Queste sono tutte le sovvenzioni dei membri dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o di sistema.",
       "ORGCONTEXT": "Si vedono tutte le organizzazioni e i progetti che sono collegati all'organizzazione attualmente selezionata.",
       "USERCONTEXT": "Vedi tutte le organizzazioni e i progetti a cui sei autorizzato. Comprese le altre organizzazioni.",
       "CREATIONDATE": "Data di creazione",
       "CHANGEDATE": "Ultima modifica",
-      "DISPLAYNAME": "Nome del display",
+      "DISPLAYNAME": "DisplayName",
       "REMOVE": "Rimuovi",
       "TYPE": "Tipo",
       "TYPES": {
@@ -517,36 +517,36 @@
   },
   "IAM": {
     "POLICIES": {
-      "TITLE": "Politiche IAM e impostazioni di accesso",
-      "DESCRIPTION": "Gestisci le tue politiche ZITADEL e le impostazioni di accesso alla gestione."
+      "TITLE": "Impostazioni IAM e impostazioni di accesso",
+      "DESCRIPTION": "Gestisci le tue impostazioni ZITADEL e le impostazioni di accesso alla gestione."
     },
     "EVENTSTORE": {
-      "TITLE": "Amministrazione dello stoccaggio IAM",
-      "DESCRIPTION": "Gestisci le tue viste ZITADEL e gli eventi falliti."
+      "TITLE": "IAM Eventstore",
+      "DESCRIPTION": "Gestisci i view di ZITADEL e gli eventi falliti."
     },
     "MEMBER": {
       "TITLE": "Manager",
       "DESCRIPTION": "I manager possono aggiungere e modificare le organizzazioni e apportare modifiche ai loro progetti e applicazioni corrispondenti."
     },
     "VIEWS": {
-      "TITLE": "Visualizzazioni",
+      "TITLE": "Views",
       "DESCRIPTION": "Questa carta mostra le tue visualizzazioni ZITADEL.",
       "VIEWNAME": "Nome",
       "DATABASE": "Database",
       "SEQUENCE": "Sequenza",
       "EVENTTIMESTAMP": "Timestamp",
-      "LASTSPOOL": "Bobina di successo",
+      "LASTSPOOL": "ultimo Pool",
       "ACTIONS": "Azioni",
-      "CLEAR": "Chiaro",
-      "CLEARED": "La vista \u00e8 stata cancellata con successo!",
+      "CLEAR": "ripristina",
+      "CLEARED": "View ripristinato con successo!",
       "DIALOG": {
-        "VIEW_CLEAR_TITLE": "Vista chiara",
-        "VIEW_CLEAR_DESCRIPTION": "Stai per cancellare una vista. La cancellazione di una vista crea un processo durante il quale i dati potrebbero non essere disponibili per gli utenti finali. Sei davvero sicuro?"
+        "VIEW_CLEAR_TITLE": "Ripristina View",
+        "VIEW_CLEAR_DESCRIPTION": "Stai per ripristinare una vista. La cancellazione o ripristinazione di una vista crea un processo durante il quale i dati potrebbero non essere disponibili per gli utenti finali. Sei davvero sicuro?"
       }
     },
     "FAILEDEVENTS": {
       "TITLE": "Eventi falliti",
-      "DESCRIPTION": "Questa carta mostra i tuoi eventi falliti.",
+      "DESCRIPTION": "Questa tabella mostra gli eventi di ZITADEL falliti.",
       "VIEWNAME": "Nome",
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Sequenza fallita",
@@ -558,8 +558,8 @@
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager rimosso.",
-      "MEMBERSADDED": "I manager hanno aggiunto.",
-      "MEMBERADDED": "Il manager ha aggiunto.",
+      "MEMBERSADDED": "I manager sono stati aggiunti con successo.",
+      "MEMBERADDED": "Il manager è stato aggiunto con successo.",
       "MEMBERCHANGED": "Manager cambiato.",
       "ROLEREMOVED": "Ruolo rimosso.",
       "ROLECHANGED": "Ruolo cambiato.",
