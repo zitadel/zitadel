@@ -34,8 +34,27 @@ In the advanced behavior you can choose if the loginname suffix (domain e.g road
 If you like to trigger your settings for your applications you have different possibilities.
 
 ### 1. Primary Domain Scope
-Send a primary domain scope with your authorization request to trigger your organization.
+Send a [primary domain scope](https://docs.zitadel.ch/docs/apis/openidoauth/scopes#reserved-scopes) with your [authorization request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request) to trigger your organization.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
+
+See the following link as an example. Users will be able to register and login to the organization that verified the @caos.ch domain only.
+```
+https://accounts.zitadel.ch/oauth/v2/authorize?client_id=69234247558357051%40zitadel&scope=openid%20profile%20urn%3Azitadel%3Aiam%3Aorg%3Adomain%3Aprimary%3Acaos.ch&redirect_uri=https%3A%2F%2Fconsole.zitadel.ch%2Fauth%2Fcallback&state=testd&response_type=code&nonce=test&code_challenge=UY30LKMy4bZFwF7Oyk6BpJemzVblLRf0qmFT8rskUW0
+```
+
+:::info
+
+Make sure to replace the domain `caos.ch` with your own domain to trigger the correct branding.
+
+:::
+
+:::caution
+
+This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request).
+
+:::
+
+
 
 ### 2. Setting on your Project
 Set the private labeling setting on your project to define which branding should trigger.
