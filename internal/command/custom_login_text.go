@@ -661,6 +661,10 @@ func (c *Commands) createPasswordlessRegistrationDoneEvents(ctx context.Context,
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, existingText.PasswordlessRegistrationDoneDescriptionClose, text.PasswordlessRegistrationDone.DescriptionClose, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, existingText.PasswordlessRegistrationDoneNextButtonText, text.PasswordlessRegistrationDone.NextButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
