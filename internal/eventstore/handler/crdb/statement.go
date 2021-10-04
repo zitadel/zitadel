@@ -201,6 +201,66 @@ func NewArrayRemoveCol(column string, value interface{}) handler.Column {
 	}
 }
 
+//NewCopyStatement creates a new upsert statement which updates a column from an existing row
+// cols represent the columns which are objective to change.
+// if the col of the column is nil the data will be copied from the selected row
+// if the col of the column is not nil the data will be set by the static value
+// conds represent the conditions for the selection subquery
+func NewCopyStatement(event eventstore.EventReader, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+	columnNames := make([]string, len(cols))
+	selectColumns := make([]string, len(cols))
+	argCounter := 0
+	args := []interface{}{}
+
+	for i, col := range cols {
+		columnNames[i] = col.Name
+		selectColumns[i] = col.Name
+		if col.Value != nil {
+			argCounter++
+			selectColumns[i] = "$" + strconv.Itoa(argCounter)
+			args = append(args, col.Value)
+		}
+	}
+
+	wheres := make([]string, len(conds))
+	for i, cond := range conds {
+		argCounter++
+		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
+		args = append(args, cond.Value)
+	}
+
+	config := execConfig{
+		args: args,
+	}
+
+	if len(cols) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
+	if len(conds) == 0 {
+		config.err = handler.ErrNoCondition
+	}
+
+	q := func(config execConfig) string {
+		return "UPSERT INTO " +
+			config.tableName +
+			" (" +
+			strings.Join(columnNames, ", ") +
+			") SELECT " +
+			strings.Join(selectColumns, ", ") +
+			" FROM " +
+			config.tableName + " AS copy_table WHERE " +
+			strings.Join(wheres, " AND ")
+	}
+
+	return &handler.Statement{
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          exec(config, q, opts),
+	}
+}
+
 func columnsToQuery(cols []handler.Column) (names []string, parameters []string, values []interface{}) {
 	names = make([]string, len(cols))
 	values = make([]interface{}, len(cols))
