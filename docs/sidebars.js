@@ -208,6 +208,7 @@ module.exports = {
                         'concepts/zitadel/objects/granted_projects',
                         'concepts/zitadel/objects/users',
                         'concepts/zitadel/objects/managers',
+                        'concepts/zitadel/objects/jwt_idp',
                     ],
                 },
             ],
