@@ -4,7 +4,6 @@ title: Login Users into your Application
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import CodeFlowChart from '../../imports/_code-flow-chart.md';
 
 ## Overview
 
@@ -27,9 +26,9 @@ Please read the following guide about the [different-client-profiles](../authori
 
 For a basic understanding of OAuth and its flows, we'll briefly describe the most important flow: **Authorization Code**.
 
-The following diagram demonstrates a basic authorization_code flow: 
+The following diagram demonstrates a basic authorization_code flow:
 
-<CodeFlowChart />
+![Authorization Code Flow](/img/guides/auth_flow.png)
 
 1. When an unauthenticated user visits your application,
 2. you will create an authorization request to the authorization endpoint.
@@ -37,7 +36,8 @@ The following diagram demonstrates a basic authorization_code flow:
 4. The user will have to authenticate using the demanded auth mechanics.
 5. Your application will be called on the registered callback path (redirect_uri) and be provided an authorization_code.
 6. This authorization_code must then be sent together with you applications authentication (client_id + client_secret) to the token_endpoint
-7. In exchange the Authorization Server (ZITADEL) will return an access_token and if requested a refresh_token and in the case of OIDC an id_token as well 
+7. In exchange the Authorization Server (ZITADEL) will return an access_token and if requested a refresh_token and in the case of OIDC an id_token as well
+8. The access_token can then be used to call a Resource Server (API). The token will be sent as Authorization Header.
 
 This flow is the same when using PKCE or JWT with Private Key for authentication.
 
