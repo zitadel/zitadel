@@ -376,6 +376,10 @@ Errors:
     WrongTriggerType: TriggerType ist ungültig
     NoChanges: Keine Änderungen
     ActionIDsNotExist: ActionIDs existieren nicht
+  Query:
+    CloseRows: SQL Statement konnte nicht abgeschlossen werden
+    SQLStatement: SQL Statement konnte nicht erstellt werden
+    InvalidRequest: Anfage ist ungültig
 EventTypes:
   user:
     added: Benutzer hinzugefügt

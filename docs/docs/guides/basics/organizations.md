@@ -11,23 +11,9 @@ title: Organizations
 
 ## What is an organization?
 
-ZITADEL is organized around the idea that:
+import OrgDescription from '../../concepts/zitadel/objects/_org_description.mdx';
 
-* Multiple organizations share the same system. In this case multiple organizations share the same service, zitadel.ch
-* organizations can grant each other rights to self-manage certain aspects of the IAM (eg, roles for access management)
-* organizations are vessels for users and projects
-
-![Overview ZITADEL Organizations](/img/zitadel_organizations.png)
-
-Organizations in ZITADEL are therefore comparable to tenants of a system or organizational units of a directory based system.
-
-You can use projects within your organization to manage the security context of closely related components, such as roles, grants and authorizations for multiple clients. You can set up multiple projects within your organization.
-
-ZITADEL allows you to give other organizations permission to manage certain aspects of a project within your organization on their own. This means you could set up a project with roles that should exist within your service/software, but allow another organization to allocate the roles to users within their own organization. As a service provider, you will find this feature useful, as it allows you to establish a self-service culture for your business customers.
-
-![Organization Grant](/img/zitadel_organization_grant.png)
-
-Each organization has its own pool of usernames, which includes human and service users, for its domain (`{username}@{domainname}.{zitadeldomain}`). A username is unique within your organization. You can configure ZITADEL to use your own domain, and simplify user experience (`{loginname}@{yourdomain.tld}`).
+<OrgDescription name="OrgDescription" />
 
 There are several more modules in our documentation to go into more detail regarding organization management, projects, clients, and users. But first let’s create a new organization and verify your domain name.
 

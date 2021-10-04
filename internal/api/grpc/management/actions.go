@@ -10,18 +10,22 @@ import (
 )
 
 func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsRequest) (*mgmt_pb.ListActionsResponse, error) {
-	query, _ := listActionsToQuery(authz.GetCtxData(ctx).OrgID, req)
+	query, err := listActionsToQuery(authz.GetCtxData(ctx).OrgID, req)
+	if err != nil {
+		return nil, err
+	}
 	actions, err := s.query.SearchActions(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListActionsResponse{
-		Result: action_grpc.ActionsToPb(actions),
+		Details: obj_grpc.ToListDetails(actions.Count, actions.Sequence, actions.Timestamp),
+		Result:  action_grpc.ActionsToPb(actions.Actions),
 	}, nil
 }
 
 func (s *Server) GetAction(ctx context.Context, req *mgmt_pb.GetActionRequest) (*mgmt_pb.GetActionResponse, error) {
-	action, err := s.query.GetAction(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	action, err := s.query.GetActionByID(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

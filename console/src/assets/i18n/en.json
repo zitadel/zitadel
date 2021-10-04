@@ -823,7 +823,8 @@
         "passwordlessPromptText":"Passwordless Prompt",
         "passwordlessRegistrationDoneText":"Passwordless Registration Done",
         "passwordlessRegistrationText":"Passwordless Registration",
-        "passwordlessText":"Passwordless"
+        "passwordlessText":"Passwordless",
+        "externalRegistrationUserOverviewText":"External Registration User Overview"
       }
     },
     "MESSAGE_TEXTS": {

@@ -8,7 +8,7 @@
     </ng-template>
 
     <div class="table-wrapper">
-        <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
+        <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
                     <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"

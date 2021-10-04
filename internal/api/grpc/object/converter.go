@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/pkg/grpc/object"
 	object_pb "github.com/caos/zitadel/pkg/grpc/object"
 )
 
@@ -69,7 +68,7 @@ func ToListDetails(
 	totalResult,
 	processedSequence uint64,
 	viewTimestamp time.Time,
-) *object.ListDetails {
+) *object_pb.ListDetails {
 	return &object_pb.ListDetails{
 		TotalResult:       totalResult,
 		ProcessedSequence: processedSequence,
@@ -79,22 +78,45 @@ func ToListDetails(
 
 func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
 	switch method {
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
 		return domain.SearchMethodEquals
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
 		return domain.SearchMethodEqualsIgnoreCase
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
 		return domain.SearchMethodStartsWith
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
 		return domain.SearchMethodStartsWithIgnoreCase
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
 		return domain.SearchMethodContains
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
 		return domain.SearchMethodContainsIgnoreCase
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
 		return domain.SearchMethodEndsWith
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
 		return domain.SearchMethodEndsWithIgnoreCase
+	default:
+		return -1
+	}
+}
+
+func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
+	switch method {
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
+		return query.TextEquals
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
+		return query.TextEqualsIgnoreCase
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
+		return query.TextStartsWith
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+		return query.TextStartsWithIgnoreCase
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
+		return query.TextContains
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+		return query.TextContainsIgnoreCase
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+		return query.TextEndsWith
+	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+		return query.TextEndsWithIgnoreCase
 	default:
 		return -1
 	}
@@ -105,27 +127,4 @@ func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc boo
 		return
 	}
 	return query.Offset, uint64(query.Limit), query.Asc
-}
-
-func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
-	switch method {
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
-		return query.TextEquals
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
-		return query.TextEqualsIgnore
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
-		return query.TextStartsWith
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
-		return query.TextStartsWithIgnore
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
-		return query.TextContains
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
-		return query.TextContainsIgnore
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
-		return query.TextEndsWith
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-		return query.TextEndsWithIgnore
-	default:
-		return -1
-	}
 }

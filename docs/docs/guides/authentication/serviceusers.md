@@ -28,11 +28,10 @@ title: Service Users
     </tr>
 </table>
 
-## Human vs. Machine
 
-ZITADEL supports human an machine users. We call human users simply "Users" and machine users "Service Users".
+import UserDescription from '../../concepts/zitadel/objects/_user_description.mdx';
 
-With Service Users you would typically secure backend services. For example in ZITADEL you would require an authenticated Service User to access the Management API. The main difference between human and machine users is the type of credentials that can be used for authentication: Human users typically logon via an login prompt, but Machine users require a non-interactive logon process.
+<UserDescription name="UserDescription" />
 
 ## Exercise: Create a Service User
 

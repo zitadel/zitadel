@@ -14,10 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -30,38 +27,6 @@ type OrgRepository struct {
 	Eventstore     eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
-}
-
-func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, err := repo.View.GetLatestOrgSequence()
-	logging.Log("EVENT-7Udhz").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org sequence")
-	members, count, err := repo.View.SearchOrgs(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &org_model.OrgSearchResult{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.OrgsToModel(members),
-	}
-	if err == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *OrgRepository) OrgByPrimaryDomain(primaryDomain string) (*org_model.OrgView, error) {
-	org, err := repo.View.OrgByPrimaryDomain(primaryDomain)
-	if err != nil {
-		return nil, err
-	}
-	return model.OrgToModel(org), nil
 }
 
 func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {

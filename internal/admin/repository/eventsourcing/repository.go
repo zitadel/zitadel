@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/static"
 )
@@ -61,9 +61,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
-			Eventstore:     es,
 			View:           view,
-			SearchLimit:    conf.SearchLimit,
 			SystemDefaults: systemDefaults,
 		},
 		IAMRepository: eventstore.IAMRepository{

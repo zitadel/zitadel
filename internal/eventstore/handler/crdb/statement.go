@@ -181,6 +181,26 @@ func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func
 	}
 }
 
+func NewArrayAppendCol(column string, value interface{}) handler.Column {
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "array_append(" + column + ", " + placeholder + ")"
+		},
+	}
+}
+
+func NewArrayRemoveCol(column string, value interface{}) handler.Column {
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "array_remove(" + column + ", " + placeholder + ")"
+		},
+	}
+}
+
 func columnsToQuery(cols []handler.Column) (names []string, parameters []string, values []interface{}) {
 	names = make([]string, len(cols))
 	values = make([]interface{}, len(cols))
@@ -189,7 +209,9 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 		names[i] = col.Name
 		values[i] = col.Value
 		parameters[i] = "$" + strconv.Itoa(i+1)
-
+		if col.ParameterOpt != nil {
+			parameters[i] = col.ParameterOpt(parameters[i])
+		}
 	}
 	return names, parameters, values
 }
