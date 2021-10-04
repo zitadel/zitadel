@@ -1,7 +1,4 @@
 import { sign } from 'jsonwebtoken'
-import { getUnixTime } from 'date-fns';
-import { debug } from 'console';
-
 interface apiCallProperties {
     authHeader: string
     baseURL: string
@@ -14,9 +11,9 @@ declare global {
             /**
              * Custom command that authenticates a user.
              *
-             * @example cy.consolelogin('hodor', 'hodor1234')
+             * @example cy.ssoLogin('hodor', 'hodor1234')
              */
-             ssoLogin(username: string, password: string): void
+             ssoLogin(user: User): void
 
             /**
              * Custom command that authenticates a user.
@@ -35,104 +32,110 @@ declare global {
     }
 }
 
+Cypress.Commands.add('ssoLogin', { prevSubject: false }, (user: User) => {
 
-/**
- * Hit the local login endpoint in the application which will redirect to Auth0.
- */
- function startLogin() {
-    return cy.request({
-      url: 'http://localhost:8080/login',
-      followRedirect: false
-    });
-  }
-  
-  /**
-   * Universal Login
-   * @param {*} user
-   * @param {*} loginUrl
-   */
-  function followUniversalLogin(user, loginUrl) {
-    return cy.task('LoginPuppeteer', {
-      username: user.email,
-      password: user.password,
-      loginUrl,
-      callbackUrl: 'http://localhost:8080/callback'
-    });
-  }
+    let creds = credentials(user)
 
-  function createCookie(cookie: any, domain: string) {
-    return {
-      name: cookie.name,
-      value: cookie.value,
-      options: {
-        domain: domain,
-        expiry: getFutureTime(15),
-        httpOnly: cookie.httpOnly,
-        path: cookie.path,
-        sameSite: cookie.sameSite,
-        secure: cookie.secure,
-        session: cookie.session
-      }
-    };
-  }
+    cy.session(creds.username, () => {
 
-  function getFutureTime(minutesInFuture) {
-    const time = new Date(new Date().getTime() + minutesInFuture * 60000);
-    return getUnixTime(time);
-  }
+        const accountsHost = `accounts.${Cypress.env('apiCallsDomain')}`
 
-Cypress.Commands.add('ssoLogin', { prevSubject: false }, (username: string, password: string) => {
-    
-/*    cy.task('login', { username: username, password: password }, { timeout: 30000 }).then(({ cookies, callbackUrl }) => {
+        const cookies = new Map<string, string>()
 
-        cy.visit(callbackUrl);
-
-        debugger
-
-        cy.intercept(`https://accounts.${Cypress.env('apiCallsDomain')}/oauth/v2/authorize*`, (req) => {
-            req.headers['x-custom-headers-req'] = 'added by cy.intercept'
-            req.headers['Cookie']=`${cookies[0].name}=${cookies[0].value}; ${cookies[1].name}=${cookies[1].value}; ${cookies[2].name}=${cookies[2].value}; `
-            req.query['promt']='login'
-            console.log("REQUEST", req)
-/*            req.continue((res) => {
-                var loc: string = <string>res.headers['location']
-                loc = loc.replace('https://accounts.zitadel.dev', 'http://localhost:4200')
-
-                req.headers['x-custom-headers-res'] = 'added by cy.intercept'
-                res.headers['location']=loc
-                console.log("RESPONSE", res)
+        cy.intercept({
+            method: 'GET',
+            hostname: accountsHost,
+            url: '/login*',
+            times: 1
+        }, (req) => {
+            req.headers['cookie'] = requestCookies(cookies)
+            req.continue((res) => {
+                updateCookies(res.headers['set-cookie'] as string[], cookies)
             })
-//            req.url = "https://example.com"
-//            req.continue()
-        })*/
-/*        var consoleUrl: string = Cypress.env('consoleUrl')
-        consoleUrl = consoleUrl.substr(consoleUrl.indexOf("://")+3)
+        }).as('login')
 
-        cy.visit(callbackUrl);
+        cy.intercept({
+            method: 'POST',
+            hostname: accountsHost,
+            url: '/loginname*',
+            times: 1
+        }, (req) => {
+            req.headers['cookie'] = requestCookies(cookies)
+            req.continue((res) => {
+                updateCookies(res.headers['set-cookie'] as string[], cookies)
+            })
+        }).as('loginName')
 
-        cookies.map(c => createCookie(c, consoleUrl)).forEach(c => {
-            cy.setCookie(c.name, c.value, c.options)    
-        });
-        cookies.map(c => createCookie(c, 'accounts.console.dev')).forEach(c => {
-            cy.setCookie(c.name, c.value, c.options)    
-        });*/
+        cy.intercept({
+            method: 'POST',
+            hostname: accountsHost,
+            url: '/password*',
+            times: 1
+        }, (req) => {
+            req.headers['cookie'] = requestCookies(cookies)
+            req.continue((res) => {
+                updateCookies(res.headers['set-cookie'] as string[], cookies)
+            })
+        }).as('password')
 
-/*
-        const cookie0 = createCookie(cookies[0],consoleUrl)
-        cy.setCookie(cookie0.name, cookie0.value, cookie0.options).then(() => {
-            const cookie1 = createCookie(cookies[1],consoleUrl)
-            cy.setCookie(cookie1.name, cookie1.value, cookie1.options).then(() => {
-                const cookie2 = createCookie(cookies[2],consoleUrl)
-                cy.setCookie(cookie2.name, cookie2.value, cookie2.options).then(() => {
-                })
+        cy.intercept({
+            method: 'GET',
+            hostname: accountsHost,
+            url: '/login/success*',
+            times: 1
+        }, (req) => {
+            req.headers['cookie'] = requestCookies(cookies)
+            req.continue((res) => {
+                updateCookies(res.headers['set-cookie'] as string[], cookies)
+            })
+        }).as('success') 
+
+        cy.intercept({
+            method: 'GET',
+            hostname: accountsHost,
+            url: '/oauth/v2/authorize/callback*',
+            times: 1
+        }, (req) => {
+            req.headers['cookie'] = requestCookies(cookies)
+            req.continue((res) => {
+                updateCookies(res.headers['set-cookie'] as string[], cookies)
+            })
+        }).as('callback')    
+        
+        cy.intercept({
+            method: 'GET',
+            url: `https://${accountsHost}/oauth/v2/authorize*`,
+            hostname: accountsHost,
+            times: 1,
+        }, (req) => {
+            req.continue((res) => {
+                updateCookies(res.headers['set-cookie'] as string[], cookies)
             })
         })
-    })*/
+
+        cy.visit(Cypress.env('consoleUrl'));
+
+        cy.wait('@login')
+        cy.get('#loginName').type(creds.username)
+        cy.get('#submit-button').click()
+
+        cy.wait('@loginName')
+        cy.get('#password').type(creds.password) 
+        cy.get('#submit-button').click()
+
+        cy.wait('@callback')
+
+        cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
+
+    }, {
+        validate: () => {
+            cy.visit(`${Cypress.env('consoleUrl')}/users/me`)
+        }        
+    })
+
 })
     
 Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
-
-//    cy.setCookie('__Secure-caos.zitadel.useragent', 'MTYzMjIyMDc4MnxXQUdsTloyNjJhX0xKYkFQYUduUlo2cWZGbXBqSTUwMHFtZ2Rqa3JjSDJfbV9LM3p6TXVRMUdac1hWYUsxNzNFdEF0WDVQaUJoWExHMjZ4U3FGRkZKWVU2bWp2a19Gaz18FV5k9ZcbWfmw7VLpsIFCzR4EIeM9owJnWDc7OeBbOSA=', {secure: true})
 
     window.sessionStorage.removeItem("zitadel:access_token")
     cy.visit(Cypress.env('consoleUrl')).then(() => {
@@ -144,6 +147,7 @@ Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, 
         cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
     })
 })
+
 
 Cypress.Commands.add('apiAuthHeader', { prevSubject: false }, () => {
 
@@ -189,3 +193,34 @@ Cypress.Commands.add('apiAuthHeader', { prevSubject: false }, () => {
         }
     })
 })
+
+function updateCookies(newCookies: string[], currentCookies: Map<string, string>) {
+    newCookies.forEach(cs => {
+        cs.split('; ').forEach(cookie => {
+            const idx = cookie.indexOf('=')
+            currentCookies.set(cookie.substring(0,idx), cookie.substring(idx+1))
+        })
+    })
+}
+
+function requestCookies(currentCookies: Map<string, string>): string[] {
+    let list = []
+    currentCookies.forEach((val, key) => {
+        list.push(key+"="+val)
+    })
+    return list
+}
+
+export enum User {
+    OrgOwner = 'org_owner',
+    OrgOwnerViewer = 'org_owner_viewer',
+    OrgProjectCreator = 'org_project_creator',
+}
+
+function credentials(user: User) {
+    
+    return {
+        username: `${user}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`,
+        password: Cypress.env(`${user}_password`)
+    }
+}

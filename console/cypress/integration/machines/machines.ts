@@ -1,4 +1,4 @@
-import { ORG_MANAGER } from "../shared/types"
+import { User } from "../../support/commands"
 
 // NEEDS TO BE DISABLED!!!!!! this is just for testing
 /*
@@ -13,19 +13,14 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 
 describe('machine', () => {
 
-    ;[ORG_MANAGER.org_owner].forEach(user => {
+    ;[User.OrgOwner].forEach(user => {
 
-        describe(`impersonating an organization manager with permission "${user}"`, () => {
+        describe(`as user "${user}"`, () => {
 
-            before(()=> {
-                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`, Cypress.env(`${user.toLowerCase()}_password`))
-//                cy.ssoLogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`, Cypress.env(`${user.toLowerCase()}_password`))
-//                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
-//                cy.get("app-refresh-table")
-            })
-
-            it.only('debug', () => {
-
+            beforeEach(()=> {
+                cy.ssoLogin(user)
+                cy.visit(Cypress.env('consoleUrl') + '/users/list/machines')
+                cy.get('[data-cy=timestamp]')
             })
 
             describe(`as user ${user}`, () => {

@@ -7,6 +7,7 @@
       "html": true,
       "json": true
     },
-    "chromeWebSecurity": false
+    "chromeWebSecurity": false,
+    "experimentalSessionSupport": true
   }
   
