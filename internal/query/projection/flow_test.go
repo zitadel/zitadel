@@ -21,37 +21,54 @@ func TestFlowProjection_reduces(t *testing.T) {
 		reduce func(event eventstore.EventReader) (*handler.Statement, error)
 		want   wantReduce
 	}{
-		//TODO: multi stmt tests
-		//{
-		//	name: "reduceTriggerActionsSetEventType",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(org.TriggerActionsSetEventType),
-		//			org.AggregateType,
-		//			[]byte(`{"flowType": 1, "triggerType": 1, "actionIDs": ["id1", "id2"]}`),
-		//		), org.TriggerActionsSetEventMapper),
-		//	},
-		//	reduce: (&FlowProjection{}).reduceTriggerActionsSetEventType,
-		//	want: wantReduce{
-		//		projection:       FlowTriggerTable,
-		//		aggregateType:    eventstore.AggregateType("org"),
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		executer: &testExecuter{
-		//			shouldExec:   true,
-		//			expectedStmt: "DELETE FROM zitadel.projections.actions WHERE (flow_type, trigger_type) = ($1, $2); INSERT INTO zitadel.projections.actions (resource_owner, flow_type, trigger_type, action_id, trigger_sequence) = ($3, $1, $2, $4, $5); INSERT INTO zitadel.projections.actions (resource_owner, flow_type, trigger_type, action_id, trigger_sequence) = ($3, $1, $2, $6, $7)",
-		//			expectedArgs: []interface{}{
-		//				domain.FlowTypeExternalAuthentication,
-		//				domain.TriggerTypePostAuthentication,
-		//				"ro-id",
-		//				"id1",
-		//				0,
-		//				"id2",
-		//				1,
-		//			},
-		//		},
-		//	},
-		//},
+		{
+			name: "reduceTriggerActionsSetEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.TriggerActionsSetEventType),
+					org.AggregateType,
+					[]byte(`{"flowType": 1, "triggerType": 1, "actionIDs": ["id1", "id2"]}`),
+				), org.TriggerActionsSetEventMapper),
+			},
+			reduce: (&FlowProjection{}).reduceTriggerActionsSetEventType,
+			want: wantReduce{
+				projection:       FlowTriggerTable,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.flows_triggers WHERE (flow_type = $1) AND (trigger_type = $2)",
+							expectedArgs: []interface{}{
+								domain.FlowTypeExternalAuthentication,
+								domain.TriggerTypePostAuthentication,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.flows_triggers (resource_owner, flow_type, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"ro-id",
+								domain.FlowTypeExternalAuthentication,
+								domain.TriggerTypePostAuthentication,
+								"id1",
+								0,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.flows_triggers (resource_owner, flow_type, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"ro-id",
+								domain.FlowTypeExternalAuthentication,
+								domain.TriggerTypePostAuthentication,
+								"id2",
+								1,
+							},
+						},
+					},
+				},
+			},
+		},
 		{
 			name: "reduceFlowClearedEventType",
 			args: args{
@@ -68,10 +85,13 @@ func TestFlowProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "DELETE FROM zitadel.projections.flows_triggers WHERE (flow_type = $1)",
-					expectedArgs: []interface{}{
-						domain.FlowTypeExternalAuthentication,
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.flows_triggers WHERE (flow_type = $1)",
+							expectedArgs: []interface{}{
+								domain.FlowTypeExternalAuthentication,
+							},
+						},
 					},
 				},
 			},

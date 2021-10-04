@@ -1,1 +1,0 @@
-ALTER TABLE zitadel.projections.orgs RENAME COLUMN domain TO primary_domain;

@@ -36,11 +36,14 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "DELETE FROM zitadel.projections.project_roles WHERE (role_key = $1) AND (project_id = $2)",
-					expectedArgs: []interface{}{
-						"key",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_roles WHERE (role_key = $1) AND (project_id = $2)",
+							expectedArgs: []interface{}{
+								"key",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -61,15 +64,18 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.project_roles SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						"New Key",
-						"New Group",
-						"key",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.project_roles SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"New Key",
+								"New Group",
+								"key",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -89,9 +95,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				executer: &testExecuter{
-					shouldExec: false,
-				},
+				executer:         &testExecuter{},
 			},
 		},
 		{
@@ -110,18 +114,21 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "INSERT INTO zitadel.projections.project_roles (role_key, project_id, creation_date, change_date, resource_owner, sequence, display_name, group_name, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-					expectedArgs: []interface{}{
-						"key",
-						"agg-id",
-						anyArg{},
-						anyArg{},
-						"ro-id",
-						uint64(15),
-						"Key",
-						"Group",
-						"editor-user",
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.project_roles (role_key, project_id, creation_date, change_date, resource_owner, sequence, display_name, group_name, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedArgs: []interface{}{
+								"key",
+								"agg-id",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								uint64(15),
+								"Key",
+								"Group",
+								"editor-user",
+							},
+						},
 					},
 				},
 			},
