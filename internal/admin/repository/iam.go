@@ -29,9 +29,6 @@ type IAMRepository interface {
 	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
 	ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
 
-	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetDefaultPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 
 	GetDefaultMessageText(ctx context.Context, textType, language string) (*domain.CustomMessageText, error)

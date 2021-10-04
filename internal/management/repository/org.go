@@ -40,9 +40,4 @@ type OrgRepository interface {
 
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 	GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error)
-
-	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 }

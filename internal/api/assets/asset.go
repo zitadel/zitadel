@@ -18,6 +18,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/management/repository"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 )
 
@@ -28,6 +29,7 @@ type Handler struct {
 	authInterceptor *http_mw.AuthInterceptor
 	idGenerator     id.Generator
 	orgRepo         repository.OrgRepository
+	query           *query.Queries
 }
 
 func (h *Handler) AuthInterceptor() *http_mw.AuthInterceptor {
@@ -73,6 +75,7 @@ func NewHandler(
 	idGenerator id.Generator,
 	storage static.Storage,
 	orgRepo repository.OrgRepository,
+	queries *query.Queries,
 ) http.Handler {
 	h := &Handler{
 		commands:        commands,
@@ -81,6 +84,7 @@ func NewHandler(
 		idGenerator:     idGenerator,
 		storage:         storage,
 		orgRepo:         orgRepo,
+		query:           queries,
 	}
 
 	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?

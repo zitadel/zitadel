@@ -56,9 +56,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newLoginPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
-		newLabelPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es},
-			staticStorage),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
 			defaults),

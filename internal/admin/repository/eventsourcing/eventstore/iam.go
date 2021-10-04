@@ -230,22 +230,6 @@ func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_
 	}, nil
 }
 
-func (repo *IAMRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
-}
-
-func (repo *IAMRepository) GetDefaultPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStatePreview))
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
-}
-
 func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
 	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {

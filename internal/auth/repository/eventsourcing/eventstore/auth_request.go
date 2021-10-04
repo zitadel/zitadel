@@ -33,6 +33,7 @@ type AuthRequestRepo struct {
 	View         *view.View
 	Eventstore   v1.Eventstore
 
+	LabelPolicyProvider       labelPolicyProvider
 	UserSessionViewProvider   userSessionViewProvider
 	UserViewProvider          userViewProvider
 	UserCommandProvider       userCommandProvider
@@ -54,6 +55,10 @@ type AuthRequestRepo struct {
 	MultiFactorCheckLifeTime   time.Duration
 
 	IAMID string
+}
+
+type labelPolicyProvider interface {
+	MyActiveLabelPolicy(context.Context, string) (*query.LabelPolicy, error)
 }
 
 type privacyPolicyProvider interface {
@@ -892,18 +897,41 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 }
 
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
-	policy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.IAMID, int32(domain.LabelPolicyStateActive))
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
+	policy, err := repo.LabelPolicyProvider.MyActiveLabelPolicy(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	return policy.ToDomain(), err
+	return labelPolicyToDomain(policy), nil
+}
+
+func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
+	return &domain.LabelPolicy{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:   p.ID,
+			Sequence:      p.Sequence,
+			ResourceOwner: p.ResourceOwner,
+			CreationDate:  p.CreationDate,
+			ChangeDate:    p.ChangeDate,
+		},
+		State:               p.State,
+		Default:             p.IsDefault,
+		PrimaryColor:        p.Light.PrimaryColor,
+		BackgroundColor:     p.Light.BackgroundColor,
+		WarnColor:           p.Light.WarnColor,
+		FontColor:           p.Light.FontColor,
+		LogoURL:             p.Light.LogoURL,
+		IconURL:             p.Light.IconURL,
+		PrimaryColorDark:    p.Dark.PrimaryColor,
+		BackgroundColorDark: p.Dark.BackgroundColor,
+		WarnColorDark:       p.Dark.WarnColor,
+		FontColorDark:       p.Dark.FontColor,
+		LogoDarkURL:         p.Dark.LogoURL,
+		IconDarkURL:         p.Dark.IconURL,
+		Font:                p.FontURL,
+		HideLoginNameSuffix: p.HideLoginNameSuffix,
+		ErrorMsgPopup:       p.ShouldErrorPopup,
+		DisableWatermark:    p.WatermarkDisabled,
+	}
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
