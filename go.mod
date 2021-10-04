@@ -3,7 +3,7 @@ module github.com/caos/zitadel
 go 1.16
 
 require (
-	cloud.google.com/go/storage v1.16.1
+	cloud.google.com/go/storage v1.17.0
 	cloud.google.com/go/trace v1.0.0 // indirect
 	github.com/BurntSushi/toml v0.4.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -76,7 +76,6 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.6
 	google.golang.org/api v0.57.0
-	google.golang.org/genproto v0.0.0-20210921142501-181ce0d877f6
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
