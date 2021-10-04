@@ -375,9 +375,9 @@ func (p *LabelPolicyProjection) reduceIconAdded(event eventstore.EventReader) (*
 		storeKey = handler.NewCol(LabelPolicyLightIconURLCol, e.StoreKey)
 	case *iam.LabelPolicyIconAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyLightIconURLCol, e.StoreKey)
-	case *org.LabelPolicyIconDarkRemovedEvent:
+	case *org.LabelPolicyIconDarkAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyDarkIconURLCol, e.StoreKey)
-	case *iam.LabelPolicyIconDarkRemovedEvent:
+	case *iam.LabelPolicyIconDarkAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyDarkIconURLCol, e.StoreKey)
 	default:
 		logging.LogWithFields("PROJE-6efFw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LabelPolicyIconAddedEventType, iam.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, iam.LabelPolicyIconDarkAddedEventType}).Error("was not an  event")
