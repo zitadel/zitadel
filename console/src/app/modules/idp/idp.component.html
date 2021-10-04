@@ -1,7 +1,9 @@
-<app-detail-layout [backRouterLink]="backroutes" [title]="'IDP.DETAIL.TITLE' | translate"
+<app-detail-layout [backRouterLink]="backroutes" [title]="idp?.name"
     [description]="'IDP.DETAIL.DESCRIPTION' | translate">
     <div class="container">
-        <form (ngSubmit)="updateIdp()">
+
+      <cnsl-info-row *ngIf="idp" [idp]="idp"></cnsl-info-row>
+        <form class="idp-form" (ngSubmit)="updateIdp()">
             <ng-container [formGroup]="idpForm">
                 <div class="content">
                     <cnsl-form-field appearance="outline" class="formfield">

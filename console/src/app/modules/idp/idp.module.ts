@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
+import { InfoRowModule } from '../info-row/info-row.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { IdpRoutingModule } from './idp-routing.module';
 import { IdpComponent } from './idp.component';
@@ -30,6 +31,7 @@ import { IdpComponent } from './idp.component';
     MatSelectModule,
     TranslateModule,
     MatCheckboxModule,
+    InfoRowModule,
     MatChipsModule,
     DetailLayoutModule,
   ],

@@ -1142,7 +1142,9 @@
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers"
+      "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers",
+      "DATECREATED":"Erstellt",
+      "DATECHANGED":"Geändert"
     },
     "OWNERTYPES": {
       "0": "unknown",

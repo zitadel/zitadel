@@ -6,8 +6,8 @@ import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ListIDPsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPOwnerType, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
-import { ListOrgIDPsResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { IDP, IDPOwnerType, IDPOwnerTypeQuery, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPQuery, ListOrgIDPsResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -150,7 +150,11 @@ export class IdpTableComponent implements OnInit {
     this.loadingSubject.next(true);
 
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).listOrgIDPs(limit, offset).then(resp => {
+      const query: IDPQuery = new IDPQuery();
+      const otQuery: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
+      otQuery.setOwnerType(IDPOwnerType.IDP_OWNER_TYPE_ORG);
+      query.setOwnerTypeQuery(otQuery);
+      (this.service as ManagementService).listOrgIDPs(limit, offset, [query]).then(resp => {
         this.idpResult = resp;
         this.dataSource.data = resp.resultList;
         this.loadingSubject.next(false);
@@ -162,6 +166,7 @@ export class IdpTableComponent implements OnInit {
       (this.service as AdminService).listIDPs(limit, offset).then(resp => {
         this.idpResult = resp;
         this.dataSource.data = resp.resultList;
+        console.log(this.dataSource.data);
 
         this.loadingSubject.next(false);
       }).catch(error => {

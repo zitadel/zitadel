@@ -1144,7 +1144,9 @@
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider."
+      "DESCRIPTION": "General Configuration of your identity provider.",
+      "DATECREATED":"Created",
+      "DATECHANGED":"Changed"
     },
     "OWNERTYPES": {
       "0": "unknown",

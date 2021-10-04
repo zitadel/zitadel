@@ -7,9 +7,14 @@
         </div>
         <div class="detail-right">
             <div class="head">
-                <h1>{{ title }}</h1>
-                <p class="desc">{{ description }}</p>
-                <ng-content></ng-content>
+              <div class="top-view">
+                <div>
+                  <h1>{{ title }}</h1>
+                  <p class="desc">{{ description }}</p>
+                </div>
+                <ng-content select="[actions]"></ng-content>
+              </div>
+              <ng-content></ng-content>
             </div>
         </div>
     </div>
