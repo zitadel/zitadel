@@ -2,11 +2,12 @@ package model
 
 import (
 	"encoding/json"
+	"reflect"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/lib/pq"
-	"reflect"
-	"testing"
 )
 
 func mockProjectGrantMemberData(member *es_model.ProjectGrantMember) []byte {
@@ -27,7 +28,7 @@ func TestGrantedProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: pq.StringArray{"Role"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: pq.StringArray{"Role"}})},
 				member: &ProjectGrantMemberView{},
 			},
 			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: pq.StringArray{"Role"}},
@@ -35,7 +36,7 @@ func TestGrantedProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append changed member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", Roles: pq.StringArray{"RoleChanged"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantMemberAdded, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", Roles: pq.StringArray{"RoleChanged"}})},
 				member: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: pq.StringArray{"Role"}},
 			},
 			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: pq.StringArray{"RoleChanged"}},

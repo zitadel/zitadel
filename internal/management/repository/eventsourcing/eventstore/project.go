@@ -226,14 +226,6 @@ func (repo *ProjectRepo) GetClientKey(ctx context.Context, projectID, applicatio
 	return key_view_model.AuthNKeyToModel(key), nil
 }
 
-func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {
-	grant, err := repo.View.ProjectGrantByID(grantID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ProjectGrantToModel(grant), nil
-}
-
 func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectGrantMemberView, error) {
 	member, err := repo.View.ProjectGrantMemberByIDs(projectID, userID)
 	if err != nil {

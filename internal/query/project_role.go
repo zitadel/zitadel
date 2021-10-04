@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -54,106 +53,13 @@ var (
 	}
 )
 
-func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, error)) {
-	return sq.Select(
-			ProjectRoleColumnProjectID.identifier(),
-			ProjectRoleColumnCreationDate.identifier(),
-			ProjectRoleColumnChangeDate.identifier(),
-			ProjectRoleColumnResourceOwner.identifier(),
-			ProjectRoleColumnSequence.identifier(),
-			ProjectRoleColumnKey.identifier(),
-			ProjectRoleColumnDisplayName.identifier(),
-			ProjectRoleColumnGroupName.identifier()).
-			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*ProjectRole, error) {
-			p := new(ProjectRole)
-			err := row.Scan(
-				&p.ProjectID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.Sequence,
-				&p.Key,
-				&p.DisplayName,
-				&p.Group,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Mf0wf", "errors.project_roles.not_found")
-				}
-				fmt.Printf("error: %v", err.Error())
-				return nil, errors.ThrowInternal(err, "QUERY-M00sf", "errors.internal")
-			}
-			return p, nil
-		}
-}
-
-func (q *Queries) prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
-	return sq.Select(
-			ProjectRoleColumnProjectID.identifier(),
-			ProjectRoleColumnCreationDate.identifier(),
-			ProjectRoleColumnChangeDate.identifier(),
-			ProjectRoleColumnResourceOwner.identifier(),
-			ProjectRoleColumnSequence.identifier(),
-			ProjectRoleColumnKey.identifier(),
-			ProjectRoleColumnDisplayName.identifier(),
-			ProjectRoleColumnGroupName.identifier(),
-			"COUNT(*) OVER ()").
-			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*ProjectRoles, error) {
-			projects := make([]*ProjectRole, 0)
-			var count uint64
-			for rows.Next() {
-				project := new(ProjectRole)
-				err := rows.Scan(
-					&project.ProjectID,
-					&project.CreationDate,
-					&project.ChangeDate,
-					&project.ResourceOwner,
-					&project.Sequence,
-					&project.Key,
-					&project.DisplayName,
-					&project.Group,
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
-				projects = append(projects, project)
-			}
-
-			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-ML0Fs", "unable to close rows")
-			}
-
-			return &ProjectRoles{
-				ProjectRoles: projects,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
-
-func (q *Queries) prepareProjectRoleUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
-	return sq.Select("COUNT(*) = 0").
-			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (isUnique bool, err error) {
-			err = row.Scan(&isUnique)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "QUERY-2N9fs", "errors.internal")
-			}
-			return isUnique, err
-		}
-}
-
 func (q *Queries) ProjectRoleByID(ctx context.Context, projectID, key string) (*ProjectRole, error) {
 	stmt, scan := prepareProjectRoleQuery()
 	query, args, err := stmt.
 		Where(sq.Eq{ProjectRoleColumnProjectID.identifier(): projectID}).
 		Where(sq.Eq{ProjectRoleColumnKey.identifier(): key}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "Errors.Query.SQLStatment")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -169,12 +75,12 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, queries *ProjectRoleSe
 	query, scan := q.prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.project_roless.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.project_roles.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
 	projects, err = scan(rows)
 	if err != nil {
@@ -196,12 +102,12 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	query, scan := q.prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.project_roless.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.project_roles.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
 	projects, err = scan(rows)
 	if err != nil {
@@ -261,14 +167,6 @@ func NewProjectRoleGroupSearchQuery(method TextComparison, value string) (Search
 	return NewTextQuery(ProjectRoleColumnGroupName, value, method)
 }
 
-func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.ToQuery(query)
-	}
-	return query
-}
-
 func (r *ProjectRoleSearchQueries) AppendProjectIDQuery(projectID string) error {
 	query, err := NewProjectRoleProjectIDSearchQuery(TextEquals, projectID)
 	if err != nil {
@@ -294,4 +192,92 @@ func (r *ProjectRoleSearchQueries) AppendRoleKeysQuery(keys []string) error {
 	}
 	r.Queries = append(r.Queries, query)
 	return nil
+}
+
+func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
+}
+
+func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, error)) {
+	return sq.Select(
+			ProjectRoleColumnProjectID.identifier(),
+			ProjectRoleColumnCreationDate.identifier(),
+			ProjectRoleColumnChangeDate.identifier(),
+			ProjectRoleColumnResourceOwner.identifier(),
+			ProjectRoleColumnSequence.identifier(),
+			ProjectRoleColumnKey.identifier(),
+			ProjectRoleColumnDisplayName.identifier(),
+			ProjectRoleColumnGroupName.identifier()).
+			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*ProjectRole, error) {
+			p := new(ProjectRole)
+			err := row.Scan(
+				&p.ProjectID,
+				&p.CreationDate,
+				&p.ChangeDate,
+				&p.ResourceOwner,
+				&p.Sequence,
+				&p.Key,
+				&p.DisplayName,
+				&p.Group,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-Mf0wf", "Errors.ProjectRole.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-M00sf", "Errors.Internal")
+			}
+			return p, nil
+		}
+}
+
+func (q *Queries) prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
+	return sq.Select(
+			ProjectRoleColumnProjectID.identifier(),
+			ProjectRoleColumnCreationDate.identifier(),
+			ProjectRoleColumnChangeDate.identifier(),
+			ProjectRoleColumnResourceOwner.identifier(),
+			ProjectRoleColumnSequence.identifier(),
+			ProjectRoleColumnKey.identifier(),
+			ProjectRoleColumnDisplayName.identifier(),
+			ProjectRoleColumnGroupName.identifier(),
+			"COUNT(*) OVER ()").
+			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*ProjectRoles, error) {
+			projects := make([]*ProjectRole, 0)
+			var count uint64
+			for rows.Next() {
+				project := new(ProjectRole)
+				err := rows.Scan(
+					&project.ProjectID,
+					&project.CreationDate,
+					&project.ChangeDate,
+					&project.ResourceOwner,
+					&project.Sequence,
+					&project.Key,
+					&project.DisplayName,
+					&project.Group,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				projects = append(projects, project)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-ML0Fs", "Errors.Query.CloseRows")
+			}
+
+			return &ProjectRoles{
+				ProjectRoles: projects,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
 }

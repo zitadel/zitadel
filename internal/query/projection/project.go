@@ -108,17 +108,27 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 		return crdb.NewNoOpStatement(e), nil
 	}
 
+	columns := make([]handler.Column, 0)
+	columns = append(columns, handler.NewCol(ProjectColumnChangeDate, e.CreationDate()))
+	columns = append(columns, handler.NewCol(ProjectColumnSequence, e.Sequence()))
+	if e.Name != nil {
+		columns = append(columns, handler.NewCol(ProjectColumnName, *e.Name))
+	}
+	if e.ProjectRoleAssertion != nil {
+		columns = append(columns, handler.NewCol(ProjectColumnProjectRoleAssertion, *e.ProjectRoleAssertion))
+	}
+	if e.ProjectRoleCheck != nil {
+		columns = append(columns, handler.NewCol(ProjectColumnProjectRoleCheck, *e.ProjectRoleCheck))
+	}
+	if e.HasProjectCheck != nil {
+		columns = append(columns, handler.NewCol(ProjectColumnHasProjectCheck, *e.HasProjectCheck))
+	}
+	if e.PrivateLabelingSetting != nil {
+		columns = append(columns, handler.NewCol(ProjectColumnPrivateLabelingSetting, *e.PrivateLabelingSetting))
+	}
 	return crdb.NewUpdateStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectColumnName, *e.Name),
-			handler.NewCol(ProjectColumnProjectRoleAssertion, *e.ProjectRoleAssertion),
-			handler.NewCol(ProjectColumnProjectRoleCheck, *e.ProjectRoleCheck),
-			handler.NewCol(ProjectColumnHasProjectCheck, *e.HasProjectCheck),
-			handler.NewCol(ProjectColumnPrivateLabelingSetting, *e.PrivateLabelingSetting),
-		},
+		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
 		},

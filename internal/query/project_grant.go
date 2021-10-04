@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -75,135 +74,13 @@ var (
 	}
 )
 
-func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
-	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
-	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
-	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
-	grantedOrgIDColumn := OrgColumnID.setTable(grantedOrgTable)
-	return sq.Select(
-			ProjectGrantColumnProjectID.identifier(),
-			ProjectGrantColumnGrantID.identifier(),
-			ProjectGrantColumnCreationDate.identifier(),
-			ProjectGrantColumnChangeDate.identifier(),
-			ProjectGrantColumnResourceOwner.identifier(),
-			ProjectGrantColumnState.identifier(),
-			ProjectGrantColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectGrantColumnGrantedOrgID.identifier(),
-			ProjectGrantColumnGrantedOrgName.identifier(),
-			ProjectGrantColumnGrantedRoleKeys.identifier(),
-			ProjectGrantColumnResourceOwnerName.identifier()).
-			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
-			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
-			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)),
-		func(row *sql.Row) (*ProjectGrant, error) {
-			p := new(ProjectGrant)
-			err := row.Scan(
-				&p.ProjectID,
-				&p.GrantID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.State,
-				&p.Sequence,
-				&p.ProjectName,
-				&p.GrantedOrgID,
-				&p.OrgName,
-				&p.GrantedRoleKeys,
-				&p.ResourceOwnerName,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-n98GGs", "errors.project_grants.not_found")
-				}
-				fmt.Printf("error: %v", err.Error())
-				return nil, errors.ThrowInternal(err, "QUERY-w9fsH", "errors.internal")
-			}
-			return p, nil
-		}
-}
-
-func (q *Queries) prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
-	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
-	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
-	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
-	grantedOrgIDColumn := OrgColumnID.setTable(grantedOrgTable)
-	return sq.Select(
-			ProjectGrantColumnProjectID.identifier(),
-			ProjectGrantColumnGrantID.identifier(),
-			ProjectGrantColumnCreationDate.identifier(),
-			ProjectGrantColumnChangeDate.identifier(),
-			ProjectGrantColumnResourceOwner.identifier(),
-			ProjectGrantColumnState.identifier(),
-			ProjectGrantColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectGrantColumnGrantedOrgID.identifier(),
-			ProjectGrantColumnGrantedOrgName.identifier(),
-			ProjectGrantColumnGrantedRoleKeys.identifier(),
-			ProjectGrantColumnResourceOwnerName.identifier(),
-			"COUNT(*) OVER ()").
-			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
-			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
-			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)), func(rows *sql.Rows) (*ProjectGrants, error) {
-			projects := make([]*ProjectGrant, 0)
-			var count uint64
-			for rows.Next() {
-				project := new(ProjectGrant)
-				err := rows.Scan(
-					&project.ProjectID,
-					&project.GrantID,
-					&project.CreationDate,
-					&project.ChangeDate,
-					&project.ResourceOwner,
-					&project.State,
-					&project.Sequence,
-					&project.ProjectName,
-					&project.GrantedOrgID,
-					&project.OrgName,
-					&project.GrantedRoleKeys,
-					&project.ResourceOwnerName,
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
-				projects = append(projects, project)
-			}
-
-			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-K9gEE", "unable to close rows")
-			}
-
-			return &ProjectGrants{
-				ProjectGrants: projects,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
-
-func (q *Queries) prepareProjectGrantUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
-	return sq.Select("COUNT(*) = 0").
-			From(projection.ProjectGrantProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (isUnique bool, err error) {
-			err = row.Scan(&isUnique)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "QUERY-j92fg", "errors.internal")
-			}
-			return isUnique, err
-		}
-}
-
 func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGrant, error) {
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectGrantColumnGrantID.identifier(): id,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -213,12 +90,11 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGran
 func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string) (*ProjectGrant, error) {
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		ProjectGrantColumnGrantID.identifier(): id,
-	}).Where(sq.Eq{
+		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -231,15 +107,15 @@ func (q *Queries) ExistsProjectGrant(ctx context.Context, id string) (err error)
 }
 
 func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries) (projects *ProjectGrants, err error) {
-	query, scan := q.prepareProjectGrantsQuery()
+	query, scan := prepareProjectGrantsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.project_grants.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-PP02n", "Errors.project_grants.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-PP02n", "Errors.Internal")
 	}
 	projects, err = scan(rows)
 	if err != nil {
@@ -316,14 +192,6 @@ func NewProjectGrantResourceOwnerSearchQuery(method TextComparison, value string
 	return NewTextQuery(ProjectGrantColumnResourceOwner, value, method)
 }
 
-func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.ToQuery(query)
-	}
-	return query
-}
-
 func (r *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewProjectGrantResourceOwnerSearchQuery(TextEquals, orgID)
 	if err != nil {
@@ -343,4 +211,121 @@ func (r ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string)
 		r.Queries = append(r.Queries, query)
 	}
 	return nil
+}
+
+func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
+}
+
+func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
+	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
+	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
+	grantedOrgIDColumn := OrgColumnID.setTable(grantedOrgTable)
+	return sq.Select(
+			ProjectGrantColumnProjectID.identifier(),
+			ProjectGrantColumnGrantID.identifier(),
+			ProjectGrantColumnCreationDate.identifier(),
+			ProjectGrantColumnChangeDate.identifier(),
+			ProjectGrantColumnResourceOwner.identifier(),
+			ProjectGrantColumnState.identifier(),
+			ProjectGrantColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectGrantColumnGrantedOrgID.identifier(),
+			ProjectGrantColumnGrantedOrgName.identifier(),
+			ProjectGrantColumnGrantedRoleKeys.identifier(),
+			ProjectGrantColumnResourceOwnerName.identifier()).
+			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
+			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
+			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)),
+		func(row *sql.Row) (*ProjectGrant, error) {
+			p := new(ProjectGrant)
+			err := row.Scan(
+				&p.ProjectID,
+				&p.GrantID,
+				&p.CreationDate,
+				&p.ChangeDate,
+				&p.ResourceOwner,
+				&p.State,
+				&p.Sequence,
+				&p.ProjectName,
+				&p.GrantedOrgID,
+				&p.OrgName,
+				&p.GrantedRoleKeys,
+				&p.ResourceOwnerName,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-n98GGs", "Errors.ProjectGrant.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-w9fsH", "Errors.Internal")
+			}
+			return p, nil
+		}
+}
+
+func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
+	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
+	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
+	grantedOrgIDColumn := OrgColumnID.setTable(grantedOrgTable)
+	return sq.Select(
+			ProjectGrantColumnProjectID.identifier(),
+			ProjectGrantColumnGrantID.identifier(),
+			ProjectGrantColumnCreationDate.identifier(),
+			ProjectGrantColumnChangeDate.identifier(),
+			ProjectGrantColumnResourceOwner.identifier(),
+			ProjectGrantColumnState.identifier(),
+			ProjectGrantColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectGrantColumnGrantedOrgID.identifier(),
+			ProjectGrantColumnGrantedOrgName.identifier(),
+			ProjectGrantColumnGrantedRoleKeys.identifier(),
+			ProjectGrantColumnResourceOwnerName.identifier(),
+			countColumn.identifier()).
+			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
+			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
+			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)), func(rows *sql.Rows) (*ProjectGrants, error) {
+			projects := make([]*ProjectGrant, 0)
+			var count uint64
+			for rows.Next() {
+				project := new(ProjectGrant)
+				err := rows.Scan(
+					&project.ProjectID,
+					&project.GrantID,
+					&project.CreationDate,
+					&project.ChangeDate,
+					&project.ResourceOwner,
+					&project.State,
+					&project.Sequence,
+					&project.ProjectName,
+					&project.GrantedOrgID,
+					&project.OrgName,
+					&project.GrantedRoleKeys,
+					&project.ResourceOwnerName,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				projects = append(projects, project)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-K9gEE", "Errors.Query.CloseRows")
+			}
+
+			return &ProjectGrants{
+				ProjectGrants: projects,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
 }

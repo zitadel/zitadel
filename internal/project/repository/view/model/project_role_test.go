@@ -2,9 +2,10 @@ package model
 
 import (
 	"encoding/json"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"testing"
 )
 
 func mockProjectRoleData(member *es_model.ProjectRole) []byte {
@@ -25,18 +26,18 @@ func TestProjectRoleAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectRoleAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectRoleData(&es_model.ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectRoleAdded, ResourceOwner: "OrgID", Data: mockProjectRoleData(&es_model.ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})},
 				member: &ProjectRoleView{},
 			},
-			result: &ProjectRoleView{OrgID: "GrantedOrgID", ResourceOwner: "GrantedOrgID", ProjectID: "AggregateID", Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			result: &ProjectRoleView{OrgID: "OrgID", ResourceOwner: "OrgID", ProjectID: "AggregateID", Key: "Key", DisplayName: "DisplayName", Group: "Group"},
 		},
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectRoleAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectRoleData(&es_model.ProjectRole{Key: "Key", DisplayName: "DisplayNameChanged", Group: "GroupChanged"})},
-				member: &ProjectRoleView{OrgID: "GrantedOrgID", ResourceOwner: "GrantedOrgID", ProjectID: "AggregateID", Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectRoleAdded, ResourceOwner: "OrgID", Data: mockProjectRoleData(&es_model.ProjectRole{Key: "Key", DisplayName: "DisplayNameChanged", Group: "GroupChanged"})},
+				member: &ProjectRoleView{OrgID: "OrgID", ResourceOwner: "OrgID", ProjectID: "AggregateID", Key: "Key", DisplayName: "DisplayName", Group: "Group"},
 			},
-			result: &ProjectRoleView{OrgID: "GrantedOrgID", ResourceOwner: "GrantedOrgID", ProjectID: "AggregateID", Key: "Key", DisplayName: "DisplayNameChanged", Group: "GroupChanged"},
+			result: &ProjectRoleView{OrgID: "OrgID", ResourceOwner: "OrgID", ProjectID: "AggregateID", Key: "Key", DisplayName: "DisplayNameChanged", Group: "GroupChanged"},
 		},
 	}
 	for _, tt := range tests {

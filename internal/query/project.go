@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -69,118 +68,13 @@ var (
 	}
 )
 
-func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
-	return sq.Select(
-			ProjectColumnID.identifier(),
-			ProjectColumnCreationDate.identifier(),
-			ProjectColumnChangeDate.identifier(),
-			ProjectColumnResourceOwner.identifier(),
-			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectColumnProjectRoleAssertion.identifier(),
-			ProjectColumnProjectRoleCheck.identifier(),
-			ProjectColumnHasProjectCheck.identifier(),
-			ProjectColumnPrivateLabelingSetting.identifier()).
-			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Project, error) {
-			p := new(Project)
-			err := row.Scan(
-				&p.ID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.State,
-				&p.Sequence,
-				&p.Name,
-				&p.ProjectRoleAssertion,
-				&p.ProjectRoleCheck,
-				&p.HasProjectCheck,
-				&p.PrivateLabelingSetting,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "errors.projects.not_found")
-				}
-				fmt.Printf("error: %v", err.Error())
-				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "errors.internal")
-			}
-			return p, nil
-		}
-}
-
-func (q *Queries) prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
-	return sq.Select(
-			ProjectColumnID.identifier(),
-			ProjectColumnCreationDate.identifier(),
-			ProjectColumnChangeDate.identifier(),
-			ProjectColumnResourceOwner.identifier(),
-			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectColumnProjectRoleAssertion.identifier(),
-			ProjectColumnProjectRoleCheck.identifier(),
-			ProjectColumnHasProjectCheck.identifier(),
-			ProjectColumnPrivateLabelingSetting.identifier(),
-			"COUNT(*) OVER ()").
-			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Projects, error) {
-			projects := make([]*Project, 0)
-			var count uint64
-			for rows.Next() {
-				project := new(Project)
-				err := rows.Scan(
-					&project.ID,
-					&project.CreationDate,
-					&project.ChangeDate,
-					&project.ResourceOwner,
-					&project.State,
-					&project.Sequence,
-					&project.Name,
-					&project.ProjectRoleAssertion,
-					&project.ProjectRoleCheck,
-					&project.HasProjectCheck,
-					&project.PrivateLabelingSetting,
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
-				projects = append(projects, project)
-			}
-
-			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-QMXJv", "unable to close rows")
-			}
-
-			return &Projects{
-				Projects: projects,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
-
-func (q *Queries) prepareProjectUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
-	return sq.Select("COUNT(*) = 0").
-			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (isUnique bool, err error) {
-			err = row.Scan(&isUnique)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "QUERY-2n99F", "errors.internal")
-			}
-			return isUnique, err
-		}
-}
-
 func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) {
 	stmt, scan := prepareProjectQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectColumnID.identifier(): id,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -193,15 +87,15 @@ func (q *Queries) ExistsProject(ctx context.Context, id string) (err error) {
 }
 
 func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {
-	query, scan := q.prepareProjectsQuery()
+	query, scan := prepareProjectsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.projects.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.projects.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
 	projects, err = scan(rows)
 	if err != nil {
@@ -252,14 +146,6 @@ func NewProjectResourceOwnerSearchQuery(method TextComparison, value string) (Se
 	return NewTextQuery(ProjectColumnResourceOwner, value, method)
 }
 
-func (q *ProjectSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.ToQuery(query)
-	}
-	return query
-}
-
 func (r *ProjectSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewProjectResourceOwnerSearchQuery(TextEquals, orgID)
 	if err != nil {
@@ -279,4 +165,104 @@ func (r ProjectSearchQueries) AppendPermissionQueries(permissions []string) erro
 		r.Queries = append(r.Queries, query)
 	}
 	return nil
+}
+
+func (q *ProjectSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
+}
+
+func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+	return sq.Select(
+			ProjectColumnID.identifier(),
+			ProjectColumnCreationDate.identifier(),
+			ProjectColumnChangeDate.identifier(),
+			ProjectColumnResourceOwner.identifier(),
+			ProjectColumnState.identifier(),
+			ProjectColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectColumnProjectRoleAssertion.identifier(),
+			ProjectColumnProjectRoleCheck.identifier(),
+			ProjectColumnHasProjectCheck.identifier(),
+			ProjectColumnPrivateLabelingSetting.identifier()).
+			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Project, error) {
+			p := new(Project)
+			err := row.Scan(
+				&p.ID,
+				&p.CreationDate,
+				&p.ChangeDate,
+				&p.ResourceOwner,
+				&p.State,
+				&p.Sequence,
+				&p.Name,
+				&p.ProjectRoleAssertion,
+				&p.ProjectRoleCheck,
+				&p.HasProjectCheck,
+				&p.PrivateLabelingSetting,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
+			}
+			return p, nil
+		}
+}
+
+func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
+	return sq.Select(
+			ProjectColumnID.identifier(),
+			ProjectColumnCreationDate.identifier(),
+			ProjectColumnChangeDate.identifier(),
+			ProjectColumnResourceOwner.identifier(),
+			ProjectColumnState.identifier(),
+			ProjectColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectColumnProjectRoleAssertion.identifier(),
+			ProjectColumnProjectRoleCheck.identifier(),
+			ProjectColumnHasProjectCheck.identifier(),
+			ProjectColumnPrivateLabelingSetting.identifier(),
+			countColumn.identifier()).
+			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Projects, error) {
+			projects := make([]*Project, 0)
+			var count uint64
+			for rows.Next() {
+				project := new(Project)
+				err := rows.Scan(
+					&project.ID,
+					&project.CreationDate,
+					&project.ChangeDate,
+					&project.ResourceOwner,
+					&project.State,
+					&project.Sequence,
+					&project.Name,
+					&project.ProjectRoleAssertion,
+					&project.ProjectRoleCheck,
+					&project.HasProjectCheck,
+					&project.PrivateLabelingSetting,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				projects = append(projects, project)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-QMXJv", "Errors.Query.CloseRows")
+			}
+
+			return &Projects{
+				Projects: projects,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
 }
