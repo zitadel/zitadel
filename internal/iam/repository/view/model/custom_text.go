@@ -697,6 +697,9 @@ func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domai
 	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
 		result.PasswordlessRegistrationDone.Description = text.Text
 	}
+	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose {
+		result.PasswordlessRegistrationDone.DescriptionClose = text.Text
+	}
 	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
 		result.PasswordlessRegistrationDone.NextButtonText = text.Text
 	}

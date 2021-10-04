@@ -153,6 +153,7 @@ PasswordlessRegistration:
 PasswordlessRegistrationDone:
   Title: Passwordless set up
   Description: Token for passwordless successfully added.
+  DescriptionClose: You can now close this window.
   NextButtonText: next
   CancelButtonText: cancel
 

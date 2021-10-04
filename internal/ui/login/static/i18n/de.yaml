@@ -153,6 +153,7 @@ PasswordlessRegistration:
 PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
   Description: Token für passwortlosen Login erfolgreich hinzugefügt.
+  DescriptionClose: Du kannst das Fenster nun schliessen.
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
