@@ -10,6 +10,7 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
+
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
@@ -157,6 +158,16 @@ export class AppComponent implements OnDestroy {
     this.matIconRegistry.addSvgIcon(
       'mdi_counter',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/counter.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_openid',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/openid.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_jwt',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'),
     );
 
     this.matIconRegistry.addSvgIcon(

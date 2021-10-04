@@ -6,9 +6,17 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { switchMap, take, takeUntil } from 'rxjs/operators';
-import { UpdateIDPOIDCConfigRequest, UpdateIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
-import { UpdateOrgIDPOIDCConfigRequest, UpdateOrgIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  UpdateIDPJWTConfigRequest,
+  UpdateIDPOIDCConfigRequest,
+  UpdateIDPRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import { IDP, IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
+import {
+  UpdateOrgIDPJWTConfigRequest,
+  UpdateOrgIDPOIDCConfigRequest,
+  UpdateOrgIDPRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -30,11 +38,13 @@ export class IdpComponent implements OnDestroy {
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
+  public idp!: IDP.AsObject;
   private destroy$: Subject<void> = new Subject();
   public projectId: string = '';
 
   public idpForm!: FormGroup;
   public oidcConfigForm!: FormGroup;
+  public jwtConfigForm!: FormGroup;
 
   public canWrite: Observable<boolean> = this.authService.isAllowed([this.serviceType === PolicyComponentServiceType.ADMIN ?
     'iam.idp.write' : this.serviceType === PolicyComponentServiceType.MGMT ?
@@ -61,6 +71,13 @@ export class IdpComponent implements OnDestroy {
       scopesList: new FormControl([], []),
       displayNameMapping: new FormControl(0),
       usernameMapping: new FormControl(0),
+    });
+
+    this.jwtConfigForm = new FormGroup({
+      jwtEndpoint: new FormControl('', [Validators.required]),
+      issuer: new FormControl('', [Validators.required]),
+      keysEndpoint: new FormControl('', [Validators.required]),
+      headerName: new FormControl('', [Validators.required]),
     });
 
     this.route.data.pipe(
@@ -95,20 +112,26 @@ export class IdpComponent implements OnDestroy {
 
             (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
               if (resp.idp) {
-                const idpObject = resp.idp;
-                this.idpForm.patchValue(idpObject);
-                if (idpObject.oidcConfig) {
-                  this.oidcConfigForm.patchValue(idpObject.oidcConfig);
+                this.idp = resp.idp;
+                this.idpForm.patchValue(this.idp);
+                if (this.idp.oidcConfig) {
+                  this.oidcConfigForm.patchValue(this.idp.oidcConfig);
+                } else if (this.idp.jwtConfig) {
+                  this.jwtConfigForm.patchValue(this.idp.jwtConfig);
+                  this.jwtIssuer?.setValue(this.idp.jwtConfig.issuer);
                 }
               }
             });
           } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
             (this.service as AdminService).getIDPByID(id).then(resp => {
               if (resp.idp) {
-                const idpObject = resp.idp;
-                this.idpForm.patchValue(idpObject);
-                if (idpObject.oidcConfig) {
-                  this.oidcConfigForm.patchValue(idpObject.oidcConfig);
+                this.idp = resp.idp;
+                this.idpForm.patchValue(this.idp);
+                if (this.idp.oidcConfig) {
+                  this.oidcConfigForm.patchValue(this.idp.oidcConfig);
+                } else if (this.idp.jwtConfig) {
+                  this.jwtConfigForm.patchValue(this.idp.jwtConfig);
+                  this.jwtIssuer?.setValue(this.idp.jwtConfig.issuer);
                 }
               }
             });
@@ -147,7 +170,6 @@ export class IdpComponent implements OnDestroy {
 
       (this.service as ManagementService).updateOrgIDP(req).then(() => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
-        // this.router.navigate(['idp', ]);
       }).catch(error => {
         this.toast.showError(error);
       });
@@ -161,7 +183,6 @@ export class IdpComponent implements OnDestroy {
 
       (this.service as AdminService).updateIDP(req).then(() => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
-        // this.router.navigate(['idp', ]);
       }).catch(error => {
         this.toast.showError(error);
       });
@@ -182,7 +203,6 @@ export class IdpComponent implements OnDestroy {
 
       (this.service as ManagementService).updateOrgIDPOIDCConfig(req).then((oidcConfig) => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
-        // this.router.navigate(['idp', ]);
       }).catch(error => {
         this.toast.showError(error);
       });
@@ -198,6 +218,39 @@ export class IdpComponent implements OnDestroy {
       req.setDisplayNameMapping(this.displayNameMapping?.value);
 
       (this.service as AdminService).updateIDPOIDCConfig(req).then((oidcConfig) => {
+        this.toast.showInfo('IDP.TOAST.SAVED', true);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
+    }
+  }
+
+  public updateJwtConfig(): void {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      const req = new UpdateOrgIDPJWTConfigRequest();
+
+      req.setIdpId(this.id?.value);
+      req.setIssuer(this.jwtIssuer?.value);
+      req.setHeaderName(this.headerName?.value);
+      req.setJwtEndpoint(this.jwtEndpoint?.value);
+      req.setKeysEndpoint(this.keyEndpoint?.value);
+
+      (this.service as ManagementService).updateOrgIDPJWTConfig(req).then((jwtConfig) => {
+        this.toast.showInfo('IDP.TOAST.SAVED', true);
+        // this.router.navigate(['idp', ]);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
+    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+      const req = new UpdateIDPJWTConfigRequest();
+
+      req.setIdpId(this.id?.value);
+      req.setIssuer(this.jwtIssuer?.value);
+      req.setHeaderName(this.headerName?.value);
+      req.setJwtEndpoint(this.jwtEndpoint?.value);
+      req.setKeysEndpoint(this.keyEndpoint?.value);
+
+      (this.service as AdminService).updateIDPJWTConfig(req).then((jwtConfig) => {
         this.toast.showInfo('IDP.TOAST.SAVED', true);
         // this.router.navigate(['idp', ]);
       }).catch(error => {
@@ -281,5 +334,22 @@ export class IdpComponent implements OnDestroy {
 
   public get usernameMapping(): AbstractControl | null {
     return this.oidcConfigForm.get('usernameMapping');
+  }
+
+
+  public get jwtIssuer(): AbstractControl | null {
+    return this.jwtConfigForm.get('issuer');
+  }
+
+  public get jwtEndpoint(): AbstractControl | null {
+    return this.jwtConfigForm.get('jwtEndpoint');
+  }
+
+  public get keyEndpoint(): AbstractControl | null {
+    return this.jwtConfigForm.get('keysEndpoint');
+  }
+
+  public get headerName(): AbstractControl | null {
+    return this.jwtConfigForm.get('headerName');
   }
 }

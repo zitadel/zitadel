@@ -1138,15 +1138,11 @@
     },
     "CREATE": {
       "TITLE": "Neuer Identitäts Provider",
-      "DESCRIPTION": "Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+      "DESCRIPTION": "Wählen Sie einen der folgenden Typen von Identitäts Providern"
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers",
-      "OIDC": {
-        "TITLE": "OIDC Konfiguration",
-        "DESCRIPTION": "Geben Sie die korrekte OIDC Konfiguration Ihres Identity Providers an!"
-      }
+      "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers"
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1195,6 +1191,17 @@
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "OIDC": {
+      "TITLE":"OpenId Connect IDP",
+      "DESCRIPTION":"Geben Sie die Daten OIDC Identity Providers ein."
+    },
+    "JWT": {
+      "TITLE":"JWT IDP",
+      "DESCRIPTION":"Geben Sie die Daten JWT Identity Providers ein. ",
+      "HEADERNAME":"Header Name",
+      "JWTENDPOINT":"JWT Endpoint",
+      "JWTKEYSENDPOINT":"JWT Keys Endpoint"
+    },
     "TOAST": {
       "SAVED": "Erfolgreich gespeichert.",
       "REACTIVATED": "Idp reaktiviert.",

@@ -1140,15 +1140,11 @@
     },
     "CREATE": {
       "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Configure the Endpoint of your new service provider."
+      "DESCRIPTION": "Choose one of the following Identity Provider types."
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider.",
-      "OIDC": {
-        "TITLE": "OIDC Configuration",
-        "DESCRIPTION": "Provide the correct OIDC Configuration for your identity Provider below!"
-      }
+      "DESCRIPTION": "General Configuration of your identity provider."
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1197,6 +1193,17 @@
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "DELETE_SELECTION_TITLE": "Delete Idp",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "OIDC": {
+      "TITLE":"OpenId Connect IDP",
+      "DESCRIPTION":"Enter the data for OIDC Identity Provider."
+    },
+    "JWT": {
+      "TITLE":"JWT IDP",
+      "DESCRIPTION":"Enter the data for JWT Identity Provider.",
+      "HEADERNAME":"Header Name",
+      "JWTENDPOINT":"JWT Endpoint",
+      "JWTKEYSENDPOINT":"JWT Keys Endpoint"
+    },
     "TOAST": {
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
