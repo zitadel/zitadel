@@ -61,7 +61,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0
-	go.opentelemetry.io/otel v1.0.0
+	go.opentelemetry.io/otel v1.0.1
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.0.0
 	go.opentelemetry.io/otel/exporters/prometheus v0.23.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.0.0
@@ -69,14 +69,13 @@ require (
 	go.opentelemetry.io/otel/sdk v1.0.0
 	go.opentelemetry.io/otel/sdk/export/metric v0.23.0
 	go.opentelemetry.io/otel/sdk/metric v0.23.0
-	go.opentelemetry.io/otel/trace v1.0.0
+	go.opentelemetry.io/otel/trace v1.0.1
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.6
 	google.golang.org/api v0.57.0
-	google.golang.org/genproto v0.0.0-20210921142501-181ce0d877f6
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
