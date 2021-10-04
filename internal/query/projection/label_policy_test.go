@@ -226,7 +226,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconAddedEventType),
 					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
@@ -242,7 +242,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								"/path/to/logo.png",
+								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
 							},
@@ -257,7 +257,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconDarkAddedEventType),
 					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconDarkAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
@@ -273,7 +273,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								"/path/to/logo.png",
+								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
 							},
@@ -350,7 +350,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconRemovedEventType),
 					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
@@ -381,7 +381,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconDarkRemovedEventType),
 					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconDarkRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
@@ -687,7 +687,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.LabelPolicyIconAddedEventType),
 					iam.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
@@ -703,7 +703,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								"/path/to/logo.png",
+								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
 							},
@@ -718,7 +718,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.LabelPolicyIconDarkAddedEventType),
 					iam.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconDarkAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
@@ -734,7 +734,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								"/path/to/logo.png",
+								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
 							},
@@ -811,7 +811,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.LabelPolicyIconRemovedEventType),
 					iam.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
@@ -842,7 +842,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.LabelPolicyIconDarkRemovedEventType),
 					iam.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconDarkRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
