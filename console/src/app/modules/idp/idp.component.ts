@@ -120,7 +120,6 @@ export class IdpComponent implements OnDestroy {
             (this.service as ManagementService).getOrgIDPByID(id).then(resp => {
               if (resp.idp) {
                 this.idp = resp.idp;
-                console.log(this.idp);
                 this.idpForm.patchValue(this.idp);
                 if (this.idp.oidcConfig) {
                   this.oidcConfigForm.patchValue(this.idp.oidcConfig);
@@ -134,8 +133,6 @@ export class IdpComponent implements OnDestroy {
             (this.service as AdminService).getIDPByID(id).then(resp => {
               if (resp.idp) {
                 this.idp = resp.idp;
-                console.log(this.idp);
-
                 this.idpForm.patchValue(this.idp);
                 if (this.idp.oidcConfig) {
                   this.oidcConfigForm.patchValue(this.idp.oidcConfig);

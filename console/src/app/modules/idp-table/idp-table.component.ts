@@ -166,8 +166,6 @@ export class IdpTableComponent implements OnInit {
       (this.service as AdminService).listIDPs(limit, offset).then(resp => {
         this.idpResult = resp;
         this.dataSource.data = resp.resultList;
-        console.log(this.dataSource.data);
-
         this.loadingSubject.next(false);
       }).catch(error => {
         this.toast.showError(error);
