@@ -353,6 +353,7 @@ Errors:
       IDPConfigIDEmpty: Identity Provider ID is empty
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
+      NoExternalUserData: No external User Data received
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organisation of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:
