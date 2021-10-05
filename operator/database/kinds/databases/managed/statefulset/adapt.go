@@ -63,6 +63,8 @@ func AdaptFunc(
 	nodeSelector map[string]string,
 	tolerations []corev1.Toleration,
 	resourcesSFS *k8s.Resources,
+	cache string,
+	maxSqlMemory string,
 ) (
 	resources.QueryFunc,
 	resources.DestroyFunc,
@@ -149,6 +151,8 @@ func AdaptFunc(
 								name,
 								int(dbPort),
 								replicaCount,
+								getCache(cache),
+								getMaxSqlMemory(maxSqlMemory),
 							),
 						},
 						Resources: getResources(resourcesSFS),
@@ -286,7 +290,14 @@ func AdaptFunc(
 	return wrapedQuery, wrapedDestroy, ensureInit, checkDBReady, getAllDBs, err
 }
 
-func getJoinExec(namespace string, name string, dbPort int, replicaCount int) string {
+func getJoinExec(
+	namespace string,
+	name string,
+	dbPort int,
+	replicaCount int,
+	cache string,
+	maxSqlMemory string,
+) string {
 	joinList := make([]string, 0)
 	for i := 0; i < replicaCount; i++ {
 		joinList = append(joinList, fmt.Sprintf("%s-%d.%s.%s:%d", name, i, name, namespace, dbPort))
@@ -294,7 +305,21 @@ func getJoinExec(namespace string, name string, dbPort int, replicaCount int) st
 	joinListStr := strings.Join(joinList, ",")
 	locality := "zone=" + namespace
 
-	return "exec /cockroach/cockroach start --logtostderr --certs-dir " + certPath + " --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join " + joinListStr + " --locality " + locality + " --cache 25% --max-sql-memory 25%"
+	return "exec /cockroach/cockroach start --logtostderr --certs-dir " + certPath + " --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join " + joinListStr + " --locality " + locality + " --cache " + cache + " --max-sql-memory " + maxSqlMemory
+}
+
+func getCache(cache string) string {
+	if cache != "" {
+		return cache
+	}
+	return "10%"
+}
+
+func getMaxSqlMemory(maxSqlMemory string) string {
+	if maxSqlMemory != "" {
+		return maxSqlMemory
+	}
+	return "10%"
 }
 
 func getResources(resourcesSFS *k8s.Resources) corev1.ResourceRequirements {

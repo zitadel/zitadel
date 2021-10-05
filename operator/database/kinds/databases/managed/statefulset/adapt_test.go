@@ -22,9 +22,11 @@ func TestStatefulset_JoinExec0(t *testing.T) {
 	name := "test"
 	dbPort := 26257
 	replicaCount := 0
+	cache := ""
+	maxSqlMemory := ""
 
-	equals := "exec /cockroach/cockroach start --logtostderr --certs-dir /cockroach/cockroach-certs --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join  --locality zone=testNs --cache 25% --max-sql-memory 25%"
-	assert.Equal(t, equals, getJoinExec(namespace, name, dbPort, replicaCount))
+	equals := "exec /cockroach/cockroach start --logtostderr --certs-dir /cockroach/cockroach-certs --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join  --locality zone=testNs --cache  --max-sql-memory "
+	assert.Equal(t, equals, getJoinExec(namespace, name, dbPort, replicaCount, cache, maxSqlMemory))
 }
 
 func TestStatefulset_JoinExec1(t *testing.T) {
@@ -32,9 +34,11 @@ func TestStatefulset_JoinExec1(t *testing.T) {
 	name := "test2"
 	dbPort := 26257
 	replicaCount := 1
+	cache := "15%"
+	maxSqlMemory := "15%"
 
-	equals := "exec /cockroach/cockroach start --logtostderr --certs-dir /cockroach/cockroach-certs --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join test2-0.test2.testNs2:26257 --locality zone=testNs2 --cache 25% --max-sql-memory 25%"
-	assert.Equal(t, equals, getJoinExec(namespace, name, dbPort, replicaCount))
+	equals := "exec /cockroach/cockroach start --logtostderr --certs-dir /cockroach/cockroach-certs --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join test2-0.test2.testNs2:26257 --locality zone=testNs2 --cache 15% --max-sql-memory 15%"
+	assert.Equal(t, equals, getJoinExec(namespace, name, dbPort, replicaCount, cache, maxSqlMemory))
 }
 
 func TestStatefulset_JoinExec2(t *testing.T) {
@@ -42,9 +46,11 @@ func TestStatefulset_JoinExec2(t *testing.T) {
 	name := "test"
 	dbPort := 23
 	replicaCount := 2
+	cache := "20%"
+	maxSqlMemory := "20%"
 
-	equals := "exec /cockroach/cockroach start --logtostderr --certs-dir /cockroach/cockroach-certs --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join test-0.test.testNs:23,test-1.test.testNs:23 --locality zone=testNs --cache 25% --max-sql-memory 25%"
-	assert.Equal(t, equals, getJoinExec(namespace, name, dbPort, replicaCount))
+	equals := "exec /cockroach/cockroach start --logtostderr --certs-dir /cockroach/cockroach-certs --advertise-host $(hostname -f) --http-addr 0.0.0.0 --join test-0.test.testNs:23,test-1.test.testNs:23 --locality zone=testNs --cache 20% --max-sql-memory 20%"
+	assert.Equal(t, equals, getJoinExec(namespace, name, dbPort, replicaCount, cache, maxSqlMemory))
 }
 
 func TestStatefulset_Resources0(t *testing.T) {
@@ -150,6 +156,8 @@ func TestStatefulset_Adapt1(t *testing.T) {
 	nodeSelector := map[string]string{}
 	tolerations := []corev1.Toleration{}
 	resourcesSFS := &k8s.Resources{}
+	cache := ""
+	maxSqlMemory := ""
 
 	quantity, err := resource.ParseQuantity(storageCapacity)
 	assert.NoError(t, err)
@@ -228,6 +236,8 @@ func TestStatefulset_Adapt1(t *testing.T) {
 								name,
 								int(dbPort),
 								replicaCount,
+								getCache(cache),
+								getMaxSqlMemory(maxSqlMemory),
 							),
 						},
 						Resources: getResources(resourcesSFS),
@@ -299,6 +309,8 @@ func TestStatefulset_Adapt1(t *testing.T) {
 		nodeSelector,
 		tolerations,
 		resourcesSFS,
+		cache,
+		maxSqlMemory,
 	)
 	assert.NoError(t, err)
 
@@ -346,6 +358,8 @@ func TestStatefulset_Adapt2(t *testing.T) {
 	nodeSelector := map[string]string{}
 	tolerations := []corev1.Toleration{}
 	resourcesSFS := &k8s.Resources{}
+	cache := "20%"
+	maxSqlMemory := "20%"
 
 	quantity, err := resource.ParseQuantity(storageCapacity)
 	assert.NoError(t, err)
@@ -424,6 +438,8 @@ func TestStatefulset_Adapt2(t *testing.T) {
 								name,
 								int(dbPort),
 								replicaCount,
+								getCache(cache),
+								getMaxSqlMemory(maxSqlMemory),
 							),
 						},
 						Resources: getResources(resourcesSFS),
@@ -495,6 +511,8 @@ func TestStatefulset_Adapt2(t *testing.T) {
 		nodeSelector,
 		tolerations,
 		resourcesSFS,
+		cache,
+		maxSqlMemory,
 	)
 	assert.NoError(t, err)
 
