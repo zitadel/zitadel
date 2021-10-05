@@ -23,7 +23,7 @@ func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request)
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderPasswordlessRegistration(w, r, authReq, "", "", "", "", nil)
+	l.renderPasswordlessRegistration(w, r, authReq, "", "", "", "", 0, nil)
 }
 
 func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {

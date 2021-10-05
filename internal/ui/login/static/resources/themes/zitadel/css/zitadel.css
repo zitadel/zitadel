@@ -537,6 +537,10 @@ a.block {
   font-size: 1.5rem;
 }
 
+#wa-error {
+  flex-direction: column;
+}
+
 .lgn-qrcode {
   display: block;
   margin: auto;
@@ -1424,6 +1428,10 @@ a.block {
 .lgn-error i {
   margin-right: 0.5rem;
   font-size: 1.5rem;
+}
+
+#wa-error {
+  flex-direction: column;
 }
 
 .lgn-qrcode {
