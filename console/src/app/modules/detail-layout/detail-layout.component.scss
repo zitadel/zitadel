@@ -57,11 +57,15 @@
             margin-top: 10px;
           }
 
-          .desc {
+          .head-desc {
             display: block;
             font-size: .9rem;
             color: var(--grey);
           }
+        }
+
+        .actions-wrap {
+          padding-top: .5rem;
         }
       }
     }

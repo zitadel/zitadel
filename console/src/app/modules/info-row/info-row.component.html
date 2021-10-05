@@ -94,13 +94,6 @@
   </div>
 
   <div class="info">
-    <p class="title">{{ 'IDP.STATE' | translate }}</p>
-    <p *ngIf="idp && idp.state !== undefined" class="state"
-    [ngClass]="{'active': idp.state === IDPState.IDP_STATE_ACTIVE, 'inactive': idp.state === IDPState.IDP_STATE_INACTIVE}">{{'IDP.STATES.'+idp.state
-    | translate}}</p>
-  </div>
-
-  <div class="info">
     <p class="title">{{ 'IDP.DETAIL.DATECREATED' | translate }}</p>
     <p class="desc">{{idp?.details?.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
@@ -108,5 +101,12 @@
   <div class="info">
     <p class="title">{{ 'IDP.DETAIL.DATECHANGED' | translate }}</p>
     <p class="desc">{{idp?.details?.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'IDP.STATE' | translate }}</p>
+    <p *ngIf="idp && idp.state !== undefined" class="state"
+    [ngClass]="{'active': idp.state === IDPState.IDP_STATE_ACTIVE, 'inactive': idp.state === IDPState.IDP_STATE_INACTIVE}">{{'IDP.STATES.'+idp.state
+    | translate}}</p>
   </div>
 </div>

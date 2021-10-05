@@ -1,15 +1,35 @@
 <app-detail-layout [backRouterLink]="backroutes" [title]="idp?.name"
     [description]="'IDP.DETAIL.DESCRIPTION' | translate">
+    <div *ngIf="canWrite | async" actions>
+      <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
+        <span>{{'ACTIONS.ACTIONS' | translate}}</span>
+        <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+      </button>
+      <mat-menu #actions="matMenu" xPosition="before">
+        
+        <button mat-menu-item
+          *ngIf="idp?.state !== IDPState.IDP_STATE_INACTIVE"
+          (click)="changeState(IDPState.IDP_STATE_INACTIVE)">
+          {{'ACTIONS.DEACTIVATE' | translate}}
+        </button>
+        <button mat-menu-item *ngIf="idp?.state == IDPState.IDP_STATE_INACTIVE"
+          (click)="changeState(IDPState.IDP_STATE_ACTIVE)">
+          {{'ACTIONS.REACTIVATE' | translate}}
+        </button>
+        <button mat-menu-item matTooltip="{{'IDP.DELETE' | translate}}"
+            (click)="deleteIdp()">
+            <span [style.color]="'var(--warn)'">{{'IDP.DELETE_TITLE' | translate}}</span>
+        </button>
+      </mat-menu>
+    </div>
+
     <div class="container">
 
       <cnsl-info-row *ngIf="idp" [idp]="idp"></cnsl-info-row>
         <form class="idp-form" (ngSubmit)="updateIdp()">
             <ng-container [formGroup]="idpForm">
-                <div class="content">
-                    <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'IDP.ID' | translate }}</cnsl-label>
-                        <input cnslInput formControlName="id" />
-                    </cnsl-form-field>
+                <div class="idp-content">
+      
                     <cnsl-form-field appearance="outline" class="formfield">
                         <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
                         <input cnslInput formControlName="name" />
@@ -48,7 +68,7 @@
 
           <form (ngSubmit)="updateOidcConfig()">
             <ng-container [formGroup]="oidcConfigForm">
-              <div class="content">
+              <div class="idp-content">
                 <cnsl-form-field appearance="outline" class="formfield">
                   <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
                   <input cnslInput formControlName="issuer" />
@@ -57,7 +77,7 @@
                   <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
                   <input cnslInput formControlName="clientId" />
                 </cnsl-form-field>
-                <mat-checkbox class="desc" [(ngModel)]="showIdSecretSection" [disabled]="(canWrite | async) === false"
+                <mat-checkbox class="idp-desc" [(ngModel)]="showIdSecretSection" [disabled]="(canWrite | async) === false"
                   [ngModelOptions]="{standalone: true}">
                   Update Client Secret
                 </mat-checkbox>
@@ -120,7 +140,7 @@
 
           <form (ngSubmit)="updateJwtConfig()">
             <ng-container [formGroup]="jwtConfigForm">
-              <div class="content">
+              <div class="idp-content">
                 <cnsl-form-field appearance="outline" class="formfield">
                   <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
                   <input cnslInput formControlName="issuer" />

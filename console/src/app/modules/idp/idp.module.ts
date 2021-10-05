@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -27,6 +28,7 @@ import { IdpComponent } from './idp.component';
     MatButtonModule,
     MatIconModule,
     InfoSectionModule,
+    MatMenuModule,
     MatTooltipModule,
     MatSelectModule,
     TranslateModule,

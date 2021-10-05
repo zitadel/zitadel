@@ -10,9 +10,11 @@
               <div class="top-view">
                 <div>
                   <h1>{{ title }}</h1>
-                  <p class="desc">{{ description }}</p>
+                  <p class="head-desc">{{ description }}</p>
                 </div>
-                <ng-content select="[actions]"></ng-content>
+                <div class="actions-wrap">
+                  <ng-content select="[actions]"></ng-content>
+                </div>
               </div>
               <ng-content></ng-content>
             </div>

@@ -87,7 +87,7 @@
                         [disabled]="serviceType==PolicyComponentServiceType.MGMT && idp?.providerType == IDPOwnerType.IDP_OWNER_TYPE_ORG"
                         mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}"
                         (click)="removeIdp(idp)">
-                        <mat-icon>remove_circle</mat-icon>
+                        <i class="las la-trash"></i>
                     </button>
                 </td>
             </ng-container>
