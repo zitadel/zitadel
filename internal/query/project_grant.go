@@ -74,6 +74,32 @@ var (
 	}
 )
 
+type ProjectGrants struct {
+	SearchResponse
+	ProjectGrants []*ProjectGrant
+}
+
+type ProjectGrant struct {
+	ProjectID     string
+	GrantID       string
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	State         domain.ProjectGrantState
+	Sequence      uint64
+
+	ProjectName       string
+	GrantedOrgID      string
+	OrgName           string
+	GrantedRoleKeys   pq.StringArray
+	ResourceOwnerName string
+}
+
+type ProjectGrantSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
 func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGrant, error) {
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
@@ -130,43 +156,15 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 		SearchRequest: SearchRequest{},
 		Queries:       make([]SearchQuery, 2),
 	}
-	projectIDQuery, err := NewProjectGrantProjectIDSearchQuery(TextEquals, projectID)
+	searchQuery.Queries[0], err = NewProjectGrantProjectIDSearchQuery(TextEquals, projectID)
 	if err != nil {
 		return nil, err
 	}
-	roleKeyQuery, err := NewProjectGrantRoleKeySearchQuery(roleKey)
+	searchQuery.Queries[1], err = NewProjectGrantRoleKeySearchQuery(roleKey)
 	if err != nil {
 		return nil, err
 	}
-	searchQuery.Queries[0] = projectIDQuery
-	searchQuery.Queries[1] = roleKeyQuery
 	return q.SearchProjectGrants(ctx, searchQuery)
-}
-
-type ProjectGrants struct {
-	SearchResponse
-	ProjectGrants []*ProjectGrant
-}
-
-type ProjectGrant struct {
-	ProjectID     string
-	GrantID       string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	State         domain.ProjectGrantState
-	Sequence      uint64
-
-	ProjectName       string
-	GrantedOrgID      string
-	OrgName           string
-	GrantedRoleKeys   pq.StringArray
-	ResourceOwnerName string
-}
-
-type ProjectGrantSearchQueries struct {
-	SearchRequest
-	Queries []SearchQuery
 }
 
 func NewProjectGrantProjectIDSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -188,12 +186,12 @@ func NewProjectGrantRoleKeySearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnGrantedRoleKeys, value, TextListContains)
 }
 
-func NewProjectGrantResourceOwnerSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectGrantColumnResourceOwner, value, method)
+func NewProjectGrantResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantColumnResourceOwner, value, TextEquals)
 }
 
 func (r *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
-	query, err := NewProjectGrantResourceOwnerSearchQuery(TextEquals, orgID)
+	query, err := NewProjectGrantResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return err
 	}

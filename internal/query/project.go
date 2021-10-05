@@ -68,6 +68,31 @@ var (
 	}
 )
 
+type Projects struct {
+	SearchResponse
+	Projects []*Project
+}
+
+type Project struct {
+	ID            string
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	State         domain.ProjectState
+	Sequence      uint64
+
+	Name                   string
+	ProjectRoleAssertion   bool
+	ProjectRoleCheck       bool
+	HasProjectCheck        bool
+	PrivateLabelingSetting domain.PrivateLabelingSetting
+}
+
+type ProjectSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
 func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) {
 	stmt, scan := prepareProjectQuery()
 	query, args, err := stmt.Where(sq.Eq{
@@ -105,49 +130,24 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	return projects, err
 }
 
-type Projects struct {
-	SearchResponse
-	Projects []*Project
-}
-
-type Project struct {
-	ID            string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	State         domain.ProjectState
-	Sequence      uint64
-
-	Name                   string
-	ProjectRoleAssertion   bool
-	ProjectRoleCheck       bool
-	HasProjectCheck        bool
-	PrivateLabelingSetting domain.PrivateLabelingSetting
-}
-
-type ProjectSearchQueries struct {
-	SearchRequest
-	Queries []SearchQuery
-}
-
 func NewProjectNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectColumnName, value, method)
 }
 
-func NewProjectIDSearchQuery(values []string) (SearchQuery, error) {
-	list := make([]interface{}, len(values))
-	for i, value := range values {
+func NewProjectIDSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
 		list[i] = value
 	}
 	return NewListQuery(ProjectColumnID, list, ListIn)
 }
 
-func NewProjectResourceOwnerSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectColumnResourceOwner, value, method)
+func NewProjectResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectColumnResourceOwner, value, TextEquals)
 }
 
 func (r *ProjectSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
-	query, err := NewProjectResourceOwnerSearchQuery(TextEquals, orgID)
+	query, err := NewProjectResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
@@ -188,7 +188,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 			ProjectColumnProjectRoleCheck.identifier(),
 			ProjectColumnHasProjectCheck.identifier(),
 			ProjectColumnPrivateLabelingSetting.identifier()).
-			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
+			From(projectsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
 			err := row.Scan(
@@ -228,7 +228,7 @@ func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error
 			ProjectColumnHasProjectCheck.identifier(),
 			ProjectColumnPrivateLabelingSetting.identifier(),
 			countColumn.identifier()).
-			From(projection.ProjectProjectionTable).PlaceholderFormat(sq.Dollar),
+			From(projectsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Projects, error) {
 			projects := make([]*Project, 0)
 			var count uint64

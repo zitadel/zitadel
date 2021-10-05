@@ -108,7 +108,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 		return crdb.NewNoOpStatement(e), nil
 	}
 
-	columns := make([]handler.Column, 0)
+	columns := make([]handler.Column, 0, 7)
 	columns = append(columns, handler.NewCol(ProjectColumnChangeDate, e.CreationDate()))
 	columns = append(columns, handler.NewCol(ProjectColumnSequence, e.Sequence()))
 	if e.Name != nil {

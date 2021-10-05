@@ -53,11 +53,35 @@ var (
 	}
 )
 
+type ProjectRoles struct {
+	SearchResponse
+	ProjectRoles []*ProjectRole
+}
+
+type ProjectRole struct {
+	ProjectID     string
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	Sequence      uint64
+
+	Key         string
+	DisplayName string
+	Group       string
+}
+
+type ProjectRoleSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
 func (q *Queries) ProjectRoleByID(ctx context.Context, projectID, key string) (*ProjectRole, error) {
 	stmt, scan := prepareProjectRoleQuery()
 	query, args, err := stmt.
-		Where(sq.Eq{ProjectRoleColumnProjectID.identifier(): projectID}).
-		Where(sq.Eq{ProjectRoleColumnKey.identifier(): key}).ToSql()
+		Where(sq.Eq{
+			ProjectRoleColumnProjectID.identifier(): projectID,
+			ProjectRoleColumnKey.identifier():       key,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "Errors.Query.SQLStatment")
 	}
@@ -117,34 +141,12 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	return projects, err
 }
 
-type ProjectRoles struct {
-	SearchResponse
-	ProjectRoles []*ProjectRole
-}
-
-type ProjectRole struct {
-	ProjectID     string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
-
-	Key         string
-	DisplayName string
-	Group       string
-}
-
-type ProjectRoleSearchQueries struct {
-	SearchRequest
-	Queries []SearchQuery
-}
-
 func NewProjectRoleProjectIDSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectRoleColumnProjectID, value, method)
 }
 
-func NewProjectRoleResourceOwnerSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectRoleColumnResourceOwner, value, method)
+func NewProjectRoleResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectRoleColumnResourceOwner, value, TextEquals)
 }
 
 func NewProjectRoleKeySearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -177,7 +179,7 @@ func (r *ProjectRoleSearchQueries) AppendProjectIDQuery(projectID string) error 
 }
 
 func (r *ProjectRoleSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
-	query, err := NewProjectRoleResourceOwnerSearchQuery(TextEquals, orgID)
+	query, err := NewProjectRoleResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
@@ -212,7 +214,7 @@ func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, 
 			ProjectRoleColumnKey.identifier(),
 			ProjectRoleColumnDisplayName.identifier(),
 			ProjectRoleColumnGroupName.identifier()).
-			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
+			From(projectRolesTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*ProjectRole, error) {
 			p := new(ProjectRole)
 			err := row.Scan(
@@ -245,8 +247,8 @@ func (q *Queries) prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) 
 			ProjectRoleColumnKey.identifier(),
 			ProjectRoleColumnDisplayName.identifier(),
 			ProjectRoleColumnGroupName.identifier(),
-			"COUNT(*) OVER ()").
-			From(projection.ProjectRoleProjectionTable).PlaceholderFormat(sq.Dollar),
+			countColumn.identifier()).
+			From(projectRolesTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*ProjectRoles, error) {
 			projects := make([]*ProjectRole, 0)
 			var count uint64
