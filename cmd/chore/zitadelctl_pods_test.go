@@ -1,6 +1,9 @@
 package chore_test
 
-import "gopkg.in/yaml.v3"
+import (
+	"fmt"
+	"gopkg.in/yaml.v3"
+)
 
 type pods struct {
 	Items []struct {
@@ -11,32 +14,38 @@ type pods struct {
 			Conditions []struct {
 				Type   string
 				Status string
+				Reason string
 			}
 		}
 	}
 }
 
-func countCompletedPods(kubectl kubectlCmd, selector string) (readyPodsCount int8) {
-	pods, err := getPodsWithSelector(kubectl, selector)
+func countCompletedPods(kubectl kubectlCmd, namespace, selector string) func() (readyPodsCount int8) {
+	return func() int8 {
+		fmt.Print(namespace)
+		fmt.Print(selector)
+		pods, err := getPodsWithSelector(kubectl, namespace, selector)
+		if err != nil {
+			return -1
+		}
+		fmt.Print(pods)
+		return countCompleted(pods)
+	}
+}
+
+func countReadyPods(kubectl kubectlCmd, namespace, selector string) (readyPodsCount int8) {
+	pods, err := getPodsWithSelector(kubectl, namespace, selector)
 	if err != nil {
 		return -1
 	}
 	return countReady(pods)
 }
 
-func countReadyPods(kubectl kubectlCmd, selector string) (readyPodsCount int8) {
-	pods, err := getPodsWithSelector(kubectl, selector)
-	if err != nil {
-		return -1
-	}
-	return countReady(pods)
-}
-
-func getPodsWithSelector(kubectl kubectlCmd, selector string) (pods, error) {
+func getPodsWithSelector(kubectl kubectlCmd, namespace, selector string) (pods, error) {
 	pods := pods{}
 	args := []string{
 		"get", "pods",
-		"--namespace", "caos-system",
+		"--namespace", namespace,
 		"--output", "yaml",
 	}
 
@@ -81,10 +90,10 @@ func countCompleted(pods pods) int8 {
 		pod := pods.Items[i]
 		for j := range pod.Status.Conditions {
 			condition := pod.Status.Conditions[j]
-			if condition.Type != "Completed" {
+			if condition.Type != "Initialized" {
 				continue
 			}
-			if condition.Status == "True" {
+			if condition.Status == "True" && condition.Reason == "PodCompleted" {
 				completedPodsCount++
 				break
 			}

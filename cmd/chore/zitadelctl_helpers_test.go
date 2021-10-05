@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 	"time"
 )
@@ -49,31 +50,40 @@ func localToRemoteFile(orbctlGitops zitadelctlGitopsCmd, remoteFile, localFile s
 	writeRemoteFile(orbctlGitops, remoteFile, contentBytes, env)
 }
 
-type awaitCompletedPodFromJob func(file []byte, selector string, timeout time.Duration)
+type awaitCompletedPodFromJob func(file []byte, namespace, selector string, timeout time.Duration)
 
 func awaitCompletedPodFromJobFunc(kubectl kubectlCmd) awaitCompletedPodFromJob {
-	return func(file []byte, selector string, timeout time.Duration) {
+	return func(file []byte, namespace, selector string, timeout time.Duration) {
 		cmd := kubectl("apply", "-f", "-")
 		cmd.Stdin = strings.NewReader(os.ExpandEnv(string(file)))
 
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Eventually(session, 1*time.Minute).Should(gexec.Exit(0))
-		Eventually(countCompletedPods(kubectl, selector), timeout).Should(Equal(int8(1)))
+		Eventually(countCompletedPods(kubectl, namespace, selector), timeout, 5*time.Second).Should(Equal(int8(1)))
 
 		cmdDel := kubectl("delete", "-f", "-")
 		cmdDel.Stdin = strings.NewReader(os.ExpandEnv(string(file)))
 
-		sessionDel, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+		sessionDel, err := gexec.Start(cmdDel, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Eventually(sessionDel, 1*time.Minute).Should(gexec.Exit(0))
 	}
 }
 
-type awaitReadyPods func(selector string, timeout time.Duration)
+type awaitReadyPods func(namespace, selector string, count int, timeout time.Duration)
 
 func awaitReadyPodsFunc(kubectl kubectlCmd) awaitReadyPods {
-	return func(selector string, timeout time.Duration) {
-		Eventually(countCompletedPods(kubectl, selector), timeout).Should(Equal(int8(1)))
+	return func(namespace, selector string, count int, timeout time.Duration) {
+		Eventually(countReadyPods(kubectl, namespace, selector), timeout).Should(Equal(int8(count)))
+	}
+}
+
+type awaitSecret func(namespace string, name string, keys []string, timeout time.Duration)
+
+func awaitSecretFunc(kubectl kubectlCmd) awaitSecret {
+	return func(namespace string, name string, keys []string, timeout time.Duration) {
+		sort.Strings(keys)
+		Eventually(getSecretWithName(kubectl, namespace, name), timeout).Should(Equal(keys))
 	}
 }
