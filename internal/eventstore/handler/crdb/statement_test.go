@@ -945,7 +945,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3)",
+							query: "UPSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3",
 							args:  []interface{}{1, 2, 3},
 						},
 					},
