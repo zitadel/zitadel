@@ -14,6 +14,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 
 import { InfoRowModule } from '../info-row/info-row.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
+import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { IdpRoutingModule } from './idp-routing.module';
 import { IdpComponent } from './idp.component';
 
@@ -26,6 +27,7 @@ import { IdpComponent } from './idp.component';
     ReactiveFormsModule,
     InputModule,
     MatButtonModule,
+    WarnDialogModule,
     MatIconModule,
     InfoSectionModule,
     MatMenuModule,

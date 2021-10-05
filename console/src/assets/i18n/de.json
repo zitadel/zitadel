@@ -1132,7 +1132,7 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Verfügbare Identitäts Provider",
+      "TITLE": "Identitäts Provider",
       "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können.",
       "ACTIVETITLE":"Aktive Identitäts Provider"
     },

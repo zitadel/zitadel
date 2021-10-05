@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { switchMap, take, takeUntil } from 'rxjs/operators';
@@ -23,6 +24,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
   selector: 'app-idp',
@@ -60,6 +62,7 @@ export class IdpComponent implements OnDestroy {
     private router: Router,
     private _location: Location,
     private authService: GrpcAuthService,
+    private dialog: MatDialog,
   ) {
     this.idpForm = new FormGroup({
       id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
@@ -165,52 +168,66 @@ export class IdpComponent implements OnDestroy {
   }
 
   public deleteIdp(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).removeOrgIDP(this.idp.id).then(() => {
-        this.toast.showInfo('APP.TOAST.DELETED', true);
-        this.router.navigate(this.backroutes);
-      }).catch((error: any) => {
-        this.toast.showError(error);
-      });
-    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      (this.service as AdminService).removeIDP(this.idp.id).then(() => {
-        this.toast.showInfo('APP.TOAST.DELETED', true);
-        this.router.navigate(this.backroutes);
-      }).catch((error: any) => {
-        this.toast.showError(error);
-      });
-    }
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'IDP.DELETE_TITLE',
+        descriptionKey: 'IDP.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe(resp => {
+      if (resp) {
+        if (this.serviceType === PolicyComponentServiceType.MGMT) {
+          (this.service as ManagementService).removeOrgIDP(this.idp.id).then(() => {
+            this.toast.showInfo('IDP.TOAST.DELETED', true);
+            this.router.navigate(this.backroutes);
+          }).catch((error: any) => {
+            this.toast.showError(error);
+          });
+        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+          (this.service as AdminService).removeIDP(this.idp.id).then(() => {
+            this.toast.showInfo('IDP.TOAST.DELETED', true);
+            this.router.navigate(this.backroutes);
+          }).catch((error: any) => {
+            this.toast.showError(error);
+          });
+        }
+      }
+    });
   }
 
   public changeState(state: IDPState): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if (state === IDPState.IDP_STATE_ACTIVE) {
-        (this.service as ManagementService).deactivateOrgIDP(this.idp.id).then(() => {
+        (this.service as ManagementService).reactivateOrgIDP(this.idp.id).then(() => {
           this.idp.state = state;
-          this.toast.showInfo('APP.TOAST.REACTIVATED', true);
+          this.toast.showInfo('IDP.TOAST.REACTIVATED', true);
         }).catch((error: any) => {
           this.toast.showError(error);
         });
       } else if (state === IDPState.IDP_STATE_INACTIVE) {
-        (this.service as ManagementService).reactivateOrgIDP(this.idp.id).then(() => {
+        (this.service as ManagementService).deactivateOrgIDP(this.idp.id).then(() => {
           this.idp.state = state;
-          this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
+          this.toast.showInfo('IDP.TOAST.DEACTIVATED', true);
         }).catch((error: any) => {
           this.toast.showError(error);
         });
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       if (state === IDPState.IDP_STATE_ACTIVE) {
-        (this.service as AdminService).deactivateIDP(this.idp.id).then(() => {
+        (this.service as AdminService).reactivateIDP(this.idp.id).then(() => {
           this.idp.state = state;
-          this.toast.showInfo('APP.TOAST.REACTIVATED', true);
+          this.toast.showInfo('IDP.TOAST.REACTIVATED', true);
         }).catch((error: any) => {
           this.toast.showError(error);
         });
       } else if (state === IDPState.IDP_STATE_INACTIVE) {
-        (this.service as AdminService).reactivateIDP(this.idp.id).then(() => {
+        (this.service as AdminService).deactivateIDP(this.idp.id).then(() => {
           this.idp.state = state;
-          this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
+          this.toast.showInfo('IDP.TOAST.DEACTIVATED', true);
         }).catch((error: any) => {
           this.toast.showError(error);
         });

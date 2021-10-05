@@ -1134,7 +1134,7 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Available Identity Providers",
+      "TITLE": "Identity Providers",
       "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Policy.",
       "ACTIVETITLE":"Active Identity Providers"
     },
