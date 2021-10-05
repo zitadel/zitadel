@@ -1,7 +1,7 @@
 import { HTTPRequest, launch, Page } from 'puppeteer'
 
 module.exports = (on, config) => {
-
+/*
   config.env.newEmail = "demo@caos.ch"
   config.env.newUserName = "demo"
   config.env.newFirstName = "demofirstname"
@@ -11,18 +11,18 @@ module.exports = (on, config) => {
   config.env.newMachineUserName = "machineusername"
   config.env.newMachineName = "name"
   config.env.newMachineDesription = "description"
-
-  on('task', {
+*/
+/*  on('task', {
     login({username, password }) {
       return login(config.env.consoleUrl, `${config.env.consoleUrl}/auth/callback`, username, password)
     },
-  })  
+  })  */
 
   // IMPORTANT return the updated config object
   return config
 
 }
-
+/*
 
 async function login(loginUrl: string, callbackUrl: string, username: string, password: string) {
 
@@ -89,3 +89,4 @@ function interceptRequest(callbackUrl: string) {
     }
   };
 }
+*/
