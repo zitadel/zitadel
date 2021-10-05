@@ -179,7 +179,7 @@ jobs:
           context: .
           file: ./build/operator/Dockerfile
           platforms: linux/amd64
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }} (https://github.com/caos/zitadel/issues/2102)
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           cache-to: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }},mode=max
           outputs: type=local,dest=/tmp/operator
           build-args: |
