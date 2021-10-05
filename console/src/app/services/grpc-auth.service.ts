@@ -166,6 +166,7 @@ export class GrpcAuthService {
 
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
       if (org && orgs.find(tmp => tmp.id === org.id)) {
+        this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
         return org;
       }
 
