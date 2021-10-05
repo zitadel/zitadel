@@ -109,8 +109,8 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 	}
 
 	columns := make([]handler.Column, 0)
-	columns = append(columns, handler.NewCol(ProjectColumnChangeDate, e.CreationDate()))
-	columns = append(columns, handler.NewCol(ProjectColumnSequence, e.Sequence()))
+	columns = append(columns, handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
+		handler.NewCol(ProjectColumnSequence, e.Sequence()))
 	if e.Name != nil {
 		columns = append(columns, handler.NewCol(ProjectColumnName, *e.Name))
 	}
