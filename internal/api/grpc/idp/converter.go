@@ -36,7 +36,7 @@ func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
 
 func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
-		Id:           idp.AggregateID,
+		Id:           idp.IDPConfigID,
 		State:        IDPStateToPb(idp.State),
 		Name:         idp.Name,
 		StylingType:  IDPStylingTypeToPb(idp.StylingType),

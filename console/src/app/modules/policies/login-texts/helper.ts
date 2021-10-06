@@ -333,6 +333,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
 
   const r31 = new PasswordlessRegistrationDoneScreenText();
   r31.setDescription(map.passwordlessRegistrationDoneText?.description ?? '');
+  r31.setDescriptionClose(map.passwordlessRegistrationDoneText?.descriptionClose ?? '');
   r31.setNextButtonText(map.passwordlessRegistrationDoneText?.nextButtonText ?? '');
   r31.setTitle(map.passwordlessRegistrationDoneText?.title ?? '');
   r31.setNextButtonText(map.passwordlessRegistrationDoneText?.cancelButtonText ?? '');
