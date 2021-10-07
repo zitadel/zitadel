@@ -32,6 +32,14 @@ type OrgDomainSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func (q *OrgDomainSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
+}
+
 func NewOrgDomainDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(OrgDomainDomainCol, value, method)
 }
