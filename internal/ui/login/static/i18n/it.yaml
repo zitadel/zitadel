@@ -355,7 +355,7 @@ Errors:
         La password non è valida e l'utente è bloccato, contatta il tuo
         amministratore.
     PasswordComplexityPolicy:
-      NotFound: Politica della password non trovata
+      NotFound: Impostazioni della password non trovate
       MinLength: La password è troppo corta
       HasLower: La password deve contenere una lettera minuscola
       HasUpper: La password deve contenere la lettera maiuscola
@@ -399,6 +399,6 @@ Errors:
     InvalidConfig: La configurazione dell'Identity Provider non è valida
   IAM:
     LockoutPolicy:
-      NotExisting: Politica di blocco non esistente
+      NotExisting: Impostazioni di blocco non esistenti
 
 optional: (opzionale)

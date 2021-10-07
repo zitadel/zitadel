@@ -737,8 +737,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Invecchiamento della password",
-      "DESCRIPTION": "\u00c8 possibile impostare una impostazone per l'invecchiamento delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico \u00e8 trascorso."
+      "TITLE": "Impostazioni di validità della password",
+      "DESCRIPTION": "\u00c8 possibile impostare una impostazone per la validità delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico \u00e8 trascorso."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Impostazione di blocco",
