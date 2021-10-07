@@ -51,6 +51,7 @@ type wantReduce struct {
 	previousSequence uint64
 	executer         *testExecuter
 	err              func(error) bool
+	projection       string
 }
 
 func assertReduce(t *testing.T, stmt *handler.Statement, err error, want wantReduce) {
