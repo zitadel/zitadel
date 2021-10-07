@@ -1,5 +1,5 @@
 <div class="view-toggle">
-    <button (click)="closeGridView()" mat-icon-button matTooltip="{{'PROJECT.TABLE.SHOWTABLE' | translate}}">
+    <button [attr.data-e2e]="'toggle-grid'" (click)="closeGridView()" mat-icon-button matTooltip="{{'PROJECT.TABLE.SHOWTABLE' | translate}}">
         <i class="show list view las la-th-list"></i>
     </button>
 </div>
@@ -35,7 +35,7 @@
     <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
     <div class="item card" *ngFor="let item of notPinned; index as i" (click)="navigateToProject(item.id, $event)"
-        [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}" [attr.data-e2e]="'grid-card'">
         <div class="text-part">
             <span *ngIf="item.details?.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
@@ -66,7 +66,7 @@
 
 <ng-template #deleteButton let-key="key">
     <button *ngIf="key.id !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
-        (click)="deleteProject($event, key)" class="delete-button" mat-icon-button>
+        (click)="deleteProject($event, key)" class="delete-button" mat-icon-button [attr.data-e2e]="'delete-project-button'">
         <i class="las la-trash"></i>
     </button>
 </ng-template>

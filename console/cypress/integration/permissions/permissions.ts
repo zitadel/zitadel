@@ -1,25 +1,34 @@
-import { ORG_MANAGER } from "../shared/types"
-
-// NEEDS TO BE DISABLED!!!!!! this is just for testing
-Cypress.on('uncaught:exception', (err, runnable) => {
-    // returning false here prevents Cypress from
-    if (err.message.includes('addEventListener')) {
-        return false
-    }
-})
-// ###############################
+import { apiAuth } from "../../support/api/apiauth";
+import { ensureProjectExists } from "../../support/api/projects";
+import { login, User } from "../../support/login/users";
 
 describe('permissions', () => {
 
-    ;[ORG_MANAGER.org_owner].forEach(user => {
+    const testProjectName = 'e2eprojectpermission'
+    const testRoleName = 'e2eroleundertest'
+    const testGrantName = 'e2egrantundertest'
 
-        describe(`impersonating an organization manager with permission "${user}"`, () => {
+    ;[User.OrgOwner].forEach(user => {
 
-            before(()=> {
-                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('domain')}`, Cypress.env(`${user.toLowerCase()}_password`))
-                cy.visit(Cypress.env('consoleUrl') + '/projects')
-                // wait until table is loaded
-                cy.contains("tr", "cypress").contains("e2e")
+        describe(`as user "${user}"`, () => {
+
+            describe('add role', () => {
+
+                before(()=> {
+                    login(user)
+                    apiAuth().then(api => {
+                        ensureProjectExists(api, testProjectName).then(projectID => {
+                            ensureRoleDoesntExist(api, projectID, testAppName).then(() => {
+                                cy.visit(`${Cypress.env('consoleUrl')}/projects/${projectID}`)
+                            })
+                        })
+                    })
+
+    //                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('domain')}`, Cypress.env(`${user.toLowerCase()}_password`))
+                    cy.visit(Cypress.env('consoleUrl') + '/projects')
+                    // wait until table is loaded
+                    cy.contains("tr", "cypress").contains("e2e")
+                })
             })
         })
     })
@@ -29,7 +38,7 @@ describe('permissions', () => {
 describe('permissions', () => {
 
     before(()=> {
-        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
+//        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
     })
 
     it('should show projects ', () => {

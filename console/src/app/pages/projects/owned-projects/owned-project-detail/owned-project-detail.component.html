@@ -63,7 +63,7 @@
 
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
                 <app-application-grid *ngIf="grid" [disabled]="isZitadel" (changeView)="grid = false"
-                    [projectId]="projectId"></app-application-grid>
+                    [projectId]="projectId" ></app-application-grid>
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
                     <div class="card-actions" card-actions>
                         <button mat-icon-button (click)="grid = true">

@@ -1,4 +1,5 @@
-import { User } from "../../support/commands"
+import { apiAuth } from "../../support/api/apiauth";
+import { login, User } from "../../support/login/users";
 
 describe('humans', () => {
 
@@ -14,17 +15,17 @@ describe('humans', () => {
         describe(`as user "${user}"`, () => {
 
             beforeEach(()=> {
-                cy.ssoLogin(user)
+                login(user)
                 cy.visit(humansPath)
                 cy.get('[data-cy=timestamp]')
             })
 
             describe('add', () => {
                 before(`ensure it doesn't exist already`, () => {
-                    cy.apiAuthHeader().then(apiCallProperties => {
+                    apiAuth().then(apiCallProperties => {
                         cy.request({
                             method: 'POST',
-                            url: `${apiCallProperties.baseURL}/management/v1/users/_search`,
+                            url: `${apiCallProperties.mgntBaseURL}users/_search`,
                             headers: {
                                 Authorization: apiCallProperties.authHeader
                             },
@@ -33,7 +34,7 @@ describe('humans', () => {
                             if (humanUser) {
                                 cy.request({
                                     method: 'DELETE',
-                                    url: `${apiCallProperties.baseURL}/management/v1/users/${humanUser.id}`,
+                                    url: `${apiCallProperties.mgntBaseURL}users/${humanUser.id}`,
                                     headers: {
                                         Authorization: apiCallProperties.authHeader
                                     },
@@ -61,10 +62,10 @@ describe('humans', () => {
             
             describe('remove', () => {
                 before('ensure it exists', () => {
-                    cy.apiAuthHeader().then(apiCallProperties => {
+                    apiAuth().then(apiCallProperties => {
                         cy.request({
                             method: 'POST',
-                            url: `${apiCallProperties.baseURL}/management/v1/users/human`,
+                            url: `${apiCallProperties.mgntBaseURL}users/human`,
                             headers: {
                                 Authorization: apiCallProperties.authHeader
                             },

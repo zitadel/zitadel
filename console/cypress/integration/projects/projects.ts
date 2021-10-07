@@ -1,84 +1,78 @@
-// NEEDS TO BE DISABLED!!!!!! this is just for testing
-Cypress.on('uncaught:exception', (err, runnable) => {
-    // returning false here prevents Cypress from
-    if (err.message.includes('addEventListener')) {
-        return false
-    }
-})
-// ###############################
+import { apiAuth } from "../../support/api/apiauth";
+import { ensureProjectDoesntExist, ensureProjectExists } from "../../support/api/projects";
+import { login, User } from "../../support/login/users";
 
 describe("projects", ()=> {
 
-    before(()=> {
-        cy.consolelogin(Cypress.env('username'), Cypress.env('password'))
-    })
+    const testProjectName = 'e2eproject'
 
-    it('should show projects', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/projects')
-        cy.url().should('contain', '/projects')
-    })
+    ;[User.OrgOwner].forEach(user => {
 
-    describe('add', () => {
+        describe(`as user "${user}"`, () => {
 
-        before('cleanup', () => {
-            cy.log(`PROJECT: delete project`);
-            //click on org to clear screen
-            cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
-                cy.url().should('contain', '/org');
+            beforeEach(()=> {
+                login(user)
+                cy.visit(`${Cypress.env('consoleUrl')}/projects`)
             })
-            //click on Projects 
-            cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
-                cy.url().should('contain', '/projects');
-                cy.get('.card').should('contain.text', "newProjectToTest")
-            })
-            //TODO variable for regex
-            cy.get('.card').filter(':contains("newProjectToTest")').find('button.delete-button').click()
-            cy.get('button').filter(':contains("Delete")').click().then(() => {
-                cy.wait(2000)
-                cy.visit(Cypress.env('consoleUrl') + '/projects');
-                cy.get('.card').contains("newProjectToTest").should('not.exist');
-            })            
-        })
 
-        it('should add a project', () => {
-            cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
-                cy.url().should('contain', '/projects');
-                cy.get('.add-project-button')
-            })
-            cy.get('.add-project-button').click({ force: true })
-            cy.get('input').type("newProjectToTest")
-            cy.get('[type^=submit]').click().then(() => {
-                cy.get('h1').should('contain', "Project newProjectToTest")
-            })
-        })
+            describe('add project', () => {
+                before(`ensure it doesn't exist already`, () => {
+                    apiAuth().then(api => {
+                        ensureProjectDoesntExist(api, testProjectName)
+                    })
+                })
 
-        it('should create an app', () => {
-            //click on org to clear screen
-            cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
-                cy.url().should('contain', '/org');
+                it('should add a project', () => {
+                    cy.get('.add-project-button').click({ force: true })
+                    cy.get('input').type(testProjectName)
+                    cy.get('[type^=submit]').click()
+                    cy.get('h1').should('contain', `Project ${testProjectName}`)
+                    cy.get('a').contains('arrow_back').click()
+                    cy.get('[data-e2e=grid-card]').contains(testProjectName)
+                    cy.get('[data-e2e=toggle-grid]').click()
+                    cy.contains("tr", testProjectName)
+                })
             })
-            cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
-                cy.url().should('contain', '/projects');
-                cy.get('.card').should('contain.text', "newProjectToTest")
+
+            describe('remove project', () => {
+                beforeEach('ensure it exists', () => {
+                    apiAuth().then(api => {
+                        ensureProjectExists(api, testProjectName)
+                    })
+                })
+
+                afterEach('project should be deleted', () => {
+                    cy.get('span.title')
+                        .contains('Delete Project')
+                        .parent()
+                        .find('button')
+                        .contains('Delete')
+                        .click()
+                    cy.contains('Deleted Project')
+                    cy.get(`[text*=${testProjectName}]`).should('not.exist');
+                    cy.get('[data-e2e=toggle-grid]').click()
+                    cy.get(`[text*=${testProjectName}]`).should('not.exist');
+                })
+
+                it('via list view', () => {
+                    cy.get('[data-e2e=toggle-grid]').click()
+                    cy.get('[data-cy=timestamp]')
+                    cy.get('h1')
+                        .contains('Projects')
+                        .parent()
+                        .contains("tr", testProjectName, { timeout: 1000 })
+                        .find('[data-e2e=delete-project-button]')
+                        .click({force: true})
+                })
+
+                it('via grid view', () => {
+                    cy.get('[data-e2e=grid-card]') 
+                        .contains(testProjectName)
+                        .trigger('mouseover')
+                        .get('[data-e2e=delete-project-button]')
+                        .click()
+                })
             })
-            cy.get('.card').contains("newProjectToTest").click()
-            cy.get('.cnsl-app-card').filter(':contains("add")').click()
-            cy.get('[formcontrolname^=name]').type("newAppToTest")
-            // select webapp
-            cy.get('[for^=WEB]').click()
-            cy.get('[type^=submit]').filter(':contains("Continue")').should('be.visible').eq(0).click()
-            //select authentication
-            cy.get('[for^=PKCE]').click()
-            cy.get('[type^=submit]').filter(':contains("Continue")').should('be.visible').eq(1).click()
-            //enter URL
-            cy.get('cnsl-redirect-uris').eq(0).type("https://testurl.org")
-            cy.get('cnsl-redirect-uris').eq(1).type("https://testlogouturl.org")
-            cy.get('[type^=submit]').filter(':contains("Continue")').should('be.visible').eq(2).click()
-            cy.get('button').filter(':contains("Create")').should('be.visible').click().then(() => {
-                cy.get('[id*=overlay]').should('exist')
-            })
-            //TODO: check client ID/Secret
-            cy.get('button').filter(':contains("Close")').should('exist').click()
         })
     })
 })

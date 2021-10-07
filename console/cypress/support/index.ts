@@ -6,6 +6,3 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
 }
 import './commands'
-
-Cypress.Cookies.debug(true)   
-//Cypress.Cookies.preserveOnce("__Secure-caos.zitadel.useragent")

@@ -1,4 +1,5 @@
-import { User } from "../../support/commands"
+import { apiAuth } from "../../support/api/apiauth";
+import { login, User } from "../../support/login/users";
 
 // NEEDS TO BE DISABLED!!!!!! this is just for testing
 /*
@@ -23,7 +24,7 @@ describe('machines', () => {
         describe(`as user "${user}"`, () => {
 
             beforeEach(()=> {
-                cy.ssoLogin(user)
+                login(user)
                 cy.visit(machinesPath)
                 cy.get('[data-cy=timestamp]')
             })
@@ -31,10 +32,10 @@ describe('machines', () => {
             describe('add', () => {
 
                 before(`ensure it doesn't exist already`, () => {
-                    cy.apiAuthHeader().then(apiCallProperties => {
+                    apiAuth().then(apiCallProperties => {
                         cy.request({
                             method: 'POST',
-                            url: `${apiCallProperties.baseURL}/management/v1/users/_search`,
+                            url: `${apiCallProperties.mgntBaseURL}users/_search`,
                             headers: {
                                 Authorization: apiCallProperties.authHeader
                             },
@@ -43,7 +44,7 @@ describe('machines', () => {
                             if (machineUser) {
                                 cy.request({
                                     method: 'DELETE',
-                                    url: `${apiCallProperties.baseURL}/management/v1/users/${machineUser.id}`,
+                                    url: `${apiCallProperties.mgntBaseURL}users/${machineUser.id}`,
                                     headers: {
                                         Authorization: apiCallProperties.authHeader
                                     },
@@ -69,10 +70,10 @@ describe('machines', () => {
 
             describe('remove', () => {
                 before('ensure it exists', () => {
-                    cy.apiAuthHeader().then(apiCallProperties => {
+                    apiAuth().then(apiCallProperties => {
                         cy.request({
                             method: 'POST',
-                            url: `${apiCallProperties.baseURL}/management/v1/users/machine`,
+                            url: `${apiCallProperties.mgntBaseURL}users/machine`,
                             headers: {
                                 Authorization: apiCallProperties.authHeader
                             },
