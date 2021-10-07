@@ -822,7 +822,8 @@
         "passwordlessPromptText": "Richista inizializzazione autenticazione passwordless",
         "passwordlessRegistrationDoneText": "Registrazione autenticazione passwordless finita",
         "passwordlessRegistrationText": "Registrazione autenticazione passwordless",
-        "passwordlessText": "Autenticazione passwordless"
+        "passwordlessText": "Autenticazione passwordless",
+        "externalRegistrationUserOverviewText":"Registrazione utente esterno"
       }
     },
     "MESSAGE_TEXTS": {

@@ -177,6 +177,7 @@ PasswordlessRegistration:
 PasswordlessRegistrationDone:
   Title: Configurazione dell'autenticazione senza password
   Description: Token per lautenticazione passwordless aggiunto con successo.
+  DescriptionClose: Ora puoi chiudere questa finestra.
   NextButtonText: Avanti
   CancelButtonText: annulla
 
@@ -387,6 +388,7 @@ Errors:
       IDPConfigIDEmpty: L'ID del fornitore di identità è vuoto
       ExternalUserIDEmpty: L'ID utente esterno è vuoto
       UserDisplayNameEmpty: Il nome visualizzato dell'utente è vuoto
+      NoExternalUserData: Nessun dato utente esterno ricevuto
     GrantRequired: >-
       Accesso non possibile. L'utente deve avere almeno una sovvenzione
       sull'applicazione. Contatta il tuo amministratore.
