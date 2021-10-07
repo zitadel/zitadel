@@ -820,7 +820,8 @@
         "passwordlessPromptText":"Passwordless Aufforderung",
         "passwordlessRegistrationDoneText":"Passwordless setzen erfolgreich",
         "passwordlessRegistrationText":"Passwordless Registrierung",
-        "passwordlessText":"Passwordless"
+        "passwordlessText":"Passwordless",
+        "externalRegistrationUserOverviewText":"Externe Registrierung Benutzer Übersicht"
       }
     },
     "MESSAGE_TEXTS": {

@@ -275,6 +275,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -307,6 +308,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
 					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -472,6 +474,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -509,6 +512,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -681,6 +685,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -721,6 +726,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -900,6 +906,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -943,6 +950,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -1174,6 +1182,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1234,6 +1243,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -1387,6 +1397,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1422,6 +1433,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
 					LockoutPolicy:            false,
+					Actions:                  false,
 				},
 			},
 			res: res{
@@ -1634,6 +1646,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{

@@ -30,6 +30,9 @@ func (o *Org) appendAddIdpProviderToLoginPolicyEvent(event *es_models.Event) err
 		return err
 	}
 	provider.ObjectRoot.CreationDate = event.CreationDate
+	if o.LoginPolicy == nil {
+		return nil
+	}
 	o.LoginPolicy.IDPProviders = append(o.LoginPolicy.IDPProviders, provider)
 	return nil
 }
@@ -39,6 +42,9 @@ func (o *Org) appendRemoveIdpProviderFromLoginPolicyEvent(event *es_models.Event
 	err := provider.SetData(event)
 	if err != nil {
 		return err
+	}
+	if o.LoginPolicy == nil {
+		return nil
 	}
 	if i, m := iam_es_model.GetIDPProvider(o.LoginPolicy.IDPProviders, provider.IDPConfigID); m != nil {
 		o.LoginPolicy.IDPProviders[i] = o.LoginPolicy.IDPProviders[len(o.LoginPolicy.IDPProviders)-1]

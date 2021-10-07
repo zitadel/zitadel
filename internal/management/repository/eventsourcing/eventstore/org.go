@@ -31,6 +31,7 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -76,6 +77,31 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*iam_model.Or
 		return nil, err
 	}
 	return iam_view_model.OrgIAMViewToModel(policy), err
+}
+
+func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
+	err := request.EnsureLimit(repo.SearchLimit)
+	if err != nil {
+		return nil, err
+	}
+	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
+	sequence, sequenceErr := repo.View.GetLatestOrgDomainSequence()
+	logging.Log("EVENT-SLowp").OnError(sequenceErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest org domain sequence")
+	domains, count, err := repo.View.SearchOrgDomains(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &org_model.OrgDomainSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.OrgDomainsToModel(domains),
+	}
+	if sequenceErr == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result, nil
 }
 
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {

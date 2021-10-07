@@ -9,13 +9,13 @@ import ThemedImage from '@theme/ThemedImage';
 
 const features = [
   {
-    title: 'Manuals',
-    darkImageUrl: 'img/index/Manual-dark.svg',
-    lightImageUrl: 'img/index/Manual-light.svg',
-    link: 'docs/manuals/introduction',
+    title: 'Guides',
+    darkImageUrl: 'img/index/Guides-dark.svg',
+    lightImageUrl: 'img/index/Guides-light.svg',
+    link: 'docs/guides/introduction',
     description: (
       <>
-        Follow this guide to get started with ZITADEL as a user.
+        Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
       </>
     ),
   },
@@ -25,20 +25,9 @@ const features = [
     lightImageUrl: 'img/index/Quickstarts-light.svg',
     link: 'docs/quickstarts/introduction',
     description: (
-      <>
-        Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
-      </>
-    ),
-  },
-  {
-    title: 'Guides',
-    darkImageUrl: 'img/index/Guides-dark.svg',
-    lightImageUrl: 'img/index/Guides-light.svg',
-    link: 'docs/guides/introduction',
-    description: (
-      <>
-        Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
-      </>
+        <>
+          Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
+        </>
     ),
   },
   {
@@ -107,7 +96,7 @@ export default function Home() {
                 'button button--outline button--lg get-started',
                 styles.getStarted,
               )}
-              to={useBaseUrl('docs/guides/usage/get-started')}>
+              to={useBaseUrl('docs/guides/basics/get-started')}>
               Get Started
             </Link>
           </div>
