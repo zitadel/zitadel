@@ -750,7 +750,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins."
+      "BTN":"Datei auswählen",
+      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
+      "ACTIVATEPREVIEW":"Preview aktivieren"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
@@ -1276,6 +1278,7 @@
         }
       },
       "NEXTSTEPS": {
+        "TITLE": "Nächste Schritte",
         "0": {
           "TITLE": "Rollen festlegen",
           "DESC": "Erfassen Sie Rollen für ihr Projekt"
