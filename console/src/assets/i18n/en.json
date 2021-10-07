@@ -591,7 +591,7 @@
         "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
         "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new Token",
+        "REQUESTNEWTOKEN": "Request new token",
         "TYPES": {
           "1": "HTTP",
           "2": "DNS"
@@ -655,7 +655,7 @@
       "POSTAL_CODE": "Postal Code",
       "COUNTRY": "Country",
       "TITLE": "Zitadel Tier",
-      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to stripe.com.",
       "QUESTIONS": "For questions regarding payments contact our support ",
       "BTN": "Change Tier"
     },
@@ -712,7 +712,7 @@
       "BTN":"Select File",
       "ACTIVATEPREVIEW":"Apply configuration",
       "DARK":"Dark Mode",
-      "LIGHT":"Lighg Mode",
+      "LIGHT":"Light Mode",
       "CHANGEVIEW":"Change View",
       "ACTIVATED":"Policy changes are now LIVE",
       "THEME":"Theme",

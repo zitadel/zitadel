@@ -1090,7 +1090,7 @@
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
       "ASSERTION_DESCRIPTION": "Rolleninformationen werden auf dem UserInfo Endpoint oder je nach Applikationseinstellungen in Tokens oder anderen Methoden bereitgestellt.",
       "CHECK": "Rollen bei Authentisierung prüfen",
-      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einem entsprechenden Rolle authentifiziert werden."
+      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden."
     },
     "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
     "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der Benutzer nicht authentifiziert werden.",
@@ -1363,7 +1363,7 @@
       "TOKENTYPE": "Auth Token Typ",
       "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
-      "UNSECUREREDIRECT": "Ich hoffe, Du weisst, was Du tust.",
+      "UNSECUREREDIRECT": "Wir hoffen, Du weisst, was Du tust.",
       "OVERVIEWSECTION": "Übersicht",
       "OVERVIEWTITLE": "Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
       "ACCESSTOKENROLEASSERTION": "Benutzerrollen dem Access Token hinzufügen",
@@ -1455,6 +1455,7 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
+    "it": "Italienisch",
     "en": "Englisch"
   },
   "MEMBER": {
