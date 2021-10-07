@@ -31,20 +31,6 @@ type ProjectRoleView struct {
 	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func ProjectRoleViewFromModel(role *model.ProjectRoleView) *ProjectRoleView {
-	return &ProjectRoleView{
-		ResourceOwner: role.ResourceOwner,
-		OrgID:         role.OrgID,
-		ProjectID:     role.ProjectID,
-		Key:           role.Key,
-		DisplayName:   role.DisplayName,
-		Group:         role.Group,
-		Sequence:      role.Sequence,
-		CreationDate:  role.CreationDate,
-		ChangeDate:    role.ChangeDate,
-	}
-}
-
 func ProjectRoleToModel(role *ProjectRoleView) *model.ProjectRoleView {
 	return &model.ProjectRoleView{
 		ResourceOwner: role.ResourceOwner,

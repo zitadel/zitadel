@@ -9,6 +9,7 @@ module.exports = {
   organizationName: 'caos',
   projectName: 'zitadel',
   themeConfig: {
+    zoomSelector: '.markdown :not(em) > img',
     navbar: {
       title: 'ZITADEL',
       logo: {
@@ -146,5 +147,6 @@ module.exports = {
         domain: 'docs.zitadel.ch',
       },
     ],
+    require.resolve('plugin-image-zoom'),
   ],
 };

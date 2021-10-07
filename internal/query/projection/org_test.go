@@ -37,13 +37,16 @@ func TestOrgProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						"domain.new",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"domain.new",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -64,13 +67,16 @@ func TestOrgProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						domain.OrgStateActive,
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.OrgStateActive,
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -91,13 +97,16 @@ func TestOrgProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						domain.OrgStateInactive,
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.OrgStateInactive,
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -118,13 +127,16 @@ func TestOrgProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						"new name",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"new name",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -144,9 +156,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				executer: &testExecuter{
-					shouldExec: false,
-				},
+				executer:         &testExecuter{},
 			},
 		},
 		{
@@ -165,16 +175,19 @@ func TestOrgProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "INSERT INTO zitadel.projections.orgs (id, creation_date, change_date, resource_owner, sequence, name, org_state) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-					expectedArgs: []interface{}{
-						"agg-id",
-						anyArg{},
-						anyArg{},
-						"ro-id",
-						uint64(15),
-						"name",
-						domain.OrgStateActive,
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.orgs (id, creation_date, change_date, resource_owner, sequence, name, org_state) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								uint64(15),
+								"name",
+								domain.OrgStateActive,
+							},
+						},
 					},
 				},
 			},

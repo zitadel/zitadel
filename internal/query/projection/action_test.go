@@ -38,19 +38,22 @@ func TestActionProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "INSERT INTO zitadel.projections.actions (id, creation_date, change_date, resource_owner, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-					expectedArgs: []interface{}{
-						"agg-id",
-						anyArg{},
-						anyArg{},
-						"ro-id",
-						uint64(15),
-						"name",
-						"name(){}",
-						3 * time.Second,
-						true,
-						domain.ActionStateActive,
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.actions (id, creation_date, change_date, resource_owner, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								uint64(15),
+								"name",
+								"name(){}",
+								3 * time.Second,
+								true,
+								domain.ActionStateActive,
+							},
+						},
 					},
 				},
 			},
@@ -71,14 +74,17 @@ func TestActionProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						"name2",
-						"name2(){}",
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"name2",
+								"name2(){}",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -99,13 +105,16 @@ func TestActionProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						domain.ActionStateInactive,
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.ActionStateInactive,
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -126,13 +135,16 @@ func TestActionProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
-					expectedArgs: []interface{}{
-						anyArg{},
-						uint64(15),
-						domain.ActionStateActive,
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.ActionStateActive,
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
@@ -153,10 +165,13 @@ func TestActionProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					shouldExec:   true,
-					expectedStmt: "DELETE FROM zitadel.projections.actions WHERE (id = $1)",
-					expectedArgs: []interface{}{
-						"agg-id",
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.actions WHERE (id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
