@@ -13,6 +13,9 @@ func (c Context) set(name string, value interface{}) {
 }
 
 func (c *Context) SetToken(t *oidc.Tokens) *Context {
+	if t == nil {
+		return c
+	}
 	if t.Token != nil && t.Token.AccessToken != "" {
 		c.set("accessToken", t.AccessToken)
 	}

@@ -184,7 +184,7 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *dom
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err := l.customExternalUserMapping(externalUser, tokens, authReq, idpConfig)
+	externalUser, err := l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -282,9 +282,17 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	if len(authReq.LinkingUsers) == 0 {
+		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
+		return
+	}
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(user, nil, authReq, idpConfig, metadata)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(user, nil, authReq, idpConfig, metadata, resourceOwner)
+	if err != nil {
+		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
+	}
 	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
@@ -295,7 +303,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(authReq.UserID, nil, authReq, idpConfig)
+	userGrants, err := l.customGrants(authReq.UserID, nil, authReq, idpConfig, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

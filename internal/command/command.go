@@ -55,16 +55,26 @@ type Commands struct {
 	keyAlgorithm       crypto.EncryptionAlgorithm
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
-	tokenVerifier      *authz.TokenVerifier
+	tokenVerifier      orgFeatureChecker
+}
+
+type orgFeatureChecker interface {
+	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
 type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo *authz_repo.EsRepository) (repo *Commands, err error) {
+func StartCommands(
+	es *eventstore.Eventstore,
+	defaults sd.SystemDefaults,
+	authZConfig authz.Config,
+	staticStore static.Storage,
+	authZRepo *authz_repo.EsRepository,
+) (repo *Commands, err error) {
 	repo = &Commands{
-		eventstore:         eventstore,
+		eventstore:         es,
 		static:             staticStore,
 		idGenerator:        id.SonyFlakeGenerator,
 		iamDomain:          defaults.Domain,
@@ -130,7 +140,7 @@ func StartCommands(eventstore *eventstore.Eventstore, defaults sd.SystemDefaults
 	}
 	repo.keyAlgorithm = keyAlgorithm
 
-	repo.tokenVerifier = authz.Start(authZRepo)
+	repo.tokenVerifier = authZRepo
 	return repo, nil
 }
 

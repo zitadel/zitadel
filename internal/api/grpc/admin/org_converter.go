@@ -4,22 +4,35 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/pkg/grpc/org"
 )
 
-func listOrgRequestToModel(req *admin.ListOrgsRequest) (*model.OrgSearchRequest, error) {
+func listOrgRequestToModel(req *admin.ListOrgsRequest) (*query.OrgSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := org_grpc.OrgQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &model.OrgSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
+	return &query.OrgSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			SortingColumn: fieldNameToOrgColumn(req.SortingColumn),
+			Asc:           asc,
+		},
 		Queries: queries,
 	}, nil
+}
+
+func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.Column {
+	switch fieldName {
+	case org.OrgFieldName_ORG_FIELD_NAME_NAME:
+		return query.OrgColumnName
+	default:
+		return query.Column{}
+	}
 }
 
 func setUpOrgOrgToDomain(req *admin.SetUpOrgRequest_Org) *domain.Org {

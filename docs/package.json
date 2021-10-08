@@ -21,6 +21,7 @@
     "docusaurus-plugin-plausible": "^0.0.5",
     "mdx-mermaid": "^1.1.0",
     "mermaid": "^8.12.1",
+    "plugin-image-zoom": "ataft/plugin-image-zoom",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },

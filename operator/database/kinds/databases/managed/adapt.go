@@ -136,6 +136,8 @@ func Adapter(
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
+			desiredKind.Spec.Cache,
+			desiredKind.Spec.MaxSQLMemory,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err

@@ -20,9 +20,9 @@ const (
 type TriggerActionsSetEvent struct {
 	eventstore.BaseEvent
 
-	FlowType    domain.FlowType
-	TriggerType domain.TriggerType
-	ActionIDs   []string
+	FlowType    domain.FlowType    `json:"flowType"`
+	TriggerType domain.TriggerType `json:"triggerType"`
+	ActionIDs   []string           `json:"actionIDs"`
 }
 
 func (e *TriggerActionsSetEvent) Data() interface{} {
@@ -63,9 +63,9 @@ func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.EventRead
 type TriggerActionsCascadeRemovedEvent struct {
 	eventstore.BaseEvent
 
-	FlowType    domain.FlowType
-	TriggerType domain.TriggerType
-	ActionID    string
+	FlowType    domain.FlowType    `json:"flowType"`
+	TriggerType domain.TriggerType `json:"triggerType"`
+	ActionID    string             `json:"actionID"`
 }
 
 func (e *TriggerActionsCascadeRemovedEvent) Data() interface{} {
@@ -104,7 +104,7 @@ func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstor
 type FlowClearedEvent struct {
 	eventstore.BaseEvent
 
-	FlowType domain.FlowType
+	FlowType domain.FlowType `json:"flowType"`
 }
 
 func (e *FlowClearedEvent) Data() interface{} {

@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetFlow(ctx context.Context, req *mgmt_pb.GetFlowRequest) (*mgmt_pb.GetFlowResponse, error) {
-	flow, err := s.query.GetFlow(ctx, action_grpc.FlowTypeToDomain(req.Type))
+	flow, err := s.query.GetFlow(ctx, action_grpc.FlowTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

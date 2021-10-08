@@ -11,6 +11,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
+
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -75,7 +76,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	}
 	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims}
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err = l.customExternalUserMapping(externalUser, tokens, authReq, idpConfig)
+	externalUser, err = l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -126,7 +127,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		return
 	}
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -141,7 +142,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(authReq.UserID, tokens, authReq, idpConfig)
+	userGrants, err := l.customGrants(authReq.UserID, tokens, authReq, idpConfig, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

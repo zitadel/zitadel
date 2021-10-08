@@ -99,6 +99,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		userRepo,
 		eventstore.AuthRequestRepo{
 			Command:                    command,
+			OrgViewProvider:            queries,
 			AuthRequests:               authReq,
 			View:                       view,
 			Eventstore:                 es,
@@ -106,7 +107,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			UserViewProvider:           view,
 			UserCommandProvider:        command,
 			UserEventProvider:          &userRepo,
-			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,
 			LoginPolicyViewProvider:    view,
 			LockoutPolicyViewProvider:  view,
@@ -154,6 +154,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IamID:       systemDefaults.IamID,
 			Auth:        authZ,
 			AuthZRepo:   authZRepo,
+			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
