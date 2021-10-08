@@ -5,7 +5,7 @@
     </button>
 </div>
 
-<div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
+<div class="scroll-container" cnslScrollable (scrollPosition)="scrollHandler($event)">
     <li class="item change-item-back" *ngFor="let hist of data | async; index as histindex">
         <span *ngIf="hist.values[0].dates[0]" class="date">{{
             hist.values[0]?.dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}</span>
