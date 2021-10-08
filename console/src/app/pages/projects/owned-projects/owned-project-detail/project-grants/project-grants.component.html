@@ -1,14 +1,14 @@
 <cnsl-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
     [dataSize]="dataSource.totalResult" [selection]="selection" [timestamp]="dataSource?.viewTimestamp"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" (refreshed)="getRoleOptions(projectId)">
-    <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
+    <ng-template cnslHasRole [hasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
         actions>
         <button (click)="deleteSelectedGrants()" [disabled]="disabled" mat-icon-button *ngIf="selection.hasValue()"
             color="warn">
             <i class="las la-trash"></i>
         </button>
     </ng-template>
-    <ng-template appHasRole [appHasRole]="['project.grant.member.write:'+projectId,'project.grant.member.write']"
+    <ng-template cnslHasRole [hasRole]="['project.grant.member.write:'+projectId,'project.grant.member.write']"
         actions>
         <a [disabled]="disabled" color="primary" color="primary" mat-raised-button
             [routerLink]="[ '/projects', projectId, 'grants', 'create']">

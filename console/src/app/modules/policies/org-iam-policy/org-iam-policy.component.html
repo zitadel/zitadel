@@ -2,7 +2,7 @@
     [title]="'POLICY.IAM_POLICY.TITLE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
     <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
-    <ng-template appHasRole [appHasRole]="['iam.policy.delete']">
+    <ng-template cnslHasRole [hasRole]="['iam.policy.delete']">
         <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
             matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
             {{'POLICY.RESET' | translate}}

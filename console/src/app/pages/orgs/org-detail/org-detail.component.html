@@ -47,7 +47,7 @@
             <cnsl-zitadel-tier [features]="features"></cnsl-zitadel-tier>
         </ng-container>
 
-        <ng-template appHasRole [appHasRole]="['policy.read']">
+        <ng-template cnslHasRole [hasRole]="['policy.read']">
             <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
         </ng-template>
     </div>

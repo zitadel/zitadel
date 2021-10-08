@@ -34,7 +34,7 @@
 
       <span class="fill-space"></span>
 
-      <ng-template appHasRole [appHasRole]="['policy.delete']">
+      <ng-template cnslHasRole [hasRole]="['policy.delete']">
         <button class="reset-button" *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
             matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
             {{'POLICY.RESET' | translate}}

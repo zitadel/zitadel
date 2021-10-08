@@ -1,6 +1,6 @@
 <cnsl-refresh-table [loading]="dataSource.loading$ | async" [selection]="selection" (refreshed)="refreshPage()"
     [dataSize]="dataSource.totalResult" [timestamp]="dataSource?.viewTimestamp">
-    <ng-template appHasRole [appHasRole]="['project.app.write']" actions>
+    <ng-template cnslHasRole [hasRole]="['project.app.write']" actions>
         <a [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']" color="primary"
             mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}

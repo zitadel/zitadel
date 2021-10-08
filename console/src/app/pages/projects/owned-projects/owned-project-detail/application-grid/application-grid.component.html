@@ -29,7 +29,7 @@
 
     </div>
 
-    <ng-template appHasRole [appHasRole]="['project.app.write']">
+    <ng-template cnslHasRole [hasRole]="['project.app.write']">
         <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']">
             <cnsl-app-card class="grid-card add" matRipple>
                 <mat-icon>add</mat-icon>

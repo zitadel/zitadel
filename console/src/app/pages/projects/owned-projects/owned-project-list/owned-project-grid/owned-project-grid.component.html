@@ -62,7 +62,7 @@
 
     <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
 
-    <ng-template appHasRole [appHasRole]="['project.create']">
+    <ng-template cnslHasRole [hasRole]="['project.create']">
         <div class="add-project-button card" (click)="addItem()">
             <mat-icon class="icon">add</mat-icon>
             <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>

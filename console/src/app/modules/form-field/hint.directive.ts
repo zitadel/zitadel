@@ -14,20 +14,20 @@ export const _CNSL_HINT = new InjectionToken<CnslHintDirective>('CnslHintDirecti
 
 /** Hint text to be shown underneath the form field control. */
 @Directive({
-    selector: 'cnsl-hint',
-    host: {
-        'class': 'cnsl-hint',
-        '[class.cnsl-form-field-hint-end]': 'align === "end"',
-        '[attr.id]': 'id',
-        // Remove align attribute to prevent it from interfering with layout.
-        '[attr.align]': 'null',
-    },
-    providers: [{ provide: _CNSL_HINT, useExisting: CnslHintDirective }],
+  selector: 'cnslHint',
+  host: {
+    'class': 'cnsl-hint',
+    '[class.cnsl-form-field-hint-end]': 'align === "end"',
+    '[attr.id]': 'id',
+    // Remove align attribute to prevent it from interfering with layout.
+    '[attr.align]': 'null',
+  },
+  providers: [{ provide: _CNSL_HINT, useExisting: CnslHintDirective }],
 })
 export class CnslHintDirective {
-    /** Whether to align the hint label at the start or end of the line. */
-    @Input() align: 'start' | 'end' = 'start';
+  /** Whether to align the hint label at the start or end of the line. */
+  @Input() align: 'start' | 'end' = 'start';
 
-    /** Unique ID for the hint. Used for the aria-describedby on the form field control. */
-    @Input() id: string = `mat-hint-${nextUniqueId++}`;
+  /** Unique ID for the hint. Used for the aria-describedby on the form field control. */
+  @Input() id: string = `mat-hint-${nextUniqueId++}`;
 }

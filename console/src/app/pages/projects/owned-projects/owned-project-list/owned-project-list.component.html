@@ -13,7 +13,7 @@
     <cnsl-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
         [selection]="selection" [loading]="loading$ | async">
 
-        <ng-template actions appHasRole [appHasRole]="['project.create']">
+        <ng-template actions cnslHasRole [hasRole]="['project.create']">
             <a [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>

@@ -67,7 +67,7 @@
                     [size]="38">
                 </cnsl-avatar>
                 <cnsl-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
-                    (close)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
+                    (closedCard)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
                 </cnsl-accounts-card>
             </div>
         </mat-toolbar>
@@ -132,7 +132,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+                            <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/users/list/humans']"
                                     [routerLinkActiveOptions]="{ exact: true }">
@@ -148,7 +148,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
+                            <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
                                     [routerLinkActiveOptions]="{ exact: true }">

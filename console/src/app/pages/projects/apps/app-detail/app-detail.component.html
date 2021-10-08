@@ -12,7 +12,7 @@
             </div>
             <ng-container *ngIf="isZitadel === false">
               <span class="fill-space"></span>
-              <ng-template appHasRole [appHasRole]="['project.app.write:'+projectId, 'project.app.write']">
+              <ng-template cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
                 <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
                   <span>{{'ACTIONS.ACTIONS' | translate}}</span>
                   <mat-icon class="icon">keyboard_arrow_down</mat-icon>
@@ -31,7 +31,7 @@
                     (click)="changeState(AppState.APP_STATE_ACTIVE)">
                     {{'ACTIONS.REACTIVATE' | translate}}
                   </button>
-                  <ng-template appHasRole [appHasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+                  <ng-template cnslHasRole [hasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
                     <button mat-menu-item matTooltip="{{'APP.PAGES.DELETE' | translate}}"
                         (click)="deleteApp()">
                         <span [style.color]="'var(--warn)'">{{'APP.PAGES.DELETE' | translate}}</span>

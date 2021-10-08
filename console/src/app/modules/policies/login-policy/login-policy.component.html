@@ -7,14 +7,14 @@
         <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
     <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
-        <ng-template appHasRole [appHasRole]="['policy.delete']">
+        <ng-template cnslHasRole [hasRole]="['policy.delete']">
             <button *ngIf="!isDefault" color="primary" matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()"
                 mat-stroked-button>
                 {{'POLICY.RESET' | translate}}
             </button>
         </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['policy.write']">
+        <ng-template cnslHasRole [hasRole]="['policy.write']">
             <button *ngIf="isDefault" color="primary" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}" (click)="savePolicy()"
                 mat-raised-button>
                 {{'POLICY.CREATECUSTOM' | translate}}
@@ -187,7 +187,7 @@
         </div>
     </div>
 
-    <ng-template appHasRole [appHasRole]="['org.idp.read']">
+    <ng-template cnslHasRole [hasRole]="['org.idp.read']">
         <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
             [expanded]="false">
 

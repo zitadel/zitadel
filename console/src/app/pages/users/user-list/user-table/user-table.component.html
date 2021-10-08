@@ -5,7 +5,7 @@
             [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
     </cnsl-form-field>
 
-    <ng-template appHasRole [appHasRole]="['user.write']" actions>
+    <ng-template cnslHasRole [hasRole]="['user.write']" actions>
         <button (click)="deactivateSelectedUsers()" matTooltip="{{'USER.TABLE.DEACTIVATE' | translate}}"
             class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
             <mat-icon svgIcon="mdi_account_cancel"></mat-icon>

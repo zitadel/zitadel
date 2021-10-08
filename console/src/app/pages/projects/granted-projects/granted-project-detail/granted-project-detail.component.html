@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <ng-template appHasRole [appHasRole]="['user.grant.read', 'user.grant.read:'+grantId]">
+        <ng-template cnslHasRole [hasRole]="['user.grant.read', 'user.grant.read:'+grantId]">
             <cnsl-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                 description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                 <cnsl-user-grants *ngIf="projectId && grantId" [context]="UserGrantContext.GRANTED_PROJECT"

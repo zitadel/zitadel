@@ -2,7 +2,7 @@
     [emitRefreshOnPreviousRoutes]="['/projects/'+projectId+'/roles/create']" [selection]="selection"
     [loading]="dataSource?.loading$ | async" [timestamp]="dataSource?.viewTimestamp">
    
-    <ng-template appHasRole [appHasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
+    <ng-template cnslHasRole [hasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
         <a *ngIf="actionsVisible" [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'roles', 'create']"
             color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}

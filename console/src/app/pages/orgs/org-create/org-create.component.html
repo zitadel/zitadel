@@ -5,7 +5,7 @@
         </button>
     </div>
 
-    <ng-template appHasRole [appHasRole]="['iam.write']">
+    <ng-template cnslHasRole [hasRole]="['iam.write']">
         <mat-slide-toggle [disabled]="currentCreateStep !== 1" class="example-margin" color="primary"
             (change)="changeSelf($event)" [(ngModel)]="forSelf">
             Use your personal account as organisation owner
@@ -156,7 +156,7 @@
             </ng-container>
         </ng-container>
     </ng-template>
-    <ng-template appHasRole [appHasRole]="['org.create']">
+    <ng-template cnslHasRole [hasRole]="['org.create']">
         <div *ngIf="forSelf">
             <ng-container *ngIf="currentCreateStep === 1">
                 <h1>{{'ORG.PAGES.ORGDETAIL_TITLE_WITHOUT_DOMAIN' | translate}} </h1>
