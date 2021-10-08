@@ -92,7 +92,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 	}
 	columns := make([]handler.Column, 0, 7)
 	columns = append(columns, handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
-		handler.NewCol(ProjectColumnSequence, e.Sequence()))
+		handler.NewCol(ProjectRoleColumnSequence, e.Sequence()))
 	if e.DisplayName != nil {
 		columns = append(columns, handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName))
 	}
