@@ -48,7 +48,7 @@
                 <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
                     translate}}</button>
 
-                <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
+                <ng-template cnslHasRole [hasRole]="['org.create','iam.write']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
                         <mat-icon class="avatar">add</mat-icon>
                         {{'MENU.NEWORG' | translate}}
@@ -73,7 +73,7 @@
         </mat-toolbar>
         <mat-drawer-container class="main-container">
             <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
-                [opened]="!(isHandset$ | async) && authenticationService.authenticated">
+                [opened]="(isHandset$ | async) === false && authenticationService.authenticated">
                 <div class="side-column">
                     <div class="list">
                         <a @navitem class="nav-item" [routerLinkActive]="['active']"
@@ -92,8 +92,7 @@
                         </ng-container>
 
                         <div *ngIf="org" [@navAnimation]="org">
-                            <ng-template appHasRole
-                                [appHasRole]="['org.read']">
+                            <ng-template cnslHasRole [hasRole]="['org.read']">
                                 <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span>{{org?.name ? org.name : ('MENU.ORGSECTION' | translate)}}</span>
@@ -101,7 +100,7 @@
                                 </div>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['org.read']">
+                            <ng-template cnslHasRole [hasRole]="['org.read']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                                     <i class="icon las la-cog"></i>
@@ -109,7 +108,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
+                            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
                                     <i class="icon las la-layer-group"></i>

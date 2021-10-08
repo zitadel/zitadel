@@ -95,7 +95,7 @@
             </cnsl-user-grants>
         </cnsl-card>
 
-        <ng-template appHasFeature [appHasFeature]="['metadata.user']">
+        <ng-template cnslHasFeature [cnslHasFeature]="['metadata.user']">
           <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>
         </ng-template>
     </div>

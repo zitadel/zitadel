@@ -21,7 +21,7 @@
     <div class="copy-row" *ngFor="let login of user?.loginNamesList">
       <button [disabled]="copied === login"
           [matTooltip]="(copied !== login ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-          appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event">
+          cnslCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event">
           {{login}}
       </button>
     </div>
@@ -51,7 +51,7 @@
     <div class="copy-row" *ngIf="app?.oidcConfig?.clientId">
       <button [disabled]="copied === app.oidcConfig?.clientId"
           [matTooltip]="(copied !== app.oidcConfig?.clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-          appCopyToClipboard [valueToCopy]="app.oidcConfig?.clientId" (copiedValue)="copied = $event">
+          cnslCopyToClipboard [valueToCopy]="app.oidcConfig?.clientId" (copiedValue)="copied = $event">
           {{app.oidcConfig?.clientId}}
       </button>
     </div>
@@ -59,7 +59,7 @@
     <div class="copy-row" *ngIf="app?.apiConfig?.clientId">
       <button [disabled]="copied === app.apiConfig?.clientId"
           [matTooltip]="(copied !== app.apiConfig?.clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-          appCopyToClipboard [valueToCopy]="app.apiConfig?.clientId" (copiedValue)="copied = $event">
+          cnslCopyToClipboard [valueToCopy]="app.apiConfig?.clientId" (copiedValue)="copied = $event">
           {{app.apiConfig?.clientId}}
       </button>
     </div>
@@ -72,7 +72,7 @@
             <span class="key">{{environmentV.key}}</span>
             <button [disabled]="copied === environmentV.value"
                 [matTooltip]="(copied !== environmentV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-                appCopyToClipboard [valueToCopy]="environmentV.value"
+                cnslCopyToClipboard [valueToCopy]="environmentV.value"
                 (copiedValue)="copied = environmentV.key">
               {{environmentV.value}}
             </button>

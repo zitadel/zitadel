@@ -10,6 +10,7 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
+
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
@@ -23,7 +24,7 @@ import { UpdateService } from './services/update.service';
 
 
 @Component({
-  selector: 'app-root',
+  selector: 'cnsl-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   animations: [
