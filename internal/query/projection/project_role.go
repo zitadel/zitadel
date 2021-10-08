@@ -90,14 +90,18 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 	if e.DisplayName == nil && e.Group == nil {
 		return crdb.NewNoOpStatement(e), nil
 	}
+	columns := make([]handler.Column, 0, 7)
+	columns = append(columns, handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
+		handler.NewCol(ProjectColumnSequence, e.Sequence()))
+	if e.DisplayName != nil {
+		columns = append(columns, handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName))
+	}
+	if e.Group != nil {
+		columns = append(columns, handler.NewCol(ProjectRoleColumnGroupName, *e.Group))
+	}
 	return crdb.NewUpdateStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName),
-			handler.NewCol(ProjectRoleColumnGroupName, *e.Group),
-		},
+		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
