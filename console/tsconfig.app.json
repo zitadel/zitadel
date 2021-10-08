@@ -1,26 +1,15 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "compileOnSave": false,
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./out-tsc/app",
-    "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "module": "es2020",
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "target": "es2015",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom"],
-    "types": [],
-    "strict": true
+    "types": []
   },
-  "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
-  },
-  "files": ["src/main.ts", "src/polyfills.ts"],
-  "include": ["src/**/*.d.ts"],
-  "exclude": ["src/test.ts", "src/**/*.spec.ts"]
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
 }

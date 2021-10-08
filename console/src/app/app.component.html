@@ -7,7 +7,7 @@
             </button>
             <ng-container *ngIf="labelpolicy && !labelpolicy?.disableWatermark">
               <a  class="title" [routerLink]="['/']">
-                  <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+                  <img class="logo" alt="zitadel logo" *ngIf="componentCssClass === 'dark-theme'; else lighttheme"
                       src="../assets/images/zitadel-logo-solo-light.svg" />
                   <ng-template #lighttheme>
                       <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />

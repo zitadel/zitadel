@@ -133,7 +133,7 @@
             [isOIDC]="app?.oidcConfig !== undefined" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
         </app-auth-method-radio>
 
-        <app-card *ngIf="currentAuthMethod == 'PK_JWT' && projectId && app?.id" [expanded]="false"
+        <app-card *ngIf="currentAuthMethod === 'PK_JWT' && projectId && app?.id" [expanded]="false"
             title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}" description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
             <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
         </app-card>
@@ -145,7 +145,7 @@
             </button>
         </div>
 
-        <div *ngIf="currentAuthMethod == 'BASIC'">
+        <div *ngIf="currentAuthMethod === 'BASIC'">
             <button [disabled]="!canWrite" mat-stroked-button
                 (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
         </div>
@@ -153,7 +153,7 @@
 
         <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
             <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
-                <div card-actions *ngIf="currentAuthMethod == 'CODE' || currentAuthMethod == 'POST'">
+                <div card-actions *ngIf="currentAuthMethod === 'CODE' || currentAuthMethod === 'POST'">
                     <button type="button" [disabled]="!canWrite" mat-stroked-button
                         (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
                 </div>
