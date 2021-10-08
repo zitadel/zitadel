@@ -103,15 +103,13 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 		logging.LogWithFields("HANDL-M00fH", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g0fg4", "reduce.wrong.event.type")
 	}
-	columns := make([]handler.Column, 0, 7)
-	columns = append(columns, handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-		handler.NewCol(ProjectGrantColumnSequence, e.Sequence()))
-	if e.RoleKeys != nil {
-		columns = append(columns, handler.NewCol(ProjectRoleColumnGroupName, pq.StringArray(e.RoleKeys)))
-	}
 	return crdb.NewUpdateStatement(
 		e,
-		columns,
+		[]handler.Column{
+			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
+			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
+		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
@@ -125,16 +123,13 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		logging.LogWithFields("HANDL-K0fwR", "seq", event.Sequence(), "expectedType", project.GrantCascadeChangedType).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ll9Ts", "reduce.wrong.event.type")
 	}
-
-	columns := make([]handler.Column, 0, 7)
-	columns = append(columns, handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-		handler.NewCol(ProjectGrantColumnSequence, e.Sequence()))
-	if e.RoleKeys != nil {
-		columns = append(columns, handler.NewCol(ProjectRoleColumnGroupName, pq.StringArray(e.RoleKeys)))
-	}
 	return crdb.NewUpdateStatement(
 		e,
-		columns,
+		[]handler.Column{
+			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
+			handler.NewCol(ProjectGrantColumnRoleKeys, e.RoleKeys),
+		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
