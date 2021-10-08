@@ -29,7 +29,7 @@ export class ContributorsComponent {
   @Input() description: string = '';
   @Input() disabled: boolean = false;
   @Input() totalResult: number = 0;
-  @Input() loading: boolean = false;
+  @Input() loading: boolean | null = false;
   @Input() membersSubject!: BehaviorSubject<Member.AsObject[]>;
   @Output() addClicked: EventEmitter<void> = new EventEmitter();
   @Output() showDetailClicked: EventEmitter<void> = new EventEmitter();

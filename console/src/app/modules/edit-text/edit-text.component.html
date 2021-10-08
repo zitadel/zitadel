@@ -25,7 +25,7 @@
           </div>
         </div>
       </div>
-      <cnsl-info-section *ngIf="warnText[key.key] !== undefined" class="info" type="WARN">{{'ACTIONS.RESETTO'| translate }} <cite>'{{warnText[key.key]}}'</cite></cnsl-info-section>
+      <cnsl-info-section *ngIf="warnText[key.key] !== undefined" class="info" [type]="InfoSectionType.WARN">{{'ACTIONS.RESETTO'| translate }} <cite>'{{warnText[key.key]}}'</cite></cnsl-info-section>
     </ng-container>
   </form>
 </div>

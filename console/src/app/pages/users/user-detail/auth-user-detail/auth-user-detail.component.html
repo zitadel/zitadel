@@ -16,7 +16,7 @@
 
         <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
 
-        <cnsl-card *ngIf="user && user.human?.profile" class=" app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
+        <cnsl-card *ngIf="user && user.human && user.human.profile" class=" app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
             <cnsl-detail-form [showEditImage]="true" [preferredLoginName]="user.preferredLoginName" [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
                 (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
             </cnsl-detail-form>
@@ -27,14 +27,14 @@
             <button class="icon-button" card-actions mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
                 <mat-icon class="icon">refresh</mat-icon>
             </button>
-            <cnsl-contact *ngIf="user?.human" [human]="user.human" [state]="user.state" canWrite="true"
+            <cnsl-contact *ngIf="user.human" [human]="user.human" [state]="user.state" [canWrite]="true"
                 (editType)="openEditDialog($event)" (enteredPhoneCode)="enteredPhoneCode($event)"
                 (deletedPhone)="deletePhone()" (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
             </cnsl-contact>
         </cnsl-card>
 
-        <cnsl-external-idps [userId]="user?.id" [service]="userService"></cnsl-external-idps>
+        <cnsl-external-idps *ngIf="user && user.id" [userId]="user.id" [service]="userService"></cnsl-external-idps>
 
         <cnsl-auth-passwordless *ngIf="user" #mfaComponent></cnsl-auth-passwordless>
 
@@ -49,7 +49,7 @@
             </cnsl-user-grants>
         </cnsl-card>
 
-        <ng-template cnslHasFeature [cnslHasFeature]="['metadata.user']">
+        <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
           <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
         </ng-template>
     </div>

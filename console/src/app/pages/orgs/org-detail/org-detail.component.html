@@ -31,7 +31,7 @@
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
 
-                <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+                <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
                   <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
                 </cnsl-info-section>
             
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+        <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
             <mat-tab label="Details">
                 <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"

@@ -19,6 +19,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, LOGIN_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -114,6 +115,7 @@ export class LoginTextsComponent implements OnDestroy {
   public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
 
   public destroy$: Subject<void> = new Subject();
+  public InfoSectionType: any = InfoSectionType;
 
   public form: FormGroup = new FormGroup({
     currentSubMap: new FormControl('emailVerificationDoneText'),

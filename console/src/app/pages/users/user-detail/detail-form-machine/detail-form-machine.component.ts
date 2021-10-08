@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-detail-form-machine',
@@ -10,7 +10,7 @@ import { User } from 'src/app/proto/generated/zitadel/user_pb';
 })
 export class DetailFormMachineComponent implements OnInit, OnDestroy {
   @Input() public username!: string;
-  @Input() public user!: User;
+  @Input() public user!: Human.AsObject | Machine.AsObject;
   @Input() public disabled: boolean = false;
   @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
 
@@ -29,7 +29,7 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.machineForm.patchValue({ userName: this.username, ...this.user });
+    this.machineForm.patchValue({ ...this.user, userName: this.username });
   }
 
   public ngOnDestroy(): void {

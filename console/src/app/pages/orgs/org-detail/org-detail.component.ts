@@ -7,6 +7,7 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Features } from 'src/app/proto/generated/zitadel/features_pb';
@@ -42,6 +43,7 @@ export class OrgDetailComponent implements OnInit {
   public membersSubject: BehaviorSubject<Member.AsObject[]>
     = new BehaviorSubject<Member.AsObject[]>([]);
   public features!: Features.AsObject;
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     private dialog: MatDialog,

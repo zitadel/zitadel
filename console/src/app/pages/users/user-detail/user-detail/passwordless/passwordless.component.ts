@@ -24,7 +24,7 @@ export interface WebAuthNOptions {
   styleUrls: ['./passwordless.component.scss'],
 })
 export class PasswordlessComponent implements OnInit, OnDestroy {
-  @Input() private user!: User.AsObject;
+  @Input() public user!: User.AsObject;
   public displayedColumns: string[] = ['name', 'state', 'actions'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();

@@ -19,6 +19,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, LOGIN_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
@@ -44,6 +45,7 @@ export class LoginPolicyComponent implements OnDestroy {
 
   public IDPStylingType: any = IDPStylingType;
   public currentPolicy: GridPolicy = LOGIN_POLICY;
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,

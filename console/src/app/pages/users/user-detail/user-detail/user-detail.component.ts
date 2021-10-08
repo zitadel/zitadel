@@ -5,6 +5,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -36,6 +37,7 @@ export class UserDetailComponent implements OnInit {
 
   public EditDialogType: any = EditDialogType;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     public translate: TranslateService,

@@ -32,7 +32,7 @@ export class RefreshTableComponent implements OnInit {
   @Input() public timestamp!: Timestamp.AsObject;
   @Input() public dataSize: number = 0;
   @Input() public emitRefreshAfterTimeoutInMs: number = 0;
-  @Input() public loading: boolean = false;
+  @Input() public loading: boolean | null = false;
   @Input() public emitRefreshOnPreviousRoutes: string[] = [];
   @Output() public refreshed: EventEmitter<void> = new EventEmitter();
   @Input() public hideRefresh: boolean = false;

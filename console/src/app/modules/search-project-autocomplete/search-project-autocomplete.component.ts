@@ -95,9 +95,9 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
     this.unsubscribed$.next();
   }
 
-  public displayFn(project?: any): string | undefined {
+  public displayFn(project?: any): string {
     return (project && project.projectName) ? `${project.projectName}` :
-      (project && project.name) ? `${project.name}` : undefined;
+      (project && project.name) ? `${project.name}` : '';
   }
 
   public add(event: MatChipInputEvent): void {

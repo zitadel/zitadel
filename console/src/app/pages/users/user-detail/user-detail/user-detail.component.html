@@ -37,7 +37,7 @@
 
         <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-        <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" type="WARN">{{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
+        <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" [type]="InfoSectionType.WARN">{{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
         <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
@@ -54,7 +54,7 @@
               <button card-actions class="icon-button" mat-icon-button (click)="refreshUser()" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
                   <mat-icon class="icon">refresh</mat-icon>
               </button>
-              <cnsl-contact disablePhoneCode="true"
+              <cnsl-contact [disablePhoneCode]="true"
                   [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
                   [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
                   (resendEmailVerification)="resendEmailVerification()"
@@ -95,7 +95,7 @@
             </cnsl-user-grants>
         </cnsl-card>
 
-        <ng-template cnslHasFeature [cnslHasFeature]="['metadata.user']">
+        <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
           <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>
         </ng-template>
     </div>
@@ -118,7 +118,7 @@
         </div>
       </div>
 
-      <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+      <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
         <mat-tab label="Details">
           <div class="side-padding">
             <ng-template cnslHasRole [hasRole]="['user.membership.read']">

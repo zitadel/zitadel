@@ -29,7 +29,7 @@
                 {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
             </mat-slide-toggle>
 
-            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) === false; else usernameInfo" [featureLink]="['/org/features']" class="info" type="WARN">
+            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) === false; else usernameInfo" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
               <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.username_login'})"></span>
             </cnsl-info-section>
 
@@ -46,7 +46,7 @@
                 {{'POLICY.DATA.ALLOWREGISTER' | translate}}
             </mat-slide-toggle>
 
-            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) === false; else regInfo" [featureLink]="['/org/features']" class="info" type="WARN">
+            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) === false; else regInfo" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
               <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.registration'})"></span>
             </cnsl-info-section>
 
@@ -62,7 +62,7 @@
                 {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
             </mat-slide-toggle>
 
-            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false; else idpInfo" [featureLink]="['/org/features']" class="info" type="WARN">
+            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false; else idpInfo" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
               <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
             </cnsl-info-section>
 
@@ -78,7 +78,7 @@
                 {{'POLICY.DATA.FORCEMFA' | translate}}
             </mat-slide-toggle>
 
-            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false; else factorsInfo" [featureLink]="['/org/features']" class="info" type="WARN">
+            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false; else factorsInfo" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
               <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})"></span>
             </cnsl-info-section>
 
@@ -94,7 +94,7 @@
           {{'POLICY.DATA.HIDEPASSWORDRESET' | translate}}
         </mat-slide-toggle>
 
-        <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false; else passwordResetInfo" [featureLink]="['/org/features']" class="info" type="WARN">
+        <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false; else passwordResetInfo" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
           <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.password_reset'})"></span>
         </cnsl-info-section>
 
@@ -116,7 +116,7 @@
                 </mat-select>
             </cnsl-form-field>
 
-            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.passwordless'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+            <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.passwordless'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
               <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.passwordless'})"></span>
             </cnsl-info-section>
         </div>
@@ -131,7 +131,7 @@
         <h3 class="subheader">{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
         <p class="subdesc">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
 
-        <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+        <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
           <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})"></span>
         </cnsl-info-section>
 
@@ -143,7 +143,7 @@
         <h3 class="subheader">{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
         <p class="subdesc">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
 
-        <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+        <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
           <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})"></span>
         </cnsl-info-section>
 
@@ -155,7 +155,7 @@
 
     <h3 class="subheader">{{'LOGINPOLICY.IDPS' | translate}}</h3>
 
-    <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+    <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
       <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
     </cnsl-info-section>
 
@@ -170,8 +170,6 @@
                     remove_circle</mat-icon>
             </button>
             <div class="line">
-                <img src="../../../assets/images/google.png"
-                    *ngIf="idp.stylingType === IDPStylingType.STYLING_TYPE_GOOGLE" alt="google" />
                 <div>
                     <span class="name">{{idp.idpName}}</span>
                     <span class="meta-info">{{ 'IDP.TYPE' | translate }}: {{ 'IDP.TYPES.'+idp.idpType |

@@ -19,7 +19,7 @@
     </cnsl-form-field>
     </div>
 
-  <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+  <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
     <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.message'})"></span>
   </cnsl-info-section>
 

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 
 @Component({
@@ -8,6 +8,6 @@ import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy
   styleUrls: ['./password-complexity-view.component.scss'],
 })
 export class PasswordComplexityViewComponent {
-  @Input() public password!: FormControl;
+  @Input() public password: AbstractControl | null = null;
   @Input() public policy!: PasswordComplexityPolicy.AsObject;
 }

@@ -7,7 +7,7 @@ export interface CnslLinks {
   routerLink?: any;
   href?: string;
   iconClasses?: string;
-  withRole?: Array<string | RegExp>;
+  withRole?: string[] | RegExp[];
 }
 
 @Component({

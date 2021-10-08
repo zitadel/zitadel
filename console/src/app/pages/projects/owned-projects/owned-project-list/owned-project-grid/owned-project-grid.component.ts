@@ -44,7 +44,7 @@ export class OwnedProjectGridComponent implements OnChanges {
 
   @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
   @Output() changedView: EventEmitter<boolean> = new EventEmitter();
-  @Input() loading: boolean = false;
+  @Input() loading: boolean | null = false;
 
   public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
 

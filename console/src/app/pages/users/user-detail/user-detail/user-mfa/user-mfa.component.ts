@@ -21,7 +21,7 @@ export interface MFAItem {
 })
 export class UserMfaComponent implements OnInit, OnDestroy {
   public displayedColumns: string[] = ['type', 'name', 'state', 'actions'];
-  @Input() private user!: User.AsObject;
+  @Input() public user!: User.AsObject;
   public mfaSubject: BehaviorSubject<AuthFactor.AsObject[]> = new BehaviorSubject<AuthFactor.AsObject[]>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();

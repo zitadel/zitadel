@@ -8,12 +8,12 @@
 
   <div class="info">
     <p class="title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
-    <p class="desc">{{user?.details?.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+    <p *ngIf="user && user.details && user.details.creationDate" class="desc">{{user.details.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
   <div class="info">
     <p class="title">{{ 'USER.DETAILS.DATECHANGED' | translate }}</p>
-    <p class="desc">{{user?.details?.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+    <p *ngIf="user && user.details && user.details.changeDate" class="desc">{{user.details.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
   <div class="info width">
@@ -38,28 +38,28 @@
 
   <div class="info">
     <p class="title">{{ 'APP.PAGES.DATECREATED' | translate }}</p>
-    <p class="desc">{{app?.details?.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+    <p *ngIf="app && app.details && app.details.creationDate" class="desc">{{app.details.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
   <div class="info">
     <p class="title">{{ 'APP.PAGES.DATECHANGED' | translate }}</p>
-    <p class="desc">{{app?.details?.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+    <p *ngIf="app && app.details && app.details.changeDate" class="desc">{{app.details.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
   <div class="info" >
     <p class="title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
     <div class="copy-row" *ngIf="app?.oidcConfig?.clientId">
-      <button [disabled]="copied === app.oidcConfig?.clientId"
+      <button *ngIf="app.oidcConfig && app.oidcConfig?.clientId" [disabled]="copied === app.oidcConfig?.clientId"
           [matTooltip]="(copied !== app.oidcConfig?.clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-          cnslCopyToClipboard [valueToCopy]="app.oidcConfig?.clientId" (copiedValue)="copied = $event">
+          cnslCopyToClipboard [valueToCopy]="app.oidcConfig.clientId" (copiedValue)="copied = $event">
           {{app.oidcConfig?.clientId}}
       </button>
     </div>
 
     <div class="copy-row" *ngIf="app?.apiConfig?.clientId">
-      <button [disabled]="copied === app.apiConfig?.clientId"
+      <button *ngIf="app && app.apiConfig && app.apiConfig.clientId" [disabled]="copied === app.apiConfig?.clientId"
           [matTooltip]="(copied !== app.apiConfig?.clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-          cnslCopyToClipboard [valueToCopy]="app.apiConfig?.clientId" (copiedValue)="copied = $event">
+          cnslCopyToClipboard [valueToCopy]="app.apiConfig.clientId" (copiedValue)="copied = $event">
           {{app.apiConfig?.clientId}}
       </button>
     </div>

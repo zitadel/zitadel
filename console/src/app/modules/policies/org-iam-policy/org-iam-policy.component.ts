@@ -65,7 +65,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     });
   }
 
-  private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | undefined> {
+  private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getOrgIAMPolicy();
@@ -74,6 +74,8 @@ export class OrgIamPolicyComponent implements OnDestroy {
           return this.adminService.getCustomOrgIAMPolicy(this.org.id);
         }
         break;
+      default:
+        return Promise.reject();
     }
   }
 

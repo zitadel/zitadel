@@ -8,7 +8,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 export class HasFeatureDirective {
   private hasView: boolean = false;
-  @Input() public set cnslHasFeature(features: string[] | RegExp[]) {
+  @Input() public set hasFeature(features: string[] | RegExp[]) {
     if (features && features.length > 0) {
       this.authService.canUseFeature(features).subscribe(isAllowed => {
         if (isAllowed && !this.hasView) {

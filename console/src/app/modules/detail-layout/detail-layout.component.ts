@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./detail-layout.component.scss'],
 })
 export class DetailLayoutComponent {
-  @Input() backRouterLink!: RouterLink;
+  @Input() backRouterLink!: RouterLink | string | any[];
   @Input() title: string | null = '';
   @Input() description: string | null = '';
   @Input() maxWidth: boolean = true;

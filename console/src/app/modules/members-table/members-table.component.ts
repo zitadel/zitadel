@@ -20,8 +20,8 @@ type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | IamMem
 })
 export class MembersTableComponent implements OnInit, OnDestroy {
   public INITIALPAGESIZE: number = 25;
-  @Input() public canDelete: boolean = false;
-  @Input() public canWrite: boolean = false;
+  @Input() public canDelete: boolean | null = false;
+  @Input() public canWrite: boolean | null = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
   @Input() public dataSource!: MemberDatasource;
