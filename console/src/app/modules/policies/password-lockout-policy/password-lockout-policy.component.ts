@@ -15,7 +15,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-password-lockout-policy',
+  selector: 'cnsl-password-lockout-policy',
   templateUrl: './password-lockout-policy.component.html',
   styleUrls: ['./password-lockout-policy.component.scss'],
 })

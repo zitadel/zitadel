@@ -50,7 +50,7 @@ import {
 } from '../authmethods';
 
 @Component({
-  selector: 'app-app-detail',
+  selector: 'cnsl-app-detail',
   templateUrl: './app-detail.component.html',
   styleUrls: ['./app-detail.component.scss'],
 })

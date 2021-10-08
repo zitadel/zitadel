@@ -6,7 +6,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
-  selector: 'app-accounts-card',
+  selector: 'cnsl-accounts-card',
   templateUrl: './accounts-card.component.html',
   styleUrls: ['./accounts-card.component.scss'],
 })

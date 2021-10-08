@@ -17,7 +17,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'app-idp',
+  selector: 'cnsl-idp',
   templateUrl: './idp.component.html',
   styleUrls: ['./idp.component.scss'],
 })

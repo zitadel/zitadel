@@ -7,7 +7,7 @@ import { Gender, Human, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
 @Component({
-  selector: 'app-detail-form',
+  selector: 'cnsl-detail-form',
   templateUrl: './detail-form.component.html',
   styleUrls: ['./detail-form.component.scss'],
 })

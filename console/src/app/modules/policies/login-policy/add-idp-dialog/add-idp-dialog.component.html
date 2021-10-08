@@ -4,7 +4,7 @@
 <p class="desc"> {{'LOGINPOLICY.ADDIDP.DESCRIPTION' | translate}}</p>
 
 <div mat-dialog-content>
-    <cnsl-form-field *ngIf="serviceType == PolicyComponentServiceType.MGMT" class="full-width" appearance="outline">
+    <cnsl-form-field *ngIf="serviceType === PolicyComponentServiceType.MGMT" class="full-width" appearance="outline">
         <cnsl-label>{{ 'IDP.TYPE' | translate }}</cnsl-label>
         <mat-select [(ngModel)]="idpType" (selectionChange)="loadIdps()">
             <mat-option *ngFor="let type of idpTypes" [value]="type">

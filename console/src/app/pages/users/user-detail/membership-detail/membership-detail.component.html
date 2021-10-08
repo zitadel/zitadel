@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ '/users', user?.id]"
+<cnsl-detail-layout [backRouterLink]="[ '/users', user?.id]"
     title="{{user?.human?.displayName}} {{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
     description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
     <cnsl-info-section class="context-wrapper">
@@ -6,7 +6,7 @@
       <span *ngIf="!isMe">{{'USER.MEMBERSHIPS.ORGCONTEXT' | translate}}</span>
     </cnsl-info-section>
 
-    <app-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
+    <cnsl-refresh-table class="refresh-table" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
         [timestamp]="dataSource?.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
         <a actions color="primary" (click)="addMember()" color="primary" mat-raised-button>
@@ -70,7 +70,7 @@
                 <ng-container matColumnDef="actions" stickyEnd>
                     <th mat-header-cell *matHeaderCellDef></th>
                     <td mat-cell *matCellDef="let member">
-                        <button [disabled]="member.projectId && member.projectGrantId ? (['project.grant.member.delete:' + member.projectGrantId, 'project.grant.member.delete'] | hasRole | async) == false : member.projectId ? (['project.member.delete:' + member.projectGrantId, 'project.member.delete'] | hasRole | async) == false : member.orgId ? (['org.member.delete:' + member.orgId, 'org.member.delete'] | hasRole | async) == false : (['iam.member.delete'] | hasRole | async) == false"
+                        <button [disabled]="member.projectId && member.projectGrantId ? (['project.grant.member.delete:' + member.projectGrantId, 'project.grant.member.delete'] | hasRole | async) === false : member.projectId ? (['project.member.delete:' + member.projectGrantId, 'project.member.delete'] | hasRole | async) === false : member.orgId ? (['org.member.delete:' + member.orgId, 'org.member.delete'] | hasRole | async) === false : (['iam.member.delete'] | hasRole | async) === false"
                             mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}"
                             (click)="removeMembership(member)">
                             <i class="las la-minus-circle"></i>
@@ -86,5 +86,5 @@
             <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
             </cnsl-paginator>
         </div>
-    </app-refresh-table>
-</app-detail-layout>
+    </cnsl-refresh-table>
+</cnsl-detail-layout>

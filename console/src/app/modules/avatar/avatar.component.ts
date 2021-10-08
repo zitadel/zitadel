@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-avatar',
+  selector: 'cnsl-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.scss'],
 })

@@ -13,7 +13,7 @@ import { ManagementService } from '../../../../services/mgmt.service';
 import { ToastService } from '../../../../services/toast.service';
 
 @Component({
-  selector: 'app-external-idps',
+  selector: 'cnsl-external-idps',
   templateUrl: './external-idps.component.html',
   styleUrls: ['./external-idps.component.scss'],
 })

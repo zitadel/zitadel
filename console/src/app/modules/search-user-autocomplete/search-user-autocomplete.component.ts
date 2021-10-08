@@ -27,7 +27,7 @@ export enum UserTarget {
 }
 
 @Component({
-  selector: 'app-search-user-autocomplete',
+  selector: 'cnsl-search-user-autocomplete',
   templateUrl: './search-user-autocomplete.component.html',
   styleUrls: ['./search-user-autocomplete.component.scss'],
 })

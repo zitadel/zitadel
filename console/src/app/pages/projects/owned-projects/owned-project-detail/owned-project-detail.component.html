@@ -1,4 +1,4 @@
-<app-meta-layout>
+<cnsl-meta-layout>
     <div class="max-width-container">
         <div class="head" *ngIf="project?.id">
             <a [routerLink]="[ '/projects' ]" mat-icon-button>
@@ -20,14 +20,14 @@
                 </button>
 
                 <button mat-menu-item
-                  [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
+                  [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) === false"
                   *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
                   (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)">
                   {{'PROJECT.TABLE.DEACTIVATE' | translate}}
                 </button>
 
                 <button mat-menu-item
-                  [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) == false"
+                  [disabled]="isZitadel || (['project.write$', 'project.write:'+ project.id]| hasRole | async) === false"
                   *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
                   (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)">
                   {{'PROJECT.TABLE.ACTIVATE' | translate}}
@@ -58,32 +58,32 @@
             </div>
 
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
-                <app-application-grid *ngIf="grid" [disabled]="isZitadel" (changeView)="grid = false"
-                    [projectId]="projectId"></app-application-grid>
-                <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
+                <cnsl-application-grid *ngIf="grid" [disabled]="isZitadel" (changeView)="grid = false"
+                    [projectId]="projectId"></cnsl-application-grid>
+                <cnsl-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
                     <div class="card-actions" card-actions>
                         <button mat-icon-button (click)="grid = true">
                             <i matTooltip="show grid view" class="las la-th-large"></i>
                         </button>
                     </div>
-                    <app-applications [disabled]="isZitadel" [projectId]="projectId"></app-applications>
-                </app-card>
+                    <cnsl-applications [disabled]="isZitadel" [projectId]="projectId"></cnsl-applications>
+                </cnsl-card>
             </ng-template>
 
-            <ng-container *ngIf="isZitadel == false">
+            <ng-container *ngIf="isZitadel === false">
                 <ng-template appHasRole [appHasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
-                    <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
+                    <cnsl-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
-                        <app-project-grants
+                        <cnsl-project-grants
                             [refreshOnPreviousRoutes]="['/projects/'+projectId+'/grants/create','/projects/'+projectId+'/roles/create']"
-                            [disabled]="((['project.grant.write$', 'project.grant.write:'+ project.id]| hasRole | async))== false"
+                            [disabled]="((['project.grant.write$', 'project.grant.write:'+ project.id]| hasRole | async)) === false"
                             [projectId]="projectId">
-                        </app-project-grants>
-                    </app-card>
+                        </cnsl-project-grants>
+                    </cnsl-card>
                 </ng-template>
 
                 <ng-template appHasRole [appHasRole]="['project.role.read:' + project.id, 'project.role.read']">
-                    <app-card id="roles" title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
+                    <cnsl-card id="roles" title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
                         <mat-checkbox [(ngModel)]="project.projectRoleAssertion" (change)="saveProject()"
@@ -97,22 +97,22 @@
                           {{'PROJECT.HAS_PROJECT' | translate}}</mat-checkbox>
                         <p class="desc">{{'PROJECT.HAS_PROJECT_DESCRIPTION' | translate}}</p>
                         <div class="divider"></div>
-                        <app-project-roles
-                            [disabled]="(['project.role.write$', 'project.role.write:'+ project.id]| hasRole | async) == false"
+                        <cnsl-project-roles
+                            [disabled]="(['project.role.write$', 'project.role.write:'+ project.id]| hasRole | async) === false"
                             [actionsVisible]="true" [projectId]="projectId">
-                        </app-project-roles>
-                    </app-card>
+                        </cnsl-project-roles>
+                    </cnsl-card>
                 </ng-template>
 
                 <ng-template appHasRole [appHasRole]="['user.grant.read']">
-                    <app-card *ngIf="project?.id" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
+                    <cnsl-card *ngIf="project?.id" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
-                        <app-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
+                        <cnsl-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
                             [refreshOnPreviousRoutes]="['/grant-create/project/'+projectId]"
-                            [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) == false"
-                            [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) == false">
-                        </app-user-grants>
-                    </app-card>
+                            [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) === false"
+                            [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) === false">
+                        </cnsl-user-grants>
+                    </cnsl-card>
                 </ng-template>
             </ng-container>
         </ng-container>
@@ -133,16 +133,16 @@
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
+                <cnsl-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
                     (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-                    [disabled]="(['project.member.write$', 'project.member.write:'+ project.id]| hasRole | async) == false">
-                </app-contributors>
+                    [disabled]="(['project.member.write$', 'project.member.write:'+ project.id]| hasRole | async) === false">
+                </cnsl-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
-                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+                <cnsl-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></cnsl-changes>
             </mat-tab>
         </mat-tab-group>
     </div>
-</app-meta-layout>
+</cnsl-meta-layout>

@@ -1,4 +1,4 @@
-<app-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
+<cnsl-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
     [dataSize]="dataSource.totalResult" [selection]="selection" [timestamp]="dataSource?.viewTimestamp"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" (refreshed)="getRoleOptions(projectId)">
     <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
@@ -75,7 +75,7 @@
             </tr>
         </table>
 
-        <div *ngIf="(dataSource.loading$ | async) == false && !dataSource?.totalResult" class="no-content-row">
+        <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
             <i class="las la-exclamation"></i>
             <span>{{'PROJECT.GRANT.EMPTY' | translate}}</span>
         </div>
@@ -84,4 +84,4 @@
             [length]="dataSource.totalResult" (page)="loadGrantsPage($event.pageIndex, $event.pageSize)">
         </cnsl-paginator>
     </div>
-</app-refresh-table>
+</cnsl-refresh-table>

@@ -1,7 +1,7 @@
-<app-owned-project-grid [zitadelProjectId]="zitadelProjectId" *ngIf="grid && zitadelProjectId"
+<cnsl-owned-project-grid [zitadelProjectId]="zitadelProjectId" *ngIf="grid && zitadelProjectId"
     [loading]="loading$ | async" (changedView)="grid = false" [items]="ownedProjectList || []"
     (newClicked)="addProject()">
-</app-owned-project-grid>
+</cnsl-owned-project-grid>
 
 <div *ngIf="!grid" class="view-toggle">
     <button (click)="grid = true" mat-icon-button class="icon-button"
@@ -10,7 +10,7 @@
     </button>
 </div>
 <div *ngIf="!grid && ownedProjectList">
-    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
+    <cnsl-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
         [selection]="selection" [loading]="loading$ | async">
 
         <ng-template actions appHasRole [appHasRole]="['project.create']">
@@ -79,12 +79,12 @@
                     [routerLink]="['/projects', row.id]"></tr>
 
             </table>
-            <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">
+            <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
                 <i class="las la-exclamation"></i>
                 <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
             </div>
             <cnsl-paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
                 (page)="changePage($event)"></cnsl-paginator>
         </div>
-    </app-refresh-table>
+    </cnsl-refresh-table>
 </div>

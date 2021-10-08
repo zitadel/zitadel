@@ -15,7 +15,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-owned-project-list',
+  selector: 'cnsl-owned-project-list',
   templateUrl: './owned-project-list.component.html',
   styleUrls: ['./owned-project-list.component.scss'],
   animations: [

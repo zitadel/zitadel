@@ -11,7 +11,7 @@ import { StorageKey, StorageLocation, StorageService } from 'src/app/services/st
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-owned-project-grid',
+  selector: 'cnsl-owned-project-grid',
   templateUrl: './owned-project-grid.component.html',
   styleUrls: ['./owned-project-grid.component.scss'],
   animations: [

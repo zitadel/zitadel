@@ -24,7 +24,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
 
 @Component({
-  selector: 'app-login-policy',
+  selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
 })

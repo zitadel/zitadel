@@ -6,13 +6,13 @@
     </div>
 
     <ng-template appHasRole [appHasRole]="['iam.write']">
-        <mat-slide-toggle [disabled]="currentCreateStep != 1" class="example-margin" color="primary"
+        <mat-slide-toggle [disabled]="currentCreateStep !== 1" class="example-margin" color="primary"
             (change)="changeSelf($event)" [(ngModel)]="forSelf">
             Use your personal account as organisation owner
         </mat-slide-toggle>
 
         <ng-container *ngIf="!forSelf">
-            <ng-container *ngIf="currentCreateStep == 1">
+            <ng-container *ngIf="currentCreateStep === 1">
                 <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}} </h1>
 
                 <form [formGroup]="orgForm" (ngSubmit)="next()">
@@ -37,7 +37,7 @@
                 </form>
             </ng-container>
 
-            <ng-container *ngIf="currentCreateStep == createSteps">
+            <ng-container *ngIf="currentCreateStep === createSteps">
                 <h1>{{'ORG.PAGES.ORGDETAILUSER_TITLE' | translate}}</h1>
 
                 <div class="user">
@@ -113,9 +113,9 @@
                             <ng-container *ngIf="usePassword && pwdForm">
                                 <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
-                                <app-password-complexity-view class="complexity-view" [policy]="this.policy"
+                                <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy"
                                     [password]="password">
-                                </app-password-complexity-view>
+                                </cnsl-password-complexity-view>
 
                                 <form [formGroup]="pwdForm" class="pwd-form">
                                     <cnsl-form-field class="pwd" *ngIf="password" appearance="outline">
@@ -158,7 +158,7 @@
     </ng-template>
     <ng-template appHasRole [appHasRole]="['org.create']">
         <div *ngIf="forSelf">
-            <ng-container *ngIf="currentCreateStep == 1">
+            <ng-container *ngIf="currentCreateStep === 1">
                 <h1>{{'ORG.PAGES.ORGDETAIL_TITLE_WITHOUT_DOMAIN' | translate}} </h1>
 
                 <form [formGroup]="orgForm" (ngSubmit)="createOrgForSelf()">

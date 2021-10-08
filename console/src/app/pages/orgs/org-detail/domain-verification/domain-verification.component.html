@@ -47,10 +47,10 @@
             <p>DNS TOKEN</p>
             <div class="line" *ngIf="dns?.token">
                 <p class="entry">{{dns?.token}}</p>
-                <button color="primary" [disabled]="copied == data.clientSecret" matTooltip="copy to clipboard"
+                <button color="primary" [disabled]="copied === data.clientSecret" matTooltip="copy to clipboard"
                     appCopyToClipboard [valueToCopy]="dns.token" (copiedValue)="copied = $event" mat-icon-button>
-                    <i *ngIf="copied != dns.token" class="las la-clipboard"></i>
-                    <i *ngIf="copied == dns.token" class="las la-clipboard-check"></i>
+                    <i *ngIf="copied !== dns.token" class="las la-clipboard"></i>
+                    <i *ngIf="copied === dns.token" class="las la-clipboard-check"></i>
                 </button>
                 <button color="primary" type="submit" mat-raised-button class="verify-button" (click)="validate()">
                     {{ 'ACTIONS.VERIFY' | translate }}

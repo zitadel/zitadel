@@ -26,7 +26,7 @@ export enum FeatureServiceType {
 }
 
 @Component({
-  selector: 'app-features',
+  selector: 'cnsl-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],
 })

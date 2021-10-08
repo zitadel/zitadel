@@ -17,7 +17,7 @@ import { COMPLEXITY_POLICY, GridPolicy } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-password-policy',
+  selector: 'cnsl-password-policy',
   templateUrl: './password-complexity-policy.component.html',
   styleUrls: ['./password-complexity-policy.component.scss'],
 })

@@ -13,7 +13,7 @@ import { StorageKey, StorageLocation, StorageService } from 'src/app/services/st
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-user-grant-create',
+  selector: 'cnsl-user-grant-create',
   templateUrl: './user-grant-create.component.html',
   styleUrls: ['./user-grant-create.component.scss'],
 })

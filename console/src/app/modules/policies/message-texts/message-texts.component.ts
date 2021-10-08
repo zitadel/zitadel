@@ -267,7 +267,7 @@ const REQUESTMAP = {
   },
 };
 @Component({
-  selector: 'app-message-texts',
+  selector: 'cnsl-message-texts',
   templateUrl: './message-texts.component.html',
   styleUrls: ['./message-texts.component.scss'],
 })

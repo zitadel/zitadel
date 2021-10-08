@@ -1,9 +1,9 @@
 <div class="wrapp">
-    <app-detail-layout [backRouterLink]="[ '/iam']" title="{{ 'IAM.MEMBER.TITLE' | translate }}"
+    <cnsl-detail-layout [backRouterLink]="[ '/iam']" title="{{ 'IAM.MEMBER.TITLE' | translate }}"
         description="{{ 'IAM.MEMBER.DESCRIPTION' | translate }}">
         <p class="desc">{{'MEMBER.DOCSINFO' | translate}} <a href="https://docs.zitadel.ch/docs/manuals/admin-managers"
                 target="_blank">ZITADEL Managers</a>.</p>
-        <app-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
+        <cnsl-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
             (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
             (changedSelection)="selection = $event" [refreshTrigger]="changePage"
             [canWrite]="['iam.member.write$'] | hasRole | async" [canDelete]="['iam.member.delete$'] | hasRole | async"
@@ -21,6 +21,6 @@
                     <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
                 </a>
             </ng-template>
-        </app-members-table>
-    </app-detail-layout>
+        </cnsl-members-table>
+    </cnsl-detail-layout>
 </div>

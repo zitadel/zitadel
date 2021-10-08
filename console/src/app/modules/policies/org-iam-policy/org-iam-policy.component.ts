@@ -15,7 +15,7 @@ import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-org-iam-policy',
+  selector: 'cnsl-org-iam-policy',
   templateUrl: './org-iam-policy.component.html',
   styleUrls: ['./org-iam-policy.component.scss'],
 })

@@ -1,5 +1,4 @@
-<div class="table-wrapper">
-    <app-refresh-table *ngIf="dataSource" (refreshed)="loadViews()" [dataSize]="dataSource.data.length"
+<div cnsl-refresh-table *ngIf="dataSource" (refreshed)="loadViews()" [dataSize]="dataSource.data.length"
         [loading]="loading$ | async">
 
         <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements" matSort>
@@ -48,5 +47,5 @@
         </table>
         <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
         </mat-paginator>
-    </app-refresh-table>
+    </cnsl-refresh-table>
 </div>

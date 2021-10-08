@@ -15,7 +15,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-granted-project-detail',
+  selector: 'cnsl-granted-project-detail',
   templateUrl: './granted-project-detail.component.html',
   styleUrls: ['./granted-project-detail.component.scss'],
 })

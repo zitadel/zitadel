@@ -1,11 +1,11 @@
-<div class="card" appOutsideClick (clickOutside)="closeCard($event)">
-    <app-avatar
+<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+    <cnsl-avatar
         *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
         class="avatar"
         [forColor]="user.preferredLoginName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
         [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
         [size]="80">
-    </app-avatar>
+    </cnsl-avatar>
 
     <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
     <span class="u-email">{{user.human?.profile?.preferredLoginName}}</span>
@@ -15,8 +15,8 @@
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
-            <app-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''" [forColor]="session.loginName" [size]="32">
-            </app-avatar>
+            <cnsl-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''" [forColor]="session.loginName" [size]="32">
+            </cnsl-avatar>
 
             <div class="col">
                 <span class="user-title">{{session.displayName ? session.displayName : session.userName}} </span>

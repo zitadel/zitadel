@@ -8,7 +8,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../../policy-component-types.enum';
 
 @Component({
-  selector: 'app-add-idp-dialog',
+  selector: 'cnsl-add-idp-dialog',
   templateUrl: './add-idp-dialog.component.html',
   styleUrls: ['./add-idp-dialog.component.scss'],
 })

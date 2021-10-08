@@ -11,11 +11,11 @@
             hist.values[0]?.dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}</span>
         <div class="item" *ngFor="let dayelement of hist.values; index as i">
             <div class="row">
-                <app-avatar matTooltip="{{ dayelement.editorDisplayName }}"
+                <cnsl-avatar matTooltip="{{ dayelement.editorDisplayName }}"
                     *ngIf="dayelement.editorDisplayName; else spacer" class="avatar"
                     [name]="dayelement.editorDisplayName" [size]="32" [forColor]="dayelement?.editorPreferredLoginName"
                     [avatarUrl]="dayelement.editorAvatarUrl || ''">
-                </app-avatar>
+                </cnsl-avatar>
                 <ng-template #spacer>
                     <div class="spacer"></div>
                 </ng-template>

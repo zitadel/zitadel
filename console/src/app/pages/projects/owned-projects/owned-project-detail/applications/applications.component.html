@@ -1,4 +1,4 @@
-<app-refresh-table [loading]="dataSource.loading$ | async" [selection]="selection" (refreshed)="refreshPage()"
+<cnsl-refresh-table [loading]="dataSource.loading$ | async" [selection]="selection" (refreshed)="refreshPage()"
     [dataSize]="dataSource.totalResult" [timestamp]="dataSource?.viewTimestamp">
     <ng-template appHasRole [appHasRole]="['project.app.write']" actions>
         <a [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']" color="primary"
@@ -49,4 +49,4 @@
             [pageSizeOptions]="[25, 50, 100, 250]">
         </cnsl-paginator>
     </div>
-</app-refresh-table>
+</cnsl-refresh-table>

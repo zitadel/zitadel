@@ -19,7 +19,7 @@ export interface WebAuthNOptions {
 }
 
 @Component({
-  selector: 'app-passwordless',
+  selector: 'cnsl-passwordless',
   templateUrl: './passwordless.component.html',
   styleUrls: ['./passwordless.component.scss'],
 })

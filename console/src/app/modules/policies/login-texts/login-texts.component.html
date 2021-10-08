@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+<cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
   [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate"
   [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
 
@@ -35,23 +35,23 @@
     </cnsl-form-field>
   </form>
 
-  <cnsl-info-section *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+  <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
     <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.login'})"></span>
   </cnsl-info-section>
 
   <div class="divider"></div>
 
   <div class="content" >
-    <cnsl-edit-text label="one" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) == false" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+    <cnsl-edit-text label="one" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) === false" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
       $event)"></cnsl-edit-text>
   </div>
 
   <div class="actions">
-    <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) == false" (click)="resetDefault()" color="warn" type="submit"
+    <button class="reset-button" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) === false" (click)="resetDefault()" color="warn" type="submit"
     mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
-    <button class="save-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
+    <button class="save-button" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) === false" (click)="saveCurrentMessage()" color="primary" type="submit"
       mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
   </div>
 
-  <app-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></app-policy-grid>
-</app-detail-layout>
+  <cnsl-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
+</cnsl-detail-layout>

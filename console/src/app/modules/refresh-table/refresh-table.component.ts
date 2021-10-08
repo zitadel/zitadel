@@ -18,7 +18,7 @@ const rotate = animation([
   ),
 ]);
 @Component({
-  selector: 'app-refresh-table',
+  selector: 'cnsl-refresh-table',
   templateUrl: './refresh-table.component.html',
   styleUrls: ['./refresh-table.component.scss'],
   animations: [

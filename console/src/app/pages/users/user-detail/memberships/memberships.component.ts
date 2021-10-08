@@ -11,7 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-memberships',
+  selector: 'cnsl-memberships',
   templateUrl: './memberships.component.html',
   styleUrls: ['./memberships.component.scss'],
   animations: [

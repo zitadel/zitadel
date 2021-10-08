@@ -9,98 +9,98 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-role-create',
-    templateUrl: './project-role-create.component.html',
-    styleUrls: ['./project-role-create.component.scss'],
-    animations: [
-        trigger('list', [
-            transition(':enter', [
-                query('@animate',
-                    stagger(80, animateChild()),
-                ),
-            ]),
-        ]),
-        trigger('animate', [
-            transition(':enter', [
-                style({ opacity: 0, transform: 'translateY(-100%)' }),
-                animate('100ms', style({ opacity: 1, transform: 'translateY(0)' })),
-            ]),
-            transition(':leave', [
-                style({ opacity: 1, transform: 'translateY(0)' }),
-                animate('100ms', style({ opacity: 0, transform: 'translateY(100%)' })),
-            ]),
-        ]),
-    ],
+  selector: 'cnsl-project-role-create',
+  templateUrl: './project-role-create.component.html',
+  styleUrls: ['./project-role-create.component.scss'],
+  animations: [
+    trigger('list', [
+      transition(':enter', [
+        query('@animate',
+          stagger(80, animateChild()),
+        ),
+      ]),
+    ]),
+    trigger('animate', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-100%)' }),
+        animate('100ms', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateY(0)' }),
+        animate('100ms', style({ opacity: 0, transform: 'translateY(100%)' })),
+      ]),
+    ]),
+  ],
 })
 export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
-    private subscription?: Subscription;
-    public projectId: string = '';
+  private subscription?: Subscription;
+  public projectId: string = '';
 
-    public formArray!: FormArray;
-    public formGroup!: FormGroup;
-    public createSteps: number = 1;
-    public currentCreateStep: number = 1;
+  public formArray!: FormArray;
+  public formGroup!: FormGroup;
+  public createSteps: number = 1;
+  public currentCreateStep: number = 1;
 
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private toast: ToastService,
-        private mgmtService: ManagementService,
-        private _location: Location,
-    ) {
-        this.formGroup = new FormGroup({
-            key: new FormControl('', [Validators.required]),
-            displayName: new FormControl(''),
-            group: new FormControl(''),
-        });
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private toast: ToastService,
+    private mgmtService: ManagementService,
+    private _location: Location,
+  ) {
+    this.formGroup = new FormGroup({
+      key: new FormControl('', [Validators.required]),
+      displayName: new FormControl(''),
+      group: new FormControl(''),
+    });
 
-        this.formArray = new FormArray([this.formGroup]);
-    }
+    this.formArray = new FormArray([this.formGroup]);
+  }
 
-    public addEntry(): void {
-        const newGroup = new FormGroup({
-            key: new FormControl('', [Validators.required]),
-            displayName: new FormControl(''),
-            group: new FormControl(''),
-        });
+  public addEntry(): void {
+    const newGroup = new FormGroup({
+      key: new FormControl('', [Validators.required]),
+      displayName: new FormControl(''),
+      group: new FormControl(''),
+    });
 
-        this.formArray.push(newGroup);
-    }
+    this.formArray.push(newGroup);
+  }
 
-    public removeEntry(index: number): void {
-        this.formArray.removeAt(index);
-    }
+  public removeEntry(index: number): void {
+    this.formArray.removeAt(index);
+  }
 
-    public ngOnInit(): void {
-        this.subscription = this.route.params.subscribe(params => this.getData(params));
-    }
+  public ngOnInit(): void {
+    this.subscription = this.route.params.subscribe(params => this.getData(params));
+  }
 
-    public ngOnDestroy(): void {
-        this.subscription?.unsubscribe();
-    }
+  public ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
 
-    private getData({ projectid }: Params): void {
-        this.projectId = projectid;
-    }
+  private getData({ projectid }: Params): void {
+    this.projectId = projectid;
+  }
 
-    public addRole(): void {
-        const rolesToAdd: BulkAddProjectRolesRequest.Role[] = this.formArray.value.map((element: any) => {
-            const role = new BulkAddProjectRolesRequest.Role;
-            role.setKey(element.key);
-            role.setDisplayName(element.displayName);
-            role.setGroup(element.group);
-            return role;
-        });
+  public addRole(): void {
+    const rolesToAdd: BulkAddProjectRolesRequest.Role[] = this.formArray.value.map((element: any) => {
+      const role = new BulkAddProjectRolesRequest.Role;
+      role.setKey(element.key);
+      role.setDisplayName(element.displayName);
+      role.setGroup(element.group);
+      return role;
+    });
 
-        this.mgmtService.bulkAddProjectRoles(this.projectId, rolesToAdd).then(() => {
-            this.router.navigate(['projects', this.projectId]);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
-    }
+    this.mgmtService.bulkAddProjectRoles(this.projectId, rolesToAdd).then(() => {
+      this.router.navigate(['projects', this.projectId]);
+    }).catch(error => {
+      this.toast.showError(error);
+    });
+  }
 
 
-    public close(): void {
-        this._location.back();
-    }
+  public close(): void {
+    this._location.back();
+  }
 }

@@ -17,7 +17,7 @@ export enum ProjectAutocompleteType {
 }
 
 @Component({
-  selector: 'app-search-project-autocomplete',
+  selector: 'cnsl-search-project-autocomplete',
   templateUrl: './search-project-autocomplete.component.html',
   styleUrls: ['./search-project-autocomplete.component.scss'],
 })

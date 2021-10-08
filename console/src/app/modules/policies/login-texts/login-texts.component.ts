@@ -88,7 +88,7 @@ const REQUESTMAP = {
   },
 };
 @Component({
-  selector: 'app-login-texts',
+  selector: 'cnsl-login-texts',
   templateUrl: './login-texts.component.html',
   styleUrls: ['./login-texts.component.scss'],
 })

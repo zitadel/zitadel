@@ -41,7 +41,7 @@ type ListChanges = ListMyUserChangesResponse.AsObject |
   ListAppChangesResponse.AsObject;
 
 @Component({
-  selector: 'app-changes',
+  selector: 'cnsl-changes',
   templateUrl: './changes.component.html',
   styleUrls: ['./changes.component.scss'],
 })

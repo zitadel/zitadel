@@ -21,7 +21,7 @@ import { DomainVerificationComponent } from './domain-verification/domain-verifi
 
 
 @Component({
-  selector: 'app-org-detail',
+  selector: 'cnsl-org-detail',
   templateUrl: './org-detail.component.html',
   styleUrls: ['./org-detail.component.scss'],
 })

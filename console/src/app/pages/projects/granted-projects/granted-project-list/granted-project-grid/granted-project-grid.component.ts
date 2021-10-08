@@ -7,7 +7,7 @@ import { GrantedProject, ProjectGrantState } from 'src/app/proto/generated/zitad
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 @Component({
-  selector: 'app-granted-project-grid',
+  selector: 'cnsl-granted-project-grid',
   templateUrl: './granted-project-grid.component.html',
   styleUrls: ['./granted-project-grid.component.scss'],
   animations: [

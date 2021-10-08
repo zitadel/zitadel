@@ -35,7 +35,7 @@
 
         <div class="right">
             <button matTooltip="{{'ACTIONS.EDIT' | translate}}"
-                [disabled]="!canWrite || state == UserState.USER_STATE_INITIAL"
+                [disabled]="!canWrite || state === UserState.USER_STATE_INITIAL"
                 (click)="openEditDialog(EditDialogType.EMAIL)" mat-icon-button>
                 <i class="las la-edit"></i>
             </button>

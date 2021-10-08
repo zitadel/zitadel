@@ -9,7 +9,7 @@
 <div class="row-lyt">
   <ng-container *ngFor="let policy of filteredPolicies">
     <ng-template appHasRole
-        [appHasRole]="type == PolicyComponentServiceType.ADMIN ? policy.iamWithRole : type == PolicyComponentServiceType.MGMT ? policy.orgWithRole : []">
+        [appHasRole]="type === PolicyComponentServiceType.ADMIN ? policy.iamWithRole : type === PolicyComponentServiceType.MGMT ? policy.orgWithRole : []">
         <div class="p-item card">
             <div class="avatar {{policy.color}}">
                 <mat-icon *ngIf="policy.svgIcon" class="icon" [svgIcon]="policy.svgIcon"></mat-icon>
@@ -28,7 +28,7 @@
             </div>
             <div class="btn-wrapper">
                 <button
-                    [routerLink]="type == PolicyComponentServiceType.ADMIN ? policy.iamRouterLink : type == PolicyComponentServiceType.MGMT ? policy.orgRouterLink : null"
+                    [routerLink]="type === PolicyComponentServiceType.ADMIN ? policy.iamRouterLink : type === PolicyComponentServiceType.MGMT ? policy.orgRouterLink : null"
                     mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
             </div>
         </div>

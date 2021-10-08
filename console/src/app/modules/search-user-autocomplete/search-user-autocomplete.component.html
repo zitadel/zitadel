@@ -1,5 +1,5 @@
 <form>
-    <cnsl-form-field *ngIf="target && target == UserTarget.SELF" appearance="outline" class="full-width more-space">
+    <cnsl-form-field *ngIf="target && target === UserTarget.SELF" appearance="outline" class="full-width more-space">
         <cnsl-label>Organizations User Loginname</cnsl-label>
 
         <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
@@ -36,12 +36,12 @@
         </span>
     </cnsl-form-field>
 
-    <div *ngIf="target && target == UserTarget.EXTERNAL" class="line">
+    <div *ngIf="target && target === UserTarget.EXTERNAL" class="line">
         <cnsl-form-field class="form-field" appearance="outline">
             <cnsl-label>Global User Loginname</cnsl-label>
             <input cnslInput type="text" [formControl]="globalLoginNameControl" />
             <span class="target-desc">
-                {{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
+                {{(target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
                 <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
             </span>
         </cnsl-form-field>
@@ -51,14 +51,14 @@
         </button>
     </div>
 
-    <div class="found" *ngIf="target == UserTarget.EXTERNAL && users.length > 0">
+    <div class="found" *ngIf="target === UserTarget.EXTERNAL && users.length > 0">
         <span class="found-label">{{'USER.SEARCH.FOUND' | translate}}:</span>
         <div class="found-user-row" *ngFor="let user of users; index as i">
             <div class="circle">
-                <app-avatar
+                <cnsl-avatar
                     *ngIf="user.human && user.human.displayName && user.human?.firstName && user.human?.lastName; else cog"
                     class="avatar" [name]="user.human.displayName" [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName" [size]="32">
-                </app-avatar>
+                </cnsl-avatar>
                 <ng-template #cog>
                     <div class="sa-icon">
                         <i class="las la-user-cog"></i>

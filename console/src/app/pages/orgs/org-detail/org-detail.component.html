@@ -1,9 +1,9 @@
-<app-meta-layout>
+<cnsl-meta-layout>
     <div class="max-width-container">
         <h1 class="h1">{{org?.name}}</h1>
         <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
         <ng-container *ngIf="(['org.write$'] | hasRole) as canwrite$">
-            <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
+            <cnsl-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
                 description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
 
                 <button class="icon-button" (click)="loadDomains()" card-actions mat-icon-button>
@@ -17,7 +17,7 @@
                     <ng-template #noCustom>
                       <span class="title disabled">{{domain.domainName}}</span>
                     </ng-template>
-                    <span *ngIf="(canwrite$ | async) == false" class="title disabled">{{domain?.domainName}}</span>
+                    <span *ngIf="(canwrite$ | async) === false" class="title disabled">{{domain?.domainName}}</span>
 
                     <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
                     <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
@@ -25,20 +25,20 @@
                         (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
                     <span class="fill-space"></span>
-                    <button class="rem-button" [disabled]="(canwrite$ | async) == false" matTooltip="Remove domain"
+                    <button class="rem-button" [disabled]="(canwrite$ | async) === false" matTooltip="Remove domain"
                         color="warn" mat-icon-button (click)="removeDomain(domain.domainName)"><i
                             class="las la-trash"></i></button>
                 </div>
                 <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
 
-                <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+                <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
                   <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
                 </cnsl-info-section>
             
-                <button [disabled]="(canwrite$ | async) == false || (['custom_domain'] | hasFeature | async) == false" matTooltip="Add domain" mat-raised-button
+                <button [disabled]="(canwrite$ | async) === false || (['custom_domain'] | hasFeature | async) === false" matTooltip="Add domain" mat-raised-button
                     color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}}
                 </button>
-            </app-card>
+            </cnsl-card>
         </ng-container>
 
         <ng-container *ngIf="['features.read'] | hasRole | async">
@@ -48,7 +48,7 @@
         </ng-container>
 
         <ng-template appHasRole [appHasRole]="['policy.read']">
-            <app-policy-grid [type]="PolicyComponentServiceType.MGMT"></app-policy-grid>
+            <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
         </ng-template>
     </div>
 
@@ -73,15 +73,15 @@
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
+                <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
                     (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
-                </app-contributors>
+                </cnsl-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.ORG.TITLE' | translate }}" class="meta-flex-col">
-                <app-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></app-changes>
+                <cnsl-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
             </mat-tab>
         </mat-tab-group>
     </div>
-</app-meta-layout>
+</cnsl-meta-layout>

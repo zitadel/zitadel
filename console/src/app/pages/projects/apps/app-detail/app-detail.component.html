@@ -1,4 +1,4 @@
-<app-meta-layout>
+<cnsl-meta-layout>
     <div class="enlarged-container">
         <div class="head">
             <a [routerLink]="['/projects', projectId]" mat-icon-button>
@@ -27,7 +27,7 @@
                     (click)="changeState(AppState.APP_STATE_INACTIVE)">
                     {{'ACTIONS.DEACTIVATE' | translate}}
                   </button>
-                  <button mat-menu-item *ngIf="app?.state == AppState.APP_STATE_INACTIVE"
+                  <button mat-menu-item *ngIf="app?.state === AppState.APP_STATE_INACTIVE"
                     (click)="changeState(AppState.APP_STATE_ACTIVE)">
                     {{'ACTIONS.REACTIVATE' | translate}}
                   </button>
@@ -70,7 +70,7 @@
                   </button>
               </p>
               <ng-container *ngIf="showRedirects">
-                <cnsl-info-section *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
+                <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
                   <div class="dev-col">
                     <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
                     <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
@@ -80,7 +80,7 @@
                   </div>
                 </cnsl-info-section>
                 <cnsl-info-section
-                *ngIf="appType?.value == OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value == OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
+                *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value === OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
                   <div class="dev-col">
                     <span>{{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</span>
                     <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
@@ -95,14 +95,14 @@
                       [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
                       (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
                       title="{{ 'APP.OIDC.REDIRECT' | translate }}"
-                      [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
+                      [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
                   </cnsl-redirect-uris>
       
                   <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
                       [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
                       [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
                       title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-                      [isNative]="appType?.value == OIDCAppType.OIDC_APP_TYPE_NATIVE">
+                      [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
                   </cnsl-redirect-uris>
                 </div>
               </ng-container>
@@ -128,15 +128,15 @@
             <div style="margin: .5rem" class="divider"></div>
         </div>
 
-        <app-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
+        <cnsl-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
             [authMethods]="authMethods" [selected]="initialAuthMethod" [current]="currentAuthMethod"
             [isOIDC]="app?.oidcConfig !== undefined" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
-        </app-auth-method-radio>
+        </cnsl-auth-method-radio>
 
-        <app-card *ngIf="currentAuthMethod === 'PK_JWT' && projectId && app?.id" [expanded]="false"
+        <cnsl-card *ngIf="currentAuthMethod === 'PK_JWT' && projectId && app?.id" [expanded]="false"
             title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}" description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
-            <app-client-keys [projectId]="projectId" [appId]="app.id"></app-client-keys>
-        </app-card>
+            <cnsl-client-keys [projectId]="projectId" [appId]="app.id"></cnsl-client-keys>
+        </cnsl-card>
 
         <div *ngIf="apiForm && app?.apiConfig" class="btn-container">
             <button class="submit-button" (click)="saveAPIApp()" color="primary"
@@ -152,7 +152,7 @@
 
 
         <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
-            <app-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
+            <cnsl-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
                 <div card-actions *ngIf="currentAuthMethod === 'CODE' || currentAuthMethod === 'POST'">
                     <button type="button" [disabled]="!canWrite" mat-stroked-button
                         (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
@@ -249,7 +249,7 @@
                         <span>{{'APP.OIDC.CLOCKSKEW' | translate}}</span>
                     </cnsl-info-section>
                 </div>
-            </app-card>
+            </cnsl-card>
 
             <div class="btn-container">
                 <button class="submit-button" type="submit" color="primary" [disabled]="oidcForm.invalid || !canWrite"
@@ -277,6 +277,6 @@
             </div>
         </div>
 
-        <app-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></app-changes>
+        <cnsl-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></cnsl-changes>
     </div>
-</app-meta-layout>
+</cnsl-meta-layout>

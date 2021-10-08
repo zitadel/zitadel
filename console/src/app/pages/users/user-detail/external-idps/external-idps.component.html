@@ -1,8 +1,8 @@
-<app-card title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}" description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
+<cnsl-card title="{{ 'USER.EXTERNALIDP.TITLE' | translate }}" description="{{ 'USER.EXTERNALIDP.DESC' | translate }}">
   <button card-actions mat-icon-button (click)="refreshPage()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <app-refresh-table [hideRefresh]="true" [loading]="loading$ | async" [dataSize]="dataSource.data.length"
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" [dataSize]="dataSource.data.length"
       [timestamp]="viewTimestamp" [selection]="selection">
 
       <div class="table-wrapper">
@@ -59,6 +59,5 @@
           <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0" [pageSize]="10"
               [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
       </div>
-
-  </app-refresh-table>
-</app-card>
+  </cnsl-refresh-table>
+</cnsl-card>

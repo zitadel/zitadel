@@ -1,10 +1,10 @@
-<app-detail-layout [maxWidth]="false" [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+<cnsl-detail-layout [maxWidth]="false" [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
     [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
     [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
     <div class="top-actions">
       <div class="message-type">
-        <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType == type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
+        <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType === type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
       </div>
 
       <cnsl-form-field class="language">
@@ -19,23 +19,23 @@
     </cnsl-form-field>
     </div>
 
-  <cnsl-info-section *ngIf="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false" [featureLink]="['/org/features']" class="info" type="WARN">
+  <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
     <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.message'})"></span>
   </cnsl-info-section>
 
     <div class="content" >
-      <cnsl-edit-text [chips]="chips[currentType]" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+      <cnsl-edit-text [chips]="chips[currentType]" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
         $event)"></cnsl-edit-text>
     </div>
 
     <div class="actions">
-      <button class="reset-button" [disabled]="serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false" (click)="resetDefault()" color="warn" type="submit"
+      <button class="reset-button" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" (click)="resetDefault()" color="warn" type="submit"
       mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
-      <button class="save-button" [disabled]="!updateRequest || serviceType == PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) == false" (click)="saveCurrentMessage()" color="primary" type="submit"
+      <button class="save-button" [disabled]="!updateRequest || serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" (click)="saveCurrentMessage()" color="primary" type="submit"
         mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
     </div>
 
     <div class="divider"></div>
 
-    <app-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></app-policy-grid>
-</app-detail-layout>
+    <cnsl-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
+</cnsl-detail-layout>

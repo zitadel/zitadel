@@ -16,7 +16,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
-  selector: 'app-client-keys',
+  selector: 'cnsl-client-keys',
   templateUrl: './client-keys.component.html',
   styleUrls: ['./client-keys.component.scss'],
 })

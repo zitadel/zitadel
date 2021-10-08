@@ -17,7 +17,7 @@ import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-di
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 
 @Component({
-  selector: 'app-user-detail',
+  selector: 'cnsl-user-detail',
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss'],
 })

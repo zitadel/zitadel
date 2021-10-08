@@ -12,99 +12,99 @@ import { ToastService } from 'src/app/services/toast.service';
 import { ProjectGrantsDataSource } from './project-grants-datasource';
 
 @Component({
-    selector: 'app-project-grants',
-    templateUrl: './project-grants.component.html',
-    styleUrls: ['./project-grants.component.scss'],
-    animations: [
-        trigger('detailExpand', [
-            state('collapsed', style({ height: '0px', minHeight: '0' })),
-            state('expanded', style({ height: '*' })),
-            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-        ]),
-    ],
+  selector: 'cnsl-project-grants',
+  templateUrl: './project-grants.component.html',
+  styleUrls: ['./project-grants.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class ProjectGrantsComponent implements OnInit, AfterViewInit {
-    @Input() refreshOnPreviousRoutes: string[] = [];
-    @Input() public projectId: string = '';
-    @Input() public disabled: boolean = false;
-    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-    @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
-    public dataSource!: ProjectGrantsDataSource;
-    public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
-    public memberRoleOptions: Role.AsObject[] = [];
+  @Input() refreshOnPreviousRoutes: string[] = [];
+  @Input() public projectId: string = '';
+  @Input() public disabled: boolean = false;
+  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
+  @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
+  public dataSource!: ProjectGrantsDataSource;
+  public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
+  public memberRoleOptions: Role.AsObject[] = [];
 
-    /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'grantedOrgName', 'dates'];
+  /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
+  public displayedColumns: string[] = ['select', 'grantedOrgName', 'dates'];
 
-    constructor(private mgmtService: ManagementService, private toast: ToastService) { }
+  constructor(private mgmtService: ManagementService, private toast: ToastService) { }
 
-    public ngOnInit(): void {
-        this.dataSource = new ProjectGrantsDataSource(this.mgmtService);
-        this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
-        this.getRoleOptions(this.projectId);
-    }
+  public ngOnInit(): void {
+    this.dataSource = new ProjectGrantsDataSource(this.mgmtService);
+    this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
+    this.getRoleOptions(this.projectId);
+  }
 
-    public ngAfterViewInit(): void {
-        this.paginator.page
-            .pipe(
-                tap(() => this.loadGrantsPage()),
-            )
-            .subscribe();
-    }
+  public ngAfterViewInit(): void {
+    this.paginator.page
+      .pipe(
+        tap(() => this.loadGrantsPage()),
+      )
+      .subscribe();
+  }
 
-    public loadGrantsPage(pageIndex?: number, pageSize?: number): void {
-        this.dataSource.loadGrants(
-            this.projectId,
-            pageIndex ?? this.paginator.pageIndex,
-            pageSize ?? this.paginator.pageSize,
-        );
-    }
+  public loadGrantsPage(pageIndex?: number, pageSize?: number): void {
+    this.dataSource.loadGrants(
+      this.projectId,
+      pageIndex ?? this.paginator.pageIndex,
+      pageSize ?? this.paginator.pageSize,
+    );
+  }
 
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.grantsSubject.value.length;
-        return numSelected === numRows;
-    }
+  public isAllSelected(): boolean {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.grantsSubject.value.length;
+    return numSelected === numRows;
+  }
 
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
-    }
+  public masterToggle(): void {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
+  }
 
-    public getRoleOptions(projectId: string): void {
-        this.mgmtService.listProjectRoles(projectId, 100, 0).then(resp => {
-            this.memberRoleOptions = resp.resultList;
-        });
-    }
+  public getRoleOptions(projectId: string): void {
+    this.mgmtService.listProjectRoles(projectId, 100, 0).then(resp => {
+      this.memberRoleOptions = resp.resultList;
+    });
+  }
 
-    updateRoles(grant: GrantedProject.AsObject, selectionChange: MatSelectChange): void {
-        this.mgmtService.updateProjectGrant(grant.grantId, grant.projectId, selectionChange.value)
-            .then(() => {
-                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTCHANGED', true);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
-    }
+  updateRoles(grant: GrantedProject.AsObject, selectionChange: MatSelectChange): void {
+    this.mgmtService.updateProjectGrant(grant.grantId, grant.projectId, selectionChange.value)
+      .then(() => {
+        this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTCHANGED', true);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
+  }
 
-    deleteSelectedGrants(): void {
-        const promises = this.selection.selected.map(grant => {
-            return this.mgmtService.removeProjectGrant(grant.grantId, grant.projectId);
-        });
+  deleteSelectedGrants(): void {
+    const promises = this.selection.selected.map(grant => {
+      return this.mgmtService.removeProjectGrant(grant.grantId, grant.projectId);
+    });
 
-        Promise.all(promises).then(() => {
-            this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
-            const data = this.dataSource.grantsSubject.getValue();
-            this.selection.selected.forEach((item) => {
-                const index = data.findIndex(i => i.grantId === item.grantId);
-                if (index > -1) {
-                    data.splice(index, 1);
-                    this.dataSource.grantsSubject.next(data);
-                }
-            });
-            this.selection.clear();
-        }).catch(error => {
-            this.toast.showError(error);
-        });
-    }
+    Promise.all(promises).then(() => {
+      this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
+      const data = this.dataSource.grantsSubject.getValue();
+      this.selection.selected.forEach((item) => {
+        const index = data.findIndex(i => i.grantId === item.grantId);
+        if (index > -1) {
+          data.splice(index, 1);
+          this.dataSource.grantsSubject.next(data);
+        }
+      });
+      this.selection.clear();
+    }).catch(error => {
+      this.toast.showError(error);
+    });
+  }
 }

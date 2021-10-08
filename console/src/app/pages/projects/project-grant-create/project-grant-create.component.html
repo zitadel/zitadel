@@ -18,7 +18,7 @@
                 <input cnslInput #domain />
             </cnsl-form-field>
 
-            <button [disabled]="domain.value.length == 0" color="primary" type="submit" class="domain-button"
+            <button [disabled]="domain.value.length === 0" color="primary" type="submit" class="domain-button"
                 mat-raised-button>
                 {{'PROJECT.GRANT.CREATE.SEL_ORG_BUTTON' | translate}}
             </button>
@@ -32,9 +32,9 @@
     <ng-container *ngIf="currentCreateStep === 2">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
 
-        <app-card *ngIf="projectId">
-            <app-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId"></app-project-roles>
-        </app-card>
+        <cnsl-card *ngIf="projectId">
+            <cnsl-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId"></cnsl-project-roles>
+        </cnsl-card>
     </ng-container>
 
     <div class="btn-container">

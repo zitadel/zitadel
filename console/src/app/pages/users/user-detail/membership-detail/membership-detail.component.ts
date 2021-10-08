@@ -15,7 +15,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MembershipDetailDataSource } from './membership-detail-datasource';
 
 @Component({
-  selector: 'app-membership-detail',
+  selector: 'cnsl-membership-detail',
   templateUrl: './membership-detail.component.html',
   styleUrls: ['./membership-detail.component.scss'],
 })

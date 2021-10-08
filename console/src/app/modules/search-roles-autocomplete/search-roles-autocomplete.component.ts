@@ -10,7 +10,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 
 
 @Component({
-  selector: 'app-search-roles-autocomplete',
+  selector: 'cnsl-search-roles-autocomplete',
   templateUrl: './search-roles-autocomplete.component.html',
   styleUrls: ['./search-roles-autocomplete.component.scss'],
 })

@@ -35,7 +35,7 @@
         </a>
 
         <ng-template appHasRole [appHasRole]="['iam.write']">
-            <app-card class="griditem" [nomargin]="true">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="icon las la-gem"></i>
@@ -63,10 +63,10 @@
                 <div class="footer">
                     <a color="primary" mat-stroked-button [routerLink]="['/iam']">{{'HOME.IAM_BUTTON' | translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
 
-        <app-card class="griditem" [nomargin]="true">
+        <cnsl-card class="griditem" [nomargin]="true">
             <div class="top">
                 <h2> <i class="icon las la-user-circle"></i>
                     {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
@@ -80,10 +80,10 @@
                 <a color="primary" mat-stroked-button [routerLink]="['/users/me']">{{'HOME.SECURITYANDPRIVACY_BUTTON' |
                     translate}}</a>
             </div>
-        </app-card>
+        </cnsl-card>
 
         <ng-template appHasRole [appHasRole]="['project.read']">
-            <app-card class="griditem" [nomargin]="true">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="icon las la-layer-group"></i>
@@ -100,11 +100,11 @@
                     <a color="primary" mat-stroked-button [routerLink]="['/projects']">{{'HOME.PROJECTS_BUTTON' |
                         translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['org.read']">
-            <app-card class="griditem" [nomargin]="true">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2> <i class="icon las la-archway"></i>
                         {{'HOME.PROTECTION'| translate}}</h2>
@@ -128,11 +128,11 @@
                     <a color="primary" mat-stroked-button [routerLink]="['/org']">{{'HOME.PROTECTION_BUTTON' |
                         translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.read']">
-            <app-card class="griditem" [nomargin]="true">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="las la-users"></i>
@@ -155,7 +155,7 @@
                     <a color="primary" mat-stroked-button [routerLink]="['/users/list/humans']">{{'HOME.USERS_BUTTON' |
                         translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
     </div>
 

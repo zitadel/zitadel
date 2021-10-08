@@ -51,7 +51,7 @@ export enum ColorType {
 const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 
 @Component({
-  selector: 'app-private-labeling-policy',
+  selector: 'cnsl-private-labeling-policy',
   templateUrl: './private-labeling-policy.component.html',
   styleUrls: ['./private-labeling-policy.component.scss'],
 })
