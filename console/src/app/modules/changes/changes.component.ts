@@ -253,7 +253,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
   }
 
   // Order by ascending property value
-  // tslint:disable
+  /* eslint-disable */
   valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.value.localeCompare(b.value);
   };
@@ -262,5 +262,5 @@ export class ChangesComponent implements OnInit, OnDestroy {
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
   };
-  // tslint:enable
+  /* eslint-enable */
 }

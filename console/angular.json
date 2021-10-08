@@ -28,19 +28,19 @@
               "src/manifest.webmanifest"
             ],
             "styles": [
-              "src/styles.scss"  
+              "src/styles.scss"
             ],
             "scripts": [
               "./node_modules/tinycolor2/dist/tinycolor-min.js"
             ],
             "allowedCommonJsDependencies": [
-                "@angular/common/locales/de",
-                "src/app/proto/generated/zitadel/admin_pb",
-                "src/app/proto/generated/zitadel/management_pb",
-                "src/app/proto/generated/**",
-                "file-saver",
-                "qrcode"
-             ],
+              "@angular/common/locales/de",
+              "src/app/proto/generated/zitadel/admin_pb",
+              "src/app/proto/generated/zitadel/management_pb",
+              "src/app/proto/generated/**",
+              "file-saver",
+              "qrcode"
+            ],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
@@ -102,8 +102,7 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-          },
+          "options": {},
           "configurations": {
             "production": {
               "browserTarget": "console:build:production"
@@ -142,15 +141,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "**/proto/generated/**"
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         },
@@ -174,6 +169,7 @@
   },
   "defaultProject": "console",
   "cli": {
-    "analytics": "2b4e8e6c-f053-4562-b7a6-00c6c06a6791"
+    "analytics": "2b4e8e6c-f053-4562-b7a6-00c6c06a6791",
+    "defaultCollection": "@angular-eslint/schematics"
   }
 }

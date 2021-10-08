@@ -24,7 +24,7 @@ import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
 
-// tslint:disable
+/* eslint-disable */
 const KeyNamesArray = [
   'emailVerificationDoneText',
   'emailVerificationText',
@@ -61,7 +61,7 @@ const KeyNamesArray = [
   'passwordlessText',
   'externalRegistrationUserOverviewText'
 ];
-// tslint:enable
+/* eslint-enable */
 
 const REQUESTMAP = {
   [PolicyComponentServiceType.MGMT]: {

@@ -194,9 +194,9 @@ export class MembershipsComponent implements OnInit {
       return colors[hash];
     }
     for (let i = 0; i < gen.length; i++) {
-      // tslint:disable-next-line: no-bitwise
+      // eslint-disable-next-line no-bitwise
       hash = gen.charCodeAt(i) + ((hash << 5) - hash);
-      // tslint:disable-next-line: no-bitwise
+      // eslint-disable-next-line no-bitwise
       hash = hash & hash;
     }
     hash = ((hash % colors.length) + colors.length) % colors.length;
