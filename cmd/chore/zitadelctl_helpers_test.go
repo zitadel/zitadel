@@ -71,11 +71,19 @@ func awaitCompletedPodFromJobFunc(kubectl kubectlCmd) awaitCompletedPodFromJob {
 	}
 }
 
+type awaitCompletedPod func(namespace, selector string, timeout time.Duration)
+
+func awaitCompletedPodFunc(kubectl kubectlCmd) awaitCompletedPod {
+	return func(namespace, selector string, timeout time.Duration) {
+		Eventually(countCompletedPods(kubectl, namespace, selector), timeout, 5*time.Second).Should(Equal(int8(1)))
+	}
+}
+
 type awaitReadyPods func(namespace, selector string, count int, timeout time.Duration)
 
 func awaitReadyPodsFunc(kubectl kubectlCmd) awaitReadyPods {
 	return func(namespace, selector string, count int, timeout time.Duration) {
-		Eventually(countReadyPods(kubectl, namespace, selector), timeout).Should(Equal(int8(count)))
+		Eventually(countReadyPods(kubectl, namespace, selector), timeout, 5*time.Second).Should(Equal(int8(count)))
 	}
 }
 
@@ -84,6 +92,14 @@ type awaitSecret func(namespace string, name string, keys []string, timeout time
 func awaitSecretFunc(kubectl kubectlCmd) awaitSecret {
 	return func(namespace string, name string, keys []string, timeout time.Duration) {
 		sort.Strings(keys)
-		Eventually(getSecretWithName(kubectl, namespace, name), timeout).Should(Equal(keys))
+		Eventually(getSecretKeysWithName(kubectl, namespace, name), timeout, 5*time.Second).Should(Equal(keys))
+	}
+}
+
+type awaitCronJobScheduled func(namespace string, name string, cron string, timeout time.Duration)
+
+func awaitCronJobScheduledFunc(kubectl kubectlCmd) awaitCronJobScheduled {
+	return func(namespace string, name string, cron string, timeout time.Duration) {
+		Eventually(getCronJobScheduleWithName(kubectl, namespace, name), timeout, 5*time.Second).Should(Equal(cron))
 	}
 }

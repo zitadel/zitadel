@@ -16,7 +16,7 @@ spec:
             - /bin/bash
             - -c
             - |-
-              cockroach sql --certs-dir=/cockroach/cockroach-certs --host=cockroachdb-public --port=26257 -e "SHOW DATABASES;"
+              cockroach sql --certs-dir=/cockroach/cockroach-certs --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "SHOW DATABASES;"
           image: ghcr.io/caos/zitadel-crbackup:${ZITADEL_E2E_TAG}
           imagePullPolicy: Always
           name: bucket

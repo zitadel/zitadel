@@ -22,12 +22,12 @@ import (
 	"time"
 )
 
-var _ = Describe("orbctl", func() {
+var _ = Describe("zitadelctl", func() {
 
 	const (
 		envPrefix       = "ZITADEL_E2E_"
 		tagEnv          = envPrefix + "TAG"
-		userEnv         = envPrefix + "USER"
+		userEnv         = envPrefix + "DBUSER"
 		cleanupAfterEnv = envPrefix + "CLEANUP_AFTER"
 		reuseOrbEnv     = envPrefix + "REUSE_ORB"
 	)
@@ -39,21 +39,30 @@ var _ = Describe("orbctl", func() {
 		kubectl                              kubectlCmd
 		zitadelctlGitops                     zitadelctlGitopsCmd
 		AwaitCompletedPodFromJob             awaitCompletedPodFromJob
+		AwaitCompletedPod                    awaitCompletedPod
 		AwaitReadyPods                       awaitReadyPods
 		AwaitSecret                          awaitSecret
+		AwaitCronJobScheduled                awaitCronJobScheduled
 	)
 	BeforeSuite(func() {
 		workfolder = "./artifacts"
 		kubeconfigPath := filepath.Join(workfolder, "kubeconfig")
 		orbconfigPath = filepath.Join(workfolder, "orbconfig")
 		tag = prefixedEnv("TAG")
-		user = prefixedEnv("USER")
+		user = prefixedEnv("DBUSER")
 		zitadelctlGitops = zitadelctlGitopsFunc(orbconfigPath)
 		kubectl = kubectlCmdFunc(kubeconfigPath)
-		monitor = mntr.Monitor{}
+		monitor = mntr.Monitor{
+			OnInfo:         mntr.LogMessage,
+			OnChange:       mntr.LogMessage,
+			OnError:        mntr.LogError,
+			OnRecoverPanic: mntr.LogPanic,
+		}
+		AwaitCompletedPod = awaitCompletedPodFunc(kubectl)
 		AwaitCompletedPodFromJob = awaitCompletedPodFromJobFunc(kubectl)
 		AwaitReadyPods = awaitReadyPodsFunc(kubectl)
 		AwaitSecret = awaitSecretFunc(kubectl)
+		AwaitCronJobScheduled = awaitCronJobScheduledFunc(kubectl)
 
 		orbconfig, err := orb.ParseOrbConfig(orbconfigPath)
 		Expect(err).ToNot(HaveOccurred())
@@ -96,7 +105,9 @@ var _ = Describe("orbctl", func() {
 			})
 		})
 	})
+
 	Context("database", func() {
+
 		When("bootstraping", func() {
 			It("succeeds when creating the initial database.yml", func() {
 				localToRemoteFile(zitadelctlGitops, "database.yml", "./templates/database.yml", os.Getenv)
@@ -106,15 +117,26 @@ var _ = Describe("orbctl", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Eventually(session, 1*time.Minute, 5*time.Second).Should(gexec.Exit(0))
-				AwaitReadyPods("caos-zitadel", "app.kubernetes.io/name=cockroachdb", 1, 5)
-			})
-			It("deploys job to test cockroach", func() {
-				bytes, err := ioutil.ReadFile("./templates/cockroachdb-root.yml")
-				Expect(err).ToNot(HaveOccurred())
-
-				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-root", 2*time.Minute)
+				AwaitReadyPods("caos-zitadel", "app.kubernetes.io/name=cockroachdb", 1, 5*time.Minute)
 			})
 		})
+		When("get connect string to cockroach", func() {
+			It("logic should give back connection information", func() {
+				host, port, err := databases.GitOpsGetConnectionInfo(monitor, k8sClient, gitClient)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(host).ToNot(BeEmpty())
+				Expect(port).ToNot(BeEmpty())
+				err = os.Setenv(envPrefix+"DBHOST", host)
+				err = os.Setenv(envPrefix+"DBPORT", port)
+			})
+			It("deploys job to test cockroach", func() {
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-root.yaml")
+				Expect(err).ToNot(HaveOccurred())
+
+				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-connect", 2*time.Minute)
+			})
+		})
+
 		When("scaling to 3 nodes", func() {
 			It("succeeds to scale cockroachdb to 3 nodes", func() {
 				count := 3
@@ -122,21 +144,22 @@ var _ = Describe("orbctl", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Eventually(session, 1*time.Minute).Should(gexec.Exit(0))
 
-				AwaitReadyPods("caos-zitadel", "app.kubernetes.io/name=cockroachdb", count, 3)
+				AwaitReadyPods("caos-zitadel", "app.kubernetes.io/name=cockroachdb", count, 3*time.Minute)
 			})
 			It("deploys job to test cockroach", func() {
-				bytes, err := ioutil.ReadFile("./templates/cockroachdb-root.yml")
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-root.yaml")
 				Expect(err).ToNot(HaveOccurred())
 
-				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-root", 2*time.Minute)
+				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-connect", 2*time.Minute)
 			})
 		})
+
 		When("add and delete users", func() {
 			It("add user to DB", func() {
-				bytes, err := ioutil.ReadFile("./templates/cockroachdb-add.yml")
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-add.yaml")
 				Expect(err).ToNot(HaveOccurred())
 
-				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-add", 2*time.Minute)
+				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-connect-add", 2*time.Minute)
 			})
 			It("generate certifcate for user", func() {
 				err := databases.GitOpsAddUser(monitor, user, k8sClient, gitClient)
@@ -144,20 +167,26 @@ var _ = Describe("orbctl", func() {
 				AwaitSecret("caos-zitadel", "cockroachdb.client."+user, []string{"ca.crt", "client." + user + ".crt", "client." + user + ".key"}, 1*time.Minute)
 			})
 			It("deploys job to test added user to connect to cockroach", func() {
-				bytes, err := ioutil.ReadFile("./templates/cockroachdb-add.yml")
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-user.yaml")
 				Expect(err).ToNot(HaveOccurred())
 
-				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-user", 2*time.Minute)
+				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-connect-user", 2*time.Minute)
 			})
 			It("delete user from DB", func() {
-				err := databases.GitOpsDeleteUser(monitor, user, k8sClient, gitClient)
-				Expect(err).ToNot(HaveOccurred())
-			})
-			It("deploys job to test deleted user to connect to cockroach", func() {
-				bytes, err := ioutil.ReadFile("./templates/cockroachdb-add.yml")
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-del.yaml")
 				Expect(err).ToNot(HaveOccurred())
 
-				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-user", 2*time.Minute)
+				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-connect-del", 2*time.Minute)
+			})
+			It("deploys job to test deleted user to connect to cockroach", func() {
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-user-fail.yaml")
+				Expect(err).ToNot(HaveOccurred())
+
+				AwaitCompletedPodFromJob(bytes, "caos-zitadel", "job-name=cockroachdb-connect-user", 2*time.Minute)
+			})
+			It("delete user secret", func() {
+				err := databases.GitOpsDeleteUser(monitor, user, k8sClient, gitClient)
+				Expect(err).ToNot(HaveOccurred())
 			})
 		})
 	})
@@ -167,6 +196,46 @@ var _ = Describe("orbctl", func() {
 			It("succeeds when creating the initial zitadel.yml", func() {
 				localToRemoteFile(zitadelctlGitops, "zitadel.yml", "./templates/zitadel.yml", os.Getenv)
 			})
+			It("generates missing secrets successfully", func() {
+				configureSession, err := gexec.Start(zitadelctlGitops("configure"), GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(configureSession, 2*time.Minute, 1*time.Second).Should(gexec.Exit(0))
+			})
+			It("deploys zitadel with 1 node", func() {
+				session, err := gexec.Start(zitadelctlGitops("takeoff"), os.Stdout, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute, 5*time.Second).Should(gexec.Exit(0))
+			})
+			It("runs migrations", func() {
+				AwaitCompletedPod("caos-zitadel", "job-name=cockroachdb-cluster-migration-ensure", 10*time.Minute)
+			})
+			It("runs setup", func() {
+				AwaitCompletedPod("caos-zitadel", "job-name=zitadel-setup-ensure", 10*time.Minute)
+			})
+			It("runs 1 zitadel pod", func() {
+				AwaitReadyPods("caos-zitadel", "app.kubernetes.io/name=zitadel", 1, 2*time.Minute)
+			})
 		})
+	})
+
+	Context("backup", func() {
+		When("backup is defined", func() {
+			It("applies job with declared information", func() {
+				backups, err := ioutil.ReadFile("./templates/backups.yml")
+				Expect(err).ToNot(HaveOccurred())
+
+				session, err := gexec.Start(zitadelctlGitops("file", "patch", "database.yml", "database.spec.backups", "--exact", "--value", string(backups)), GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute).Should(gexec.Exit(0))
+
+				AwaitCronJobScheduled("caos-zitadel", "backup-bucket", "0 0 1 1 *", 1*time.Minute)
+			})
+		})
+		/*
+			When("instant-backup", func() {
+				It("deploys job to backup data", func() {
+					AwaitCompletedPod("caos-zitadel")
+				})
+			})*/
 	})
 })

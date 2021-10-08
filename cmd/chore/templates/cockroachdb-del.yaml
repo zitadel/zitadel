@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cockroachdb-connect-user
+  name: cockroachdb-connect-del
   namespace: caos-zitadel
   labels:
-    app.kubernetes.io/name: cockroach-user
+    app.kubernetes.io/name: cockroach-del
 spec:
   backoffLimit: 3
   completions: 1
@@ -16,7 +16,7 @@ spec:
             - /bin/bash
             - -c
             - |-
-              cockroach sql --certs-dir=/cockroach/cockroach-certs --user=${ZITADEL_E2E_DBUSER} --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "SHOW DATABASES;"
+              cockroach sql --certs-dir=/cockroach/cockroach-certs --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "DROP USER IF EXISTS ${ZITADEL_E2E_DBUSER};"
           image: ghcr.io/caos/zitadel-crbackup:${ZITADEL_E2E_TAG}
           imagePullPolicy: Always
           name: bucket
@@ -35,4 +35,4 @@ spec:
         - name: client-certs
           secret:
             defaultMode: 256
-            secretName: cockroachdb.client.${ZITADEL_E2E_DBUSER}
+            secretName: cockroachdb.client.root

@@ -1,0 +1,8 @@
+bucket:
+  kind: databases.caos.ch/BucketBackup
+  version: v0
+  spec:
+    verbose: true
+    cron: 0 0 1 1 *
+    bucket: caos-zitadel-e2e-backup
+    serviceAccountJSON: null

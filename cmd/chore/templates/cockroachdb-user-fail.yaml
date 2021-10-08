@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: cockroach-user
 spec:
-  backoffLimit: 3
+  backoffLimit: 1
   completions: 1
   parallelism: 1
   template:
@@ -16,7 +16,7 @@ spec:
             - /bin/bash
             - -c
             - |-
-              cockroach sql --certs-dir=/cockroach/cockroach-certs --user=${ZITADEL_E2E_DBUSER} --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "SHOW DATABASES;"
+              cockroach sql --certs-dir=/cockroach/cockroach-certs --user=${ZITADEL_E2E_DBUSER} --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "SHOW DATABASES;" && exit 1 || exit 0
           image: ghcr.io/caos/zitadel-crbackup:${ZITADEL_E2E_TAG}
           imagePullPolicy: Always
           name: bucket

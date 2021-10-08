@@ -16,7 +16,7 @@ spec:
             - /bin/bash
             - -c
             - |-
-              cockroach sql --certs-dir=/cockroach/cockroach-certs --host=cockroachdb-public --port=26257 -e "CREATE USER ${ZITADEL_E2E_DBUSER};GRANT admin TO ${ZITADEL_E2E_DBUSER} WITH ADMIN OPTION;"
+              cockroach sql --certs-dir=/cockroach/cockroach-certs --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "CREATE USER IF NOT EXISTS ${ZITADEL_E2E_DBUSER};GRANT admin TO ${ZITADEL_E2E_DBUSER} WITH ADMIN OPTION;"
           image: ghcr.io/caos/zitadel-crbackup:${ZITADEL_E2E_TAG}
           imagePullPolicy: Always
           name: bucket
