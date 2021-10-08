@@ -56,6 +56,10 @@ func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
 					Event:  project.GrantRemovedType,
 					Reduce: p.reduceProjectGrantRemoved,
 				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
 			},
 		},
 	}
@@ -187,6 +191,20 @@ func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
+			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *ProjectGrantProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-Ms0fe", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-gn9rw", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
 		},
 	), nil

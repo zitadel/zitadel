@@ -42,6 +42,10 @@ func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
 					Event:  project.RoleRemovedType,
 					Reduce: p.reduceProjectRoleRemoved,
 				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
 			},
 		},
 	}
@@ -119,6 +123,20 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventR
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
+			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("was not an  event")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-l0geG", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
 		},
 	), nil
