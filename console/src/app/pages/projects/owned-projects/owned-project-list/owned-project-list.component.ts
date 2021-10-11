@@ -10,7 +10,7 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Project } from 'src/app/proto/generated/zitadel/project_pb';
+import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -58,6 +58,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   public zitadelProjectId: string = '';
+  public ProjectState: any = ProjectState;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -162,7 +163,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
-  public deleteProject(item: Project.AsObject): void {
+  public deleteProject(id: string): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
@@ -174,8 +175,8 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(resp => {
-      if (this.zitadelProjectId && resp && item.id !== this.zitadelProjectId) {
-        this.mgmtService.removeProject(item.id).then(() => {
+      if (this.zitadelProjectId && resp && id !== this.zitadelProjectId) {
+        this.mgmtService.removeProject(id).then(() => {
           this.toast.showInfo('PROJECT.TOAST.DELETED', true);
           setTimeout(() => {
             this.refreshPage();

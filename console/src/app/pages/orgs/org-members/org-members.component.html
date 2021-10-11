@@ -7,14 +7,14 @@
         (changedSelection)="selection = $event" [refreshTrigger]="changePage"
         [canDelete]="['org.member.delete:'+org?.id,'org.member.delete$'] | hasRole | async"
         [canWrite]="['org.member.write$'] | hasRole | async" (deleteMember)="removeOrgMember($event)">
-        <ng-template appHasRole selectactions [appHasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
+        <ng-template cnslHasRole selectactions [hasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
             <button (click)="removeOrgMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
                 class="del-button" mat-raised-button color="warn">
                 <i class="las la-trash"></i>
                 {{'ACTIONS.SELECTIONDELETE' | translate}}
             </button>
         </ng-template>
-        <ng-template appHasRole writeactions [appHasRole]="['org.member.write:'+org?.id,'org.member.write']">
+        <ng-template cnslHasRole writeactions [hasRole]="['org.member.write:'+org?.id,'org.member.write']">
             <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
             </a>

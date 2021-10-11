@@ -36,19 +36,20 @@
 
                 <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.NAME' | translate }} </th>
-                    <td mat-cell *matCellDef="let project"> {{project.name}} </td>
+                    <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project"> {{project.name}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="state">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.STATE' | translate }} </th>
-                    <td mat-cell *matCellDef="let project"><span *ngIf="project.state">{{'PROJECT.STATE.'+project.state
-                            | translate}}</span></td>
+                    <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project">
+                      <span class="state" [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE}" *ngIf="project.state">{{'PROJECT.STATE.'+project.state | translate}}</span>
+                    </td>
                 </ng-container>
 
 
                 <ng-container matColumnDef="creationDate">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CREATIONDATE' | translate }} </th>
-                    <td mat-cell *matCellDef="let project">
+                    <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project">
                         <span *ngIf="project.details.creationDate">{{project.details.creationDate | timestampToDate |
                             localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
                     </td>
@@ -57,7 +58,7 @@
 
                 <ng-container matColumnDef="changeDate">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CHANGEDATE' | translate }} </th>
-                    <td mat-cell *matCellDef="let project">
+                    <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project">
                         <span *ngIf="project.details.changeDate">{{project.details.changeDate | timestampToDate |
                             localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
                     </td>
@@ -75,8 +76,7 @@
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"
-                    [routerLink]="['/projects', row.id]"></tr>
+                <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
             </table>
             <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
