@@ -12,7 +12,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 })
 export class AccountsCardComponent implements OnInit {
   @Input() public user!: User.AsObject;
-  @Input() public iamuser: boolean = false;
+  @Input() public iamuser: boolean | null = false;
 
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
   public sessions: Session.AsObject[] = [];

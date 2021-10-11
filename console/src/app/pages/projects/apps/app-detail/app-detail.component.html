@@ -49,7 +49,7 @@
 
         <div class="compliance"
           *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
-          <cnsl-info-section class="problem" type="WARN">
+          <cnsl-info-section class="problem" [type]="InfoSectionType.WARN">
               <ul style="margin: 0;">
                   <li style="margin: 0 0 .5rem 0;"
                       *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
@@ -73,7 +73,7 @@
                 <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
                   <div class="dev-col">
                     <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
-                    <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
+                    <mat-slide-toggle *ngIf="devMode" color="primary" class="devmode" [formControl]="devMode" name="devMode"
                     matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
                     {{ 'APP.OIDC.DEVMODE' | translate }}
                     </mat-slide-toggle>
@@ -83,7 +83,7 @@
                 *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value === OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
                   <div class="dev-col">
                     <span>{{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</span>
-                    <mat-slide-toggle color="primary" class="devmode" [formControl]="devMode" name="devMode"
+                    <mat-slide-toggle *ngIf="devMode" color="primary" class="devmode" [formControl]="devMode" name="devMode"
                     matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
                     {{ 'APP.OIDC.DEVMODE' | translate }}
                     </mat-slide-toggle>
@@ -93,13 +93,13 @@
                 <div class="content">
                   <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
                       [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
-                      (changedUris)="redirectUrisList = $event" [urisList]="redirectUrisList"
+                      (changedUris)="redirectUrisList = $any($event)" [urisList]="redirectUrisList"
                       title="{{ 'APP.OIDC.REDIRECT' | translate }}"
                       [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
                   </cnsl-redirect-uris>
       
                   <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
-                      [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $event"
+                      [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $any($event)"
                       [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
                       title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
                       [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
@@ -119,7 +119,7 @@
                 <ng-container *ngIf="showAdditionalOrigins">
                     <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
                     <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
-                        [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $event"
+                        [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $any($event)"
                         [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
                     </cnsl-additional-origins>
                 </ng-container>

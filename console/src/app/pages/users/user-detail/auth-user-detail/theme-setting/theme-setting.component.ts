@@ -23,7 +23,10 @@ export class ThemeSettingComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
-  public change(checked: boolean): void {
-    this.themeService.setDarkTheme(checked);
+  public change(event: any): void {
+    if (event.target) {
+      const checked = event.target.checked;
+      this.themeService.setDarkTheme(checked);
+    }
   }
 }

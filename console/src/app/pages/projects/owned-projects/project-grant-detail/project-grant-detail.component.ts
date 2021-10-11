@@ -49,13 +49,13 @@ export class ProjectGrantDetailComponent {
       this.grantid = params.grantid;
 
       this.dataSource = new ProjectGrantMembersDataSource(this.mgmtService);
-      this.dataSource.loadGrantMembers(params.projectid, params.grantid, 0, this.INITIALPAGESIZE);
+      this.dataSource.loadMembers(params.projectid, params.grantid, 0, this.INITIALPAGESIZE);
 
       this.getRoleOptions(params.projectid);
       this.getMemberRoleOptions();
 
       this.changePageFactory = (event?: PageEvent) => {
-        return this.dataSource.loadGrantMembers(
+        return this.dataSource.loadMembers(
           params.projectid,
           params.grantid,
           event?.pageIndex ?? 0,

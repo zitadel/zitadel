@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,6 +12,7 @@ import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { CnslLinks } from 'src/app/modules/links/links.component';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -122,6 +123,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
   public copiedKey: any = '';
   public nextLinks: Array<CnslLinks> = [];
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     public translate: TranslateService,
@@ -596,8 +598,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.apiForm.get('authMethodType');
   }
 
-  public get devMode(): AbstractControl | null {
-    return this.oidcForm.get('devMode');
+  public get devMode(): FormControl | null {
+    return this.oidcForm.get('devMode') as FormControl;
   }
 
   public get accessTokenType(): AbstractControl | null {

@@ -8,7 +8,7 @@
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
             <mat-chip class="chip" *ngFor="let selecteduser of users" [selectable]="selectable" [removable]="removable"
                 (removed)="remove(selecteduser)">
-                {{ selecteduser?.human?.profile ? (selecteduser.human.profile.displayName) :
+                {{ (selecteduser.human && selecteduser.human.profile) ? (selecteduser.human.profile.displayName) :
                 selecteduser?.machine?.name}}
                 | <small>
                     {{selecteduser.preferredLoginName}}</small>
@@ -25,7 +25,7 @@
                 <mat-spinner diameter="30"></mat-spinner>
             </mat-option>
             <mat-option *ngFor="let user of filteredUsers" [value]="user">
-                {{user.human?.profile?.displayName ? user.human.profile.displayName : user.machine?.name}}
+                {{(user.human && user.human.profile && user.human.profile.displayName) ? user.human.profile.displayName : user.machine?.name}}
                 <small>{{user.preferredLoginName}}</small>
             </mat-option>
         </mat-autocomplete>
@@ -56,8 +56,8 @@
         <div class="found-user-row" *ngFor="let user of users; index as i">
             <div class="circle">
                 <cnsl-avatar
-                    *ngIf="user.human && user.human.displayName && user.human?.firstName && user.human?.lastName; else cog"
-                    class="avatar" [name]="user.human.displayName" [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName" [size]="32">
+                    *ngIf="user.human && user.human.profile && user.human.profile.displayName && user.human.profile.firstName && user.human.profile.lastName; else cog"
+                    class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human.profile?.avatarUrl || ''" [forColor]="user.preferredLoginName ?? 'A'" [size]="32">
                 </cnsl-avatar>
                 <ng-template #cog>
                     <div class="sa-icon">

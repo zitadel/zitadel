@@ -15,7 +15,6 @@ import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolba
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
-import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -48,7 +47,7 @@ export class AppComponent implements OnDestroy {
   public showAccount: boolean = false;
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
-  public user!: User.AsObject;
+  // public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -340,7 +339,7 @@ export class AppComponent implements OnDestroy {
 
     this.authService.user.subscribe(userprofile => {
       if (userprofile) {
-        this.user = userprofile;
+        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
         const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
 

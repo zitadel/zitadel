@@ -25,6 +25,7 @@ import { StorageKey, StorageLocation, StorageService } from 'src/app/services/st
 import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -88,6 +89,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public loadingImages: boolean = false;
   private org!: Org.AsObject;
   public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -164,16 +166,18 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public onDropFont(filelist: FileList): Promise<any> | void {
-    const file = filelist.item(0);
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
-        case PolicyComponentServiceType.ADMIN:
-          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+  public onDropFont(filelist: FileList | null): Promise<any> | void {
+    if (filelist) {
+      const file = filelist.item(0);
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        switch (this.serviceType) {
+          case PolicyComponentServiceType.MGMT:
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
+          case PolicyComponentServiceType.ADMIN:
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+        }
       }
     }
   }

@@ -2,7 +2,7 @@
   <button card-actions mat-icon-button (click)="getMFAs()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()" [dataSize]="dataSource?.data?.length">
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()" [dataSize]="dataSource?.data?.length ?? 0">
         <table class="table" mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>

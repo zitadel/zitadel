@@ -20,7 +20,7 @@
                     [displayedColumns]="['select','user', 'projectId', 'dates', 'roleNamesList']"
                     [disableWrite]="(['user.grant.write$','user.grant.write:'+grantId] | hasRole | async) === false"
                     [disableDelete]="(['user.grant.delete$','user.grant.delete:'+grantId] | hasRole | async) === false"
-                    refreshOnPreviousRoutes="['/grant-create/project/{{projectId}}/grant/{{grantId}}']">
+                    [refreshOnPreviousRoutes]="['/grant-create/project/{{projectId}}/grant/{{grantId}}']">
                 </cnsl-user-grants>
             </cnsl-card>
         </ng-template>
@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+        <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
             <mat-tab label="Details">
                 <cnsl-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
                     [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"

@@ -1,7 +1,7 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BulkAddProjectRolesRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -33,11 +33,15 @@ import { ToastService } from 'src/app/services/toast.service';
   ],
 })
 export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
-  private subscription?: Subscription;
+  private subscription: Subscription = new Subscription();
   public projectId: string = '';
 
   public formArray!: FormArray;
-  public formGroup!: FormGroup;
+  public formGroup: FormGroup = this.fb.group({
+    key: new FormControl('', [Validators.required]),
+    displayName: new FormControl(''),
+    group: new FormControl(''),
+  });
   public createSteps: number = 1;
   public currentCreateStep: number = 1;
 
@@ -46,19 +50,14 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private toast: ToastService,
     private mgmtService: ManagementService,
+    private fb: FormBuilder,
     private _location: Location,
   ) {
-    this.formGroup = new FormGroup({
-      key: new FormControl('', [Validators.required]),
-      displayName: new FormControl(''),
-      group: new FormControl(''),
-    });
-
     this.formArray = new FormArray([this.formGroup]);
   }
 
   public addEntry(): void {
-    const newGroup = new FormGroup({
+    const newGroup = this.fb.group({
       key: new FormControl('', [Validators.required]),
       displayName: new FormControl(''),
       group: new FormControl(''),
@@ -76,7 +75,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   private getData({ projectid }: Params): void {

@@ -11,7 +11,7 @@
     <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
     <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
-    <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" type="WARN">
+    <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
       <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.private_label'})"></span>
   </cnsl-info-section>
 
@@ -99,7 +99,7 @@
                 <label class="file-label">
                   <i class="icon las la-image"></i>
                   <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
-                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $event.target.files)">
+                  <input #selectedFile style="display: none;"  class="file-input" type="file" (change)="onDropLogo(theme, $any($event.target).files)">
                   <a class="btn" *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="$event.preventDefault(); selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
             </div>
@@ -138,7 +138,7 @@
               <label class="file-label">
                 <i class="icon las la-image"></i>
                 <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate): ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
-                <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $event.target.files)">
+                <input #selectedFileIcon style="display: none;"  class="file-input" type="file" (change)="onDropIcon(theme, $any($event.target).files)">
                 <a class="btn" *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="$event.preventDefault(); selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
               </label>
               </div>
@@ -225,7 +225,7 @@
                 <label class="file-label">
                   <i class="icon las la-file"></i>
                   <span >{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate): ('POLICY.PRIVATELABELING.DROPFONT' | translate)}}</span>
-                  <input #selectedFontFile style="display: none;"  class="file-input" type="file" (change)="onDropFont($event.target.files)">
+                  <input #selectedFontFile style="display: none;"  class="file-input" type="file" (change)="onDropFont($any($event.target).files)">
                   <a class="btn" *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))" (click)="selectedFontFile.click()">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
             </div>
@@ -245,7 +245,7 @@
 
             <ng-container
         *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false">
-          <cnsl-info-section [featureLink]="['/org/features']" class="info" type="WARN"
+          <cnsl-info-section [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN"
           >
           <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.private_label'})"></span>
           </cnsl-info-section>
@@ -258,7 +258,7 @@
 
         <ng-container
         *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) === false">
-          <cnsl-info-section [featureLink]="['/org/features']" class="info" type="WARN">
+          <cnsl-info-section [featureLink]="['/org/features']" class="info" type]="InfoSectionType.WARN">
               <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.watermark'})"></span>
           </cnsl-info-section>
         </ng-container>

@@ -94,9 +94,11 @@ export class OwnedProjectGridComponent implements OnChanges {
     this.getPrefixedItem('pinned-projects').then(storageEntry => {
       if (storageEntry) {
         const array: string[] = JSON.parse(storageEntry);
-        const toSelect: Project.AsObject[] = this.items.filter((item, index) => {
+        const toSelect: Project.AsObject[] = this.items.filter((item) => {
           if (array.includes(item.id)) {
             return true;
+          } else {
+            return false;
           }
         });
         this.selection.select(...toSelect);

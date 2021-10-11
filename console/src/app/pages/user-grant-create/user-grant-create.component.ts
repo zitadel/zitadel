@@ -179,8 +179,10 @@ export class UserGrantCreateComponent implements OnDestroy {
     this.grantedRoleKeysList = project.grantedRoleKeysList ?? [];
   }
 
-  public selectUser(user: User.AsObject): void {
-    this.userId = user.id;
+  public selectUser(user: User.AsObject | User.AsObject[]): void {
+    if (typeof user === 'object') {
+      this.userId = (user as User.AsObject).id;
+    }
   }
 
   public selectRoles(roles: Role.AsObject[]): void {

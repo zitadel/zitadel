@@ -29,6 +29,9 @@ export interface MappedChange {
     dates: Timestamp.AsObject[];
     editorId: string;
     editorName: string;
+    editorDisplayName: string;
+    editorAvatarUrl: string;
+    editorPreferredLoginName: string;
     eventTypes: Array<{ key: string; localizedMessage: string; }>;
     sequences: number[];
   }>;

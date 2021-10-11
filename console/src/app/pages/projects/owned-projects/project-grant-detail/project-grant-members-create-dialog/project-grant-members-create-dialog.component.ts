@@ -22,8 +22,10 @@ export class ProjectGrantMembersCreateDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) { }
 
-  public selectUsers(users: User.AsObject[]): void {
-    this.userIds = users.map(user => user.id);
+  public selectUsers(users: User.AsObject | User.AsObject[]): void {
+    if (Array.isArray(users)) {
+      this.userIds = users.map(user => user.id);
+    }
   }
 
   public closeDialog(): void {

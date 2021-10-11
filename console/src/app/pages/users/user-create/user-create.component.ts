@@ -170,6 +170,8 @@ export class UserCreateComponent implements OnDestroy {
   public get suffixPadding(): string | undefined {
     if (this.suffix?.nativeElement.offsetWidth) {
       return `${(this.suffix.nativeElement as HTMLElement).offsetWidth + 10}px`;
+    } else {
+      return;
     }
   }
 }

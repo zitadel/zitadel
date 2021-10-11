@@ -19,7 +19,7 @@
         <ng-container>
             <h2>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h2>
 
-            <cnsl-search-user-autocomplete class="block" singleOutput="true" [users]="user ? [user] : []"
+            <cnsl-search-user-autocomplete class="block" [singleOutput]="true" [users]="user ? [user] : []"
                 (selectionChanged)="selectUser($event)"
                 [target]="context === UserGrantContext.USER ? UserTarget.EXTERNAL : UserTarget.SELF">
             </cnsl-search-user-autocomplete>
@@ -28,7 +28,7 @@
         <ng-container *ngIf="context && (context === UserGrantContext.USER || context === UserGrantContext.NONE)">
             <h2>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
 
-            <cnsl-search-project-autocomplete class="block" singleOutput="true"
+            <cnsl-search-project-autocomplete class="block" [singleOutput]="true"
                 (selectionChanged)="selectProject($event)">
             </cnsl-search-project-autocomplete>
         </ng-container>

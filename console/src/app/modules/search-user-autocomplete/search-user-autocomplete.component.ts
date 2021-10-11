@@ -95,8 +95,8 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
     });
   }
 
-  public displayFn(user?: User.AsObject): string | undefined {
-    return user ? `${user.preferredLoginName}` : undefined;
+  public displayFn(user?: User.AsObject): string {
+    return user ? `${user.preferredLoginName}` : '';
   }
 
   public add(event: MatChipInputEvent): void {
@@ -108,6 +108,8 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         const index = this.filteredUsers.findIndex((user) => {
           if (user.preferredLoginName) {
             return user.preferredLoginName === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {

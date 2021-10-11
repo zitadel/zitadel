@@ -35,7 +35,7 @@ export class GrantedProjectGridComponent implements OnChanges {
   public notPinned: Array<GrantedProject.AsObject> = [];
   @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
   @Output() changedView: EventEmitter<boolean> = new EventEmitter();
-  @Input() loading: boolean = false;
+  @Input() loading: boolean | null = false;
   public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
 
   public showNewProject: boolean = false;
@@ -70,9 +70,11 @@ export class GrantedProjectGridComponent implements OnChanges {
     this.getPrefixedItem('pinned-granted-projects').then(storageEntry => {
       if (storageEntry) {
         const array: string[] = JSON.parse(storageEntry);
-        const toSelect: GrantedProject.AsObject[] = this.items.filter((item, index) => {
+        const toSelect: GrantedProject.AsObject[] = this.items.filter((item) => {
           if (array.includes(item.projectId)) {
             return true;
+          } else {
+            return false;
           }
         });
         this.selection.select(...toSelect);
