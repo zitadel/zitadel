@@ -71,7 +71,7 @@
                                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                                     (matChipInputTokenEnd)="addScope($event)">
                             </cnsl-form-field>
-                            <button (click)="addScope($event)" mat-icon-button>
+                            <button (click)="addScope($any($event))" mat-icon-button>
                                 <mat-icon>add</mat-icon>
                             </button>
                         </div>

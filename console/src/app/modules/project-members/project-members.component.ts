@@ -127,6 +127,8 @@ export class ProjectMembersComponent {
         }).catch(error => {
           this.toast.showError(error);
         });
+      } else {
+        return Promise.reject();
       }
     })).then(() => {
       setTimeout(() => {
@@ -183,6 +185,8 @@ export class ProjectMembersComponent {
                 user.id,
                 roles,
               );
+            } else {
+              return Promise.reject();
             }
           })).then(() => {
             setTimeout(() => {

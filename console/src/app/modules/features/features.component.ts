@@ -133,15 +133,16 @@ export class FeaturesComponent implements OnDestroy {
     });
   }
 
-  private async getData(): Promise<GetFeaturesResponse.AsObject | GetOrgFeaturesResponse.AsObject | undefined> {
+  private async getData(): Promise<GetFeaturesResponse.AsObject | GetOrgFeaturesResponse.AsObject> {
     switch (this.serviceType) {
       case FeatureServiceType.MGMT:
         return this.managementService.getFeatures();
       case FeatureServiceType.ADMIN:
         if (this.org?.id) {
           return this.adminService.getDefaultFeatures();
+        } else {
+          return Promise.reject();
         }
-        break;
     }
   }
 

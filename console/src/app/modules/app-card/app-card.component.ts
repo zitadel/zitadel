@@ -10,5 +10,5 @@ export class AppCardComponent {
   @Input() public outline: boolean = false;
   @Input() public type: OIDCAppType | undefined = undefined;
   @Input() public isApiApp: boolean = false;
-  public OIDCAppType: Object = OIDCAppType;
+  public OIDCAppType: any = OIDCAppType;
 }

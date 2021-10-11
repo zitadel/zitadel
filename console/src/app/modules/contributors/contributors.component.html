@@ -14,7 +14,7 @@
                         [ngStyle]="{'z-index': 100 - i}">
                         <cnsl-avatar
                             *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
-                            class="avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''" [forColor]="member?.userName"[forColor]="member?.preferredLoginName"
+                            class="avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''" [forColor]="member.preferredLoginName ?? 'A'"
                             [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
                             [size]="32">
                         </cnsl-avatar>

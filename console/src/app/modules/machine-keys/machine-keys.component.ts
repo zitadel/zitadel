@@ -95,7 +95,7 @@ export class MachineKeysComponent implements OnInit {
         }
 
         if (type) {
-          return this.mgmtService.addMachineKey(this.userId, type, date).then((response) => {
+          this.mgmtService.addMachineKey(this.userId, type, date).then((response) => {
             if (response) {
               setTimeout(() => {
                 this.refreshPage();

@@ -6,12 +6,15 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
+import {
+  ProjectGrantMembersDataSource,
+} from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
 
-type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | IamMembersDataSource;
+type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | ProjectGrantMembersDataSource | IamMembersDataSource;
 
 @Component({
   selector: 'cnsl-members-table',

@@ -4,7 +4,7 @@
 
     <div class="top-actions">
       <div class="message-type">
-        <button (click)="setCurrentType(type.value)" [ngClass]="{'active': currentType === type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
+        <button (click)="setCurrentType($any(type).value)" [ngClass]="{'active': currentType === type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
       </div>
 
       <cnsl-form-field class="language">

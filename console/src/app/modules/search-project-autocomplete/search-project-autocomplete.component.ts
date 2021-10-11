@@ -111,6 +111,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
             return project.projectName === value;
           } else if (project?.name) {
             return project.name === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {

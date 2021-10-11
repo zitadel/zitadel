@@ -1,6 +1,6 @@
 <cnsl-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
     [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
-    [dataSize]="dataSource?.totalResult" [selection]="selection">
+    [dataSize]="dataSource?.totalResult ?? 0" [selection]="selection">
     <cnsl-form-field @appearfade *ngIf="userGrantListSearchKey !== undefined" actions class="filtername">
         <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
             [placeholder]="('USER.GRANTS.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>

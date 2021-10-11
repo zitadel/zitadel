@@ -79,7 +79,7 @@ export class ClientKeysComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const type: KeyType = resp.type;
 
@@ -96,7 +96,7 @@ export class ClientKeysComponent implements OnInit {
         }
 
         if (type) {
-          return this.mgmtService.addAppKey(
+          this.mgmtService.addAppKey(
             this.projectId,
             this.appId,
             type,

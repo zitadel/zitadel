@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'cnsl-detail-layout',
@@ -7,7 +6,7 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./detail-layout.component.scss'],
 })
 export class DetailLayoutComponent {
-  @Input() backRouterLink!: RouterLink | string | any[];
+  @Input() backRouterLink: any = undefined;
   @Input() title: string | null = '';
   @Input() description: string | null = '';
   @Input() maxWidth: boolean = true;
