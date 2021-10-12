@@ -48,6 +48,16 @@
   color: #6b7280;
 }
 
+.navbar {
+  background-color: hsla(0,0%,100%,.8);
+  backdrop-filter: saturate(110%) blur(5px);
+}
+
+:root[data-theme="dark"] .navbar {
+  background-color: rgba(31,41,55,.5019607843137255);
+  backdrop-filter: saturate(110%) blur(5px);
+}
+
 .navbar .navbar__items .navbar__item{
   font-size: 14px;
   line-height: 1.25rem;
