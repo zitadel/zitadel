@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -118,14 +119,20 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.org.SearchMyOrgDomains(ctx, queries)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries.Queries = append(queries.Queries, orgIDQuery)
+
+	domains, err := s.query.SearchOrgDomains(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
-		Result: org_grpc.DomainsToPb(domains.Result),
+		Result: org_grpc.DomainsToPb(domains.Domains),
 		Details: object.ToListDetails(
-			domains.TotalResult,
+			domains.Count,
 			domains.Sequence,
 			domains.Timestamp,
 		),

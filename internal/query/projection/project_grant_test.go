@@ -144,24 +144,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceProjectGrantChanged no changes",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantChangedType),
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.GrantChangedEventMapper),
-			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantChanged,
-			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
-			},
-		},
-		{
 			name: "reduceProjectGrantAdded",
 			args: args{
 				event: getEvent(testEvent(
