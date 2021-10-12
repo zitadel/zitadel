@@ -69,6 +69,14 @@
   font-weight: 550;
 }
 
+.menu__link {
+  font-size: 14px;
+}
+
+.menu__link--sublist:after {
+  opacity: .3;
+}
+
 :root[data-theme="dark"] .react-toggle-track {
   background-color: #454a66 !important;
 }
