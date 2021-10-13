@@ -524,6 +524,7 @@
     "NAME":"Name",
     "STATE":"State",
     "TIMEOUT":"Timeout",
+    "TIMEOUTINSEC":"Timout in seconds",
     "ALLOWEDTOFAIL":"Allowed To Fail",
     "SCRIPT":"Script",
     "DIALOG": {

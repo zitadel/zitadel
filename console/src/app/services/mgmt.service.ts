@@ -3,6 +3,7 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
+import { FlowType, TriggerType } from '../proto/generated/zitadel/action_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -67,6 +68,8 @@ import {
   BulkRemoveUserGrantResponse,
   BulkSetUserMetadataRequest,
   BulkSetUserMetadataResponse,
+  ClearFlowRequest,
+  ClearFlowResponse,
   CreateActionRequest,
   CreateActionResponse,
   DeactivateAppRequest,
@@ -123,6 +126,8 @@ import {
   GetDefaultVerifyPhoneMessageTextResponse,
   GetFeaturesRequest,
   GetFeaturesResponse,
+  GetFlowRequest,
+  GetFlowResponse,
   GetGrantedProjectByIDRequest,
   GetGrantedProjectByIDResponse,
   GetHumanEmailRequest,
@@ -351,6 +356,8 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  SetTriggerActionsRequest,
+  SetTriggerActionsResponse,
   SetUserMetadataRequest,
   SetUserMetadataResponse,
   UnlockUserRequest,
@@ -936,6 +943,34 @@ export class ManagementService {
     }
     req.setQuery(metadata);
     return this.grpcService.mgmt.listActions(req, null).then(resp => resp.toObject());
+  }
+
+  public getFlow(
+    type: FlowType
+  ): Promise<GetFlowResponse.AsObject> {
+    const req = new GetFlowRequest();
+    req.setType(type);
+    return this.grpcService.mgmt.getFlow(req, null).then(resp => resp.toObject());
+  }
+
+  public clearFlow(
+    type: FlowType
+  ): Promise<ClearFlowResponse.AsObject> {
+    const req = new ClearFlowRequest();
+    req.setType(type);
+    return this.grpcService.mgmt.clearFlow(req, null).then(resp => resp.toObject());
+  }
+
+  public setTriggerActions(
+    actionIdsList: string[],
+    type: FlowType,
+    triggerType: TriggerType,
+  ): Promise<SetTriggerActionsResponse.AsObject> {
+    const req = new SetTriggerActionsRequest();
+    req.setActionIdsList(actionIdsList);
+    req.setFlowType(type);
+    req.setTriggerType(triggerType);
+    return this.grpcService.mgmt.setTriggerActions(req, null).then(resp => resp.toObject());
   }
 
   public getIAM(): Promise<GetIAMResponse.AsObject> {
