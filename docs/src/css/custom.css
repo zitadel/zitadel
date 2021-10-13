@@ -60,12 +60,12 @@
   color: #6b7280;
 }
 
-.navbar {
+.navbar:not(.navbar-sidebar--show) {
   background-color: hsla(0,0%,100%,.8);
   backdrop-filter: saturate(110%) blur(5px);
 }
 
-:root[data-theme="dark"] .navbar {
+:root[data-theme="dark"] .navbar:not(.navbar-sidebar--show) {
   background-color: rgba(31,41,55,.5019607843137255);
   backdrop-filter: saturate(110%) blur(5px);
 }
