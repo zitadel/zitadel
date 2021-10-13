@@ -41,6 +41,9 @@
   --ifm-color-success-contrast-foreground: #0e6245;
   --ifm-color-success-contrast-background: #cbf4c9;
   --ifm-color-success-dark: #0e6245;
+  --ifm-color-info-dark: #6c8eef;
+  --ifm-color-info-contrast-background: #f0f3fa;
+  --ifm-color-secondary-contrast-background: #f0f3fa;
 }
 
 .react-toggle-track {
@@ -159,6 +162,11 @@ h2 {
   --ifm-color-success-contrast-foreground: #cbf4c9;
   --ifm-color-success-contrast-background: #4f566b;
   --ifm-color-success-dark: #cbf4c9;
+  --ifm-color-info-dark: #6c8eef;
+  --ifm-color-info-contrast-background: #3c4257;
+  --ifm-table-stripe-background: #3c4257;
+  --ifm-color-secondary-contrast-background: #3c4257;
+  --ifm-code-background: #3c4257;
 }
 
 .menu li li a {
