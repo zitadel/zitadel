@@ -94,6 +94,10 @@ protoc \
   ${PROTO_PATH}/admin.proto
 protoc \
   -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,action.md \
+  ${PROTO_PATH}/action.proto
+protoc \
+  -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,app.md \
   ${PROTO_PATH}/app.proto
 protoc \
@@ -126,7 +130,7 @@ protoc \
   ${PROTO_PATH}/object.proto
 protoc \
   -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,options.md \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,optiobuins.md \
   ${PROTO_PATH}/options.proto
 protoc \
   -I=/proto/include \

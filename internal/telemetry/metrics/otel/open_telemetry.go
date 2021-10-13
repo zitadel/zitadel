@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	label "go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
 	export "go.opentelemetry.io/otel/sdk/export/metric"
@@ -62,7 +62,7 @@ func (m *Metrics) RegisterCounter(name, description string) error {
 	return nil
 }
 
-func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error {
+func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error {
 	counter, exists := m.Counters.Load(name)
 	if !exists {
 		return caos_errs.ThrowNotFound(nil, "METER-4u8fs", "Errors.Metrics.Counter.NotFound")
@@ -93,13 +93,16 @@ func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc m
 	return nil
 }
 
-func MapToKeyValue(labels map[string]interface{}) []label.KeyValue {
+func MapToKeyValue(labels map[string]attribute.Value) []attribute.KeyValue {
 	if labels == nil {
 		return nil
 	}
-	keyValues := make([]label.KeyValue, 0, len(labels))
+	keyValues := make([]attribute.KeyValue, 0, len(labels))
 	for key, value := range labels {
-		keyValues = append(keyValues, label.Any(key, value))
+		keyValues = append(keyValues, attribute.KeyValue{
+			Key:   attribute.Key(key),
+			Value: value,
+		})
 	}
 	return keyValues
 }

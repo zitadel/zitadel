@@ -13,7 +13,7 @@ import { GetFeaturesResponse } from 'src/app/proto/generated/zitadel/management_
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { StripeCustomer, SubscriptionService } from 'src/app/services/subscription.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -49,13 +49,14 @@ export class FeaturesComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
-    private sessionStorage: StorageService,
+    private storage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
     private subService: SubscriptionService,
     private dialog: MatDialog,
   ) {
-    const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
+    const temporg: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
+
     if (temporg) {
       this.org = temporg;
     }

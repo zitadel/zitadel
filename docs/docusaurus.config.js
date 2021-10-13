@@ -9,12 +9,13 @@ module.exports = {
   organizationName: 'caos',
   projectName: 'zitadel',
   themeConfig: {
+    zoomSelector: '.markdown :not(em) > img',
     navbar: {
-      title: 'ZITADEL',
+      // title: 'ZITADEL',
       logo: {
         alt: 'ZITADEL logo',
-        src: 'img/zitadel-logo-solo-light.png',
-        srcDark: 'img/zitadel-logo-solo-darkdesign.svg',
+        src: 'img/zitadel-logo-dark.svg',
+        srcDark: 'img/zitadel-logo-light.svg',
       },
       items: [
         {
@@ -61,7 +62,6 @@ module.exports = {
       ],
     },
     footer: {
-      style: 'dark',
       links: [
         {
           title: 'Community',
@@ -146,5 +146,6 @@ module.exports = {
         domain: 'docs.zitadel.ch',
       },
     ],
+    require.resolve('plugin-image-zoom'),
   ],
 };

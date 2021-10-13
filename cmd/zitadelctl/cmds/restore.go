@@ -3,11 +3,11 @@ package cmds
 import (
 	"errors"
 
-	"github.com/caos/zitadel/pkg/zitadel"
-
 	"github.com/caos/orbos/mntr"
 
 	"github.com/caos/orbos/pkg/kubernetes/cli"
+	"github.com/caos/zitadel/operator/crtlcrd"
+	"github.com/caos/zitadel/operator/crtlgitops"
 
 	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
@@ -82,17 +82,17 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			return mntr.ToUserError(errors.New("chosen backup is not existing"))
 		}
 
+		ensure := func() error { return nil }
 		if rv.Gitops {
-			if err := zitadel.GitOpsClearMigrateRestore(monitor, gitClient, orbConfig, k8sClient, backup, &version); err != nil {
-				return err
+			ensure = func() error {
+				return crtlgitops.Restore(monitor, gitClient, k8sClient, backup)
 			}
 		} else {
-			if err := zitadel.CrdClearMigrateRestore(monitor, k8sClient, backup, &version); err != nil {
-				return err
+			ensure = func() error {
+				return crtlcrd.Restore(monitor, k8sClient, backup)
 			}
-
 		}
-		return nil
+		return scaleForFunction(monitor, gitClient, orbConfig, k8sClient, &version, rv.Gitops, ensure)
 	}
 	return cmd
 }
