@@ -6,3 +6,14 @@ bucket:
     cron: 0 0 1 1 *
     bucket: caos-zitadel-e2e-backup
     serviceAccountJSON: null
+csbucket:
+  kind: databases.caos.ch/S3Backup
+  version: v0
+  spec:
+    verbose: true
+    cron: 0 0 1 1 *
+    bucket: caos-zitadel-e2e-backup
+    endpoint: https://objects.lpg.cloudscale.ch
+    region: LPG
+    accessKeyID: null
+    secretAccessKey: null

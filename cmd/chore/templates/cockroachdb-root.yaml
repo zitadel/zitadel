@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cockroachdb-connect
+  name: cockroachdb-connect-root
   namespace: caos-zitadel
   labels:
-    app.kubernetes.io/name: cockroach-root
+    app.kubernetes.io/name: cockroachdb-connect-root
 spec:
   backoffLimit: 3
   completions: 1

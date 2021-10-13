@@ -9,7 +9,9 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -50,24 +52,41 @@ func localToRemoteFile(orbctlGitops zitadelctlGitopsCmd, remoteFile, localFile s
 	writeRemoteFile(orbctlGitops, remoteFile, contentBytes, env)
 }
 
-type awaitCompletedPodFromJob func(file []byte, namespace, selector string, timeout time.Duration)
+type applyFile func(file []byte)
 
-func awaitCompletedPodFromJobFunc(kubectl kubectlCmd) awaitCompletedPodFromJob {
-	return func(file []byte, namespace, selector string, timeout time.Duration) {
+func applyFileFunc(kubectl kubectlCmd) applyFile {
+	return func(file []byte) {
 		cmd := kubectl("apply", "-f", "-")
 		cmd.Stdin = strings.NewReader(os.ExpandEnv(string(file)))
 
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Eventually(session, 1*time.Minute).Should(gexec.Exit(0))
+	}
+}
+
+type deleteFile func(file []byte)
+
+func deleteFileFunc(kubectl kubectlCmd) deleteFile {
+	return func(file []byte) {
+		cmd := kubectl("delete", "-f", "-")
+		cmd.Stdin = strings.NewReader(os.ExpandEnv(string(file)))
+
+		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+		Eventually(session, 1*time.Minute).Should(gexec.Exit(0))
+	}
+}
+
+type awaitCompletedPodFromJob func(file []byte, namespace, selector string, timeout time.Duration)
+
+func awaitCompletedPodFromJobFunc(kubectl kubectlCmd) awaitCompletedPodFromJob {
+	return func(file []byte, namespace, selector string, timeout time.Duration) {
+		applyFileFunc(kubectl)(file)
+
 		Eventually(countCompletedPods(kubectl, namespace, selector), timeout, 5*time.Second).Should(Equal(int8(1)))
 
-		cmdDel := kubectl("delete", "-f", "-")
-		cmdDel.Stdin = strings.NewReader(os.ExpandEnv(string(file)))
-
-		sessionDel, err := gexec.Start(cmdDel, GinkgoWriter, GinkgoWriter)
-		Expect(err).ToNot(HaveOccurred())
-		Eventually(sessionDel, 1*time.Minute).Should(gexec.Exit(0))
+		deleteFileFunc(kubectl)(file)
 	}
 }
 
@@ -102,4 +121,43 @@ func awaitCronJobScheduledFunc(kubectl kubectlCmd) awaitCronJobScheduled {
 	return func(namespace string, name string, cron string, timeout time.Duration) {
 		Eventually(getCronJobScheduleWithName(kubectl, namespace, name), timeout, 5*time.Second).Should(Equal(cron))
 	}
+}
+
+type getLogsOfPod func(namespace string, selector string) string
+
+func getLogsOfPodFunc(kubectl kubectlCmd) getLogsOfPod {
+	return func(namespace string, selector string) string {
+		cmd := kubectl("logs", "-n", namespace, "--selector", selector)
+		out, err := cmd.CombinedOutput()
+		Expect(err).ToNot(HaveOccurred())
+
+		return string(out)
+	}
+}
+
+func lastVersionOfMigrations(folder string) int {
+	absFolder, err := filepath.Abs(folder)
+	if err != nil {
+		return 0
+	}
+
+	highest := 0
+	err = filepath.Walk(absFolder, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() && strings.HasPrefix(info.Name(), "V") {
+			parts := strings.Split(info.Name(), "__")
+			versionParts := strings.Split(parts[0], ".")
+			version, err := strconv.Atoi(versionParts[1])
+			if err != nil {
+				return err
+			}
+			if highest < version {
+				highest = version
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return 0
+	}
+	return highest
 }

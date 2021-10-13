@@ -4,7 +4,7 @@ metadata:
   name: cockroachdb-connect-add
   namespace: caos-zitadel
   labels:
-    app.kubernetes.io/name: cockroach-add
+    app.kubernetes.io/name: cockroachdb-connect-add
 spec:
   backoffLimit: 3
   completions: 1

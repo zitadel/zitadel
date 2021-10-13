@@ -2,7 +2,7 @@ kind: databases.caos.ch/Orb
 version: v0
 spec:
   verbose: false
-  version: SHA-2be0fa2cf208
+  version: operator-e2e
   selfReconciling: true
 database:
   kind: databases.caos.ch/CockroachDB

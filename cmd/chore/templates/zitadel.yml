@@ -2,7 +2,7 @@ kind: zitadel.caos.ch/Orb
 version: v0
 spec:
   verbose: false
-  version: SHA-e64b280faa17
+  version: operator-e2e
   selfReconciling: true
 iam:
   kind: zitadel.caos.ch/ZITADEL
