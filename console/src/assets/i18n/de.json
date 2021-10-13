@@ -91,6 +91,7 @@
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTSECTION": "Berechtigungssektion",
     "GRANTS": "Berechtigungen",
+    "ACTIONS":"Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
     "TOOLTIP": {
@@ -102,7 +103,8 @@
       "GRANTEDPROJECTS": "Verwalte die berechtigten Projekte von anderen Organisationen",
       "HUMANUSERS": "Verwalte die Menschlichen Benutzer deiner Organisation",
       "MACHINEUSERS": "Verwalte die  Service Benutzer deiner Organisation",
-      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer"
+      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer",
+      "ACTIONS":"Hinterlege scripts die bei einem bestimmten Event ausgeführt werden."
     }
   },
   "ACTIONS": {
@@ -515,6 +517,21 @@
       }
     }
   },
+  "FLOWS": {
+    "TITLE":"Aktionen und Abläufe",
+    "DESCRIPTION":"Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
+    "ID":"ID",
+    "NAME":"Name",
+    "STATE":"State",
+    "TIMEOUT":"Timeout",
+    "ALLOWEDTOFAIL":"Allowed To Fail",
+    "SCRIPT":"Script",
+    "DIALOG": {
+      "ADD": {
+        "TITLE":"Aktion erstellen"
+      }
+    }
+  },
   "IAM": {
     "POLICIES": {
       "TITLE": "IAM Administration",
@@ -665,7 +682,8 @@
       "LABELPOLICY":"Privatelabelling",
       "DOMAIN":"Organisations Domänen",
       "TEXTSANDLINKS":"Texte und Links",
-      "METADATA":"Metadata"
+      "METADATA":"Metadata",
+      "FLOWS":"Aktionen und Abläufe"
     },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
@@ -683,7 +701,8 @@
       "CUSTOMTEXTLOGIN": "Benutzerdefinierte Logininterface Texte",
       "CUSTOMTEXTMESSAGE":"Benutzerdefinierte Benachrichtigungstexte",
       "PRIVACYPOLICY":"Benutzerdefinierte Datenschutzrichtlinie und AGB",
-      "METADATAUSER":"User Metadata"
+      "METADATAUSER":"User Metadata",
+      "FLOWS":"Aktionen und Abläufe"
     },
     "TIERSTATES": {
       "0": "Aktiv",

@@ -166,6 +166,7 @@ export class FeaturesComponent implements OnDestroy {
         req.setPrivacyPolicy(this.features.privacyPolicy);
         req.setMetadataUser(this.features.metadataUser);
         req.setLockoutPolicy(this.features.lockoutPolicy);
+        req.setActions(this.features.actions);
 
         this.adminService.setOrgFeatures(req).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -190,6 +191,7 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setCustomTextMessage(this.features.customTextMessage);
         dreq.setMetadataUser(this.features.metadataUser);
         dreq.setLockoutPolicy(this.features.lockoutPolicy);
+        dreq.setActions(this.features.actions);
 
         this.adminService.setDefaultFeatures(dreq).then(() => {
           this.toast.showInfo('POLICY.TOAST.SET', true);

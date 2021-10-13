@@ -8,6 +8,7 @@ import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { IDPOwnerType } from '../proto/generated/zitadel/idp_pb';
 import {
+  ActionQuery,
   ActivateCustomLabelPolicyRequest,
   ActivateCustomLabelPolicyResponse,
   AddAPIAppRequest,
@@ -66,6 +67,8 @@ import {
   BulkRemoveUserGrantResponse,
   BulkSetUserMetadataRequest,
   BulkSetUserMetadataResponse,
+  CreateActionRequest,
+  CreateActionResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -78,8 +81,12 @@ import {
   DeactivateProjectResponse,
   DeactivateUserRequest,
   DeactivateUserResponse,
+  DeleteActionRequest,
+  DeleteActionResponse,
   GenerateOrgDomainValidationRequest,
   GenerateOrgDomainValidationResponse,
+  GetActionRequest,
+  GetActionResponse,
   GetAppByIDRequest,
   GetAppByIDResponse,
   GetCustomDomainClaimedMessageTextRequest,
@@ -165,6 +172,8 @@ import {
   GetUserMetadataRequest,
   GetUserMetadataResponse,
   IDPQuery,
+  ListActionsRequest,
+  ListActionsResponse,
   ListAppChangesRequest,
   ListAppChangesResponse,
   ListAppKeysRequest,
@@ -346,6 +355,8 @@ import {
   SetUserMetadataResponse,
   UnlockUserRequest,
   UnlockUserResponse,
+  UpdateActionRequest,
+  UpdateActionResponse,
   UpdateAPIAppConfigRequest,
   UpdateAPIAppConfigResponse,
   UpdateAppRequest,
@@ -872,6 +883,59 @@ export class ManagementService {
     }
     req.setQuery(metadata);
     return this.grpcService.mgmt.listHumanLinkedIDPs(req, null).then(resp => resp.toObject());
+  }
+
+  public getAction(
+    id: string,
+  ): Promise<GetActionResponse.AsObject> {
+    const req = new GetActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.getAction(req, null).then(resp => resp.toObject());
+  }
+
+  public createAction(
+    req: CreateActionRequest,
+  ): Promise<CreateActionResponse.AsObject> {
+    return this.grpcService.mgmt.createAction(req, null).then(resp => resp.toObject());
+  }
+
+  public updateAction(
+    req: UpdateActionRequest,
+  ): Promise<UpdateActionResponse.AsObject> {
+    return this.grpcService.mgmt.updateAction(req, null).then(resp => resp.toObject());
+  }
+
+  public deleteAction(
+    id: string,
+  ): Promise<DeleteActionResponse.AsObject> {
+    const req = new DeleteActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.deleteAction(req, null).then(resp => resp.toObject());
+  }
+
+  public listActions(
+    limit?: number,
+    offset?: number,
+    asc?: boolean,
+    queryList?: ActionQuery[],
+  ): Promise<ListActionsResponse.AsObject> {
+    const req = new ListActionsRequest();
+    const metadata = new ListQuery();
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (asc) {
+      metadata.setAsc(asc);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.mgmt.listActions(req, null).then(resp => resp.toObject());
   }
 
   public getIAM(): Promise<GetIAMResponse.AsObject> {

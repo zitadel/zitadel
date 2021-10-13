@@ -1,0 +1,22 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.desc {
+  color: var(--grey);
+  font-size: .9rem;
+}
+
+.script {
+  min-height: 200px;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+}

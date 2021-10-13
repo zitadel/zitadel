@@ -91,6 +91,7 @@
     "SHOWORGS": "Show All Organisations",
     "GRANTSECTION": "Authorization Section",
     "GRANTS": "Authorizations",
+    "ACTIONS":"Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "TOOLTIP": {
@@ -102,7 +103,8 @@
       "GRANTEDPROJECTS": "Show projects your organisation was granted access",
       "HUMANUSERS": "Show all registered human users on your organisation",
       "MACHINEUSERS": "Show service users of your organisation",
-      "AUTHZ": "Show authorizations available to your organisation users"
+      "AUTHZ": "Show authorizations available to your organisation users",
+      "ACTIONS":"Define scripts to execute on a certain event."
     }
   },
   "ACTIONS": {
@@ -515,6 +517,21 @@
       }
     }
   },
+  "FLOWS": {
+    "TITLE":"Actions and Flows",
+    "DESCRIPTION":"Define scripts to execute on a certain event.",
+    "ID":"ID",
+    "NAME":"Name",
+    "STATE":"State",
+    "TIMEOUT":"Timeout",
+    "ALLOWEDTOFAIL":"Allowed To Fail",
+    "SCRIPT":"Script",
+    "DIALOG": {
+      "ADD": {
+        "TITLE":"Create an Action"
+      }
+    }
+  },
   "IAM": {
     "POLICIES": {
       "TITLE": "IAM Policies and Access Settings",
@@ -665,7 +682,8 @@
       "LABELPOLICY":"Privatelabelling",
       "DOMAIN":"Organization Domain",
       "TEXTSANDLINKS":"Texts and Links",
-      "METADATA":"Metadata"
+      "METADATA":"Metadata",
+      "FLOWS":"Actions and Flows"
     },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
@@ -683,7 +701,8 @@
       "CUSTOMTEXTLOGIN": "Custom login interface texts",
       "CUSTOMTEXTMESSAGE":"Custom notification mail texts",
       "PRIVACYPOLICY":"Custom Privacy Policy and TOS Links",
-      "METADATAUSER":"User Metadata"
+      "METADATAUSER":"User Metadata",
+      "FLOWS":"Actions and Flows"
     },
     "TIERSTATES": {
       "0": "Active",
