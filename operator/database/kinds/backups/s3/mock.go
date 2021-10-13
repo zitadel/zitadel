@@ -1,4 +1,4 @@
-package bucket
+package s3
 
 import (
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -23,16 +23,38 @@ func SetInstantBackup(
 	k8sClient *kubernetesmock.MockClientInt,
 	namespace string,
 	backupName string,
-	labels map[string]string,
-	saJson string,
+	labelsAKID map[string]string,
+	labelsSAK map[string]string,
+	labelsST map[string]string,
+	akid, sak, st string,
 ) {
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      secretName,
+			Name:      accessKeyIDName,
 			Namespace: namespace,
-			Labels:    labels,
+			Labels:    labelsAKID,
 		},
-		StringData: map[string]string{secretKey: saJson},
+		StringData: map[string]string{accessKeyIDKey: akid},
+		Type:       "Opaque",
+	}).MinTimes(1).MaxTimes(1).Return(nil)
+
+	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      secretAccessKeyName,
+			Namespace: namespace,
+			Labels:    labelsSAK,
+		},
+		StringData: map[string]string{secretAccessKeyKey: sak},
+		Type:       "Opaque",
+	}).MinTimes(1).MaxTimes(1).Return(nil)
+
+	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      sessionTokenName,
+			Namespace: namespace,
+			Labels:    labelsST,
+		},
+		StringData: map[string]string{sessionTokenKey: st},
 		Type:       "Opaque",
 	}).MinTimes(1).MaxTimes(1).Return(nil)
 
@@ -45,16 +67,38 @@ func SetInstantBackup(
 func SetBackup(
 	k8sClient *kubernetesmock.MockClientInt,
 	namespace string,
-	labels map[string]string,
-	saJson string,
+	labelsAKID map[string]string,
+	labelsSAK map[string]string,
+	labelsST map[string]string,
+	akid, sak, st string,
 ) {
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      secretName,
+			Name:      accessKeyIDName,
 			Namespace: namespace,
-			Labels:    labels,
+			Labels:    labelsAKID,
 		},
-		StringData: map[string]string{secretKey: saJson},
+		StringData: map[string]string{accessKeyIDKey: akid},
+		Type:       "Opaque",
+	}).MinTimes(1).MaxTimes(1).Return(nil)
+
+	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      secretAccessKeyName,
+			Namespace: namespace,
+			Labels:    labelsSAK,
+		},
+		StringData: map[string]string{secretAccessKeyKey: sak},
+		Type:       "Opaque",
+	}).MinTimes(1).MaxTimes(1).Return(nil)
+
+	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      sessionTokenName,
+			Namespace: namespace,
+			Labels:    labelsST,
+		},
+		StringData: map[string]string{sessionTokenKey: st},
 		Type:       "Opaque",
 	}).MinTimes(1).MaxTimes(1).Return(nil)
 	k8sClient.EXPECT().ApplyCronJob(gomock.Any()).Times(1).Return(nil)
@@ -64,19 +108,40 @@ func SetRestore(
 	k8sClient *kubernetesmock.MockClientInt,
 	namespace string,
 	backupName string,
-	labels map[string]string,
-	saJson string,
+	labelsAKID map[string]string,
+	labelsSAK map[string]string,
+	labelsST map[string]string,
+	akid, sak, st string,
 ) {
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      secretName,
+			Name:      accessKeyIDName,
 			Namespace: namespace,
-			Labels:    labels,
+			Labels:    labelsAKID,
 		},
-		StringData: map[string]string{secretKey: saJson},
+		StringData: map[string]string{accessKeyIDKey: akid},
 		Type:       "Opaque",
 	}).MinTimes(1).MaxTimes(1).Return(nil)
 
+	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      secretAccessKeyName,
+			Namespace: namespace,
+			Labels:    labelsSAK,
+		},
+		StringData: map[string]string{secretAccessKeyKey: sak},
+		Type:       "Opaque",
+	}).MinTimes(1).MaxTimes(1).Return(nil)
+
+	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      sessionTokenName,
+			Namespace: namespace,
+			Labels:    labelsST,
+		},
+		StringData: map[string]string{sessionTokenKey: st},
+		Type:       "Opaque",
+	}).MinTimes(1).MaxTimes(1).Return(nil)
 	k8sClient.EXPECT().ApplyJob(gomock.Any()).Times(1).Return(nil)
 	k8sClient.EXPECT().GetJob(namespace, restore.GetJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, restore.GetJobName(backupName)))
 	k8sClient.EXPECT().WaitUntilJobCompleted(namespace, restore.GetJobName(backupName), gomock.Any()).Times(1).Return(nil)

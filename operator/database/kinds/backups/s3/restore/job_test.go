@@ -1,27 +1,29 @@
-package clean
+package restore
 
 import (
-	"testing"
-
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"testing"
 )
 
 func TestBackup_Job1(t *testing.T) {
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
+	image := "testVersion"
 	command := "test"
-	secretKey := "testKey"
-	secretName := "testSecretName"
+	accessKeyIDName := "testAKIN"
+	accessKeyIDKey := "testAKIK"
+	secretAccessKeyName := "testSAKN"
+	secretAccessKeyKey := "testSAKK"
+	sessionTokenName := "testSTN"
+	sessionTokenKey := "testSTK"
 	jobName := "testJob"
 	namespace := "testNs"
-	image := "testImage"
-
 	k8sLabels := map[string]string{
 		"app.kubernetes.io/component":  "testComponent",
 		"app.kubernetes.io/managed-by": "testOp",
@@ -58,11 +60,19 @@ func TestBackup_Job1(t *testing.T) {
 								Name:      internalSecretName,
 								MountPath: certPath,
 							}, {
-								Name:      secretKey,
-								SubPath:   secretKey,
-								MountPath: secretPath,
+								Name:      accessKeyIDKey,
+								SubPath:   accessKeyIDKey,
+								MountPath: accessKeyIDPath,
+							}, {
+								Name:      secretAccessKeyKey,
+								SubPath:   secretAccessKeyKey,
+								MountPath: secretAccessKeyPath,
+							}, {
+								Name:      sessionTokenKey,
+								SubPath:   sessionTokenKey,
+								MountPath: sessionTokenPath,
 							}},
-							ImagePullPolicy: corev1.PullAlways,
+							ImagePullPolicy: corev1.PullIfNotPresent,
 						}},
 						Volumes: []corev1.Volume{{
 							Name: internalSecretName,
@@ -73,10 +83,24 @@ func TestBackup_Job1(t *testing.T) {
 								},
 							},
 						}, {
-							Name: secretKey,
+							Name: accessKeyIDKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: secretName,
+									SecretName: accessKeyIDName,
+								},
+							},
+						}, {
+							Name: secretAccessKeyKey,
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: secretAccessKeyName,
+								},
+							},
+						}, {
+							Name: sessionTokenKey,
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: sessionTokenName,
 								},
 							},
 						}},
@@ -85,19 +109,36 @@ func TestBackup_Job1(t *testing.T) {
 			},
 		}
 
-	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image))
+	assert.Equal(t, equals, getJob(
+		namespace,
+		nameLabels,
+		nodeselector,
+		tolerations,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
+		image,
+		command,
+	))
 }
 
 func TestBackup_Job2(t *testing.T) {
 	nodeselector := map[string]string{"test2": "test2"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
+	image := "testVersion2"
 	command := "test2"
-	secretKey := "testKey2"
-	secretName := "testSecretName2"
+	accessKeyIDName := "testAKIN2"
+	accessKeyIDKey := "testAKIK2"
+	secretAccessKeyName := "testSAKN2"
+	secretAccessKeyKey := "testSAKK2"
+	sessionTokenName := "testSTN2"
+	sessionTokenKey := "testSTK2"
 	jobName := "testJob2"
 	namespace := "testNs2"
-	image := "testImage2"
 	k8sLabels := map[string]string{
 		"app.kubernetes.io/component":  "testComponent2",
 		"app.kubernetes.io/managed-by": "testOp2",
@@ -134,11 +175,19 @@ func TestBackup_Job2(t *testing.T) {
 								Name:      internalSecretName,
 								MountPath: certPath,
 							}, {
-								Name:      secretKey,
-								SubPath:   secretKey,
-								MountPath: secretPath,
+								Name:      accessKeyIDKey,
+								SubPath:   accessKeyIDKey,
+								MountPath: accessKeyIDPath,
+							}, {
+								Name:      secretAccessKeyKey,
+								SubPath:   secretAccessKeyKey,
+								MountPath: secretAccessKeyPath,
+							}, {
+								Name:      sessionTokenKey,
+								SubPath:   sessionTokenKey,
+								MountPath: sessionTokenPath,
 							}},
-							ImagePullPolicy: corev1.PullAlways,
+							ImagePullPolicy: corev1.PullIfNotPresent,
 						}},
 						Volumes: []corev1.Volume{{
 							Name: internalSecretName,
@@ -149,10 +198,24 @@ func TestBackup_Job2(t *testing.T) {
 								},
 							},
 						}, {
-							Name: secretKey,
+							Name: accessKeyIDKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: secretName,
+									SecretName: accessKeyIDName,
+								},
+							},
+						}, {
+							Name: secretAccessKeyKey,
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: secretAccessKeyName,
+								},
+							},
+						}, {
+							Name: sessionTokenKey,
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: sessionTokenName,
 								},
 							},
 						}},
@@ -161,5 +224,17 @@ func TestBackup_Job2(t *testing.T) {
 			},
 		}
 
-	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image))
+	assert.Equal(t, equals, getJob(
+		namespace,
+		nameLabels,
+		nodeselector,
+		tolerations,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
+		image,
+		command))
 }

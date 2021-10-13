@@ -14,18 +14,18 @@ import (
 )
 
 const (
-	defaultMode        int32 = 256
-	certPath                 = "/cockroach/cockroach-certs"
-	secretPath               = "/secrets/sa.json"
-	backupPath               = "/cockroach"
-	backupNameEnv            = "BACKUP_NAME"
-	saJsonBase64Env          = "SAJSON"
-	cronJobNamePrefix        = "backup-"
-	internalSecretName       = "client-certs"
-	rootSecretName           = "cockroachdb.client.root"
-	timeout                  = 45 * time.Minute
-	Normal                   = "backup"
-	Instant                  = "instantbackup"
+	defaultMode         int32 = 256
+	certPath                  = "/cockroach/cockroach-certs"
+	accessKeyIDPath           = "/secrets/accessaccountkey"
+	secretAccessKeyPath       = "/secrets/secretaccesskey"
+	sessionTokenPath          = "/secrets/sessiontoken"
+	backupNameEnv             = "BACKUP_NAME"
+	cronJobNamePrefix         = "backup-"
+	internalSecretName        = "client-certs"
+	rootSecretName            = "cockroachdb.client.root"
+	timeout                   = 15 * time.Minute
+	Normal                    = "backup"
+	Instant                   = "instantbackup"
 )
 
 func AdaptFunc(
@@ -36,8 +36,14 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	bucketName string,
 	cron string,
-	secretName string,
-	secretKey string,
+	accessKeyIDName string,
+	accessKeyIDKey string,
+	secretAccessKeyName string,
+	secretAccessKeyKey string,
+	sessionTokenName string,
+	sessionTokenKey string,
+	region string,
+	endpoint string,
 	timestamp string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
@@ -56,7 +62,11 @@ func AdaptFunc(
 		bucketName,
 		backupName,
 		certPath,
-		secretPath,
+		accessKeyIDPath,
+		secretAccessKeyPath,
+		sessionTokenPath,
+		region,
+		endpoint,
 		dbURL,
 		dbPort,
 	)
@@ -64,11 +74,15 @@ func AdaptFunc(
 	jobSpecDef := getJobSpecDef(
 		nodeselector,
 		tolerations,
-		secretName,
-		secretKey,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
 		backupName,
-		command,
 		image,
+		command,
 	)
 
 	destroyers := []operator.DestroyFunc{}

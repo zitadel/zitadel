@@ -1,6 +1,7 @@
-package clean
+package restore
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"testing"
 
 	"github.com/caos/orbos/mntr"
@@ -19,15 +20,23 @@ func TestBackup_Adapt1(t *testing.T) {
 
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
-	databases := []string{"testDb"}
-	users := []string{"testUser"}
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
-	backupName := "testName"
-	image := "testImage"
-	secretKey := "testKey"
-	secretName := "testSecretName"
+	timestamp := "testTs"
+	backupName := "testName2"
+	bucketName := "testBucket2"
+	version := "testVersion"
+	accessKeyIDName := "testAKIN"
+	accessKeyIDKey := "testAKIK"
+	secretAccessKeyName := "testSAKN"
+	secretAccessKeyKey := "testSAKK"
+	sessionTokenName := "testSTN"
+	sessionTokenKey := "testSTK"
+	region := "region"
+	endpoint := "endpoint"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "testVersion"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
@@ -41,13 +50,26 @@ func TestBackup_Adapt1(t *testing.T) {
 		nameLabels,
 		nodeselector,
 		tolerations,
-		secretName,
-		secretKey,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
+		common.BackupImage.Reference("", version),
 		getCommand(
-			databases,
-			users,
+			timestamp,
+			bucketName,
+			backupName,
+			certPath,
+			accessKeyIDPath,
+			secretAccessKeyPath,
+			sessionTokenPath,
+			region,
+			endpoint,
+			dbURL,
+			dbPort,
 		),
-		image,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -58,14 +80,22 @@ func TestBackup_Adapt1(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
-		users,
+		bucketName,
+		timestamp,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
+		region,
+		endpoint,
 		nodeselector,
 		tolerations,
 		checkDBReady,
-		secretName,
-		secretKey,
-		image,
+		dbURL,
+		dbPort,
+		common.BackupImage.Reference("", version),
 	)
 
 	assert.NoError(t, err)
@@ -80,15 +110,23 @@ func TestBackup_Adapt2(t *testing.T) {
 
 	monitor := mntr.Monitor{}
 	namespace := "testNs2"
-	databases := []string{"testDb1", "testDb2"}
-	users := []string{"testUser1", "testUser2"}
 	nodeselector := map[string]string{"test2": "test2"}
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
+	timestamp := "testTs"
 	backupName := "testName2"
-	image := "testImage2"
-	secretKey := "testKey2"
-	secretName := "testSecretName2"
+	bucketName := "testBucket2"
+	version := "testVersion2"
+	accessKeyIDName := "testAKIN2"
+	accessKeyIDKey := "testAKIK2"
+	secretAccessKeyName := "testSAKN2"
+	secretAccessKeyKey := "testSAKK2"
+	sessionTokenName := "testSTN2"
+	sessionTokenKey := "testSTK2"
+	region := "region2"
+	endpoint := "endpoint2"
+	dbURL := "testDB"
+	dbPort := int32(80)
 	jobName := GetJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent2")
 	nameLabels := labels.MustForName(componentLabels, jobName)
@@ -102,13 +140,26 @@ func TestBackup_Adapt2(t *testing.T) {
 		nameLabels,
 		nodeselector,
 		tolerations,
-		secretName,
-		secretKey,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
+		common.BackupImage.Reference("", version),
 		getCommand(
-			databases,
-			users,
+			timestamp,
+			bucketName,
+			backupName,
+			certPath,
+			accessKeyIDPath,
+			secretAccessKeyPath,
+			sessionTokenPath,
+			region,
+			endpoint,
+			dbURL,
+			dbPort,
 		),
-		image,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -119,14 +170,22 @@ func TestBackup_Adapt2(t *testing.T) {
 		backupName,
 		namespace,
 		componentLabels,
-		databases,
-		users,
+		bucketName,
+		timestamp,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
+		region,
+		endpoint,
 		nodeselector,
 		tolerations,
 		checkDBReady,
-		secretName,
-		secretKey,
-		image,
+		dbURL,
+		dbPort,
+		common.BackupImage.Reference("", version),
 	)
 
 	assert.NoError(t, err)

@@ -1,10 +1,7 @@
-package bucket
+package s3
 
 import (
 	"fmt"
-
-	corev1 "k8s.io/api/core/v1"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
@@ -14,13 +11,18 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
+	"github.com/caos/zitadel/operator/database/kinds/backups/s3/backup"
+	"github.com/caos/zitadel/operator/database/kinds/backups/s3/restore"
+	corev1 "k8s.io/api/core/v1"
 )
 
 const (
-	secretName = "backup-serviceaccountjson"
-	secretKey  = "serviceaccountjson"
+	accessKeyIDName     = "backup-accessaccountkey"
+	accessKeyIDKey      = "accessaccountkey"
+	secretAccessKeyName = "backup-secretaccesskey"
+	secretAccessKeyKey  = "secretaccesskey"
+	sessionTokenName    = "backup-sessiontoken"
+	sessionTokenKey     = "sessiontoken"
 )
 
 func AdaptFunc(
@@ -55,7 +57,7 @@ func AdaptFunc(
 
 		desiredKind, err := ParseDesiredV0(desired)
 		if err != nil {
-			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
+			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %s", err)
 		}
 		desired.Parsed = desiredKind
 
@@ -65,7 +67,17 @@ func AdaptFunc(
 			internalMonitor.Verbose()
 		}
 
-		destroyS, err := secret.AdaptFuncToDestroy(namespace, secretName)
+		destroySAKI, err := secret.AdaptFuncToDestroy(namespace, accessKeyIDName)
+		if err != nil {
+			return nil, nil, nil, nil, nil, false, err
+		}
+
+		destroySSAK, err := secret.AdaptFuncToDestroy(namespace, secretAccessKeyName)
+		if err != nil {
+			return nil, nil, nil, nil, nil, false, err
+		}
+
+		destroySSTK, err := secret.AdaptFuncToDestroy(namespace, sessionTokenName)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
@@ -80,8 +92,14 @@ func AdaptFunc(
 			checkDBReady,
 			desiredKind.Spec.Bucket,
 			desiredKind.Spec.Cron,
-			secretName,
-			secretKey,
+			accessKeyIDName,
+			accessKeyIDKey,
+			secretAccessKeyName,
+			secretAccessKeyKey,
+			sessionTokenName,
+			sessionTokenKey,
+			desiredKind.Spec.Region,
+			desiredKind.Spec.Endpoint,
 			timestamp,
 			nodeselector,
 			tolerations,
@@ -101,11 +119,17 @@ func AdaptFunc(
 			componentLabels,
 			desiredKind.Spec.Bucket,
 			timestamp,
+			accessKeyIDName,
+			accessKeyIDKey,
+			secretAccessKeyName,
+			secretAccessKeyKey,
+			sessionTokenName,
+			sessionTokenKey,
+			desiredKind.Spec.Region,
+			desiredKind.Spec.Endpoint,
 			nodeselector,
 			tolerations,
 			checkDBReady,
-			secretName,
-			secretKey,
 			dbURL,
 			dbPort,
 			image,
@@ -114,36 +138,16 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		/*_, destroyC, err := clean.AdaptFunc(
-			monitor,
-			name,
-			namespace,
-			componentLabels,
-			[]string{},
-			[]string{},
-			nodeselector,
-			tolerations,
-			checkDBReady,
-			secretName,
-			secretKey,
-			image,
-		)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}*/
-
 		destroyers := make([]operator.DestroyFunc, 0)
 		for _, feature := range features {
 			switch feature {
 			case backup.Normal, backup.Instant:
 				destroyers = append(destroyers,
-					operator.ResourceDestroyToZitadelDestroy(destroyS),
+					operator.ResourceDestroyToZitadelDestroy(destroySSAK),
+					operator.ResourceDestroyToZitadelDestroy(destroySAKI),
+					operator.ResourceDestroyToZitadelDestroy(destroySSTK),
 					destroyB,
 				)
-			/*case clean.Instant:
-			destroyers = append(destroyers,
-				destroyC,
-			)*/
 			case restore.Instant:
 				destroyers = append(destroyers,
 					destroyR,
@@ -157,12 +161,32 @@ func AdaptFunc(
 					return nil, err
 				}
 
-				value, err := read.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
+				valueAKI, err := read.GetSecretValue(k8sClient, desiredKind.Spec.AccessKeyID, desiredKind.Spec.ExistingAccessKeyID)
 				if err != nil {
 					return nil, err
 				}
 
-				queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), map[string]string{secretKey: value})
+				querySAKI, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, accessKeyIDName), map[string]string{accessKeyIDKey: valueAKI})
+				if err != nil {
+					return nil, err
+				}
+
+				valueSAK, err := read.GetSecretValue(k8sClient, desiredKind.Spec.SecretAccessKey, desiredKind.Spec.ExistingSecretAccessKey)
+				if err != nil {
+					return nil, err
+				}
+
+				querySSAK, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretAccessKeyName), map[string]string{secretAccessKeyKey: valueSAK})
+				if err != nil {
+					return nil, err
+				}
+
+				valueST, err := read.GetSecretValue(k8sClient, desiredKind.Spec.SessionToken, desiredKind.Spec.ExistingSessionToken)
+				if err != nil {
+					return nil, err
+				}
+
+				querySST, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, sessionTokenName), map[string]string{sessionTokenKey: valueST})
 				if err != nil {
 					return nil, err
 				}
@@ -175,8 +199,14 @@ func AdaptFunc(
 					checkDBReady,
 					desiredKind.Spec.Bucket,
 					desiredKind.Spec.Cron,
-					secretName,
-					secretKey,
+					accessKeyIDName,
+					accessKeyIDKey,
+					secretAccessKeyName,
+					secretAccessKeyKey,
+					sessionTokenName,
+					sessionTokenKey,
+					desiredKind.Spec.Region,
+					desiredKind.Spec.Endpoint,
 					timestamp,
 					nodeselector,
 					tolerations,
@@ -196,11 +226,17 @@ func AdaptFunc(
 					componentLabels,
 					desiredKind.Spec.Bucket,
 					timestamp,
+					accessKeyIDName,
+					accessKeyIDKey,
+					secretAccessKeyName,
+					secretAccessKeyKey,
+					sessionTokenName,
+					sessionTokenKey,
+					desiredKind.Spec.Region,
+					desiredKind.Spec.Endpoint,
 					nodeselector,
 					tolerations,
 					checkDBReady,
-					secretName,
-					secretKey,
 					dbURL,
 					dbPort,
 					image,
@@ -209,58 +245,39 @@ func AdaptFunc(
 					return nil, err
 				}
 
-				/*queryC, _, err := clean.AdaptFunc(
-					monitor,
-					name,
-					namespace,
-					componentLabels,
-					databases,
-					users,
-					nodeselector,
-					tolerations,
-					checkDBReady,
-					secretName,
-					secretKey,
-					image,
-				)
-				if err != nil {
-					return nil, err
-				}*/
-
 				queriers := make([]operator.QueryFunc, 0)
 				cleanupQueries := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
 					switch feature {
 					case backup.Normal:
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(queryS),
+							operator.ResourceQueryToZitadelQuery(querySAKI),
+							operator.ResourceQueryToZitadelQuery(querySSAK),
+							operator.ResourceQueryToZitadelQuery(querySST),
 							queryB,
 						)
 					case backup.Instant:
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(queryS),
+							operator.ResourceQueryToZitadelQuery(querySAKI),
+							operator.ResourceQueryToZitadelQuery(querySSAK),
+							operator.ResourceQueryToZitadelQuery(querySST),
 							queryB,
 						)
 						cleanupQueries = append(cleanupQueries,
 							operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
 						)
-					/*case clean.Instant:
-					queriers = append(queriers,
-						operator.ResourceQueryToZitadelQuery(queryS),
-						queryC,
-					)
-					cleanupQueries = append(cleanupQueries,
-						operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
-					)*/
 					case restore.Instant:
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(queryS),
+							operator.ResourceQueryToZitadelQuery(querySAKI),
+							operator.ResourceQueryToZitadelQuery(querySSAK),
+							operator.ResourceQueryToZitadelQuery(querySST),
 							queryR,
 						)
 						cleanupQueries = append(cleanupQueries,
 							operator.EnsureFuncToQueryFunc(restore.GetCleanupFunc(monitor, namespace, name)),
 						)
 					}
+
 				}
 
 				for _, cleanup := range cleanupQueries {

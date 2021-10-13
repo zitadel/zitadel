@@ -10,7 +10,11 @@ func getBackupCommand(
 	bucketName string,
 	backupName string,
 	certsFolder string,
-	serviceAccountPath string,
+	accessKeyIDPath string,
+	secretAccessKeyPath string,
+	sessionTokenPath string,
+	region string,
+	endpoint string,
 	dbURL string,
 	dbPort int32,
 ) string {
@@ -22,7 +26,15 @@ func getBackupCommand(
 		backupCommands = append(backupCommands, "export "+backupNameEnv+"=$(date +%Y-%m-%dT%H:%M:%SZ)")
 	}
 
-	backupCommands = append(backupCommands, "export "+saJsonBase64Env+"=$(cat "+serviceAccountPath+" | base64 | tr -d '\n' )")
+	parameters := []string{
+		"AWS_ACCESS_KEY_ID=$(cat " + accessKeyIDPath + ")",
+		"AWS_SECRET_ACCESS_KEY=$(cat " + secretAccessKeyPath + ")",
+		"AWS_SESSION_TOKEN=$(cat " + sessionTokenPath + ")",
+		"AWS_ENDPOINT=" + endpoint,
+	}
+	if region != "" {
+		parameters = append(parameters, "AWS_REGION="+region)
+	}
 
 	backupCommands = append(backupCommands,
 		strings.Join([]string{
@@ -32,7 +44,7 @@ func getBackupCommand(
 			"--host=" + dbURL,
 			"--port=" + strconv.Itoa(int(dbPort)),
 			"-e",
-			"\"BACKUP TO \\\"gs://" + bucketName + "/" + backupName + "/${" + backupNameEnv + "}?AUTH=specified&CREDENTIALS=${" + saJsonBase64Env + "}\\\";\"",
+			"\"BACKUP TO \\\"s3://" + bucketName + "/" + backupName + "/${" + backupNameEnv + "}?" + strings.Join(parameters, "&") + "\\\";\"",
 		}, " ",
 		),
 	)

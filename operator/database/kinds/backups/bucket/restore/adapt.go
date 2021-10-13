@@ -22,6 +22,7 @@ const (
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
 	timeout            = 45 * time.Minute
+	saJsonBase64Env    = "SAJSON"
 )
 
 func AdaptFunc(
@@ -29,7 +30,6 @@ func AdaptFunc(
 	backupName string,
 	namespace string,
 	componentLabels *labels.Component,
-	databases []string,
 	bucketName string,
 	timestamp string,
 	nodeselector map[string]string,
@@ -37,6 +37,8 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	secretName string,
 	secretKey string,
+	dbURL string,
+	dbPort int32,
 	image string,
 ) (
 	queryFunc operator.QueryFunc,
@@ -47,9 +49,12 @@ func AdaptFunc(
 	jobName := jobPrefix + backupName + jobSuffix
 	command := getCommand(
 		timestamp,
-		databases,
 		bucketName,
 		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
 	)
 
 	jobdef := getJob(
@@ -60,7 +65,8 @@ func AdaptFunc(
 		secretName,
 		secretKey,
 		command,
-		image)
+		image,
+	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
 	if err != nil {

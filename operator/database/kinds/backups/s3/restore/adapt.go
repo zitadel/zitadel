@@ -1,4 +1,4 @@
-package clean
+package restore
 
 import (
 	"time"
@@ -13,15 +13,17 @@ import (
 )
 
 const (
-	Instant            = "clean"
-	defaultMode        = int32(256)
-	certPath           = "/cockroach/cockroach-certs"
-	secretPath         = "/secrets/sa.json"
-	internalSecretName = "client-certs"
-	rootSecretName     = "cockroachdb.client.root"
-	jobPrefix          = "backup-"
-	jobSuffix          = "-clean"
-	timeout            = 60 * time.Second
+	Instant             = "restore"
+	defaultMode         = int32(256)
+	certPath            = "/cockroach/cockroach-certs"
+	accessKeyIDPath     = "/secrets/accessaccountkey"
+	secretAccessKeyPath = "/secrets/secretaccesskey"
+	sessionTokenPath    = "/secrets/sessiontoken"
+	jobPrefix           = "backup-"
+	jobSuffix           = "-restore"
+	internalSecretName  = "client-certs"
+	rootSecretName      = "cockroachdb.client.root"
+	timeout             = 15 * time.Minute
 )
 
 func AdaptFunc(
@@ -29,13 +31,21 @@ func AdaptFunc(
 	backupName string,
 	namespace string,
 	componentLabels *labels.Component,
-	databases []string,
-	users []string,
+	bucketName string,
+	timestamp string,
+	accessKeyIDName string,
+	accessKeyIDKey string,
+	secretAccessKeyName string,
+	secretAccessKeyKey string,
+	sessionTokenName string,
+	sessionTokenKey string,
+	region string,
+	endpoint string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	checkDBReady operator.EnsureFunc,
-	secretName string,
-	secretKey string,
+	dbURL string,
+	dbPort int32,
 	image string,
 ) (
 	queryFunc operator.QueryFunc,
@@ -43,20 +53,37 @@ func AdaptFunc(
 	err error,
 ) {
 
-	command := getCommand(databases, users)
+	jobName := jobPrefix + backupName + jobSuffix
+	command := getCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		accessKeyIDPath,
+		secretAccessKeyPath,
+		sessionTokenPath,
+		region,
+		endpoint,
+		dbURL,
+		dbPort,
+	)
 
-	jobDef := getJob(
+	jobdef := getJob(
 		namespace,
 		labels.MustForName(componentLabels, GetJobName(backupName)),
 		nodeselector,
 		tolerations,
-		secretName,
-		secretKey,
-		command,
+		accessKeyIDName,
+		accessKeyIDKey,
+		secretAccessKeyName,
+		secretAccessKeyKey,
+		sessionTokenName,
+		sessionTokenKey,
 		image,
+		command,
 	)
 
-	destroyJ, err := job.AdaptFuncToDestroy(jobDef.Namespace, jobDef.Name)
+	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -65,7 +92,7 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyJ),
 	}
 
-	queryJ, err := job.AdaptFuncToEnsure(jobDef)
+	queryJ, err := job.AdaptFuncToEnsure(jobdef)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -79,6 +106,7 @@ func AdaptFunc(
 			return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
+
 		nil
 }
 

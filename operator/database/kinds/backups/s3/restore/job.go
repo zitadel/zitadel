@@ -1,4 +1,4 @@
-package clean
+package restore
 
 import (
 	"github.com/caos/orbos/pkg/labels"
@@ -13,12 +13,16 @@ func getJob(
 	nameLabels *labels.Name,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	secretName string,
-	secretKey string,
-	command string,
+	accessKeyIDName string,
+	accessKeyIDKey string,
+	secretAccessKeyName string,
+	secretAccessKeyKey string,
+	sessionTokenName string,
+	sessionTokenKey string,
 	image string,
-) *batchv1.Job {
+	command string,
 
+) *batchv1.Job {
 	return &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      nameLabels.Name(),
@@ -43,11 +47,19 @@ func getJob(
 							Name:      internalSecretName,
 							MountPath: certPath,
 						}, {
-							Name:      secretKey,
-							SubPath:   secretKey,
-							MountPath: secretPath,
+							Name:      accessKeyIDKey,
+							SubPath:   accessKeyIDKey,
+							MountPath: accessKeyIDPath,
+						}, {
+							Name:      secretAccessKeyKey,
+							SubPath:   secretAccessKeyKey,
+							MountPath: secretAccessKeyPath,
+						}, {
+							Name:      sessionTokenKey,
+							SubPath:   sessionTokenKey,
+							MountPath: sessionTokenPath,
 						}},
-						ImagePullPolicy: corev1.PullAlways,
+						ImagePullPolicy: corev1.PullIfNotPresent,
 					}},
 					Volumes: []corev1.Volume{{
 						Name: internalSecretName,
@@ -58,10 +70,24 @@ func getJob(
 							},
 						},
 					}, {
-						Name: secretKey,
+						Name: accessKeyIDKey,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName: secretName,
+								SecretName: accessKeyIDName,
+							},
+						},
+					}, {
+						Name: secretAccessKeyKey,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName: secretAccessKeyName,
+							},
+						},
+					}, {
+						Name: sessionTokenKey,
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName: sessionTokenName,
 							},
 						},
 					}},
@@ -69,5 +95,4 @@ func getJob(
 			},
 		},
 	}
-
 }

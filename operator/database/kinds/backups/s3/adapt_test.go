@@ -1,4 +1,4 @@
-package bucket
+package s3
 
 import (
 	"testing"
@@ -19,7 +19,11 @@ import (
 func TestBucket_Secrets(t *testing.T) {
 	masterkey := "testMk"
 	features := []string{backup.Normal}
-	saJson := "testSA"
+	region := "testRegion"
+	endpoint := "testEndpoint"
+	akid := "testAKID"
+	sak := "testSAK"
+	st := "testST"
 
 	bucketName := "testBucket2"
 	cron := "testCron2"
@@ -42,11 +46,19 @@ func TestBucket_Secrets(t *testing.T) {
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: tree.NewCommon("databases.caos.ch/"+kind, kindVersion, false),
 		Spec: &Spec{
-			Verbose: true,
-			Cron:    cron,
-			Bucket:  bucketName,
-			ServiceAccountJSON: &secret.Secret{
-				Value: saJson,
+			Verbose:  true,
+			Cron:     cron,
+			Bucket:   bucketName,
+			Endpoint: endpoint,
+			Region:   region,
+			AccessKeyID: &secret.Secret{
+				Value: akid,
+			},
+			SecretAccessKey: &secret.Secret{
+				Value: sak,
+			},
+			SessionToken: &secret.Secret{
+				Value: st,
 			},
 		},
 	})
@@ -56,7 +68,9 @@ func TestBucket_Secrets(t *testing.T) {
 	}
 
 	allSecrets := map[string]string{
-		"serviceaccountjson": saJson,
+		"accesskeyid":     "testAKID",
+		"secretaccesskey": "testSAK",
+		"sessiontoken":    "testST",
 	}
 
 	_, _, _, secrets, existing, _, err := AdaptFunc(
@@ -89,7 +103,11 @@ func TestBucket_AdaptBackup(t *testing.T) {
 	masterkey := "testMk"
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	features := []string{backup.Normal}
-	saJson := "testSA"
+	region := "testRegion"
+	endpoint := "testEndpoint"
+	akid := "testAKID"
+	sak := "testSAK"
+	st := "testST"
 
 	dbURL := "testDB"
 	dbPort := int32(80)
@@ -99,10 +117,28 @@ func TestBucket_AdaptBackup(t *testing.T) {
 	namespace := "testNs2"
 
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "BucketBackup", "v0"), "testComponent")
-	k8sLabels := map[string]string{
+	k8sLabelsAKID := map[string]string{
 		"app.kubernetes.io/component":  "testComponent",
 		"app.kubernetes.io/managed-by": "testOp",
-		"app.kubernetes.io/name":       "backup-serviceaccountjson",
+		"app.kubernetes.io/name":       accessKeyIDName,
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
+	k8sLabelsSAK := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       secretAccessKeyName,
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
+	k8sLabelsST := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       sessionTokenName,
 		"app.kubernetes.io/part-of":    "testProd",
 		"app.kubernetes.io/version":    "testVersion",
 		"caos.ch/apiversion":           "v0",
@@ -118,11 +154,19 @@ func TestBucket_AdaptBackup(t *testing.T) {
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
-			Verbose: true,
-			Cron:    cron,
-			Bucket:  bucketName,
-			ServiceAccountJSON: &secret.Secret{
-				Value: saJson,
+			Verbose:  true,
+			Cron:     cron,
+			Bucket:   bucketName,
+			Endpoint: endpoint,
+			Region:   region,
+			AccessKeyID: &secret.Secret{
+				Value: akid,
+			},
+			SecretAccessKey: &secret.Secret{
+				Value: sak,
+			},
+			SessionToken: &secret.Secret{
+				Value: st,
 			},
 		},
 	})
@@ -131,7 +175,7 @@ func TestBucket_AdaptBackup(t *testing.T) {
 		return nil
 	}
 
-	SetBackup(client, namespace, k8sLabels, saJson)
+	SetBackup(client, namespace, k8sLabelsAKID, k8sLabelsSAK, k8sLabelsST, akid, sak, st)
 
 	query, _, _, _, _, _, err := AdaptFunc(
 		backupName,
@@ -174,10 +218,28 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 	dbPort := int32(80)
 
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "BucketBackup", "v0"), "testComponent")
-	k8sLabels := map[string]string{
+	k8sLabelsAKID := map[string]string{
 		"app.kubernetes.io/component":  "testComponent",
 		"app.kubernetes.io/managed-by": "testOp",
-		"app.kubernetes.io/name":       "backup-serviceaccountjson",
+		"app.kubernetes.io/name":       accessKeyIDName,
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
+	k8sLabelsSAK := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       secretAccessKeyName,
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
+	k8sLabelsST := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       sessionTokenName,
 		"app.kubernetes.io/part-of":    "testProd",
 		"app.kubernetes.io/version":    "testVersion",
 		"caos.ch/apiversion":           "v0",
@@ -189,16 +251,28 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	version := "testVersion"
-	saJson := "testSA"
+	region := "testRegion"
+	endpoint := "testEndpoint"
+	akid := "testAKID"
+	sak := "testSAK"
+	st := "testST"
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
-			Verbose: true,
-			Cron:    cron,
-			Bucket:  bucketName,
-			ServiceAccountJSON: &secret.Secret{
-				Value: saJson,
+			Verbose:  true,
+			Cron:     cron,
+			Bucket:   bucketName,
+			Endpoint: endpoint,
+			Region:   region,
+			AccessKeyID: &secret.Secret{
+				Value: akid,
+			},
+			SecretAccessKey: &secret.Secret{
+				Value: sak,
+			},
+			SessionToken: &secret.Secret{
+				Value: st,
 			},
 		},
 	})
@@ -207,7 +281,7 @@ func TestBucket_AdaptInstantBackup(t *testing.T) {
 		return nil
 	}
 
-	SetInstantBackup(client, namespace, backupName, k8sLabels, saJson)
+	SetInstantBackup(client, namespace, backupName, k8sLabelsAKID, k8sLabelsSAK, k8sLabelsST, akid, sak, st)
 
 	query, _, _, _, _, _, err := AdaptFunc(
 		backupName,
@@ -248,10 +322,28 @@ func TestBucket_AdaptRestore(t *testing.T) {
 	namespace := "testNs"
 
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "BucketBackup", "v0"), "testComponent")
-	k8sLabels := map[string]string{
+	k8sLabelsAKID := map[string]string{
 		"app.kubernetes.io/component":  "testComponent",
 		"app.kubernetes.io/managed-by": "testOp",
-		"app.kubernetes.io/name":       "backup-serviceaccountjson",
+		"app.kubernetes.io/name":       accessKeyIDName,
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
+	k8sLabelsSAK := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       secretAccessKeyName,
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
+	k8sLabelsST := map[string]string{
+		"app.kubernetes.io/component":  "testComponent",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       sessionTokenName,
 		"app.kubernetes.io/part-of":    "testProd",
 		"app.kubernetes.io/version":    "testVersion",
 		"caos.ch/apiversion":           "v0",
@@ -264,18 +356,30 @@ func TestBucket_AdaptRestore(t *testing.T) {
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	version := "testVersion"
-	saJson := "testSA"
+	region := "testRegion"
+	endpoint := "testEndpoint"
+	akid := "testAKID"
+	sak := "testSAK"
+	st := "testST"
 	dbURL := "testDB"
 	dbPort := int32(80)
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
 		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
 		Spec: &Spec{
-			Verbose: true,
-			Cron:    cron,
-			Bucket:  bucketName,
-			ServiceAccountJSON: &secret.Secret{
-				Value: saJson,
+			Verbose:  true,
+			Cron:     cron,
+			Bucket:   bucketName,
+			Endpoint: endpoint,
+			Region:   region,
+			AccessKeyID: &secret.Secret{
+				Value: akid,
+			},
+			SecretAccessKey: &secret.Secret{
+				Value: sak,
+			},
+			SessionToken: &secret.Secret{
+				Value: st,
 			},
 		},
 	})
@@ -284,7 +388,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 		return nil
 	}
 
-	SetRestore(client, namespace, backupName, k8sLabels, saJson)
+	SetRestore(client, namespace, backupName, k8sLabelsAKID, k8sLabelsSAK, k8sLabelsST, akid, sak, st)
 
 	query, _, _, _, _, _, err := AdaptFunc(
 		backupName,
@@ -347,7 +451,10 @@ func TestBucket_AdaptClean(t *testing.T) {
 	dbPort := int32(80)
 
 	desired := getDesiredTree(t, masterkey, &DesiredV0{
-		Common: tree.NewCommon("databases.caos.ch/BucketBackup", "v0", false),
+		Common: &tree.Common{
+			Kind:    "databases.caos.ch/BucketBackup",
+			Version: "v0",
+		},
 		Spec: &Spec{
 			Verbose: true,
 			Cron:    cron,
@@ -376,7 +483,6 @@ func TestBucket_AdaptClean(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		"",
 	)(
 		monitor,
 		desired,

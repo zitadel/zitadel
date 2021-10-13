@@ -49,11 +49,15 @@ func getJob(
 func getJobSpecDef(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	secretName string,
-	secretKey string,
+	accessKeyIDName string,
+	accessKeyIDKey string,
+	secretAccessKeyName string,
+	secretAccessKeyKey string,
+	sessionTokenName string,
+	sessionTokenKey string,
 	backupName string,
-	command string,
 	image string,
+	command string,
 ) batchv1.JobSpec {
 	return batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -73,9 +77,17 @@ func getJobSpecDef(
 						Name:      internalSecretName,
 						MountPath: certPath,
 					}, {
-						Name:      secretKey,
-						SubPath:   secretKey,
-						MountPath: secretPath,
+						Name:      accessKeyIDKey,
+						SubPath:   accessKeyIDKey,
+						MountPath: accessKeyIDPath,
+					}, {
+						Name:      secretAccessKeyKey,
+						SubPath:   secretAccessKeyKey,
+						MountPath: secretAccessKeyPath,
+					}, {
+						Name:      sessionTokenKey,
+						SubPath:   sessionTokenKey,
+						MountPath: sessionTokenPath,
 					}},
 					ImagePullPolicy: corev1.PullIfNotPresent,
 				}},
@@ -88,10 +100,24 @@ func getJobSpecDef(
 						},
 					},
 				}, {
-					Name: secretKey,
+					Name: accessKeyIDKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretName,
+							SecretName: accessKeyIDName,
+						},
+					},
+				}, {
+					Name: secretAccessKeyKey,
+					VolumeSource: corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName: secretAccessKeyName,
+						},
+					},
+				}, {
+					Name: sessionTokenKey,
+					VolumeSource: corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName: sessionTokenName,
 						},
 					},
 				}},
