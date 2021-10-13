@@ -44,6 +44,10 @@
   --ifm-color-info-dark: #6c8eef;
   --ifm-color-info-contrast-background: #f0f3fa;
   --ifm-color-secondary-contrast-background: #f0f3fa;
+  --ifm-alert-background-color-highlight: #620e0e;
+  --ifm-color-warning-dark: #ffc1c1;
+  --ifm-color-warning-contrast-background: #ffc1c1;
+  --ifm-color-warning-contrast-foreground: #620e0e;
 }
 
 .react-toggle-track {
@@ -167,6 +171,10 @@ h2 {
   --ifm-table-stripe-background: #3c4257;
   --ifm-color-secondary-contrast-background: #3c4257;
   --ifm-code-background: #3c4257;
+  --ifm-alert-background-color-highlight: #ffc1c1;
+  --ifm-color-warning-dark: #4f566b;
+  --ifm-color-warning-contrast-background: #4f566b;
+  --ifm-color-warning-contrast-foreground: #ffc1c1;
 }
 
 .menu li li a {
