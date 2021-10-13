@@ -1,14 +1,11 @@
 import { apiAuth } from "../../support/api/apiauth";
+import { ensureHumanUserExists, ensureUserDoesntExist } from "../../support/api/users";
 import { login, User } from "../../support/login/users";
 
 describe('humans', () => {
 
     const humansPath = `${Cypress.env('consoleUrl')}/users/list/humans`
     const testHumanUserName = 'e2ehumanusername'
-    const testHumanFirstName = 'e2ehumanfirstname'
-    const testHumanLastName = 'e2ehumanlastname'
-    const testHumanEmail = `e2ehuman@${Cypress.env('apiCallsDomain')}`
-    const testHumanPhone = '+41 123456789'    
 
     ;[User.OrgOwner].forEach(user => {
 
@@ -23,36 +20,19 @@ describe('humans', () => {
             describe('add', () => {
                 before(`ensure it doesn't exist already`, () => {
                     apiAuth().then(apiCallProperties => {
-                        cy.request({
-                            method: 'POST',
-                            url: `${apiCallProperties.mgntBaseURL}users/_search`,
-                            headers: {
-                                Authorization: apiCallProperties.authHeader
-                            },
-                        }).then(usersRes => {
-                            var humanUser = usersRes.body.result.find(user => user.userName === testHumanUserName)
-                            if (humanUser) {
-                                cy.request({
-                                    method: 'DELETE',
-                                    url: `${apiCallProperties.mgntBaseURL}users/${humanUser.id}`,
-                                    headers: {
-                                        Authorization: apiCallProperties.authHeader
-                                    },
-                                })
-                            }
-                        })
+                        ensureUserDoesntExist(apiCallProperties, testHumanUserName)
                     })
                 })
 
                 it('should add a user', () => {
                     cy.contains('a', 'New').click()
                     cy.url().should('contain', 'users/create')
-                    cy.get('[formcontrolname^=email]').type(testHumanEmail)
+                    cy.get('[formcontrolname^=email]').type(`e2ehuman@${Cypress.env('apiCallsDomain')}`)
                     //force needed due to the prefilled username prefix
                     cy.get('[formcontrolname^=userName]').type(testHumanUserName, {force: true})
-                    cy.get('[formcontrolname^=firstName]').type(testHumanFirstName)
-                    cy.get('[formcontrolname^=lastName]').type(testHumanLastName)
-                    cy.get('[formcontrolname^=phone]').type(testHumanPhone)
+                    cy.get('[formcontrolname^=firstName]').type('e2ehumanfirstname')
+                    cy.get('[formcontrolname^=lastName]').type('e2ehumanlastname')
+                    cy.get('[formcontrolname^=phone]').type('+41 123456789')
                     cy.get('button').filter(':contains("Create")').should('be.visible').click()
                     cy.contains('User created successfully')
                     cy.visit(humansPath);
@@ -62,31 +42,8 @@ describe('humans', () => {
             
             describe('remove', () => {
                 before('ensure it exists', () => {
-                    apiAuth().then(apiCallProperties => {
-                        cy.request({
-                            method: 'POST',
-                            url: `${apiCallProperties.mgntBaseURL}users/human`,
-                            headers: {
-                                Authorization: apiCallProperties.authHeader
-                            },
-                            body: {
-                                user_name: testHumanUserName,
-                                profile: {
-                                    first_name: testHumanFirstName,
-                                    last_name: testHumanLastName,
-                                },
-                                email: { 
-                                    email: testHumanEmail,
-                                },
-                                phone: {
-                                    phone: testHumanPhone,
-                                },
-                            },
-                            failOnStatusCode: false,
-                            followRedirect: false
-                        }).then(res => {
-                            expect(res.status).to.be.oneOf([200,409])
-                        })
+                    apiAuth().then(api => {
+                        ensureHumanUserExists(api, testHumanUserName)
                     })                    
                 })
 

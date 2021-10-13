@@ -1,6 +1,5 @@
 import { login, User } from "../../support/login/users";
-import { ensureProjectExists } from "../../support/api/projects";
-import { ensureAppDoesntExist } from "../../support/api/applications";
+import { Apps, ensureProjectExists, ensureProjectResourceDoesntExist } from "../../support/api/projects";
 import { apiAuth } from "../../support/api/apiauth";
 
 describe('applications', () => {
@@ -16,7 +15,7 @@ describe('applications', () => {
                 login(user)
                 apiAuth().then(api => {
                     ensureProjectExists(api, testProjectName).then(projectID => {
-                        ensureAppDoesntExist(api, projectID, testAppName).then(() => {
+                        ensureProjectResourceDoesntExist(api, projectID, Apps, testAppName).then(() => {
                             cy.visit(`${Cypress.env('consoleUrl')}/projects/${projectID}`)
                         })
                     })
@@ -42,7 +41,7 @@ describe('applications', () => {
                 //TODO: check client ID/Secret
                 cy.get('button').filter(':contains("Close")').should('exist').click()
                 cy.contains('arrow_back').click()
-                cy.get('[data-e2e=app-card]').contains(testAppName)
+                cy.contains('[data-e2e=app-card]', testAppName)
             })
         })
     }) 

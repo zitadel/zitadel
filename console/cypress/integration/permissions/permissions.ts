@@ -1,39 +1,57 @@
-import { apiAuth } from "../../support/api/apiauth";
-import { ensureProjectExists } from "../../support/api/projects";
+import { apiAuth, apiCallProperties } from "../../support/api/apiauth";
+import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from "../../support/api/projects";
 import { login, User } from "../../support/login/users";
 
-describe('permissions', () => {
+describe.only('permissions', () => {
 
     const testProjectName = 'e2eprojectpermission'
-    const testRoleName = 'e2eroleundertest'
+    const testAppName = 'e2eapppermission'
+    const testRoleName = 'e2eroleundertestname'
+    const testRoleDisplay = 'e2eroleundertestdisplay'
+    const testRoleGroup = 'e2eroleundertestgroup'
     const testGrantName = 'e2egrantundertest'
 
     ;[User.OrgOwner].forEach(user => {
 
         describe(`as user "${user}"`, () => {
 
-            describe('add role', () => {
+            var api: apiCallProperties
+            var projectId: number
 
-                before(()=> {
-                    login(user)
-                    apiAuth().then(api => {
-                        ensureProjectExists(api, testProjectName).then(projectID => {
-                            ensureRoleDoesntExist(api, projectID, testAppName).then(() => {
-                                cy.visit(`${Cypress.env('consoleUrl')}/projects/${projectID}`)
-                            })
-                        })
+            beforeEach(() => {
+                login(user)
+                apiAuth().then(apiCalls => {
+                    api = apiCalls
+                    ensureProjectExists(apiCalls, testProjectName).then(projId => {
+                        projectId = projId
+                        cy.visit(`${Cypress.env('consoleUrl')}/projects/${projId}`)
                     })
+                })
+            })
 
-    //                cy.consolelogin(`${user.toLowerCase()}_user_name@caos-demo.${Cypress.env('domain')}`, Cypress.env(`${user.toLowerCase()}_password`))
-                    cy.visit(Cypress.env('consoleUrl') + '/projects')
-                    // wait until table is loaded
-                    cy.contains("tr", "cypress").contains("e2e")
+
+            describe('add role', () => {
+                beforeEach(()=> {
+                    ensureProjectResourceDoesntExist(api, projectId, Roles, testRoleName)
+                })
+
+                it.only('should add a role', () => {
+                    cy.contains('[data-e2e=app-card]', 'Roles').within(() => {
+                        cy.contains('a', 'New').click()
+                    })
+//                    cy.then(() => cy.visit(Cypress.env('consoleUrl') + '/projects/' + projectId +'/roles/create'))
+                    cy.get('[formcontrolname^=key]').type(testRoleName)
+                    cy.get('[formcontrolname^=displayName]').type(testRoleDisplay)
+                    cy.get('[formcontrolname^=group]').type(testRoleGroup)
+                    cy.contains('button', 'Save').should('be.visible').click()
+                    //let the Role get processed
+                    cy.wait(5000)
                 })
             })
         })
     })
 })
-
+/*
 
 describe('permissions', () => {
 
@@ -101,3 +119,4 @@ describe('permissions', () => {
     })
 })
 
+*/
