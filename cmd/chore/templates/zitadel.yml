@@ -2,7 +2,7 @@ kind: zitadel.caos.ch/Orb
 version: v0
 spec:
   verbose: false
-  version: operator-e2e
+  version: ${ZITADEL_E2E_SHA}
   selfReconciling: true
 iam:
   kind: zitadel.caos.ch/ZITADEL
@@ -65,7 +65,7 @@ iam:
         location: us-east-1
         bucketPrefix: zitadel-dev-assets
         ssl: false
-      sentry: {}
+      sentry: { }
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:

@@ -17,7 +17,7 @@ spec:
             - -c
             - |-
               cockroach sql --certs-dir=/cockroach/cockroach-certs --user=${ZITADEL_E2E_DBUSER} --host=${ZITADEL_E2E_DBHOST} --port=${ZITADEL_E2E_DBPORT} -e "SHOW DATABASES;" && exit 1 || exit 0
-          image: ghcr.io/caos/zitadel-crbackup:${ZITADEL_E2E_TAG}
+          image: ghcr.io/caos/zitadel-crbackup:${ZITADEL_E2E_SHA}
           imagePullPolicy: Always
           name: bucket
           resources: { }

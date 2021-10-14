@@ -2,7 +2,7 @@ kind: databases.caos.ch/Orb
 version: v0
 spec:
   verbose: false
-  version: operator-e2e
+  version: ${ZITADEL_E2E_SHA}
   selfReconciling: true
 database:
   kind: databases.caos.ch/CockroachDB
