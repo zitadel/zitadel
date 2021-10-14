@@ -523,13 +523,33 @@
     "ID":"ID",
     "NAME":"Name",
     "STATE":"State",
+    "STATES": {
+      "0": "no status",
+      "1": "inactive",
+      "2": "active"
+    },
+    "TYPES": {
+      "0": "Unspecified Type",
+      "1": "External Authentication"
+    },
+    "TRIGGERTYPES":  {
+      "1": "Post Authentication",
+      "2": "Pre Creation",
+      "3": "Post Creation"
+    },
     "TIMEOUT":"Timeout",
     "TIMEOUTINSEC":"Timout in seconds",
     "ALLOWEDTOFAIL":"Allowed To Fail",
     "SCRIPT":"Script",
+    "FLOWTYPE":"Flow Type",
+    "TRIGGERTYPE":"Trigger Type",
+    "ACTIONS":"Actions",
     "DIALOG": {
       "ADD": {
         "TITLE":"Create an Action"
+      },
+      "UPDATE": {
+        "TITLE":"Update Action"
       }
     }
   },

@@ -7,3 +7,28 @@ h1 {
   margin-bottom: 2rem;
   font-size: 14px;
 }
+
+.flow {
+  display: flex;
+  flex-direction: column;
+
+  .trigger {
+    padding: 1rem;
+    border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    background: var(--color-main);
+    color: white;
+
+    .icon {
+      margin-right: 1rem;
+    }
+  }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    margin: 1rem 0;
+  }
+}

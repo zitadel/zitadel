@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
-import { Action } from 'src/app/proto/generated/zitadel/action_pb';
+import { Action, ActionState } from 'src/app/proto/generated/zitadel/action_pb';
 import { CreateActionRequest, ListActionsResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -29,6 +29,7 @@ export class ActionTableComponent implements OnInit {
 
   @Output() public changedSelection: EventEmitter<Array<Action.AsObject>> = new EventEmitter();
 
+  public ActionState: any = ActionState;
   constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
     private toast: ToastService) {
     this.selection.changed.subscribe(() => {
@@ -68,9 +69,28 @@ export class ActionTableComponent implements OnInit {
     });
   }
 
-  public openAddKey(): void {
+  public openAddAction(): void {
     const dialogRef = this.dialog.open(AddActionDialogComponent, {
       data: {},
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((req: CreateActionRequest) => {
+      if (req) {
+        this.mgmtService.createAction(req).then(resp => {
+          this.refreshPage();
+        }).catch((error: any) => {
+          this.toast.showError(error);
+        });
+      }
+    });
+  }
+
+  public openDialog(action: Action.AsObject): void {
+    const dialogRef = this.dialog.open(AddActionDialogComponent, {
+      data: {
+        action: action,
+      },
       width: '400px',
     });
 
