@@ -12,16 +12,35 @@ h1 {
   display: flex;
   flex-direction: column;
 
-  .trigger {
+  .flow-type {
     padding: 1rem;
+    margin: .5rem 0;
     border-radius: .5rem;
-    display: flex;
-    align-items: center;
-    background: var(--color-main);
-    color: white;
+  }
 
-    .icon {
-      margin-right: 1rem;
+  .trigger-wrapper {
+    padding-left: 100px;
+
+    .trigger {
+      padding: 1rem;
+      border-radius: .5rem;
+      display: flex;
+      align-items: center;
+      background: var(--color-main);
+      color: white;
+      margin: .5rem 0;
+
+      .icon {
+        margin-right: 1rem;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .action {
+        font-size: 14px;
+      }
     }
   }
 

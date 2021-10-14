@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
+import { Action, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -22,6 +22,8 @@ export class ActionsComponent implements OnInit {
   public typesForSelection: FlowType[] = [
     FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION,
   ];
+
+  public selection: Action.AsObject[] = [];
   
   constructor(
     private mgmtService: ManagementService,
@@ -43,10 +45,12 @@ export class ActionsComponent implements OnInit {
   }
 
   public openAddTrigger(): void {
+    console.log(this.selection)
     const dialogRef = this.dialog.open(AddFlowDialogComponent, {
       data: {
         flowType: this.flowType,
         triggerType: TriggerType.TRIGGER_TYPE_POST_AUTHENTICATION,
+        actions: (this.selection && this.selection.length) ? this.selection : [],
       },
       width: '400px',
     });

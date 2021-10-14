@@ -31,21 +31,16 @@ export class AddFlowDialogComponent {
       public dialogRef: MatDialogRef<AddFlowDialogComponent>,
       @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-      if (data && data.actionIds) {
-        this.actions = data.actionIds;
-      }
-
       this.form = this.fb.group({
         flowType: [data.flowType ? data.flowType : '', [Validators.required]],
         triggerType: [data.triggerType ? data.triggerType : '', [Validators.required]],
-        actionIdsList: [this.actions, [Validators.required]],
+        actionIdsList: [data.actions ? (data.actions as Action.AsObject[]).map(a => a.id) : [], [Validators.required]],
       });
-
       this.getActionIds();
     }
 
-    private getActionIds(): void {
-      this.mgmtService.listActions().then(resp => {
+    private getActionIds(): Promise<void> {
+      return this.mgmtService.listActions().then(resp => {
         this.actions = resp.resultList;
       }).catch((error: any) => {
         this.toast.showError(error);

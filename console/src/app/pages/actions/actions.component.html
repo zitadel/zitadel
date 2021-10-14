@@ -1,7 +1,7 @@
 <div class="enlarged-container">
   <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
   <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
-  <cnsl-action-table></cnsl-action-table>
+  <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
 
   <div *ngIf="flow" class="flow">
     <cnsl-form-field class="formfield" appearance="outline">
@@ -13,17 +13,22 @@
       </mat-select>
     </cnsl-form-field>
 
-    <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
-
-    <div *ngFor="let trigger of flow.triggerActionsList" class="trigger">
-      <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon las la-exchange-alt"></mat-icon>
-      <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
-      <span></span>
+    <div class="flow-type mat-elevation-z1">
+      <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
     </div>
 
-    <button class="add-btn" mat-raised-button (click)="openAddTrigger()">
-      <span>{{'ACTIONS.NEW' | translate}}</span>
-      <mat-icon>add</mat-icon>
-    </button>
+    <div class="trigger-wrapper">
+      <div *ngFor="let trigger of flow.triggerActionsList" class="trigger mat-elevation-z1">
+        <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
+        <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
+        <span class="fill-space"></span>
+        <span class="action" *ngFor="let action of trigger.actionsList">{{action.name}}</span>
+      </div>
+
+      <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
+        <span>{{'ACTIONS.NEW' | translate}}</span>
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
   </div>
 </div>
