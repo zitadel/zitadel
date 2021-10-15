@@ -19,7 +19,6 @@ module.exports = {
             items: ['quickstarts/call-zitadel-api/go', 'quickstarts/call-zitadel-api/dot-net'],
             collapsed: false,
         },
-        'quickstarts/libs',
         {
             type: 'category',
             label: 'Identity Aware Proxy',
