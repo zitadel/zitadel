@@ -180,6 +180,11 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-right-bottom.svg'),
     );
 
+    this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_decision',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
+    );
+
     this.activatedRoute.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(route => {

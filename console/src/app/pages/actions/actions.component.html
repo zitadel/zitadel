@@ -1,7 +1,18 @@
 <div class="enlarged-container">
   <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
   <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
+
+  <div class="title-section">
+    <h2>{{'FLOWS.ACTIONSTITLE' | translate}}</h2>
+    <i class="las la-code"></i>
+  </div>
+
   <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
+
+  <div class="title-section">
+    <h2>{{'FLOWS.FLOWSTITLE' | translate}}</h2>
+    <i class="las la-exchange-alt"></i>
+  </div>
 
   <div *ngIf="flow" class="flow">
     <cnsl-form-field class="formfield" appearance="outline">
@@ -13,8 +24,11 @@
       </mat-select>
     </cnsl-form-field>
 
-    <div class="flow-type mat-elevation-z1">
-      <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
+    <div class="topelements">
+      <div class="flow-type mat-elevation-z1">
+        <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
+        <button (click)="clearFlow()" color="warn" mat-raised-button>{{'ACTIONS.CLEAR' | translate}}</button>
+      </div>
     </div>
 
     <div class="trigger-wrapper">
@@ -22,8 +36,15 @@
         <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
         <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
         <span class="fill-space"></span>
-        <span class="action" *ngFor="let action of trigger.actionsList">{{action.name}}</span>
+        <div class="action-wrapper">
+          <div class="action" *ngFor="let action of trigger.actionsList">
+            <i class="las la-code"></i>
+            <span>{{action.name}}</span>
+          </div>
+        </div>
       </div>
+
+      <div class="topbottomline"></div>
 
       <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
         <span>{{'ACTIONS.NEW' | translate}}</span>

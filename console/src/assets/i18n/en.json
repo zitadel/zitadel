@@ -520,6 +520,8 @@
   "FLOWS": {
     "TITLE":"Actions and Flows",
     "DESCRIPTION":"Define scripts to execute on a certain event.",
+    "ACTIONSTITLE":"Actions",
+    "FLOWSTITLE":"Flows",
     "ID":"ID",
     "NAME":"Name",
     "STATE":"State",
@@ -550,6 +552,14 @@
       },
       "UPDATE": {
         "TITLE":"Update Action"
+      },
+      "DELETEACTION": {
+        "TITLE":"Delete Action?",
+        "DESCRIPTION":"You are about to delete an action. This cannot be reverted. Are you sure?"
+      },
+      "CLEAR": {
+        "TITLE":"Clear flow?",
+        "DESCRIPTION":"You are about to reset the flow along with its triggers and actions. This change cannot be restored. Are you sure?"
       }
     }
   },

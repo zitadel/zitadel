@@ -520,6 +520,8 @@
   "FLOWS": {
     "TITLE":"Aktionen und Abläufe",
     "DESCRIPTION":"Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
+    "ACTIONSTITLE":"Aktionen",
+    "FLOWSTITLE":"Abläufe",
     "ID":"ID",
     "NAME":"Name",
     "STATE":"State",
@@ -550,6 +552,14 @@
       },
       "UPDATE": {
         "TITLE":"Aktion bearbeiten"
+      },
+      "DELETEACTION": {
+        "TITLE":"Aktion löschen?",
+        "DESCRIPTION":"Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?"
+      },
+      "CLEAR": {
+        "TITLE":"Flow zurücksetzen?",
+        "DESCRIPTION":"Sie sind im Begriff den Flow mitsamt seinen Triggern und Aktionen zurückzusetzen. Diese Änderung kann nicht wiederhergestellt werden."
       }
     }
   },

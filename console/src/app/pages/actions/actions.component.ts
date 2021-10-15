@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -42,6 +43,28 @@ export class ActionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  public clearFlow(): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.CLEAR',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'FLOWS.DIALOG.CLEAR.TITLE',
+          descriptionKey: 'FLOWS.DIALOG.CLEAR.DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe(resp => {
+          if (resp) {
+        this.mgmtService.clearFlow(this.flowType).then(resp => {
+          this.loadFlow();
+        }).catch((error: any) => {
+          this.toast.showError(error);
+        });
+      }
+    });
   }
 
   public openAddTrigger(): void {

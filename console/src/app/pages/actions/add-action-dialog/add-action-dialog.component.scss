@@ -14,9 +14,13 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   margin-top: 1rem;
 
+  .fill-space {
+    flex: 1;
+  }
+  
   .ok-button {
     margin-left: .5rem;
   }

@@ -8,27 +8,63 @@ h1 {
   font-size: 14px;
 }
 
+.title-section {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+
+  h2 {
+    margin: 0;
+  }
+
+  i {
+    margin-left: .5rem;
+  }
+}
+
 .flow {
   display: flex;
   flex-direction: column;
+  max-width: 1000px;
 
   .flow-type {
-    padding: 1rem;
+    padding: 1rem 1rem;
     margin: .5rem 0;
     border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topelements {
+    border: 3px solid var(--color-main);
+    border-radius: 1rem;
+    padding: 0rem .5rem;
   }
 
   .trigger-wrapper {
     padding-left: 100px;
+    position: relative;
+
+    .topbottomline {
+      position: absolute;
+      top: 0;
+      bottom: 100px;
+      left: 120px;
+      width: 3px;
+      z-index: -1;
+      background-color: var(--color-main);
+    }
 
     .trigger {
-      padding: 1rem;
+      padding: .5rem 1rem;
       border-radius: .5rem;
       display: flex;
       align-items: center;
       background: var(--color-main);
       color: white;
       margin: .5rem 0;
+      min-height: 40px;
 
       .icon {
         margin-right: 1rem;
@@ -38,8 +74,17 @@ h1 {
         flex: 1;
       }
 
-      .action {
-        font-size: 14px;
+      .action-wrapper {
+        .action {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          padding: .5rem 0;
+
+          i {
+            margin-right: .5rem;
+          }
+        }
       }
     }
   }

@@ -1,8 +1,11 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action } from 'src/app/proto/generated/zitadel/action_pb';
 import { CreateActionRequest, UpdateActionRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 
 @Component({
@@ -19,6 +22,9 @@ export class AddActionDialogComponent {
     public id: string = '';
     
     constructor(
+      private toast: ToastService,
+      private mgmtService: ManagementService,
+      private dialog: MatDialog,
         public dialogRef: MatDialogRef<AddActionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
@@ -67,5 +73,27 @@ export class AddActionDialogComponent {
         req.setTimeout(duration)
         this.dialogRef.close(req);
       }
+    }
+
+    public deleteAndCloseDialog(): void {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.CLEAR',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'FLOWS.DIALOG.DELETEACTION.TITLE',
+          descriptionKey: 'FLOWS.DIALOG.DELETEACTION.DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe(resp => {
+        if (resp) {
+          this.mgmtService.deleteAction(this.id).then(resp => {
+            this.dialogRef.close();
+          }).catch((error: any) => {
+            this.toast.showError(error);
+          });
+        }
+      });
     }
 }
