@@ -17,7 +17,7 @@
     "@angular/core": "~12.2.7",
     "@angular/forms": "~12.2.7",
     "@angular/material": "^12.2.7",
-    "@angular/material-moment-adapter": "^12.2.7",
+    "@angular/material-moment-adapter": "^12.2.10",
     "@angular/platform-browser": "~12.2.7",
     "@angular/platform-browser-dynamic": "~12.2.7",
     "@angular/router": "~12.2.7",
