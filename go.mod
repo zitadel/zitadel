@@ -3,7 +3,7 @@ module github.com/caos/zitadel
 go 1.16
 
 require (
-	cloud.google.com/go/storage v1.16.1
+	cloud.google.com/go/storage v1.18.1
 	cloud.google.com/go/trace v1.0.0 // indirect
 	github.com/BurntSushi/toml v0.4.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -15,11 +15,10 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.7.0
 	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75
 	github.com/allegro/bigcache v1.2.1
-	github.com/aws/aws-sdk-go-v2 v1.6.0 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.3.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.2.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.3.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.10.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.6.0
+	github.com/aws/aws-sdk-go-v2/config v1.3.0
+	github.com/aws/aws-sdk-go-v2/credentials v1.2.1
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.10.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.15.10
@@ -76,12 +75,11 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.23.0
 	go.opentelemetry.io/otel/trace v1.0.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
+	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.6
-	google.golang.org/api v0.57.0
-	google.golang.org/genproto v0.0.0-20210921142501-181ce0d877f6
+	google.golang.org/api v0.58.0
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
