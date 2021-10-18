@@ -190,8 +190,21 @@ func NewProjectGrantResourceOwnerSearchQuery(value string) (SearchQuery, error) 
 	return NewTextQuery(ProjectGrantColumnResourceOwner, value, TextEquals)
 }
 
+func NewProjectGrantGrantedOrgIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantColumnGrantedOrgID, value, TextEquals)
+}
+
 func (r *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewProjectGrantResourceOwnerSearchQuery(orgID)
+	if err != nil {
+		return err
+	}
+	r.Queries = append(r.Queries, query)
+	return nil
+}
+
+func (r *ProjectGrantSearchQueries) AppendGrantedOrgQuery(orgID string) error {
+	query, err := NewProjectGrantGrantedOrgIDSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
