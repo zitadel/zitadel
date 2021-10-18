@@ -18,7 +18,6 @@ func (s *Server) GetLoginPolicy(ctx context.Context, req *mgmt_pb.GetLoginPolicy
 	if err != nil {
 		return nil, err
 	}
-	//TODO: why do we provice IsDefault twice?
 	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy), IsDefault: policy.IsDefault}, nil
 }
 
