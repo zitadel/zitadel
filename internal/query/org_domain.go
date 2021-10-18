@@ -77,7 +77,6 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 			OrgDomainIsVerifiedCol.identifier(),
 			OrgDomainIsPrimaryCol.identifier(),
 			OrgDomainValidationTypeCol.identifier(),
-			OrgDomainColumnCount.identifier(),
 			countColumn.identifier(),
 		).From(orgDomainsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Domains, error) {
