@@ -223,7 +223,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "errors.login_policy.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 			}
