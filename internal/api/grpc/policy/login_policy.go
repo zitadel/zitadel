@@ -21,7 +21,7 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 			Sequence:      policy.Sequence,
 			CreationDate:  timestamp_pb.New(policy.CreationDate),
 			ChangeDate:    timestamp_pb.New(policy.ChangeDate),
-			ResourceOwner: policy.OrgID, //TODO: should resource owner always be the org from ctx?
+			ResourceOwner: policy.OrgID,
 		},
 	}
 }
