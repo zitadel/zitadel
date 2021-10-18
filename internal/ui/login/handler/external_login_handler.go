@@ -184,7 +184,12 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *dom
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	err := l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	externalUser, err := l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil
@@ -200,6 +205,17 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		}
 		l.handleAutoRegister(w, r, authReq)
 		return
+	}
+	if len(externalUser.Metadatas) > 0 {
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			return
+		}
+		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 	}
 	l.renderNextStep(w, r, authReq)
 }
@@ -266,10 +282,35 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
+	if len(authReq.LinkingUsers) == 0 {
+		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
+		return
+	}
+	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(user, nil, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
+	}
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
+	if err != nil {
+		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
+	}
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	userGrants, err := l.customGrants(authReq.UserID, nil, authReq, idpConfig, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
@@ -305,7 +346,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -360,5 +401,5 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyV
 		ExternalUserID: linkingUser.ExternalUserID,
 		DisplayName:    displayName,
 	}
-	return human, externalIDP
+	return human, externalIDP, linkingUser.Metadatas
 }

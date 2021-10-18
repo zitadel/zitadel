@@ -68,6 +68,7 @@ type ExternalUser struct {
 	PreferredLanguage language.Tag
 	Phone             string
 	IsPhoneVerified   bool
+	Metadatas         []*Metadata
 }
 
 type Prompt int32

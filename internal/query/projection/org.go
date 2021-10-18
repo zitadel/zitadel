@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -17,7 +18,7 @@ type OrgProjection struct {
 }
 
 const (
-	OrgProjectionTable = projectionSchema + ".orgs"
+	OrgProjectionTable = "zitadel.projections.orgs"
 )
 
 func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgProjection {

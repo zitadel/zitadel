@@ -40,6 +40,7 @@ type FeaturesSetEvent struct {
 	CustomTextMessage        *bool                 `json:"customTextMessage,omitempty"`
 	CustomTextLogin          *bool                 `json:"customTextLogin,omitempty"`
 	LockoutPolicy            *bool                 `json:"lockoutPolicy,omitempty"`
+	Actions                  *bool                 `json:"actions,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -185,6 +186,12 @@ func ChangeCustomTextLogin(customTextLogin bool) func(event *FeaturesSetEvent) {
 func ChangeLockoutPolicy(lockoutPolicy bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.LockoutPolicy = &lockoutPolicy
+	}
+}
+
+func ChangeActions(actions bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.Actions = &actions
 	}
 }
 

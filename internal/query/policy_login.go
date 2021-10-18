@@ -98,7 +98,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPoli
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -111,7 +111,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) 
 		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -132,7 +132,7 @@ func (q *Queries) SecondFactorsByID(ctx context.Context, orgID string) (*SecondF
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -145,7 +145,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, err
 		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -166,7 +166,7 @@ func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFac
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -179,7 +179,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error
 		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -225,7 +225,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "errors.login_policy.not_found")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 			}
 
 			p.MultiFactors = make([]domain.MultiFactorType, len(multiFactors))
@@ -256,7 +256,7 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "errors.login_policy.not_found")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
 			p.Factors = make([]domain.SecondFactorType, len(secondFactors))
@@ -283,7 +283,7 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "errors.login_policy.not_found")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
 			p.Factors = make([]domain.MultiFactorType, len(multiFactors))

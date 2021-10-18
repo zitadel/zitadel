@@ -33,6 +33,8 @@ const (
 	privateServiceName = SfsName
 	cockroachPort      = int32(26257)
 	cockroachHTTPPort  = int32(8080)
+	Clean              = "clean"
+	DBReady            = "dbready"
 )
 
 func Adapter(
@@ -89,14 +91,14 @@ func Adapter(
 
 		var (
 			isFeatureDatabase bool
-			isFeatureRestore  bool
+			isFeatureClean    bool
 		)
 		for _, feature := range features {
 			switch feature {
 			case "database":
 				isFeatureDatabase = true
-			case "restore":
-				isFeatureRestore = true
+			case Clean:
+				isFeatureClean = true
 			}
 		}
 
@@ -134,6 +136,8 @@ func Adapter(
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
 			desiredKind.Spec.Resources,
+			desiredKind.Spec.Cache,
+			desiredKind.Spec.MaxSQLMemory,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -177,15 +181,27 @@ func Adapter(
 				queryS,
 				operator.EnsureFuncToQueryFunc(ensureInit),
 			)
-		}
-
-		if isFeatureDatabase {
 			destroyers = append(destroyers,
 				destroyS,
 				operator.ResourceDestroyToZitadelDestroy(destroySFS),
 				destroyRBAC,
 				destroyCert,
 				destroyRoot,
+			)
+		}
+
+		if isFeatureClean {
+			queriers = append(queriers,
+				operator.ResourceQueryToZitadelQuery(
+					statefulset.CleanPVCs(
+						monitor,
+						namespace,
+						cockroachSelectabel,
+						desiredKind.Spec.ReplicaCount,
+					),
+				),
+				operator.EnsureFuncToQueryFunc(ensureInit),
+				operator.EnsureFuncToQueryFunc(checkDBReady),
 			)
 		}
 
@@ -213,6 +229,8 @@ func Adapter(
 						nodeselector,
 						tolerations,
 						version,
+						PublicServiceName,
+						cockroachPort,
 						features,
 						customImageRegistry,
 					)
@@ -231,21 +249,19 @@ func Adapter(
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				if !isFeatureRestore {
-					queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
-					if err != nil || queriedCurrentDB == nil {
-						// TODO: query system state
-						currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
-						currentDB.Current.URL = PublicServiceName
-						currentDB.Current.ReadyFunc = checkDBReady
-						currentDB.Current.AddUserFunc = addUser
-						currentDB.Current.DeleteUserFunc = deleteUser
-						currentDB.Current.ListUsersFunc = listUsers
-						currentDB.Current.ListDatabasesFunc = listDatabases
+				queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
+				if err != nil || queriedCurrentDB == nil {
+					// TODO: query system state
+					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
+					currentDB.Current.URL = PublicServiceName
+					currentDB.Current.ReadyFunc = checkDBReady
+					currentDB.Current.AddUserFunc = addUser
+					currentDB.Current.DeleteUserFunc = deleteUser
+					currentDB.Current.ListUsersFunc = listUsers
+					currentDB.Current.ListDatabasesFunc = listDatabases
 
-						core.SetQueriedForDatabase(queried, current)
-						internalMonitor.Info("set current state of managed database")
-					}
+					core.SetQueriedForDatabase(queried, current)
+					internalMonitor.Info("set current state of managed database")
 				}
 
 				ensure, err := operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)

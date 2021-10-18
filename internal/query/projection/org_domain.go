@@ -18,7 +18,7 @@ type OrgDomainProjection struct {
 }
 
 const (
-	OrgDomainTable = projectionSchema + ".org_domains"
+	OrgDomainTable = "zitadel.projections.org_domains"
 )
 
 func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgDomainProjection {
