@@ -19,7 +19,7 @@ type LoginPolicyProjection struct {
 }
 
 const (
-	LoginPolicyTable = projectionSchema + ".login_policies"
+	LoginPolicyTable = "zitadel.projections.login_policies"
 )
 
 func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginPolicyProjection {
