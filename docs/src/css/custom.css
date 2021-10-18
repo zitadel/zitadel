@@ -13,6 +13,9 @@
   --ifm-footer-background-color: #f4f4f4;
   --ifm-menu-color-background-active: #f2f5ff;
   --ifm-menu-color-active: #5469d4;
+  --ifm-menu-color-background-hover: #f7fafc;
+  --ifm-font-color-base: #6b7280;
+  --ifm-link-color: #5469d4;
   --ifm-menu-color: #697386;
   --ifm-footer-link-color: #000000;
   --ifm-color-primary: #5469d4;
@@ -48,6 +51,21 @@
   --ifm-color-warning-dark: #ffc1c1;
   --ifm-color-warning-contrast-background: #ffc1c1;
   --ifm-color-warning-contrast-foreground: #620e0e;
+  --card-background: #fafafa;
+  --list-background: #f7fafc;
+  --ifm-spacing-horizontal: 1.5rem;
+}
+
+.padding-top--md {
+  padding-top: 3rem !important;
+}
+
+.menu {
+  padding: 3rem .5rem !important;
+}
+
+.menu__link--active {
+  font-weight: 600;
 }
 
 .react-toggle-track {
@@ -138,7 +156,10 @@ h2 {
   --ifm-footer-background-color: #121430;
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
+  --ifm-menu-color-background-hover: #3c405850;
+  --ifm-font-color-base: #c1c9d2;
   --ifm-menu-color: #a3acb9;
+  --ifm-link-color: #ff2069;
   --docsearch-searchbox-background: #454a66;
   --docsearch-searchbox-focus-background: #454a66;
   --docsearch-searchbox-shadow: inset 0 0 0 1px var(--docsearch-primary-color);
@@ -175,11 +196,55 @@ h2 {
   --ifm-color-warning-dark: #4f566b;
   --ifm-color-warning-contrast-background: #4f566b;
   --ifm-color-warning-contrast-foreground: #ffc1c1;
+  --card-background: #454a66;
+  --list-background: #3c405850;
 }
 
 .menu li li a {
   font-size: 14px;
   /* padding: 2px 14px; */
+}
+
+i {
+  font-size: 1.5rem;
+  color: var(--ifm-heading-color);
+}
+
+main .container img {
+  border-radius: .5rem;
+}
+
+.rounded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .5rem;
+  margin-right: 1rem;
+  border-radius: 50%;
+}
+
+.rounded i {
+  color: white;
+}
+
+.rounded-start {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.rounded-login {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.rounded-privatelabel {
+  background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+}
+
+.rounded-texts {
+  background: linear-gradient(40deg, #dc2626 30%, #db2777);
+}
+
+.rounded-system, .rounded-apis {
+  background: linear-gradient(40deg, #1f2937, #111827);
 }
 
 .docusaurus-highlight-code-line {
