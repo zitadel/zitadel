@@ -20,7 +20,7 @@ type IDPProjection struct {
 }
 
 const (
-	IDPTable     = projectionSchema + ".idps"
+	IDPTable     = "zitadel.projections.idps"
 	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
 	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
 )

@@ -60,7 +60,7 @@ func (q *Queries) IDPByID(ctx context.Context, id string) (*IDP, error) {
 		IDPIDCol.identifier(): id,
 	}, id).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -71,13 +71,13 @@ func (q *Queries) SearchIDPs(ctx context.Context, queries *IDPSearchQueries) (id
 	query, scan := prepareIDPsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-zC6gk", "Errors.idps.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-zC6gk", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
 		log.Println(err)
-		return nil, errors.ThrowInternal(err, "QUERY-YTug9", "Errors.idps.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-YTug9", "Errors.Internal")
 	}
 	idps, err = scan(rows)
 	if err != nil {
@@ -166,9 +166,9 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-rhR2o", "errors.idp.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDP.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-zE3Ro", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
 			}
 
 			if oidc.IDPID != "" {
@@ -252,7 +252,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-iiBgK", "unable to close rows")
+				return nil, errors.ThrowInternal(err, "QUERY-iiBgK", "Errors.Query.CloseRows")
 			}
 
 			return &IDPs{
