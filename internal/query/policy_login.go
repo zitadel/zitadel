@@ -254,7 +254,7 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "errors.login_policy.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
@@ -281,7 +281,7 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "errors.login_policy.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
