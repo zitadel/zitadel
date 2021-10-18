@@ -190,8 +190,21 @@ func NewProjectGrantResourceOwnerSearchQuery(value string) (SearchQuery, error) 
 	return NewTextQuery(ProjectGrantColumnResourceOwner, value, TextEquals)
 }
 
+func NewProjectGrantGrantedOrgIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantColumnGrantedOrgID, value, TextEquals)
+}
+
 func (r *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewProjectGrantResourceOwnerSearchQuery(orgID)
+	if err != nil {
+		return err
+	}
+	r.Queries = append(r.Queries, query)
+	return nil
+}
+
+func (r *ProjectGrantSearchQueries) AppendGrantedOrgQuery(orgID string) error {
+	query, err := NewProjectGrantGrantedOrgIDSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
@@ -240,7 +253,7 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			p := new(ProjectGrant)
 			err := row.Scan(
@@ -289,8 +302,8 @@ func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGra
 			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnResourceOwner)), 
-			func(rows *sql.Rows) (*ProjectGrants, error) {
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
+		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var count uint64
 			for rows.Next() {
