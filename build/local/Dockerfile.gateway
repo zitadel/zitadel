@@ -1,6 +1,6 @@
 # copy from https://raw.githubusercontent.com/grpc/grpc-web/master/net/grpc/gateway/docker/grpcwebproxy/Dockerfile
 
-FROM golang:1.16-alpine3.13
+FROM golang:1.17-alpine3.13
 
 RUN apk add --no-cache curl git ca-certificates && \
   rm -rf /var/lib/apt/lists/*

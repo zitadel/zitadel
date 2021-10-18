@@ -32,10 +32,10 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
+				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -66,10 +66,10 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgDomainProjection{}).reduceDomainVerificationAdded,
 			want: wantReduce{
+				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -97,10 +97,10 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgDomainProjection{}).reduceDomainVerified,
 			want: wantReduce{
+				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -128,10 +128,10 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgDomainProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
+				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -169,10 +169,10 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
+				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{

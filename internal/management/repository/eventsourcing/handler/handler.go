@@ -33,10 +33,6 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, staticStorage static.Storage) []query.Handler {
 	return []query.Handler{
-		newProject(
-			handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount, es}),
-		newProjectGrant(
-			handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount, es}),
 		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
 		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
 		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),

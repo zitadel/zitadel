@@ -32,6 +32,14 @@ type OrgDomainSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func (q *OrgDomainSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
+}
+
 func NewOrgDomainDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(OrgDomainDomainCol, value, method)
 }
@@ -44,12 +52,12 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	query, scan := prepareDomainsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.domains.invalid.request")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
+		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
 	domains, err = scan(rows)
 	if err != nil {
@@ -70,6 +78,7 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 			OrgDomainIsPrimaryCol.identifier(),
 			OrgDomainValidationTypeCol.identifier(),
 			OrgDomainColumnCount.identifier(),
+			countColumn.identifier(),
 		).From(orgDomainsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Domains, error) {
 			domains := make([]*Domain, 0)
@@ -94,7 +103,7 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "unable to close rows")
+				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
 			}
 
 			return &Domains{
@@ -141,10 +150,6 @@ var (
 	}
 	OrgDomainValidationTypeCol = Column{
 		name:  projection.OrgDomainValidationTypeCol,
-		table: orgDomainsTable,
-	}
-	OrgDomainColumnCount = Column{
-		name:  "COUNT(*) OVER ()",
 		table: orgDomainsTable,
 	}
 )

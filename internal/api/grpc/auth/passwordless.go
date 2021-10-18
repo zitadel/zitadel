@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
@@ -24,7 +25,7 @@ func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswo
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPasswordlessRequest) (*auth_pb.AddMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	token, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
+	token, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false, domain.AuthenticatorAttachmentUnspecified)
 	if err != nil {
 		return nil, err
 	}
