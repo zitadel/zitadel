@@ -39,24 +39,25 @@ var _ = Describe("zitadelctl", func() {
 		reuseOrbEnv         = envPrefix + "REUSE_ORB"
 	)
 	var (
-		tag, sha, orbconfigPath, workfolder, user, backupSAJson, backupAKID, backupSAK string
-		gcsBackupName, gcsBackupBucket, s3BackupName, s3BackupBucket, backupName       string
-		monitor                                                                        mntr.Monitor
-		k8sClient                                                                      kubernetes.ClientInt
-		gitClient                                                                      *git.Client
-		kubectl                                                                        kubectlCmd
-		zitadelctlGitops                                                               zitadelctlGitopsCmd
-		GetLogsOfPod                                                                   getLogsOfPod
-		ApplyFile                                                                      applyFile
-		DeleteFile                                                                     deleteFile
-		AwaitCompletedPodFromJob                                                       awaitCompletedPodFromJob
-		AwaitCompletedPod                                                              awaitCompletedPod
-		AwaitReadyPods                                                                 awaitReadyPods
-		AwaitSecret                                                                    awaitSecret
-		AwaitCronJobScheduled                                                          awaitCronJobScheduled
+		tag, sha, orbconfigPath, workfolder, user, backupSAJson, backupAKID, backupSAK              string
+		gcsBackupName, gcsBackupBucket, s3BackupName, s3BackupBucket, backupName, changedBackupName string
+		monitor                                                                                     mntr.Monitor
+		k8sClient                                                                                   kubernetes.ClientInt
+		gitClient                                                                                   *git.Client
+		kubectl                                                                                     kubectlCmd
+		zitadelctlGitops                                                                            zitadelctlGitopsCmd
+		GetLogsOfPod                                                                                getLogsOfPod
+		ApplyFile                                                                                   applyFile
+		DeleteFile                                                                                  deleteFile
+		AwaitCompletedPodFromJob                                                                    awaitCompletedPodFromJob
+		AwaitCompletedPod                                                                           awaitCompletedPod
+		AwaitReadyPods                                                                              awaitReadyPods
+		AwaitSecret                                                                                 awaitSecret
+		AwaitCronJobScheduled                                                                       awaitCronJobScheduled
 	)
 	BeforeSuite(func() {
 		backupName = "e2e-test"
+		changedBackupName = "e2e-test2"
 		gcsBackupName = "bucket"
 		gcsBackupBucket = "caos-zitadel-e2e-backup"
 		s3BackupName = "csbucket"
@@ -188,7 +189,7 @@ var _ = Describe("zitadelctl", func() {
 
 				AwaitCompletedPodFromJob(bytes, zitadelNamespace, "job-name=cockroachdb-connect-add", 2*time.Minute)
 			})
-			It("generate certifcate for user", func() {
+			It("generate certificate for user", func() {
 				err := databases.GitOpsAddUser(monitor, user, k8sClient, gitClient)
 				Expect(err).ToNot(HaveOccurred())
 				AwaitSecret(zitadelNamespace, "cockroachdb.client."+user, []string{"ca.crt", "client." + user + ".crt", "client." + user + ".key"}, 1*time.Minute)
@@ -305,7 +306,7 @@ var _ = Describe("zitadelctl", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Ω(backups).To(ContainElement(backupName))
 			})
-			It("created a backup on the GCS bucket", func() {
+			It("created a backup on the S3 bucket", func() {
 				akid, err := ioutil.ReadFile(backupAKID)
 				Expect(err).ToNot(HaveOccurred())
 				sak, err := ioutil.ReadFile(backupSAK)
@@ -315,18 +316,85 @@ var _ = Describe("zitadelctl", func() {
 				Ω(backups).To(ContainElement(backupName))
 			})
 		})
+		When("instant-backup of changed data", func() {
+			It("add user to DB", func() {
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-add.yaml")
+				Expect(err).ToNot(HaveOccurred())
+
+				AwaitCompletedPodFromJob(bytes, zitadelNamespace, "job-name=cockroachdb-connect-add", 2*time.Minute)
+			})
+			It("generate certificate for user", func() {
+				err := databases.GitOpsAddUser(monitor, user, k8sClient, gitClient)
+				Expect(err).ToNot(HaveOccurred())
+				AwaitSecret(zitadelNamespace, "cockroachdb.client."+user, []string{"ca.crt", "client." + user + ".crt", "client." + user + ".key"}, 1*time.Minute)
+			})
+			It("deploys job to test added user to connect to cockroach", func() {
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-user.yaml")
+				Expect(err).ToNot(HaveOccurred())
+
+				AwaitCompletedPodFromJob(bytes, zitadelNamespace, "job-name=cockroachdb-connect-user", 2*time.Minute)
+			})
+			It("starts command to backup changed data", func() {
+				session, err := gexec.Start(zitadelctlGitops("backup", "--backup", changedBackupName), GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 8*time.Minute).Should(gexec.Exit(0))
+			})
+			It("deploys job to backup changed data to GCS", func() {
+				AwaitCompletedPod(zitadelNamespace, "job-name=backup-"+gcsBackupName, 8*time.Minute)
+			})
+			It("deploys job to backup changed data to S3", func() {
+				AwaitCompletedPod(zitadelNamespace, "job-name=backup-"+s3BackupName, 8*time.Minute)
+			})
+			It("created a backup on the GCS bucket", func() {
+				backups, err := backup.ListGCSFolders(backupSAJson, gcsBackupBucket, gcsBackupName)
+				Expect(err).ToNot(HaveOccurred())
+				Ω(backups).To(ContainElement(changedBackupName))
+			})
+			It("created a backup on the S3 bucket", func() {
+				akid, err := ioutil.ReadFile(backupAKID)
+				Expect(err).ToNot(HaveOccurred())
+				sak, err := ioutil.ReadFile(backupSAK)
+				Expect(err).ToNot(HaveOccurred())
+				backups, err := backup.ListS3Folders("https://objects.lpg.cloudscale.ch", string(akid), string(sak), s3BackupBucket, s3BackupName, "LPG")
+				Expect(err).ToNot(HaveOccurred())
+				Ω(backups).To(ContainElement(changedBackupName))
+			})
+		})
 		When("backuplist", func() {
-			//TODO
+			It("starts command to list backups", func() {
+				session, err := gexec.Start(zitadelctlGitops("backuplist"), GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 8*time.Minute).Should(gexec.Exit(0))
+				buf := make([]byte, 0)
+				_, err = session.Out.Read(buf)
+				Expect(err).ToNot(HaveOccurred())
+				backups := strings.Split(string(buf), "\n")
+
+				expectedBackups := []string{
+					gcsBackupName + "." + backupName,
+					s3BackupName + "." + backupName,
+					gcsBackupName + "." + changedBackupName,
+					s3BackupName + "." + changedBackupName,
+				}
+				Ω(backups).To(ContainElements(expectedBackups))
+			})
 		})
 
 		When("restore", func() {
 			It("starts command to restore data", func() {
-				session, err := gexec.Start(zitadelctlGitops("restore", "--backup", gcsBackupName+"."+backupName), GinkgoWriter, GinkgoWriter)
+				session, err := gexec.Start(zitadelctlGitops("restore", "--backup", gcsBackupName+"."+changedBackupName), GinkgoWriter, GinkgoWriter)
 				Expect(err).ToNot(HaveOccurred())
 				Eventually(session, 8*time.Minute).Should(gexec.Exit(0))
 			})
 			It("deploys job to restore data", func() {
 				AwaitCompletedPod(zitadelNamespace, "job-name=backup-"+gcsBackupName+"-restore", 10*time.Minute)
+				AwaitReadyPods(zitadelNamespace, "app.kubernetes.io/name=cockroachdb", 3, 3*time.Minute)
+			})
+			It("deploys job to test added user to connect to cockroach", func() {
+				bytes, err := ioutil.ReadFile("./templates/cockroachdb-user.yaml")
+				Expect(err).ToNot(HaveOccurred())
+
+				AwaitCompletedPodFromJob(bytes, zitadelNamespace, "job-name=cockroachdb-connect-user", 2*time.Minute)
 			})
 		})
 	})
