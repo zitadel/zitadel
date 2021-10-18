@@ -27,7 +27,7 @@ module.exports = {
         }
     ],
     guides: [
-        'guides/introduction',
+        'guides/overview',
         {
             type: 'category',
             label: 'Get to know ZITADEL',

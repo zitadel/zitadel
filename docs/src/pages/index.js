@@ -1,18 +1,19 @@
-import React from 'react';
-import clsx from 'clsx';
-import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import styles from './styles.module.css';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import Layout from '@theme/Layout';
 import ThemedImage from '@theme/ThemedImage';
+import clsx from 'clsx';
+import React from 'react';
+
+import styles from './styles.module.css';
 
 const features = [
   {
     title: 'Guides',
     darkImageUrl: 'img/index/Guides-dark.svg',
     lightImageUrl: 'img/index/Guides-light.svg',
-    link: 'docs/guides/introduction',
+    link: 'docs/guides/overview',
     description: (
       <>
         Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
