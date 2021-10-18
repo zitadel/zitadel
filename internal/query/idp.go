@@ -97,7 +97,14 @@ func NewIDPIDSearchQuery(id string) (SearchQuery, error) {
 }
 
 func NewIDPOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQuery, error) {
-	return nil, errors.ThrowUnimplemented(nil, "QUERY-8yZAI", "number comparison not implemented")
+	switch ownerType {
+	case domain.IdentityProviderTypeOrg:
+		return NewBoolQuery(LoginPolicyColumnIsDefault, false)
+	case domain.IdentityProviderTypeSystem:
+		return NewBoolQuery(LoginPolicyColumnIsDefault, true)
+	default:
+		return nil, errors.ThrowUnimplemented(nil, "QUERY-8yZAI", "Errors.Query.InvalidRequest")
+	}
 }
 
 func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
