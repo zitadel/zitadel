@@ -11,5 +11,7 @@ CREATE TABLE zitadel.projections.password_complexity_policies (
     has_lowercase BOOL NULL,
     has_uppercase BOOL NULL,
     has_symbol BOOL NULL,
-    has_number BOOL NULL
+    has_number BOOL NULL,
+
+    PRIMARY KEY (id)
 );
