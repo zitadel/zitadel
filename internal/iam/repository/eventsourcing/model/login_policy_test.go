@@ -2,9 +2,11 @@ package model
 
 import (
 	"encoding/json"
+	"testing"
+
+	"github.com/caos/zitadel/internal/domain"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
-	"testing"
 )
 
 func TestLoginPolicyChanges(t *testing.T) {
@@ -275,12 +277,12 @@ func TestAppendAddSecondFactorToPolicyEvent(t *testing.T) {
 			name: "append add second factor to login policy event",
 			args: args{
 				iam:   &IAM{DefaultLoginPolicy: &LoginPolicy{AllowExternalIdp: true, AllowRegister: true, AllowUsernamePassword: true}},
-				mfa:   &MFA{MFAType: int32(model.SecondFactorTypeOTP)},
+				mfa:   &MFA{MFAType: int32(domain.SecondFactorTypeOTP)},
 				event: &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{
 				SecondFactors: []int32{
-					int32(model.SecondFactorTypeOTP),
+					int32(domain.SecondFactorTypeOTP),
 				}}},
 		},
 	}
@@ -318,9 +320,9 @@ func TestRemoveSecondFactorToPolicyEvent(t *testing.T) {
 				iam: &IAM{
 					DefaultLoginPolicy: &LoginPolicy{
 						SecondFactors: []int32{
-							int32(model.SecondFactorTypeOTP),
+							int32(domain.SecondFactorTypeOTP),
 						}}},
-				mfa:   &MFA{MFAType: int32(model.SecondFactorTypeOTP)},
+				mfa:   &MFA{MFAType: int32(domain.SecondFactorTypeOTP)},
 				event: &es_models.Event{},
 			},
 			result: &IAM{DefaultLoginPolicy: &LoginPolicy{

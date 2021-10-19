@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -70,24 +71,6 @@ func LoginPolicyToModel(policy *LoginPolicy) *iam_model.LoginPolicy {
 	}
 }
 
-func LoginPolicyFromModel(policy *iam_model.LoginPolicy) *LoginPolicy {
-	idps := IDOProvidersFromModel(policy.IDPProviders)
-	secondFactors := SecondFactorsFromModel(policy.SecondFactors)
-	multiFactors := MultiFactorsFromModel(policy.MultiFactors)
-	return &LoginPolicy{
-		ObjectRoot:            policy.ObjectRoot,
-		State:                 int32(policy.State),
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIdp:      policy.AllowExternalIdp,
-		IDPProviders:          idps,
-		ForceMFA:              policy.ForceMFA,
-		SecondFactors:         secondFactors,
-		MultiFactors:          multiFactors,
-		PasswordlessType:      int32(policy.PasswordlessType),
-	}
-}
-
 func IDPProvidersToModel(members []*IDPProvider) []*iam_model.IDPProvider {
 	convertedProviders := make([]*iam_model.IDPProvider, len(members))
 	for i, m := range members {
@@ -120,7 +103,7 @@ func IDPProviderFromModel(provider *iam_model.IDPProvider) *IDPProvider {
 	}
 }
 
-func SecondFactorsFromModel(mfas []iam_model.SecondFactorType) []int32 {
+func SecondFactorsFromModel(mfas []domain.SecondFactorType) []int32 {
 	convertedMFAs := make([]int32, len(mfas))
 	for i, mfa := range mfas {
 		convertedMFAs[i] = int32(mfa)
@@ -128,14 +111,14 @@ func SecondFactorsFromModel(mfas []iam_model.SecondFactorType) []int32 {
 	return convertedMFAs
 }
 
-func SecondFactorFromModel(mfa iam_model.SecondFactorType) *MFA {
+func SecondFactorFromModel(mfa domain.SecondFactorType) *MFA {
 	return &MFA{MFAType: int32(mfa)}
 }
 
-func SecondFactorsToModel(mfas []int32) []iam_model.SecondFactorType {
-	convertedMFAs := make([]iam_model.SecondFactorType, len(mfas))
+func SecondFactorsToModel(mfas []int32) []domain.SecondFactorType {
+	convertedMFAs := make([]domain.SecondFactorType, len(mfas))
 	for i, mfa := range mfas {
-		convertedMFAs[i] = iam_model.SecondFactorType(mfa)
+		convertedMFAs[i] = domain.SecondFactorType(mfa)
 	}
 	return convertedMFAs
 }
@@ -152,10 +135,10 @@ func MultiFactorFromModel(mfa iam_model.MultiFactorType) *MFA {
 	return &MFA{MFAType: int32(mfa)}
 }
 
-func MultiFactorsToModel(mfas []int32) []iam_model.MultiFactorType {
-	convertedMFAs := make([]iam_model.MultiFactorType, len(mfas))
+func MultiFactorsToModel(mfas []int32) []domain.MultiFactorType {
+	convertedMFAs := make([]domain.MultiFactorType, len(mfas))
 	for i, mfa := range mfas {
-		convertedMFAs[i] = iam_model.MultiFactorType(mfa)
+		convertedMFAs[i] = domain.MultiFactorType(mfa)
 	}
 	return convertedMFAs
 }

@@ -30,12 +30,12 @@ const (
 
 type SecondFactorsSearchResponse struct {
 	TotalResult uint64
-	Result      []SecondFactorType
+	Result      []domain.SecondFactorType
 }
 
 type MultiFactorsSearchResponse struct {
 	TotalResult uint64
-	Result      []MultiFactorType
+	Result      []domain.MultiFactorType
 }
 
 func (r *SecondFactorsSearchRequest) AppendAggregateIDQuery(aggregateID string) {

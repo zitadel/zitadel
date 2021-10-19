@@ -31,12 +31,14 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type OrgRepository struct {
+	Query                               *query.Queries
 	SearchLimit                         uint64
 	Eventstore                          v1.Eventstore
 	View                                *mgmt_view.View
@@ -242,31 +244,6 @@ func (repo *OrgRepository) getDefaultLabelPolicy(ctx context.Context, state doma
 	return iam_view_model.LabelPolicyViewToModel(policy), nil
 }
 
-func (repo *OrgRepository) GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, viewErr := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.LoginPolicyView)
-	}
-	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return repo.GetDefaultLoginPolicy(ctx)
-	}
-	if esErr != nil {
-		logging.Log("EVENT-38iTr").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.LoginPolicyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.LoginPolicyViewToModel(policy), nil
-		}
-	}
-	return iam_view_model.LoginPolicyViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
 	idpProviders, err := repo.View.IDPProvidersByIdpConfigID(aggregateID, idpConfigID)
 	if err != nil {
@@ -275,38 +252,12 @@ func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, agg
 	return iam_view_model.IDPProviderViewsToModel(idpProviders), err
 }
 
-func (repo *OrgRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, viewErr := repo.View.LoginPolicyByAggregateID(domain.IAMID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.LoginPolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-28uLp").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.LoginPolicyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.LoginPolicyViewToModel(policy), nil
-		}
-	}
-	policy.Default = true
-	return iam_view_model.LoginPolicyViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
-	policy, err := repo.View.LoginPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
+	policy, err := repo.Query.LoginPolicyByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	if policy.Default {
+	if policy.IsDefault {
 		request.AppendAggregateIDQuery(domain.IAMID)
 	} else {
 		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
@@ -332,28 +283,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *OrgRepository) SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
-	policy, err := repo.GetLoginPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.SecondFactorsSearchResponse{
-		TotalResult: uint64(len(policy.SecondFactors)),
-		Result:      policy.SecondFactors,
-	}, nil
-}
-
-func (repo *OrgRepository) SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
-	policy, err := repo.GetLoginPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.MultiFactorsSearchResponse{
-		TotalResult: uint64(len(policy.MultiFactors)),
-		Result:      policy.MultiFactors,
-	}, nil
 }
 
 func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
