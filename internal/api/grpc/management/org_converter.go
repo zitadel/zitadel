@@ -8,20 +8,22 @@ import (
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*org_model.OrgDomainSearchRequest, error) {
+func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.OrgDomainSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := org_grpc.DomainQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgDomainSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
+	return &query.OrgDomainSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

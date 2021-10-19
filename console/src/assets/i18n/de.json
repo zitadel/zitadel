@@ -820,7 +820,8 @@
         "passwordlessPromptText":"Passwordless Aufforderung",
         "passwordlessRegistrationDoneText":"Passwordless setzen erfolgreich",
         "passwordlessRegistrationText":"Passwordless Registrierung",
-        "passwordlessText":"Passwordless"
+        "passwordlessText":"Passwordless",
+        "externalRegistrationUserOverviewText":"Externe Registrierung Benutzer Übersicht"
       }
     },
     "MESSAGE_TEXTS": {
@@ -1090,7 +1091,7 @@
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
       "ASSERTION_DESCRIPTION": "Rolleninformationen werden auf dem UserInfo Endpoint oder je nach Applikationseinstellungen in Tokens oder anderen Methoden bereitgestellt.",
       "CHECK": "Rollen bei Authentisierung prüfen",
-      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einem entsprechenden Rolle authentifiziert werden."
+      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden."
     },
     "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
     "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der Benutzer nicht authentifiziert werden.",

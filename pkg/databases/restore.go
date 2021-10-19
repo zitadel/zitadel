@@ -6,7 +6,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/api/database"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 )
 
@@ -15,26 +14,24 @@ func GitOpsRestore(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 	name string,
-	databases []string,
 ) error {
 	desired, err := gitClient.ReadTree(git.DatabaseFile)
 	if err != nil {
 		return err
 	}
-	return restore(monitor, k8sClient, desired, name, databases)
+	return restore(monitor, k8sClient, desired, name)
 }
 
 func CrdRestore(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 	name string,
-	databases []string,
 ) error {
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		return err
 	}
-	return restore(monitor, k8sClient, desired, name, databases)
+	return restore(monitor, k8sClient, desired, name)
 }
 
 func restore(
@@ -42,7 +39,6 @@ func restore(
 	k8sClient kubernetes.ClientInt,
 	desired *tree.Tree,
 	name string,
-	databases []string,
 ) error {
 	current := &tree.Tree{}
 
@@ -52,8 +48,6 @@ func restore(
 		return err
 	}
 	queried := map[string]interface{}{}
-	core.SetQueriedForDatabaseDBList(queried, databases, []string{})
-
 	ensure, err := query(k8sClient, queried)
 	if err != nil {
 		monitor.Error(err)

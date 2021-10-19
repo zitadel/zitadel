@@ -4,7 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/query"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	org_pb "github.com/caos/zitadel/pkg/grpc/org"
@@ -117,8 +116,8 @@ func OrgStateToPb(state domain.OrgState) org_pb.OrgState {
 	}
 }
 
-func DomainQueriesToModel(queries []*org_pb.DomainSearchQuery) (_ []*org_model.OrgDomainSearchQuery, err error) {
-	q := make([]*org_model.OrgDomainSearchQuery, len(queries))
+func DomainQueriesToModel(queries []*org_pb.DomainSearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = DomainQueryToModel(query)
 		if err != nil {
@@ -128,24 +127,16 @@ func DomainQueriesToModel(queries []*org_pb.DomainSearchQuery) (_ []*org_model.O
 	return q, nil
 }
 
-func DomainQueryToModel(query *org_pb.DomainSearchQuery) (*org_model.OrgDomainSearchQuery, error) {
-	switch q := query.Query.(type) {
+func DomainQueryToModel(searchQuery *org_pb.DomainSearchQuery) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
 	case *org_pb.DomainSearchQuery_DomainNameQuery:
-		return DomainNameQueryToModel(q.DomainNameQuery)
+		return query.NewOrgDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainNameQuery.Method), q.DomainNameQuery.Name)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}
 }
 
-func DomainNameQueryToModel(query *org_pb.DomainNameQuery) (*org_model.OrgDomainSearchQuery, error) {
-	return &org_model.OrgDomainSearchQuery{
-		Key:    org_model.OrgDomainSearchKeyDomain,
-		Method: object.TextMethodToModel(query.Method),
-		Value:  query.Name,
-	}, nil
-}
-
-func DomainsToPb(domains []*org_model.OrgDomainView) []*org_pb.Domain {
+func DomainsToPb(domains []*query.Domain) []*org_pb.Domain {
 	d := make([]*org_pb.Domain, len(domains))
 	for i, domain := range domains {
 		d[i] = DomainToPb(domain)
@@ -153,18 +144,18 @@ func DomainsToPb(domains []*org_model.OrgDomainView) []*org_pb.Domain {
 	return d
 }
 
-func DomainToPb(domain *org_model.OrgDomainView) *org_pb.Domain {
+func DomainToPb(d *query.Domain) *org_pb.Domain {
 	return &org_pb.Domain{
-		OrgId:          domain.OrgID,
-		DomainName:     domain.Domain,
-		IsVerified:     domain.Verified,
-		IsPrimary:      domain.Primary,
-		ValidationType: DomainValidationTypeFromModel(domain.ValidationType),
+		OrgId:          d.OrgID,
+		DomainName:     d.Domain,
+		IsVerified:     d.IsVerified,
+		IsPrimary:      d.IsPrimary,
+		ValidationType: DomainValidationTypeFromModel(d.ValidationType),
 		Details: object.ToViewDetailsPb(
-			0,
-			domain.CreationDate,
-			domain.ChangeDate,
-			"",
+			d.Sequence,
+			d.CreationDate,
+			d.ChangeDate,
+			d.OrgID,
 		),
 	}
 }
@@ -180,11 +171,11 @@ func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) do
 	}
 }
 
-func DomainValidationTypeFromModel(validationType org_model.OrgDomainValidationType) org_pb.DomainValidationType {
+func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType) org_pb.DomainValidationType {
 	switch validationType {
-	case org_model.OrgDomainValidationTypeDNS:
+	case domain.OrgDomainValidationTypeDNS:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS
-	case org_model.OrgDomainValidationTypeHTTP:
+	case domain.OrgDomainValidationTypeHTTP:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
 	default:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED

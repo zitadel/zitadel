@@ -39,7 +39,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   PasswordAgeTable,
+				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -77,7 +77,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   PasswordAgeTable,
+				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -108,7 +108,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   PasswordAgeTable,
+				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -138,7 +138,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   PasswordAgeTable,
+				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -176,7 +176,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   PasswordAgeTable,
+				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{

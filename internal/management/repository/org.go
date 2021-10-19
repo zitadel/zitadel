@@ -16,8 +16,6 @@ type OrgRepository interface {
 	Languages(ctx context.Context) ([]language.Tag, error)
 	OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error)
 
-	SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error)
-
 	SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)
 
 	GetOrgMemberRoles() []string
@@ -27,12 +25,8 @@ type OrgRepository interface {
 
 	GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
 
-	GetLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
-	GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error)
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
-	SearchSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error)
-	SearchMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error)
 
 	GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
 	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)

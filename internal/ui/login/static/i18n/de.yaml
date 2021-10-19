@@ -153,6 +153,7 @@ PasswordlessRegistration:
 PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
   Description: Token für passwortlosen Login erfolgreich hinzugefügt.
+  DescriptionClose: Du kannst das Fenster nun schliessen.
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
@@ -351,6 +352,7 @@ Errors:
       IDPConfigIDEmpty: Identity Provider ID ist leer
       ExternalUserIDEmpty: Externe User ID  ist leer
       UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
+      NoExternalUserData: Keine externe User Daten erhalten
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
     ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:

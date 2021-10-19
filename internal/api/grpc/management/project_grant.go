@@ -12,29 +12,29 @@ import (
 )
 
 func (s *Server) GetProjectGrantByID(ctx context.Context, req *mgmt_pb.GetProjectGrantByIDRequest) (*mgmt_pb.GetProjectGrantByIDResponse, error) {
-	grant, err := s.project.ProjectGrantByID(ctx, req.GrantId)
+	grant, err := s.query.ProjectGrantByID(ctx, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetProjectGrantByIDResponse{
-		ProjectGrant: proj_grpc.GrantedProjectToPb(grant),
+		ProjectGrant: proj_grpc.GrantedProjectViewToPb(grant),
 	}, nil
 }
 
 func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProjectGrantsRequest) (*mgmt_pb.ListProjectGrantsResponse, error) {
-	queries, err := ListProjectGrantsRequestToModel(req)
+	queries, err := listProjectGrantsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
 	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
-	domains, err := s.project.SearchProjectGrants(ctx, queries)
+	domains, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
-		Result: proj_grpc.GrantedProjectsToPb(domains.Result),
+		Result: proj_grpc.GrantedProjectViewsToPb(domains.ProjectGrants),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
+			domains.Count,
 			domains.Sequence,
 			domains.Timestamp,
 		),

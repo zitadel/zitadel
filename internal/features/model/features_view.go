@@ -33,6 +33,7 @@ type FeaturesView struct {
 	CustomTextMessage        bool
 	CustomTextLogin          bool
 	LockoutPolicy            bool
+	Actions                  bool
 }
 
 func (f *FeaturesView) FeatureList() []string {
@@ -81,6 +82,9 @@ func (f *FeaturesView) FeatureList() []string {
 	}
 	if f.LockoutPolicy {
 		list = append(list, domain.FeatureLockoutPolicy)
+	}
+	if f.Actions {
+		list = append(list, domain.FeatureActions)
 	}
 	return list
 }
