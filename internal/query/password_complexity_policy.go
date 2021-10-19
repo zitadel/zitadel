@@ -41,7 +41,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID strin
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-lDnrk", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-lDnrk", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -56,7 +56,7 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context) (*Passwor
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-h4Uyr", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-h4Uyr", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -134,9 +134,9 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "errors.policy.password.complexity.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexity.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}
