@@ -1,5 +1,5 @@
 CREATE TABLE zitadel.projections.password_complexity_policies (
-    id STRING NOT NULL, --TODO: pk
+    id STRING NOT NULL,
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
     sequence INT8 NULL,
