@@ -43,6 +43,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
 	NewLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
 	NewIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
+
 	return nil
 }
 

@@ -122,7 +122,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 }
 
 func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*project.GrantChangedEvent)
+	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-K0fwR", "seq", event.Sequence(), "expectedType", project.GrantCascadeChangedType).Error("was not an  event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ll9Ts", "reduce.wrong.event.type")
@@ -132,7 +132,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, e.RoleKeys),
+			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
