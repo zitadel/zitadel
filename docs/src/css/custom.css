@@ -223,6 +223,12 @@ main .container img {
   border-radius: 50%;
 }
 
+.rounded svg {
+  fill: white;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
 .rounded i {
   color: white;
 }
@@ -231,19 +237,30 @@ main .container img {
   background: linear-gradient(40deg, #059669 30%, #047857);
 }
 
-.rounded-login {
+.rounded-password {
+  background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+}
+
+.rounded-login,
+.rounded-register {
   background: linear-gradient(40deg, #059669 30%, #047857);
 }
 
-.rounded-privatelabel {
+.rounded-privatelabel,
+.rounded-phone,
+.rounded-email,
+.rounded-service {
   background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
 }
 
-.rounded-texts {
+.rounded-texts,
+.rounded-help {
   background: linear-gradient(40deg, #dc2626 30%, #db2777);
 }
 
-.rounded-system, .rounded-apis {
+.rounded-system, 
+.rounded-apis,
+.rounded-policy {
   background: linear-gradient(40deg, #1f2937, #111827);
 }
 
