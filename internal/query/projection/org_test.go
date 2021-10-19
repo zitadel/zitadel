@@ -32,10 +32,10 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
+				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -62,10 +62,10 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgProjection{}).reduceOrgReactivated,
 			want: wantReduce{
+				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -92,10 +92,10 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgProjection{}).reduceOrgDeactivated,
 			want: wantReduce{
+				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -122,10 +122,10 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgProjection{}).reduceOrgChanged,
 			want: wantReduce{
+				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -152,10 +152,10 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgProjection{}).reduceOrgChanged,
 			want: wantReduce{
+				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgProjectionTable,
 				executer:         &testExecuter{},
 			},
 		},
@@ -170,10 +170,10 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&OrgProjection{}).reduceOrgAdded,
 			want: wantReduce{
+				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{

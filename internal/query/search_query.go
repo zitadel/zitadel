@@ -220,6 +220,56 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
+type ListQuery struct {
+	Column  Column
+	List    []interface{}
+	Compare ListComparison
+}
+
+func NewListQuery(column Column, value []interface{}, compare ListComparison) (*ListQuery, error) {
+	if compare < 0 || compare >= listCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if column.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &ListQuery{
+		Column:  column,
+		List:    value,
+		Compare: compare,
+	}, nil
+}
+
+func (q *ListQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	where, args := q.comp()
+	return query.Where(where, args...)
+}
+
+func (s *ListQuery) comp() (interface{}, []interface{}) {
+	switch s.Compare {
+	case ListIn:
+		return sq.Eq{s.Column.identifier(): s.List}, nil
+	}
+	return nil, nil
+}
+
+type ListComparison int
+
+const (
+	ListIn ListComparison = iota
+
+	listCompareMax
+)
+
+func ListComparisonFromMethod(m domain.SearchMethod) ListComparison {
+	switch m {
+	case domain.SearchMethodEquals:
+		return ListIn
+	default:
+		return listCompareMax
+	}
+}
+
 var (
 	//countColumn represents the default counter for search responses
 	countColumn = Column{
@@ -258,10 +308,13 @@ type Column struct {
 }
 
 func (c Column) identifier() string {
-	if c.table.alias == "" {
-		return c.name
+	if c.table.alias != "" {
+		return c.table.alias + "." + c.name
 	}
-	return c.table.alias + "." + c.name
+	if c.table.name != "" {
+		return c.table.name + "." + c.name
+	}
+	return c.name
 }
 
 func (c Column) setTable(t table) Column {

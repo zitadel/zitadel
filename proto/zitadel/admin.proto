@@ -2813,6 +2813,7 @@ message SetDefaultFeaturesRequest {
     bool custom_text_message = 20;
     bool custom_text_login = 21;
     bool lockout_policy = 22;
+    bool actions = 23;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2852,6 +2853,7 @@ message SetOrgFeaturesRequest {
     bool custom_text_message = 21;
     bool custom_text_login = 22;
     bool lockout_policy = 23;
+    bool actions = 24;
 }
 
 message SetOrgFeaturesResponse {
@@ -2897,6 +2899,7 @@ message GetCustomOrgIAMPolicyRequest {
 
 message GetCustomOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy
     bool is_default = 2;
 }
 

@@ -302,6 +302,7 @@ func PasswordlessRegistrationDoneScreenTextToPb(text domain.PasswordlessRegistra
 	return &text_pb.PasswordlessRegistrationDoneScreenText{
 		Title:            text.Title,
 		Description:      text.Description,
+		DescriptionClose: text.DescriptionClose,
 		NextButtonText:   text.NextButtonText,
 		CancelButtonText: text.CancelButtonText,
 	}
@@ -754,9 +755,10 @@ func PasswordlessRegistrationDoneScreenTextPbToDomain(text *text_pb.Passwordless
 		return domain.PasswordlessRegistrationDoneScreenText{}
 	}
 	return domain.PasswordlessRegistrationDoneScreenText{
-		Title:          text.Title,
-		Description:    text.Description,
-		NextButtonText: text.NextButtonText,
+		Title:            text.Title,
+		Description:      text.Description,
+		DescriptionClose: text.DescriptionClose,
+		NextButtonText:   text.NextButtonText,
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 )
 
@@ -20,7 +21,7 @@ type Metrics interface {
 	GetExporter() http.Handler
 	GetMetricsProvider() metric.MeterProvider
 	RegisterCounter(name, description string) error
-	AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error
+	AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error
 	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
 	RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
 }
@@ -52,7 +53,7 @@ func RegisterCounter(name, description string) error {
 	return M.RegisterCounter(name, description)
 }
 
-func AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error {
+func AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error {
 	if M == nil {
 		return nil
 	}

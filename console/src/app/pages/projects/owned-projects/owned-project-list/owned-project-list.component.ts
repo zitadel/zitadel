@@ -121,7 +121,6 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
       if (resp.details?.viewTimestamp) {
         this.viewTimestamp = resp.details?.viewTimestamp;
       }
-      console.log(resp.resultList);
       this.dataSource.data = this.ownedProjectList;
       this.loadingSubject.next(false);
     }).catch(error => {

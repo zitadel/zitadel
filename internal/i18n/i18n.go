@@ -199,7 +199,7 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 		TemplateData: args,
 	})
 	if err != nil {
-		logging.Log("I18N-MsF5sx").WithError(err).Warnf("missing translation")
+		logging.LogWithFields("I18N-MsF5sx", "id", id, "args", args).WithError(err).Warnf("missing translation")
 		return id
 	}
 	return s
