@@ -125,6 +125,9 @@ const (
 	IDPJWTSuffix  = "jwt_config"
 
 	IDPIDCol           = "id"
+	IDPCreationDateCol = "creation_date"
+	IDPChangeDateCol   = "change_date"
+	IDPSequenceCol     = "sequence"
 	IDPStateCol        = "state"
 	IDPNameCol         = "name"
 	IDPStylingTypeCol  = "styling_type"
@@ -167,6 +170,9 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.S
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCol(IDPCreationDateCol, idpEvent.CreationDate()),
+			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
 			handler.NewCol(IDPNameCol, idpEvent.Name),
 			handler.NewCol(IDPStylingTypeCol, idpEvent.StylingType),
@@ -188,7 +194,7 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.EventReader) (*handler
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-NVvJD", "reduce.wrong.event.type")
 	}
 
-	cols := make([]handler.Column, 0, 3)
+	cols := make([]handler.Column, 0, 5)
 	if idpEvent.Name != nil {
 		cols = append(cols, handler.NewCol(IDPNameCol, *idpEvent.Name))
 	}
@@ -201,6 +207,11 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.EventReader) (*handler
 	if len(cols) == 0 {
 		return crdb.NewNoOpStatement(&idpEvent), nil
 	}
+
+	cols = append(cols,
+		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+	)
 
 	return crdb.NewUpdateStatement(
 		&idpEvent,
@@ -227,6 +238,8 @@ func (p *IDPProjection) reduceIDPDeactivated(event eventstore.EventReader) (*han
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateInactive),
+			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -250,6 +263,8 @@ func (p *IDPProjection) reduceIDPReactivated(event eventstore.EventReader) (*han
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
+			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -289,20 +304,30 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*ha
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-2FuAA", "reduce.wrong.event.type")
 	}
 
-	return crdb.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
-			handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
-			handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
-			handler.NewCol(OIDCConfigScopesCol, pq.StringArray(idpEvent.Scopes)),
-			handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
-			handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
-			handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
-			handler.NewCol(OIDCConfigTokenEndpointCol, idpEvent.TokenEndpoint),
-		},
-		crdb.WithTableSuffix(IDPOIDCSuffix),
+	return crdb.NewMultiStatement(&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
+				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
+				handler.NewCol(OIDCConfigScopesCol, pq.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
+				handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
+				handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
+				handler.NewCol(OIDCConfigTokenEndpointCol, idpEvent.TokenEndpoint),
+			},
+			crdb.WithTableSuffix(IDPOIDCSuffix),
+		),
 	), nil
 }
 
@@ -336,7 +361,7 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 		cols = append(cols, handler.NewCol(OIDCConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, idpEvent.Scopes))
+		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, pq.StringArray(idpEvent.Scopes)))
 	}
 	if idpEvent.IDPDisplayNameMapping != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))
@@ -349,13 +374,23 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 		return crdb.NewNoOpStatement(&idpEvent), nil
 	}
 
-	return crdb.NewUpdateStatement(
-		&idpEvent,
-		cols,
-		[]handler.Condition{
-			handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
-		},
-		crdb.WithTableSuffix(IDPOIDCSuffix),
+	return crdb.NewMultiStatement(&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			cols,
+			[]handler.Condition{
+				handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+			},
+			crdb.WithTableSuffix(IDPOIDCSuffix),
+		),
 	), nil
 }
 
@@ -371,16 +406,27 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.EventReader) (*han
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-qvPdb", "reduce.wrong.event.type")
 	}
 
-	return crdb.NewCreateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCol(JWTConfigEndpointCol, idpEvent.JWTEndpoint),
-			handler.NewCol(JWTConfigIssuerCol, idpEvent.Issuer),
-			handler.NewCol(JWTConfigKeysEndpointCol, idpEvent.KeysEndpoint),
-			handler.NewCol(JWTConfigHeaderNameCol, idpEvent.HeaderName),
-		},
-		crdb.WithTableSuffix(IDPJWTSuffix),
+	return crdb.NewMultiStatement(&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			},
+		),
+
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(JWTConfigEndpointCol, idpEvent.JWTEndpoint),
+				handler.NewCol(JWTConfigIssuerCol, idpEvent.Issuer),
+				handler.NewCol(JWTConfigKeysEndpointCol, idpEvent.KeysEndpoint),
+				handler.NewCol(JWTConfigHeaderNameCol, idpEvent.HeaderName),
+			},
+			crdb.WithTableSuffix(IDPJWTSuffix),
+		),
 	), nil
 }
 
@@ -405,7 +451,7 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.EventReader) (*h
 		cols = append(cols, handler.NewCol(JWTConfigIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.KeysEndpoint != nil {
-		cols = append(cols, handler.NewCol(JWTConfigKeysEndpointCol, *idpEvent.Issuer))
+		cols = append(cols, handler.NewCol(JWTConfigKeysEndpointCol, *idpEvent.KeysEndpoint))
 	}
 	if idpEvent.HeaderName != nil {
 		cols = append(cols, handler.NewCol(JWTConfigHeaderNameCol, *idpEvent.HeaderName))
@@ -415,12 +461,22 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.EventReader) (*h
 		return crdb.NewNoOpStatement(&idpEvent), nil
 	}
 
-	return crdb.NewUpdateStatement(
-		&idpEvent,
-		cols,
-		[]handler.Condition{
-			handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
-		},
-		crdb.WithTableSuffix(IDPJWTSuffix),
+	return crdb.NewMultiStatement(&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			cols,
+			[]handler.Condition{
+				handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+			},
+			crdb.WithTableSuffix(IDPJWTSuffix),
+		),
 	), nil
 }

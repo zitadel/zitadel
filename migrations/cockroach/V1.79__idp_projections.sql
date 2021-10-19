@@ -1,5 +1,8 @@
 CREATE TABLE zitadel.projections.idps (
     id TEXT,
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    sequence BIGINT,
     
     state SMALLINT,
     name TEXT,
@@ -11,7 +14,7 @@ CREATE TABLE zitadel.projections.idps (
 );
 
 CREATE TABLE zitadel.projections.idps_oidc_config (
-    idp_id TEXT REFERENCES zitadel.projections.idps (id),
+    idp_id TEXT REFERENCES zitadel.projections.idps (id) ON DELETE CASCADE,
     
     client_id TEXT,
     client_secret JSONB,
@@ -26,7 +29,7 @@ CREATE TABLE zitadel.projections.idps_oidc_config (
 );
 
 CREATE TABLE zitadel.projections.idps_jwt_config (
-    idp_id TEXT REFERENCES zitadel.projections.idps (id),
+    idp_id TEXT REFERENCES zitadel.projections.idps (id) ON DELETE CASCADE,
 
     issuer TEXT,
     keys_endpoint TEXT,
