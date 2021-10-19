@@ -132,7 +132,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, e.RoleKeys),
+			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),

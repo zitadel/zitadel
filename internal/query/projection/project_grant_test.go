@@ -144,6 +144,37 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceProjectGrantCascadeChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantCascadeChangedType),
+					project.AggregateType,
+					[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
+				), project.GrantCascadeChangedEventMapper),
+			},
+			reduce: (&ProjectGrantProjection{}).reduceProjectGrantCascadeChanged,
+			want: wantReduce{
+				projection:       ProjectGrantProjectionTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								pq.StringArray{"admin", "user"},
+								"grant-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceProjectGrantAdded",
 			args: args{
 				event: getEvent(testEvent(
