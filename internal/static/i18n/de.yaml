@@ -365,6 +365,21 @@ Errors:
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig
     KeyNotExisting: Ein oder mehrere Keys existiert nicht
+  Action:
+    Invalid: Action ist ungültig
+    NotFound: Action wurde nicht gefunden
+    NotActive: Action ist nicht aktiv
+    NotInactive: Action ist nicht inaktiv
+  Flow:
+    FlowTypeMissing: FlowType fehlt
+    Empty: Flow ist bereits leer
+    WrongTriggerType: TriggerType ist ungültig
+    NoChanges: Keine Änderungen
+    ActionIDsNotExist: ActionIDs existieren nicht
+  Query:
+    CloseRows: SQL Statement konnte nicht abgeschlossen werden
+    SQLStatement: SQL Statement konnte nicht erstellt werden
+    InvalidRequest: Anfage ist ungültig
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -654,6 +669,12 @@ EventTypes:
         added: Datenschutzbestimmung und AGB hinzugefügt
         changed: Datenschutzbestimmung und AGB geändert
         removed: Datenschutzbestimmung und AGB entfernt
+    flow:
+      trigger_actions:
+        set: Aktionen festgelegt
+        cascade:
+          removed: Aktionen kaskadiert entfernt
+        removed: Aktionen entfernt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -784,6 +805,12 @@ EventTypes:
           removed: Bilder und Schrift von Label Richtlinie entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
+  action:
+    added: Aktion hinzugefügt
+    changed: Aktion geändert
+    deactivated: Aktion deaktiviert
+    reactivated: Aktion reaktiviert
+    removed: Aktion gelöscht
 Application:
   OIDC:
     V1:

@@ -164,7 +164,14 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
 	}
-	var err error
+	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-Ffgw2", "Errors.Org.LoginPolicy.NotFound")
+	}
+
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
@@ -201,8 +208,16 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66m9s", "Errors.Org.LoginPolicy.IDP.Invalid")
 	}
+	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-GVDfe", "Errors.Org.LoginPolicy.NotFound")
+	}
+
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}

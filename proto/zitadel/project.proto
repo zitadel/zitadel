@@ -61,7 +61,7 @@ message GrantedProject {
             description: "current state of the project grant";
         }
     ];
-    
+
     string project_id = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
@@ -109,6 +109,7 @@ message ProjectQuery {
         option (validate.required) = true;
 
         ProjectNameQuery name_query = 1;
+        ProjectResourceOwnerQuery project_resource_owner_query = 2;
     }
 }
 
@@ -123,6 +124,15 @@ message ProjectNameQuery {
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message ProjectResourceOwnerQuery {
+    string resource_owner = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
         }
     ];
 }

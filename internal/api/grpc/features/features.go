@@ -33,6 +33,7 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		CustomTextLogin:          features.CustomTextLogin,
 		MetadataUser:             features.MetadataUser,
 		LockoutPolicy:            features.LockoutPolicy,
+		Actions:                  features.Actions,
 	}
 }
 

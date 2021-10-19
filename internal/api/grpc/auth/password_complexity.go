@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *auth_pb.GetMyPasswordComplexityPolicyRequest) (*auth_pb.GetMyPasswordComplexityPolicyResponse, error) {
-	policy, err := s.query.MyPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).UserID)
+	policy, err := s.query.PasswordComplexityPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

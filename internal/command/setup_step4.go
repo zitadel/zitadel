@@ -19,6 +19,7 @@ func (s *Step4) Step() domain.Step {
 func (s *Step4) execute(ctx context.Context, commandSide *Commands) error {
 	return commandSide.SetupStep4(ctx, s)
 }
+
 //This step should not be executed when a new instance is setup, because its not used anymore
 //SetupStep4 is no op in favour of step 18.
 //Password lockout policy is replaced by lockout policy

@@ -2,27 +2,27 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
-	"time"
 
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, req *mgmt_pb.GetLoginPolicyRequest) (*mgmt_pb.GetLoginPolicyResponse, error) {
-	policy, err := s.org.GetLoginPolicy(ctx)
+	policy, err := s.query.LoginPolicyByID(ctx, "")
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy), IsDefault: policy.Default}, nil
+	return &mgmt_pb.GetLoginPolicyResponse{Policy: policy_grpc.ModelLoginPolicyToPb(policy), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetDefaultLoginPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLoginPolicyRequest) (*mgmt_pb.GetDefaultLoginPolicyResponse, error) {
-	policy, err := s.org.GetDefaultLoginPolicy(ctx)
+	policy, err := s.query.DefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -107,14 +107,13 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.Remo
 }
 
 func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicySecondFactorsRequest) (*mgmt_pb.ListLoginPolicySecondFactorsResponse, error) {
-	result, err := s.org.SearchSecondFactors(ctx)
+	result, err := s.query.SecondFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListLoginPolicySecondFactorsResponse{
-		//TODO: missing values from res
-		Details: object.ToListDetails(result.TotalResult, 0, time.Time{}),
-		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Result),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Factors),
 	}, nil
 }
 
@@ -139,14 +138,13 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgm
 }
 
 func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicyMultiFactorsRequest) (*mgmt_pb.ListLoginPolicyMultiFactorsResponse, error) {
-	res, err := s.org.SearchMultiFactors(ctx)
+	res, err := s.query.MultiFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListLoginPolicyMultiFactorsResponse{
-		//TODO: additional values
-		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Result),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Factors),
 	}, nil
 }
 

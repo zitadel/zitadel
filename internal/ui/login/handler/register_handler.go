@@ -109,7 +109,10 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		registerFormData: *formData,
 	}
 
-	resourceOwner := authRequest.RequestedOrgID
+	var resourceOwner string
+	if authRequest != nil {
+		resourceOwner = authRequest.RequestedOrgID
+	}
 
 	if resourceOwner == "" {
 		iam, err := l.authRepo.GetIAM(r.Context())

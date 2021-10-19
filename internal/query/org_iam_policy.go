@@ -39,7 +39,7 @@ func (q *Queries) MyOrgIAMPolicy(ctx context.Context, orgID string) (*OrgIAMPoli
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -54,7 +54,7 @@ func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-pM7lP", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-pM7lP", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -117,9 +117,9 @@ func prepareOrgIAMPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgIAMPolicy
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-K0Jr5", "errors.policy.org_iam.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-K0Jr5", "Errors.OrgIAMPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-rIy6j", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-rIy6j", "Errors.Internal")
 			}
 			return policy, nil
 		}

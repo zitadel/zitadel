@@ -40,7 +40,7 @@ func (q *Queries) MyLockoutPolicy(ctx context.Context, orgID string) (*LockoutPo
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -55,7 +55,7 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, err
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -123,9 +123,9 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "errors.policy.password.complexity.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexityPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}

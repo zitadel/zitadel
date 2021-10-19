@@ -21,7 +21,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -48,7 +48,6 @@ export enum ColorType {
   BACKGROUNDLIGHT,
 }
 
-const ORG_STORAGE_KEY = 'organization';
 const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 
 @Component({
@@ -96,10 +95,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private injector: Injector,
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
-    private storageService: StorageService,
+    private storage: StorageService,
     private themeService: ThemeService,
   ) {
-    const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
+    const org: Org.AsObject | null = (this.storage.getItem(StorageKey.organization, StorageLocation.session));
 
     if (org) {
       this.org = org;

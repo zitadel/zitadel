@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -14,8 +15,8 @@ type LoginPolicy struct {
 	AllowExternalIdp      bool
 	IDPProviders          []*IDPProvider
 	ForceMFA              bool
-	SecondFactors         []SecondFactorType
-	MultiFactors          []MultiFactorType
+	SecondFactors         []domain.SecondFactorType
+	MultiFactors          []domain.MultiFactorType
 	PasswordlessType      PasswordlessType
 }
 
@@ -37,14 +38,6 @@ type IDPProviderType int32
 const (
 	IDPProviderTypeSystem IDPProviderType = iota
 	IDPProviderTypeOrg
-)
-
-type SecondFactorType int32
-
-const (
-	SecondFactorTypeUnspecified SecondFactorType = iota
-	SecondFactorTypeOTP
-	SecondFactorTypeU2F
 )
 
 type MultiFactorType int32
@@ -78,7 +71,7 @@ func (p *LoginPolicy) GetIdpProvider(id string) (int, *IDPProvider) {
 	return -1, nil
 }
 
-func (p *LoginPolicy) GetSecondFactor(mfaType SecondFactorType) (int, SecondFactorType) {
+func (p *LoginPolicy) GetSecondFactor(mfaType domain.SecondFactorType) (int, domain.SecondFactorType) {
 	for i, m := range p.SecondFactors {
 		if m == mfaType {
 			return i, m
@@ -87,7 +80,7 @@ func (p *LoginPolicy) GetSecondFactor(mfaType SecondFactorType) (int, SecondFact
 	return -1, 0
 }
 
-func (p *LoginPolicy) GetMultiFactor(mfaType MultiFactorType) (int, MultiFactorType) {
+func (p *LoginPolicy) GetMultiFactor(mfaType domain.MultiFactorType) (int, domain.MultiFactorType) {
 	for i, m := range p.MultiFactors {
 		if m == mfaType {
 			return i, m

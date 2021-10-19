@@ -40,7 +40,7 @@ func (q *Queries) MyPrivacyPolicy(ctx context.Context, orgID string) (*PrivacyPo
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-UXuPI", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-UXuPI", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -55,7 +55,7 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, err
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-LkFZ7", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-LkFZ7", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -123,9 +123,9 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-vNMHL", "errors.policy.privacy.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-vNMHL", "Errors.PrivacyPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-csrdo", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-csrdo", "Errors.Internal")
 			}
 			return policy, nil
 		}

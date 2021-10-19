@@ -183,6 +183,8 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 				literalsSecretVars["ZITADEL_TWILIO_SID"] = value
 			}
 		}
+		literalsSecretVars["ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID"] = ""
+		literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = ""
 		if desired.AssetStorage != nil {
 			as := desired.AssetStorage
 			if as.AccessKeyID != nil || as.ExistingAccessKeyID != nil {
@@ -200,6 +202,8 @@ func literalsSecretVars(k8sClient kubernetes.ClientInt, desired *Configuration) 
 				literalsSecretVars["ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY"] = value
 			}
 		}
+		literalsSecretVars["HTTP_PROXY"] = ""
+		literalsSecretVars["HTTPS_PROXY"] = ""
 		if desired.Proxy != nil {
 			if desired.Proxy.HTTP != nil || desired.Proxy.ExistingHTTP != nil {
 				value, err := read.GetSecretValue(k8sClient, desired.Proxy.HTTP, desired.Proxy.ExistingHTTP)

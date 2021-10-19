@@ -49,7 +49,7 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 
 ### CAOS-Managed
 
-* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
+* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
 * **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
 ## Start using ZITADEL

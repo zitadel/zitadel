@@ -15,8 +15,8 @@ type LoginPolicyView struct {
 	ForceMFA              bool
 	HidePasswordReset     bool
 	PasswordlessType      PasswordlessType
-	SecondFactors         []SecondFactorType
-	MultiFactors          []MultiFactorType
+	SecondFactors         []domain.SecondFactorType
+	MultiFactors          []domain.MultiFactorType
 	Default               bool
 
 	CreationDate time.Time
@@ -100,24 +100,24 @@ func passwordLessTypeToDomain(passwordless PasswordlessType) domain.Passwordless
 	}
 }
 
-func secondFactorsToDomain(types []SecondFactorType) []domain.SecondFactorType {
+func secondFactorsToDomain(types []domain.SecondFactorType) []domain.SecondFactorType {
 	secondfactors := make([]domain.SecondFactorType, len(types))
 	for i, secondfactorType := range types {
 		switch secondfactorType {
-		case SecondFactorTypeU2F:
+		case domain.SecondFactorTypeU2F:
 			secondfactors[i] = domain.SecondFactorTypeU2F
-		case SecondFactorTypeOTP:
+		case domain.SecondFactorTypeOTP:
 			secondfactors[i] = domain.SecondFactorTypeOTP
 		}
 	}
 	return secondfactors
 }
 
-func multiFactorsToDomain(types []MultiFactorType) []domain.MultiFactorType {
+func multiFactorsToDomain(types []domain.MultiFactorType) []domain.MultiFactorType {
 	multifactors := make([]domain.MultiFactorType, len(types))
 	for i, multifactorType := range types {
 		switch multifactorType {
-		case MultiFactorTypeU2FWithPIN:
+		case domain.MultiFactorTypeU2FWithPIN:
 			multifactors[i] = domain.MultiFactorTypeU2FWithPIN
 		}
 	}
