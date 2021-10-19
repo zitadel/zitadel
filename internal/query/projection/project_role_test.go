@@ -21,6 +21,33 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
+			name: "reduceProjectRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectRemovedType),
+					project.AggregateType,
+					nil,
+				), project.ProjectRemovedEventMapper),
+			},
+			reduce: (&ProjectRoleProjection{}).reduceProjectRemoved,
+			want: wantReduce{
+				projection:       ProjectRoleProjectionTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_roles WHERE (project_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceProjectRoleRemoved",
 			args: args{
 				event: getEvent(testEvent(
