@@ -20,74 +20,74 @@ func TestNotifyUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(nil))},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(nil))},
 				user:  &NotifyUser{},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 		},
 		{
 			name: "append added human event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullHuman(nil))},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.HumanAdded, ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(nil))},
 				user:  &NotifyUser{},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 		},
 		{
 			name: "append change user profile event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserProfileChanged, ResourceOwner: "OrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserProfileChanged, ResourceOwner: "GrantedOrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstNameChanged", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstNameChanged", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 		},
 		{
 			name: "append change user email event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailChanged, ResourceOwner: "OrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailChanged, ResourceOwner: "GrantedOrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "EmailChanged", LastPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "EmailChanged", LastPhone: "Phone"},
 		},
 		{
 			name: "append change user email event, existing email",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailChanged, ResourceOwner: "OrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", VerifiedEmail: "Email", LastPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailChanged, ResourceOwner: "GrantedOrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", VerifiedEmail: "Email", LastPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "EmailChanged", VerifiedEmail: "Email", LastPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "EmailChanged", VerifiedEmail: "Email", LastPhone: "Phone"},
 		},
 		{
 			name: "append verify user email event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailVerified, ResourceOwner: "OrgID"},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserEmailVerified, ResourceOwner: "GrantedOrgID"},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", VerifiedEmail: "Email", LastPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", VerifiedEmail: "Email", LastPhone: "Phone"},
 		},
 		{
 			name: "append change user phone event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneChanged, ResourceOwner: "OrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneChanged, ResourceOwner: "GrantedOrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "PhoneChanged"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "PhoneChanged"},
 		},
 		{
 			name: "append change user phone event, existing phone",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneChanged, ResourceOwner: "OrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone", VerifiedPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneChanged, ResourceOwner: "GrantedOrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone", VerifiedPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "PhoneChanged", VerifiedPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "PhoneChanged", VerifiedPhone: "Phone"},
 		},
 		{
 			name: "append verify user phone event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneVerified, ResourceOwner: "OrgID"},
-				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPhoneVerified, ResourceOwner: "GrantedOrgID"},
+				user:  &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone"},
 			},
-			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone", VerifiedPhone: "Phone"},
+			result: &NotifyUser{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", LastEmail: "Email", LastPhone: "Phone", VerifiedPhone: "Phone"},
 		},
 	}
 	for _, tt := range tests {

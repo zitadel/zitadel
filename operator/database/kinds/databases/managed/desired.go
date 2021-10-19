@@ -26,6 +26,8 @@ type Spec struct {
 	ClusterDns      string                `yaml:"clusterDNS,omitempty"`
 	Backups         map[string]*tree.Tree `yaml:"backups,omitempty"`
 	Resources       *k8s.Resources        `yaml:"resources,omitempty"`
+	MaxSQLMemory    string                `yaml:"maxSqlMemory,omitempty"`
+	Cache           string                `yaml:"cache,omitempty"`
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {

@@ -3,10 +3,9 @@ import { OAuthModuleConfig } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
 
 import { Org } from '../../proto/generated/zitadel/org_pb';
-import { StorageService } from '../storage.service';
+import { StorageKey, StorageLocation, StorageService } from '../storage.service';
 
 const orgKey = 'x-zitadel-orgid';
-const ORG_STORAGE_KEY = 'organization';
 export abstract class HttpOrgInterceptor implements HttpInterceptor {
   private org!: Org.AsObject;
 
@@ -18,7 +17,7 @@ export abstract class HttpOrgInterceptor implements HttpInterceptor {
     private storageService: StorageService,
     protected oauthModuleConfig: OAuthModuleConfig,
   ) {
-    const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
+    const org: Org.AsObject | null = (this.storageService.getItem(StorageKey.organization, StorageLocation.session));
 
     if (org) {
       this.org = org;

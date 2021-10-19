@@ -94,6 +94,10 @@ protoc \
   ${PROTO_PATH}/admin.proto
 protoc \
   -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,action.md \
+  ${PROTO_PATH}/action.proto
+protoc \
+  -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,app.md \
   ${PROTO_PATH}/app.proto
 protoc \

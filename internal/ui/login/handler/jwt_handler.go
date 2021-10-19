@@ -8,8 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
+
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -74,28 +76,24 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	}
 	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims}
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
+	externalUser, err = l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	metadata := externalUser.Metadatas
 	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
-		if errors.IsNotFound(err) {
-			err = nil
-		}
-		if !idpConfig.AutoRegister {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
-			return
-		}
+		l.jwtExtractionUserNotFound(w, r, authReq, idpConfig, tokens, err)
+		return
+	}
+	if len(metadata) > 0 {
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
 		}
-		resourceOwner := l.getOrgID(authReq)
-		orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return
-		}
-		user, externalIDP := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-		err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, domain.BrowserInfoFromRequest(r))
+		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, metadata...)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
@@ -107,6 +105,72 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		return
 	}
 	http.Redirect(w, r, redirect, http.StatusFound)
+}
+
+func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, tokens *oidc.Tokens, err error) {
+	if errors.IsNotFound(err) {
+		err = nil
+	}
+	if !idpConfig.AutoRegister {
+		l.renderExternalNotFoundOption(w, r, authReq, err)
+		return
+	}
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	resourceOwner := l.getOrgID(authReq)
+	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	userGrants, err := l.customGrants(authReq.UserID, tokens, authReq, idpConfig, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	redirect, err := l.redirectToJWTCallback(authReq)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	http.Redirect(w, r, redirect, http.StatusFound)
+}
+
+func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
+	if len(userGrants) == 0 {
+		return nil
+	}
+	for _, grant := range userGrants {
+		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, resourceOwner)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (l *Login) redirectToJWTCallback(authReq *domain.AuthRequest) (string, error) {
@@ -160,6 +224,7 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateToken(ctx context.Context, token string, config *iam_model.IDPConfigView) (oidc.IDTokenClaims, error) {
+	logging.Log("LOGIN-ADf42").Debug("begin token validation")
 	offset := 3 * time.Second
 	maxAge := time.Hour
 	claims := oidc.EmptyIDTokenClaims()
@@ -172,6 +237,7 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		return nil, err
 	}
 
+	logging.Log("LOGIN-Dfg22").Debug("begin signature validation")
 	keySet := rp.NewRemoteKeySet(http.DefaultClient, config.JWTKeysEndpoint)
 	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
 		return nil, err

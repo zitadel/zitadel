@@ -2563,6 +2563,7 @@ This is an empty request
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
+| actions |  bool | - |  |
 
 
 
@@ -2752,6 +2753,7 @@ This is an empty request
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
+| actions |  bool | - |  |
 
 
 

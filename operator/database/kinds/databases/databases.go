@@ -10,7 +10,6 @@ import (
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
 	"github.com/caos/zitadel/operator/database/kinds/databases/provided"
@@ -50,16 +49,7 @@ func Adapt(
 
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
-		return managed.Adapter(
-			componentLabels,
-			namespace,
-			timestamp,
-			nodeselector,
-			tolerations,
-			version,
-			features,
-			customImageRegistry,
-		)(internalMonitor, desiredTree, currentTree)
+		return managed.Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features, customImageRegistry)(internalMonitor, desiredTree, currentTree)
 	case "databases.caos.ch/ProvidedDatabase":
 		return provided.Adapter()(internalMonitor, desiredTree, currentTree)
 	default:

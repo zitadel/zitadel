@@ -30,5 +30,5 @@ This command generates static content into the `build` directory and can be serv
 
 ## Deployment
 
-Each PR will be automaticly built with a preview link from cloudflare pages.
+Each PR will be automatically built with a preview link from cloudflare pages.
 Visit the checks / comments on the PR for the link.
