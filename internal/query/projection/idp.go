@@ -124,15 +124,16 @@ const (
 	IDPOIDCSuffix = "oidc_config"
 	IDPJWTSuffix  = "jwt_config"
 
-	IDPIDCol           = "id"
-	IDPCreationDateCol = "creation_date"
-	IDPChangeDateCol   = "change_date"
-	IDPSequenceCol     = "sequence"
-	IDPStateCol        = "state"
-	IDPNameCol         = "name"
-	IDPStylingTypeCol  = "styling_type"
-	IDPOwnerCol        = "owner"
-	IDPAutoRegisterCol = "auto_register"
+	IDPIDCol            = "id"
+	IDPCreationDateCol  = "creation_date"
+	IDPChangeDateCol    = "change_date"
+	IDPSequenceCol      = "sequence"
+	IDPResourceOwnerCol = "resource_owner"
+	IDPStateCol         = "state"
+	IDPNameCol          = "name"
+	IDPStylingTypeCol   = "styling_type"
+	IDPOwnerTypeCol     = "owner_type"
+	IDPAutoRegisterCol  = "auto_register"
 
 	OIDCConfigIDPIDCol                 = "idp_id"
 	OIDCConfigClientIDCol              = "client_id"
@@ -173,11 +174,12 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.S
 			handler.NewCol(IDPCreationDateCol, idpEvent.CreationDate()),
 			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+			handler.NewCol(IDPResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
 			handler.NewCol(IDPNameCol, idpEvent.Name),
 			handler.NewCol(IDPStylingTypeCol, idpEvent.StylingType),
 			handler.NewCol(IDPAutoRegisterCol, idpEvent.AutoRegister),
-			handler.NewCol(IDPOwnerCol, idpOwnerType),
+			handler.NewCol(IDPOwnerTypeCol, idpOwnerType),
 		},
 	), nil
 }

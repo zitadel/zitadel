@@ -47,12 +47,13 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps (id, creation_date, change_date, sequence, state, name, styling_type, auto_register, owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO zitadel.projections.idps (id, creation_date, change_date, sequence, resource_owner, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
+								"ro-id",
 								domain.IDPConfigStateActive,
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeUnspecified,
@@ -462,12 +463,13 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps (id, creation_date, change_date, sequence, state, name, styling_type, auto_register, owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO zitadel.projections.idps (id, creation_date, change_date, sequence, resource_owner, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
+								"ro-id",
 								domain.IDPConfigStateActive,
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeUnspecified,

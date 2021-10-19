@@ -37,6 +37,7 @@ func ModelIDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 
 func IDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
+		Owner:        ownerTypeToPB(idp.OwnerType),
 		Id:           idp.ID,
 		State:        IDPStateToPb(idp.State),
 		Name:         idp.Name,
@@ -287,5 +288,15 @@ func IDPOwnerTypeQueryToModel(query *idp_pb.IDPOwnerTypeQuery) *iam_model.IDPCon
 		Key:    iam_model.IDPConfigSearchKeyIdpProviderType,
 		Method: domain.SearchMethodEquals,
 		Value:  IDPProviderTypeModelFromPb(query.OwnerType),
+	}
+}
+func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
+	switch typ {
+	case domain.IdentityProviderTypeOrg:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
+	case domain.IdentityProviderTypeSystem:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+	default:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
 	}
 }

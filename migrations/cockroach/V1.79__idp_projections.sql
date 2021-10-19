@@ -3,11 +3,12 @@ CREATE TABLE zitadel.projections.idps (
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
     sequence BIGINT,
+    resource_owner TEXT,
     
     state SMALLINT,
     name TEXT,
     styling_type SMALLINT,
-    owner SMALLINT,
+    owner_type SMALLINT,
     auto_register BOOLEAN,
 
     PRIMARY KEY (id)

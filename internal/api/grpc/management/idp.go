@@ -10,19 +10,19 @@ import (
 )
 
 func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRequest) (*mgmt_pb.GetOrgIDPByIDResponse, error) {
-	//TODO: check if allowed
-	idp, err := s.query.IDPByID(ctx, req.Id)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetOrgIDPByIDResponse{Idp: idp_grpc.ModelIDPViewToPb(idp)}, nil
 }
+
 func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (*mgmt_pb.ListOrgIDPsResponse, error) {
 	queries, err := listIDPsToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchIDPs(ctx, queries)
+	resp, err := s.query.SearchIDPs(ctx, authz.GetCtxData(ctx).OrgID, queries)
 	if err != nil {
 		return nil, err
 	}
