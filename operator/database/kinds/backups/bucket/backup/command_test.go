@@ -7,47 +7,40 @@ import (
 
 func TestBackup_Command1(t *testing.T) {
 	timestamp := ""
-	databases := []string{}
 	bucketName := "test"
 	backupName := "test"
+	dbURL := "testDB"
+	dbPort := int32(80)
 
-	cmd := getBackupCommand(timestamp, databases, bucketName, backupName)
-	equals := "export " + backupNameEnv + "=$(date +%Y-%m-%dT%H:%M:%SZ)"
+	cmd := getBackupCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
+	)
+	equals := "export " + backupNameEnv + "=$(date +%Y-%m-%dT%H:%M:%SZ) && export SAJSON=$(cat /secrets/sa.json | base64 | tr -d '\n' ) && cockroach sql --certs-dir=/cockroach/cockroach-certs --host=testDB --port=80 -e \"BACKUP TO \\\"gs://test/test/${BACKUP_NAME}?AUTH=specified&CREDENTIALS=${SAJSON}\\\";\""
 	assert.Equal(t, equals, cmd)
 }
 
 func TestBackup_Command2(t *testing.T) {
 	timestamp := "test"
-	databases := []string{}
 	bucketName := "test"
 	backupName := "test"
+	dbURL := "testDB"
+	dbPort := int32(80)
 
-	cmd := getBackupCommand(timestamp, databases, bucketName, backupName)
-	equals := "export " + backupNameEnv + "=test"
-	assert.Equal(t, equals, cmd)
-}
-
-func TestBackup_Command3(t *testing.T) {
-	timestamp := ""
-	databases := []string{"testDb"}
-	bucketName := "testBucket"
-	backupName := "testBackup"
-
-	cmd := getBackupCommand(timestamp, databases, bucketName, backupName)
-	equals := "export " + backupNameEnv + "=$(date +%Y-%m-%dT%H:%M:%SZ) && /scripts/backup.sh testBackup testBucket testDb " + backupPath + " " + secretPath + " " + certPath + " ${" + backupNameEnv + "}"
-	assert.Equal(t, equals, cmd)
-}
-
-func TestBackup_Command4(t *testing.T) {
-	timestamp := "test"
-	databases := []string{"test1", "test2", "test3"}
-	bucketName := "testBucket"
-	backupName := "testBackup"
-
-	cmd := getBackupCommand(timestamp, databases, bucketName, backupName)
-	equals := "export " + backupNameEnv + "=test && " +
-		"/scripts/backup.sh testBackup testBucket test1 " + backupPath + " " + secretPath + " " + certPath + " ${" + backupNameEnv + "} && " +
-		"/scripts/backup.sh testBackup testBucket test2 " + backupPath + " " + secretPath + " " + certPath + " ${" + backupNameEnv + "} && " +
-		"/scripts/backup.sh testBackup testBucket test3 " + backupPath + " " + secretPath + " " + certPath + " ${" + backupNameEnv + "}"
+	cmd := getBackupCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
+	)
+	equals := "export " + backupNameEnv + "=test && export SAJSON=$(cat /secrets/sa.json | base64 | tr -d '\n' ) && cockroach sql --certs-dir=/cockroach/cockroach-certs --host=testDB --port=80 -e \"BACKUP TO \\\"gs://test/test/${BACKUP_NAME}?AUTH=specified&CREDENTIALS=${SAJSON}\\\";\""
 	assert.Equal(t, equals, cmd)
 }

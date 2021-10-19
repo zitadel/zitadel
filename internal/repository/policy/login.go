@@ -79,9 +79,6 @@ type LoginPolicyChangedEvent struct {
 	PasswordlessType      *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
-type LoginPolicyEventData struct {
-}
-
 func (e *LoginPolicyChangedEvent) Data() interface{} {
 	return e
 }

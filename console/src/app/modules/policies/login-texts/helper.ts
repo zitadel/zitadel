@@ -3,6 +3,7 @@ import { SetCustomLoginTextsRequest } from 'src/app/proto/generated/zitadel/mana
 import {
   EmailVerificationDoneScreenText,
   EmailVerificationScreenText,
+  ExternalRegistrationUserOverviewScreenText,
   ExternalUserNotFoundScreenText,
   FooterText,
   InitializeUserDoneScreenText,
@@ -61,6 +62,11 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r2.setDescription(map.externalUserNotFoundText?.description ?? '');
   r2.setLinkButtonText(map.externalUserNotFoundText?.linkButtonText ?? '');
   r2.setTitle(map.externalUserNotFoundText?.title ?? '');
+  r2.setTosAndPrivacyLabel(map.externalUserNotFoundText?.tosAndPrivacyLabel ?? '');
+  r2.setTosConfirm(map.externalUserNotFoundText?.tosConfirm ?? '');
+  r2.setTosConfirmAnd(map.externalUserNotFoundText?.tosConfirmAnd ?? '');
+  r2.setTosLinkText(map.externalUserNotFoundText?.tosLinkText ?? '');
+  r2.setPrivacyLinkText(map.externalUserNotFoundText?.privacyLinkText ?? '');
   req.setExternalUserNotFoundText(r2);
 
   const r3 = new FooterText();
@@ -327,8 +333,10 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
 
   const r31 = new PasswordlessRegistrationDoneScreenText();
   r31.setDescription(map.passwordlessRegistrationDoneText?.description ?? '');
+  r31.setDescriptionClose(map.passwordlessRegistrationDoneText?.descriptionClose ?? '');
   r31.setNextButtonText(map.passwordlessRegistrationDoneText?.nextButtonText ?? '');
   r31.setTitle(map.passwordlessRegistrationDoneText?.title ?? '');
+  r31.setNextButtonText(map.passwordlessRegistrationDoneText?.cancelButtonText ?? '');
   req.setPasswordlessRegistrationDoneText(r31);
 
   const r32 = new PasswordlessRegistrationScreenText();
@@ -349,6 +357,25 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r33.setTitle(map.passwordlessText?.title ?? '');
   r33.setValidateTokenButtonText(map.passwordlessText?.validateTokenButtonText ?? '');
   req.setPasswordlessText(r33);
+
+  const r34 = new ExternalRegistrationUserOverviewScreenText();
+  r34.setBackButtonText(map.externalRegistrationUserOverviewText?.backButtonText ?? '');
+  r34.setDescription(map.externalRegistrationUserOverviewText?.description ?? '');
+  r34.setEmailLabel(map.externalRegistrationUserOverviewText?.emailLabel ?? '');
+  r34.setFirstnameLabel(map.externalRegistrationUserOverviewText?.firstnameLabel ?? '');
+  r34.setLanguageLabel(map.externalRegistrationUserOverviewText?.languageLabel ?? '');
+  r34.setLastnameLabel(map.externalRegistrationUserOverviewText?.lastnameLabel ?? '');
+  r34.setNextButtonText(map.externalRegistrationUserOverviewText?.nextButtonText ?? '');
+  r34.setNicknameLabel(map.externalRegistrationUserOverviewText?.nicknameLabel ?? '');
+  r34.setPhoneLabel(map.externalRegistrationUserOverviewText?.phoneLabel ?? '');
+  r34.setPrivacyLinkText(map.externalRegistrationUserOverviewText?.privacyLinkText ?? '');
+  r34.setTitle(map.externalRegistrationUserOverviewText?.title ?? '');
+  r34.setTosAndPrivacyLabel(map.externalRegistrationUserOverviewText?.tosAndPrivacyLabel ?? '');
+  r34.setTosConfirm(map.externalRegistrationUserOverviewText?.tosConfirm ?? '');
+  r34.setTosConfirmAnd(map.externalRegistrationUserOverviewText?.tosConfirmAnd ?? '');
+  r34.setTosLinkText(map.externalRegistrationUserOverviewText?.tosLinkText ?? '');
+  r34.setUsernameLabel(map.externalRegistrationUserOverviewText?.usernameLabel ?? '');
+  req.setExternalRegistrationUserOverviewText(r34);
 
   return req;
 }

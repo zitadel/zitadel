@@ -178,6 +178,7 @@ const (
 	LoginKeyPasswordlessRegistrationDone                 = "PasswordlessRegistrationDone."
 	LoginKeyPasswordlessRegistrationDoneTitle            = LoginKeyPasswordlessRegistrationDone + "Title"
 	LoginKeyPasswordlessRegistrationDoneDescription      = LoginKeyPasswordlessRegistrationDone + "Description"
+	LoginKeyPasswordlessRegistrationDoneDescriptionClose = LoginKeyPasswordlessRegistrationDone + "DescriptionClose"
 	LoginKeyPasswordlessRegistrationDoneNextButtonText   = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
 	LoginKeyPasswordlessRegistrationDoneCancelButtonText = LoginKeyPasswordlessRegistrationDone + "CancelButtonText"
 
@@ -659,6 +660,7 @@ type PasswordlessRegistrationScreenText struct {
 type PasswordlessRegistrationDoneScreenText struct {
 	Title            string
 	Description      string
+	DescriptionClose string
 	NextButtonText   string
 	CancelButtonText string
 }

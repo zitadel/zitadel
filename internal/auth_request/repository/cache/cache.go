@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
+	"time"
 
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -43,11 +44,14 @@ func (c *AuthRequestCache) GetAuthRequestByCode(_ context.Context, code string) 
 }
 
 func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *domain.AuthRequest) error {
-	return c.saveAuthRequest(request, "INSERT INTO auth.auth_requests (id, request, request_type) VALUES($1, $2, $3)", request.Request.Type())
+	return c.saveAuthRequest(request, "INSERT INTO auth.auth_requests (id, request, creation_date, change_date, request_type) VALUES($1, $2, $3, $3, $4)", request.CreationDate, request.Request.Type())
 }
 
 func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *domain.AuthRequest) error {
-	return c.saveAuthRequest(request, "UPDATE auth.auth_requests SET request = $2, code = $3 WHERE id = $1", request.Code)
+	if request.ChangeDate.IsZero() {
+		request.ChangeDate = time.Now()
+	}
+	return c.saveAuthRequest(request, "UPDATE auth.auth_requests SET request = $2, change_date = $3, code = $4 WHERE id = $1", request.ChangeDate, request.Code)
 }
 
 func (c *AuthRequestCache) DeleteAuthRequest(_ context.Context, id string) error {
@@ -79,7 +83,7 @@ func (c *AuthRequestCache) getAuthRequest(key, value string) (*domain.AuthReques
 	return request, nil
 }
 
-func (c *AuthRequestCache) saveAuthRequest(request *domain.AuthRequest, query string, param interface{}) error {
+func (c *AuthRequestCache) saveAuthRequest(request *domain.AuthRequest, query string, date time.Time, param interface{}) error {
 	b, err := json.Marshal(request)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-os0GH", "Errors.Internal")
@@ -88,7 +92,7 @@ func (c *AuthRequestCache) saveAuthRequest(request *domain.AuthRequest, query st
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-su3GK", "Errors.Internal")
 	}
-	_, err = stmt.Exec(request.ID, b, param)
+	_, err = stmt.Exec(request.ID, b, date, param)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-sj8iS", "Errors.Internal")
 	}

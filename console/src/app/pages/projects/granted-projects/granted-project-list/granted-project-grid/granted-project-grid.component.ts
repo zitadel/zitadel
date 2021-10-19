@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { Router } from '@angular/router';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, ProjectGrantState } from 'src/app/proto/generated/zitadel/project_pb';
-import { StorageKey, StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 @Component({
   selector: 'app-granted-project-grid',
@@ -81,12 +81,12 @@ export class GrantedProjectGridComponent implements OnChanges {
   }
 
   private async getPrefixedItem(key: string): Promise<string | null> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     return localStorage.getItem(`${org.id}:${key}`);
   }
 
   private async setPrefixedItem(key: string, value: any): Promise<void> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     return localStorage.setItem(`${org.id}:${key}`, value);
   }
 

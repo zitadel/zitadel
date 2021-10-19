@@ -7,7 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query/projection"
 )
 
 type LatestSequence struct {
@@ -28,9 +30,9 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-gmd9o", "errors.current_sequence.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-gmd9o", "Errors.CurrentSequence.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
 			}
 			return seq, nil
 		}
@@ -42,7 +44,7 @@ func (q *Queries) latestSequence(ctx context.Context, projection table) (*Latest
 		CurrentSequenceColProjectionName.identifier(): projection.name,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -51,7 +53,7 @@ func (q *Queries) latestSequence(ctx context.Context, projection table) (*Latest
 
 var (
 	currentSequencesTable = table{
-		name: "zitadel.projections.current_sequences",
+		name: projection.CurrentSeqTable,
 	}
 	CurrentSequenceColAggregateType = Column{
 		name:  "aggregate_type",

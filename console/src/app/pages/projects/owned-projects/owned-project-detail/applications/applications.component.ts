@@ -1,8 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
-import { merge, of } from 'rxjs';
+import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
@@ -11,57 +10,56 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ProjectApplicationsDataSource } from './applications-datasource';
 
 @Component({
-    selector: 'app-applications',
-    templateUrl: './applications.component.html',
-    styleUrls: ['./applications.component.scss'],
+  selector: 'app-applications',
+  templateUrl: './applications.component.html',
+  styleUrls: ['./applications.component.scss'],
 })
 export class ApplicationsComponent implements AfterViewInit, OnInit {
-    @Input() public projectId: string = '';
-    @Input() public disabled: boolean = false;
-    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-    @ViewChild(MatSort) public sort!: MatSort;
-    @ViewChild(MatTable) public table!: MatTable<App.AsObject>;
-    public dataSource!: ProjectApplicationsDataSource;
-    public selection: SelectionModel<App.AsObject> = new SelectionModel<App.AsObject>(true, []);
+  @Input() public projectId: string = '';
+  @Input() public disabled: boolean = false;
+  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
+  @ViewChild(MatTable) public table!: MatTable<App.AsObject>;
+  public dataSource!: ProjectApplicationsDataSource;
+  public selection: SelectionModel<App.AsObject> = new SelectionModel<App.AsObject>(true, []);
 
-    public displayedColumns: string[] = ['select', 'name', 'type'];
+  public displayedColumns: string[] = ['select', 'name', 'type'];
 
-    constructor(private mgmtService: ManagementService) { }
+  constructor(private mgmtService: ManagementService) { }
 
-    public ngOnInit(): void {
-        this.dataSource = new ProjectApplicationsDataSource(this.mgmtService);
-        this.dataSource.loadApps(this.projectId, 0, 25);
-    }
+  public ngOnInit(): void {
+    this.dataSource = new ProjectApplicationsDataSource(this.mgmtService);
+    this.dataSource.loadApps(this.projectId, 0, 25);
+  }
 
-    public ngAfterViewInit(): void {
-        merge(this.sort ? this.sort?.sortChange : of(null), this.paginator.page)
-            .pipe(
-                tap(() => this.loadRolesPage()),
-            )
-            .subscribe();
-    }
+  public ngAfterViewInit(): void {
+    merge(this.paginator.page)
+      .pipe(
+        tap(() => this.loadRolesPage()),
+      )
+      .subscribe();
+  }
 
-    private loadRolesPage(): void {
-        this.dataSource.loadApps(
-            this.projectId,
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-        );
-    }
+  private loadRolesPage(): void {
+    this.dataSource.loadApps(
+      this.projectId,
+      this.paginator.pageIndex,
+      this.paginator.pageSize,
+    );
+  }
 
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.appsSubject.value.length;
-        return numSelected === numRows;
-    }
+  public isAllSelected(): boolean {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.appsSubject.value.length;
+    return numSelected === numRows;
+  }
 
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.appsSubject.value.forEach((row: App.AsObject) => this.selection.select(row));
-    }
+  public masterToggle(): void {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.appsSubject.value.forEach((row: App.AsObject) => this.selection.select(row));
+  }
 
-    public refreshPage(): void {
-        this.dataSource.loadApps(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
-    }
+  public refreshPage(): void {
+    this.dataSource.loadApps(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
+  }
 }
