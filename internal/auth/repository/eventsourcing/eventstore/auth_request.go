@@ -71,7 +71,7 @@ type loginPolicyViewProvider interface {
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByAggregateID(string) (*iam_view_model.LockoutPolicyView, error)
+	LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -294,7 +294,22 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, res
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), policy)
+	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+}
+
+func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
+	return &domain.LockoutPolicy{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:   policy.ID,
+			Sequence:      policy.Sequence,
+			ResourceOwner: policy.ResourceOwner,
+			CreationDate:  policy.CreationDate,
+			ChangeDate:    policy.ChangeDate,
+		},
+		Default:             policy.IsDefault,
+		MaxPasswordAttempts: policy.MaxPasswordAttempts,
+		ShowLockOutFailures: policy.ShowFailures,
+	}
 }
 
 func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -512,7 +527,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	if err != nil {
 		return err
 	}
-	request.LockoutPolicy = lockoutPolicy
+	request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
 	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
 	if err != nil {
 		return err
@@ -889,34 +904,12 @@ func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string)
 	return policy.ToDomain(), err
 }
 
-func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*domain.LockoutPolicy, error) {
-	policy, err := repo.View.LockoutPolicyByAggregateID(orgID)
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.LockoutPolicyByAggregateID(repo.IAMID)
-		if err != nil && !errors.IsNotFound(err) {
-			return nil, err
-		}
-		if err == nil {
-			return policy.ToDomain(), nil
-		}
-		policy = &iam_view_model.LockoutPolicyView{}
-		events, err := repo.Eventstore.FilterEvents(ctx, es_models.NewSearchQuery().
-			AggregateIDFilter(repo.IAMID).
-			AggregateTypeFilter(iam.AggregateType).
-			EventTypesFilter(es_models.EventType(iam.LockoutPolicyAddedEventType), es_models.EventType(iam.LockoutPolicyChangedEventType)))
-		if err != nil || len(events) == 0 {
-			return nil, errors.ThrowNotFound(err, "EVENT-Gfgr2", "IAM.LockoutPolicy.NotExisting")
-		}
-		policy.Default = true
-		for _, event := range events {
-			policy.AppendEvent(event)
-		}
-		return policy.ToDomain(), nil
-	}
+func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	return policy.ToDomain(), err
+	return policy, err
 }
 
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {

@@ -285,57 +285,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	return result, nil
 }
 
-func (repo *OrgRepository) GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
-	policy, viewErr := repo.View.LockoutPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.LockoutPolicyView)
-	}
-	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return repo.GetDefaultLockoutPolicy(ctx)
-	}
-	if esErr != nil {
-		logging.Log("EVENT-mS9od").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.LockoutViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.LockoutViewToModel(policy), nil
-		}
-	}
-	return iam_view_model.LockoutViewToModel(policy), nil
-}
-
-func (repo *OrgRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
-	policy, viewErr := repo.View.LockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.LockoutPolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LockoutPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-2Ms9f").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.LockoutViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.LockoutViewToModel(policy), nil
-		}
-	}
-	policy.Default = true
-	return iam_view_model.LockoutViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
 	policy, err := repo.View.PrivacyPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
