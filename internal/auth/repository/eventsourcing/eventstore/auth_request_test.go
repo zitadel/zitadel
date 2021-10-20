@@ -15,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
