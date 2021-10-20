@@ -55,7 +55,7 @@ var (
 	}
 )
 
-func (q *Queries) MyOrgIAMPolicy(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
+func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{

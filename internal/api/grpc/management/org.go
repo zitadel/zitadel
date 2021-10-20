@@ -105,7 +105,7 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 }
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, req *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.query.MyOrgIAMPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
