@@ -28,7 +28,7 @@ type OrgRepository struct {
 	Eventstore     eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
-	Query          query.Queries
+	Query          *query.Queries
 }
 
 func (repo *OrgRepository) GetDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error) {
