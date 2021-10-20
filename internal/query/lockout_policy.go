@@ -54,7 +54,7 @@ var (
 	}
 )
 
-func (q *Queries) MyLockoutPolicy(ctx context.Context, orgID string) (*LockoutPolicy, error) {
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*LockoutPolicy, error) {
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
