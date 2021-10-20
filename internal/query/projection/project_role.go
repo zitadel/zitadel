@@ -66,7 +66,7 @@ const (
 func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g92Fg", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -88,7 +88,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventRea
 func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sM0f", "reduce.wrong.event.type")
 	}
 	if e.DisplayName == nil && e.Group == nil {
@@ -116,7 +116,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-L0fJf", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
@@ -131,7 +131,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventR
 func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-l0geG", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(

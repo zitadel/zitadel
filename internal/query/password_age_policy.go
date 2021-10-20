@@ -54,7 +54,7 @@ var (
 	}
 )
 
-func (q *Queries) MyPasswordAgePolicy(ctx context.Context, orgID string) (*PasswordAgePolicy, error) {
+func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*PasswordAgePolicy, error) {
 	stmt, scan := preparePasswordAgePolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
