@@ -20,6 +20,16 @@ type LockoutPolicyProjection struct {
 
 const (
 	LockoutPolicyTable = "zitadel.projections.lockout_policies"
+
+	LockoutPolicyCreationDateCol        = "creation_date"
+	LockoutPolicyChangeDateCol          = "change_date"
+	LockoutPolicySequenceCol            = "sequence"
+	LockoutPolicyIDCol                  = "id"
+	LockoutPolicyStateCol               = "state"
+	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
+	LockoutPolicyShowLockOutFailuresCol = "show_failure"
+	LockoutPolicyIsDefaultCol           = "is_default"
+	LockoutPolicyResourceOwnerCol       = "resource_owner"
 )
 
 func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LockoutPolicyProjection {
@@ -135,15 +145,3 @@ func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.EventReader) (*
 			handler.NewCond(LockoutPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
-
-const (
-	LockoutPolicyCreationDateCol        = "creation_date"
-	LockoutPolicyChangeDateCol          = "change_date"
-	LockoutPolicySequenceCol            = "sequence"
-	LockoutPolicyIDCol                  = "id"
-	LockoutPolicyStateCol               = "state"
-	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
-	LockoutPolicyShowLockOutFailuresCol = "show_failure"
-	LockoutPolicyIsDefaultCol           = "is_default"
-	LockoutPolicyResourceOwnerCol       = "resource_owner"
-)
