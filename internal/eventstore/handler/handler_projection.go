@@ -120,6 +120,7 @@ func (h *ProjectionHandler) Process(
 			return
 		case event := <-h.Handler.EventQueue:
 			if err := h.processEvent(ctx, event, reduce); err != nil {
+				logging.LogWithFields("HANDL-TUk5J", "projection", h.ProjectionName).WithError(err).Warn("process failed")
 				continue
 			}
 			h.triggerShouldPush(0)
@@ -137,6 +138,7 @@ func (h *ProjectionHandler) Process(
 				return
 			case event := <-h.Handler.EventQueue:
 				if err := h.processEvent(ctx, event, reduce); err != nil {
+					logging.LogWithFields("HANDL-horKq", "projection", h.ProjectionName).WithError(err).Warn("process failed")
 					continue
 				}
 				h.triggerShouldPush(0)

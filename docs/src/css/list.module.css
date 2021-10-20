@@ -1,0 +1,47 @@
+.listelement {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: .5rem 0;
+  text-decoration: none;
+  transition: all .2 ease-in-out;
+  margin: .5rem 0;
+}
+
+.listelement:hover {
+  text-decoration: none;
+}
+
+.listelement h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.listelement p {
+  font-size: 14px;
+  margin: 0;
+  color: var(--ifm-font-color-base);
+}
+
+.fillspace {
+  flex: 1;
+}
+
+.icon {
+  padding: .5rem 1rem .5rem .5rem;
+}
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  background: var(--list-background);
+  border-radius: .5rem;
+  padding: 1rem;
+}
+
+.listWrapperTitle {
+  color: var(--ifm-heading-color);
+  font-size: 16px;
+  margin-bottom: .5rem;
+  display: block;
+}

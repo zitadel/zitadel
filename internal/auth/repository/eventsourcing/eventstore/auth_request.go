@@ -67,7 +67,7 @@ type userViewProvider interface {
 }
 
 type loginPolicyViewProvider interface {
-	LoginPolicyByAggregateID(string) (*iam_view_model.LoginPolicyView, error)
+	LoginPolicyByID(context.Context, string) (*query.LoginPolicy, error)
 }
 
 type lockoutPolicyViewProvider interface {
@@ -474,21 +474,21 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*domain.LoginPolicy, []*domain.IDPProvider, error) {
-	policy, err := repo.getLoginPolicy(ctx, orgID)
+func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*query.LoginPolicy, []*domain.IDPProvider, error) {
+	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
-	if !policy.AllowExternalIDP {
-		return policy.ToLoginPolicyDomain(), nil, nil
+	if !policy.AllowExternalIDPs {
+		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.Default)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	providers := iam_model.IdpProviderViewsToDomain(idpProviders)
-	return policy.ToLoginPolicyDomain(), providers, nil
+	return policy, providers, nil
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
@@ -504,7 +504,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	if err != nil {
 		return err
 	}
-	request.LoginPolicy = loginPolicy
+	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
 	if idpProviders != nil {
 		request.AllowedExternalIDPs = idpProviders
 	}
@@ -580,7 +580,7 @@ func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDP {
+	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDPs {
 		return errors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
@@ -589,9 +589,30 @@ func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Contex
 			return errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
-	request.LoginPolicy = loginPolicy
+	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
 	request.AllowedExternalIDPs = idpProviders
 	return nil
+}
+
+func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
+	return &domain.LoginPolicy{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:   policy.OrgID,
+			Sequence:      policy.Sequence,
+			ResourceOwner: policy.OrgID,
+			CreationDate:  policy.CreationDate,
+			ChangeDate:    policy.ChangeDate,
+		},
+		Default:               policy.IsDefault,
+		AllowUsernamePassword: policy.AllowUsernamePassword,
+		AllowRegister:         policy.AllowRegister,
+		AllowExternalIDP:      policy.AllowExternalIDPs,
+		ForceMFA:              policy.ForceMFA,
+		SecondFactors:         policy.SecondFactors,
+		MultiFactors:          policy.MultiFactors,
+		PasswordlessType:      policy.PasswordlessType,
+		HidePasswordReset:     policy.HidePasswordReset,
+	}
 }
 
 func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthRequest, idpConfigID string) error {
@@ -836,14 +857,6 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 		return true
 	}
 	return checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime)
-}
-
-func (repo *AuthRequestRepo) getLoginPolicy(ctx context.Context, orgID string) (*iam_model.LoginPolicyView, error) {
-	policy, err := repo.View.LoginPolicyByAggregateID(orgID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.LoginPolicyViewToModel(policy), err
 }
 
 func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {

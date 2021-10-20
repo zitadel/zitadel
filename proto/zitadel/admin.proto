@@ -2899,6 +2899,7 @@ message GetCustomOrgIAMPolicyRequest {
 
 message GetCustomOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy
     bool is_default = 2;
 }
 
