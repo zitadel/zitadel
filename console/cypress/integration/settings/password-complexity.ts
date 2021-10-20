@@ -1,15 +1,24 @@
-import { User } from "../../support/login/users";
+import { login, User } from "../../support/login/users";
 
 describe("password complexity", ()=> {
 
+    const orgPath = `${Cypress.env('consoleUrl')}/org`
     const testProjectName = 'e2eproject'
 
     ;[User.OrgOwner].forEach(user => {
 
         describe(`as user "${user}"`, () => {
-            it(`should restrict passwords that don't have the minimal length`, () => {
-                
+
+            beforeEach(()=> {
+                login(user)
+                cy.visit(orgPath)
+                // TODO: Why force?
+                cy.contains('[data-e2e=policy-card]', 'Password Complexity').contains('button', 'Modify').click({force: true})
             })
+
+            // TODO: fix saving password complexity policy bug
+
+            it(`should restrict passwords that don't have the minimal length`)
             it(`should require passwords to contain a number if option is switched on`)
             it(`should not require passwords to contain a number if option is switched off`)
             it(`should require passwords to contain a symbol if option is switched on`)

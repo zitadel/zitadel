@@ -39,13 +39,10 @@ describe.only('permissions', () => {
                     cy.contains('[data-e2e=app-card]', 'Roles').within(() => {
                         cy.contains('a', 'New').click()
                     })
-//                    cy.then(() => cy.visit(Cypress.env('consoleUrl') + '/projects/' + projectId +'/roles/create'))
                     cy.get('[formcontrolname^=key]').type(testRoleName)
                     cy.get('[formcontrolname^=displayName]').type(testRoleDisplay)
                     cy.get('[formcontrolname^=group]').type(testRoleGroup)
                     cy.contains('button', 'Save').should('be.visible').click()
-                    //let the Role get processed
-                    cy.wait(5000)
                 })
             })
         })

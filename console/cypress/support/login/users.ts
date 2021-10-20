@@ -2,10 +2,12 @@ export enum User {
     OrgOwner = 'org_owner',
     OrgOwnerViewer = 'org_owner_viewer',
     OrgProjectCreator = 'org_project_creator',
+    LoginPolicyUser = 'login_policy_user',
+    PasswordComplexityUser = 'password_complexity_user',
 }
 
-export function login(user:User): void {
-    let creds = credentials(user)
+export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?: () => void, onPasswordScreen?: () => void): void {
+    let creds = credentials(user, pw)
 
     cy.session(creds.username, () => {
 
@@ -84,13 +86,15 @@ export function login(user:User): void {
             })
         })
 
-        cy.visit(Cypress.env('consoleUrl'));
+        cy.visit(`${Cypress.env('consoleUrl')}/loginname`);
 
         cy.wait('@login')
+        onUsernameScreen ? onUsernameScreen() : null
         cy.get('#loginName').type(creds.username)
         cy.get('#submit-button').click()
 
         cy.wait('@loginName')
+        onPasswordScreen ? onPasswordScreen() : null
         cy.get('#password').type(creds.password) 
         cy.get('#submit-button').click()
 
@@ -100,15 +104,20 @@ export function login(user:User): void {
 
     }, {
         validate: () => {
+
+            if (force || user === User.LoginPolicyUser || user === User.PasswordComplexityUser) {
+                throw new Error("clear session");
+            }
+
             cy.visit(`${Cypress.env('consoleUrl')}/users/me`)
         }        
     })
 }
 
-function credentials(user: User) {
+function credentials(user: User, pw?: string) {
     return {
         username: `${user}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`,
-        password: Cypress.env(`${user}_password`)
+        password: pw ? pw : Cypress.env(`${user}_password`)
     }
 }
 
