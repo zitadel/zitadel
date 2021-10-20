@@ -76,7 +76,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.EventReader)
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-mP8AR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-mP8AR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KTHmJ", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -105,7 +105,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.EventReade
 	case *iam.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-L4UHn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, iam.PasswordComplexityPolicyChangedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-L4UHn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, iam.PasswordComplexityPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-cf3Xb", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{
@@ -138,7 +138,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.EventReade
 func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordComplexityPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-ibd0c", "seq", event.Sequence(), "expectedType", org.PasswordComplexityPolicyRemovedEventType).Error("was not an  event")
+		logging.LogWithFields("PROJE-ibd0c", "seq", event.Sequence(), "expectedType", org.PasswordComplexityPolicyRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-wttCd", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(

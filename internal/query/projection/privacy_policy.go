@@ -76,7 +76,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.EventReader) (*ha
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-BrdLn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-BrdLn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-kRNh8", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -102,7 +102,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*
 	case *iam.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-1nQWm", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-1nQWm", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-91weZ", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{
@@ -126,7 +126,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*
 func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PrivacyPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-hN5Ip", "seq", event.Sequence(), "expectedType", org.PrivacyPolicyRemovedEventType).Error("was not an  event")
+		logging.LogWithFields("PROJE-hN5Ip", "seq", event.Sequence(), "expectedType", org.PrivacyPolicyRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-FvtGO", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(

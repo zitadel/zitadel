@@ -26,6 +26,39 @@ type LockoutPolicy struct {
 	IsDefault bool
 }
 
+var (
+	lockoutTable = table{
+		name: projection.LockoutPolicyTable,
+	}
+	LockoutColID = Column{
+		name: projection.LockoutPolicyIDCol,
+	}
+	LockoutColSequence = Column{
+		name: projection.LockoutPolicySequenceCol,
+	}
+	LockoutColCreationDate = Column{
+		name: projection.LockoutPolicyCreationDateCol,
+	}
+	LockoutColChangeDate = Column{
+		name: projection.LockoutPolicyChangeDateCol,
+	}
+	LockoutColResourceOwner = Column{
+		name: projection.LockoutPolicyResourceOwnerCol,
+	}
+	LockoutColShowFailures = Column{
+		name: projection.LockoutPolicyShowLockOutFailuresCol,
+	}
+	LockoutColMaxPasswordAttempts = Column{
+		name: projection.LockoutPolicyMaxPasswordAttemptsCol,
+	}
+	LockoutColIsDefault = Column{
+		name: projection.LockoutPolicyIsDefaultCol,
+	}
+	LockoutColState = Column{
+		name: projection.LockoutPolicyStateCol,
+	}
+)
+
 func (q *Queries) MyLockoutPolicy(ctx context.Context, orgID string) (*LockoutPolicy, error) {
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
@@ -61,39 +94,6 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, err
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	lockoutTable = table{
-		name: projection.LockoutPolicyTable,
-	}
-	LockoutColID = Column{
-		name: projection.LockoutPolicyIDCol,
-	}
-	LockoutColSequence = Column{
-		name: projection.LockoutPolicySequenceCol,
-	}
-	LockoutColCreationDate = Column{
-		name: projection.LockoutPolicyCreationDateCol,
-	}
-	LockoutColChangeDate = Column{
-		name: projection.LockoutPolicyChangeDateCol,
-	}
-	LockoutColResourceOwner = Column{
-		name: projection.LockoutPolicyResourceOwnerCol,
-	}
-	LockoutColShowFailures = Column{
-		name: projection.LockoutPolicyShowLockOutFailuresCol,
-	}
-	LockoutColMaxPasswordAttempts = Column{
-		name: projection.LockoutPolicyMaxPasswordAttemptsCol,
-	}
-	LockoutColIsDefault = Column{
-		name: projection.LockoutPolicyIsDefaultCol,
-	}
-	LockoutColState = Column{
-		name: projection.LockoutPolicyStateCol,
-	}
-)
 
 func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
 	return sq.Select(
