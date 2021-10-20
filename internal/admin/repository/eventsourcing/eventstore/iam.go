@@ -167,32 +167,6 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
-	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PasswordAgePolicyView)
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-vMyS3", "Errors.IAM.PasswordAgePolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-3M0xs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PasswordAgeViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PasswordAgeViewToModel(policy), nil
-		}
-	}
-	return iam_es_model.PasswordAgeViewToModel(policy), nil
-}
-
 func (repo *IAMRepository) GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error) {
 	policy, viewErr := repo.View.LockoutPolicyByAggregateID(repo.SystemDefaults.IamID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {

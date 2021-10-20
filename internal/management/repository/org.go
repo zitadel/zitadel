@@ -28,9 +28,6 @@ type OrgRepository interface {
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 
-	GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
-	GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
-
 	GetLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
 	GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)
 
