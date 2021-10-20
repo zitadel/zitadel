@@ -2,8 +2,10 @@ package model
 
 import (
 	"encoding/json"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
+
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/query"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
@@ -33,24 +35,9 @@ type PasswordComplexityPolicyView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func PasswordComplexityViewFromModel(policy *model.PasswordComplexityPolicyView) *PasswordComplexityPolicyView {
-	return &PasswordComplexityPolicyView{
-		AggregateID:  policy.AggregateID,
-		Sequence:     policy.Sequence,
-		CreationDate: policy.CreationDate,
-		ChangeDate:   policy.ChangeDate,
-		MinLength:    policy.MinLength,
-		HasLowercase: policy.HasLowercase,
-		HasUppercase: policy.HasUppercase,
-		HasSymbol:    policy.HasSymbol,
-		HasNumber:    policy.HasNumber,
-		Default:      policy.Default,
-	}
-}
-
-func PasswordComplexityViewToModel(policy *PasswordComplexityPolicyView) *model.PasswordComplexityPolicyView {
+func PasswordComplexityViewToModel(policy *query.PasswordComplexityPolicy) *model.PasswordComplexityPolicyView {
 	return &model.PasswordComplexityPolicyView{
-		AggregateID:  policy.AggregateID,
+		AggregateID:  policy.ID,
 		Sequence:     policy.Sequence,
 		CreationDate: policy.CreationDate,
 		ChangeDate:   policy.ChangeDate,
@@ -59,7 +46,7 @@ func PasswordComplexityViewToModel(policy *PasswordComplexityPolicyView) *model.
 		HasUppercase: policy.HasUppercase,
 		HasSymbol:    policy.HasSymbol,
 		HasNumber:    policy.HasNumber,
-		Default:      policy.Default,
+		Default:      policy.IsDefault,
 	}
 }
 

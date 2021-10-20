@@ -35,8 +35,6 @@ type IAMRepository interface {
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 
-	GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
-
 	GetDefaultPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error)
 
 	GetDefaultLockoutPolicy(ctx context.Context) (*iam_model.LockoutPolicyView, error)

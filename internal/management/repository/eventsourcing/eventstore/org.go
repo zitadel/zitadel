@@ -285,57 +285,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	return result, nil
 }
 
-func (repo *OrgRepository) GetPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
-	policy, viewErr := repo.View.PasswordComplexityPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.PasswordComplexityPolicyView)
-	}
-	events, esErr := repo.getOrgEvents(ctx, repo.SystemDefaults.IamID, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return repo.GetDefaultPasswordComplexityPolicy(ctx)
-	}
-	if esErr != nil {
-		logging.Log("EVENT-1Bx8s").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.PasswordComplexityViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.PasswordComplexityViewToModel(policy), nil
-		}
-	}
-	return iam_view_model.PasswordComplexityViewToModel(policy), nil
-}
-
-func (repo *OrgRepository) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error) {
-	policy, viewErr := repo.View.PasswordComplexityPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.PasswordComplexityPolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.PasswordComplexityPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-pL9sw").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.PasswordComplexityViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.PasswordComplexityViewToModel(policy), nil
-		}
-	}
-	policy.Default = true
-	return iam_view_model.PasswordComplexityViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) GetPasswordAgePolicy(ctx context.Context) (*iam_model.PasswordAgePolicyView, error) {
 	policy, viewErr := repo.View.PasswordAgePolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
